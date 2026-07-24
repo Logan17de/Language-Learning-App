@@ -16,9 +16,9 @@ import {
   Sparkles,
   UserRound,
 } from "lucide-react";
+import { PublicPrimaryAction } from "@/components/auth/public-auth-actions";
 import { PublicHeader } from "@/components/layout/public-header";
 import { Badge } from "@/components/ui/badge";
-import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Brand } from "@/components/ui/brand";
 
@@ -114,6 +114,9 @@ const plans = [
       "Limited speaking practice",
       "Random non-repeating lessons at your level",
     ],
+    price: "¥0",
+    cadence: "",
+    annual: null,
     cta: "Start Free",
     primary: false,
   },
@@ -130,6 +133,9 @@ const plans = [
       "Full progress insights",
       "Future languages and premium tutors when available",
     ],
+    price: "¥2,000",
+    cadence: "/ month",
+    annual: "¥20,000 / year",
     cta: "Explore Pro",
     primary: true,
   },
@@ -168,13 +174,7 @@ export default function LandingPage() {
                 guidance in one learning experience. Japanese is only the beginning.
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                <ButtonLink href="/signup" className="group px-7">
-                  Start learning
-                  <ArrowRight
-                    className="size-4 transition-transform group-hover:translate-x-1"
-                    aria-hidden="true"
-                  />
-                </ButtonLink>
+                <PublicPrimaryAction signedOutLabel="Start learning" className="group px-7" />
                 <a
                   href="#learning-system"
                   className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold text-ink hover:bg-white ${focusRing}`}
@@ -392,6 +392,19 @@ export default function LandingPage() {
                       <h3 className="text-3xl font-semibold">{plan.name}</h3>
                       {plan.primary && <Badge tone="orange">More ways to learn</Badge>}
                     </div>
+                    <div className="mt-6 flex flex-wrap items-end gap-x-2 gap-y-1">
+                      <span className="text-4xl font-semibold tracking-tight">{plan.price}</span>
+                      {plan.cadence && (
+                        <span className={plan.primary ? "pb-1 text-white/60" : "pb-1 text-stone-500"}>
+                          {plan.cadence}
+                        </span>
+                      )}
+                    </div>
+                    {plan.annual && (
+                      <p className={`mt-2 text-sm font-semibold ${plan.primary ? "text-persimmon-400" : "text-moss-700"}`}>
+                        {plan.annual}
+                      </p>
+                    )}
                     <p className={`mt-4 leading-7 ${plan.primary ? "text-white/65" : "text-stone-500"}`}>
                       {plan.copy}
                     </p>
@@ -414,22 +427,22 @@ export default function LandingPage() {
                       </li>
                     ))}
                   </ul>
-                  <ButtonLink
-                    href="/signup"
+                  <PublicPrimaryAction
+                    signedOutLabel={plan.cta}
+                    signedInLabel={plan.primary ? "View subscription" : "Go to dashboard"}
+                    signedInHref={plan.primary ? "/subscription" : "/home"}
                     variant={plan.primary ? "primary" : "secondary"}
                     className={
                       plan.primary
                         ? "mt-9 w-full bg-persimmon-500 hover:bg-persimmon-600"
                         : "mt-9 w-full"
                     }
-                  >
-                    {plan.cta}
-                  </ButtonLink>
+                  />
                 </Card>
               ))}
             </div>
             <p className="mt-5 text-center text-sm text-stone-400">
-              Pro pricing will be shared before paid subscriptions launch.
+              Pro costs ¥2,000 per month or ¥20,000 per year.
             </p>
           </div>
         </section>
@@ -523,16 +536,7 @@ export default function LandingPage() {
               styles, and AI tutors will follow.
             </p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-              <ButtonLink href="/signup" className="group">
-                Create your account
-                <ArrowRight
-                  className="size-4 transition-transform group-hover:translate-x-1"
-                  aria-hidden="true"
-                />
-              </ButtonLink>
-              <ButtonLink href="/login" variant="secondary">
-                Sign in
-              </ButtonLink>
+              <PublicPrimaryAction signedOutLabel="Create your account" className="group" />
             </div>
           </div>
         </section>
@@ -556,7 +560,6 @@ export default function LandingPage() {
             <a className={focusRing} href="/support">Support</a>
             <a className={focusRing} href="/privacy">Privacy</a>
             <a className={focusRing} href="/terms">Terms</a>
-            <a className={focusRing} href="/login">Sign in</a>
           </nav>
         </div>
         <div className="border-t border-black/[.06]">
