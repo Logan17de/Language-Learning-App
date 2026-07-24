@@ -429,7 +429,7 @@ export default function LandingPage() {
                   </ul>
                   <PublicPrimaryAction
                     signedOutLabel={plan.cta}
-                    signedInLabel={plan.primary ? "View subscription" : "Go to dashboard"}
+                    signedInLabel={plan.primary ? "Explore Pro" : "Go to dashboard"}
                     signedInHref={plan.primary ? "/subscription" : "/home"}
                     variant={plan.primary ? "primary" : "secondary"}
                     className={
