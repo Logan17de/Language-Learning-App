@@ -1,20 +1,64 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { useAdminStore } from "@/store/admin-store";
 import { useAppStore } from "@/store/app-store";
 import type { Priority, SupportTicketStatus } from "@/types/admin";
 import { AdminEmptyState, AdminPageHeader, AdminStatus, AdminTable } from "@/components/admin/admin-primitives";
+import { getBackendMode } from "@/lib/supabase/config";
+import { adminOperationsRepository } from "@/lib/repositories/admin-operations-repository";
+import type { Database } from "@/types/database";
+import type { SupportRequest } from "@/types/app-preferences";
 
 export function SupportTicketManagement() {
-  const requests = useAppStore((state) => state.supportRequests);
-  const tickets = useAdminStore((state) => state.supportTickets);
-  const update = useAdminStore((state) => state.updateSupportTicket);
+  const localRequests = useAppStore((state) => state.supportRequests);
+  const localTickets = useAdminStore((state) => state.supportTickets);
+  const updateLocal = useAdminStore((state) => state.updateSupportTicket);
+  const backendMode = getBackendMode() === "supabase";
+  const [backendRows, setBackendRows] = useState<Database["public"]["Tables"]["support_tickets"]["Row"][]>([]);
+  const requests: SupportRequest[] = backendMode ? backendRows.map((row) => ({
+    id: row.id,
+    type: row.category as SupportRequest["type"],
+    email: "Protected learner",
+    subject: row.subject,
+    message: "",
+    createdAt: new Date(row.created_at).toLocaleString(),
+  })) : localRequests;
+  const tickets = backendMode ? Object.fromEntries(backendRows.map((row) => [row.id, {
+    requestId: row.id,
+    status: row.status.replaceAll("_", " ") as SupportTicketStatus,
+    priority: row.priority as Priority,
+    assignedTo: row.assigned_to ?? "Unassigned",
+    internalNotes: [],
+    conversation: [],
+    updatedAt: row.updated_at,
+  }])) : localTickets;
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<SupportTicketStatus | "all">("all");
   const [priority, setPriority] = useState<Priority | "all">("all");
+  useEffect(() => {
+    if (!backendMode) return;
+    void adminOperationsRepository.listSupportTickets().then((result) => {
+      if (result.ok) setBackendRows(result.data);
+    });
+  }, [backendMode]);
+  function update(requestId: string, nextStatus: SupportTicketStatus, nextPriority?: Priority) {
+    if (!backendMode) {
+      updateLocal(requestId, nextStatus, nextPriority);
+      return;
+    }
+    void fetch(`/api/admin/support/${requestId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: nextStatus.replaceAll(" ", "_"), priority: nextPriority }),
+    }).then(async (response) => {
+      if (!response.ok) return;
+      const row = await response.json() as Database["public"]["Tables"]["support_tickets"]["Row"];
+      setBackendRows((items) => items.map((item) => item.id === row.id ? row : item));
+    });
+  }
   const visible = useMemo(() => requests.filter((request) => {
     const ticket = tickets[request.id];
     return (!query || `${request.email} ${request.subject} ${request.message}`.toLowerCase().includes(query.toLowerCase())) && (status === "all" || (ticket?.status ?? "new") === status) && (priority === "all" || (ticket?.priority ?? "medium") === priority);

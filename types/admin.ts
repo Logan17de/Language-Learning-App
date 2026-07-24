@@ -5,7 +5,7 @@ export interface AdminSession {
   authenticated: boolean;
   email: string;
   displayName: string;
-  role: "Content administrator";
+  role: string;
   signedInAt?: string;
 }
 

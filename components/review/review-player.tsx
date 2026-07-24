@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { syncReviewCompletion, syncReviewProgress } from "@/lib/sync/backend-sync";
 
 export function ReviewPlayer() {
   const router = useRouter();
@@ -28,8 +29,15 @@ export function ReviewPlayer() {
   }, [hydrated, session, startOrResume]);
 
   useEffect(() => {
-    if (session?.completed && session.result && !session.rewarded) reward(session.result);
+    if (session?.completed && session.result && !session.rewarded) {
+      reward(session.result);
+      void syncReviewCompletion(session);
+    }
   }, [reward, session]);
+
+  useEffect(() => {
+    if (session && !session.completed) void syncReviewProgress(session);
+  }, [session]);
 
   if (!hydrated || !session) {
     return <main className="grid min-h-screen place-items-center bg-paper"><span className="size-10 animate-spin rounded-full border-4 border-moss-100 border-t-moss-600" /></main>;

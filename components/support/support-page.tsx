@@ -1,11 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BookOpen, CircleDollarSign, LifeBuoy, MessageCircleQuestion, Search, Shield, TriangleAlert, Wrench } from "lucide-react";
 import type { SupportRequest } from "@/types/app-preferences";
 import { FaqList, type FaqItem } from "@/components/support/faq-list";
 import { SupportForm } from "@/components/support/support-form";
 import { Card } from "@/components/ui/card";
+import { getBackendMode } from "@/lib/supabase/config";
+import { supportRepository } from "@/lib/repositories/support-repository";
+import type { Database } from "@/types/database";
 
 const faqs: FaqItem[] = [
   { category: "Getting Started", question: "Where should I begin?", answer: "Complete onboarding, then use the strongest action on Home. AIko will recommend a lesson at your selected level." },
@@ -27,6 +30,14 @@ const actions = [
 export function SupportPage() {
   const [query, setQuery] = useState("");
   const [type, setType] = useState<SupportRequest["type"]>("contact");
+  const [tickets, setTickets] = useState<Database["public"]["Tables"]["support_tickets"]["Row"][]>([]);
+  const backendMode = getBackendMode() === "supabase";
+  useEffect(() => {
+    if (!backendMode) return;
+    void supportRepository.listMine().then((result) => {
+      if (result.ok) setTickets(result.data);
+    });
+  }, [backendMode]);
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     if (!normalized) return faqs;
@@ -35,7 +46,8 @@ export function SupportPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-7 sm:px-8 sm:py-10">
-      <header className="text-center"><span className="mx-auto grid size-16 place-items-center rounded-3xl bg-moss-100 text-moss-700"><MessageCircleQuestion className="size-7" /></span><p className="section-kicker mt-6">Support</p><h1 className="mt-3 text-4xl font-semibold tracking-tight">How can we help?</h1><p className="mx-auto mt-3 max-w-2xl text-stone-500">Search common questions or save a frontend-only request for the future support workflow.</p></header>
+      <header className="text-center"><span className="mx-auto grid size-16 place-items-center rounded-3xl bg-moss-100 text-moss-700"><MessageCircleQuestion className="size-7" /></span><p className="section-kicker mt-6">Support</p><h1 className="mt-3 text-4xl font-semibold tracking-tight">How can we help?</h1><p className="mx-auto mt-3 max-w-2xl text-stone-500">{backendMode ? "Search common questions, create a ticket, and track its status." : "Search common questions or save a local demo request."}</p></header>
+      {backendMode && tickets.length > 0 && <section className="mx-auto mt-8 max-w-2xl rounded-3xl bg-white p-5"><h2 className="font-semibold">Your tickets</h2><div className="mt-3 space-y-2">{tickets.map((ticket) => <div key={ticket.id} className="flex items-center justify-between gap-4 rounded-2xl bg-stone-50 px-4 py-3 text-sm"><div><strong>{ticket.subject}</strong><p className="mt-1 text-xs capitalize text-stone-500">{ticket.category} · {new Date(ticket.last_message_at).toLocaleString()}</p></div><span className="rounded-full bg-moss-100 px-3 py-1 text-xs font-semibold capitalize text-moss-800">{ticket.status.replaceAll("_", " ")}</span></div>)}</div></section>}
       <label className="relative mx-auto mt-8 block max-w-2xl"><Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-stone-400" /><span className="sr-only">Search help articles</span><input value={query} onChange={(event) => setQuery(event.target.value)} className="form-input min-h-14 pl-12" placeholder="Search lessons, reading, billing, privacy…" /></label>
       <div className="mt-10 grid gap-7 lg:grid-cols-[1.15fr_.85fr]">
         <section><div className="mb-5 flex items-center gap-3"><Shield className="size-5 text-moss-600" /><h2 className="text-xl font-semibold">Frequently asked questions</h2></div><FaqList items={filtered} /></section>
@@ -44,7 +56,7 @@ export function SupportPage() {
             <h2 className="text-xl font-semibold">Ask for help</h2>
             <div className="mt-5 grid grid-cols-2 gap-2">{actions.map(({ type: actionType, label, icon: Icon }) => <button key={actionType} type="button" onClick={() => setType(actionType)} className={`min-h-20 rounded-2xl border p-3 text-left text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-moss-100 ${type === actionType ? "border-moss-600 bg-moss-50 text-moss-700" : "border-stone-100"}`}><Icon className="mb-2 size-4" />{label}</button>)}</div>
             <div className="mt-6"><SupportForm type={type} onTypeChange={setType} /></div>
-            <p className="mt-4 flex items-start gap-2 text-[11px] leading-5 text-stone-400"><TriangleAlert className="mt-0.5 size-3 shrink-0" /> No email is sent. Requests are stored only in local prototype state.</p>
+            <p className="mt-4 flex items-start gap-2 text-[11px] leading-5 text-stone-400"><TriangleAlert className="mt-0.5 size-3 shrink-0" /> {backendMode ? "Email delivery is not connected; replies appear in your account." : "No email is sent. Requests stay in local demo state."}</p>
           </Card>
         </aside>
       </div>

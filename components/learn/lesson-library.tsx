@@ -13,6 +13,8 @@ import { LessonCard } from "@/components/learn/lesson-card";
 import { LessonFilters } from "@/components/learn/lesson-filters";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button";
+import { getBackendMode } from "@/lib/supabase/config";
+import { useBackendLessonStore } from "@/store/backend-lesson-store";
 
 const tabs: Array<{ id: LessonLibraryTab; label: string }> = [
   { id: "recommended", label: "Recommended" },
@@ -35,6 +37,9 @@ const defaultFilter: LessonLibraryFilter = {
 export function LessonLibrary() {
   const [filter, setFilter] = useState(defaultFilter);
   const [loading, setLoading] = useState(true);
+  const backendLessons = useBackendLessonStore((state) => state.lessons);
+  const backendLoading = useBackendLessonStore((state) => state.loading);
+  const loadBackendLessons = useBackendLessonStore((state) => state.load);
   const generated = useAppStore((state) => state.generatedLessons);
   const overrides = useAdminStore((state) => state.lessonOverrides);
   const deletedLessonIds = useAdminStore((state) => state.deletedLessonIds);
@@ -44,8 +49,10 @@ export function LessonLibrary() {
   const sessions = useAppStore((state) => state.lessonSessions);
   const toggleSaved = useAppStore((state) => state.toggleSavedLesson);
   const lessons = useMemo(
-    () => learnerVisibleLessons(mergeCanonicalLessons(mockLessons, generated, overrides, deletedLessonIds)),
-    [deletedLessonIds, generated, overrides],
+    () => getBackendMode() === "supabase"
+      ? backendLessons
+      : learnerVisibleLessons(mergeCanonicalLessons(mockLessons, generated, overrides, deletedLessonIds)),
+    [backendLessons, deletedLessonIds, generated, overrides],
   );
   const topics = useMemo(() => Array.from(new Set(lessons.map((lesson) => lesson.topic))).sort(), [lessons]);
   const cards = useMemo(
@@ -54,9 +61,10 @@ export function LessonLibrary() {
   );
 
   useEffect(() => {
+    void loadBackendLessons();
     const timer = window.setTimeout(() => setLoading(false), 420);
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [loadBackendLessons]);
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-7 sm:px-8 sm:py-10">
@@ -74,7 +82,7 @@ export function LessonLibrary() {
       </div>
       <div className="mt-4"><LessonFilters value={filter} topics={topics} onChange={setFilter} /></div>
 
-      {loading ? (
+      {loading || backendLoading ? (
         <div className="mt-7 grid gap-5 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading lessons">
           {[1, 2, 3, 4, 5, 6].map((item) => <div key={item} className="h-[28rem] animate-pulse rounded-3xl bg-moss-50" />)}
         </div>

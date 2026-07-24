@@ -17,6 +17,8 @@ import { ListeningPhase } from "@/components/lesson/listening-phase";
 import { SpeakingPhase } from "@/components/lesson/speaking-phase";
 import { FinalReviewPhase } from "@/components/lesson/final-review-phase";
 import { LessonReportDialog } from "@/components/support/lesson-report-dialog";
+import { restoreLessonProgress, syncLessonProgress } from "@/lib/sync/backend-sync";
+import { getBackendMode } from "@/lib/supabase/config";
 
 export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
   const router = useRouter();
@@ -31,16 +33,18 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
   useEffect(() => {
     if (!hasHydrated) return;
     const next = persistedSession ?? startOrResumeLesson(lesson.id);
-    if (next.completed && next.completionResult) {
-      router.replace(`/lesson/${lesson.id}/complete`);
-      return;
-    }
-    // The session becomes available only after persisted client state hydrates.
-    /* eslint-disable react-hooks/set-state-in-effect */
-    setSession(next);
-    setElapsedSeconds(next.elapsedSeconds);
-    /* eslint-enable react-hooks/set-state-in-effect */
-  }, [hasHydrated, lesson.id, persistedSession, router, startOrResumeLesson]);
+    const apply = (restored: LessonSession) => {
+      if (restored.completed && restored.completionResult) {
+        router.replace(`/lesson/${lesson.id}/complete`);
+        return;
+      }
+      setSession(restored);
+      setElapsedSeconds(restored.elapsedSeconds);
+      if (restored !== next) saveLessonSession(restored);
+    };
+    if (!persistedSession && getBackendMode() === "supabase") void restoreLessonProgress(lesson, next).then(apply);
+    else apply(next);
+  }, [hasHydrated, lesson, persistedSession, router, saveLessonSession, startOrResumeLesson]);
 
   useEffect(() => {
     if (!session) return;
@@ -50,8 +54,10 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
 
   useEffect(() => {
     if (!session || elapsedSeconds === 0 || elapsedSeconds % 10 !== 0) return;
-    saveLessonSession({ ...session, elapsedSeconds });
-  }, [elapsedSeconds, saveLessonSession, session]);
+    const checkpoint = { ...session, elapsedSeconds };
+    saveLessonSession(checkpoint);
+    void syncLessonProgress(lesson, checkpoint);
+  }, [elapsedSeconds, lesson, saveLessonSession, session]);
 
   useEffect(() => {
     if (!session) return;
@@ -59,17 +65,28 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
       saveLessonSession({ ...session, elapsedSeconds });
       event.preventDefault();
     };
+    const handleVisibility = () => {
+      if (document.visibilityState !== "hidden") return;
+      const checkpoint = { ...session, elapsedSeconds };
+      saveLessonSession(checkpoint);
+      void syncLessonProgress(lesson, checkpoint);
+    };
     window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [elapsedSeconds, saveLessonSession, session]);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [elapsedSeconds, lesson, saveLessonSession, session]);
 
   const updateSession = useCallback(
     (next: LessonSession) => {
       const withTime = { ...next, elapsedSeconds };
       setSession(withTime);
       saveLessonSession(withTime);
+      void syncLessonProgress(lesson, withTime);
     },
-    [elapsedSeconds, saveLessonSession],
+    [elapsedSeconds, lesson, saveLessonSession],
   );
 
   const phase = lesson.phases[session?.currentPhaseIndex ?? 0];
@@ -142,6 +159,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
   function exit() {
     if (!session) return;
     saveLessonSession({ ...session, elapsedSeconds });
+    void syncLessonProgress(lesson, { ...session, elapsedSeconds });
     router.push(`/lesson/${lesson.id}/preview`);
   }
 

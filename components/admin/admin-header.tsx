@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Bell, ChevronDown, LogOut, Menu, Search } from "lucide-react";
 import { AdminBreadcrumbs } from "@/components/admin/admin-breadcrumbs";
 import { useAdminStore } from "@/store/admin-store";
+import { authService } from "@/lib/auth/auth-service";
 
 export function AdminHeader({ onMenu }: { onMenu: () => void }) {
   const router = useRouter();
@@ -28,7 +29,7 @@ export function AdminHeader({ onMenu }: { onMenu: () => void }) {
         <button type="button" className="relative grid size-10 place-items-center rounded-xl text-slate-600 hover:bg-slate-100" aria-label="3 admin notifications"><Bell className="size-5" /><span className="absolute right-2 top-2 size-2 rounded-full bg-orange-500" /></button>
         <div className="relative">
           <button type="button" onClick={() => setProfileOpen((value) => !value)} className="flex min-h-10 items-center gap-2 rounded-xl px-2 text-left hover:bg-slate-100" aria-expanded={profileOpen}><span className="grid size-8 place-items-center rounded-lg bg-slate-900 text-xs font-bold text-white">AA</span><span className="hidden text-xs sm:block"><strong className="block text-slate-800">{session.displayName}</strong><span className="text-slate-500">{session.role}</span></span><ChevronDown className="size-3 text-slate-400" /></button>
-          {profileOpen && <div className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-xl"><p className="px-3 py-2 text-xs text-slate-500">{session.email}</p><button type="button" onClick={() => { logout(); router.replace("/admin/login"); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"><LogOut className="size-4" /> Log out</button></div>}
+          {profileOpen && <div className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-xl"><p className="px-3 py-2 text-xs text-slate-500">{session.email}</p><button type="button" onClick={async () => { await authService.signOut(); logout(); router.replace("/admin/login"); router.refresh(); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"><LogOut className="size-4" /> Log out</button></div>}
         </div>
       </div>
     </header>

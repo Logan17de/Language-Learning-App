@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { LessonPackage } from "@/types/lesson";
 import { isPlayableLesson } from "@/lib/lesson-search-utils";
 import { useAppStore } from "@/store/app-store";
@@ -7,6 +8,8 @@ import { useAdminStore } from "@/store/admin-store";
 import { LessonPreview } from "@/components/lesson/lesson-preview";
 import { LessonPlayer } from "@/components/lesson/lesson-player";
 import { ButtonLink } from "@/components/ui/button";
+import { getBackendMode } from "@/lib/supabase/config";
+import { useBackendLessonStore } from "@/store/backend-lesson-store";
 
 export function LessonRouteResolver({
   lessonId,
@@ -21,9 +24,23 @@ export function LessonRouteResolver({
   const override = useAdminStore((state) => state.lessonOverrides[lessonId]);
   const deleted = useAdminStore((state) => state.deletedLessonIds.includes(lessonId));
   const generatedLesson = useAppStore((state) => state.generatedLessons.find((lesson) => lesson.id === lessonId));
-  const lesson = deleted ? undefined : override ?? staticLesson ?? generatedLesson;
+  const loadBackendLesson = useBackendLessonStore((state) => state.loadOne);
+  const cachedBackendLesson = useBackendLessonStore((state) => state.lessons.find((lesson) => lesson.id === lessonId));
+  const [requestedBackendLesson, setRequestedBackendLesson] = useState<LessonPackage | undefined>();
+  const [backendResolved, setBackendResolved] = useState(getBackendMode() !== "supabase");
+  const lesson = getBackendMode() === "supabase"
+    ? cachedBackendLesson ?? requestedBackendLesson
+    : deleted ? undefined : override ?? staticLesson ?? generatedLesson;
 
-  if (!hydrated && !staticLesson && !override) {
+  useEffect(() => {
+    if (getBackendMode() !== "supabase" || cachedBackendLesson) return;
+    void loadBackendLesson(lessonId).then((value) => {
+      setRequestedBackendLesson(value);
+      setBackendResolved(true);
+    });
+  }, [cachedBackendLesson, lessonId, loadBackendLesson]);
+
+  if ((!hydrated && getBackendMode() !== "supabase" && !staticLesson && !override) || !backendResolved) {
     return <main className="grid min-h-screen place-items-center bg-paper"><span className="size-10 animate-spin rounded-full border-4 border-moss-100 border-t-moss-600" /></main>;
   }
   if (!lesson || !isPlayableLesson(lesson)) {

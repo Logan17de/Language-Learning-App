@@ -5,6 +5,8 @@ import { Check, Pencil, Plus, X } from "lucide-react";
 import type { DailyMinutes, LearnerLevel, LearningGoal } from "@/types/learner";
 import { useAppStore } from "@/store/app-store";
 import { Button } from "@/components/ui/button";
+import { profileRepository } from "@/lib/repositories/profile-repository";
+import { getBackendMode } from "@/lib/supabase/config";
 
 const goals: LearningGoal[] = ["JLPT preparation", "Conversation", "Workplace Japanese", "Daily life in Japan", "Travel"];
 const levels: LearnerLevel[] = ["Beginner", "N5", "N4", "N3", "N2", "Not sure"];
@@ -21,9 +23,25 @@ export function ProfileForm() {
   const [minutes, setMinutes] = useState<DailyMinutes>(onboarding.dailyMinutes ?? 30);
   const [interests, setInterests] = useState(onboarding.interests.length ? onboarding.interests : ["Daily life", "Technology"]);
   const [newInterest, setNewInterest] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setError("");
+    if (getBackendMode() === "supabase") {
+      setLoading(true);
+      const result = await profileRepository.updateCurrent({
+        display_name: name,
+        current_jlpt_level: level === "Beginner" || level === "Not sure" ? "N5" : level,
+        learning_goal: goal,
+        daily_study_minutes: minutes,
+        interests,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      });
+      setLoading(false);
+      if (!result.ok) return setError(result.error.message);
+    }
     updateProfile({ name, level, goal, dailyMinutes: minutes, interests });
     setEditing(false);
     setSaved(true);
@@ -47,7 +65,7 @@ export function ProfileForm() {
           <Detail label="Interests" value={(onboarding.interests.length ? onboarding.interests : interests).join(", ")} />
         </dl>
         <Button type="button" variant="secondary" className="mt-7" onClick={() => setEditing(true)}><Pencil className="size-4" /> Edit learning profile</Button>
-        {saved && <p className="mt-4 flex items-center gap-2 text-sm font-semibold text-moss-700" role="status"><Check className="size-4" /> Profile changes saved locally.</p>}
+        {saved && <p className="mt-4 flex items-center gap-2 text-sm font-semibold text-moss-700" role="status"><Check className="size-4" /> {getBackendMode() === "supabase" ? "Profile changes synced." : "Profile changes saved locally."}</p>}
       </div>
     );
   }
@@ -65,7 +83,8 @@ export function ProfileForm() {
         <div className="flex flex-wrap gap-2">{interests.map((interest) => <button key={interest} type="button" onClick={() => setInterests(interests.filter((item) => item !== interest))} className="inline-flex min-h-10 items-center gap-2 rounded-full bg-moss-50 px-4 text-xs font-semibold text-moss-700">{interest}<X className="size-3" /></button>)}</div>
         <div className="mt-3 flex gap-2"><input value={newInterest} onChange={(event) => setNewInterest(event.target.value)} className="form-input" placeholder="Add an interest" /><Button type="button" variant="secondary" onClick={addInterest} className="shrink-0 px-4"><Plus className="size-4" /> Add</Button></div>
       </div>
-      <div className="flex gap-3"><Button type="button" variant="secondary" onClick={() => setEditing(false)}>Cancel</Button><Button type="submit">Save changes</Button></div>
+      {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
+      <div className="flex gap-3"><Button type="button" variant="secondary" onClick={() => setEditing(false)}>Cancel</Button><Button type="submit" disabled={loading}>{loading ? "Saving…" : "Save changes"}</Button></div>
     </form>
   );
 }

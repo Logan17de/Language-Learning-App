@@ -1,23 +1,80 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Download, RotateCcw, Search, ShieldOff, Trash2 } from "lucide-react";
 import { useAdminStore } from "@/store/admin-store";
 import type { AdminUserRecord, AdminUserStatus } from "@/types/admin";
 import type { SubscriptionPlan } from "@/types/app-preferences";
 import { AdminConfirmDialog, AdminEmptyState, AdminPageHeader, AdminStatus, AdminTable } from "@/components/admin/admin-primitives";
+import { getBackendMode } from "@/lib/supabase/config";
+import { adminUserRepository } from "@/lib/repositories/admin-user-repository";
+import type { ProfileRow } from "@/types/database";
 
 export function UserManagement() {
-  const users = useAdminStore((state) => state.users);
-  const updateUser = useAdminStore((state) => state.updateUser);
-  const changePlan = useAdminStore((state) => state.changeUserPlan);
-  const resetProgress = useAdminStore((state) => state.resetUserProgress);
-  const deleteUser = useAdminStore((state) => state.deleteUser);
+  const localUsers = useAdminStore((state) => state.users);
+  const updateUserLocal = useAdminStore((state) => state.updateUser);
+  const changePlanLocal = useAdminStore((state) => state.changeUserPlan);
+  const resetProgressLocal = useAdminStore((state) => state.resetUserProgress);
+  const deleteUserLocal = useAdminStore((state) => state.deleteUser);
+  const backendMode = getBackendMode() === "supabase";
+  const [backendProfiles, setBackendProfiles] = useState<ProfileRow[]>([]);
+  const users: AdminUserRecord[] = backendMode ? backendProfiles.map((profile) => ({
+    id: profile.id,
+    displayName: profile.display_name,
+    email: profile.email,
+    level: profile.current_jlpt_level,
+    subscription: profile.subscription_plan === "free" ? "free" : "premium",
+    joinDate: profile.created_at.slice(0, 10),
+    lastActive: "Server account",
+    streak: profile.streak_days,
+    lessonsCompleted: 0,
+    xp: profile.xp,
+    supportRequestCount: 0,
+    reportCount: 0,
+    status: profile.status,
+  })) : localUsers;
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<AdminUserStatus | "all">("all");
   const [plan, setPlan] = useState<SubscriptionPlan | "all">("all");
   const [confirm, setConfirm] = useState<{ action: "reset" | "delete"; user: AdminUserRecord } | null>(null);
+  useEffect(() => {
+    if (!backendMode) return;
+    void adminUserRepository.list().then((result) => {
+      if (result.ok) setBackendProfiles(result.data);
+    });
+  }, [backendMode]);
+  function updateUser(user: AdminUserRecord, action: string) {
+    if (!backendMode) return updateUserLocal(user, action);
+    void fetch(`/api/admin/users/${user.id}/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: user.status }),
+    }).then((response) => {
+      if (response.ok) setBackendProfiles((items) => items.map((item) => item.id === user.id ? { ...item, status: user.status } : item));
+    });
+  }
+  function changePlan(userId: string, nextPlan: SubscriptionPlan) {
+    if (!backendMode) return changePlanLocal(userId, nextPlan);
+    void fetch(`/api/admin/subscriptions/${userId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ plan: nextPlan === "premium" ? "premium_monthly" : "free", status: "active" }),
+    }).then((response) => {
+      if (response.ok) setBackendProfiles((items) => items.map((item) => item.id === userId ? { ...item, subscription_plan: nextPlan === "premium" ? "premium_monthly" : "free" } : item));
+    });
+  }
+  function resetProgress(userId: string) {
+    if (!backendMode) return resetProgressLocal(userId);
+    void fetch(`/api/admin/users/${userId}/reset-progress`, { method: "POST" }).then((response) => {
+      if (response.ok) setBackendProfiles((items) => items.map((item) => item.id === userId ? { ...item, xp: 0, streak_days: 0, longest_streak: 0, total_study_minutes: 0 } : item));
+    });
+  }
+  function deleteUser(userId: string) {
+    if (!backendMode) return deleteUserLocal(userId);
+    const user = users.find((item) => item.id === userId);
+    if (user) updateUser({ ...user, status: "deleted" }, "user deleted");
+  }
   const visible = useMemo(() => users.filter((user) => (!query || `${user.displayName} ${user.email}`.toLowerCase().includes(query.toLowerCase())) && (status === "all" || user.status === status) && (plan === "all" || user.subscription === plan)), [plan, query, status, users]);
 
   function exportUser(user: AdminUserRecord) {

@@ -1,139 +1,124 @@
-# AIko Japanese — Phases 1–4
+# AIko — adaptive Japanese learning
 
-AIko is a frontend-first prototype for structured, adaptive Japanese learning. “AIko” combines AI with `ko` (子, child).
+AIko combines “AI” with `ko` (子, child). The application includes the learner experience, seven-phase lesson player, deterministic review engine, custom-topic simulation, progress analytics, and an operations workspace. Phase 5 adds a Supabase backend foundation while retaining the complete local demo.
 
-The project contains the complete learner experience from Phases 1–3 and the frontend-only Admin and Content Management workspace from Phase 4.
+## Architecture
 
-## Run locally
+- Next.js 16 App Router and React 19
+- Zustand for transient, optimistic, and legacy local state
+- Supabase Auth, PostgreSQL, Row Level Security, and Storage in backend mode
+- Typed repositories under `lib/repositories`; UI components never instantiate Supabase clients
+- Transactional PostgreSQL functions for lesson/review completion, rewards, publishing, reset, and legacy import
+- Canonical published lessons loaded from Supabase in backend mode; bundled lessons remain the demo fallback
+
+More detail is in [backend architecture](docs/backend-architecture.md), [database schema](docs/database-schema.md), [RLS policies](docs/rls-policies.md), and [local data migration](docs/local-data-migration.md).
+
+## Development modes
+
+### Demo mode
+
+Leave the Supabase variables unset:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open `http://localhost:3000`. In development, a banner states that AIko is running in local demo mode. Existing deterministic learner/admin flows and localStorage persistence remain available.
 
-## Mock admin access
-
-The admin login is available only at `/admin/login`.
+Demo admin credentials:
 
 - Email: `admin@aiko.local`
 - Password: `admin123`
 
-The session is a local prototype session. It is not real authentication and must be replaced before production use.
+### Backend mode
 
-## Learner flows
+Copy `.env.example` to `.env.local` and set:
 
-### Core journey
+```text
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
-1. Open `/` and create a demo account.
-2. Complete onboarding and open `/home`.
-3. Browse `/learn`, preview a lesson, and complete all seven phases.
-4. Complete a quick review at `/review`.
-5. Inspect persisted learning analytics at `/progress`.
+`SUPABASE_SERVICE_ROLE_KEY` is imported only by server-only modules and trusted route handlers. Never expose it through a `NEXT_PUBLIC_` variable.
 
-### Custom topics and subscription
-
-1. Open `/subscription` and enable the Premium demo plan.
-2. Open `/custom-topic`.
-3. Try `IT support` for an existing lesson.
-4. Try `café` for a variation.
-5. Try `agriculture technology` for a generated lesson.
-6. Generated lessons appear in `/learn` and in the admin validation queue.
-
-### Reports and support
-
-- Submit a lesson report from a preview, lesson phase, or result.
-- Submit a support request at `/support`.
-- Both records synchronize into their corresponding admin screens.
-
-Active lessons and reviews survive refresh. Persisted `rewarded` flags keep lesson and review XP rewards idempotent.
-
-## Phase 4 admin routes
-
-- `/admin` — operational dashboard
-- `/admin/lessons` — canonical lesson management
-- `/admin/lessons/[lessonId]` — lesson detail and preview data
-- `/admin/lessons/[lessonId]/edit` — structured lesson editor
-- `/admin/generated` and `/admin/generated/[lessonId]` — generated-content validation
-- `/admin/curriculum` — JLPT sequences, prerequisites, and lesson coverage
-- `/admin/grammar`
-- `/admin/vocabulary`
-- `/admin/images`
-- `/admin/audio`
-- `/admin/users` and `/admin/users/[userId]`
-- `/admin/subscriptions`
-- `/admin/reports` and `/admin/reports/[reportId]`
-- `/admin/support` and `/admin/support/[requestId]`
-- `/admin/analytics`
-- `/admin/costs`
-- `/admin/audit-log`
-- `/admin/settings`
-
-### Admin test flows
-
-#### Lesson management
-
-1. Sign in at `/admin/login`.
-2. Open `/admin/lessons`.
-3. Edit a published lesson and save it.
-4. Preview it through the existing learner preview.
-5. Publish the lesson.
-6. Open `/learn` and confirm the title/content reflects the canonical admin override.
-
-#### Generated validation
-
-1. Create a custom lesson from `/custom-topic`.
-2. Open `/admin/generated`.
-3. Open the generated lesson and inspect all validation categories.
-4. Approve, then publish it.
-5. Confirm it remains playable and visible in `/learn`.
-
-#### Report and support operations
-
-1. Submit a learner lesson report and support request.
-2. Open `/admin/reports` and change the report from New to Investigating, then Fixed.
-3. Add an internal note and record a mock user notification.
-4. Open `/admin/support`, add a mock reply, and resolve the ticket.
-5. Refresh to confirm persistence.
-
-#### User and audit integration
-
-1. Open Hana at `/admin/users/user_hana_001`.
-2. Change the mock plan.
-3. Confirm `/custom-topic` gating reflects the new plan.
-4. Suspend and restore the account or reset mock progress.
-5. Open `/admin/audit-log` and confirm each mutation was recorded.
-
-## Data and persistence
-
-Learner state is stored under `aiko-app-state`, currently at version 3. It retains backward compatibility with older AIko state and the legacy `kizuna-app-state` key.
-
-Admin state is stored separately under `aiko-admin-state`, currently at version 2. The store is split across:
-
-- `store/admin-store.ts`
-- `store/admin-store-types.ts`
-- `store/admin-store-migrations.ts`
-
-Canonical lesson content is assembled from:
-
-1. Curated seed lessons.
-2. Phase 3 generated lessons in the learner store.
-3. Persisted admin lesson overrides.
-4. Persisted admin deletions.
-
-The learner library displays only canonical lessons with `published` status. Admin edits do not create a disconnected learner copy. Publishing an override immediately changes learner discovery and lesson resolution.
-
-Generated lessons, learner reports, support requests, and the primary learner’s subscription remain in the learner store. Admin workflow metadata—validation, report status, ticket conversations, audit history, and settings—stays in the admin store and references learner entity IDs.
-
-Both stores use localStorage-safe fallbacks and versioned migration functions.
-
-## Quality checks
+Start a local Supabase stack (Docker Desktop must be running):
 
 ```bash
+npm run db:start
+npm run db:reset
+npm run db:types
+npm run dev
+```
+
+Supabase Studio is available at `http://127.0.0.1:54323` with the local configuration in `supabase/config.toml`.
+
+## Database commands
+
+```bash
+npm run db:start       # start local Supabase containers
+npm run db:stop        # stop them
+npm run db:reset       # rebuild schema and run supabase/seed.sql
+npm run db:seed        # deterministic reset + seed
+npm run db:types       # regenerate types/database.ts
+npm run db:validate    # static schema/RLS/function contract validation
+npm run seed:validate  # deterministic seed validation
+```
+
+The seed includes JLPT levels, vocabulary, kanji, grammar, assets, operational records, achievements, and the playable “Going to Work” lesson with deterministic IDs.
+
+## Authentication and admin setup
+
+Sign-up creates the Auth user and the `profiles`, `user_preferences`, `user_settings`, and `user_subscriptions` records through a database trigger. Email/password login, logout, password recovery, PKCE callback exchange, session refresh, and protected routes use the Supabase SSR pattern.
+
+Create an account through `/signup`, then promote it locally in SQL:
+
+```sql
+update public.profiles
+set role = 'admin'
+where email = 'admin@example.com';
+```
+
+Supported roles are `learner`, `admin`, `content_editor`, and `support`. The proxy and RLS both enforce permissions. Content editors cannot manage subscriptions or suspensions; support staff cannot publish content.
+
+## Storage
+
+- `lesson-images`: public read; admin/content-editor write
+- `lesson-audio`: authenticated read; admin/content-editor write
+- `user-exports`: private per-user paths
+
+The seed inserts metadata and placeholder paths only. No production media is uploaded.
+
+## Legacy import
+
+After backend login, AIko checks `aiko-app-state` (and the legacy `kizuna-app-state` fallback). If the server profile has not been imported, the user receives a preview and explicit opt-in prompt. Valid preferences, history, mastery, review items, and achievements merge without overwriting existing server records. Malformed/unsupported records are reported and skipped. See [local data migration](docs/local-data-migration.md).
+
+## Testing and verification
+
+```bash
+npm run db:validate
+npm run seed:validate
 npm run lint
 npm run typecheck
+npm test
 npm run build
 ```
 
-No backend, database, authentication provider, AI API, payment API, cloud storage, analytics provider, or external operational service is connected.
+Tests cover scoring validation, migration parsing, canonical lesson merge rules, deterministic review scheduling, idempotency helpers, role permissions, and database security contracts. Production builds do not require a live Supabase project.
+
+## Important routes
+
+- Public: `/`, `/login`, `/signup`, `/forgot-password`, `/auth/callback`, `/reset-password`
+- Learner: `/home`, `/learn`, `/review`, `/progress`, `/custom-topic`, `/profile`, `/settings`, `/support`, `/lesson/*`
+- Admin: `/admin/*` with a server-verified role gate
+- Trusted APIs: `/api/lesson/complete`, `/api/review/complete`, `/api/account/export`, `/api/account/reset-progress`, and role-restricted admin mutation endpoints
+
+## Known Phase 5 limitations
+
+- AI generation, speech recognition, TTS, image generation, email delivery, Stripe, and external AI APIs are intentionally not implemented.
+- Billing state is persisted but remains mocked.
+- Account deletion remains a documented future privileged workflow; progress reset is transactional now.
+- Local Supabase execution requires Docker. Static migration/seed validation and mocked tests remain available without it.
+- Phase 4 local admin fixtures remain as a demo fallback; backend repositories and trusted mutations are the production boundary.

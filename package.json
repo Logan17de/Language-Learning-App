@@ -7,9 +7,20 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset --local",
+    "db:seed": "supabase db reset --local",
+    "db:types": "supabase gen types --lang typescript --local > types/database.ts",
+    "db:validate": "node scripts/validate-supabase.mjs",
+    "seed:validate": "node scripts/validate-seed.mjs"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.3",
+    "@supabase/supabase-js": "^2.110.8",
     "lucide-react": "^0.468.0",
     "next": "16.2.11",
     "react": "19.2.8",
@@ -25,7 +36,9 @@
     "eslint": "^9.17.0",
     "eslint-config-next": "16.2.11",
     "postcss": "^8.4.49",
+    "supabase": "^2.109.1",
     "tailwindcss": "3.4.19",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
   }
 }

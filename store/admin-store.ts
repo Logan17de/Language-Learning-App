@@ -133,6 +133,15 @@ export const useAdminStore = create<AdminStoreState>()(
         });
         return true;
       },
+      establishBackendSession: (email, displayName, role) => set({
+        session: {
+          authenticated: true,
+          email,
+          displayName,
+          role,
+          signedInAt: timestamp(),
+        },
+      }),
       logout: () => set({ session: signedOutSession }),
       saveLesson: (lesson, action = "lesson edited") => {
         if (lesson.source === "user_generated") useAppStore.getState().addGeneratedLesson(lesson);

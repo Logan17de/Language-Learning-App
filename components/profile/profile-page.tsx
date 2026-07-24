@@ -1,16 +1,21 @@
 "use client";
 
-import { BookCheck, CalendarDays, Crown, Flame, Gem, Mail } from "lucide-react";
+import { BookCheck, CalendarDays, Crown, Flame, Gem, LogOut, Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/app-store";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { authService } from "@/lib/auth/auth-service";
 
 export function ProfilePage() {
+  const router = useRouter();
   const user = useAppStore((state) => state.user);
   const progress = useAppStore((state) => state.progress);
   const subscription = useAppStore((state) => state.subscription);
+  const signOut = useAppStore((state) => state.signOut);
   return (
     <div className="mx-auto max-w-6xl px-5 py-7 sm:px-8 sm:py-10">
       <header><p className="section-kicker">Your profile</p><h1 className="mt-3 text-4xl font-semibold tracking-tight">The learner behind the progress.</h1></header>
@@ -34,6 +39,7 @@ export function ProfilePage() {
             <ButtonLink href="/settings" variant="secondary">Settings</ButtonLink>
             <ButtonLink href="/subscription" variant="secondary">Manage subscription</ButtonLink>
             <ButtonLink href="/support" variant="ghost">Help & support</ButtonLink>
+            <Button type="button" variant="ghost" onClick={async () => { await authService.signOut(); signOut(); router.replace("/login"); router.refresh(); }}><LogOut className="size-4" /> Log out</Button>
           </div>
         </aside>
         <Card className="p-7">

@@ -8,6 +8,7 @@ import { useAppStore } from "@/store/app-store";
 import { SettingsSection } from "@/components/settings/settings-section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getBackendMode } from "@/lib/supabase/config";
 
 export function SettingsPage() {
   const settings = useAppStore((state) => state.settings);
@@ -22,6 +23,12 @@ export function SettingsPage() {
   const [exported, setExported] = useState(false);
 
   function exportData() {
+    if (getBackendMode() === "supabase") {
+      window.location.assign("/api/account/export");
+      setExported(true);
+      window.setTimeout(() => setExported(false), 2200);
+      return;
+    }
     const payload = JSON.stringify({ profile: user, progress, settings }, null, 2);
     const blob = new Blob([payload], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -36,7 +43,7 @@ export function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
-      <header><p className="section-kicker">Settings</p><h1 className="mt-3 text-4xl font-semibold tracking-tight">Make AIko fit your routine.</h1><p className="mt-3 max-w-2xl text-stone-500">All preferences remain on this device and can be changed at any time.</p></header>
+      <header><p className="section-kicker">Settings</p><h1 className="mt-3 text-4xl font-semibold tracking-tight">Make AIko fit your routine.</h1><p className="mt-3 max-w-2xl text-stone-500">{getBackendMode() === "supabase" ? "Preferences sync to your account and remain cached on this device." : "All preferences remain on this device and can be changed at any time."}</p></header>
       <div className="mt-8 space-y-6">
         <SettingsSection icon={BookOpen} title="Learning" description="Set the pace and kind of support you prefer.">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -84,7 +91,7 @@ export function SettingsPage() {
         </SettingsSection>
 
         <SettingsSection icon={Shield} title="Privacy" description="Review, export, or reset the local prototype data.">
-          <div className="rounded-2xl bg-stone-50 p-4 text-sm leading-6 text-stone-600">AIko currently stores one learner profile, {progress.completedLessonIds.length} completed lesson IDs, {progress.reviewQueue.length} review queue items, and settings locally. A memory fallback is used if localStorage is unavailable.</div>
+          <div className="rounded-2xl bg-stone-50 p-4 text-sm leading-6 text-stone-600">{getBackendMode() === "supabase" ? "Your export includes the server profile, settings, lesson sessions, completions, mastery, review data, reports, and support tickets." : `AIko currently stores one learner profile, ${progress.completedLessonIds.length} completed lesson IDs, ${progress.reviewQueue.length} review queue items, and settings locally.`}</div>
           <div className="flex flex-wrap gap-3"><Button type="button" variant="secondary" onClick={exportData}><Download className="size-4" /> Export learning data</Button><Button type="button" variant="secondary" onClick={() => setConfirm("reset")}><TriangleAlert className="size-4" /> Reset progress</Button><Button type="button" variant="ghost" className="text-persimmon-600" onClick={() => setConfirm("delete")}><Trash2 className="size-4" /> Delete account</Button></div>
           {exported && <p className="flex items-center gap-2 text-sm font-semibold text-moss-700" role="status"><Check className="size-4" /> Local data export prepared.</p>}
         </SettingsSection>
@@ -92,7 +99,7 @@ export function SettingsPage() {
 
       {confirm && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-5" role="dialog" aria-modal="true" aria-labelledby="destructive-title">
-          <div className="w-full max-w-md rounded-4xl bg-white p-7 shadow-float"><Trash2 className="size-8 text-persimmon-500" /><Badge tone="orange" className="mt-5">Confirmation required</Badge><h2 id="destructive-title" className="mt-4 text-2xl font-semibold">{confirm === "reset" ? "Reset learning progress?" : "Delete this mock account?"}</h2><p className="mt-3 text-sm leading-6 text-stone-500">{confirm === "reset" ? "Lessons, reviews, scores, and mastery will return to the demo defaults. Profile preferences remain." : "All locally persisted AIko state will return to demo defaults."}</p><div className="mt-6 flex gap-3"><Button variant="secondary" className="flex-1" onClick={() => setConfirm(null)}>Cancel</Button><Button className="flex-1 bg-persimmon-500 hover:bg-persimmon-600" onClick={() => { if (confirm === "reset") resetProgress(); else resetDemo(); setConfirm(null); }}>{confirm === "reset" ? "Reset progress" : "Delete mock account"}</Button></div></div>
+          <div className="w-full max-w-md rounded-4xl bg-white p-7 shadow-float"><Trash2 className="size-8 text-persimmon-500" /><Badge tone="orange" className="mt-5">Confirmation required</Badge><h2 id="destructive-title" className="mt-4 text-2xl font-semibold">{confirm === "reset" ? "Reset learning progress?" : getBackendMode() === "supabase" ? "Account deletion is not available yet" : "Delete this mock account?"}</h2><p className="mt-3 text-sm leading-6 text-stone-500">{confirm === "reset" ? "Lessons, reviews, scores, mastery, rewards, and review history will be cleared. Your account and profile preferences remain." : getBackendMode() === "supabase" ? "A future privileged deletion workflow will remove the authentication account safely. You can export or reset progress now." : "All locally persisted AIko state will return to demo defaults."}</p><div className="mt-6 flex gap-3"><Button variant="secondary" className="flex-1" onClick={() => setConfirm(null)}>Cancel</Button>{!(confirm === "delete" && getBackendMode() === "supabase") && <Button className="flex-1 bg-persimmon-500 hover:bg-persimmon-600" onClick={async () => { if (confirm === "reset") { if (getBackendMode() === "supabase") { const response = await fetch("/api/account/reset-progress", { method: "POST" }); if (!response.ok) return; } resetProgress(); } else resetDemo(); setConfirm(null); }}>{confirm === "reset" ? "Reset progress" : "Delete mock account"}</Button>}</div></div>
         </div>
       )}
     </div>

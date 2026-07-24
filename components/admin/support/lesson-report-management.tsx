@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { useAdminStore } from "@/store/admin-store";
@@ -8,15 +8,62 @@ import { useAppStore } from "@/store/app-store";
 import type { LessonReport } from "@/types/app-preferences";
 import type { LessonReportStatus, Priority } from "@/types/admin";
 import { AdminEmptyState, AdminPageHeader, AdminTable } from "@/components/admin/admin-primitives";
+import { getBackendMode } from "@/lib/supabase/config";
+import { adminOperationsRepository } from "@/lib/repositories/admin-operations-repository";
+import type { Database } from "@/types/database";
 
 export function LessonReportManagement() {
-  const reports = useAppStore((state) => state.lessonReports);
-  const states = useAdminStore((state) => state.reportStates);
-  const update = useAdminStore((state) => state.updateReport);
+  const localReports = useAppStore((state) => state.lessonReports);
+  const localStates = useAdminStore((state) => state.reportStates);
+  const updateLocal = useAdminStore((state) => state.updateReport);
+  const backendMode = getBackendMode() === "supabase";
+  const [backendRows, setBackendRows] = useState<Database["public"]["Tables"]["lesson_reports"]["Row"][]>([]);
+  const reports: LessonReport[] = backendMode ? backendRows.map((row) => ({
+    id: row.id,
+    category: row.category as LessonReport["category"],
+    details: row.description,
+    lessonId: row.lesson_id,
+    lessonTitle: row.lesson_id,
+    phase: row.phase ?? undefined,
+    activityId: row.activity_id ?? undefined,
+    userAnswer: row.user_answer ?? undefined,
+    route: row.route,
+    createdAt: new Date(row.submitted_at).toLocaleString(),
+  })) : localReports;
+  const states = backendMode ? Object.fromEntries(backendRows.map((row) => [row.id, {
+    reportId: row.id,
+    status: row.status as LessonReportStatus,
+    priority: row.priority as Priority,
+    assignedTo: row.assigned_to ?? "Unassigned",
+    internalNotes: [],
+    userNotified: false,
+    updatedAt: row.updated_at,
+  }])) : localStates;
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<LessonReport["category"] | "all">("all");
   const [status, setStatus] = useState<LessonReportStatus | "all">("all");
   const [priority, setPriority] = useState<Priority | "all">("all");
+  useEffect(() => {
+    if (!backendMode) return;
+    void adminOperationsRepository.listReports().then((result) => {
+      if (result.ok) setBackendRows(result.data);
+    });
+  }, [backendMode]);
+  function update(reportId: string, nextStatus: LessonReportStatus, nextPriority?: Priority) {
+    if (!backendMode) {
+      updateLocal(reportId, nextStatus, nextPriority);
+      return;
+    }
+    void fetch(`/api/admin/reports/${reportId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: nextStatus, priority: nextPriority }),
+    }).then(async (response) => {
+      if (!response.ok) return;
+      const row = await response.json() as Database["public"]["Tables"]["lesson_reports"]["Row"];
+      setBackendRows((items) => items.map((item) => item.id === row.id ? row : item));
+    });
+  }
   const categories = [...new Set(reports.map((report) => report.category))];
   const visible = useMemo(() => reports.filter((report) => {
     const state = states[report.id];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Archive, Copy, Download, Eye, FileCheck2, Pencil, Plus, Search, Trash2 } from "lucide-react";
@@ -11,6 +11,8 @@ import { useAppStore } from "@/store/app-store";
 import type { JLPTLevel, LessonPackage, LessonSource, LessonStatus } from "@/types/lesson";
 import { AdminConfirmDialog, AdminEmptyState, AdminPageHeader, AdminStatus, AdminTable } from "@/components/admin/admin-primitives";
 import { Button, ButtonLink } from "@/components/ui/button";
+import { getBackendMode } from "@/lib/supabase/config";
+import { useBackendAdminLessonStore } from "@/store/backend-admin-lesson-store";
 
 type SortKey = "title" | "level" | "status" | "updated";
 
@@ -35,7 +37,27 @@ export function LessonManagementTable() {
   const [selected, setSelected] = useState<string[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<LessonPackage | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
-  const allLessons = useMemo(() => mergeCanonicalLessons(mockLessons, generated, overrides, deleted), [deleted, generated, overrides]);
+  const backendLessons = useBackendAdminLessonStore((state) => state.lessons);
+  const loadBackendLessons = useBackendAdminLessonStore((state) => state.load);
+  const setBackendStatus = useBackendAdminLessonStore((state) => state.setStatus);
+  const allLessons = useMemo(
+    () => getBackendMode() === "supabase" ? backendLessons : mergeCanonicalLessons(mockLessons, generated, overrides, deleted),
+    [backendLessons, deleted, generated, overrides],
+  );
+
+  useEffect(() => {
+    if (getBackendMode() === "supabase") void loadBackendLessons();
+  }, [loadBackendLessons]);
+
+  function changeStatus(lesson: LessonPackage, nextStatus: LessonStatus) {
+    if (getBackendMode() === "supabase") void setBackendStatus(lesson, nextStatus);
+    else updateStatus(lesson, nextStatus);
+  }
+
+  function changeStatuses(lessons: LessonPackage[], nextStatus: LessonStatus) {
+    if (getBackendMode() === "supabase") void Promise.all(lessons.map((lesson) => setBackendStatus(lesson, nextStatus)));
+    else bulkUpdate(lessons, nextStatus);
+  }
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return allLessons
@@ -84,7 +106,7 @@ export function LessonManagementTable() {
         </div>
         <div className="mt-3 flex flex-wrap gap-4 text-sm"><CheckFilter checked={reportedOnly} onChange={setReportedOnly} label="Reported content" /><CheckFilter checked={missingOnly} onChange={setMissingOnly} label="Missing assets or answers" /></div>
       </div>
-      {selected.length > 0 && <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-teal-200 bg-teal-50 p-3"><span className="mr-2 text-sm font-bold text-teal-900">{selected.length} selected</span><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4" onClick={() => bulkUpdate(selectedLessons, "published")}>Publish</Button><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4" onClick={() => bulkUpdate(selectedLessons, "draft")}>Unpublish</Button><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4" onClick={() => bulkUpdate(selectedLessons, "archived")}>Archive</Button><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4" onClick={() => selectedLessons.forEach(duplicate)}>Duplicate</Button><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4" onClick={() => exportLessons(selectedLessons)}><Download className="size-4" /> Export</Button><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4 text-red-700" onClick={() => setBulkDeleteOpen(true)}><Trash2 className="size-4" /> Delete</Button></div>}
+      {selected.length > 0 && <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-teal-200 bg-teal-50 p-3"><span className="mr-2 text-sm font-bold text-teal-900">{selected.length} selected</span><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4" onClick={() => changeStatuses(selectedLessons, "published")}>Publish</Button><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4" onClick={() => changeStatuses(selectedLessons, "draft")}>Unpublish</Button><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4" onClick={() => changeStatuses(selectedLessons, "archived")}>Archive</Button><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4" onClick={() => selectedLessons.forEach(duplicate)}>Duplicate</Button><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4" onClick={() => exportLessons(selectedLessons)}><Download className="size-4" /> Export</Button><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4 text-red-700" onClick={() => setBulkDeleteOpen(true)}><Trash2 className="size-4" /> Delete</Button></div>}
       <div className="mt-5 hidden lg:block">
         {visible.length ? <AdminTable caption="Admin lesson library" headers={["Select", "Lesson", "Level", "Topic", "Source", "Status", "Duration", "Grammar", "Kanji", "Completions", "Score", "Reports", "Updated", "Actions"]} rows={visible.map((lesson) => {
           const lessonStats = stats.find((item) => item.lessonId === lesson.id);
@@ -93,12 +115,12 @@ export function LessonManagementTable() {
             <div key="lesson" className="min-w-48"><Link href={`/admin/lessons/${lesson.id}`} className="font-bold text-slate-900 hover:text-teal-700">{lesson.title}</Link><p className="mt-1 text-xs text-slate-500">{lesson.japaneseTitle}</p></div>,
             lesson.level, lesson.topic, lesson.source.replaceAll("_", " "), <AdminStatus key="status">{lesson.status}</AdminStatus>, `${lesson.durationMinutes}m`, lesson.grammar.length, lesson.kanji.length,
             lessonStats?.completionCount.toLocaleString() ?? 0, `${lessonStats?.averageScore ?? 0}%`, lessonStats?.reportCount ?? 0, lessonStats?.updatedAt ?? "Today",
-            <LessonActions key="actions" lesson={lesson} onStatus={updateStatus} onDuplicate={duplicate} onDelete={() => setDeleteTarget(lesson)} />,
+            <LessonActions key="actions" lesson={lesson} onStatus={changeStatus} onDuplicate={duplicate} onDelete={() => setDeleteTarget(lesson)} />,
           ] };
         })} /> : <AdminEmptyState title="No lessons found" description="Adjust the search or filters to restore canonical lesson records." />}
       </div>
       <div className="mt-5 grid gap-4 lg:hidden">
-        {visible.map((lesson) => <article key={lesson.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-start justify-between gap-3"><div><Link href={`/admin/lessons/${lesson.id}`} className="font-bold text-slate-900">{lesson.title}</Link><p className="mt-1 text-sm text-slate-500">{lesson.japaneseTitle}</p></div><AdminStatus>{lesson.status}</AdminStatus></div><p className="mt-4 text-sm text-slate-600">{lesson.level} · {lesson.topic} · {lesson.durationMinutes} min</p><div className="mt-4"><LessonActions lesson={lesson} onStatus={updateStatus} onDuplicate={duplicate} onDelete={() => setDeleteTarget(lesson)} /></div></article>)}
+        {visible.map((lesson) => <article key={lesson.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-start justify-between gap-3"><div><Link href={`/admin/lessons/${lesson.id}`} className="font-bold text-slate-900">{lesson.title}</Link><p className="mt-1 text-sm text-slate-500">{lesson.japaneseTitle}</p></div><AdminStatus>{lesson.status}</AdminStatus></div><p className="mt-4 text-sm text-slate-600">{lesson.level} · {lesson.topic} · {lesson.durationMinutes} min</p><div className="mt-4"><LessonActions lesson={lesson} onStatus={changeStatus} onDuplicate={duplicate} onDelete={() => setDeleteTarget(lesson)} /></div></article>)}
       </div>
       <div className="mt-5 flex items-center justify-between text-sm text-slate-500"><span>{filtered.length} records · page {Math.min(page, pages)} of {pages}</span><div className="flex gap-2"><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}>Previous</Button><Button type="button" variant="secondary" className="min-h-10 rounded-lg px-4" disabled={page >= pages} onClick={() => setPage((value) => value + 1)}>Next</Button></div></div>
       <AdminConfirmDialog open={Boolean(deleteTarget)} title="Delete mock lesson?" description={`${deleteTarget?.title ?? "This lesson"} will be removed from canonical local content. This cannot be undone without resetting admin mock data.`} confirmLabel="Delete lesson" onClose={() => setDeleteTarget(null)} onConfirm={() => { if (deleteTarget) deleteLesson(deleteTarget); }} />

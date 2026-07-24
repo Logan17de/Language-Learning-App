@@ -5,6 +5,11 @@ import { createJSONStorage, persist, type StateStorage } from "zustand/middlewar
 import { defaultPreferences, mockUser } from "@/data/mock-user";
 import { mockProgress } from "@/data/mock-progress";
 import { createReviewSession } from "@/lib/review-utils";
+import { rescheduleReviewItem } from "@/lib/review-scheduling";
+import { customLessonRepository } from "@/lib/repositories/custom-lesson-repository";
+import { getBackendMode } from "@/lib/supabase/config";
+import { settingsRepository } from "@/lib/repositories/settings-repository";
+import type { BackendProgressSnapshot } from "@/lib/repositories/progress-repository";
 import type {
   CustomLessonRequest,
   LessonReport,
@@ -38,6 +43,8 @@ interface AppState {
   lessonReports: LessonReport[];
   setHasHydrated: (value: boolean) => void;
   signIn: (name?: string) => void;
+  syncBackendIdentity: (name: string, email: string) => void;
+  hydrateBackendProgress: (snapshot: BackendProgressSnapshot) => void;
   signOut: () => void;
   setGoal: (goal: LearningGoal) => void;
   setLevel: (level: LearnerLevel) => void;
@@ -182,6 +189,32 @@ export const useAppStore = create<AppState>()(
           isAuthenticated: true,
           user: { ...state.user, name: name?.trim() || state.user.name },
         })),
+      syncBackendIdentity: (name, email) =>
+        set((state) => ({
+          isAuthenticated: true,
+          user: { ...state.user, name: name.trim() || state.user.name, email },
+        })),
+      hydrateBackendProgress: (snapshot) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            xp: snapshot.xp,
+            streakDays: snapshot.streakDays,
+          },
+          progress: {
+            ...state.progress,
+            weeklyActivity: snapshot.weeklyActivity,
+            weakKanji: snapshot.weakKanji,
+            weakVocabulary: snapshot.weakVocabulary,
+            grammarToReview: snapshot.grammarToReview,
+            recentLessons: snapshot.recentLessons,
+            completedLessonIds: snapshot.completedLessonIds,
+            reviewQueue: snapshot.reviewQueue,
+            longestStreak: snapshot.longestStreak,
+            totalStudyMinutes: snapshot.totalStudyMinutes,
+            achievements: snapshot.achievements,
+          },
+        })),
       signOut: () => set({ isAuthenticated: false }),
       setGoal: (goal) => set((state) => ({ onboarding: { ...state.onboarding, goal } })),
       setLevel: (level) =>
@@ -215,7 +248,11 @@ export const useAppStore = create<AppState>()(
             interests: edits.interests,
           },
         })),
-      updateSettings: (next) => set((state) => ({ settings: { ...state.settings, ...next } })),
+      updateSettings: (next) => {
+        const settings = { ...get().settings, ...next };
+        set({ settings });
+        if (getBackendMode() === "supabase") void settingsRepository.save(settings);
+      },
       setSubscription: (plan, billingPeriod) =>
         set((state) => ({
           subscription: {
@@ -246,8 +283,10 @@ export const useAppStore = create<AppState>()(
         set((state) => ({
           generatedLessons: state.generatedLessons.filter((lesson) => lesson.id !== lessonId),
         })),
-      addCustomLessonRequest: (request) =>
-        set((state) => ({ customLessonRequests: [request, ...state.customLessonRequests] })),
+      addCustomLessonRequest: (request) => {
+        set((state) => ({ customLessonRequests: [request, ...state.customLessonRequests] }));
+        if (getBackendMode() === "supabase") void customLessonRepository.create(request);
+      },
       addSupportRequest: (request) =>
         set((state) => ({ supportRequests: [request, ...state.supportRequests] })),
       addLessonReport: (report) =>
@@ -379,9 +418,9 @@ export const useAppStore = create<AppState>()(
           const weak = new Set(result.weakItemIds);
           const reviewQueue = state.progress.reviewQueue
             .map((item) => {
-              if (weak.has(item.id)) return { ...item, confidence: Math.max(20, item.confidence - 4), dueLabel: "Today", reason: "Missed in quick review" };
+              if (weak.has(item.id)) return rescheduleReviewItem(item, false);
               if (!improved.has(item.id)) return item;
-              return { ...item, confidence: Math.min(100, item.confidence + 12), dueLabel: "In 3 days", lastReviewed: "Just now", overdue: false };
+              return rescheduleReviewItem(item, true);
             })
             .filter((item) => !(improved.has(item.id) && item.confidence >= 72));
           return {

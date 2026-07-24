@@ -1,17 +1,58 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { useAdminStore } from "@/store/admin-store";
-import type { SubscriptionRecordStatus } from "@/types/admin";
+import type { SubscriptionRecord, SubscriptionRecordStatus } from "@/types/admin";
 import type { SubscriptionPlan } from "@/types/app-preferences";
 import { AdminPageHeader, AdminStatCard, AdminStatus, AdminTable } from "@/components/admin/admin-primitives";
 import { Button } from "@/components/ui/button";
+import { getBackendMode } from "@/lib/supabase/config";
+import { adminOperationsRepository } from "@/lib/repositories/admin-operations-repository";
+import type { Database } from "@/types/database";
 
 export function SubscriptionManagement() {
-  const records = useAdminStore((state) => state.subscriptions);
-  const update = useAdminStore((state) => state.updateSubscription);
+  const localRecords = useAdminStore((state) => state.subscriptions);
+  const updateLocal = useAdminStore((state) => state.updateSubscription);
+  const backendMode = getBackendMode() === "supabase";
+  const [backendRows, setBackendRows] = useState<Database["public"]["Tables"]["user_subscriptions"]["Row"][]>([]);
+  const records: SubscriptionRecord[] = backendMode ? backendRows.map((row) => ({
+    id: row.id,
+    userId: row.user_id,
+    userName: row.user_id,
+    plan: row.plan === "free" ? "free" : "premium",
+    billingInterval: row.billing_interval === "annual" ? "annual" : "monthly",
+    status: row.status === "past_due" ? "failed" : row.status,
+    startDate: row.starts_at.slice(0, 10),
+    renewalDate: row.renews_at?.slice(0, 10),
+    cancellationDate: row.cancelled_at?.slice(0, 10),
+    paymentStatus: (row.mock_payment_status === "not_applicable" ? "not applicable" : row.mock_payment_status) as SubscriptionRecord["paymentStatus"],
+  })) : localRecords;
   const [filter, setFilter] = useState<SubscriptionRecordStatus | "all">("all");
+  useEffect(() => {
+    if (!backendMode) return;
+    void adminOperationsRepository.listSubscriptions().then((result) => {
+      if (result.ok) setBackendRows(result.data);
+    });
+  }, [backendMode]);
+  function update(recordId: string, nextStatus: SubscriptionRecordStatus, nextPlan?: SubscriptionPlan) {
+    if (!backendMode) return updateLocal(recordId, nextStatus, nextPlan);
+    const record = records.find((item) => item.id === recordId);
+    if (!record) return;
+    const plan = nextPlan ?? record.plan;
+    void fetch(`/api/admin/subscriptions/${record.userId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        plan: plan === "premium" ? (record.billingInterval === "annual" ? "premium_annual" : "premium_monthly") : "free",
+        status: nextStatus === "failed" ? "past_due" : nextStatus,
+      }),
+    }).then(async (response) => {
+      if (!response.ok) return;
+      const row = await response.json() as Database["public"]["Tables"]["user_subscriptions"]["Row"];
+      setBackendRows((items) => items.map((item) => item.id === row.id ? row : item));
+    });
+  }
   const visible = useMemo(() => records.filter((record) => filter === "all" || record.status === filter), [filter, records]);
   const premium = records.filter((record) => record.plan === "premium" && record.status === "active").length;
   const free = records.filter((record) => record.plan === "free").length;
