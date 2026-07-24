@@ -1,0 +1,131 @@
+import type { LessonPhase } from "@/types/lesson";
+
+export type LessonPhaseId = LessonPhase["id"];
+export type ConfidenceLevel = "low" | "medium" | "high";
+export type VocabularyMode = "kanji-reading" | "reading-meaning" | "meaning-japanese" | "mixed";
+export type GrammarExerciseType = "multiple-choice" | "fill-blank" | "sentence-order" | "natural-sentence";
+
+export interface LessonActivityProgress {
+  phaseId: LessonPhaseId;
+  activityIndex: number;
+  completed: boolean;
+  attempts: number;
+}
+
+export interface VocabularyAnswer {
+  questionId: string;
+  mode: VocabularyMode;
+  selectedAnswer: string;
+  correct: boolean;
+  attempts: number;
+}
+
+export interface GrammarAnswer {
+  questionId: string;
+  type: GrammarExerciseType;
+  selectedAnswer: string;
+  correct: boolean;
+  skill: "understanding" | "production";
+  attempts: number;
+}
+
+export type ReadingEventType =
+  | "started"
+  | "correct-word"
+  | "paused-before-word"
+  | "skipped-word"
+  | "reading-revealed"
+  | "meaning-revealed"
+  | "pronunciation-issue"
+  | "successful-retry"
+  | "stopped-at-word";
+
+export interface ReadingEvent {
+  id: string;
+  type: ReadingEventType;
+  term: string;
+  confidence: ConfidenceLevel;
+  elapsedSeconds: number;
+}
+
+export type ListeningEventType = "play" | "replay" | "difficulty-signal" | "answer";
+
+export interface ListeningEvent {
+  id: string;
+  type: ListeningEventType;
+  replayCount: number;
+  correct?: boolean;
+  selectedAnswer?: string;
+  elapsedSeconds: number;
+}
+
+export interface SpeakingEvent {
+  id: string;
+  mode: "easy" | "medium" | "hard";
+  attempt: number;
+  pronunciationConfidence: number;
+  grammarAccuracy: number;
+  recognizedWords: string[];
+  missedWords: string[];
+  successfulRetry: boolean;
+}
+
+export interface ReviewAnswer {
+  questionId: string;
+  category: "kanji" | "vocabulary" | "grammar" | "listening" | "speaking";
+  selectedAnswer: string;
+  correct: boolean;
+}
+
+export interface ReviewResult {
+  answers: ReviewAnswer[];
+  correctCount: number;
+  totalCount: number;
+  score: number;
+}
+
+export interface LessonCompletionResult {
+  lessonId: string;
+  score: number;
+  xpGained: number;
+  durationMinutes: number;
+  recognitionChange: number;
+  pronunciationChange: number;
+  grammarUnderstandingChange: number;
+  grammarProductionChange: number;
+  wordsNeedingReview: string[];
+  completedAt: string;
+}
+
+export interface StoryInteraction {
+  id: string;
+  lineId: string;
+  term?: string;
+  type: "audio-played" | "word-opened" | "reading-revealed" | "meaning-revealed";
+}
+
+export interface LessonSession {
+  lessonId: string;
+  currentPhaseIndex: number;
+  activityIndex: number;
+  elapsedSeconds: number;
+  startedAt: string;
+  updatedAt: string;
+  completedPhaseIds: LessonPhaseId[];
+  activities: Record<string, LessonActivityProgress>;
+  storyInteractions: StoryInteraction[];
+  storyComplete: boolean;
+  vocabularyAnswers: VocabularyAnswer[];
+  grammarAnswers: GrammarAnswer[];
+  readingEvents: ReadingEvent[];
+  readingComplete: boolean;
+  listeningEvents: ListeningEvent[];
+  listeningComplete: boolean;
+  speakingEvents: SpeakingEvent[];
+  speakingComplete: boolean;
+  reviewAnswers: ReviewAnswer[];
+  reviewResult: ReviewResult | null;
+  completionResult: LessonCompletionResult | null;
+  completed: boolean;
+  rewarded: boolean;
+}
