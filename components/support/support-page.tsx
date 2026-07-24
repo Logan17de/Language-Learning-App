@@ -1,65 +1,356 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { BookOpen, CircleDollarSign, LifeBuoy, MessageCircleQuestion, Search, Shield, TriangleAlert, Wrench } from "lucide-react";
-import type { SupportRequest } from "@/types/app-preferences";
+import { type FormEvent, useMemo, useState } from "react";
+import {
+  ArrowRight,
+  BookOpen,
+  Bot,
+  CircleDollarSign,
+  LifeBuoy,
+  LockKeyhole,
+  MessageCircleQuestion,
+  Mic,
+  Search,
+  Send,
+  Shield,
+  Sparkles,
+  Wrench,
+} from "lucide-react";
 import { FaqList, type FaqItem } from "@/components/support/faq-list";
-import { SupportForm } from "@/components/support/support-form";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { getBackendMode } from "@/lib/supabase/config";
-import { supportRepository } from "@/lib/repositories/support-repository";
-import type { Database } from "@/types/database";
 
 const faqs: FaqItem[] = [
-  { category: "Getting Started", question: "Where should I begin?", answer: "Complete onboarding, then use the strongest action on Home. AIko will recommend a lesson at your selected level." },
-  { category: "Lessons", question: "Can I leave a lesson and return later?", answer: "Yes. Your phase, answers, reveal events, and elapsed time are saved locally." },
-  { category: "Reading and Speaking", question: "Is my microphone recording real audio?", answer: "No. Reading and speaking feedback is simulated in this frontend prototype." },
-  { category: "Progress", question: "Why is an item marked weak?", answer: "AIko combines repeated signals such as missed retrieval, revealed readings, and uncertain speaking. A single stop remains low confidence." },
-  { category: "Subscription", question: "Will upgrading charge me?", answer: "No. Plan changes are local mock controls and no payment provider is connected." },
-  { category: "Privacy", question: "Where is my learning data stored?", answer: "Prototype state is stored in your browser localStorage, with an in-memory fallback where practical." },
-  { category: "Technical Issues", question: "How do I recover from a stuck lesson?", answer: "Return to the lesson preview and resume. If needed, use Settings to reset local progress after confirmation." },
+  {
+    category: "Getting started",
+    question: "Where should I begin?",
+    answer:
+      "Create an account, choose the language and level available to you, and begin with the recommended structured lesson. Japanese is the first supported language.",
+  },
+  {
+    category: "Account access",
+    question: "What should I do if I cannot sign in?",
+    answer:
+      "Check that you are using the correct email address. If you forgot your password, use the password-reset option on the sign-in page and follow the link sent to your email.",
+  },
+  {
+    category: "Lessons",
+    question: "Can I leave a lesson and return later?",
+    answer:
+      "AIko saves supported lesson activity so you can continue your learning journey. If a lesson does not resume correctly, refresh the page and sign in again before starting over.",
+  },
+  {
+    category: "Progress",
+    question: "Why does AIko ask me to review something again?",
+    answer:
+      "AIko uses learning signals such as incorrect answers, revealed help, repeated listening, speaking attempts, and review performance to decide what may need more practice.",
+  },
+  {
+    category: "Voice and speaking",
+    question: "Which voice features are available?",
+    answer:
+      "Speaking and voice-based AI features are being introduced gradually. The lesson will show which controls are currently available; unavailable voice features should not be treated as active.",
+  },
+  {
+    category: "Free and Pro",
+    question: "What is included in the Free plan?",
+    answer:
+      "Free is designed to include structured lessons, limited learning sessions, basic review, progress tracking, limited speaking practice, and standard lesson topics.",
+  },
+  {
+    category: "Free and Pro",
+    question: "What is planned for Pro?",
+    answer:
+      "Pro is planned to include unlimited sessions, lessons about your own topics, voice-based practice, deeper feedback, adaptive review, fuller progress insights, and future premium language experiences.",
+  },
+  {
+    category: "Billing",
+    question: "Can I be charged right now?",
+    answer:
+      "Paid subscriptions have not launched. Pro pricing and payment terms will be shown clearly before any real payment is accepted.",
+  },
+  {
+    category: "Languages",
+    question: "Is AIko only for Japanese?",
+    answer:
+      "No. AIko is launching with Japanese because it is the first learning experience being built and tested, but the platform is designed to support more languages.",
+  },
+  {
+    category: "Privacy",
+    question: "What information may AIko store?",
+    answer:
+      "When the hosted backend is enabled, AIko may store account details, settings, lesson activity, answers, review history, progress, and support conversations needed to provide the service.",
+  },
+  {
+    category: "Technical issues",
+    question: "What should I try when a page is not working?",
+    answer:
+      "Refresh the page once, check your connection, and sign out and back in if the problem continues. Include the page, action, and error you saw when asking support for help.",
+  },
 ];
 
-const actions = [
-  { type: "contact" as const, label: "Contact Support", icon: LifeBuoy },
-  { type: "technical" as const, label: "Report Technical Issue", icon: Wrench },
-  { type: "lesson" as const, label: "Report Lesson Issue", icon: BookOpen },
-  { type: "billing" as const, label: "Billing Help", icon: CircleDollarSign },
+const topics = [
+  {
+    label: "Account and access",
+    copy: "Sign-in, passwords, privacy, and account questions.",
+    icon: LockKeyhole,
+  },
+  {
+    label: "Lessons and progress",
+    copy: "Lesson flow, reviews, weak areas, and saved progress.",
+    icon: BookOpen,
+  },
+  {
+    label: "Voice and speaking",
+    copy: "Microphone access, speaking practice, and voice features.",
+    icon: Mic,
+  },
+  {
+    label: "Plans and billing",
+    copy: "Free and Pro features, availability, and future payments.",
+    icon: CircleDollarSign,
+  },
 ];
+
+type ChatMessage = {
+  role: "assistant" | "user";
+  content: string;
+};
+
+const initialMessage: ChatMessage = {
+  role: "assistant",
+  content:
+    "Hi, I’m AIko Support. Ask me about accounts, lessons, progress, voice features, plans, billing, languages, or privacy. For now, I answer only from the support information on this page.",
+};
+
+function findSupportAnswer(message: string) {
+  const normalized = message.trim().toLowerCase();
+
+  if (/^(hi|hello|hey|help)$/.test(normalized)) {
+    return "Hello! Tell me what you need help with—your account, a lesson, progress, voice features, plans, billing, languages, privacy, or a technical issue.";
+  }
+
+  const words = normalized
+    .split(/[^a-z0-9]+/)
+    .filter((word) => word.length > 2);
+
+  const ranked = faqs
+    .map((item) => {
+      const searchable = (item.category + " " + item.question + " " + item.answer).toLowerCase();
+      const score = words.reduce(
+        (total, word) => total + (searchable.includes(word) ? 1 : 0),
+        0,
+      );
+      return { item, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  if (!ranked[0] || ranked[0].score === 0) {
+    return "I don’t have a reliable answer for that in the current support material. Try asking in a different way or search the FAQs. A grounded AI support connection will be added later for broader help.";
+  }
+
+  return ranked[0].item.answer;
+}
 
 export function SupportPage() {
   const [query, setQuery] = useState("");
-  const [type, setType] = useState<SupportRequest["type"]>("contact");
-  const [tickets, setTickets] = useState<Database["public"]["Tables"]["support_tickets"]["Row"][]>([]);
-  const backendMode = getBackendMode() === "supabase";
-  useEffect(() => {
-    if (!backendMode) return;
-    void supportRepository.listMine().then((result) => {
-      if (result.ok) setTickets(result.data);
-    });
-  }, [backendMode]);
-  const filtered = useMemo(() => {
+  const [draft, setDraft] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([initialMessage]);
+
+  const filteredFaqs = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     if (!normalized) return faqs;
-    return faqs.filter((item) => `${item.category} ${item.question} ${item.answer}`.toLowerCase().includes(normalized));
+
+    return faqs.filter((item) =>
+      (item.category + " " + item.question + " " + item.answer)
+        .toLowerCase()
+        .includes(normalized),
+    );
   }, [query]);
 
+  function submitMessage(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const message = draft.trim();
+    if (!message) return;
+
+    setMessages((current) => [
+      ...current,
+      { role: "user", content: message },
+      { role: "assistant", content: findSupportAnswer(message) },
+    ]);
+    setDraft("");
+  }
+
+  function chooseTopic(label: string) {
+    setDraft("I need help with " + label.toLowerCase() + ".");
+  }
+
   return (
-    <div className="mx-auto max-w-6xl px-5 py-7 sm:px-8 sm:py-10">
-      <header className="text-center"><span className="mx-auto grid size-16 place-items-center rounded-3xl bg-moss-100 text-moss-700"><MessageCircleQuestion className="size-7" /></span><p className="section-kicker mt-6">Support</p><h1 className="mt-3 text-4xl font-semibold tracking-tight">How can we help?</h1><p className="mx-auto mt-3 max-w-2xl text-stone-500">{backendMode ? "Search common questions, create a ticket, and track its status." : "Search common questions or save a local demo request."}</p></header>
-      {backendMode && tickets.length > 0 && <section className="mx-auto mt-8 max-w-2xl rounded-3xl bg-white p-5"><h2 className="font-semibold">Your tickets</h2><div className="mt-3 space-y-2">{tickets.map((ticket) => <div key={ticket.id} className="flex items-center justify-between gap-4 rounded-2xl bg-stone-50 px-4 py-3 text-sm"><div><strong>{ticket.subject}</strong><p className="mt-1 text-xs capitalize text-stone-500">{ticket.category} · {new Date(ticket.last_message_at).toLocaleString()}</p></div><span className="rounded-full bg-moss-100 px-3 py-1 text-xs font-semibold capitalize text-moss-800">{ticket.status.replaceAll("_", " ")}</span></div>)}</div></section>}
-      <label className="relative mx-auto mt-8 block max-w-2xl"><Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-stone-400" /><span className="sr-only">Search help articles</span><input value={query} onChange={(event) => setQuery(event.target.value)} className="form-input min-h-14 pl-12" placeholder="Search lessons, reading, billing, privacy…" /></label>
-      <div className="mt-10 grid gap-7 lg:grid-cols-[1.15fr_.85fr]">
-        <section><div className="mb-5 flex items-center gap-3"><Shield className="size-5 text-moss-600" /><h2 className="text-xl font-semibold">Frequently asked questions</h2></div><FaqList items={filtered} /></section>
-        <aside>
-          <Card className="sticky top-6 p-6">
-            <h2 className="text-xl font-semibold">Ask for help</h2>
-            <div className="mt-5 grid grid-cols-2 gap-2">{actions.map(({ type: actionType, label, icon: Icon }) => <button key={actionType} type="button" onClick={() => setType(actionType)} className={`min-h-20 rounded-2xl border p-3 text-left text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-moss-100 ${type === actionType ? "border-moss-600 bg-moss-50 text-moss-700" : "border-stone-100"}`}><Icon className="mb-2 size-4" />{label}</button>)}</div>
-            <div className="mt-6"><SupportForm type={type} onTypeChange={setType} /></div>
-            <p className="mt-4 flex items-start gap-2 text-[11px] leading-5 text-stone-400"><TriangleAlert className="mt-0.5 size-3 shrink-0" /> {backendMode ? "Email delivery is not connected; replies appear in your account." : "No email is sent. Requests stay in local demo state."}</p>
+    <main className="mx-auto w-full max-w-7xl px-5 py-10 sm:px-8 sm:py-14">
+      <header className="mx-auto max-w-3xl text-center">
+        <span className="mx-auto grid size-16 place-items-center rounded-3xl bg-moss-100 text-moss-700">
+          <MessageCircleQuestion className="size-7" aria-hidden="true" />
+        </span>
+        <p className="section-kicker mt-6">AIko Support</p>
+        <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+          How can we help?
+        </h1>
+        <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-stone-500">
+          Find clear answers about AIko or ask the support chat. This page is separate from your
+          learning dashboard and contains support information only.
+        </p>
+      </header>
+
+      <section className="mt-10" aria-labelledby="support-topics-heading">
+        <div className="flex items-center gap-3">
+          <LifeBuoy className="size-5 text-moss-600" aria-hidden="true" />
+          <h2 id="support-topics-heading" className="text-xl font-semibold">
+            What do you need help with?
+          </h2>
+        </div>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {topics.map(({ label, copy, icon: Icon }) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => chooseTopic(label)}
+              className="group rounded-3xl border border-black/[.06] bg-white p-5 text-left shadow-card transition hover:-translate-y-0.5 hover:border-moss-200 focus:outline-none focus:ring-4 focus:ring-moss-100"
+            >
+              <span className="grid size-11 place-items-center rounded-2xl bg-moss-100 text-moss-700">
+                <Icon className="size-5" aria-hidden="true" />
+              </span>
+              <span className="mt-5 flex items-center justify-between gap-3 font-semibold">
+                {label}
+                <ArrowRight
+                  className="size-4 text-persimmon-500 transition-transform group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </span>
+              <span className="mt-2 block text-sm leading-6 text-stone-500">{copy}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <div className="mt-12 grid items-start gap-8 lg:grid-cols-[1fr_.92fr]">
+        <section aria-labelledby="faq-heading">
+          <div className="flex items-center gap-3">
+            <Shield className="size-5 text-moss-600" aria-hidden="true" />
+            <h2 id="faq-heading" className="text-2xl font-semibold">
+              Frequently asked questions
+            </h2>
+          </div>
+          <label className="relative mt-5 block">
+            <Search
+              className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-stone-400"
+              aria-hidden="true"
+            />
+            <span className="sr-only">Search frequently asked questions</span>
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              className="form-input min-h-14 pl-12"
+              placeholder="Search accounts, lessons, voice, plans, privacy…"
+            />
+          </label>
+          <div className="mt-5">
+            <FaqList items={filteredFaqs} />
+          </div>
+        </section>
+
+        <section aria-labelledby="support-chat-heading">
+          <Card className="overflow-hidden p-0 lg:sticky lg:top-24">
+            <div className="border-b border-black/[.06] bg-moss-900 p-5 text-white sm:p-6">
+              <div className="flex items-center justify-between gap-4">
+                <span className="grid size-11 place-items-center rounded-2xl bg-white/10 text-persimmon-400">
+                  <Bot className="size-5" aria-hidden="true" />
+                </span>
+                <Badge tone="orange">Guided support preview</Badge>
+              </div>
+              <h2 id="support-chat-heading" className="mt-4 text-2xl font-semibold">
+                Ask AIko Support
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-white/65">
+                Current answers come from the verified support information shown on this page.
+              </p>
+            </div>
+
+            <div
+              className="h-[25rem] space-y-4 overflow-y-auto bg-stone-50 p-5"
+              aria-live="polite"
+              aria-label="Support conversation"
+            >
+              {messages.map((message, index) => (
+                <div
+                  key={message.role + index}
+                  className={message.role === "user" ? "flex justify-end" : "flex justify-start"}
+                >
+                  <p
+                    className={
+                      message.role === "user"
+                        ? "max-w-[88%] rounded-3xl rounded-br-lg bg-moss-600 px-4 py-3 text-sm leading-6 text-white"
+                        : "max-w-[88%] rounded-3xl rounded-bl-lg bg-white px-4 py-3 text-sm leading-6 text-stone-600 shadow-card"
+                    }
+                  >
+                    {message.content}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <form onSubmit={submitMessage} className="border-t border-black/[.06] bg-white p-4">
+              <label className="sr-only" htmlFor="support-message">
+                Ask AIko Support
+              </label>
+              <div className="flex items-end gap-2">
+                <textarea
+                  id="support-message"
+                  value={draft}
+                  onChange={(event) => setDraft(event.target.value)}
+                  rows={2}
+                  className="min-h-12 flex-1 resize-none rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-stone-300 focus:border-moss-500 focus:ring-4 focus:ring-moss-100"
+                  placeholder="Describe what you need help with…"
+                />
+                <button
+                  type="submit"
+                  disabled={!draft.trim()}
+                  className="grid size-12 shrink-0 place-items-center rounded-full bg-moss-600 text-white transition hover:bg-moss-700 focus:outline-none focus:ring-4 focus:ring-moss-200 disabled:cursor-not-allowed disabled:opacity-40"
+                  aria-label="Send support message"
+                >
+                  <Send className="size-4" aria-hidden="true" />
+                </button>
+              </div>
+            </form>
+
+            <div className="flex gap-3 border-t border-black/[.06] bg-persimmon-50 px-5 py-4">
+              <Sparkles className="mt-0.5 size-4 shrink-0 text-persimmon-600" aria-hidden="true" />
+              <p className="text-xs leading-5 text-stone-600">
+                When the AI connection is added, it will answer from approved AIko support
+                material and say when that material does not contain a reliable answer.
+              </p>
+            </div>
           </Card>
-        </aside>
+        </section>
       </div>
-    </div>
+
+      <section className="mt-12 rounded-3xl border border-black/[.06] bg-white p-6 sm:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="flex items-center gap-3">
+              <Wrench className="size-5 text-moss-600" aria-hidden="true" />
+              <h2 className="text-xl font-semibold">Reporting a technical problem?</h2>
+            </div>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-stone-500">
+              Tell the support chat which page you were using, what you tried, and any error
+              message you saw. Do not include passwords or other sensitive credentials.
+            </p>
+          </div>
+          <Badge tone="neutral" className="shrink-0 self-start sm:self-auto">
+            <Shield className="mr-1.5 size-3.5" aria-hidden="true" />
+            Never share passwords
+          </Badge>
+        </div>
+      </section>
+    </main>
   );
 }
