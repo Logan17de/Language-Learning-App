@@ -240,8 +240,11 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="bg-white py-16 sm:py-20">
-          <div id="learning-system" className="mx-auto max-w-7xl scroll-mt-20 px-5 sm:px-8">
+        <section
+          id="learning-system"
+          className="scroll-mt-20 flex min-h-[calc(100svh-5rem)] items-center bg-white py-16 sm:py-20"
+        >
+          <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
             <div className="mx-auto max-w-3xl text-center">
               <p className="section-kicker">A connected learning loop</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
@@ -311,8 +314,11 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="bg-white py-16 sm:py-20">
-          <div id="lesson-journey" className="mx-auto max-w-7xl scroll-mt-20 px-5 sm:px-8">
+        <section
+          id="lesson-journey"
+          className="scroll-mt-20 flex min-h-[calc(100svh-5rem)] items-center bg-white py-16 sm:py-20"
+        >
+          <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
             <div className="max-w-3xl">
               <p className="section-kicker">The lesson journey</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
@@ -344,8 +350,11 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="py-16 sm:py-20">
-          <div id="pricing" className="mx-auto max-w-5xl scroll-mt-20 px-5 sm:px-8">
+        <section
+          id="pricing"
+          className="scroll-mt-20 flex min-h-[calc(100svh-5rem)] items-center py-16 sm:py-20"
+        >
+          <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">
             <div className="mx-auto max-w-3xl text-center">
               <p className="section-kicker">Free and Pro</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
@@ -413,19 +422,19 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="bg-white py-16 sm:py-20">
-          <div
-            id="founder"
-            className="mx-auto grid max-w-7xl scroll-mt-20 gap-10 px-5 sm:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center"
-          >
+        <section
+          id="founder"
+          className="scroll-mt-20 flex min-h-[calc(100svh-5rem)] items-center bg-white py-16 sm:py-20"
+        >
+          <div className="mx-auto grid w-full max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center">
             <div>
               <p className="section-kicker">Meet the founder</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-                Built by Logeshkumar, with AI beside him.
+                Built by Logan, with AI beside him.
               </h2>
               <div className="mt-6 max-w-2xl space-y-4 text-lg leading-8 text-stone-500">
                 <p>
-                  AIko is being created by Logeshkumar Duraisamy, an independent AI researcher
+                  AIko is being created by Logan, an independent AI researcher
                   and language learner based in Tokyo. While learning Japanese himself, he kept
                   meeting the same problem: lessons, weak points, and progress were scattered,
                   while general AI tutors did not reliably remember what needed more practice.
@@ -437,7 +446,7 @@ export default function LandingPage() {
                   platform is being designed to support many languages.
                 </p>
                 <p>
-                  Logeshkumar leads the learning design, product direction, experiments, and
+                  Logan leads the learning design, product direction, experiments, and
                   decisions. AI helps him explore, code, test, and refine the app, turning one
                   person&apos;s idea into a real product while human judgement stays in charge.
                 </p>
