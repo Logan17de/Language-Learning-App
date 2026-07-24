@@ -11,14 +11,13 @@ export default function LessonCompletePage() {
   const params = useParams<{ lessonId: string }>();
   const lessonId = params?.lessonId ?? "";
   const hasHydrated = useAppStore((state) => state.hasHydrated);
-  const adminHydrated = useAdminStore((state) => state.hasHydrated);
   const override = useAdminStore((state) => state.lessonOverrides[lessonId]);
   const deleted = useAdminStore((state) => state.deletedLessonIds.includes(lessonId));
   const session = useAppStore((state) => state.lessonSessions[lessonId]);
   const generatedLesson = useAppStore((state) => state.generatedLessons.find((item) => item.id === lessonId));
   const lesson = deleted ? undefined : override ?? getLessonById(lessonId) ?? generatedLesson;
 
-  if (!hasHydrated || !adminHydrated) {
+  if (!hasHydrated) {
     return <main className="grid min-h-screen place-items-center bg-paper"><span className="size-10 animate-spin rounded-full border-4 border-moss-100 border-t-moss-600" /></main>;
   }
   if (!lesson) {
