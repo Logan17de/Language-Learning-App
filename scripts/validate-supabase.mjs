@@ -18,6 +18,7 @@ const requiredTables = [
   "generated_lesson_jobs", "lesson_validation_runs", "lesson_validation_checks",
   "lesson_reports", "support_tickets", "support_messages", "audit_logs", "feature_flags",
   "service_status", "cost_records", "reward_ledger",
+  "lesson_assignments",
 ];
 
 const missingTables = requiredTables.filter((table) => !sql.includes(`create table public.${table}`));
@@ -30,6 +31,7 @@ const requiredFunctions = [
   "complete_lesson_session", "complete_review_session", "claim_lesson_reward",
   "claim_review_reward", "publish_lesson_version", "reset_learner_progress",
   "save_lesson_draft",
+  "assign_next_lesson", "begin_custom_lesson_generation", "store_generated_lesson_package",
 ];
 const missingFunctions = requiredFunctions.filter((name) => !sql.includes(`function public.${name}`));
 

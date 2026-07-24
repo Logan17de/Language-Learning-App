@@ -1,103 +1,135 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { BookOpen, SearchX, Sparkles } from "lucide-react";
+import { BrainCircuit, CheckCircle2, Crown, Route, Sparkles } from "lucide-react";
 import { mockLessons } from "@/data/mock-lessons";
 import { learnerVisibleLessons, mergeCanonicalLessons } from "@/lib/canonical-lessons";
-import { buildLessonCardStates, filterLessonCards } from "@/lib/lesson-search-utils";
-import type { LessonLibraryFilter, LessonLibraryTab } from "@/types/library";
+import { buildLessonCardStates } from "@/lib/lesson-search-utils";
+import { selectNextLesson } from "@/lib/lesson-assignment";
 import { useAppStore } from "@/store/app-store";
 import { useAdminStore } from "@/store/admin-store";
-import { cn } from "@/lib/utils";
 import { LessonCard } from "@/components/learn/lesson-card";
-import { LessonFilters } from "@/components/learn/lesson-filters";
-import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { getBackendMode } from "@/lib/supabase/config";
 import { useBackendLessonStore } from "@/store/backend-lesson-store";
-
-const tabs: Array<{ id: LessonLibraryTab; label: string }> = [
-  { id: "recommended", label: "Recommended" },
-  { id: "jlpt", label: "JLPT" },
-  { id: "topics", label: "Topics" },
-  { id: "completed", label: "Completed" },
-  { id: "saved", label: "Saved" },
-  { id: "custom", label: "Custom" },
-];
-
-const defaultFilter: LessonLibraryFilter = {
-  tab: "recommended",
-  query: "",
-  level: "all",
-  topic: "all",
-  duration: "all",
-  completion: "all",
-};
+import type { JLPTLevel } from "@/types/lesson";
 
 export function LessonLibrary() {
-  const [filter, setFilter] = useState(defaultFilter);
-  const [loading, setLoading] = useState(true);
+  const [demoLoading, setDemoLoading] = useState(true);
   const backendLessons = useBackendLessonStore((state) => state.lessons);
   const backendLoading = useBackendLessonStore((state) => state.loading);
+  const backendError = useBackendLessonStore((state) => state.error);
   const loadBackendLessons = useBackendLessonStore((state) => state.load);
   const generated = useAppStore((state) => state.generatedLessons);
   const overrides = useAdminStore((state) => state.lessonOverrides);
   const deletedLessonIds = useAdminStore((state) => state.deletedLessonIds);
-  const savedIds = useAppStore((state) => state.savedLessonIds);
   const completedIds = useAppStore((state) => state.progress.completedLessonIds);
   const recentLessons = useAppStore((state) => state.progress.recentLessons);
   const sessions = useAppStore((state) => state.lessonSessions);
-  const toggleSaved = useAppStore((state) => state.toggleSavedLesson);
-  const lessons = useMemo(
-    () => getBackendMode() === "supabase"
-      ? backendLessons
-      : learnerVisibleLessons(mergeCanonicalLessons(mockLessons, generated, overrides, deletedLessonIds)),
-    [backendLessons, deletedLessonIds, generated, overrides],
+  const onboarding = useAppStore((state) => state.onboarding);
+  const subscription = useAppStore((state) => state.subscription);
+  const user = useAppStore((state) => state.user);
+  const backendMode = getBackendMode();
+  const premium = subscription.plan === "premium";
+
+  const allDemoLessons = useMemo(
+    () => learnerVisibleLessons(mergeCanonicalLessons(mockLessons, generated, overrides, deletedLessonIds)),
+    [deletedLessonIds, generated, overrides],
   );
-  const topics = useMemo(() => Array.from(new Set(lessons.map((lesson) => lesson.topic))).sort(), [lessons]);
-  const cards = useMemo(
-    () => filterLessonCards(buildLessonCardStates(lessons, savedIds, completedIds, sessions, recentLessons), filter),
-    [completedIds, filter, lessons, recentLessons, savedIds, sessions],
-  );
+  const assigned = useMemo(() => {
+    if (backendMode === "supabase") {
+      return backendLessons[0] ? { lesson: backendLessons[0], mode: premium ? "pro_interest" as const : "free_random" as const, interestMatches: [] } : null;
+    }
+    const activeLesson = allDemoLessons.find((lesson) => sessions[lesson.id] && !sessions[lesson.id].completed);
+    if (activeLesson) return { lesson: activeLesson, mode: premium ? "pro_interest" as const : "free_random" as const, interestMatches: [] };
+    return selectNextLesson({
+      lessons: allDemoLessons,
+      level: learnerLevel(onboarding.level ?? user.level),
+      interests: onboarding.interests,
+      premium,
+      excludedLessonIds: completedIds,
+      seed: `${user.id}:${completedIds.length}`,
+    });
+  }, [allDemoLessons, backendLessons, backendMode, completedIds, onboarding.interests, onboarding.level, premium, sessions, user.id, user.level]);
+  const card = assigned
+    ? buildLessonCardStates([assigned.lesson], [], completedIds, sessions, recentLessons)[0]
+    : null;
 
   useEffect(() => {
     void loadBackendLessons();
-    const timer = window.setTimeout(() => setLoading(false), 420);
+    const timer = window.setTimeout(() => setDemoLoading(false), 320);
     return () => window.clearTimeout(timer);
   }, [loadBackendLessons]);
 
+  const loading = backendLoading || (backendMode === "demo" && demoLoading);
+
   return (
-    <div className="mx-auto max-w-7xl px-5 py-7 sm:px-8 sm:py-10">
+    <div className="mx-auto max-w-6xl px-5 py-7 sm:px-8 sm:py-10">
       <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <div><p className="section-kicker">Lesson library</p><h1 className="mt-3 text-4xl font-semibold tracking-tight">Learn with a clear path.</h1><p className="mt-3 max-w-2xl text-stone-500">Choose a structured lesson, return to an active one, or save something for later.</p></div>
-        <ButtonLink href="/custom-topic" variant="secondary"><Sparkles className="size-4 text-persimmon-500" /> Request a custom topic</ButtonLink>
+        <div>
+          <p className="section-kicker">Your learning path</p>
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight">One right-sized lesson at a time.</h1>
+          <p className="mt-3 max-w-2xl leading-7 text-stone-500">AIko selects what comes next from your level and learning history. Assigned lessons never repeat.</p>
+        </div>
+        {premium && <ButtonLink href="/custom-topic" variant="secondary"><Sparkles className="size-4 text-persimmon-500" /> Create from my topic</ButtonLink>}
       </header>
 
-      <div className="mt-8 overflow-x-auto pb-2">
-        <div className="flex min-w-max gap-2" role="tablist" aria-label="Lesson library sections">
-          {tabs.map((tab) => (
-            <button key={tab.id} type="button" role="tab" aria-selected={filter.tab === tab.id} onClick={() => setFilter({ ...filter, tab: tab.id })} className={cn("min-h-11 rounded-full px-5 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-moss-100", filter.tab === tab.id ? "bg-moss-600 text-white" : "bg-white text-stone-500 hover:text-moss-700")}>{tab.label}</button>
-          ))}
+      <section className="mt-8 grid gap-6 lg:grid-cols-[1.35fr_.65fr]">
+        <div>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[.16em] text-stone-400">Assigned now</p>
+              <p className="mt-1 text-sm text-stone-500">{premium ? "Matched to your level and interests" : "Randomly selected at your level"}</p>
+            </div>
+            <span className="rounded-full bg-moss-100 px-3 py-1.5 text-xs font-bold text-moss-700">{learnerLevel(onboarding.level ?? user.level)}</span>
+          </div>
+          {loading ? (
+            <div className="h-[28rem] animate-pulse rounded-3xl bg-moss-50" aria-label="Selecting your next lesson" />
+          ) : card ? (
+            <LessonCard state={card} />
+          ) : (
+            <Card className="grid min-h-[24rem] place-items-center border-dashed text-center">
+              <div>
+                <CheckCircle2 className="mx-auto size-10 text-moss-500" />
+                <h2 className="mt-5 text-xl font-semibold">You finished every available lesson at this level.</h2>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-stone-500">{backendError || "AIko will offer another lesson as soon as more level-matched content is published."}</p>
+              </div>
+            </Card>
+          )}
         </div>
-      </div>
-      <div className="mt-4"><LessonFilters value={filter} topics={topics} onChange={setFilter} /></div>
 
-      {loading || backendLoading ? (
-        <div className="mt-7 grid gap-5 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading lessons">
-          {[1, 2, 3, 4, 5, 6].map((item) => <div key={item} className="h-[28rem] animate-pulse rounded-3xl bg-moss-50" />)}
-        </div>
-      ) : cards.length ? (
-        <div className="mt-7 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {cards.map((card) => <LessonCard key={card.lesson.id} state={card} onToggleSaved={toggleSaved} />)}
-        </div>
-      ) : (
-        <div className="mt-7 rounded-4xl border border-dashed border-moss-200 bg-white py-16 text-center">
-          {filter.tab === "custom" ? <BookOpen className="mx-auto size-9 text-moss-300" /> : <SearchX className="mx-auto size-9 text-moss-300" />}
-          <h2 className="mt-5 text-xl font-semibold">{filter.tab === "custom" ? "No custom lessons yet" : "No lessons match these filters"}</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-stone-500">{filter.tab === "custom" ? "Request a premium custom topic and it will appear here after validation." : "Try clearing a filter or searching for a broader topic."}</p>
-          {filter.tab === "custom" ? <ButtonLink href="/custom-topic" className="mt-6">Create a custom lesson</ButtonLink> : <Button type="button" variant="secondary" onClick={() => setFilter(defaultFilter)} className="mt-6">Clear filters</Button>}
-        </div>
-      )}
+        <aside className="space-y-4">
+          <Card className="!bg-moss-900 p-6 text-white">
+            <Route className="size-6 text-persimmon-400" />
+            <h2 className="mt-5 text-xl font-semibold">Why this lesson?</h2>
+            <p className="mt-3 text-sm leading-6 text-white/65">
+              {premium
+                ? assigned?.interestMatches.length
+                  ? `It matches ${assigned.interestMatches.join(", ")} and your current level.`
+                  : "It fits your current level; AIko also considered your profile interests."
+                : "Free lessons are chosen randomly from your current level. Interests do not influence the selection."}
+            </p>
+          </Card>
+          <Card className="p-6">
+            <BrainCircuit className="size-6 text-moss-600" />
+            <h2 className="mt-5 text-lg font-semibold">The path learns with you</h2>
+            <p className="mt-2 text-sm leading-6 text-stone-500">Answers, retries, reveals, listening, and review results shape your strengths and weaknesses. You do not need to manage or star lessons.</p>
+          </Card>
+          {!premium && (
+            <Card className="p-6">
+              <Crown className="size-6 text-persimmon-500" />
+              <h2 className="mt-5 text-lg font-semibold">Want a topic of your own?</h2>
+              <p className="mt-2 text-sm leading-6 text-stone-500">Pro can turn a topic plus your interests into a full level-matched lesson.</p>
+              <ButtonLink href="/subscription" variant="secondary" className="mt-5 w-full">Explore Pro</ButtonLink>
+            </Card>
+          )}
+        </aside>
+      </section>
     </div>
   );
+}
+
+function learnerLevel(level: string | null): JLPTLevel {
+  return level === "N5" || level === "N4" || level === "N3" || level === "N2" || level === "N1" ? level : "N5";
 }

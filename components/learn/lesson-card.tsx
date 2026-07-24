@@ -1,6 +1,6 @@
 "use client";
 
-import { Bookmark, BookmarkCheck, Clock3, Play, RotateCcw, Sparkles, TriangleAlert } from "lucide-react";
+import { Clock3, Play, RotateCcw, Sparkles, TriangleAlert } from "lucide-react";
 import type { LessonCardState } from "@/types/library";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
@@ -8,12 +8,10 @@ import { Card } from "@/components/ui/card";
 
 export function LessonCard({
   state,
-  onToggleSaved,
 }: {
   state: LessonCardState;
-  onToggleSaved: (lessonId: string) => void;
 }) {
-  const { lesson, completed, hasResult, active, saved, score, malformed } = state;
+  const { lesson, completed, hasResult, active, score, malformed } = state;
   const primaryHref = completed
     ? hasResult ? `/lesson/${lesson.id}/complete` : `/lesson/${lesson.id}/preview`
     : active
@@ -31,9 +29,6 @@ export function LessonCard({
             <Badge tone={lesson.source === "user_generated" ? "orange" : "moss"} className={lesson.source !== "user_generated" ? "bg-white/10 text-white" : ""}>{lesson.level}</Badge>
             {lesson.source === "user_generated" && <Badge tone="orange"><Sparkles className="mr-1 size-3" /> Custom</Badge>}
           </div>
-          <button type="button" onClick={() => onToggleSaved(lesson.id)} aria-label={saved ? `Unsave ${lesson.title}` : `Save ${lesson.title}`} className="grid size-10 place-items-center rounded-full bg-white/10 transition hover:bg-white/20 focus:outline-none focus:ring-4 focus:ring-white/20">
-            {saved ? <BookmarkCheck className="size-5 fill-current" /> : <Bookmark className="size-5" />}
-          </button>
         </div>
         <p className="relative mt-6 text-xs font-semibold opacity-60">{lesson.topic}</p>
       </div>
@@ -58,10 +53,7 @@ export function LessonCard({
           {malformed ? (
             <span className="flex items-center gap-2 text-xs font-semibold text-persimmon-600"><TriangleAlert className="size-4" /> Unavailable</span>
           ) : (
-            <div className="flex gap-2">
-              <ButtonLink href={`/lesson/${lesson.id}/preview`} variant="secondary" className="min-h-10 px-4">Preview</ButtonLink>
-              <ButtonLink href={primaryHref} className="min-h-10 px-4">{active ? <RotateCcw className="size-4" /> : <Play className="size-4" />}{primaryLabel}</ButtonLink>
-            </div>
+            <ButtonLink href={primaryHref} className="min-h-10 px-5">{active ? <RotateCcw className="size-4" /> : <Play className="size-4" />}{primaryLabel}</ButtonLink>
           )}
         </div>
       </div>

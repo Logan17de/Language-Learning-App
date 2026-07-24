@@ -72,8 +72,8 @@ const learningFlow: Array<{
   },
   {
     number: "06",
-    title: "Improve what comes next",
-    copy: "Your practice history helps future lessons and reviews focus attention more usefully.",
+    title: "Let AIko choose what comes next",
+    copy: "Your level and learning evidence guide one new assignment at a time, without repeating an assigned lesson.",
     icon: BrainCircuit,
   },
 ];
@@ -112,7 +112,7 @@ const plans = [
       "Basic vocabulary and grammar review",
       "Basic progress tracking",
       "Limited speaking practice",
-      "Access to standard lesson topics",
+      "Random non-repeating lessons at your level",
     ],
     cta: "Start Free",
     primary: false,
@@ -123,7 +123,7 @@ const plans = [
     features: [
       "Unlimited learning sessions",
       "Request lessons about your own topics",
-      "Personalised lesson recommendations",
+      "Level- and interest-matched lesson assignments",
       "Voice-based speaking practice",
       "Advanced reading and pronunciation feedback",
       "Adaptive review and learner memory",
@@ -250,6 +250,7 @@ export default function LandingPage() {
               <p className="mt-5 text-lg leading-8 text-stone-500">
                 Each activity builds on the one before it. What you practise, reveal, retry,
                 and remember helps AIko decide where your attention may be most useful next.
+                Learners do not browse or star lessons; the path handles that decision.
               </p>
             </div>
             <ol className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -291,6 +292,16 @@ export default function LandingPage() {
               <p className="mt-5 max-w-xl rounded-2xl border-l-4 border-persimmon-500 bg-white px-5 py-4 font-medium leading-7 shadow-card">
                 AIko adapts using what you practise, reveal, retry, and remember.
               </p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl bg-white p-4 shadow-card">
+                  <p className="text-xs font-bold uppercase tracking-wider text-moss-700">Free path</p>
+                  <p className="mt-2 text-sm leading-6 text-stone-500">A random, non-repeating lesson from your current level. Profile interests do not affect Free selection.</p>
+                </div>
+                <div className="rounded-2xl bg-moss-100 p-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-moss-700">Pro path</p>
+                  <p className="mt-2 text-sm leading-6 text-stone-600">Level plus interests shape assignments. Your own topic can become a complete saved lesson package.</p>
+                </div>
+              </div>
             </div>
             <div className="rounded-4xl bg-moss-900 p-7 text-white sm:p-8">
               <p className="text-sm font-semibold text-moss-200">Learning evidence may include</p>
@@ -353,7 +364,8 @@ export default function LandingPage() {
               </h2>
               <p className="mt-5 text-lg leading-8 text-stone-500">
                 Start with the essentials, then choose Pro when you want more sessions,
-                feedback, and lessons built around your interests.
+                feedback, and lessons built around your interests. Every plan remains
+                level-based, and AIko never reassigns the same lesson.
               </p>
             </div>
             <div className="mt-10 grid gap-6 md:grid-cols-2">

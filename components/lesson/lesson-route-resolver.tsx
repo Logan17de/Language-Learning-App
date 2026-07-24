@@ -10,6 +10,10 @@ import { LessonPlayer } from "@/components/lesson/lesson-player";
 import { ButtonLink } from "@/components/ui/button";
 import { getBackendMode } from "@/lib/supabase/config";
 import { useBackendLessonStore } from "@/store/backend-lesson-store";
+import { mockLessons } from "@/data/mock-lessons";
+import { learnerVisibleLessons, mergeCanonicalLessons } from "@/lib/canonical-lessons";
+import { selectNextLesson } from "@/lib/lesson-assignment";
+import type { JLPTLevel } from "@/types/lesson";
 
 export function LessonRouteResolver({
   lessonId,
@@ -24,13 +28,32 @@ export function LessonRouteResolver({
   const override = useAdminStore((state) => state.lessonOverrides[lessonId]);
   const deleted = useAdminStore((state) => state.deletedLessonIds.includes(lessonId));
   const generatedLesson = useAppStore((state) => state.generatedLessons.find((lesson) => lesson.id === lessonId));
+  const generatedLessons = useAppStore((state) => state.generatedLessons);
+  const completedIds = useAppStore((state) => state.progress.completedLessonIds);
+  const sessions = useAppStore((state) => state.lessonSessions);
+  const onboarding = useAppStore((state) => state.onboarding);
+  const subscription = useAppStore((state) => state.subscription);
+  const user = useAppStore((state) => state.user);
   const loadBackendLesson = useBackendLessonStore((state) => state.loadOne);
   const cachedBackendLesson = useBackendLessonStore((state) => state.lessons.find((lesson) => lesson.id === lessonId));
   const [requestedBackendLesson, setRequestedBackendLesson] = useState<LessonPackage | undefined>();
   const [backendResolved, setBackendResolved] = useState(getBackendMode() !== "supabase");
-  const lesson = getBackendMode() === "supabase"
+  const resolvedLesson = getBackendMode() === "supabase"
     ? cachedBackendLesson ?? requestedBackendLesson
     : deleted ? undefined : override ?? staticLesson ?? generatedLesson;
+  const demoLessons = learnerVisibleLessons(mergeCanonicalLessons(mockLessons, generatedLessons, useAdminStore.getState().lessonOverrides, useAdminStore.getState().deletedLessonIds));
+  const activeLessonId = Object.values(sessions).find((session) => !session.completed)?.lessonId;
+  const assignedDemoLesson = activeLessonId
+    ? demoLessons.find((item) => item.id === activeLessonId)
+    : selectNextLesson({
+      lessons: demoLessons,
+      level: learnerLevel(onboarding.level ?? user.level),
+      interests: onboarding.interests,
+      premium: subscription.plan === "premium",
+      excludedLessonIds: completedIds,
+      seed: `${user.id}:${completedIds.length}`,
+    })?.lesson;
+  const lesson = getBackendMode() === "demo" && assignedDemoLesson?.id !== lessonId ? undefined : resolvedLesson;
 
   useEffect(() => {
     if (getBackendMode() !== "supabase" || cachedBackendLesson) return;
@@ -51,4 +74,8 @@ export function LessonRouteResolver({
     );
   }
   return mode === "preview" ? <LessonPreview lesson={lesson} /> : <LessonPlayer lesson={lesson} />;
+}
+
+function learnerLevel(level: string | null): JLPTLevel {
+  return level === "N5" || level === "N4" || level === "N3" || level === "N2" || level === "N1" ? level : "N5";
 }

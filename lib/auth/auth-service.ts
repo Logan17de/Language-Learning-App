@@ -18,7 +18,7 @@ function friendlyAuthMessage(message: string): string {
   if (lower.includes("invalid login")) return "The email or password is incorrect.";
   if (lower.includes("already registered")) return "An account already exists for this email.";
   if (lower.includes("email not confirmed")) return "Confirm your email before signing in.";
-  if (lower.includes("password")) return "Use a stronger password with at least 6 characters.";
+  if (lower.includes("password")) return "Use a stronger password with at least 8 characters.";
   return "Authentication could not be completed. Please try again.";
 }
 
@@ -82,6 +82,19 @@ export const authService = {
       role: profile.data.role,
       subscriptionPlan: profile.data.subscription_plan,
     });
+  },
+
+  async signInWithGoogle(next = "/home"): Promise<RepositoryResult<null>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/home";
+    const { error } = await client.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${getAppUrl()}/auth/callback?next=${encodeURIComponent(safeNext)}`,
+      },
+    });
+    return error ? failure(error, friendlyAuthMessage(error.message)) : success(null);
   },
 
   async signOut(): Promise<RepositoryResult<null>> {

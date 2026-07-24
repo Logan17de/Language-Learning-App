@@ -23,21 +23,21 @@ export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
   load: async () => {
     if (getBackendMode() !== "supabase" || get().loading || get().loaded) return;
     set({ loading: true, error: "" });
-    const list = await lessonRepository.listPublished();
-    if (!list.ok) {
-      set({ loading: false, loaded: true, error: list.error.message });
+    const result = await lessonRepository.assignNext();
+    if (!result.ok) {
+      set({ loading: false, loaded: true, error: result.error.message });
       return;
     }
-    const results = await Promise.all(list.data.map((lesson) => lessonRepository.getPublished(lesson.id)));
-    const lessons = results.flatMap((result) => result.ok ? [mapCanonicalLesson(result.data)] : []);
-    set({ lessons, loading: false, loaded: true, error: results.some((result) => !result.ok) ? "Some lessons could not be loaded." : "" });
+    const lessons = result.data ? [mapCanonicalLesson(result.data.lesson)] : [];
+    set({ lessons, loading: false, loaded: true, error: result.data ? "" : "You have completed every available lesson at this level." });
   },
   loadOne: async (id) => {
     const existing = get().lessons.find((lesson) => lesson.id === id);
     if (existing) return existing;
-    const result = await lessonRepository.getPlayable(id);
-    if (!result.ok) return undefined;
-    const lesson = mapCanonicalLesson(result.data);
+    const result = await lessonRepository.assignNext();
+    if (!result.ok || !result.data) return undefined;
+    const lesson = mapCanonicalLesson(result.data.lesson);
+    if (lesson.id !== id && result.data.assignment.lessonId !== id) return undefined;
     set((state) => ({ lessons: [...state.lessons.filter((item) => item.id !== lesson.id), lesson] }));
     return lesson;
   },

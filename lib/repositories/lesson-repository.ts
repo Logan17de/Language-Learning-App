@@ -17,6 +17,31 @@ export interface CanonicalLesson {
   review: Database["public"]["Tables"]["lesson_review_activities"]["Row"][];
 }
 
+export interface AssignedLesson {
+  assignmentId: string;
+  lessonId: string;
+  lessonVersionId: string;
+  selectionMode: "free_random" | "pro_interest" | "pro_custom";
+  interestMatches: string[];
+  reused: boolean;
+}
+
+function assignmentFromJson(value: unknown): AssignedLesson | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const row = value as Record<string, unknown>;
+  if (typeof row.assignment_id !== "string" || typeof row.lesson_id !== "string" || typeof row.lesson_version_id !== "string") return null;
+  const mode = row.selection_mode;
+  if (mode !== "free_random" && mode !== "pro_interest" && mode !== "pro_custom") return null;
+  return {
+    assignmentId: row.assignment_id,
+    lessonId: row.lesson_id,
+    lessonVersionId: row.lesson_version_id,
+    selectionMode: mode,
+    interestMatches: Array.isArray(row.interest_matches) ? row.interest_matches.filter((item): item is string => typeof item === "string") : [],
+    reused: row.reused === true,
+  };
+}
+
 async function loadContent(lesson: Lesson, version: Version): Promise<RepositoryResult<CanonicalLesson>> {
   const client = createClient();
   if (!client) return notConfigured();
@@ -46,6 +71,19 @@ async function loadContent(lesson: Lesson, version: Version): Promise<Repository
 }
 
 export const lessonRepository = {
+  async assignNext(): Promise<RepositoryResult<{ assignment: AssignedLesson; lesson: CanonicalLesson } | null>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { data, error } = await client.rpc("assign_next_lesson");
+    if (error) return failure(error, "AIko could not select your next lesson.");
+    const assignment = assignmentFromJson(data);
+    if (!assignment) return success(null);
+    const lesson = await this.getPublished(assignment.lessonId);
+    return lesson.ok
+      ? success({ assignment, lesson: lesson.data })
+      : failure(lesson.error, lesson.error.message);
+  },
+
   async listPublished(): Promise<RepositoryResult<Lesson[]>> {
     const client = createClient();
     if (!client) return notConfigured();

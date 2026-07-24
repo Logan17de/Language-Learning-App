@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { BookOpenCheck, Brain, CalendarClock, Flame, Headphones, Languages, Mic2, RotateCcw, Sparkles } from "lucide-react";
+import { BookOpenCheck, Brain, CalendarClock, Flame, Headphones, Languages, Mic2, RotateCcw, ShieldCheck, Sparkles } from "lucide-react";
 import type { ReviewDashboardItem } from "@/types/review-session";
 import { useAppStore } from "@/store/app-store";
 import { AppShell } from "@/components/layout/app-shell";
@@ -63,6 +63,18 @@ export function ReviewDashboard() {
           })}
         </section>
 
+        <Card className="mt-6 grid gap-5 !bg-moss-900 p-6 text-white md:grid-cols-[auto_1fr_auto] md:items-center">
+          <span className="grid size-12 place-items-center rounded-2xl bg-white/10 text-persimmon-400"><ShieldCheck className="size-6" /></span>
+          <div>
+            <h2 className="text-lg font-semibold">Insights, not a lesson wishlist</h2>
+            <p className="mt-1 text-sm leading-6 text-white/65">Review shows where your recall is strong and where it needs support. There is no lesson starring: AIko uses this evidence automatically when it schedules practice and selects what comes next.</p>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-center">
+            <Insight value={items.filter((item) => item.status === "mastered").length} label="strong" />
+            <Insight value={items.filter((item) => item.status === "weak" || item.status === "overdue").length} label="needs work" />
+          </div>
+        </Card>
+
         <div className="mt-8 flex flex-wrap gap-2" role="tablist" aria-label="Review item filters">
           {filters.map((item) => <button key={item.id} type="button" role="tab" aria-selected={filter === item.id} onClick={() => setFilter(item.id)} className={cn("min-h-10 rounded-full px-4 text-xs font-semibold focus:outline-none focus:ring-4 focus:ring-moss-100", filter === item.id ? "bg-moss-600 text-white" : "bg-white text-stone-500")}>{item.label}</button>)}
         </div>
@@ -87,4 +99,8 @@ export function ReviewDashboard() {
 function Summary({ icon: Icon, value, label, tone }: { icon: typeof Brain; value: string; label: string; tone: "moss" | "orange" | "neutral" }) {
   const styles = { moss: "bg-moss-100 text-moss-700", orange: "bg-persimmon-100 text-persimmon-600", neutral: "bg-stone-100 text-stone-600" };
   return <Card className="flex items-center gap-4"><span className={`grid size-11 place-items-center rounded-2xl ${styles[tone]}`}><Icon className="size-5" /></span><div><p className="text-2xl font-semibold">{value}</p><p className="text-xs text-stone-400">{label}</p></div></Card>;
+}
+
+function Insight({ value, label }: { value: number; label: string }) {
+  return <div className="min-w-20 rounded-2xl bg-white/[.08] px-3 py-2"><p className="text-xl font-semibold">{value}</p><p className="text-[.65rem] uppercase tracking-wide text-white/45">{label}</p></div>;
 }

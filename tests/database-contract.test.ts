@@ -6,6 +6,7 @@ const rls = readFileSync("supabase/migrations/20260724090100_rls_policies.sql", 
 const functions = readFileSync("supabase/migrations/20260724090200_functions_views_storage.sql", "utf8");
 const legacyImport = readFileSync("supabase/migrations/20260724090300_legacy_import.sql", "utf8");
 const authoring = readFileSync("supabase/migrations/20260724090400_draft_authoring.sql", "utf8");
+const assignment = readFileSync("supabase/migrations/20260725090000_adaptive_lesson_assignment.sql", "utf8");
 
 describe("Supabase integration contract", () => {
   it("pins sessions to a lesson version and makes rewards database-idempotent", () => {
@@ -47,5 +48,20 @@ describe("Supabase integration contract", () => {
     expect(authoring).toContain("insert into public.lesson_review_activities");
     expect(authoring).toContain("v_source.metadata");
     expect(authoring).toContain("current_version_id = v_new_id");
+  });
+
+  it("enforces level-based, non-repeating backend assignment", () => {
+    expect(assignment).toContain("unique (user_id, lesson_id)");
+    expect(assignment).toContain("l.jlpt_level = v_profile.current_jlpt_level");
+    expect(assignment).toContain("v_profile.subscription_plan = 'free'");
+    expect(assignment).toContain("lesson_sessions_requires_assignment");
+    expect(assignment).toContain("as restrictive for insert");
+  });
+
+  it("keeps custom generation Pro-only, private, and database-backed", () => {
+    expect(assignment).toContain("Pro subscription required");
+    expect(assignment).toContain("generated_for_user_id = auth.uid()");
+    expect(assignment).toContain("function public.store_generated_lesson_package");
+    expect(assignment).toContain("'pro_custom'");
   });
 });

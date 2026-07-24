@@ -1,6 +1,6 @@
 # AIko — adaptive Japanese learning
 
-AIko combines “AI” with `ko` (子, child). The application includes the learner experience, seven-phase lesson player, deterministic review engine, custom-topic simulation, progress analytics, and an operations workspace. Phase 5 adds a Supabase backend foundation while retaining the complete local demo.
+AIko combines “AI” with `ko` (子, child). The application includes the learner experience, seven-phase lesson player, adaptive review, backend lesson assignment, Pro custom-topic generation, progress analytics, and an operations workspace.
 
 ## Architecture
 
@@ -40,6 +40,8 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+OPENAI_API_KEY=
+OPENAI_LESSON_MODEL=gpt-5.6
 ```
 
 `SUPABASE_SERVICE_ROLE_KEY` is imported only by server-only modules and trusted route handlers. Never expose it through a `NEXT_PUBLIC_` variable.
@@ -69,9 +71,28 @@ npm run seed:validate  # deterministic seed validation
 
 The seed includes JLPT levels, vocabulary, kanji, grammar, assets, operational records, achievements, and the playable “Going to Work” lesson with deterministic IDs.
 
+## Lesson assignment and generation
+
+- Learners never submit a lesson ID for selection. `assign_next_lesson()` chooses and records one current-level lesson.
+- Free accounts receive a random eligible lesson at their JLPT level; profile interests are intentionally ignored.
+- Pro accounts rank eligible current-level lessons using profile interests.
+- A unique learner/lesson assignment prevents any assigned lesson from being selected again.
+- Lesson-session inserts require a valid active assignment through a restrictive RLS policy.
+- Pro custom topics use the server-only OpenAI Responses API with Structured Outputs. The validated seven-stage package is persisted, privately scoped to its owner, and immediately assigned.
+- Review evidence reports strengths and weaknesses and automatically drives the learning system; there is no learner-managed lesson starring.
+
 ## Authentication and admin setup
 
-Sign-up creates the Auth user and the `profiles`, `user_preferences`, `user_settings`, and `user_subscriptions` records through a database trigger. Email/password login, logout, password recovery, PKCE callback exchange, session refresh, and protected routes use the Supabase SSR pattern.
+Sign-up creates the Auth user and the `profiles`, `user_preferences`, `user_settings`, and `user_subscriptions` records through a database trigger. Email/password login, Google OAuth, logout, password recovery, PKCE callback exchange, session refresh, and protected routes use the Supabase SSR pattern.
+
+To enable Google sign-in:
+
+1. Create a Google OAuth web client and add the Supabase callback URL shown in **Supabase Dashboard → Authentication → Providers → Google**.
+2. Add the Google client ID and secret to that provider and enable it.
+3. Add `http://localhost:3000/auth/callback` and the production `https://<your-domain>/auth/callback` URL to **Authentication → URL Configuration → Redirect URLs**.
+4. Set `NEXT_PUBLIC_APP_URL` to the matching deployment origin in each Vercel environment.
+
+Do not put the Google client secret in this repository or in a `NEXT_PUBLIC_*` variable.
 
 Create an account through `/signup`, then promote it locally in SQL:
 
@@ -113,11 +134,12 @@ Tests cover scoring validation, migration parsing, canonical lesson merge rules,
 - Public: `/`, `/login`, `/signup`, `/forgot-password`, `/auth/callback`, `/reset-password`
 - Learner: `/home`, `/learn`, `/review`, `/progress`, `/custom-topic`, `/profile`, `/settings`, `/support`, `/lesson/*`
 - Admin: `/admin/*` with a server-verified role gate
-- Trusted APIs: `/api/lesson/complete`, `/api/review/complete`, `/api/account/export`, `/api/account/reset-progress`, and role-restricted admin mutation endpoints
+- Trusted APIs: `/api/lesson/complete`, `/api/review/complete`, `/api/custom-lessons/generate`, `/api/account/export`, `/api/account/reset-progress`, and role-restricted admin mutation endpoints
 
 ## Known Phase 5 limitations
 
-- AI generation, speech recognition, TTS, image generation, email delivery, Stripe, and external AI APIs are intentionally not implemented.
+- Speech recognition, TTS, image generation, email delivery, and Stripe are not yet implemented.
+- Pro lesson generation requires `OPENAI_API_KEY`; the local demo retains a deterministic no-network fallback.
 - Billing state is persisted but remains mocked.
 - Account deletion remains a documented future privileged workflow; progress reset is transactional now.
 - Local Supabase execution requires Docker. Static migration/seed validation and mocked tests remain available without it.

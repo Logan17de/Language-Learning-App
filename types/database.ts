@@ -59,6 +59,7 @@ export type LessonRow = Timestamps & {
   archived_at: string | null;
   created_by: string | null;
   updated_by: string | null;
+  generated_for_user_id: string | null;
 };
 
 export type LessonVersionRow = Timestamps & {
@@ -120,6 +121,7 @@ export interface Database {
       lesson_activity_answers: TableDef<OwnedRow & { lesson_session_id: string; phase: string; activity_id: string; selected_answer: string; correct: boolean; attempts: number; answer_data: Json }>;
       lesson_events: TableDef<OwnedRow & { lesson_session_id: string; client_event_id: string; phase: string; event_type: string; event_data: Json; occurred_at: string }>;
       lesson_completions: TableDef<OwnedRow & { lesson_id: string; lesson_version_id: string; lesson_session_id: string; score: number; xp_awarded: number; duration_minutes: number; completion_data: Json; completed_at: string }>;
+      lesson_assignments: TableDef<Timestamps & { id: string; user_id: string; lesson_id: string; lesson_version_id: string; selection_mode: "free_random" | "pro_interest" | "pro_custom"; status: "assigned" | "started" | "completed"; algorithm_version: string; interest_matches: string[]; assigned_at: string; started_at: string | null; completed_at: string | null }>;
       learner_mastery: TableDef<OwnedRow & { item_type: string; item_key: string; mastery: number; confidence: number; last_reviewed_at: string | null; next_review_at: string | null; evidence_count: number }>;
       review_queue: TableDef<OwnedRow & { item_type: string; item_key: string; prompt_data: Json; due_at: string; confidence: number; reason: string; status: string }>;
       review_sessions: TableDef<OwnedRow & { status: Database["public"]["Enums"]["session_status"]; started_at: string; completed_at: string | null; score: number | null; xp_awarded: number; reward_claimed_at: string | null }>;
@@ -199,6 +201,22 @@ export interface Database {
       current_app_role: {
         Args: Record<string, never>;
         Returns: Database["public"]["Enums"]["app_role"];
+      };
+      assign_next_lesson: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      begin_custom_lesson_generation: {
+        Args: { p_topic: string; p_duration_minutes: number; p_focus: string; p_speaking_difficulty: string; p_note: string };
+        Returns: Json;
+      };
+      store_generated_lesson_package: {
+        Args: { p_request_id: string; p_package: Json; p_generation_seconds: number };
+        Returns: Json;
+      };
+      fail_custom_lesson_generation: {
+        Args: { p_request_id: string; p_error: string };
+        Returns: undefined;
       };
     };
     Enums: {
