@@ -7,13 +7,15 @@ import { authService } from "@/lib/auth/auth-service";
 import { progressRepository } from "@/lib/repositories/progress-repository";
 
 export function BackendSessionHydrator() {
+  const backendMode = getBackendMode();
   const syncBackendIdentity = useAppStore((state) => state.syncBackendIdentity);
   const signOut = useAppStore((state) => state.signOut);
   const setSubscription = useAppStore((state) => state.setSubscription);
   const hydrateBackendProgress = useAppStore((state) => state.hydrateBackendProgress);
-  const [loading, setLoading] = useState(getBackendMode() === "supabase");
+  const [loading, setLoading] = useState(backendMode === "supabase");
 
   useEffect(() => {
+    if (backendMode !== "supabase") return;
     let active = true;
     async function hydrate() {
       const result = await authService.getIdentity();
@@ -40,7 +42,7 @@ export function BackendSessionHydrator() {
       active = false;
       unsubscribe();
     };
-  }, [hydrateBackendProgress, setSubscription, signOut, syncBackendIdentity]);
+  }, [backendMode, hydrateBackendProgress, setSubscription, signOut, syncBackendIdentity]);
 
   if (!loading) return null;
   return <div className="fixed inset-x-0 top-0 z-[120] h-1 overflow-hidden bg-moss-100" aria-label="Restoring account session"><span className="block h-full w-1/2 animate-pulse bg-moss-600" /></div>;

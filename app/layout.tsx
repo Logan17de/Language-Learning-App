@@ -8,10 +8,17 @@ import { BackendSessionHydrator } from "@/components/backend/backend-session-hyd
 
 export const metadata: Metadata = {
   title: {
-    default: "AIko — Japanese that adapts to you",
+    default: "AIko — Adaptive Language Learning",
     template: "%s · AIko",
   },
-  description: "Structured Japanese lessons that adapt to the words and grammar you find difficult.",
+  description:
+    "Structured language learning through stories, vocabulary, grammar, reading, listening, speaking, and personalised review. Launching first with Japanese.",
+  openGraph: {
+    title: "AIko — Adaptive Language Learning",
+    description:
+      "Structured language learning through connected lessons and personalised review. Launching first with Japanese.",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {
@@ -23,7 +30,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body><ThemeSync /><BackendSessionHydrator /><DemoModeBanner />{children}<LegacyImportAssistant /><SyncStatus /></body>
+      <body>
+        <ThemeSync />
+        <BackendSessionHydrator />
+        <DemoModeBanner />
+        {children}
+        <LegacyImportAssistant />
+        <SyncStatus />
+      </body>
     </html>
   );
 }
