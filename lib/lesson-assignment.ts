@@ -37,14 +37,16 @@ export function selectNextLesson({
   seed: string;
 }): LessonAssignment | null {
   const excluded = new Set(excludedLessonIds);
-  const eligible = lessons.filter((lesson) =>
-    lesson.status === "published"
-    && lesson.level === level
-    && !excluded.has(lesson.id),
+  const eligible = lessons.filter(
+    (lesson) =>
+      lesson.status === "published" &&
+      lesson.level === level &&
+      !excluded.has(lesson.id),
   );
   if (!eligible.length) return null;
 
-  if (!premium) {
+  const learnerInterests = normalized(interests);
+  if (!premium || learnerInterests.length === 0) {
     return {
       lesson: eligible[stableIndex(seed, eligible.length)],
       mode: "free_random",
@@ -52,18 +54,23 @@ export function selectNextLesson({
     };
   }
 
-  const learnerInterests = normalized(interests);
-  const ranked = eligible.map((lesson) => {
-    const lessonSignals = normalized([lesson.topic, ...(lesson.tags ?? [])]);
-    const interestMatches = learnerInterests.filter((interest) =>
-      lessonSignals.some((signal) => signal.includes(interest) || interest.includes(signal)),
+  const ranked = eligible
+    .map((lesson) => {
+      const lessonSignals = normalized([lesson.topic, ...(lesson.tags ?? [])]);
+      const interestMatches = learnerInterests.filter((interest) =>
+        lessonSignals.some(
+          (signal) => signal.includes(interest) || interest.includes(signal),
+        ),
+      );
+      return { lesson, interestMatches };
+    })
+    .sort(
+      (a, b) =>
+        Number(b.lesson.source === "user_generated") -
+          Number(a.lesson.source === "user_generated") ||
+        b.interestMatches.length - a.interestMatches.length ||
+        a.lesson.id.localeCompare(b.lesson.id),
     );
-    return { lesson, interestMatches };
-  }).sort((a, b) =>
-    Number(b.lesson.source === "user_generated") - Number(a.lesson.source === "user_generated")
-    || b.interestMatches.length - a.interestMatches.length
-    || a.lesson.id.localeCompare(b.lesson.id),
-  );
 
   return {
     ...ranked[0],
