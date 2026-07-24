@@ -6,7 +6,6 @@ import { useAppStore } from "@/store/app-store";
 import type { BillingPeriod } from "@/types/app-preferences";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const proFeatures = [
@@ -70,7 +69,7 @@ export function SubscriptionPage() {
         ))}
       </div>
 
-      <Card className="mx-auto mt-10 max-w-2xl overflow-hidden border-moss-900 bg-moss-900 p-0 text-white shadow-float">
+      <section className="mx-auto mt-10 max-w-2xl overflow-hidden rounded-3xl border border-moss-900 bg-moss-900 p-0 text-white shadow-float">
         <div className="p-7 sm:p-10">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -123,7 +122,7 @@ export function SubscriptionPage() {
             </p>
           )}
         </div>
-      </Card>
+      </section>
 
       {showCheckoutNotice && (
         <div
