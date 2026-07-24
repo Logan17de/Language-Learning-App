@@ -145,10 +145,10 @@ export default function LandingPage() {
       <main>
         <section className="relative isolate" aria-labelledby="hero-heading">
           <div
-            className="absolute inset-x-0 top-0 -z-10 h-[46rem] bg-[radial-gradient(circle_at_78%_20%,rgba(229,119,72,.16),transparent_34%),radial-gradient(circle_at_18%_14%,rgba(79,128,104,.17),transparent_30%)]"
+            className="absolute inset-x-0 top-0 -z-10 h-[38rem] bg-[radial-gradient(circle_at_78%_20%,rgba(229,119,72,.16),transparent_34%),radial-gradient(circle_at_18%_14%,rgba(79,128,104,.17),transparent_30%)]"
             aria-hidden="true"
           />
-          <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 pb-24 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[1.04fr_.96fr] lg:gap-16 lg:py-28">
+          <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 pb-16 pt-10 sm:px-8 sm:pt-14 lg:grid-cols-[1.04fr_.96fr] lg:gap-14 lg:py-20">
             <div className="animate-fade-up">
               <Badge className="gap-2 py-2">
                 <Sparkles className="size-3.5" aria-hidden="true" />
@@ -163,11 +163,11 @@ export default function LandingPage() {
                   adapt to you.
                 </span>
               </h1>
-              <p className="mt-7 max-w-2xl text-lg leading-8 text-stone-600">
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-stone-600">
                 AIko combines structured lessons, speaking practice, review, and personalised
                 guidance in one learning experience. Japanese is only the beginning.
               </p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 <ButtonLink href="/signup" className="group px-7">
                   Start learning
                   <ArrowRight
@@ -183,57 +183,56 @@ export default function LandingPage() {
                   See how it works
                 </a>
               </div>
-              <p className="mt-7 flex items-center gap-2 text-sm font-medium text-stone-500">
+              <p className="mt-5 flex items-center gap-2 text-sm font-medium text-stone-500">
                 <span className="size-2 rounded-full bg-persimmon-500" aria-hidden="true" />
                 Currently launching with Japanese.
               </p>
             </div>
 
-            <div className="relative mx-auto w-full max-w-xl lg:mr-0">
+            <div className="relative mx-auto w-full max-w-lg lg:mr-0">
               <div
-                className="absolute -left-8 top-20 size-32 rounded-full bg-persimmon-100 blur-2xl"
+                className="absolute -left-6 top-16 size-28 rounded-full bg-persimmon-100 blur-2xl"
                 aria-hidden="true"
               />
-              <div className="relative animate-float-slow rounded-[2.5rem] border border-white bg-white/85 p-3 shadow-float backdrop-blur">
-                <div className="rounded-[2rem] bg-moss-900 p-6 text-white sm:p-8">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="relative animate-float-slow rounded-[2rem] border border-white bg-white/85 p-3 shadow-float backdrop-blur">
+                <div className="rounded-[1.6rem] bg-moss-900 p-6 text-white sm:p-7">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-xs font-semibold uppercase tracking-[.18em] text-moss-200">
-                      Japanese launch preview
+                      One connected system
                     </span>
-                    <Badge tone="orange">Connected lesson</Badge>
+                    <Badge tone="orange">Built to adapt</Badge>
                   </div>
-                  <div className="mt-7 rounded-3xl bg-white/10 p-5">
-                    <p className="text-xs font-semibold uppercase tracking-[.16em] text-white/50">
-                      Story context
-                    </p>
-                    <p className="mt-3 font-serif text-2xl sm:text-3xl">
-                      会社へ行く朝
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-white/65">
-                      A morning commute becomes the shared context for every activity.
-                    </p>
-                  </div>
-                  <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    {["Story", "Meaning", "Sound", "Expression"].map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-2xl bg-white/[.08] px-3 py-3 text-center text-xs font-semibold text-white/75"
+                  <h2 className="mt-5 max-w-sm text-2xl font-semibold leading-tight sm:text-3xl">
+                    A learning loop built around your practice.
+                  </h2>
+                  <div className="mt-6 grid grid-cols-2 gap-2.5">
+                    {[
+                      { label: "Learn", icon: BookOpenText },
+                      { label: "Practise", icon: Mic },
+                      { label: "Review", icon: RefreshCw },
+                      { label: "Adapt", icon: BrainCircuit },
+                    ].map(({ label, icon: Icon }) => (
+                      <div
+                        key={label}
+                        className="flex items-center gap-3 rounded-2xl bg-white/[.09] px-4 py-3.5"
                       >
-                        {item}
-                      </span>
+                        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-white/10 text-persimmon-400">
+                          <Icon className="size-4" aria-hidden="true" />
+                        </span>
+                        <span className="text-sm font-semibold text-white/85">{label}</span>
+                      </div>
                     ))}
                   </div>
                 </div>
-                <div className="grid gap-3 p-3 pt-4 sm:grid-cols-2">
-                  <div className="rounded-3xl bg-moss-50 p-5">
-                    <p className="text-xs font-semibold text-moss-600">Grammar in context</p>
-                    <p className="mt-3 text-2xl font-semibold">〜ながら</p>
-                    <p className="mt-1 text-xs text-stone-500">while doing</p>
-                  </div>
-                  <div className="rounded-3xl bg-persimmon-50 p-5">
-                    <p className="text-xs font-semibold text-persimmon-600">Vocabulary support</p>
-                    <p className="mt-3 text-2xl font-semibold">改札</p>
-                    <p className="mt-1 text-xs text-stone-500">かいさつ · ticket gate</p>
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-moss-100 text-moss-700">
+                    <Languages className="size-5" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-ink">Japanese first</p>
+                    <p className="text-xs leading-5 text-stone-500">
+                      More languages will follow as AIko grows.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -241,7 +240,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="learning-system" className="scroll-mt-24 bg-white py-24 sm:py-28">
+        <section id="learning-system" className="scroll-mt-24 bg-white py-16 sm:py-20">
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
             <div className="mx-auto max-w-3xl text-center">
               <p className="section-kicker">A connected learning loop</p>
@@ -253,10 +252,10 @@ export default function LandingPage() {
                 and remember helps AIko decide where your attention may be most useful next.
               </p>
             </div>
-            <ol className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            <ol className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {learningFlow.map(({ number, title, copy, icon: Icon }) => (
                 <li key={title}>
-                  <Card className="group relative h-full overflow-hidden p-7 transition hover:-translate-y-1 hover:shadow-float">
+                  <Card className="group relative h-full overflow-hidden p-6 transition hover:-translate-y-1 hover:shadow-float">
                     <span
                       className="absolute right-5 top-2 font-serif text-7xl text-moss-50"
                       aria-hidden="true"
@@ -275,7 +274,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="py-24 sm:py-28" aria-labelledby="adapt-heading">
+        <section className="py-16 sm:py-20" aria-labelledby="adapt-heading">
           <div className="mx-auto grid max-w-7xl gap-8 px-5 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
             <div>
               <p className="section-kicker">Adaptation grounded in practice</p>
@@ -285,15 +284,15 @@ export default function LandingPage() {
               >
                 Guidance based on what you actually do.
               </h2>
-              <p className="mt-5 max-w-xl text-lg leading-8 text-stone-500">
+              <p className="mt-4 max-w-xl text-lg leading-8 text-stone-500">
                 AIko does not guess what you are thinking. It uses learning evidence from the
                 lesson to shape review and future recommendations.
               </p>
-              <p className="mt-7 max-w-xl rounded-2xl border-l-4 border-persimmon-500 bg-white px-5 py-4 font-medium leading-7 shadow-card">
+              <p className="mt-5 max-w-xl rounded-2xl border-l-4 border-persimmon-500 bg-white px-5 py-4 font-medium leading-7 shadow-card">
                 AIko adapts using what you practise, reveal, retry, and remember.
               </p>
             </div>
-            <div className="rounded-4xl bg-moss-900 p-7 text-white sm:p-10">
+            <div className="rounded-4xl bg-moss-900 p-7 text-white sm:p-8">
               <p className="text-sm font-semibold text-moss-200">Learning evidence may include</p>
               <ul className="mt-6 grid gap-3 sm:grid-cols-2">
                 {learningSignals.map((signal) => (
@@ -312,7 +311,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="lesson-journey" className="scroll-mt-24 bg-white py-24 sm:py-28">
+        <section id="lesson-journey" className="scroll-mt-24 bg-white py-16 sm:py-20">
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
             <div className="max-w-3xl">
               <p className="section-kicker">The lesson journey</p>
@@ -325,7 +324,7 @@ export default function LandingPage() {
                 to use this system; the structure is designed to support more.
               </p>
             </div>
-            <ol className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
+            <ol className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
               {lessonStages.map(({ number, title, copy, icon: Icon }) => (
                 <li
                   key={title}
@@ -345,7 +344,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="pricing" className="scroll-mt-24 py-24 sm:py-28">
+        <section id="pricing" className="scroll-mt-24 py-16 sm:py-20">
           <div className="mx-auto max-w-5xl px-5 sm:px-8">
             <div className="mx-auto max-w-3xl text-center">
               <p className="section-kicker">Free and Pro</p>
@@ -357,7 +356,7 @@ export default function LandingPage() {
                 feedback, and lessons built around your interests.
               </p>
             </div>
-            <div className="mt-12 grid gap-6 md:grid-cols-2">
+            <div className="mt-10 grid gap-6 md:grid-cols-2">
               {plans.map((plan) => (
                 <Card
                   key={plan.name}
@@ -414,14 +413,14 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="founder" className="scroll-mt-24 bg-white py-24 sm:py-28">
-          <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center">
+        <section id="founder" className="scroll-mt-24 bg-white py-16 sm:py-20">
+          <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center">
             <div>
               <p className="section-kicker">Built differently</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
                 One person, many AI collaborators.
               </h2>
-              <div className="mt-7 max-w-2xl space-y-5 text-lg leading-8 text-stone-500">
+              <div className="mt-6 max-w-2xl space-y-4 text-lg leading-8 text-stone-500">
                 <p>
                   AIko is being built by an independent creator who wanted a better way to
                   learn languages—one where stories, vocabulary, grammar, reading, listening,
@@ -438,7 +437,7 @@ export default function LandingPage() {
                   more when AI becomes a thoughtful collaborator, not a replacement.
                 </p>
               </div>
-              <p className="mt-8 font-serif text-xl italic text-moss-700">
+              <p className="mt-6 font-serif text-xl italic text-moss-700">
                 Designed by a learner. Built with AI. Made for people who want to keep growing.
               </p>
             </div>
@@ -484,8 +483,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="px-5 py-20 sm:px-8 sm:py-24" aria-labelledby="final-cta-heading">
-          <div className="mx-auto max-w-7xl overflow-hidden rounded-4xl bg-persimmon-50 px-6 py-14 text-center sm:px-16 sm:py-16">
+        <section className="px-5 py-12 sm:px-8 sm:py-16" aria-labelledby="final-cta-heading">
+          <div className="mx-auto max-w-7xl overflow-hidden rounded-4xl bg-persimmon-50 px-6 py-10 text-center sm:px-16 sm:py-12">
             <p className="section-kicker !text-persimmon-600">Your first language awaits</p>
             <h2
               id="final-cta-heading"
@@ -493,11 +492,11 @@ export default function LandingPage() {
             >
               Start with Japanese. Grow with AIko.
             </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-stone-500">
+            <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-stone-500">
               Begin with structured lessons today. As AIko grows, more languages, lesson
               styles, and AI tutors will follow.
             </p>
-            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <ButtonLink href="/signup" className="group">
                 Create your account
                 <ArrowRight
@@ -514,7 +513,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="border-t border-black/[.06] bg-white">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 md:grid-cols-[1fr_auto] md:items-end">
+        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 sm:px-8 md:grid-cols-[1fr_auto] md:items-end">
           <div>
             <Brand />
             <p className="mt-4 max-w-sm text-sm leading-6 text-stone-500">
@@ -535,7 +534,7 @@ export default function LandingPage() {
           </nav>
         </div>
         <div className="border-t border-black/[.06]">
-          <p className="mx-auto max-w-7xl px-5 py-6 text-xs text-stone-400 sm:px-8">
+          <p className="mx-auto max-w-7xl px-5 py-5 text-xs text-stone-400 sm:px-8">
             © 2026 AIko. Built independently with the help of AI.
           </p>
         </div>
