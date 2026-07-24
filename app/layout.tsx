@@ -5,6 +5,7 @@ import { DemoModeBanner } from "@/components/backend/demo-mode-banner";
 import { LegacyImportAssistant } from "@/components/backend/legacy-import-assistant";
 import { SyncStatus } from "@/components/backend/sync-status";
 import { BackendSessionHydrator } from "@/components/backend/backend-session-hydrator";
+import { LearnerRouteGuard } from "@/components/auth/learner-route-guard";
 
 export const metadata: Metadata = {
   title: {
@@ -34,7 +35,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ThemeSync />
         <BackendSessionHydrator />
         <DemoModeBanner />
-        {children}
+        <LearnerRouteGuard>{children}</LearnerRouteGuard>
         <LegacyImportAssistant />
         <SyncStatus />
       </body>

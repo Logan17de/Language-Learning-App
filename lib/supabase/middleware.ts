@@ -4,7 +4,7 @@ import { canAccessAdminPath, type AppRole } from "@/lib/auth/permissions";
 import { getSupabasePublicConfig } from "@/lib/supabase/config";
 import type { Database } from "@/types/database";
 
-const learnerPrefixes = ["/home", "/learn", "/review", "/progress", "/custom-topic", "/profile", "/settings", "/support", "/lesson"];
+const learnerPrefixes = ["/home", "/learn", "/review", "/progress", "/custom-topic", "/profile", "/settings", "/subscription", "/lesson"];
 
 export async function updateSession(request: NextRequest): Promise<NextResponse> {
   const config = getSupabasePublicConfig();

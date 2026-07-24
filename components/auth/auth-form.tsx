@@ -21,6 +21,11 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const backendMode = getBackendMode();
+  const requestedNext = () => {
+    if (typeof window === "undefined") return null;
+    const value = new URLSearchParams(window.location.search).get("next");
+    return value?.startsWith("/") && !value.startsWith("//") ? value : null;
+  };
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -33,7 +38,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     if (backendMode === "demo") {
       window.setTimeout(() => {
         signIn(mode === "signup" ? name : undefined);
-        router.push(onboardingComplete ? "/home" : "/onboarding");
+        router.push(mode === "login" && requestedNext() ? requestedNext()! : onboardingComplete ? "/home" : "/onboarding");
       }, 650);
       return;
     }
@@ -52,7 +57,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       if (!result.ok) return setError(result.error.message);
       signIn(result.data.displayName);
     }
-    router.push(mode === "signup" || !onboardingComplete ? "/onboarding" : "/home");
+    router.push(mode === "signup" || !onboardingComplete ? "/onboarding" : requestedNext() ?? "/home");
     router.refresh();
   }
 
@@ -63,7 +68,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       return;
     }
     setLoading(true);
-    const result = await authService.signInWithGoogle(onboardingComplete ? "/home" : "/onboarding");
+    const result = await authService.signInWithGoogle(requestedNext() ?? (onboardingComplete ? "/home" : "/onboarding"));
     if (!result.ok) {
       setLoading(false);
       setError(result.error.message);
