@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronDown, Crown, Sparkles, X } from "lucide-react";
+import { Check, Crown, Sparkles } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import type { BillingPeriod } from "@/types/app-preferences";
 import { Badge } from "@/components/ui/badge";
@@ -9,29 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-const planFeatures = {
-  free: [
-    "Structured JLPT lessons",
-    "Random lessons matched to your level",
-    "Basic review and progress tracking",
-    "Standard speaking practice",
-    "Interests saved for a future upgrade",
-  ],
-  pro: [
-    "Interest-based lesson recommendations",
-    "Custom-topic AI lesson generation",
-    "Unlimited adaptive lesson access",
-    "Extended speaking practice",
-    "Deeper progress analytics and review",
-  ],
-};
-
-const comparison = [
-  { feature: "Level-matched lessons", free: true, pro: true },
-  { feature: "Basic review and progress", free: true, pro: true },
-  { feature: "Interest-based recommendations", free: false, pro: true },
-  { feature: "Custom-topic AI lessons", free: false, pro: true },
-  { feature: "Extended speaking practice", free: false, pro: true },
+const proFeatures = [
+  "Interest-based lesson recommendations",
+  "Custom-topic AI lesson generation",
+  "Unlimited adaptive lesson access",
+  "Extended speaking practice",
+  "Deeper progress analytics and review",
 ];
 
 export function SubscriptionPage() {
@@ -41,27 +24,29 @@ export function SubscriptionPage() {
   );
   const [showCheckoutNotice, setShowCheckoutNotice] = useState(false);
   const isPro = subscription.plan === "premium";
+  const price = billing === "annual" ? "¥20,000" : "¥2,000";
+  const priceSuffix = billing === "annual" ? "/ year" : "/ month";
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-7 sm:px-8 sm:py-10">
+    <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
       <header className="text-center">
-        <Badge tone={isPro ? "orange" : "neutral"}>
-          <Crown className="mr-1 size-3" /> Current plan:{" "}
-          {isPro ? "Pro" : "Free"}
+        <Badge tone="orange">
+          <Crown className="mr-1 size-3" />{" "}
+          {isPro ? "Your Pro plan" : "AIko Pro"}
         </Badge>
         <h1 className="mt-5 text-4xl font-semibold tracking-tight sm:text-5xl">
-          Choose how personally AIko adapts.
+          Learning shaped around your interests.
         </h1>
         <p className="mx-auto mt-4 max-w-2xl leading-7 text-stone-500">
-          Free keeps learning structured and level-matched. Pro adds
-          interest-based recommendations and custom AI-generated lessons.
+          Pro adds interest-based recommendations, custom AI-generated lessons,
+          and deeper practice tools to your Japanese learning path.
         </p>
       </header>
 
       <div
         className="mx-auto mt-8 flex w-fit rounded-full bg-stone-100 p-1"
         role="group"
-        aria-label="Billing period"
+        aria-label="Pro billing period"
       >
         {(["monthly", "annual"] as BillingPeriod[]).map((period) => (
           <button
@@ -85,80 +70,60 @@ export function SubscriptionPage() {
         ))}
       </div>
 
-      <div className="mt-10 grid gap-6 md:grid-cols-2">
-        <PlanCard
-          name="Free"
-          price="¥0"
-          suffix="/ forever"
-          features={planFeatures.free}
-          current={!isPro}
-        />
-        <PlanCard
-          name="Pro"
-          price={billing === "annual" ? "¥20,000" : "¥2,000"}
-          suffix={billing === "annual" ? "/ year" : "/ month"}
-          features={planFeatures.pro}
-          current={isPro}
-          pro
-          onChoose={() => setShowCheckoutNotice(true)}
-        />
-      </div>
-
-      {!isPro && (
-        <p className="mx-auto mt-5 max-w-xl text-center text-xs leading-5 text-stone-400">
-          Your Free plan continues normally. Viewing Pro does not change your
-          account or start a charge.
-        </p>
-      )}
-
-      <Card className="mt-10 overflow-hidden p-0">
-        <div className="grid grid-cols-[1fr_5rem_5rem] border-b border-stone-100 bg-moss-50 p-4 text-xs font-bold uppercase tracking-wide sm:grid-cols-[1fr_7rem_7rem]">
-          <span>Feature</span>
-          <span className="text-center">Free</span>
-          <span className="text-center">Pro</span>
-        </div>
-        {comparison.map((item) => (
-          <div
-            key={item.feature}
-            className="grid grid-cols-[1fr_5rem_5rem] items-center border-b border-stone-100 p-4 text-sm last:border-0 sm:grid-cols-[1fr_7rem_7rem]"
-          >
-            <span>{item.feature}</span>
-            <FeatureMark included={item.free} />
-            <FeatureMark included={item.pro} />
+      <Card className="mx-auto mt-10 max-w-2xl overflow-hidden border-moss-900 bg-moss-900 p-0 text-white shadow-float">
+        <div className="p-7 sm:p-10">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[.18em] text-moss-200">
+                AIko Pro
+              </p>
+              <h2 className="mt-2 text-3xl font-semibold">Personal learning</h2>
+            </div>
+            <Badge tone="orange">
+              <Sparkles className="mr-1 size-3" /> Full experience
+            </Badge>
           </div>
-        ))}
-      </Card>
 
-      <section className="mt-10">
-        <h2 className="text-center text-2xl font-semibold">Plan questions</h2>
-        <div className="mx-auto mt-5 max-w-3xl space-y-3">
-          {[
-            {
-              question: "Will this page charge me now?",
-              answer:
-                "No. Checkout is not connected yet, so this page cannot charge you or change your account plan.",
-            },
-            {
-              question: "How does Free choose lessons?",
-              answer:
-                "Free selects a random available lesson at your current level. Profile interests can be saved, but they do not affect Free lesson selection.",
-            },
-            {
-              question: "When does Pro use my interests?",
-              answer:
-                "Pro uses interests after you add them to your learning profile. Without interests, Pro also falls back to random level-matched lessons.",
-            },
-          ].map(({ question, answer }) => (
-            <details key={question} className="group rounded-2xl bg-white p-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
-                {question}
-                <ChevronDown className="size-4 shrink-0 transition group-open:rotate-180" />
-              </summary>
-              <p className="mt-3 text-sm leading-6 text-stone-500">{answer}</p>
-            </details>
-          ))}
+          <p className="mt-8 text-5xl font-semibold">
+            {price}
+            <span className="ml-2 text-sm font-normal text-white/50">
+              {priceSuffix}
+            </span>
+          </p>
+          {billing === "annual" && (
+            <p className="mt-2 text-sm text-moss-200">
+              Equivalent to about ¥1,667 per month.
+            </p>
+          )}
+
+          <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+            {proFeatures.map((feature) => (
+              <li
+                key={feature}
+                className="flex gap-3 text-sm leading-6 text-white/80"
+              >
+                <Check className="mt-1 size-4 shrink-0 text-persimmon-400" />
+                {feature}
+              </li>
+            ))}
+          </ul>
+
+          <Button
+            type="button"
+            onClick={() => setShowCheckoutNotice(true)}
+            disabled={isPro}
+            className="mt-9 w-full bg-persimmon-500 hover:bg-persimmon-600"
+          >
+            {isPro ? "Current Pro plan" : `Get Pro · ${price} ${priceSuffix}`}
+          </Button>
+          {!isPro && (
+            <p className="mt-4 text-center text-xs leading-5 text-white/45">
+              Checkout is not connected yet. You will not be charged from this
+              page.
+            </p>
+          )}
         </div>
-      </section>
+      </Card>
 
       {showCheckoutNotice && (
         <div
@@ -174,8 +139,8 @@ export function SubscriptionPage() {
             </h2>
             <p className="mt-3 text-sm leading-6 text-stone-500">
               Payment is not connected yet, so AIko will not charge you or
-              silently switch your plan. The pricing and benefits shown here are
-              the intended Pro offer.
+              silently switch your plan. The pricing shown here is the intended
+              Pro offer.
             </p>
             <Button
               className="mt-6 w-full"
@@ -187,69 +152,5 @@ export function SubscriptionPage() {
         </div>
       )}
     </div>
-  );
-}
-
-function PlanCard({
-  name,
-  price,
-  suffix,
-  features,
-  current,
-  pro = false,
-  onChoose,
-}: {
-  name: string;
-  price: string;
-  suffix: string;
-  features: string[];
-  current: boolean;
-  pro?: boolean;
-  onChoose?: () => void;
-}) {
-  return (
-    <Card
-      className={pro ? "border-moss-900 bg-moss-900 p-8 text-white" : "p-8"}
-    >
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">{name}</h2>
-        {pro && (
-          <Badge tone="orange">
-            <Sparkles className="mr-1 size-3" /> Personal learning
-          </Badge>
-        )}
-      </div>
-      <p className="mt-7 text-4xl font-semibold">
-        {price}
-        <span className="text-sm font-normal opacity-50"> {suffix}</span>
-      </p>
-      <ul className="mt-7 space-y-3">
-        {features.map((item) => (
-          <li key={item} className="flex gap-3 text-sm leading-5">
-            <Check
-              className={`mt-0.5 size-4 shrink-0 ${pro ? "text-persimmon-400" : "text-moss-600"}`}
-            />
-            {item}
-          </li>
-        ))}
-      </ul>
-      <Button
-        type="button"
-        variant={pro ? "primary" : "secondary"}
-        onClick={onChoose}
-        disabled={current || !onChoose}
-        className={`mt-8 w-full ${pro && !current ? "bg-persimmon-500 hover:bg-persimmon-600" : ""}`}
-      >
-        {current ? "Current plan" : pro ? "Get Pro" : "Free plan"}
-      </Button>
-    </Card>
-  );
-}
-
-function FeatureMark({ included }: { included: boolean }) {
-  return included ? (
-    <Check className="mx-auto size-4 text-moss-600" aria-label="Included" />
-  ) : (
-    <X className="mx-auto size-4 text-stone-300" aria-label="Not included" />
   );
 }
