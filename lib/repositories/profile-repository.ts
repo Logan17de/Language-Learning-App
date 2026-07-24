@@ -1,24 +1,59 @@
 import { createClient } from "@/lib/supabase/client";
-import { failure, notConfigured, success, type RepositoryResult } from "@/lib/repositories/result";
+import {
+  failure,
+  notConfigured,
+  success,
+  type RepositoryResult,
+} from "@/lib/repositories/result";
 import type { Database, ProfileRow } from "@/types/database";
+import type { DailyMinutes, LearnerLevel, LearningGoal } from "@/types/learner";
 
 type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
+
+interface OnboardingUpdate {
+  goal: LearningGoal | null;
+  level: LearnerLevel | null;
+  dailyMinutes: DailyMinutes | null;
+  interests: string[];
+}
+
+function toDatabaseLevel(
+  level: LearnerLevel,
+): Database["public"]["Enums"]["jlpt_level"] {
+  return level === "Beginner" || level === "Not sure" ? "N5" : level;
+}
 
 export const profileRepository = {
   async getCurrent(): Promise<RepositoryResult<ProfileRow>> {
     const client = createClient();
     if (!client) return notConfigured();
     const { data: auth } = await client.auth.getUser();
-    if (!auth.user) return failure({ code: "AUTH", message: "No session" }, "Your session has expired. Please sign in again.");
-    const { data, error } = await client.from("profiles").select("*").eq("id", auth.user.id).single();
-    return error ? failure(error, "Your profile could not be loaded.") : success(data);
+    if (!auth.user)
+      return failure(
+        { code: "AUTH", message: "No session" },
+        "Your session has expired. Please sign in again.",
+      );
+    const { data, error } = await client
+      .from("profiles")
+      .select("*")
+      .eq("id", auth.user.id)
+      .single();
+    return error
+      ? failure(error, "Your profile could not be loaded.")
+      : success(data);
   },
 
-  async updateCurrent(values: ProfileUpdate): Promise<RepositoryResult<ProfileRow>> {
+  async updateCurrent(
+    values: ProfileUpdate,
+  ): Promise<RepositoryResult<ProfileRow>> {
     const client = createClient();
     if (!client) return notConfigured();
     const { data: auth } = await client.auth.getUser();
-    if (!auth.user) return failure({ code: "AUTH" }, "Your session has expired. Please sign in again.");
+    if (!auth.user)
+      return failure(
+        { code: "AUTH" },
+        "Your session has expired. Please sign in again.",
+      );
     const safeValues: ProfileUpdate = {
       display_name: values.display_name,
       current_jlpt_level: values.current_jlpt_level,
@@ -27,17 +62,95 @@ export const profileRepository = {
       interests: values.interests,
       timezone: values.timezone,
     };
-    const { data, error } = await client.from("profiles").update(safeValues).eq("id", auth.user.id).select("*").single();
-    return error ? failure(error, "Your profile could not be updated.") : success(data);
+    const { data, error } = await client
+      .from("profiles")
+      .update(safeValues)
+      .eq("id", auth.user.id)
+      .select("*")
+      .single();
+    if (error) return failure(error, "Your profile could not be updated.");
+
+    const preferences = await client
+      .from("user_preferences")
+      .update({
+        learning_goal: values.learning_goal,
+        daily_study_minutes: values.daily_study_minutes,
+        interests: values.interests,
+        onboarding_complete: true,
+      })
+      .eq("user_id", auth.user.id);
+    return preferences.error
+      ? failure(
+          preferences.error,
+          "Your learning preferences could not be updated.",
+        )
+      : success(data);
+  },
+
+  async saveOnboarding(
+    values: OnboardingUpdate,
+  ): Promise<RepositoryResult<null>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { data: auth } = await client.auth.getUser();
+    if (!auth.user)
+      return failure(
+        { code: "AUTH" },
+        "Your session has expired. Please sign in again.",
+      );
+
+    const profileValues: ProfileUpdate = {
+      interests: values.interests,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      ...(values.goal ? { learning_goal: values.goal } : {}),
+      ...(values.level
+        ? { current_jlpt_level: toDatabaseLevel(values.level) }
+        : {}),
+      ...(values.dailyMinutes
+        ? { daily_study_minutes: values.dailyMinutes }
+        : {}),
+    };
+    const profile = await client
+      .from("profiles")
+      .update(profileValues)
+      .eq("id", auth.user.id);
+    if (profile.error)
+      return failure(
+        profile.error,
+        "Your onboarding choices could not be saved.",
+      );
+
+    const preferenceValues: Database["public"]["Tables"]["user_preferences"]["Update"] =
+      {
+        interests: values.interests,
+        onboarding_complete: true,
+        ...(values.goal ? { learning_goal: values.goal } : {}),
+        ...(values.dailyMinutes
+          ? { daily_study_minutes: values.dailyMinutes }
+          : {}),
+      };
+    const preferences = await client
+      .from("user_preferences")
+      .update(preferenceValues)
+      .eq("user_id", auth.user.id);
+    return preferences.error
+      ? failure(preferences.error, "Your onboarding status could not be saved.")
+      : success(null);
   },
 
   async markLegacyImported(): Promise<RepositoryResult<string>> {
     const client = createClient();
     if (!client) return notConfigured();
     const { data: auth } = await client.auth.getUser();
-    if (!auth.user) return failure({ code: "AUTH" }, "Your session has expired.");
+    if (!auth.user)
+      return failure({ code: "AUTH" }, "Your session has expired.");
     const importedAt = new Date().toISOString();
-    const { error } = await client.from("profiles").update({ legacy_imported_at: importedAt }).eq("id", auth.user.id);
-    return error ? failure(error, "The import marker could not be saved.") : success(importedAt);
+    const { error } = await client
+      .from("profiles")
+      .update({ legacy_imported_at: importedAt })
+      .eq("id", auth.user.id);
+    return error
+      ? failure(error, "The import marker could not be saved.")
+      : success(importedAt);
   },
 };
