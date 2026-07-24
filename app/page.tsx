@@ -240,8 +240,11 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="learning-system" className="scroll-mt-24 bg-white py-16 sm:py-20">
-          <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <section
+          id="learning-system"
+          className="scroll-mt-20 flex min-h-[calc(100svh-5rem)] items-center bg-white py-16 sm:py-20"
+        >
+          <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
             <div className="mx-auto max-w-3xl text-center">
               <p className="section-kicker">A connected learning loop</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
@@ -322,8 +325,11 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="lesson-journey" className="scroll-mt-24 bg-white py-16 sm:py-20">
-          <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <section
+          id="lesson-journey"
+          className="scroll-mt-20 flex min-h-[calc(100svh-5rem)] items-center bg-white py-16 sm:py-20"
+        >
+          <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
             <div className="max-w-3xl">
               <p className="section-kicker">The lesson journey</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
@@ -355,8 +361,11 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="pricing" className="scroll-mt-24 py-16 sm:py-20">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
+        <section
+          id="pricing"
+          className="scroll-mt-20 flex min-h-[calc(100svh-5rem)] items-center py-16 sm:py-20"
+        >
+          <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">
             <div className="mx-auto max-w-3xl text-center">
               <p className="section-kicker">Free and Pro</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
@@ -425,51 +434,56 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="founder" className="scroll-mt-24 bg-white py-16 sm:py-20">
-          <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center">
+        <section
+          id="founder"
+          className="scroll-mt-20 flex min-h-[calc(100svh-5rem)] items-center bg-white py-16 sm:py-20"
+        >
+          <div className="mx-auto grid w-full max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center">
             <div>
-              <p className="section-kicker">Built differently</p>
+              <p className="section-kicker">Meet the founder</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-                One person, many AI collaborators.
+                Built by Logan, with AI beside him.
               </h2>
               <div className="mt-6 max-w-2xl space-y-4 text-lg leading-8 text-stone-500">
                 <p>
-                  AIko is being built by an independent creator who wanted a better way to
-                  learn languages—one where stories, vocabulary, grammar, reading, listening,
-                  speaking, and review all work together.
+                  AIko is being created by Logan, an independent AI researcher
+                  and language learner based in Tokyo. While learning Japanese himself, he kept
+                  meeting the same problem: lessons, weak points, and progress were scattered,
+                  while general AI tutors did not reliably remember what needed more practice.
                 </p>
                 <p>
-                  Instead of starting with a large company or development team, the product is
-                  being designed and built by one person working alongside AI. The ideas,
-                  learning structure, experiments, and decisions come from a human. AI helps
-                  turn those ideas into a working product.
+                  That frustration became AIko—a structured system where stories, vocabulary,
+                  grammar, reading, listening, speaking, and review stay connected. Japanese is
+                  the first language because it is the challenge he knows personally, but the
+                  platform is being designed to support many languages.
                 </p>
                 <p>
-                  AIko itself is proof of the idea behind the platform: a person can achieve
-                  more when AI becomes a thoughtful collaborator, not a replacement.
+                  Logan leads the learning design, product direction, experiments, and
+                  decisions. AI helps him explore, code, test, and refine the app, turning one
+                  person&apos;s idea into a real product while human judgement stays in charge.
                 </p>
               </div>
               <p className="mt-6 font-serif text-xl italic text-moss-700">
-                Designed by a learner. Built with AI. Made for people who want to keep growing.
+                Designed from real frustration. Built through human direction and AI collaboration.
               </p>
             </div>
             <div className="rounded-4xl bg-paper p-6 sm:p-9">
-              <div className="flex flex-col gap-4" aria-label="How AIko is built">
+              <div className="flex flex-col gap-4" aria-label="About AIko's founder">
                 {[
                   {
-                    label: "Human idea",
-                    copy: "A learner identifies a better way to connect the learning journey.",
+                    label: "Learning in Japan",
+                    copy: "Based in Tokyo and preparing for JLPT N2, he builds around problems he experiences firsthand.",
                     icon: UserRound,
                   },
                   {
-                    label: "AI-assisted creation",
-                    copy: "AI helps explore, build, test, and refine the idea.",
-                    icon: Sparkles,
+                    label: "Independent AI research",
+                    copy: "His work explores transformer models, fine-tuning, adaptation, and how AI systems learn.",
+                    icon: BrainCircuit,
                   },
                   {
-                    label: "Real working product",
-                    copy: "The result becomes something people can use and improve with.",
-                    icon: Languages,
+                    label: "Human-led, AI-assisted",
+                    copy: "The product vision and decisions stay human; AI helps turn them into a working app.",
+                    icon: Sparkles,
                   },
                 ].map(({ label, copy, icon: Icon }, index) => (
                   <div key={label}>
