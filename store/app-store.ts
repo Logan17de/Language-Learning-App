@@ -178,6 +178,78 @@ export function createEmptyLessonSession(lessonId: string): LessonSession {
   };
 }
 
+export function normalizeLessonSession(
+  lessonId: string,
+  value: unknown,
+): LessonSession {
+  const empty = createEmptyLessonSession(lessonId);
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return empty;
+  }
+
+  const session = value as Partial<LessonSession>;
+  const integer = (candidate: unknown, fallback: number) =>
+    typeof candidate === "number" && Number.isInteger(candidate)
+      ? candidate
+      : fallback;
+  const timestamp = (candidate: unknown, fallback: string) =>
+    typeof candidate === "string" && candidate.length > 0
+      ? candidate
+      : fallback;
+
+  return {
+    ...empty,
+    ...session,
+    lessonId,
+    currentPhaseIndex: Math.max(
+      0,
+      Math.min(6, integer(session.currentPhaseIndex, 0)),
+    ),
+    activityIndex: Math.max(0, integer(session.activityIndex, 0)),
+    elapsedSeconds: Math.max(0, integer(session.elapsedSeconds, 0)),
+    startedAt: timestamp(session.startedAt, empty.startedAt),
+    updatedAt: timestamp(session.updatedAt, empty.updatedAt),
+    completedPhaseIds: Array.isArray(session.completedPhaseIds)
+      ? session.completedPhaseIds
+      : [],
+    activities:
+      typeof session.activities === "object" &&
+      session.activities !== null &&
+      !Array.isArray(session.activities)
+        ? session.activities
+        : {},
+    storyInteractions: Array.isArray(session.storyInteractions)
+      ? session.storyInteractions
+      : [],
+    storyComplete: session.storyComplete === true,
+    vocabularyAnswers: Array.isArray(session.vocabularyAnswers)
+      ? session.vocabularyAnswers
+      : [],
+    grammarAnswers: Array.isArray(session.grammarAnswers)
+      ? session.grammarAnswers
+      : [],
+    readingEvents: Array.isArray(session.readingEvents)
+      ? session.readingEvents
+      : [],
+    readingComplete: session.readingComplete === true,
+    listeningEvents: Array.isArray(session.listeningEvents)
+      ? session.listeningEvents
+      : [],
+    listeningComplete: session.listeningComplete === true,
+    speakingEvents: Array.isArray(session.speakingEvents)
+      ? session.speakingEvents
+      : [],
+    speakingComplete: session.speakingComplete === true,
+    reviewAnswers: Array.isArray(session.reviewAnswers)
+      ? session.reviewAnswers
+      : [],
+    reviewResult: session.reviewResult ?? null,
+    completionResult: session.completionResult ?? null,
+    completed: session.completed === true,
+    rewarded: session.rewarded === true,
+  };
+}
+
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -300,7 +372,16 @@ export const useAppStore = create<AppState>()(
         })),
       startOrResumeLesson: (lessonId) => {
         const existing = get().lessonSessions[lessonId];
-        if (existing) return existing;
+        if (existing) {
+          const session = normalizeLessonSession(lessonId, existing);
+          set((state) => ({
+            lessonSessions: {
+              ...state.lessonSessions,
+              [lessonId]: session,
+            },
+          }));
+          return session;
+        }
         const session = createEmptyLessonSession(lessonId);
         set((state) => ({
           lessonSessions: { ...state.lessonSessions, [lessonId]: session },
@@ -311,11 +392,15 @@ export const useAppStore = create<AppState>()(
         }));
         return session;
       },
-      saveLessonSession: (session) =>
+      saveLessonSession: (value) => {
+        const session = normalizeLessonSession(value.lessonId, value);
         set((state) => ({
           lessonSessions: {
             ...state.lessonSessions,
-            [session.lessonId]: { ...session, updatedAt: new Date().toISOString() },
+            [session.lessonId]: {
+              ...session,
+              updatedAt: new Date().toISOString(),
+            },
           },
           progress: {
             ...state.progress,
@@ -323,10 +408,14 @@ export const useAppStore = create<AppState>()(
               ...state.progress.lessonProgress,
               [session.lessonId]: session.completed
                 ? 100
-                : Math.max(1, Math.round((session.currentPhaseIndex / 7) * 100)),
+                : Math.max(
+                    1,
+                    Math.round((session.currentPhaseIndex / 7) * 100),
+                  ),
             },
           },
-        })),
+        }));
+      },
       rewardLessonCompletion: (lesson, result) => {
         const session = get().lessonSessions[lesson.id];
         if (!session || session.rewarded) return false;
@@ -466,7 +555,14 @@ export const useAppStore = create<AppState>()(
           user: { ...current.user, ...saved.user },
           onboarding: { ...current.onboarding, ...saved.onboarding },
           progress: mergeProgress(current.progress, saved.progress),
-          lessonSessions: saved.lessonSessions ?? {},
+          lessonSessions: Object.fromEntries(
+            Object.entries(saved.lessonSessions ?? {}).map(
+              ([lessonId, session]) => [
+                lessonId,
+                normalizeLessonSession(lessonId, session),
+              ],
+            ),
+          ),
           savedLessonIds: saved.savedLessonIds ?? [],
           generatedLessons: saved.generatedLessons ?? [],
           customLessonRequests: saved.customLessonRequests ?? [],
