@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Bot } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
-import { Button, ButtonLink } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { authService } from "@/lib/auth/auth-service";
 import { getBackendMode } from "@/lib/supabase/config";
 import { useAppStore } from "@/store/app-store";
@@ -92,7 +91,7 @@ function usePublicAuthState() {
 }
 
 export function PublicHeaderActions() {
-  const { isSigningOut, plan, resolved, signedIn, signOut } = usePublicAuthState();
+  const { resolved, signedIn } = usePublicAuthState();
 
   if (!resolved) {
     return (
@@ -105,36 +104,10 @@ export function PublicHeaderActions() {
 
   if (signedIn) {
     return (
-      <>
-        <Badge
-          tone={plan === "pro" ? "orange" : "neutral"}
-          className="shrink-0 px-2 text-[10px] sm:px-3 sm:text-xs"
-        >
-          {plan === "pro" ? "Pro plan" : "Free plan"}
-        </Badge>
-        {plan === "free" && (
-          <ButtonLink
-            href="/subscription"
-            variant="ghost"
-            className="hidden min-h-10 px-3 text-xs text-moss-700 sm:inline-flex"
-          >
-            Explore Pro
-          </ButtonLink>
-        )}
-        <Button
-          type="button"
-          variant="ghost"
-          className="min-h-10 px-2 text-xs sm:px-4 sm:text-sm"
-          onClick={() => void signOut()}
-          disabled={isSigningOut}
-        >
-          {isSigningOut ? "Signing out…" : "Sign out"}
-        </Button>
-        <ButtonLink href="/home" className="min-h-10 px-3 text-xs sm:px-5 sm:text-sm">
-          <span className="sm:hidden">Dashboard</span>
-          <span className="hidden sm:inline">Go to dashboard</span>
-        </ButtonLink>
-      </>
+      <ButtonLink href="/home" className="min-h-10 px-3 text-xs sm:px-5 sm:text-sm">
+        <span className="sm:hidden">Dashboard</span>
+        <span className="hidden sm:inline">Go to dashboard</span>
+      </ButtonLink>
     );
   }
 
@@ -158,12 +131,16 @@ export function PublicPrimaryAction({
   signedOutLabel,
   signedInLabel = "Go to dashboard",
   signedInHref = "/home",
+  hideWhenSignedIn = false,
+  showAiIcon = false,
   className,
   variant = "primary",
 }: {
   signedOutLabel: string;
   signedInLabel?: string;
   signedInHref?: string;
+  hideWhenSignedIn?: boolean;
+  showAiIcon?: boolean;
   className?: string;
   variant?: "primary" | "secondary" | "ghost" | "dark";
 }) {
@@ -178,12 +155,17 @@ export function PublicPrimaryAction({
     );
   }
 
+  if (signedIn && hideWhenSignedIn) {
+    return null;
+  }
+
   return (
     <ButtonLink
       href={signedIn ? signedInHref : "/signup"}
       variant={variant}
       className={className}
     >
+      {showAiIcon && <Bot className="size-4" aria-hidden="true" />}
       {signedIn ? signedInLabel : signedOutLabel}
       <ArrowRight
         className="size-4 transition-transform group-hover:translate-x-1"
