@@ -174,7 +174,7 @@ export default function LandingPage() {
                 guidance in one learning experience. Japanese is only the beginning.
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                <PublicPrimaryAction signedOutLabel="Start learning" className="group px-7" />
+                <PublicPrimaryAction signedOutLabel="Start learning" hideWhenSignedIn className="group px-7" />
                 <a
                   href="#learning-system"
                   className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold text-ink hover:bg-white ${focusRing}`}
@@ -295,16 +295,7 @@ export default function LandingPage() {
               <p className="mt-5 max-w-xl rounded-2xl border-l-4 border-persimmon-500 bg-white px-5 py-4 font-medium leading-7 shadow-card">
                 AIko adapts using what you practise, reveal, retry, and remember.
               </p>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl bg-white p-4 shadow-card">
-                  <p className="text-xs font-bold uppercase tracking-wider text-moss-700">Free path</p>
-                  <p className="mt-2 text-sm leading-6 text-stone-500">A random, non-repeating lesson from your current level. Profile interests do not affect Free selection.</p>
-                </div>
-                <div className="rounded-2xl bg-moss-100 p-4">
-                  <p className="text-xs font-bold uppercase tracking-wider text-moss-700">Pro path</p>
-                  <p className="mt-2 text-sm leading-6 text-stone-600">Level plus interests shape assignments. Your own topic can become a complete saved lesson package.</p>
-                </div>
-              </div>
+
             </div>
             <div className="rounded-4xl bg-moss-900 p-7 text-white sm:p-8">
               <p className="text-sm font-semibold text-moss-200">Learning evidence may include</p>
@@ -431,6 +422,8 @@ export default function LandingPage() {
                     signedOutLabel={plan.cta}
                     signedInLabel={plan.primary ? "Explore Pro" : "Go to dashboard"}
                     signedInHref={plan.primary ? "/subscription" : "/home"}
+                    hideWhenSignedIn={!plan.primary}
+                    showAiIcon={plan.primary}
                     variant={plan.primary ? "primary" : "secondary"}
                     className={
                       plan.primary
@@ -536,7 +529,7 @@ export default function LandingPage() {
               styles, and AI tutors will follow.
             </p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-              <PublicPrimaryAction signedOutLabel="Create your account" className="group" />
+              <PublicPrimaryAction signedOutLabel="Create your account" hideWhenSignedIn className="group" />
             </div>
           </div>
         </section>
