@@ -1,6 +1,10 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
+import {
+  clearGoogleOAuthStorage,
+  createClient,
+  createGoogleOAuthClient,
+} from "@/lib/supabase/client";
 import { getAppUrl } from "@/lib/supabase/config";
 import { isStrongEnough } from "@/lib/auth/password-strength";
 import {
@@ -186,7 +190,8 @@ export const authService = {
     mode: "login" | "signup",
     next?: string,
   ): Promise<RepositoryResult<null>> {
-    const client = createClient();
+    clearGoogleOAuthStorage();
+    const client = createGoogleOAuthClient();
     if (!client) return notConfigured();
     const safeNext =
       next?.startsWith("/") && !next.startsWith("//") ? next : null;
