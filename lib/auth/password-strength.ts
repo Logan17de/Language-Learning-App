@@ -11,10 +11,10 @@ export interface PasswordStrength {
 
 export function getPasswordStrength(password: string): PasswordStrength {
   const checks = {
-    length: password.length >= 8,
+    length: password.length >= 12,
     upperAndLower: /[a-z]/.test(password) && /[A-Z]/.test(password),
     number: /\d/.test(password),
-    symbol: /[^A-Za-z0-9]/.test(password),
+    symbol: /[^A-Za-z0-9\s]/.test(password),
   };
   const passed = Object.values(checks).filter(Boolean).length;
   const score = (password.length === 0 ? 0 : Math.min(4, passed)) as PasswordStrength["score"];
@@ -23,5 +23,5 @@ export function getPasswordStrength(password: string): PasswordStrength {
 }
 
 export function isStrongEnough(password: string): boolean {
-  return getPasswordStrength(password).score >= 3;
+  return Object.values(getPasswordStrength(password).checks).every(Boolean);
 }
