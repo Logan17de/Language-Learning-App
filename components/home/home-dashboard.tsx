@@ -11,7 +11,6 @@ import {
   Gem,
   Lightbulb,
   RotateCcw,
-  Sparkles,
   Target,
   Trophy,
 } from "lucide-react";
@@ -28,7 +27,6 @@ export function HomeDashboard() {
   const progress = useAppStore((state) => state.progress);
   const sessions = useAppStore((state) => state.lessonSessions);
   const generatedLessons = useAppStore((state) => state.generatedLessons);
-  const subscription = useAppStore((state) => state.subscription);
   const activeSession = Object.values(sessions).find(
     (session) => !session.completed,
   );
@@ -338,58 +336,7 @@ export function HomeDashboard() {
             </ButtonLink>
           </Card>
 
-          <Card className="overflow-hidden p-0">
-            <div className="flex items-center justify-between border-b border-stone-100 px-5 py-4">
-              <div>
-                <h2 className="font-semibold">Free vs Pro</h2>
-                <p className="mt-1 text-xs text-stone-400">Choose how personally AIko adapts.</p>
-              </div>
-              <Badge tone={subscription.plan === "premium" ? "orange" : "neutral"}>
-                {subscription.plan === "premium" ? "Pro plan" : "Free plan"}
-              </Badge>
-            </div>
-            <div className="grid gap-px bg-stone-100 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
-              <div className="bg-white p-5">
-                <p className="text-xs font-bold uppercase tracking-[.16em] text-stone-400">Free</p>
-                <ul className="mt-4 space-y-3 text-xs leading-5 text-stone-600">
-                  {[
-                    "Random lessons at your level",
-                    "Basic review and progress",
-                    "Standard speaking practice",
-                  ].map((feature) => (
-                    <li key={feature} className="flex gap-2">
-                      <CircleCheckBig className="mt-0.5 size-3.5 shrink-0 text-moss-600" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="bg-moss-900 p-5 text-white">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-bold uppercase tracking-[.16em] text-moss-200">Pro</p>
-                  <Sparkles className="size-4 text-persimmon-400" />
-                </div>
-                <ul className="mt-4 space-y-3 text-xs leading-5 text-white/70">
-                  {[
-                    "Interest-based recommendations",
-                    "Custom-topic AI lessons",
-                    "Extended practice and analytics",
-                  ].map((feature) => (
-                    <li key={feature} className="flex gap-2">
-                      <CircleCheckBig className="mt-0.5 size-3.5 shrink-0 text-persimmon-400" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <ButtonLink
-                  href="/subscription"
-                  className="mt-5 w-full justify-between bg-persimmon-500 px-4 hover:bg-persimmon-600"
-                >
-                  Explore Pro <ChevronRight className="size-4" />
-                </ButtonLink>
-              </div>
-            </div>
-          </Card>
+
 
           {generatedLessons[0] && (
             <Card className="border-persimmon-100 bg-persimmon-50">
