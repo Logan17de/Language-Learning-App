@@ -30,7 +30,11 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       "oauth-cancelled":
         "Google sign-in was cancelled or did not return an authorization code. Please try again.",
       "oauth-exchange":
-        "Google sign-in could not be completed. Please try again. If it continues, check AIko's Supabase redirect settings.",
+        "Google sign-in could not be completed. Please try again.",
+      "oauth-verifier":
+        "The temporary Google sign-in session was lost. Start again in the same browser without clearing cookies.",
+      "oauth-expired":
+        "The Google sign-in request expired or was already used. Please start again.",
       "backend-not-configured":
         "Authentication is not configured for this deployment.",
       "auth-callback":
