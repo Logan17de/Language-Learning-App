@@ -100,9 +100,13 @@ export interface LessonCompletionResult {
 export interface StoryInteraction {
   id: string;
   lineId: string;
+  wordId?: string;
   term?: string;
   type: "audio-played" | "word-opened" | "reading-revealed" | "meaning-revealed";
   scoreDelta?: number;
+  meaningDelta?: number;
+  recognitionDelta?: number;
+  pronunciationDelta?: number;
   script?: "kanji" | "kana";
 }
 
