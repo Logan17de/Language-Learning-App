@@ -140,7 +140,7 @@ export function LessonLibrary() {
                 href={
                   isResuming
                     ? "/lesson/" + assignedLesson.id + "/play"
-                    : "/lesson/" + assignedLesson.id + "/preview"
+                    : "/lesson/" + assignedLesson.id + "/play"
                 }
                 className="mt-8 bg-persimmon-500 px-8 hover:bg-persimmon-600"
               >
