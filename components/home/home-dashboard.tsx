@@ -10,6 +10,7 @@ import {
   RotateCcw,
   Target,
 } from "lucide-react";
+import Link from "next/link";
 import { mockLessons } from "@/data/mock-lessons";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
@@ -104,12 +105,13 @@ export function HomeDashboard() {
             おはよう, {user.name}.
           </h1>
         </div>
-        <div
-          className="grid size-11 shrink-0 place-items-center rounded-full bg-moss-600 font-semibold text-white"
-          aria-label={user.name + "'s profile"}
+        <Link
+          href="/profile"
+          className="grid size-11 shrink-0 place-items-center rounded-full bg-moss-600 font-semibold text-white transition hover:bg-moss-700 focus:outline-none focus:ring-4 focus:ring-moss-100"
+          aria-label={"Open " + user.name + "'s profile"}
         >
           {user.name.charAt(0).toUpperCase()}
-        </div>
+        </Link>
       </header>
 
       <section className="mt-7 grid gap-4 sm:grid-cols-3">
