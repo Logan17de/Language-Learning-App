@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,24 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const backendMode = getBackendMode();
+
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get("error");
+    const messages: Record<string, string> = {
+      "no-google-account":
+        "No AIko account is connected to this Google address. Create an account first, then use Google to log in.",
+      "oauth-cancelled":
+        "Google sign-in was cancelled or did not return an authorization code. Please try again.",
+      "oauth-exchange":
+        "Google sign-in could not be completed. Please try again. If it continues, check AIko's Supabase redirect settings.",
+      "backend-not-configured":
+        "Authentication is not configured for this deployment.",
+      "auth-callback":
+        "Google sign-in could not be completed. Please try again.",
+    };
+    if (code && messages[code]) setError(messages[code]);
+  }, []);
+
   const requestedNext = () => {
     if (typeof window === "undefined") return null;
     const value = new URLSearchParams(window.location.search).get("next");
@@ -85,6 +103,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     }
     setLoading(true);
     const result = await authService.signInWithGoogle(
+      mode,
       requestedNext() ?? undefined,
     );
     if (!result.ok) {
@@ -103,7 +122,9 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         onClick={googleSignIn}
       >
         <GoogleMark />
-        Continue with Google
+        {mode === "login"
+          ? "Log in with Google"
+          : "Create account with Google"}
       </Button>
       <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[.16em] text-stone-300">
         <span className="h-px flex-1 bg-stone-200" />
