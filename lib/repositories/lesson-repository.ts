@@ -9,6 +9,7 @@ export interface CanonicalLesson {
   lesson: Lesson;
   version: Version;
   story: Database["public"]["Tables"]["lesson_story_lines"]["Row"][];
+  storyWords: Database["public"]["Tables"]["lesson_story_words"]["Row"][];
   vocabulary: Database["public"]["Tables"]["lesson_vocabulary"]["Row"][];
   grammar: Database["public"]["Tables"]["lesson_grammar"]["Row"][];
   reading: Database["public"]["Tables"]["lesson_reading_sections"]["Row"][];
@@ -46,8 +47,18 @@ async function loadContent(lesson: Lesson, version: Version): Promise<Repository
   const client = createClient();
   if (!client) return notConfigured();
   const versionId = version.id;
-  const [story, vocabulary, grammar, reading, listening, speaking, review] = await Promise.all([
+  const [
+    story,
+    storyWords,
+    vocabulary,
+    grammar,
+    reading,
+    listening,
+    speaking,
+    review,
+  ] = await Promise.all([
     client.from("lesson_story_lines").select("*").eq("lesson_version_id", versionId).order("position"),
+    client.from("lesson_story_words").select("*").eq("lesson_version_id", versionId).order("story_line_id").order("position"),
     client.from("lesson_vocabulary").select("*").eq("lesson_version_id", versionId).order("position"),
     client.from("lesson_grammar").select("*").eq("lesson_version_id", versionId).order("position"),
     client.from("lesson_reading_sections").select("*").eq("lesson_version_id", versionId).order("position"),
@@ -55,12 +66,26 @@ async function loadContent(lesson: Lesson, version: Version): Promise<Repository
     client.from("lesson_speaking_activities").select("*").eq("lesson_version_id", versionId).order("position"),
     client.from("lesson_review_activities").select("*").eq("lesson_version_id", versionId).order("position"),
   ]);
-  const firstError = [story, vocabulary, grammar, reading, listening, speaking, review].find((result) => result.error)?.error;
+  const storyWordTableMissing =
+    storyWords.error?.code === "42P01" ||
+    storyWords.error?.code === "PGRST205" ||
+    storyWords.error?.message?.includes("lesson_story_words") === true;
+  const firstError = [
+    story,
+    vocabulary,
+    grammar,
+    reading,
+    listening,
+    speaking,
+    review,
+    ...(storyWordTableMissing ? [] : [storyWords]),
+  ].find((result) => result.error)?.error;
   if (firstError) return failure(firstError, "Lesson content could not be loaded.");
   return success({
     lesson,
     version,
     story: story.data ?? [],
+    storyWords: storyWordTableMissing ? [] : (storyWords.data ?? []),
     vocabulary: vocabulary.data ?? [],
     grammar: grammar.data ?? [],
     reading: reading.data ?? [],
