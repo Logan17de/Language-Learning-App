@@ -6,7 +6,6 @@ import {
   Check,
   Image as ImageIcon,
   Sparkles,
-  Volume2,
 } from "lucide-react";
 import type { LessonPackage } from "@/types/lesson";
 import type {
@@ -166,14 +165,6 @@ export function StoryPhase({
     };
   }
 
-  function speakTerm(term: string) {
-    if (!("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(term);
-    utterance.lang = "ja-JP";
-    window.speechSynthesis.speak(utterance);
-  }
-
   const helpedWords = new Set(
     session.storyInteractions
       .filter(
@@ -274,7 +265,7 @@ export function StoryPhase({
               key={`story_paragraph_${paragraphIndex}`}
               className="font-serif text-xl leading-[3.4rem] text-ink sm:text-2xl"
             >
-              {paragraph.map((line, lineIndex) => (
+              {paragraph.map((line) => (
                 <span key={line.id}>
                   {segmentStoryLine(
                     line.japanese,
@@ -302,7 +293,7 @@ export function StoryPhase({
                             event.currentTarget,
                           )
                         }
-                        className={`mx-0.5 inline border-x-0 border-t-0 bg-transparent px-0.5 font-serif text-inherit leading-[inherit] transition focus:outline-none focus:ring-2 focus:ring-moss-200 ${
+                        className={`inline appearance-none border-x-0 border-t-0 bg-transparent p-0 align-baseline font-serif text-inherit leading-[inherit] transition focus:outline-none focus:ring-2 focus:ring-moss-200 ${
                           isOpen
                             ? "border-b-2 border-solid border-persimmon-400 text-persimmon-600"
                             : support.touched
@@ -316,9 +307,6 @@ export function StoryPhase({
                       </button>
                     );
                   })}
-                  {lineIndex < paragraph.length - 1 && (
-                    <span className="inline-block w-3" aria-hidden="true" />
-                  )}
                 </span>
               ))}
             </p>
@@ -350,29 +338,17 @@ export function StoryPhase({
             aria-hidden="true"
           />
           {activeDetails.reading && (
-            <div className="relative flex items-center justify-center gap-2 border-b border-white/15 px-5 py-3 text-lg font-semibold text-persimmon-200">
-              <button
-                type="button"
-                onClick={() => speakTerm(activeSupport.term)}
-                className="grid size-9 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50"
-                aria-label={`Hear ${activeSupport.term}`}
-              >
-                <Volume2 className="size-5" />
-              </button>
-              <span>{activeDetails.reading}</span>
+            <div className="relative border-b border-white/15 px-5 py-3 text-center text-lg font-semibold text-persimmon-200">
+              {activeDetails.reading}
             </div>
           )}
-          <div className="relative px-5 py-5 text-center">
-            {activeDetails.meaning ? (
+          {activeDetails.meaning && (
+            <div className="relative px-5 py-5 text-center">
               <p className="text-xl font-medium leading-snug">
                 {activeDetails.meaning}
               </p>
-            ) : (
-              <p className="text-sm leading-6 text-white/70">
-                Tap the underlined word again to reveal its meaning.
-              </p>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 
