@@ -40,11 +40,14 @@ export function requireSupabasePublicConfig(): SupabasePublicConfig {
 }
 
 export function getAppUrl(): string {
+  // OAuth and email-auth actions begin in the browser, so the current origin is
+  // the authoritative callback host. This also prevents a stale development
+  // NEXT_PUBLIC_APP_URL from sending a deployed user back to localhost.
+  if (typeof window !== "undefined") return window.location.origin;
+
   const configuredUrl =
     process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
   if (configuredUrl) return configuredUrl;
-
-  if (typeof window !== "undefined") return window.location.origin;
 
   const vercelUrl =
     process.env.VERCEL_PROJECT_PRODUCTION_URL ||
