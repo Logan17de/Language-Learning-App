@@ -173,7 +173,14 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             )}
           </button>
         </span>
-        {mode === "signup" && <PasswordStrengthMeter password={password} />}
+        {mode === "signup" ? (
+          <PasswordStrengthMeter password={password} />
+        ) : (
+          <p className="mt-2 text-xs leading-5 text-stone-400">
+            Password strength is checked when you create or reset a password.
+            Enter the password for your existing AIko account here.
+          </p>
+        )}
       </label>
       {mode === "login" && (
         <div className="text-right">
