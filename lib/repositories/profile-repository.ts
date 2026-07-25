@@ -11,6 +11,7 @@ import type { DailyMinutes, LearnerLevel, LearningGoal } from "@/types/learner";
 type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
 interface OnboardingUpdate {
+  displayName: string;
   goal: LearningGoal | null;
   level: LearnerLevel | null;
   dailyMinutes: DailyMinutes | null;
@@ -100,6 +101,7 @@ export const profileRepository = {
       );
 
     const profileValues: ProfileUpdate = {
+      display_name: values.displayName.trim(),
       interests: values.interests,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       ...(values.goal ? { learning_goal: values.goal } : {}),
