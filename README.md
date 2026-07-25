@@ -92,7 +92,7 @@ To enable Google sign-in:
 2. Add the Google client ID and secret to that provider and enable it.
 3. Add `http://localhost:3000/auth/callback` and the production `https://<your-domain>/auth/callback` URL to **Authentication → URL Configuration → Redirect URLs**.
 4. In Vercel, set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. AIko also accepts the legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-5. Set `NEXT_PUBLIC_APP_URL` to the matching deployment origin when you need to override the automatically detected origin.
+5. In Vercel, set `NEXT_PUBLIC_APP_URL=https://language-learning-app-kappa-dusky.vercel.app`. Never leave this variable pointing to localhost in a production environment. Browser-started auth also uses the current page origin as a safeguard.
 
 Do not put the Google client secret in this repository or in a `NEXT_PUBLIC_*` variable.
 
