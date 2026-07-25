@@ -1,5 +1,8 @@
 import type { LessonPackage } from "@/types/lesson";
-import { storyTermScore } from "@/lib/story-support";
+import {
+  storyWordIndependence,
+  storyWordScores,
+} from "@/lib/story-support";
 import type {
   GrammarAnswer,
   LessonCompletionResult,
@@ -58,21 +61,21 @@ export function calculateLessonCompletion(
     session.grammarAnswers.filter((answer) => answer.correct).length,
     Math.max(1, session.grammarAnswers.length),
   );
-  const storyTerms = lesson.story.flatMap((line) =>
-    line.tappableTerms.map((term) => ({ lineId: line.id, term })),
+  const storyWords = lesson.story.flatMap((line) =>
+    line.words.map((word) => ({ lineId: line.id, word })),
   );
-  const storyIndependence = storyTerms.length
-    ? storyTerms.reduce(
+  const storyIndependence = storyWords.length
+    ? storyWords.reduce(
         (total, item) =>
           total +
-          storyTermScore(
+          storyWordIndependence(
             session.storyInteractions,
             item.lineId,
-            item.term,
+            item.word,
           ),
         0,
       ) /
-      storyTerms.length /
+      storyWords.length /
       100
     : 1;
   const score = Math.round(
@@ -82,16 +85,20 @@ export function calculateLessonCompletion(
       storyIndependence * 10,
   );
   const wordsNeedingReview = unique([
-    ...storyTerms
-      .filter(
-        (item) =>
-          storyTermScore(
-            session.storyInteractions,
-            item.lineId,
-            item.term,
-          ) < 100,
-      )
-      .map((item) => item.term),
+    ...storyWords
+      .filter((item) => {
+        const scores = storyWordScores(
+          session.storyInteractions,
+          item.lineId,
+          item.word,
+        );
+        return (
+          scores.meaning < item.word.baseMeaningScore ||
+          scores.recognition < item.word.baseRecognitionScore ||
+          scores.pronunciation < item.word.basePronunciationScore
+        );
+      })
+      .map((item) => item.word.surface),
     ...session.vocabularyAnswers.filter((answer) => !answer.correct).map((answer) => answer.questionId.includes("kaisatsu") ? "改札" : "一緒に"),
     ...session.readingEvents
       .filter((event) => ["paused-before-word", "pronunciation-issue", "stopped-at-word"].includes(event.type))
