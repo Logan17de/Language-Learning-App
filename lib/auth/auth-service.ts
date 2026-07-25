@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { getAppUrl } from "@/lib/supabase/config";
+import { isStrongEnough } from "@/lib/auth/password-strength";
 import {
   failure,
   notConfigured,
@@ -28,7 +29,7 @@ function friendlyAuthMessage(message: string): string {
   if (lower.includes("email not confirmed"))
     return "Confirm your email before signing in.";
   if (lower.includes("password"))
-    return "Use a stronger password with at least 8 characters.";
+    return "Use at least 12 characters with uppercase and lowercase letters, a number, and a symbol.";
   return "Authentication could not be completed. Please try again.";
 }
 
@@ -83,6 +84,12 @@ export const authService = {
     password: string,
     displayName: string,
   ): Promise<RepositoryResult<{ confirmationRequired: boolean }>> {
+    if (!isStrongEnough(password)) {
+      return failure(
+        { code: "WEAK_PASSWORD" },
+        "Use at least 12 characters with uppercase and lowercase letters, a number, and a symbol.",
+      );
+    }
     const client = createClient();
     if (!client) return notConfigured();
     const { data, error } = await client.auth.signUp({
@@ -183,6 +190,12 @@ export const authService = {
   },
 
   async updatePassword(password: string): Promise<RepositoryResult<null>> {
+    if (!isStrongEnough(password)) {
+      return failure(
+        { code: "WEAK_PASSWORD" },
+        "Use at least 12 characters with uppercase and lowercase letters, a number, and a symbol.",
+      );
+    }
     const client = createClient();
     if (!client) return notConfigured();
     const { error } = await client.auth.updateUser({ password });
