@@ -20,8 +20,7 @@ import { ListeningPhase } from "@/components/lesson/listening-phase";
 import { SpeakingPhase } from "@/components/lesson/speaking-phase";
 import { FinalReviewPhase } from "@/components/lesson/final-review-phase";
 import { LessonReportDialog } from "@/components/support/lesson-report-dialog";
-import { restoreLessonProgress, syncLessonProgress } from "@/lib/sync/backend-sync";
-import { getBackendMode } from "@/lib/supabase/config";
+import { syncLessonProgress } from "@/lib/sync/backend-sync";
 
 export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
   const router = useRouter();
@@ -39,39 +38,19 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
       lesson.id,
       persistedSession ?? startOrResumeLesson(lesson.id),
     );
-    const apply = (restored: LessonSession) => {
-      const normalized = normalizeLessonSession(lesson.id, restored);
-      if (normalized.completed && normalized.completionResult) {
-        router.replace(`/lesson/${lesson.id}/complete`);
-        return;
-      }
-      setSession(normalized);
-      setElapsedSeconds(normalized.elapsedSeconds);
-      if (!persistedSession) {
-        saveLessonSession(normalized);
-      }
-    };
-    if (!persistedSession && getBackendMode() === "supabase") {
-      void restoreLessonProgress(lesson, next)
-        .then(apply)
-        .catch(() => apply(next));
-    } else {
-      apply(next);
+    if (next.completed && next.completionResult) {
+      router.replace(`/lesson/${lesson.id}/complete`);
+      return;
     }
-  }, [hasHydrated, lesson, persistedSession, router, saveLessonSession, startOrResumeLesson]);
+    setSession(next);
+    setElapsedSeconds(next.elapsedSeconds);
+  }, [hasHydrated, lesson.id, persistedSession, router, startOrResumeLesson]);
 
   useEffect(() => {
     if (!session) return;
     const timer = window.setInterval(() => setElapsedSeconds((value) => value + 1), 1000);
     return () => window.clearInterval(timer);
   }, [session]);
-
-  useEffect(() => {
-    if (!session || elapsedSeconds === 0 || elapsedSeconds % 10 !== 0) return;
-    const checkpoint = { ...session, elapsedSeconds };
-    saveLessonSession(checkpoint);
-    void syncLessonProgress(lesson, checkpoint).catch(() => undefined);
-  }, [elapsedSeconds, lesson, saveLessonSession, session]);
 
   useEffect(() => {
     if (!session) return;
@@ -81,9 +60,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
     };
     const handleVisibility = () => {
       if (document.visibilityState !== "hidden") return;
-      const checkpoint = { ...session, elapsedSeconds };
-      saveLessonSession(checkpoint);
-      void syncLessonProgress(lesson, checkpoint).catch(() => undefined);
+      saveLessonSession({ ...session, elapsedSeconds });
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("visibilitychange", handleVisibility);
@@ -91,16 +68,15 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [elapsedSeconds, lesson, saveLessonSession, session]);
+  }, [elapsedSeconds, saveLessonSession, session]);
 
   const updateSession = useCallback(
     (next: LessonSession) => {
       const withTime = { ...next, elapsedSeconds };
       setSession(withTime);
       saveLessonSession(withTime);
-      void syncLessonProgress(lesson, withTime).catch(() => undefined);
     },
-    [elapsedSeconds, lesson, saveLessonSession],
+    [elapsedSeconds, saveLessonSession],
   );
 
   const phase = lesson.phases[session?.currentPhaseIndex ?? 0];
@@ -148,6 +124,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
       const result = calculateLessonCompletion(lesson, timedSession);
       const completeSession = { ...timedSession, completionResult: result };
       updateSession(completeSession);
+      void syncLessonProgress(lesson, completeSession).catch(() => undefined);
       router.push(`/lesson/${lesson.id}/complete`);
       return;
     }
@@ -173,7 +150,6 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
   function exit() {
     if (!session) return;
     saveLessonSession({ ...session, elapsedSeconds });
-    void syncLessonProgress(lesson, { ...session, elapsedSeconds });
     router.push(`/lesson/${lesson.id}/preview`);
   }
 
