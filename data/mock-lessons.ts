@@ -1,4 +1,20 @@
 import type { LessonPackage } from "@/types/lesson";
+import { fallbackStoryWords } from "@/lib/story-support";
+
+function mockStoryLine(
+  id: string,
+  japanese: string,
+  english: string,
+  tappableTerms: string[],
+): LessonPackage["story"][number] {
+  return {
+    id,
+    japanese,
+    english,
+    tappableTerms,
+    words: fallbackStoryWords(id, japanese, tappableTerms, []),
+  };
+}
 
 export const commuteLesson: LessonPackage = {
   id: "lesson_n4_commute_001",
@@ -49,16 +65,16 @@ export const commuteLesson: LessonPackage = {
   ],
   reviewItems: ["駅", "〜ので"],
   story: [
-    { id: "s1", japanese: "朝、ゆきさんは六時半に起きます。", english: "Yuki wakes up at 6:30 in the morning.", tappableTerms: ["朝"] },
-    { id: "s2", japanese: "最近、早く起きられるようになりました。", english: "Recently, she has become able to wake up early.", tappableTerms: ["最近", "早く"] },
-    { id: "s3", japanese: "コーヒーを飲みながら、ニュースを読みます。", english: "She reads the news while drinking coffee.", tappableTerms: ["飲み", "読み"] },
-    { id: "s4", japanese: "七時十五分に家を出ます。", english: "She leaves home at 7:15.", tappableTerms: ["家", "出"] },
-    { id: "s5", japanese: "音楽を聞きながら、駅まで歩きます。", english: "She walks to the station while listening to music.", tappableTerms: ["聞き", "駅", "歩き"] },
-    { id: "s6", japanese: "改札で同僚の田中さんに会います。", english: "She meets her colleague Tanaka at the ticket gate.", tappableTerms: ["改札", "同僚", "会い"] },
-    { id: "s7", japanese: "二人は一緒に電車に乗ります。", english: "The two get on the train together.", tappableTerms: ["一緒に", "電車", "乗り"] },
-    { id: "s8", japanese: "会社は駅から十分です。", english: "The company is ten minutes from the station.", tappableTerms: ["会社", "駅"] },
-    { id: "s9", japanese: "ゆきさんはIT会社で働いています。", english: "Yuki works at an IT company.", tappableTerms: ["会社", "働いて"] },
-    { id: "s10", japanese: "新しい仕事にも慣れるようになりました。", english: "She has also become used to her new work.", tappableTerms: ["新しい", "仕事", "慣れる"] },
+    mockStoryLine("s1", "朝、ゆきさんは六時半に起きます。", "Yuki wakes up at 6:30 in the morning.", ["朝"]),
+    mockStoryLine("s2", "最近、早く起きられるようになりました。", "Recently, she has become able to wake up early.", ["最近", "早く"]),
+    mockStoryLine("s3", "コーヒーを飲みながら、ニュースを読みます。", "She reads the news while drinking coffee.", ["飲み", "読み"]),
+    mockStoryLine("s4", "七時十五分に家を出ます。", "She leaves home at 7:15.", ["家", "出"]),
+    mockStoryLine("s5", "音楽を聞きながら、駅まで歩きます。", "She walks to the station while listening to music.", ["聞き", "駅", "歩き"]),
+    mockStoryLine("s6", "改札で同僚の田中さんに会います。", "She meets her colleague Tanaka at the ticket gate.", ["改札", "同僚", "会い"]),
+    mockStoryLine("s7", "二人は一緒に電車に乗ります。", "The two get on the train together.", ["一緒に", "電車", "乗り"]),
+    mockStoryLine("s8", "会社は駅から十分です。", "The company is ten minutes from the station.", ["会社", "駅"]),
+    mockStoryLine("s9", "ゆきさんはIT会社で働いています。", "Yuki works at an IT company.", ["会社", "働いて"]),
+    mockStoryLine("s10", "新しい仕事にも慣れるようになりました。", "She has also become used to her new work.", ["新しい", "仕事", "慣れる"]),
   ],
   images: [
     { id: "img_commute_station", description: "A calm morning walk to the station", accent: "moss" },
