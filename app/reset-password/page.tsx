@@ -21,7 +21,7 @@ export default function ResetPasswordPage() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
-    if (!isStrongEnough(password)) return setError("Choose a stronger password using at least three of the four requirements.");
+    if (!isStrongEnough(password)) return setError("Use at least 12 characters with uppercase and lowercase letters, a number, and a symbol.");
     if (password !== confirmation) return setError("The passwords do not match.");
     setLoading(true);
     const result = await authService.updatePassword(password);
@@ -39,7 +39,7 @@ export default function ResetPasswordPage() {
         <label className="block">
           <span className="mb-2 block text-sm font-semibold">New password</span>
           <span className="relative block">
-            <input required minLength={8} type={showPassword ? "text" : "password"} value={password} onChange={(event) => setPassword(event.target.value)} className="form-input pr-12" autoComplete="new-password" />
+            <input required minLength={12} type={showPassword ? "text" : "password"} value={password} onChange={(event) => setPassword(event.target.value)} className="form-input pr-12" autoComplete="new-password" />
             <PasswordVisibility shown={showPassword} onToggle={() => setShowPassword((value) => !value)} />
           </span>
           <PasswordStrengthMeter password={password} />
@@ -47,7 +47,7 @@ export default function ResetPasswordPage() {
         <label className="block">
           <span className="mb-2 block text-sm font-semibold">Confirm password</span>
           <span className="relative block">
-            <input required minLength={8} type={showConfirmation ? "text" : "password"} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} className="form-input pr-12" autoComplete="new-password" />
+            <input required minLength={12} type={showConfirmation ? "text" : "password"} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} className="form-input pr-12" autoComplete="new-password" />
             <PasswordVisibility shown={showConfirmation} onToggle={() => setShowConfirmation((value) => !value)} />
           </span>
         </label>
