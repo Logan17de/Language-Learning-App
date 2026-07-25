@@ -8,7 +8,11 @@ import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter
 import { useAppStore } from "@/store/app-store";
 import { authService } from "@/lib/auth/auth-service";
 import { getBackendMode } from "@/lib/supabase/config";
-import { isStrongEnough } from "@/lib/auth/password-strength";
+import {
+  isStrongEnough,
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_REQUIREMENTS_MESSAGE,
+} from "@/lib/auth/password-strength";
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
@@ -40,7 +44,10 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       "auth-callback":
         "Google sign-in could not be completed. Please try again.",
     };
-    if (code && messages[code]) setError(messages[code]);
+    const message = code ? messages[code] : null;
+    if (!message) return;
+    const timer = window.setTimeout(() => setError(message), 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const requestedNext = () => {
@@ -53,9 +60,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     event.preventDefault();
     setError("");
     if (mode === "signup" && !isStrongEnough(password)) {
-      setError(
-        "Use at least 12 characters with uppercase and lowercase letters, a number, and a symbol.",
-      );
+      setError(PASSWORD_REQUIREMENTS_MESSAGE);
       return;
     }
     setLoading(true);
@@ -171,7 +176,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         <span className="relative block">
           <input
             required
-            minLength={mode === "signup" ? 12 : 6}
+            minLength={mode === "signup" ? PASSWORD_MIN_LENGTH : 6}
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             type={showPassword ? "text" : "password"}

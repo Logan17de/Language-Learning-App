@@ -4,7 +4,9 @@ import { getPasswordStrength, isStrongEnough } from "@/lib/auth/password-strengt
 describe("password strength", () => {
   it("requires a varied password before signup", () => {
     expect(isStrongEnough("password")).toBe(false);
-    expect(isStrongEnough("GoodPass9")).toBe(true);
+    expect(isStrongEnough("Good7!A")).toBe(false);
+    expect(isStrongEnough("Good7!Ab")).toBe(true);
+    expect(isStrongEnough("GoodPass9!")).toBe(true);
   });
 
   it("reports every strength signal", () => {

@@ -16,7 +16,9 @@ export function getSupabasePublicConfig(): SupabasePublicConfig | null {
     !url ||
     !anonKey ||
     url.includes("your-project") ||
-    anonKey.includes("your-")
+    anonKey.includes("your-") ||
+    anonKey === url ||
+    anonKey.includes("supabase.co")
   )
     return null;
   try {

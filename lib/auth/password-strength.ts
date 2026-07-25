@@ -9,9 +9,13 @@ export interface PasswordStrength {
   };
 }
 
+export const PASSWORD_MIN_LENGTH = 8;
+export const PASSWORD_REQUIREMENTS_MESSAGE =
+  "Use at least 8 characters with uppercase and lowercase letters, a number, and a symbol.";
+
 export function getPasswordStrength(password: string): PasswordStrength {
   const checks = {
-    length: password.length >= 12,
+    length: password.length >= PASSWORD_MIN_LENGTH,
     upperAndLower: /[a-z]/.test(password) && /[A-Z]/.test(password),
     number: /\d/.test(password),
     symbol: /[^A-Za-z0-9\s]/.test(password),

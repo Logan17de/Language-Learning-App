@@ -6,7 +6,10 @@ import {
   createGoogleOAuthClient,
 } from "@/lib/supabase/client";
 import { getAppUrl } from "@/lib/supabase/config";
-import { isStrongEnough } from "@/lib/auth/password-strength";
+import {
+  isStrongEnough,
+  PASSWORD_REQUIREMENTS_MESSAGE,
+} from "@/lib/auth/password-strength";
 import {
   failure,
   notConfigured,
@@ -62,7 +65,37 @@ function friendlyAuthMessage(message: string, code?: string): string {
     lower.includes("weak password") ||
     lower.includes("password should")
   )
-    return "Use at least 12 characters with uppercase and lowercase letters, a number, and a symbol.";
+    return PASSWORD_REQUIREMENTS_MESSAGE;
+
+  if (
+    normalizedCode === "bad_jwt" ||
+    lower.includes("invalid api key") ||
+    lower.includes("invalid api-key") ||
+    lower.includes("invalid jwt")
+  )
+    return "AIko authentication is not configured correctly for this deployment. Please contact support.";
+
+  if (
+    normalizedCode === "provider_disabled" ||
+    lower.includes("unsupported provider") ||
+    lower.includes("provider is not enabled")
+  )
+    return "Google sign-in is not enabled for this deployment yet.";
+
+  if (
+    normalizedCode === "unexpected_failure" ||
+    lower.includes("database error") ||
+    lower.includes("saving new user")
+  )
+    return "AIko could not create your learner profile. Please contact support.";
+
+  if (
+    normalizedCode === "over_request_rate_limit" ||
+    normalizedCode === "over_email_send_rate_limit" ||
+    lower.includes("rate limit") ||
+    lower.includes("too many requests")
+  )
+    return "Too many authentication attempts were made. Wait a moment, then try again.";
 
   return "Authentication could not be completed. Please try again.";
 }
@@ -121,7 +154,7 @@ export const authService = {
     if (!isStrongEnough(password)) {
       return failure(
         { code: "WEAK_PASSWORD" },
-        "Use at least 12 characters with uppercase and lowercase letters, a number, and a symbol.",
+        PASSWORD_REQUIREMENTS_MESSAGE,
       );
     }
     const client = createClient();
@@ -231,7 +264,7 @@ export const authService = {
     if (!isStrongEnough(password)) {
       return failure(
         { code: "WEAK_PASSWORD" },
-        "Use at least 12 characters with uppercase and lowercase letters, a number, and a symbol.",
+        PASSWORD_REQUIREMENTS_MESSAGE,
       );
     }
     const client = createClient();

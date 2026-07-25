@@ -1,12 +1,15 @@
 import { Check, Circle } from "lucide-react";
-import { getPasswordStrength } from "@/lib/auth/password-strength";
+import {
+  getPasswordStrength,
+  PASSWORD_MIN_LENGTH,
+} from "@/lib/auth/password-strength";
 import { cn } from "@/lib/utils";
 
 export function PasswordStrengthMeter({ password }: { password: string }) {
   const strength = getPasswordStrength(password);
   const tones = ["bg-stone-200", "bg-red-400", "bg-amber-400", "bg-lime-500", "bg-moss-600"];
   const rules = [
-    ["length", "12 or more characters"],
+    ["length", `${PASSWORD_MIN_LENGTH} or more characters`],
     ["upperAndLower", "Upper and lowercase letters"],
     ["number", "At least one number"],
     ["symbol", "At least one symbol"],
