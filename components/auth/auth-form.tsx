@@ -32,7 +32,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     setError("");
     if (mode === "signup" && !isStrongEnough(password)) {
       setError(
-        "Choose a stronger password using at least three of the four requirements.",
+        "Use at least 12 characters with uppercase and lowercase letters, a number, and a symbol.",
       );
       return;
     }
@@ -40,12 +40,11 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     if (backendMode === "demo") {
       window.setTimeout(() => {
         signIn(mode === "signup" ? name : undefined);
+        const next = requestedNext();
         router.push(
-          mode === "login" && requestedNext()
-            ? requestedNext()!
-            : onboardingComplete
-              ? "/home"
-              : "/onboarding",
+          mode === "signup" || !onboardingComplete
+            ? "/onboarding"
+            : (next ?? "/home"),
         );
       }, 650);
       return;
@@ -147,7 +146,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         <span className="relative block">
           <input
             required
-            minLength={mode === "signup" ? 8 : 6}
+            minLength={mode === "signup" ? 12 : 6}
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             type={showPassword ? "text" : "password"}
