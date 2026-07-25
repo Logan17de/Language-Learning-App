@@ -1,6 +1,7 @@
 import type { CanonicalLesson } from "@/lib/repositories/lesson-repository";
 import type { LessonPackage, LessonPhase } from "@/types/lesson";
 import type { Json } from "@/types/database";
+import { fallbackStoryWords } from "@/lib/story-support";
 
 const defaultPhases: LessonPhase[] = [
   { id: "story", label: "Story", description: "Meet today’s language in context" },
@@ -47,6 +48,13 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
   const status = sourceStatus === "approved" || sourceStatus === "published" || sourceStatus === "rejected" || sourceStatus === "archived"
     ? sourceStatus
     : "draft";
+  const vocabulary = value.vocabulary.map((item) => ({
+    term: item.written_form,
+    reading: item.reading,
+    meaning: item.meaning,
+    partOfSpeech: item.part_of_speech,
+    exampleSentence: item.example_sentence ?? undefined,
+  }));
   return {
     id: lesson.legacy_id ?? lesson.id,
     title: metadataText(value.version.metadata, "title") ?? lesson.title,
@@ -74,22 +82,41 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
       reading: item.reading,
       meaning: item.meaning,
     })),
-    vocabulary: value.vocabulary.map((item) => ({
-      term: item.written_form,
-      reading: item.reading,
-      meaning: item.meaning,
-      partOfSpeech: item.part_of_speech,
-      exampleSentence: item.example_sentence ?? undefined,
-    })),
+    vocabulary,
     reviewItems: value.version.review_items,
-    story: value.story.map((item) => ({
-      id: item.id,
-      japanese: item.japanese_text,
-      english: item.translation,
-      tappableTerms: item.tappable_terms,
-      imageId: item.image_asset_id ?? undefined,
-      audioAssetId: item.audio_asset_id ?? undefined,
-    })),
+    story: value.story.map((item) => {
+      const storedWords = value.storyWords
+        .filter((word) => word.story_line_id === item.id)
+        .sort((left, right) => left.position - right.position)
+        .map((word) => ({
+          id: word.id,
+          position: word.position,
+          surface: word.surface,
+          reading: word.reading,
+          meaning: word.meaning,
+          scriptType: word.script_type,
+          baseMeaningScore: word.meaning_score,
+          baseRecognitionScore: word.recognition_score,
+          basePronunciationScore: word.pronunciation_score,
+        }));
+      const words = storedWords.length
+        ? storedWords
+        : fallbackStoryWords(
+            item.id,
+            item.japanese_text,
+            item.tappable_terms,
+            vocabulary,
+          );
+      return {
+        id: item.id,
+        japanese: item.japanese_text,
+        english: item.translation,
+        tappableTerms: words.map((word) => word.surface),
+        words,
+        imageId: item.image_asset_id ?? undefined,
+        audioAssetId: item.audio_asset_id ?? undefined,
+      };
+    }),
     images: [],
     readingConversation: value.reading.map((item) => ({
       speaker: item.speaker,
