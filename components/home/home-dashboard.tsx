@@ -208,7 +208,7 @@ export function HomeDashboard() {
                 selectedLessonId
                   ? activeSession
                     ? "/lesson/" + selectedLessonId + "/play"
-                    : "/lesson/" + selectedLessonId + "/preview"
+                    : "/lesson/" + selectedLessonId + "/play"
                   : "/learn"
               }
               className="mt-8 bg-persimmon-500 px-7 hover:bg-persimmon-600"
