@@ -3,7 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
-import { createClient } from "@/lib/supabase/client";
+import {
+  clearGoogleOAuthStorage,
+  createClient,
+  createGoogleOAuthClient,
+} from "@/lib/supabase/client";
 
 type GoogleFlow = "login" | "signup";
 
@@ -41,7 +45,10 @@ export function OAuthCallback() {
 
       const code = url.searchParams.get("code");
       const client = createClient();
-      if (!client) {
+      const exchangeClient = googleFlow
+        ? createGoogleOAuthClient()
+        : client;
+      if (!client || !exchangeClient) {
         returnToAuth(googleFlow, "backend-not-configured");
         return;
       }
@@ -51,8 +58,8 @@ export function OAuthCallback() {
       }
 
       setStatus("Securing your AIko session…");
-      const { error: exchangeError } =
-        await client.auth.exchangeCodeForSession(code);
+      const { data: exchangeData, error: exchangeError } =
+        await exchangeClient.auth.exchangeCodeForSession(code);
       if (exchangeError) {
         const lower = exchangeError.message.toLowerCase();
         const reason =
@@ -65,6 +72,22 @@ export function OAuthCallback() {
               : "oauth-exchange";
         returnToAuth(googleFlow, reason);
         return;
+      }
+
+      if (googleFlow) {
+        if (!exchangeData.session) {
+          returnToAuth(googleFlow, "oauth-exchange");
+          return;
+        }
+        const { error: sessionError } = await client.auth.setSession({
+          access_token: exchangeData.session.access_token,
+          refresh_token: exchangeData.session.refresh_token,
+        });
+        if (sessionError) {
+          returnToAuth(googleFlow, "oauth-exchange");
+          return;
+        }
+        clearGoogleOAuthStorage();
       }
 
       // Remove the one-time authorization code before any further navigation.
