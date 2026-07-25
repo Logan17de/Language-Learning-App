@@ -37,7 +37,8 @@ Copy `.env.example` to `.env.local` and set:
 
 ```text
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+# Legacy alternative: NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 OPENAI_API_KEY=
@@ -90,7 +91,8 @@ To enable Google sign-in:
 1. Create a Google OAuth web client and add the Supabase callback URL shown in **Supabase Dashboard → Authentication → Providers → Google**.
 2. Add the Google client ID and secret to that provider and enable it.
 3. Add `http://localhost:3000/auth/callback` and the production `https://<your-domain>/auth/callback` URL to **Authentication → URL Configuration → Redirect URLs**.
-4. Set `NEXT_PUBLIC_APP_URL` to the matching deployment origin in each Vercel environment.
+4. In Vercel, set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. AIko also accepts the legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+5. Set `NEXT_PUBLIC_APP_URL` to the matching deployment origin when you need to override the automatically detected origin.
 
 Do not put the Google client secret in this repository or in a `NEXT_PUBLIC_*` variable.
 
