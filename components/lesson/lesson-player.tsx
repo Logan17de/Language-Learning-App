@@ -6,7 +6,10 @@ import { AlertTriangle, Save } from "lucide-react";
 import type { LessonPackage } from "@/types/lesson";
 import type { LessonPhaseId, LessonSession } from "@/types/lesson-session";
 import { calculateLessonCompletion } from "@/lib/scoring-utils";
-import { useAppStore } from "@/store/app-store";
+import {
+  normalizeLessonSession,
+  useAppStore,
+} from "@/store/app-store";
 import { Button } from "@/components/ui/button";
 import { LessonPlayerShell } from "@/components/lesson/lesson-player-shell";
 import { StoryPhase } from "@/components/lesson/story-phase";
@@ -32,18 +35,27 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
 
   useEffect(() => {
     if (!hasHydrated) return;
-    const next = persistedSession ?? startOrResumeLesson(lesson.id);
+    const next = normalizeLessonSession(
+      lesson.id,
+      persistedSession ?? startOrResumeLesson(lesson.id),
+    );
     const apply = (restored: LessonSession) => {
-      if (restored.completed && restored.completionResult) {
+      const normalized = normalizeLessonSession(lesson.id, restored);
+      if (normalized.completed && normalized.completionResult) {
         router.replace(`/lesson/${lesson.id}/complete`);
         return;
       }
-      setSession(restored);
-      setElapsedSeconds(restored.elapsedSeconds);
-      if (restored !== next) saveLessonSession(restored);
+      setSession(normalized);
+      setElapsedSeconds(normalized.elapsedSeconds);
+      saveLessonSession(normalized);
     };
-    if (!persistedSession && getBackendMode() === "supabase") void restoreLessonProgress(lesson, next).then(apply);
-    else apply(next);
+    if (!persistedSession && getBackendMode() === "supabase") {
+      void restoreLessonProgress(lesson, next)
+        .then(apply)
+        .catch(() => apply(next));
+    } else {
+      apply(next);
+    }
   }, [hasHydrated, lesson, persistedSession, router, saveLessonSession, startOrResumeLesson]);
 
   useEffect(() => {
@@ -56,7 +68,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
     if (!session || elapsedSeconds === 0 || elapsedSeconds % 10 !== 0) return;
     const checkpoint = { ...session, elapsedSeconds };
     saveLessonSession(checkpoint);
-    void syncLessonProgress(lesson, checkpoint);
+    void syncLessonProgress(lesson, checkpoint).catch(() => undefined);
   }, [elapsedSeconds, lesson, saveLessonSession, session]);
 
   useEffect(() => {
@@ -69,7 +81,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
       if (document.visibilityState !== "hidden") return;
       const checkpoint = { ...session, elapsedSeconds };
       saveLessonSession(checkpoint);
-      void syncLessonProgress(lesson, checkpoint);
+      void syncLessonProgress(lesson, checkpoint).catch(() => undefined);
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("visibilitychange", handleVisibility);
@@ -84,7 +96,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
       const withTime = { ...next, elapsedSeconds };
       setSession(withTime);
       saveLessonSession(withTime);
-      void syncLessonProgress(lesson, withTime);
+      void syncLessonProgress(lesson, withTime).catch(() => undefined);
     },
     [elapsedSeconds, lesson, saveLessonSession],
   );
