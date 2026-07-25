@@ -7,16 +7,15 @@ import {
   Image as ImageIcon,
   Sparkles,
 } from "lucide-react";
-import type { LessonPackage } from "@/types/lesson";
+import type { LessonPackage, StoryWord } from "@/types/lesson";
 import type {
   LessonSession,
   StoryInteraction,
 } from "@/types/lesson-session";
 import {
-  isKanaOnly,
-  segmentStoryLine,
+  segmentStoredStoryLine,
   STORY_MEANING_PENALTY,
-  STORY_READING_PENALTY,
+  STORY_RECOGNITION_PENALTY,
 } from "@/lib/story-support";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 
 interface ActiveWordSupport {
   lineId: string;
-  term: string;
+  word: StoryWord;
   x: number;
   y: number;
   placement: "above" | "below";
@@ -56,24 +55,36 @@ export function StoryPhase({
     });
   }
 
+  function evidenceFor(lineId: string, word: StoryWord) {
+    return session.storyInteractions.filter(
+      (item) =>
+        item.lineId === lineId &&
+        (item.wordId === word.id ||
+          (!item.wordId && item.term === word.surface)),
+    );
+  }
+
   function anchorSupport(
     lineId: string,
-    term: string,
+    word: StoryWord,
     target: HTMLElement,
   ): ActiveWordSupport {
     const rect = target.getBoundingClientRect();
-    const width = Math.min(288, window.innerWidth - 32);
+    const width = Math.min(288, Math.max(180, window.innerWidth - 32));
     const halfWidth = width / 2;
     const x = Math.max(
       16 + halfWidth,
-      Math.min(window.innerWidth - 16 - halfWidth, rect.left + rect.width / 2),
+      Math.min(
+        window.innerWidth - 16 - halfWidth,
+        rect.left + rect.width / 2,
+      ),
     );
     const placeAbove =
       rect.bottom + 190 > window.innerHeight && rect.top > 190;
 
     return {
       lineId,
-      term,
+      word,
       x,
       y: placeAbove ? rect.top - 12 : rect.bottom + 12,
       placement: placeAbove ? "above" : "below",
@@ -81,87 +92,91 @@ export function StoryPhase({
     };
   }
 
-  function revealTerm(lineId: string, term: string, target: HTMLElement) {
-    const interactions = session.storyInteractions.filter(
-      (item) => item.lineId === lineId && item.term === term,
-    );
+  function revealWord(
+    lineId: string,
+    word: StoryWord,
+    target: HTMLElement,
+  ) {
+    const interactions = evidenceFor(lineId, word);
     const readingRevealed = interactions.some(
       (item) => item.type === "reading-revealed",
     );
     const meaningRevealed = interactions.some(
       (item) => item.type === "meaning-revealed",
     );
-    const kana = isKanaOnly(term);
+    const kana = word.scriptType !== "kanji";
     const sameWordIsOpen =
-      activeSupport?.lineId === lineId && activeSupport.term === term;
+      activeSupport?.lineId === lineId && activeSupport.word.id === word.id;
 
     if (meaningRevealed && (kana || readingRevealed)) {
       setActiveSupport(
-        sameWordIsOpen ? null : anchorSupport(lineId, term, target),
+        sameWordIsOpen ? null : anchorSupport(lineId, word, target),
       );
       return;
     }
 
-    setActiveSupport(anchorSupport(lineId, term, target));
+    setActiveSupport(anchorSupport(lineId, word, target));
 
     if (kana && !meaningRevealed) {
       addInteraction({
         lineId,
-        term,
+        wordId: word.id,
+        term: word.surface,
         type: "meaning-revealed",
         scoreDelta: -STORY_MEANING_PENALTY,
+        meaningDelta: -STORY_MEANING_PENALTY,
+        recognitionDelta: -STORY_MEANING_PENALTY,
+        pronunciationDelta: 0,
         script: "kana",
       });
       return;
     }
+
     if (!kana && !readingRevealed) {
       addInteraction({
         lineId,
-        term,
+        wordId: word.id,
+        term: word.surface,
         type: "reading-revealed",
-        scoreDelta: -STORY_READING_PENALTY,
+        scoreDelta: -STORY_RECOGNITION_PENALTY,
+        meaningDelta: 0,
+        recognitionDelta: -STORY_RECOGNITION_PENALTY,
+        pronunciationDelta: 0,
         script: "kanji",
       });
       return;
     }
+
     if (!meaningRevealed) {
       addInteraction({
         lineId,
-        term,
+        wordId: word.id,
+        term: word.surface,
         type: "meaning-revealed",
         scoreDelta: -STORY_MEANING_PENALTY,
-        script: kana ? "kana" : "kanji",
+        meaningDelta: -STORY_MEANING_PENALTY,
+        recognitionDelta: 0,
+        pronunciationDelta: 0,
+        script: "kanji",
       });
     }
   }
 
-  function termSupport(lineId: string, term: string) {
-    const interactions = session.storyInteractions.filter(
-      (item) => item.lineId === lineId && item.term === term,
+  function wordSupport(lineId: string, word: StoryWord) {
+    const interactions = evidenceFor(lineId, word);
+    const readingRevealed = interactions.some(
+      (item) => item.type === "reading-revealed",
     );
-    const vocabulary = lesson.vocabulary.find(
-      (item) => item.term === term || item.term.startsWith(term),
+    const meaningRevealed = interactions.some(
+      (item) => item.type === "meaning-revealed",
     );
-    const kanji = lesson.kanji.find(
-      (item) => item.character === term || term.includes(item.character),
-    );
-    const dictionary = supportDictionary[term];
     return {
-      reading: interactions.some(
-        (item) => item.type === "reading-revealed",
-      )
-        ? (vocabulary?.reading ?? kanji?.reading ?? dictionary?.reading)
-        : undefined,
-      meaning: interactions.some(
-        (item) => item.type === "meaning-revealed",
-      )
-        ? (vocabulary?.meaning ?? kanji?.meaning ?? dictionary?.meaning)
-        : undefined,
-      touched: interactions.some(
-        (item) =>
-          item.type === "reading-revealed" ||
-          item.type === "meaning-revealed",
-      ),
+      reading:
+        word.scriptType === "kanji" && readingRevealed
+          ? word.reading
+          : undefined,
+      meaning: meaningRevealed ? word.meaning : undefined,
+      touched: readingRevealed || meaningRevealed,
     };
   }
 
@@ -169,31 +184,16 @@ export function StoryPhase({
     session.storyInteractions
       .filter(
         (item) =>
-          item.term &&
-          (item.type === "reading-revealed" ||
-            item.type === "meaning-revealed"),
+          item.type === "reading-revealed" ||
+          item.type === "meaning-revealed",
       )
-      .map((item) => `${item.lineId}:${item.term}`),
-  ).size;
-
-  function tappableTermsFor(line: LessonPackage["story"][number]) {
-    const candidates = [
-      ...line.tappableTerms,
-      ...lesson.vocabulary.map((item) => item.term),
-      ...lesson.kanji.map((item) => item.character),
-      ...Object.keys(supportDictionary),
-    ];
-    return Array.from(
-      new Set(
-        candidates.filter(
-          (term) => term.length > 0 && line.japanese.includes(term),
-        ),
+      .map(
+        (item) =>
+          item.wordId ?? `${item.lineId}:${item.term ?? "unknown"}`,
       ),
-    ).sort((left, right) => right.length - left.length);
-  }
-
+  ).size;
   const availableWords = lesson.story.reduce(
-    (total, line) => total + tappableTermsFor(line).length,
+    (total, line) => total + line.words.length,
     0,
   );
   const storyParagraphs: LessonPackage["story"][] = [];
@@ -201,7 +201,7 @@ export function StoryPhase({
     storyParagraphs.push(lesson.story.slice(index, index + 2));
   }
   const activeDetails = activeSupport
-    ? termSupport(activeSupport.lineId, activeSupport.term)
+    ? wordSupport(activeSupport.lineId, activeSupport.word)
     : null;
 
   return (
@@ -214,12 +214,12 @@ export function StoryPhase({
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-500">
             Read naturally and touch a word only when you need help. Kanji
-            reveals its hiragana first and meaning second; kana reveals meaning
-            immediately.
+            reveals its hiragana first and meaning on the next touch. Kana
+            reveals meaning immediately.
           </p>
         </div>
         <div className="rounded-2xl border border-moss-100 bg-moss-50 px-4 py-3 text-xs text-moss-800">
-          <p className="font-semibold">{availableWords} tappable words</p>
+          <p className="font-semibold">{availableWords} stored words</p>
           <p className="mt-1 text-moss-600">
             Help used on {helpedWords} {helpedWords === 1 ? "word" : "words"}
           </p>
@@ -229,10 +229,10 @@ export function StoryPhase({
       <div className="mt-6 flex items-start gap-3 rounded-2xl bg-persimmon-50 p-4 text-sm text-stone-600">
         <Sparkles className="mt-0.5 size-4 shrink-0 text-persimmon-500" />
         <p>
-          Every word begins at <strong>100 independence points</strong>.
-          Reading help costs {STORY_READING_PENALTY}; meaning help costs{" "}
-          {STORY_MEANING_PENALTY}. This changes that word’s review priority,
-          not your right to continue.
+          Meaning, recognition, and pronunciation are tracked separately.
+          Reading help changes recognition; meaning help changes meaning. For
+          kana, one meaning reveal changes meaning and recognition together.
+          Pronunciation remains independent for reading and speaking practice.
         </p>
       </div>
 
@@ -267,46 +267,42 @@ export function StoryPhase({
             >
               {paragraph.map((line) => (
                 <span key={line.id}>
-                  {segmentStoryLine(
-                    line.japanese,
-                    tappableTermsFor(line),
-                  ).map((segment, segmentIndex) => {
-                    if (!segment.term) {
+                  {segmentStoredStoryLine(line.japanese, line.words).map(
+                    (segment, segmentIndex) => {
+                      if (!segment.word) {
+                        return (
+                          <span key={`${line.id}_text_${segmentIndex}`}>
+                            {segment.text}
+                          </span>
+                        );
+                      }
+                      const word = segment.word;
+                      const support = wordSupport(line.id, word);
+                      const isOpen =
+                        activeSupport?.lineId === line.id &&
+                        activeSupport.word.id === word.id;
                       return (
-                        <span key={`${line.id}_text_${segmentIndex}`}>
-                          {segment.text}
-                        </span>
+                        <button
+                          key={word.id}
+                          type="button"
+                          onClick={(event) =>
+                            revealWord(line.id, word, event.currentTarget)
+                          }
+                          className={`inline appearance-none border-x-0 border-t-0 bg-transparent p-0 align-baseline font-serif text-inherit leading-[inherit] transition focus:outline-none focus:ring-2 focus:ring-moss-200 ${
+                            isOpen
+                              ? "border-b-2 border-solid border-persimmon-400 text-persimmon-600"
+                              : support.touched
+                                ? "border-b-2 border-dotted border-persimmon-300 text-ink"
+                                : "border-b-2 border-dotted border-stone-300 text-ink hover:border-moss-500"
+                          }`}
+                          aria-label={`Get help with ${word.surface}`}
+                          aria-expanded={isOpen}
+                        >
+                          {word.surface}
+                        </button>
                       );
-                    }
-                    const support = termSupport(line.id, segment.term);
-                    const isOpen =
-                      activeSupport?.lineId === line.id &&
-                      activeSupport.term === segment.term;
-                    return (
-                      <button
-                        key={`${line.id}_term_${segmentIndex}`}
-                        type="button"
-                        onClick={(event) =>
-                          revealTerm(
-                            line.id,
-                            segment.term!,
-                            event.currentTarget,
-                          )
-                        }
-                        className={`inline appearance-none border-x-0 border-t-0 bg-transparent p-0 align-baseline font-serif text-inherit leading-[inherit] transition focus:outline-none focus:ring-2 focus:ring-moss-200 ${
-                          isOpen
-                            ? "border-b-2 border-solid border-persimmon-400 text-persimmon-600"
-                            : support.touched
-                              ? "border-b-2 border-dotted border-persimmon-300 text-ink"
-                              : "border-b-2 border-dotted border-stone-300 text-ink hover:border-moss-500"
-                        }`}
-                        aria-label={`Get help with ${segment.term}`}
-                        aria-expanded={isOpen}
-                      >
-                        {segment.term}
-                      </button>
-                    );
-                  })}
+                    },
+                  )}
                 </span>
               ))}
             </p>
@@ -317,7 +313,7 @@ export function StoryPhase({
       {activeSupport && activeDetails && (
         <div
           role="dialog"
-          aria-label={`Help for ${activeSupport.term}`}
+          aria-label={`Help for ${activeSupport.word.surface}`}
           className="fixed z-50 overflow-visible rounded-2xl border border-moss-700 bg-moss-900 text-white shadow-2xl"
           style={{
             left: activeSupport.x,
@@ -384,43 +380,3 @@ export function StoryPhase({
     </div>
   );
 }
-
-const supportDictionary: Record<
-  string,
-  { reading: string; meaning: string }
-> = {
-  朝: { reading: "あさ", meaning: "morning" },
-  ゆきさん: { reading: "ゆきさん", meaning: "Yuki" },
-  は: { reading: "は", meaning: "topic marker" },
-  六時半: { reading: "ろくじはん", meaning: "6:30" },
-  に: { reading: "に", meaning: "at / to" },
-  起きます: { reading: "おきます", meaning: "wake up" },
-  コーヒー: { reading: "コーヒー", meaning: "coffee" },
-  を: { reading: "を", meaning: "object marker" },
-  飲み: { reading: "のみ", meaning: "drink" },
-  ながら: { reading: "ながら", meaning: "while doing" },
-  ニュース: { reading: "ニュース", meaning: "news" },
-  読みます: { reading: "よみます", meaning: "read" },
-  音楽: { reading: "おんがく", meaning: "music" },
-  聞き: { reading: "きき", meaning: "listen" },
-  駅: { reading: "えき", meaning: "station" },
-  まで: { reading: "まで", meaning: "until / as far as" },
-  歩きます: { reading: "あるきます", meaning: "walk" },
-  改札: { reading: "かいさつ", meaning: "ticket gate" },
-  で: { reading: "で", meaning: "at / by means of" },
-  同僚: { reading: "どうりょう", meaning: "colleague" },
-  の: { reading: "の", meaning: "possessive marker" },
-  田中さん: { reading: "たなかさん", meaning: "Mr. Tanaka" },
-  会います: { reading: "あいます", meaning: "meet" },
-  最近: { reading: "さいきん", meaning: "recently" },
-  早く: { reading: "はやく", meaning: "early" },
-  家: { reading: "いえ", meaning: "home" },
-  出: { reading: "で", meaning: "leave" },
-  歩き: { reading: "あるき", meaning: "walk" },
-  会い: { reading: "あい", meaning: "meet" },
-  電車: { reading: "でんしゃ", meaning: "train" },
-  乗り: { reading: "のり", meaning: "ride" },
-  新しい: { reading: "あたらしい", meaning: "new" },
-  仕事: { reading: "しごと", meaning: "work" },
-  慣れる: { reading: "なれる", meaning: "get used to" },
-};
