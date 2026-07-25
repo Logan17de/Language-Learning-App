@@ -29,11 +29,26 @@ export interface VocabularyItem {
   exampleSentence?: string;
 }
 
+export type StoryWordScript = "kanji" | "hiragana" | "katakana";
+
+export interface StoryWord {
+  id: string;
+  position: number;
+  surface: string;
+  reading: string;
+  meaning: string;
+  scriptType: StoryWordScript;
+  baseMeaningScore: number;
+  baseRecognitionScore: number;
+  basePronunciationScore: number;
+}
+
 export interface StoryLine {
   id: string;
   japanese: string;
   english: string;
   tappableTerms: string[];
+  words: StoryWord[];
   imageId?: string;
   audioAssetId?: string;
 }
