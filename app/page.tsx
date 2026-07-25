@@ -536,14 +536,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="border-t border-black/[.06] bg-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 sm:px-8 md:grid-cols-[1fr_auto] md:items-end">
-          <div>
-            <Brand />
-            <p className="mt-4 max-w-sm text-sm leading-6 text-stone-500">
-              Structured language learning through connected lessons and adaptive review.
-              Launching first with Japanese.
-            </p>
-          </div>
+        <div className="mx-auto flex max-w-7xl justify-end px-5 py-8 sm:px-8">
           <nav
             className="flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-stone-500"
             aria-label="Footer navigation"
