@@ -108,6 +108,7 @@ export interface Database {
       lessons: TableDef<LessonRow>;
       lesson_versions: TableDef<LessonVersionRow>;
       lesson_story_lines: TableDef<ContentRow & { japanese_text: string; translation: string; tappable_terms: string[]; image_asset_id: string | null; audio_asset_id: string | null }>;
+      lesson_story_words: TableDef<ContentRow & { story_line_id: string; surface: string; reading: string; meaning: string; script_type: "kanji" | "hiragana" | "katakana"; meaning_score: number; recognition_score: number; pronunciation_score: number }>;
       lesson_vocabulary: TableDef<ContentRow & { vocabulary_id: string | null; written_form: string; reading: string; meaning: string; part_of_speech: string; example_sentence: string | null }>;
       lesson_grammar: TableDef<ContentRow & { grammar_id: string | null; pattern: string; meaning: string; structure: string; usage_notes: string; example: string; translation: string; common_mistake: string }>;
       lesson_reading_sections: TableDef<ContentRow & { speaker: string; japanese_text: string; translation: string; tappable_terms: string[] }>;
