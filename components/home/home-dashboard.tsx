@@ -11,27 +11,44 @@ import {
   Target,
 } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
 import { mockLessons } from "@/data/mock-lessons";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { useAppStore } from "@/store/app-store";
+import { getBackendMode } from "@/lib/supabase/config";
+import { useBackendLessonStore } from "@/store/backend-lesson-store";
 
 export function HomeDashboard() {
   const user = useAppStore((state) => state.user);
   const progress = useAppStore((state) => state.progress);
   const sessions = useAppStore((state) => state.lessonSessions);
   const generatedLessons = useAppStore((state) => state.generatedLessons);
+  const backendMode = getBackendMode();
+  const backendLessons = useBackendLessonStore((state) => state.lessons);
+  const backendLoading = useBackendLessonStore((state) => state.loading);
+  const backendLoaded = useBackendLessonStore((state) => state.loaded);
+  const backendError = useBackendLessonStore((state) => state.error);
+  const loadBackendLessons = useBackendLessonStore((state) => state.load);
 
-  const allLessons = [
+  useEffect(() => {
+    if (backendMode === "supabase") void loadBackendLessons();
+  }, [backendMode, loadBackendLessons]);
+
+  const demoLessons = [
     ...generatedLessons,
     ...mockLessons.filter(
       (lesson) => !generatedLessons.some((item) => item.id === lesson.id),
     ),
   ];
+  const allLessons =
+    backendMode === "supabase" ? backendLessons : demoLessons;
   const activeSession = Object.values(sessions).find(
-    (session) => !session.completed,
+    (session) =>
+      !session.completed &&
+      allLessons.some((lesson) => lesson.id === session.lessonId),
   );
   const activeLesson = activeSession
     ? allLessons.find((lesson) => lesson.id === activeSession.lessonId)
@@ -164,9 +181,14 @@ export function HomeDashboard() {
               {activeSession ? "Resume your lesson" : "Start your next lesson"}
             </h2>
             <p className="mt-3 max-w-lg text-sm leading-6 text-white/65">
-              {activeSession
-                ? "Continue exactly where you stopped."
-                : "Your lesson is ready. Its topic stays hidden until you begin."}
+              {backendMode === "supabase" && !selectedLesson
+                ? backendLoading || !backendLoaded
+                  ? "AIko is selecting a level-matched lesson for you."
+                  : backendError ||
+                    "No published lesson is available for your current level yet."
+                : activeSession
+                  ? "Continue exactly where you stopped."
+                  : "Your lesson is ready. Its topic stays hidden until you begin."}
             </p>
             {activeSession && (
               <div className="mt-7 max-w-md">
@@ -191,7 +213,11 @@ export function HomeDashboard() {
               }
               className="mt-8 bg-persimmon-500 px-7 hover:bg-persimmon-600"
             >
-              {activeSession ? "Resume lesson" : "Start lesson"}
+              {backendLoading
+                ? "Preparing lesson"
+                : activeSession
+                  ? "Resume lesson"
+                  : "Start lesson"}
               <ArrowRight className="size-4" />
             </ButtonLink>
           </div>
