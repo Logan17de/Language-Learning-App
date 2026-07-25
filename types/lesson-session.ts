@@ -102,6 +102,8 @@ export interface StoryInteraction {
   lineId: string;
   term?: string;
   type: "audio-played" | "word-opened" | "reading-revealed" | "meaning-revealed";
+  scoreDelta?: number;
+  script?: "kanji" | "kana";
 }
 
 export interface LessonSession {
