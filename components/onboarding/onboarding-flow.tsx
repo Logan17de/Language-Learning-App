@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -19,6 +19,7 @@ import {
   Plane,
   Sparkles,
   Target,
+  UserRound,
   Utensils,
 } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
@@ -84,11 +85,13 @@ const interests = [
 export function OnboardingFlow() {
   const router = useRouter();
   const [step, setStep] = useState(0);
+  const [name, setName] = useState("");
   const [customInterest, setCustomInterest] = useState("");
   const [showSkipDialog, setShowSkipDialog] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const {
+    user,
     onboarding,
     subscription,
     setGoal,
@@ -97,20 +100,28 @@ export function OnboardingFlow() {
     setInterests,
     acknowledgeReading,
     completeOnboarding,
+    signIn,
   } = useAppStore();
   const isPro = subscription.plan === "premium";
 
-  const totalSteps = 6;
+  useEffect(() => {
+    setName((current) =>
+      current || (user.name === "Hana" ? "" : user.name),
+    );
+  }, [user.name]);
+
+  const totalSteps = 7;
   const canContinue = useMemo(() => {
-    if (step === 0) return Boolean(onboarding.goal);
-    if (step === 1) return Boolean(onboarding.level);
-    if (step === 2) return Boolean(onboarding.dailyMinutes);
+    if (step === 0) return Boolean(name.trim());
+    if (step === 1) return Boolean(onboarding.goal);
+    if (step === 2) return Boolean(onboarding.level);
+    if (step === 3) return Boolean(onboarding.dailyMinutes);
     return true;
-  }, [step, onboarding]);
+  }, [name, step, onboarding]);
 
   function next() {
-    if (step === 4) acknowledgeReading();
-    if (step === 5) {
+    if (step === 5) acknowledgeReading();
+    if (step === 6) {
       void finishOnboarding();
       return;
     }
@@ -122,8 +133,13 @@ export function OnboardingFlow() {
     setSaving(true);
     setError("");
 
+    const displayName = name.trim() || user.name || "Learner";
+
     if (getBackendMode() === "supabase") {
-      const result = await profileRepository.saveOnboarding(onboarding);
+      const result = await profileRepository.saveOnboarding({
+        ...onboarding,
+        displayName,
+      });
       if (!result.ok) {
         setSaving(false);
         setError(result.error.message);
@@ -131,6 +147,7 @@ export function OnboardingFlow() {
       }
     }
 
+    signIn(displayName);
     completeOnboarding();
     router.push("/home");
   }
@@ -183,6 +200,34 @@ export function OnboardingFlow() {
         <div className="flex-1 animate-fade-up" key={step}>
           {step === 0 && (
             <StepShell
+              kicker="Your profile"
+              title="What should AIko call you?"
+              description="This name appears on your Home and Profile pages. You can change it later."
+            >
+              <div className="rounded-4xl bg-white p-6 shadow-card sm:p-8">
+                <span className="grid size-12 place-items-center rounded-2xl bg-moss-100 text-moss-700">
+                  <UserRound className="size-5" />
+                </span>
+                <label className="mt-6 block">
+                  <span className="mb-2 block text-sm font-semibold">
+                    Display name
+                  </span>
+                  <input
+                    required
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                    className="form-input"
+                    placeholder="Your name"
+                    autoComplete="name"
+                    maxLength={60}
+                  />
+                </label>
+              </div>
+            </StepShell>
+          )}
+
+          {step === 1 && (
+            <StepShell
               kicker="Your direction"
               title="What brings you to Japanese?"
               description="Choose the goal that matters most right now. You can change this later."
@@ -205,7 +250,7 @@ export function OnboardingFlow() {
             </StepShell>
           )}
 
-          {step === 1 && (
+          {step === 2 && (
             <StepShell
               kicker="Your starting point"
               title="Where are you now?"
@@ -233,7 +278,7 @@ export function OnboardingFlow() {
             </StepShell>
           )}
 
-          {step === 2 && (
+          {step === 3 && (
             <StepShell
               kicker="Your rhythm"
               title="How much time feels realistic?"
@@ -271,7 +316,7 @@ export function OnboardingFlow() {
             </StepShell>
           )}
 
-          {step === 3 && (
+          {step === 4 && (
             <StepShell
               kicker="Make it relevant"
               title="What do you enjoy talking about?"
@@ -340,7 +385,7 @@ export function OnboardingFlow() {
             </StepShell>
           )}
 
-          {step === 4 && (
+          {step === 5 && (
             <StepShell
               kicker="Reading aloud"
               title="Your voice can guide your practice."
@@ -371,7 +416,7 @@ export function OnboardingFlow() {
             </StepShell>
           )}
 
-          {step === 5 && (
+          {step === 6 && (
             <div className="mx-auto max-w-xl py-8 text-center">
               <span className="mx-auto grid size-20 place-items-center rounded-[2rem] bg-persimmon-100 text-persimmon-500">
                 <Sparkles className="size-9" />
@@ -428,11 +473,11 @@ export function OnboardingFlow() {
               {saving && <LoaderCircle className="size-4 animate-spin" />}
               {saving
                 ? "Saving…"
-                : step === 5
+                : step === 6
                   ? "Go to my home"
-                  : step === 4
+                  : step === 5
                     ? "I understand"
-                    : step === 3 && onboarding.interests.length === 0
+                    : step === 4 && onboarding.interests.length === 0
                       ? "Continue without interests"
                       : "Continue"}
               {!saving && <ArrowRight className="size-4" />}
