@@ -47,7 +47,9 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
       }
       setSession(normalized);
       setElapsedSeconds(normalized.elapsedSeconds);
-      saveLessonSession(normalized);
+      if (!persistedSession) {
+        saveLessonSession(normalized);
+      }
     };
     if (!persistedSession && getBackendMode() === "supabase") {
       void restoreLessonProgress(lesson, next)
