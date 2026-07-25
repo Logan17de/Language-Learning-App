@@ -54,6 +54,7 @@ export function LessonRouteResolver({
       seed: `${user.id}:${completedIds.length}`,
     })?.lesson;
   const lesson = getBackendMode() === "demo" && assignedDemoLesson?.id !== lessonId ? undefined : resolvedLesson;
+  const backendReady = backendResolved || Boolean(cachedBackendLesson);
 
   useEffect(() => {
     if (getBackendMode() !== "supabase" || cachedBackendLesson) return;
@@ -63,7 +64,7 @@ export function LessonRouteResolver({
     });
   }, [cachedBackendLesson, lessonId, loadBackendLesson]);
 
-  if ((!hydrated && getBackendMode() !== "supabase" && !staticLesson && !override) || !backendResolved) {
+  if ((!hydrated && getBackendMode() !== "supabase" && !staticLesson && !override) || !backendReady) {
     return <main className="grid min-h-screen place-items-center bg-paper"><span className="size-10 animate-spin rounded-full border-4 border-moss-100 border-t-moss-600" /></main>;
   }
   if (!lesson || !isPlayableLesson(lesson)) {
