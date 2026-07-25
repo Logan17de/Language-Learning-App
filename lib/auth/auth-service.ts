@@ -20,16 +20,46 @@ export interface AuthIdentity {
   onboardingComplete: boolean;
 }
 
-function friendlyAuthMessage(message: string): string {
+function friendlyAuthMessage(message: string, code?: string): string {
   const lower = message.toLowerCase();
-  if (lower.includes("invalid login"))
-    return "The email or password is incorrect.";
-  if (lower.includes("already registered"))
-    return "An account already exists for this email.";
-  if (lower.includes("email not confirmed"))
-    return "Confirm your email before signing in.";
-  if (lower.includes("password"))
+  const normalizedCode = code?.toLowerCase();
+
+  if (
+    normalizedCode === "invalid_credentials" ||
+    lower.includes("invalid credentials") ||
+    lower.includes("invalid login") ||
+    lower.includes("incorrect email") ||
+    lower.includes("incorrect password")
+  )
+    return "The email or password is incorrect. If you are new to AIko, create an account first.";
+
+  if (
+    normalizedCode === "email_not_confirmed" ||
+    lower.includes("email not confirmed")
+  )
+    return "Confirm your email using the link we sent before signing in.";
+
+  if (
+    normalizedCode === "email_provider_disabled" ||
+    lower.includes("email logins are disabled") ||
+    lower.includes("email provider is disabled")
+  )
+    return "Email and password sign-in is not enabled yet. Use Google sign-in or contact support.";
+
+  if (
+    normalizedCode === "user_already_exists" ||
+    lower.includes("already registered") ||
+    lower.includes("already exists")
+  )
+    return "An account already exists for this email. Log in instead.";
+
+  if (
+    normalizedCode === "weak_password" ||
+    lower.includes("weak password") ||
+    lower.includes("password should")
+  )
     return "Use at least 12 characters with uppercase and lowercase letters, a number, and a symbol.";
+
   return "Authentication could not be completed. Please try again.";
 }
 
@@ -101,7 +131,7 @@ export const authService = {
       },
     });
     return error
-      ? failure(error, friendlyAuthMessage(error.message))
+      ? failure(error, friendlyAuthMessage(error.message, error.code))
       : success({ confirmationRequired: !data.session });
   },
 
@@ -115,7 +145,7 @@ export const authService = {
       email,
       password,
     });
-    if (error) return failure(error, friendlyAuthMessage(error.message));
+    if (error) return failure(error, friendlyAuthMessage(error.message, error.code));
     const [profile, preferences] = await Promise.all([
       client
         .from("profiles")
@@ -165,7 +195,7 @@ export const authService = {
       options: { redirectTo },
     });
     return error
-      ? failure(error, friendlyAuthMessage(error.message))
+      ? failure(error, friendlyAuthMessage(error.message, error.code))
       : success(null);
   },
 
@@ -185,7 +215,7 @@ export const authService = {
       redirectTo: `${getAppUrl()}/auth/callback?next=/reset-password`,
     });
     return error
-      ? failure(error, friendlyAuthMessage(error.message))
+      ? failure(error, friendlyAuthMessage(error.message, error.code))
       : success(null);
   },
 
@@ -200,7 +230,7 @@ export const authService = {
     if (!client) return notConfigured();
     const { error } = await client.auth.updateUser({ password });
     return error
-      ? failure(error, friendlyAuthMessage(error.message))
+      ? failure(error, friendlyAuthMessage(error.message, error.code))
       : success(null);
   },
 };
