@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowRight, Bot } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ButtonLink } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { authService } from "@/lib/auth/auth-service";
 import { getBackendMode } from "@/lib/supabase/config";
 import { useAppStore } from "@/store/app-store";
@@ -91,7 +91,7 @@ function usePublicAuthState() {
 }
 
 export function PublicHeaderActions() {
-  const { resolved, signedIn } = usePublicAuthState();
+  const { isSigningOut, resolved, signedIn, signOut } = usePublicAuthState();
 
   if (!resolved) {
     return (
@@ -104,10 +104,21 @@ export function PublicHeaderActions() {
 
   if (signedIn) {
     return (
-      <ButtonLink href="/home" className="min-h-10 px-3 text-xs sm:px-5 sm:text-sm">
-        <span className="sm:hidden">Dashboard</span>
-        <span className="hidden sm:inline">Go to dashboard</span>
-      </ButtonLink>
+      <>
+        <Button
+          type="button"
+          variant="ghost"
+          className="min-h-10 px-2 text-xs sm:px-4 sm:text-sm"
+          onClick={() => void signOut()}
+          disabled={isSigningOut}
+        >
+          {isSigningOut ? "Signing out…" : "Sign out"}
+        </Button>
+        <ButtonLink href="/home" className="min-h-10 px-3 text-xs sm:px-5 sm:text-sm">
+          <span className="sm:hidden">Dashboard</span>
+          <span className="hidden sm:inline">Go to dashboard</span>
+        </ButtonLink>
+      </>
     );
   }
 
@@ -165,7 +176,7 @@ export function PublicPrimaryAction({
       variant={variant}
       className={className}
     >
-      {showAiIcon && <Bot className="size-4" aria-hidden="true" />}
+      {showAiIcon && <Sparkles className="size-4" aria-hidden="true" />}
       {signedIn ? signedInLabel : signedOutLabel}
       <ArrowRight
         className="size-4 transition-transform group-hover:translate-x-1"
