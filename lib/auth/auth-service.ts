@@ -31,7 +31,7 @@ function friendlyAuthMessage(message: string, code?: string): string {
     lower.includes("incorrect email") ||
     lower.includes("incorrect password")
   )
-    return "The email or password is incorrect. If you are new to AIko, create an account first.";
+    return "No matching account was found, or the password is incorrect. If you are new to AIko, create an account first.";
 
   if (
     normalizedCode === "email_not_confirmed" ||
@@ -182,17 +182,20 @@ export const authService = {
     });
   },
 
-  async signInWithGoogle(next?: string): Promise<RepositoryResult<null>> {
+  async signInWithGoogle(
+    mode: "login" | "signup",
+    next?: string,
+  ): Promise<RepositoryResult<null>> {
     const client = createClient();
     if (!client) return notConfigured();
     const safeNext =
       next?.startsWith("/") && !next.startsWith("//") ? next : null;
-    const redirectTo = safeNext
-      ? `${getAppUrl()}/auth/callback?next=${encodeURIComponent(safeNext)}`
-      : `${getAppUrl()}/auth/callback`;
+    const callbackUrl = new URL("/auth/callback", getAppUrl());
+    callbackUrl.searchParams.set("flow", mode);
+    if (safeNext) callbackUrl.searchParams.set("next", safeNext);
     const { error } = await client.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo },
+      options: { redirectTo: callbackUrl.toString() },
     });
     return error
       ? failure(error, friendlyAuthMessage(error.message, error.code))
