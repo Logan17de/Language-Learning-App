@@ -60,7 +60,6 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
   }, [
     hasHydrated,
     lesson,
-    persistedSession,
     router,
     saveLessonSession,
     startOrResumeLesson,
