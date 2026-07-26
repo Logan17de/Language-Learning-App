@@ -29,7 +29,7 @@ describe("Gemini structured request builders", () => {
       generationConfig: {
         responseFormat: {
           text: {
-            mimeType: "application/json",
+            mimeType: "APPLICATION_JSON",
             schema,
           },
         },
