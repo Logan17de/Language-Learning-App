@@ -14,6 +14,10 @@ import type {
 } from "@/types/progress";
 
 export interface BackendProgressSnapshot {
+  levelCompletion: number;
+  learnedVocabularyCount: number;
+  learnedKanjiCount: number;
+  learnedGrammarCount: number;
   xp: number;
   streakDays: number;
   longestStreak: number;
@@ -53,6 +57,16 @@ function promptFirst(value: unknown, key: string): string | undefined {
     : undefined;
 }
 
+function summaryNumber(value: unknown, key: string): number {
+  return typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    key in value &&
+    typeof value[key as keyof typeof value] === "number"
+    ? (value[key as keyof typeof value] as number)
+    : 0;
+}
+
 export const progressRepository = {
   async loadCurrent(): Promise<
     RepositoryResult<BackendProgressSnapshot>
@@ -66,6 +80,7 @@ export const progressRepository = {
     const userId = auth.user.id;
     const [
       profile,
+      summary,
       weekly,
       mastery,
       completions,
@@ -81,6 +96,7 @@ export const progressRepository = {
         )
         .eq("id", userId)
         .single(),
+      client.rpc("get_learner_progress_summary"),
       client
         .from("weekly_activity")
         .select("*")
@@ -112,6 +128,7 @@ export const progressRepository = {
     ]);
     const firstError = [
       profile,
+      summary,
       weekly,
       mastery,
       completions,
@@ -206,6 +223,13 @@ export const progressRepository = {
       (earned.data ?? []).map((item) => [item.achievement_id, item]),
     );
     return success({
+      levelCompletion: summaryNumber(summary.data, "level_completion"),
+      learnedVocabularyCount: summaryNumber(
+        summary.data,
+        "learned_vocabulary",
+      ),
+      learnedKanjiCount: summaryNumber(summary.data, "learned_kanji"),
+      learnedGrammarCount: summaryNumber(summary.data, "learned_grammar"),
       xp: profile.data.xp,
       streakDays: profile.data.streak_days,
       longestStreak: profile.data.longest_streak,
@@ -289,4 +313,3 @@ export const progressRepository = {
     });
   },
 };
-
