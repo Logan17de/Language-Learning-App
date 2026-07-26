@@ -2,6 +2,7 @@ import "server-only";
 
 import type { Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
+import { createGeminiApiError, GeminiApiError } from "@/lib/gemini/api-error";
 import {
   blueprintSchema,
   grammarSchema,
@@ -94,13 +95,6 @@ function findOutputText(value: unknown): string | null {
   return null;
 }
 
-function errorMessage(payload: unknown, fallback: string): string {
-  if (!isRecord(payload)) return fallback;
-  if (stringValue(payload.message)) return payload.message;
-  if (isRecord(payload.error) && stringValue(payload.error.message)) return payload.error.message;
-  return fallback;
-}
-
 async function callModel(model: string, prompt: string, schema: JsonSchema): Promise<unknown> {
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new Error("GEMINI_API_KEY is not configured.");
@@ -109,6 +103,7 @@ async function callModel(model: string, prompt: string, schema: JsonSchema): Pro
     headers: {
       "Content-Type": "application/json",
       "x-goog-api-key": apiKey,
+      "Api-Revision": "2026-05-20",
     },
     body: JSON.stringify({
       model,
@@ -122,7 +117,7 @@ async function callModel(model: string, prompt: string, schema: JsonSchema): Pro
     signal: AbortSignal.timeout(90_000),
   });
   const payload: unknown = await response.json().catch(() => null);
-  if (!response.ok) throw new Error(errorMessage(payload, `Gemini request failed with status ${response.status}.`));
+  if (!response.ok) throw createGeminiApiError(model, response.status, payload);
 
   const output = findOutputText(payload);
   if (output) {
@@ -140,6 +135,9 @@ async function callGemini(prompt: string, schema: JsonSchema): Promise<GeminiRes
   try {
     return { value: await callModel(PRIMARY_MODEL, prompt, schema), model: PRIMARY_MODEL };
   } catch (primaryError) {
+    if (primaryError instanceof GeminiApiError && !primaryError.allowFallback) {
+      throw primaryError;
+    }
     if (FALLBACK_MODEL === PRIMARY_MODEL) throw primaryError;
     try {
       return { value: await callModel(FALLBACK_MODEL, prompt, schema), model: FALLBACK_MODEL };
