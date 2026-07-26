@@ -71,7 +71,14 @@ export async function selectLessonTargets(
   enrichIfNeeded = true,
 ): Promise<SelectedLessonTargets> {
   const levels = allowedLevels(level);
-  const [kanjiResult, grammarResult, vocabularyResult, masteryResult] = await Promise.all([
+  const [
+    kanjiResult,
+    grammarResult,
+    vocabularyResult,
+    masteryResult,
+    kanjiCatalogResult,
+    grammarCatalogResult,
+  ] = await Promise.all([
     client
       .from("kanji_records")
       .select("id,legacy_id,character,jlpt_level,meanings,readings,archived_at")
@@ -95,9 +102,27 @@ export async function selectLessonTargets(
       .select("item_type,item_key,mastery,evidence_count")
       .eq("user_id", userId)
       .in("item_type", ["kanji", "grammar"]),
+    client
+      .from("kanji_catalog")
+      .select("character,jlpt_level,source_order")
+      .in("jlpt_level", levels)
+      .eq("active", true)
+      .limit(2500),
+    client
+      .from("grammar_catalog")
+      .select("pattern,jlpt_level,source_order")
+      .in("jlpt_level", levels)
+      .eq("active", true)
+      .limit(700),
   ]);
 
-  const libraryError = kanjiResult.error ?? grammarResult.error ?? vocabularyResult.error ?? masteryResult.error;
+  const libraryError =
+    kanjiResult.error
+    ?? grammarResult.error
+    ?? vocabularyResult.error
+    ?? masteryResult.error
+    ?? kanjiCatalogResult.error
+    ?? grammarCatalogResult.error;
   if (libraryError) throw new Error(`The lesson library could not be loaded: ${libraryError.message}`);
 
   const kanjiMastery = new Map<string, MasteryValue>();
@@ -121,7 +146,7 @@ export async function selectLessonTargets(
     };
     return {
       target,
-      priority: targetPriority(row.jlpt_level, level, mastery, `${userId}:${topic}:kanji:${row.id}`),
+      priority: targetPriority(row.jlpt_level, level, mastery, `${userId}:${topic}:kanji:${row.character}`),
     };
   }).sort((left, right) => compareTuple(left.priority, right.priority));
 
@@ -142,20 +167,73 @@ export async function selectLessonTargets(
     };
     return {
       target,
-      priority: targetPriority(row.jlpt_level, level, mastery, `${userId}:${topic}:grammar:${row.id}`),
+      priority: targetPriority(row.jlpt_level, level, mastery, `${userId}:${topic}:grammar:${row.pattern}`),
     };
   }).sort((left, right) => compareTuple(left.priority, right.priority));
 
   const vocabularyRows = vocabularyResult.data ?? [];
+  const detailedKanji = new Set(rankedKanji.map((item) => item.target.character));
+  const detailedGrammar = new Set(rankedGrammar.map((item) => item.target.pattern));
+  const catalogKanji = (kanjiCatalogResult.data ?? [])
+    .filter((row) => !detailedKanji.has(row.character))
+    .map((row) => ({
+      value: row.character,
+      hasDetails: false,
+      priority: targetPriority(
+        row.jlpt_level,
+        level,
+        masteryFor([row.character], kanjiMastery),
+        `${userId}:${topic}:kanji:${row.character}`,
+      ),
+    }))
+    .sort((left, right) => compareTuple(left.priority, right.priority));
+  const catalogGrammar = (grammarCatalogResult.data ?? [])
+    .filter((row) => !detailedGrammar.has(row.pattern))
+    .map((row) => ({
+      value: row.pattern,
+      hasDetails: false,
+      priority: targetPriority(
+        row.jlpt_level,
+        level,
+        masteryFor([row.pattern], grammarMastery),
+        `${userId}:${topic}:grammar:${row.pattern}`,
+      ),
+    }))
+    .sort((left, right) => compareTuple(left.priority, right.priority));
+  const selectedKanji = [
+    ...rankedKanji.map((item) => ({
+      value: item.target.character,
+      hasDetails: true,
+      priority: item.priority,
+    })),
+    ...catalogKanji,
+  ].sort((left, right) => compareTuple(left.priority, right.priority)).slice(0, 5);
+  const selectedGrammar = [
+    ...rankedGrammar.map((item) => ({
+      value: item.target.pattern,
+      hasDetails: true,
+      priority: item.priority,
+    })),
+    ...catalogGrammar,
+  ].sort((left, right) => compareTuple(left.priority, right.priority)).slice(0, 3);
+  const requiredKanji = selectedKanji.map((item) => item.value);
+  const requiredGrammar = selectedGrammar.map((item) => item.value);
+  const selectedKanjiNeedDetails = selectedKanji.some((item) => !item.hasDetails);
+  const selectedGrammarNeedDetails = selectedGrammar.some((item) => !item.hasDetails);
   const libraryNeedsEnrichment =
-    rankedKanji.length < 5 ||
-    rankedGrammar.length < 3 ||
+    selectedKanjiNeedDetails ||
+    selectedGrammarNeedDetails ||
     vocabularyRows.length < 20;
 
   if (libraryNeedsEnrichment && enrichIfNeeded) {
+    if (requiredKanji.length !== 5 || requiredGrammar.length !== 3) {
+      throw new Error(`The ${level} catalog does not contain enough kanji and grammar targets.`);
+    }
     const seed = await generateLessonLibrarySeed({
       topic,
       level,
+      requiredKanji,
+      requiredGrammar,
       existingKanji: rankedKanji.map((item) => item.target.character),
       existingGrammar: rankedGrammar.map((item) => item.target.pattern),
       existingVocabulary: vocabularyRows.map((item) => item.written_form),
@@ -163,8 +241,8 @@ export async function selectLessonTargets(
     const enriched = await client.rpc("enrich_custom_lesson_library", {
       p_level: level,
       p_seed: {
-        kanji: rankedKanji.length < 5 ? seed.kanji : [],
-        grammar: rankedGrammar.length < 3 ? seed.grammar : [],
+        kanji: selectedKanjiNeedDetails ? seed.kanji : [],
+        grammar: selectedGrammarNeedDetails ? seed.grammar : [],
         vocabulary: vocabularyRows.length < 20 ? seed.vocabulary : [],
       } as unknown as Json,
     });

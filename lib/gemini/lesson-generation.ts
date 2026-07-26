@@ -206,7 +206,11 @@ function promptHeader(input: LessonGenerationInput): string {
   ].join("\n");
 }
 
-function librarySeedIssues(value: unknown): string[] {
+function librarySeedIssues(
+  value: unknown,
+  requiredKanji: string[],
+  requiredGrammar: string[],
+): string[] {
   if (!isRecord(value)) return ["Library seed must be an object."];
   const kanji = Array.isArray(value.kanji) ? value.kanji : [];
   const grammar = Array.isArray(value.grammar) ? value.grammar : [];
@@ -222,6 +226,14 @@ function librarySeedIssues(value: unknown): string[] {
       isRecord(item) && stringValue(item[key]) ? [item[key] as string] : []));
   if (unique(kanji, "character").size !== kanji.length) issues.push("Generated kanji must be unique.");
   if (unique(grammar, "pattern").size !== grammar.length) issues.push("Generated grammar patterns must be unique.");
+  const generatedKanji = unique(kanji, "character");
+  const generatedGrammar = unique(grammar, "pattern");
+  if (requiredKanji.some((character) => !generatedKanji.has(character))) {
+    issues.push("Generated kanji must exactly cover the engine-selected kanji catalog entries.");
+  }
+  if (requiredGrammar.some((pattern) => !generatedGrammar.has(pattern))) {
+    issues.push("Generated grammar must exactly cover the engine-selected grammar catalog entries.");
+  }
   if (unique(vocabulary, "writtenForm").size < Math.min(20, vocabulary.length)) {
     issues.push("Generated vocabulary contains too many duplicate written forms.");
   }
@@ -231,28 +243,37 @@ function librarySeedIssues(value: unknown): string[] {
 export async function generateLessonLibrarySeed(input: {
   topic: string;
   level: JLPTLevel;
+  requiredKanji: string[];
+  requiredGrammar: string[];
   existingKanji: string[];
   existingGrammar: string[];
   existingVocabulary: string[];
 }): Promise<LessonLibrarySeed> {
+  if (input.requiredKanji.length !== 5 || input.requiredGrammar.length !== 3) {
+    throw new Error("Library enrichment requires exactly 5 catalog kanji and 3 catalog grammar patterns.");
+  }
   const prompt = [
     "You maintain AIko's reusable Japanese learning library.",
     "Return only the structured JSON required by the supplied response schema.",
     `Create level-appropriate reusable records for JLPT ${input.level}. Do not exceed that level.`,
     `The immediate lesson topic is: ${input.topic}`,
-    "Create exactly 5 useful kanji, exactly 3 grammar patterns, and 24-36 vocabulary records.",
+    "Create detailed records for exactly the 5 engine-selected kanji and exactly the 3 engine-selected grammar patterns listed below.",
+    "Do not replace, omit, normalize, combine, or invent any selected kanji or grammar pattern.",
+    `Required kanji (exact): ${JSON.stringify(input.requiredKanji)}`,
+    `Required grammar patterns (exact): ${JSON.stringify(input.requiredGrammar)}`,
+    "Also create 24-36 vocabulary records.",
     "Prefer words that support the topic while remaining broadly reusable in future lessons.",
     "Readings must be kana, meanings must be concise English, and examples must be natural Japanese.",
     "Vocabulary linkedKanjiCharacters may contain only characters included in the kanji output or the existing kanji list.",
-    `Avoid duplicating these kanji: ${JSON.stringify(input.existingKanji)}`,
-    `Avoid duplicating these grammar patterns: ${JSON.stringify(input.existingGrammar)}`,
+    `Existing detailed kanji available for vocabulary linking: ${JSON.stringify(input.existingKanji)}`,
+    `Existing detailed grammar patterns: ${JSON.stringify(input.existingGrammar)}`,
     `Avoid duplicating these vocabulary forms: ${JSON.stringify(input.existingVocabulary)}`,
   ].join("\n");
   const result = await generateSection<LessonLibrarySeed>({
     name: "blueprint",
     schema: lessonLibrarySeedSchema,
     prompt,
-    validate: librarySeedIssues,
+    validate: (value) => librarySeedIssues(value, input.requiredKanji, input.requiredGrammar),
   });
   return result.value;
 }

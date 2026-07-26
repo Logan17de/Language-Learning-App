@@ -8,7 +8,8 @@ if (files.length < 3) throw new Error("Expected schema, RLS, and functions migra
 const sql = (await Promise.all(files.map((file) => readFile(join(migrationDir, file), "utf8")))).join("\n").toLowerCase();
 const requiredTables = [
   "profiles", "user_preferences", "user_settings", "user_subscriptions",
-  "curriculum_levels", "curriculum_items", "grammar_records", "kanji_records", "vocabulary_records",
+  "curriculum_levels", "curriculum_items", "grammar_catalog", "grammar_records",
+  "kanji_catalog", "kanji_records", "vocabulary_records",
   "lessons", "lesson_versions", "lesson_story_lines", "lesson_vocabulary", "lesson_grammar",
   "lesson_reading_sections", "lesson_listening_activities", "lesson_speaking_activities",
   "lesson_review_activities", "lesson_assets", "image_assets", "audio_assets",
