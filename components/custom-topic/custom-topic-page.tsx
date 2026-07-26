@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { ArrowLeft, CheckCircle2, Crown, Sparkles, WandSparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Crown,
+  LoaderCircle,
+  Sparkles,
+  WandSparkles,
+} from "lucide-react";
 import { generateCustomLesson } from "@/lib/custom-lesson-utils";
 import type { JLPTLevel } from "@/types/lesson";
 import { useAppStore } from "@/store/app-store";
@@ -55,22 +62,32 @@ export function CustomTopicPage() {
       return;
     }
 
-    const response = await fetch("/api/custom-lessons/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic, level }),
-    });
-    const result: unknown = await response.json().catch(() => null);
-    if (!response.ok) {
-      const message = result && typeof result === "object" && !Array.isArray(result)
-        && "error" in result && typeof result.error === "string"
-        ? result.error
-        : "AIko could not create this lesson. Please try again.";
-      setError(message);
+    try {
+      const response = await fetch("/api/custom-lessons/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic, level }),
+        signal: AbortSignal.timeout(300_000),
+      });
+      const result: unknown = await response.json().catch(() => null);
+      if (!response.ok) {
+        const message = result && typeof result === "object" && !Array.isArray(result)
+          && "error" in result && typeof result.error === "string"
+          ? result.error
+          : "AIko could not create this lesson. Please try again.";
+        setError(message);
+        setState("error");
+        return;
+      }
+      setState("ready");
+    } catch (requestError) {
+      const timedOut = requestError instanceof DOMException
+        && (requestError.name === "TimeoutError" || requestError.name === "AbortError");
+      setError(timedOut
+        ? "Lesson generation is taking longer than expected. Please try again."
+        : "The connection was interrupted while creating your lesson. Please try again.");
       setState("error");
-      return;
     }
-    setState("ready");
   }
 
   if (subscription.plan !== "premium") {
@@ -99,12 +116,13 @@ export function CustomTopicPage() {
       <div className="mt-8 grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
         <Card className="p-6 sm:p-7">
           <form className="space-y-5" onSubmit={submit}>
-            <Field label="Topic"><input required minLength={2} maxLength={120} value={topic} onChange={(event) => setTopic(event.target.value)} className="form-input" placeholder="A sustainable farm, my first day at work…" /></Field>
+            <Field label="Topic"><input required minLength={2} maxLength={120} value={topic} onChange={(event) => setTopic(event.target.value)} disabled={state === "generating"} className="form-input disabled:cursor-not-allowed disabled:opacity-60" placeholder="A sustainable farm, my first day at work…" /></Field>
             <Field label="Level">
               <select
                 value={level}
                 onChange={(event) => setLevel(event.target.value as JLPTLevel)}
-                className="form-input"
+                disabled={state === "generating"}
+                className="form-input disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {(["N5", "N4", "N3", "N2", "N1"] as JLPTLevel[]).map((item) => (
                   <option key={item} value={item}>{item}</option>
@@ -126,10 +144,33 @@ export function CustomTopicPage() {
               <ButtonLink href="/learn" className="mt-7">Open my assigned lesson</ButtonLink>
             </div>
           ) : state === "generating" ? (
-            <div>
-              <span className="mx-auto grid size-16 animate-pulse place-items-center rounded-3xl bg-persimmon-100 text-persimmon-600"><Sparkles className="size-7" /></span>
-              <h2 className="mt-6 text-2xl font-semibold">Building the full lesson package…</h2>
-              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">AIko is selecting your targets, enriching any missing reusable language records, writing the activities, and checking answer consistency. This can take about a minute.</p>
+            <div role="status" aria-live="polite" className="w-full max-w-lg">
+              <div className="relative mx-auto grid size-24 place-items-center">
+                <span className="absolute inset-0 rounded-full border border-moss-100 bg-gradient-to-br from-moss-50 to-persimmon-50 shadow-sm" />
+                <LoaderCircle className="absolute size-24 animate-spin text-moss-500 [animation-duration:1.8s]" strokeWidth={1.2} />
+                <span className="relative grid size-14 place-items-center rounded-full bg-white text-persimmon-500 shadow-sm">
+                  <Sparkles className="size-6 animate-pulse" />
+                </span>
+              </div>
+
+              <Badge tone="moss" className="mt-6">AI lesson studio is working</Badge>
+              <h2 className="mt-4 text-2xl font-semibold">Our AI is creating a lesson for you.</h2>
+              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">
+                AIko is turning your topic into a connected Japanese lesson. Keep this page open while it writes, checks, and saves your package.
+              </p>
+
+              <div className="mx-auto mt-7 space-y-2.5 text-left">
+                <GenerationStep delay="0ms">Selecting 5 kanji and 3 grammar targets</GenerationStep>
+                <GenerationStep delay="300ms">Writing your story and practice activities</GenerationStep>
+                <GenerationStep delay="600ms">Checking answers and saving your lesson</GenerationStep>
+              </div>
+
+              <div className="mt-7 overflow-hidden rounded-full bg-stone-100 p-1">
+                <div className="h-1.5 w-full animate-pulse rounded-full bg-gradient-to-r from-moss-500 via-persimmon-400 to-moss-500" />
+              </div>
+              <p className="mt-3 text-xs font-medium text-stone-400">
+                A complete lesson usually takes one or two minutes.
+              </p>
             </div>
           ) : (
             <div>
@@ -146,6 +187,19 @@ export function CustomTopicPage() {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <label className="block"><span className="mb-2 block text-sm font-semibold">{label}</span>{children}</label>;
+}
+
+function GenerationStep({ children, delay }: { children: React.ReactNode; delay: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-stone-100 bg-white/75 px-4 py-3 shadow-sm">
+      <span
+        aria-hidden="true"
+        className="size-2.5 shrink-0 animate-pulse rounded-full bg-moss-500"
+        style={{ animationDelay: delay }}
+      />
+      <span className="text-sm font-medium text-stone-600">{children}</span>
+    </div>
+  );
 }
 
 function learnerLevel(level: string | null): JLPTLevel {

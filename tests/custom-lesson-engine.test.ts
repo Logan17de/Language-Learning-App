@@ -31,6 +31,15 @@ describe("custom lesson engine contract", () => {
     expect(route).toContain('tone: "encouraging"');
   });
 
+  it("shows an unmistakable, accessible generation state", () => {
+    expect(form).toContain('role="status"');
+    expect(form).toContain("Our AI is creating a lesson for you.");
+    expect(form).toContain("Selecting 5 kanji and 3 grammar targets");
+    expect(form).toContain("Writing your story and practice activities");
+    expect(form).toContain("Checking answers and saving your lesson");
+    expect(form).toContain("AbortSignal.timeout(300_000)");
+  });
+
   it("enriches only missing library categories before selecting targets", () => {
     expect(targets).toContain("libraryNeedsEnrichment");
     expect(targets).toContain("generateLessonLibrarySeed");
