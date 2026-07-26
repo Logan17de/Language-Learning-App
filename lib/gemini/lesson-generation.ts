@@ -2,7 +2,16 @@ import "server-only";
 
 import type { Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
-import { createGeminiApiError, GeminiApiError } from "@/lib/gemini/api-error";
+import {
+  createGeminiApiError,
+  GeminiApiError,
+  getGeminiApiDiagnostics,
+} from "@/lib/gemini/api-error";
+import {
+  buildGenerateContentRequest,
+  buildInteractionsRequest,
+  generateContentUrl,
+} from "@/lib/gemini/api-request";
 import {
   blueprintSchema,
   grammarSchema,
@@ -34,7 +43,9 @@ import type {
 
 const PRIMARY_MODEL = process.env.GEMINI_LESSON_MODEL?.trim() || "gemini-3-flash-preview";
 const FALLBACK_MODEL = process.env.GEMINI_LESSON_FALLBACK_MODEL?.trim() || "gemini-3.1-flash-lite";
-const GEMINI_ENDPOINT = process.env.GEMINI_API_BASE?.trim()
+const GEMINI_GENERATE_CONTENT_BASE = process.env.GEMINI_GENERATE_CONTENT_BASE?.trim()
+  || "https://generativelanguage.googleapis.com/v1beta/models";
+const GEMINI_INTERACTIONS_ENDPOINT = process.env.GEMINI_API_BASE?.trim()
   || "https://generativelanguage.googleapis.com/v1beta/interactions";
 
 type JsonSchema = Record<string, unknown>;
@@ -55,6 +66,12 @@ interface SectionDefinition {
 interface SectionResult<T> {
   value: T;
   attempts: GenerationAttempt[];
+}
+
+interface GeminiHttpResult {
+  response: Response;
+  payload: unknown;
+  transport: "generateContent" | "interactions";
 }
 
 function isRecord(value: unknown): value is RecordValue {
@@ -86,7 +103,7 @@ function findOutputText(value: unknown): string | null {
       }
     }
   }
-  for (const key of ["outputs", "output", "content", "parts", "response"]) {
+  for (const key of ["candidates", "outputs", "output", "content", "parts", "response"]) {
     if (key in value) {
       const found = findOutputText(value[key]);
       if (found) return found;
@@ -95,31 +112,71 @@ function findOutputText(value: unknown): string | null {
   return null;
 }
 
-async function callModel(model: string, prompt: string, schema: JsonSchema): Promise<unknown> {
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
-  if (!apiKey) throw new Error("GEMINI_API_KEY is not configured.");
-  const response = await fetch(GEMINI_ENDPOINT, {
+async function postGemini(
+  url: string,
+  apiKey: string,
+  body: Record<string, unknown>,
+  transport: GeminiHttpResult["transport"],
+  includeApiRevision = false,
+): Promise<GeminiHttpResult> {
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "x-goog-api-key": apiKey,
-      "Api-Revision": "2026-05-20",
+      ...(includeApiRevision ? { "Api-Revision": "2026-05-20" } : {}),
     },
-    body: JSON.stringify({
-      model,
-      input: prompt,
-      response_format: {
-        type: "text",
-        mime_type: "application/json",
-        schema,
-      },
-    }),
+    body: JSON.stringify(body),
     signal: AbortSignal.timeout(90_000),
   });
-  const payload: unknown = await response.json().catch(() => null);
-  if (!response.ok) throw createGeminiApiError(model, response.status, payload);
+  return {
+    response,
+    payload: await response.json().catch(() => null),
+    transport,
+  };
+}
 
-  const output = findOutputText(payload);
+function shouldUseInteractionsFallback(status: number): boolean {
+  return status === 404 || status === 405 || status === 501;
+}
+
+function reportGeminiRejection(model: string, result: GeminiHttpResult): void {
+  const diagnostics = getGeminiApiDiagnostics(result.payload);
+  console.error("Gemini structured request rejected.", {
+    model,
+    transport: result.transport,
+    status: result.response.status,
+    messages: diagnostics.messages.slice(0, 3),
+    reasons: diagnostics.reasons.slice(0, 3),
+    fields: diagnostics.fields.slice(0, 5),
+    descriptions: diagnostics.descriptions.slice(0, 3),
+  });
+}
+
+async function callModel(model: string, prompt: string, schema: JsonSchema): Promise<unknown> {
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  if (!apiKey) throw new Error("GEMINI_API_KEY is not configured.");
+  let result = await postGemini(
+    generateContentUrl(GEMINI_GENERATE_CONTENT_BASE, model),
+    apiKey,
+    buildGenerateContentRequest(prompt, schema),
+    "generateContent",
+  );
+  if (!result.response.ok && shouldUseInteractionsFallback(result.response.status)) {
+    result = await postGemini(
+      GEMINI_INTERACTIONS_ENDPOINT,
+      apiKey,
+      buildInteractionsRequest(model, prompt, schema),
+      "interactions",
+      true,
+    );
+  }
+  if (!result.response.ok) {
+    reportGeminiRejection(model, result);
+    throw createGeminiApiError(model, result.response.status, result.payload);
+  }
+
+  const output = findOutputText(result.payload);
   if (output) {
     try {
       return JSON.parse(output);
@@ -127,7 +184,12 @@ async function callModel(model: string, prompt: string, schema: JsonSchema): Pro
       throw new Error(`${model} returned malformed JSON.`);
     }
   }
-  if (isRecord(payload) && !("outputs" in payload) && !("output" in payload)) return payload;
+  if (isRecord(result.payload)
+    && !("candidates" in result.payload)
+    && !("outputs" in result.payload)
+    && !("output" in result.payload)) {
+    return result.payload;
+  }
   throw new Error(`${model} did not return structured output.`);
 }
 

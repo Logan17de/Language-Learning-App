@@ -10,34 +10,66 @@ export class GeminiApiError extends Error {
   }
 }
 
+export interface GeminiApiDiagnostics {
+  messages: string[];
+  reasons: string[];
+  fields: string[];
+  descriptions: string[];
+}
+
 function isRecord(value: unknown): value is UnknownRecord {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 function collectFacts(
   value: unknown,
-  messages: string[],
-  reasons: string[],
+  diagnostics: GeminiApiDiagnostics,
   depth = 0,
 ): void {
   if (depth > 8) return;
   if (Array.isArray(value)) {
-    for (const item of value) collectFacts(item, messages, reasons, depth + 1);
+    for (const item of value) collectFacts(item, diagnostics, depth + 1);
     return;
   }
   if (!isRecord(value)) return;
 
   if (typeof value.message === "string" && value.message.trim()) {
-    messages.push(value.message.trim());
+    diagnostics.messages.push(value.message.trim());
   }
   if (typeof value.reason === "string" && value.reason.trim()) {
-    reasons.push(value.reason.trim());
+    diagnostics.reasons.push(value.reason.trim());
+  }
+  if (typeof value.field === "string" && value.field.trim()) {
+    diagnostics.fields.push(value.field.trim());
+  }
+  if (typeof value.description === "string" && value.description.trim()) {
+    diagnostics.descriptions.push(value.description.trim());
   }
   for (const child of Object.values(value)) {
     if (child && typeof child === "object") {
-      collectFacts(child, messages, reasons, depth + 1);
+      collectFacts(child, diagnostics, depth + 1);
     }
   }
+}
+
+function unique(values: string[]): string[] {
+  return [...new Set(values)];
+}
+
+export function getGeminiApiDiagnostics(payload: unknown): GeminiApiDiagnostics {
+  const diagnostics: GeminiApiDiagnostics = {
+    messages: [],
+    reasons: [],
+    fields: [],
+    descriptions: [],
+  };
+  collectFacts(payload, diagnostics);
+  return {
+    messages: unique(diagnostics.messages),
+    reasons: unique(diagnostics.reasons),
+    fields: unique(diagnostics.fields),
+    descriptions: unique(diagnostics.descriptions),
+  };
 }
 
 export function createGeminiApiError(
@@ -45,10 +77,8 @@ export function createGeminiApiError(
   status: number,
   payload: unknown,
 ): GeminiApiError {
-  const messages: string[] = [];
-  const reasons: string[] = [];
-  collectFacts(payload, messages, reasons);
-  const uniqueReasons = new Set(reasons);
+  const diagnostics = getGeminiApiDiagnostics(payload);
+  const uniqueReasons = new Set(diagnostics.reasons);
 
   if (uniqueReasons.has("API_KEY_INVALID")) {
     return new GeminiApiError(
@@ -73,15 +103,17 @@ export function createGeminiApiError(
     );
   }
   if (status === 400) {
+    const location = diagnostics.fields[0] ? ` at ${diagnostics.fields[0]}` : "";
+    const detail = diagnostics.descriptions[0] ?? diagnostics.messages[0];
     return new GeminiApiError(
-      messages[0]
-        ? `Gemini rejected the structured request: ${messages[0]}`
-        : "Gemini rejected the structured request as invalid.",
+      detail
+        ? `Gemini rejected the structured request${location}: ${detail}`
+        : `Gemini rejected the structured request${location} as invalid.`,
       false,
     );
   }
 
-  const detail = messages[0] ?? `request failed with status ${status}`;
+  const detail = diagnostics.messages[0] ?? `request failed with status ${status}`;
   return new GeminiApiError(
     `${model} ${detail}`,
     status === 404 || status === 408 || status === 409 || status === 429 || status >= 500,

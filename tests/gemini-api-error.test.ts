@@ -28,4 +28,23 @@ describe("Gemini API error handling", () => {
       error: { message: "Service unavailable." },
     }).allowFallback).toBe(true);
   });
+
+  it("surfaces structured field violations without exposing the request", () => {
+    const error = createGeminiApiError("primary", 400, {
+      error: {
+        message: "Request contains an invalid argument.",
+        details: [{
+          fieldViolations: [{
+            field: "generation_config.response_format.text.schema",
+            description: "Schema is too complex.",
+          }],
+        }],
+      },
+    });
+
+    expect(error.message).toBe(
+      "Gemini rejected the structured request at generation_config.response_format.text.schema: Schema is too complex.",
+    );
+    expect(error.allowFallback).toBe(false);
+  });
 });
