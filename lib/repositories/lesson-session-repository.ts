@@ -77,6 +77,22 @@ export const lessonSessionRepository = {
     return error ? failure(error, "Your learning events are waiting to sync.") : success(events.length);
   },
 
+  async recordMasteryEvidence(
+    sessionId: string,
+    events: Json[],
+  ): Promise<RepositoryResult<Json>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    if (!events.length) return success({ processed: 0 });
+    const { data, error } = await client.rpc("record_mastery_evidence", {
+      p_session_id: sessionId,
+      p_events: events,
+    });
+    return error
+      ? failure(error, "Your learning scores are waiting to sync.")
+      : success(data);
+  },
+
   async complete(input: LessonCompletionInput): Promise<RepositoryResult<Json>> {
     const client = createClient();
     if (!client) return notConfigured();
