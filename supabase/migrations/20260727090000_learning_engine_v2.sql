@@ -135,13 +135,17 @@ create table if not exists public.lesson_practice_activities (
   activity_type text not null check (
     activity_type in ('multiple_choice', 'word_order', 'matching', 'text_input')
   ),
+  difficulty text not null check (difficulty in ('Easy', 'Medium', 'Hard')),
+  mode text not null,
+  skill text not null check (skill in ('understanding', 'production')),
   prompt text not null,
   cue text not null default '',
   choices text[] not null default '{}',
   correct_answer text not null,
   accepted_answers text[] not null default '{}',
   explanation text not null default '',
-  hint text not null default '',
+  hint_front text not null default '',
+  hint_back text not null default '',
   target_item_ids uuid[] not null default '{}',
   inspectable_terms jsonb not null default '[]'::jsonb
     check (jsonb_typeof(inspectable_terms) = 'array'),
