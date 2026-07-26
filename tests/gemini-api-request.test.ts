@@ -14,7 +14,7 @@ const schema = {
 };
 
 describe("Gemini structured request builders", () => {
-  it("builds the current generateContent response-format envelope", () => {
+  it("builds the generateContent JSON Schema envelope supported by the lesson models", () => {
     expect(generateContentUrl(
       "https://generativelanguage.googleapis.com/v1beta/models/",
       "gemini-3-flash-preview",
@@ -27,12 +27,8 @@ describe("Gemini structured request builders", () => {
         parts: [{ text: "Create a lesson." }],
       }],
       generationConfig: {
-        responseFormat: {
-          text: {
-            mimeType: "APPLICATION_JSON",
-            schema,
-          },
-        },
+        responseMimeType: "application/json",
+        responseJsonSchema: schema,
       },
     });
   });

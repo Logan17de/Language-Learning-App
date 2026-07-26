@@ -14,12 +14,8 @@ export function buildGenerateContentRequest(
       parts: [{ text: prompt }],
     }],
     generationConfig: {
-      responseFormat: {
-        text: {
-          mimeType: "APPLICATION_JSON",
-          schema,
-        },
-      },
+      responseMimeType: "application/json",
+      responseJsonSchema: schema,
     },
   };
 }
