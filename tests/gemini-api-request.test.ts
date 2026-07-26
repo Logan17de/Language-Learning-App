@@ -3,6 +3,7 @@ import {
   buildGenerateContentRequest,
   buildInteractionsRequest,
   generateContentUrl,
+  simplifyGeminiJsonSchema,
 } from "@/lib/gemini/api-request";
 
 const schema = {
@@ -45,6 +46,45 @@ describe("Gemini structured request builders", () => {
         type: "text",
         mime_type: "application/json",
         schema,
+      },
+    });
+  });
+
+  it("moves complexity-heavy constraints to application validation", () => {
+    expect(simplifyGeminiJsonSchema({
+      type: "object",
+      additionalProperties: false,
+      required: ["items"],
+      properties: {
+        items: {
+          type: "array",
+          minItems: 5,
+          maxItems: 5,
+          items: {
+            type: "integer",
+            minimum: 1,
+            maximum: 64,
+          },
+        },
+        level: {
+          type: "string",
+          enum: ["N5", "N4"],
+        },
+      },
+    })).toEqual({
+      type: "object",
+      required: ["items"],
+      properties: {
+        items: {
+          type: "array",
+          items: {
+            type: "integer",
+          },
+        },
+        level: {
+          type: "string",
+          enum: ["N5", "N4"],
+        },
       },
     });
   });
