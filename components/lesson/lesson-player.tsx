@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Save } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import type { LessonPackage } from "@/types/lesson";
 import type { LessonPhaseId, LessonSession } from "@/types/lesson-session";
 import { calculateLessonCompletion } from "@/lib/scoring-utils";
@@ -184,11 +184,10 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
           <div className="w-full max-w-md rounded-4xl bg-white p-7 shadow-float">
             <span className="grid size-12 place-items-center rounded-2xl bg-persimmon-100 text-persimmon-600"><AlertTriangle className="size-5" /></span>
             <h2 id="exit-title" className="mt-6 text-2xl font-semibold">Pause this lesson?</h2>
-            <p className="mt-3 leading-7 text-stone-500">Your current phase, answers, reading events, and elapsed time will be saved on this device.</p>
-            <div className="mt-5 flex items-center gap-2 rounded-2xl bg-moss-50 p-4 text-sm text-moss-700"><Save className="size-4" /> Resume from {phase.label} anytime.</div>
+            <p className="mt-3 leading-7 text-stone-500">You can leave now and continue from {phase.label} when you return.</p>
             <div className="mt-6 flex gap-3">
               <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowExit(false)}>Keep learning</Button>
-              <Button type="button" className="flex-1" onClick={exit}>Save & exit</Button>
+              <Button type="button" className="flex-1" onClick={exit}>Exit lesson</Button>
             </div>
           </div>
         </div>
@@ -202,9 +201,9 @@ function phaseIsComplete(session: LessonSession, phaseId: LessonPhaseId): boolea
     case "story":
       return session.storyComplete;
     case "vocabulary":
-      return new Set(session.vocabularyAnswers.filter((answer) => answer.correct).map((answer) => answer.questionId)).size >= 5;
+      return new Set(session.vocabularyAnswers.map((answer) => answer.questionId)).size >= 10;
     case "grammar":
-      return new Set(session.grammarAnswers.filter((answer) => answer.correct).map((answer) => answer.questionId)).size >= 4;
+      return new Set(session.grammarAnswers.map((answer) => answer.questionId)).size >= 10;
     case "reading":
       return session.readingComplete;
     case "listening":
