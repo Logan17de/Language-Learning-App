@@ -346,6 +346,7 @@ begin
         select jsonb_agg(value->>'libraryId')
         from jsonb_array_elements(p_package->'kanji')
       ),
+      'targetKanji', p_package->'kanji',
       'generationAudit', coalesce(p_package->'generationAudit', '{}'::jsonb)
     ),
     now(),
