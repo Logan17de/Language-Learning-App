@@ -176,6 +176,15 @@ create policy lesson_practice_activities_staff_all
   using (public.has_app_role(array['admin','content_editor']::public.app_role[]))
   with check (public.has_app_role(array['admin','content_editor']::public.app_role[]));
 
+grant select on public.lesson_practice_activities to anon, authenticated;
+grant insert, update, delete on public.lesson_practice_activities to authenticated;
+
+drop trigger if exists lesson_practice_activities_updated_at
+  on public.lesson_practice_activities;
+create trigger lesson_practice_activities_updated_at
+before update on public.lesson_practice_activities
+for each row execute function public.set_updated_at();
+
 -- ---------------------------------------------------------------------------
 -- Immutable learner evidence and deterministic scores
 -- ---------------------------------------------------------------------------
@@ -217,6 +226,8 @@ alter table public.learner_mastery_events enable row level security;
 create policy learner_mastery_events_own_select
   on public.learner_mastery_events for select to authenticated
   using (user_id = auth.uid());
+
+grant select on public.learner_mastery_events to authenticated;
 
 create or replace function public.mastery_prompt_data(
   p_item_type text,
