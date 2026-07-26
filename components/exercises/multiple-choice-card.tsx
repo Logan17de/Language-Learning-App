@@ -1,3 +1,5 @@
+"use client";
+
 import { Check, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnswerFeedback } from "@/components/exercises/answer-feedback";
@@ -10,6 +12,7 @@ export function MultipleChoiceCard({
   correctAnswer,
   explanation,
   answered,
+  lockAfterAnswer = false,
   onSelect,
 }: {
   prompt: string;
@@ -19,9 +22,12 @@ export function MultipleChoiceCard({
   correctAnswer: string;
   explanation: string;
   answered: boolean;
+  lockAfterAnswer?: boolean;
   onSelect: (answer: string) => void;
 }) {
   const isCorrect = selectedAnswer === correctAnswer;
+  const locked = answered && lockAfterAnswer;
+
   return (
     <section aria-labelledby="question-prompt">
       <p id="question-prompt" className="text-sm font-semibold text-stone-500">{prompt}</p>
@@ -37,13 +43,15 @@ export function MultipleChoiceCard({
               type="button"
               role="radio"
               aria-checked={selected}
+              disabled={locked}
               onClick={() => onSelect(choice)}
               className={cn(
-                "flex min-h-16 items-center gap-3 rounded-2xl border bg-white p-4 text-left text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-moss-100",
+                "flex min-h-16 items-center gap-3 rounded-2xl border bg-white p-4 text-left text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-moss-100 disabled:cursor-default",
                 correctChoice && "border-moss-500 bg-moss-50 text-moss-900",
                 wrongChoice && "border-persimmon-400 bg-persimmon-50 text-persimmon-600",
                 !correctChoice && !wrongChoice && selected && "border-moss-600",
-                !selected && !correctChoice && "border-stone-200 hover:border-moss-300",
+                !selected && !correctChoice && !locked && "border-stone-200 hover:border-moss-300",
+                !selected && !correctChoice && locked && "border-stone-200 opacity-55",
               )}
             >
               <span className="grid size-7 shrink-0 place-items-center rounded-full border border-current/20 text-xs">
