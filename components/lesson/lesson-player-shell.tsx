@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Save, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -56,7 +56,6 @@ export function LessonPlayerShell({
           <Button type="button" variant="ghost" onClick={onBack} className="px-4">
             <ArrowLeft className="size-4" /> Back
           </Button>
-          <span className="hidden items-center gap-2 text-xs text-stone-400 sm:flex"><Save className="size-3.5" /> Progress saved locally</span>
           <Button type="button" onClick={onContinue} disabled={!canContinue} className="min-w-40">
             {continueLabel} <ArrowRight className="size-4" />
           </Button>
