@@ -42,6 +42,24 @@ export function ReviewPlayer() {
   if (!hydrated || !session) {
     return <main className="grid min-h-screen place-items-center bg-paper"><span className="size-10 animate-spin rounded-full border-4 border-moss-100 border-t-moss-600" /></main>;
   }
+  if (session.activities.length === 0) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-paper px-5 py-12">
+        <Card className="w-full max-w-xl p-8 text-center sm:p-12">
+          <span className="mx-auto grid size-16 place-items-center rounded-3xl bg-moss-50 text-moss-700">
+            <Sparkles className="size-7" />
+          </span>
+          <Badge tone="moss" className="mt-6">Review is clear</Badge>
+          <h1 className="mt-4 text-3xl font-semibold">No weak items are due.</h1>
+          <p className="mx-auto mt-3 max-w-md leading-7 text-stone-500">
+            Review will contain only kanji, vocabulary, and grammar that need more practice.
+          </p>
+          <ButtonLink href="/learn" className="mt-7">Continue learning</ButtonLink>
+        </Card>
+      </main>
+    );
+  }
+
   if (session.completed && session.result) {
     const improved = session.result.improvedItemIds.length;
     const weak = session.result.weakItemIds.length;
