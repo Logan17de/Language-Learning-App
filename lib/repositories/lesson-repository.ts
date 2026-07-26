@@ -12,6 +12,7 @@ export interface CanonicalLesson {
   storyWords: Database["public"]["Tables"]["lesson_story_words"]["Row"][];
   vocabulary: Database["public"]["Tables"]["lesson_vocabulary"]["Row"][];
   grammar: Database["public"]["Tables"]["lesson_grammar"]["Row"][];
+  practice: Database["public"]["Tables"]["lesson_practice_activities"]["Row"][];
   reading: Database["public"]["Tables"]["lesson_reading_sections"]["Row"][];
   listening: Database["public"]["Tables"]["lesson_listening_activities"]["Row"][];
   speaking: Database["public"]["Tables"]["lesson_speaking_activities"]["Row"][];
@@ -52,6 +53,7 @@ async function loadContent(lesson: Lesson, version: Version): Promise<Repository
     storyWords,
     vocabulary,
     grammar,
+    practice,
     reading,
     listening,
     speaking,
@@ -61,6 +63,7 @@ async function loadContent(lesson: Lesson, version: Version): Promise<Repository
     client.from("lesson_story_words").select("*").eq("lesson_version_id", versionId).order("story_line_id").order("position"),
     client.from("lesson_vocabulary").select("*").eq("lesson_version_id", versionId).order("position"),
     client.from("lesson_grammar").select("*").eq("lesson_version_id", versionId).order("position"),
+    client.from("lesson_practice_activities").select("*").eq("lesson_version_id", versionId).order("phase").order("position"),
     client.from("lesson_reading_sections").select("*").eq("lesson_version_id", versionId).order("position"),
     client.from("lesson_listening_activities").select("*").eq("lesson_version_id", versionId).order("position"),
     client.from("lesson_speaking_activities").select("*").eq("lesson_version_id", versionId).order("position"),
@@ -74,6 +77,7 @@ async function loadContent(lesson: Lesson, version: Version): Promise<Repository
     story,
     vocabulary,
     grammar,
+    practice,
     reading,
     listening,
     speaking,
@@ -88,6 +92,7 @@ async function loadContent(lesson: Lesson, version: Version): Promise<Repository
     storyWords: storyWordTableMissing ? [] : (storyWords.data ?? []),
     vocabulary: vocabulary.data ?? [],
     grammar: grammar.data ?? [],
+    practice: practice.data ?? [],
     reading: reading.data ?? [],
     listening: listening.data ?? [],
     speaking: speaking.data ?? [],
