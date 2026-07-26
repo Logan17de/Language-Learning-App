@@ -275,6 +275,10 @@ export const useAppStore = create<AppState>()(
           },
           progress: {
             ...state.progress,
+            levelCompletion: snapshot.levelCompletion,
+            learnedVocabularyCount: snapshot.learnedVocabularyCount,
+            learnedKanjiCount: snapshot.learnedKanjiCount,
+            learnedGrammarCount: snapshot.learnedGrammarCount,
             weeklyActivity: snapshot.weeklyActivity,
             weakKanji: snapshot.weakKanji,
             weakVocabulary: snapshot.weakVocabulary,
