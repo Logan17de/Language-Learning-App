@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { ArrowRight, CheckCircle2, Lightbulb } from "lucide-react";
-import type { LessonPackage } from "@/types/lesson";
+import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession } from "@/types/lesson-session";
-import { grammarQuestions } from "@/data/mock-activities";
-import type { ExerciseDifficulty } from "@/data/mock-activities";
 import { upsertGrammarAnswer } from "@/lib/scoring-utils";
 import { MultipleChoiceCard } from "@/components/exercises/multiple-choice-card";
 import { AnswerFeedback } from "@/components/exercises/answer-feedback";
@@ -26,6 +24,7 @@ export function GrammarPhase({
   const [showLesson, setShowLesson] = useState(session.grammarAnswers.length === 0);
   const [typedAnswer, setTypedAnswer] = useState("");
   const [hintQuestionId, setHintQuestionId] = useState<string | null>(null);
+  const grammarQuestions = lesson.grammarQuestions;
 
   const answeredCount = grammarQuestions.filter((question) =>
     session.grammarAnswers.some((answer) => answer.questionId === question.id),
