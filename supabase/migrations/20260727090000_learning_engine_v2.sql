@@ -381,10 +381,19 @@ begin
         v_item_type = 'kanji'
         and exists (
           select 1
-          from public.lesson_story_words word
-          where word.lesson_version_id = v_session.lesson_version_id
-            and word.library_type = 'kanji'
-            and word.library_id::text = v_item_key
+          from public.lesson_versions version
+          where version.id = v_session.lesson_version_id
+            and (
+              coalesce(version.metadata->'targetKanjiIds', '[]'::jsonb)
+                ? v_item_key
+              or exists (
+                select 1
+                from public.lesson_story_words word
+                where word.lesson_version_id = v_session.lesson_version_id
+                  and word.library_type = 'kanji'
+                  and word.library_id::text = v_item_key
+              )
+            )
         )
       )
       or (
