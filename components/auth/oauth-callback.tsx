@@ -8,11 +8,19 @@ import {
   createClient,
   createGoogleOAuthClient,
 } from "@/lib/supabase/client";
+import { canAccessAdmin, type AppRole } from "@/lib/auth/permissions";
+import { useAdminStore } from "@/store/admin-store";
 
-type GoogleFlow = "login" | "signup";
+type GoogleFlow = "login" | "signup" | "admin";
 
 function returnToAuth(flow: GoogleFlow | null, error: string) {
-  const target = new URL(flow === "signup" ? "/signup" : "/login", window.location.origin);
+  const pathname =
+    flow === "signup"
+      ? "/signup"
+      : flow === "admin"
+        ? "/admin/login"
+        : "/login";
+  const target = new URL(pathname, window.location.origin);
   target.searchParams.set("error", error);
   window.location.replace(target.toString());
 }
@@ -29,7 +37,9 @@ export function OAuthCallback() {
       const url = new URL(window.location.href);
       const requestedFlow = url.searchParams.get("flow");
       const googleFlow: GoogleFlow | null =
-        requestedFlow === "login" || requestedFlow === "signup"
+        requestedFlow === "login" ||
+        requestedFlow === "signup" ||
+        requestedFlow === "admin"
           ? requestedFlow
           : null;
       const requestedNext = url.searchParams.get("next");
@@ -99,7 +109,7 @@ export function OAuthCallback() {
         return;
       }
 
-      if (googleFlow) {
+      if (googleFlow && googleFlow !== "admin") {
         const registrationComplete =
           auth.user.user_metadata?.aiko_google_registration_complete;
         const createdAt = Date.parse(auth.user.created_at);
@@ -124,6 +134,38 @@ export function OAuthCallback() {
             data: { aiko_google_registration_complete: true },
           });
         }
+      }
+
+      if (googleFlow === "admin") {
+        const profile = await client
+          .from("profiles")
+          .select("email,display_name,role,status")
+          .eq("id", auth.user.id)
+          .maybeSingle();
+        const role = profile.data?.role as AppRole | undefined;
+
+        if (
+          profile.error ||
+          !profile.data ||
+          profile.data.status !== "active" ||
+          !role ||
+          !canAccessAdmin(role)
+        ) {
+          await client.auth.signOut({ scope: "local" });
+          returnToAuth("admin", "admin-access-denied");
+          return;
+        }
+
+        useAdminStore.getState().establishBackendSession(
+          profile.data.email ?? auth.user.email ?? "",
+          profile.data.display_name,
+          role.replace("_", " "),
+        );
+        const adminNext = explicitNext?.startsWith("/admin")
+          ? explicitNext
+          : "/admin";
+        window.location.replace(adminNext);
+        return;
       }
 
       const preferences = await client

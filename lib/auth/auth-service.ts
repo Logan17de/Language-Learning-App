@@ -220,7 +220,7 @@ export const authService = {
   },
 
   async signInWithGoogle(
-    mode: "login" | "signup",
+    mode: "login" | "signup" | "admin",
     next?: string,
   ): Promise<RepositoryResult<null>> {
     clearGoogleOAuthStorage();
