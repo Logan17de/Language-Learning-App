@@ -23,7 +23,17 @@ export function VocabularyPhase({
   const correctCount = vocabularyQuestions.filter((question) =>
     session.vocabularyAnswers.some((answer) => answer.questionId === question.id && answer.correct),
   ).length;
-  const currentIndex = Math.min(session.activityIndex, vocabularyQuestions.length - 1);
+  const savedIndex = Math.min(session.activityIndex, vocabularyQuestions.length - 1);
+  const earliestUnansweredIndex = vocabularyQuestions.findIndex(
+    (question) => !session.vocabularyAnswers.some((answer) => answer.questionId === question.id),
+  );
+  const savedQuestionAnswered = session.vocabularyAnswers.some(
+    (answer) => answer.questionId === vocabularyQuestions[savedIndex].id,
+  );
+  const currentIndex =
+    savedQuestionAnswered && earliestUnansweredIndex >= 0 && earliestUnansweredIndex < savedIndex
+      ? earliestUnansweredIndex
+      : savedIndex;
   const question = vocabularyQuestions[currentIndex];
   const answer = session.vocabularyAnswers.find((item) => item.questionId === question.id);
   const isLastQuestion = currentIndex === vocabularyQuestions.length - 1;
