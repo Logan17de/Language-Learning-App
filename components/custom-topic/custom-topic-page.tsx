@@ -31,6 +31,7 @@ export function CustomTopicPage() {
     learnerLevel(onboarding.level ?? user.level),
   );
   const [state, setState] = useState<GenerationState>("idle");
+  const [lessonId, setLessonId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -57,6 +58,7 @@ export function CustomTopicPage() {
           generatedLessonId: lesson.id,
           createdAt: "Just now",
         });
+        setLessonId(lesson.id);
         setState("ready");
       }, 1200);
       return;
@@ -79,6 +81,17 @@ export function CustomTopicPage() {
         setState("error");
         return;
       }
+      const generatedLessonId =
+        result && typeof result === "object" && !Array.isArray(result)
+          && "lesson_id" in result && typeof result.lesson_id === "string"
+          ? result.lesson_id
+          : null;
+      if (!generatedLessonId) {
+        setError("The lesson was saved, but its link was not returned. Open Learn to continue.");
+        setState("error");
+        return;
+      }
+      setLessonId(generatedLessonId);
       setState("ready");
     } catch (requestError) {
       const timedOut = requestError instanceof DOMException
@@ -141,7 +154,7 @@ export function CustomTopicPage() {
               <Badge tone="moss" className="mt-6">Saved to your path</Badge>
               <h2 className="mt-4 text-2xl font-semibold">Your complete lesson is ready.</h2>
               <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">The story, vocabulary, grammar, reading, listening, speaking, and review package has been saved and assigned without changing your level.</p>
-              <ButtonLink href="/learn" className="mt-7">Open my assigned lesson</ButtonLink>
+              <ButtonLink href={lessonId ? `/lesson/${lessonId}/preview` : "/learn"} className="mt-7">Open my assigned lesson</ButtonLink>
             </div>
           ) : state === "generating" ? (
             <div role="status" aria-live="polite" className="w-full max-w-lg">
