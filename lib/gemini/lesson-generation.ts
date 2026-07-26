@@ -13,6 +13,12 @@ import {
   generateContentUrl,
 } from "@/lib/gemini/api-request";
 import {
+  createInspectableTermLookup,
+  resolveInspectableTerm,
+  type InspectableTermLookup,
+} from "@/lib/gemini/inspectable-canonicalization";
+import { storyUsesGrammarPattern } from "@/lib/gemini/lesson-validation";
+import {
   blueprintSchema,
   grammarSchema,
   interactiveSchema,
@@ -408,13 +414,6 @@ function exerciseIssues(value: unknown, expectedCount: number): string[] {
   return issues;
 }
 
-function normalizePattern(pattern: string): string[] {
-  return pattern
-    .split(/[・/]/)
-    .map((part) => part.replace(/[～〜\s（）()]/g, "").trim())
-    .filter((part) => part.length >= 2);
-}
-
 function blueprintIssues(value: unknown, input: LessonGenerationInput): string[] {
   const issues = baseValidation(value, [
     "title", "japaneseTitle", "summary", "setting", "characters", "storySummary",
@@ -442,8 +441,7 @@ function storyIssues(value: unknown, input: LessonGenerationInput): string[] {
     if (!japanese.includes(kanji.character)) issues.push(`Story does not use target kanji ${kanji.character}.`);
   }
   for (const grammar of input.targets.grammar) {
-    const variants = normalizePattern(grammar.pattern);
-    if (variants.length > 0 && !variants.some((variant) => japanese.includes(variant))) {
+    if (!storyUsesGrammarPattern(japanese, grammar.pattern)) {
       issues.push(`Story does not visibly use target grammar ${grammar.pattern}.`);
     }
   }
@@ -463,10 +461,8 @@ function exactArrayIssues(value: unknown, key: string, count: number): string[] 
 
 function referenceIssues(value: unknown, input: LessonGenerationInput): string[] {
   const issues: string[] = [];
-  const inspectableIds = new Set([
-    ...input.targets.vocabulary.map((item) => item.id),
-    ...input.targets.kanji.map((item) => item.id),
-  ]);
+  const inspectables = inspectableLookup(input);
+  const inspectableIds = new Set(inspectables.byId.keys());
   const targetIds = new Set([
     ...inspectableIds,
     ...input.targets.grammar.map((item) => item.id),
@@ -480,10 +476,10 @@ function referenceIssues(value: unknown, input: LessonGenerationInput): string[]
     for (const [key, child] of Object.entries(node)) {
       if ((key === "inspectableTerms" || key === "transcriptTerms" || key === "promptTerms")
         && Array.isArray(child)) {
-        for (const term of child) {
-          const id = isRecord(term) && typeof term.libraryId === "string" ? term.libraryId : "";
-          if (!id || !inspectableIds.has(id)) issues.push(`Unknown inspectable library ID ${id || "(missing)"}.`);
-        }
+        // Inspectable metadata is canonicalized after generation. A model-created
+        // ID is acceptable when its surface or reading maps to the supplied
+        // reusable library; unresolved metadata is safely omitted.
+        continue;
       } else if (key === "targetIds" && Array.isArray(child)) {
         for (const id of child) {
           if (typeof id !== "string" || !targetIds.has(id)) {
@@ -540,13 +536,13 @@ function interactiveIssues(value: unknown): string[] {
   return issues;
 }
 
-function inspectableLookup(input: LessonGenerationInput): Map<string, InspectableTerm> {
-  const lookup = new Map<string, InspectableTerm>();
+function inspectableLookup(input: LessonGenerationInput): InspectableTermLookup {
+  const terms: InspectableTerm[] = [];
   for (const item of input.targets.vocabulary) {
     const scriptType = /[\u4e00-\u9faf]/u.test(item.writtenForm)
       ? "kanji"
       : /[\u30a0-\u30ff]/u.test(item.writtenForm) ? "katakana" : "hiragana";
-    lookup.set(item.id, {
+    terms.push({
       libraryId: item.id,
       surface: item.writtenForm,
       reading: item.reading,
@@ -555,7 +551,7 @@ function inspectableLookup(input: LessonGenerationInput): Map<string, Inspectabl
     });
   }
   for (const item of input.targets.kanji) {
-    lookup.set(item.id, {
+    terms.push({
       libraryId: item.id,
       surface: item.character,
       reading: item.readings.join("・"),
@@ -563,29 +559,22 @@ function inspectableLookup(input: LessonGenerationInput): Map<string, Inspectabl
       scriptType: "kanji",
     });
   }
-  return lookup;
+  return createInspectableTermLookup(terms);
 }
 
-function canonicalizeTerms(value: unknown, lookup: Map<string, InspectableTerm>, issues: string[]): unknown {
-  if (Array.isArray(value)) return value.map((item) => canonicalizeTerms(item, lookup, issues));
+function canonicalizeTerms(value: unknown, lookup: InspectableTermLookup): unknown {
+  if (Array.isArray(value)) return value.map((item) => canonicalizeTerms(item, lookup));
   if (!isRecord(value)) return value;
   const result: RecordValue = {};
   for (const [key, child] of Object.entries(value)) {
     if ((key === "inspectableTerms" || key === "transcriptTerms" || key === "promptTerms") && Array.isArray(child)) {
       result[key] = child.flatMap((term) => {
-        if (!isRecord(term) || !stringValue(term.libraryId)) {
-          issues.push(`An inspectable term in ${key} is missing libraryId.`);
-          return [];
-        }
-        const canonical = lookup.get(term.libraryId);
-        if (!canonical) {
-          issues.push(`Inspectable term references unknown library ID ${term.libraryId}.`);
-          return [];
-        }
+        const canonical = resolveInspectableTerm(term, lookup);
+        if (!canonical) return [];
         return [canonical];
       });
     } else {
-      result[key] = canonicalizeTerms(child, lookup, issues);
+      result[key] = canonicalizeTerms(child, lookup);
     }
   }
   return result;
@@ -916,7 +905,6 @@ export async function generateLessonPackage(input: LessonGenerationInput): Promi
       }),
     ]);
 
-  const termIssues: string[] = [];
   const lookup = inspectableLookup(input);
   const canonical = canonicalizeTerms({
     story: storyResult.value,
@@ -926,10 +914,7 @@ export async function generateLessonPackage(input: LessonGenerationInput): Promi
     listening: listeningResult.value,
     speaking: speakingResult.value,
     interactive: interactiveResult.value,
-  }, lookup, termIssues) as RecordValue;
-  if (termIssues.length > 0) {
-    throw new Error(`Generated inspectable terms failed library validation: ${[...new Set(termIssues)].join(" ")}`);
-  }
+  }, lookup) as RecordValue;
 
   const attempts = [
     ...blueprintResult.attempts,
