@@ -499,13 +499,17 @@ begin
       position,
       phase,
       activity_type,
+      difficulty,
+      mode,
+      skill,
       prompt,
       cue,
       choices,
       correct_answer,
       accepted_answers,
       explanation,
-      hint,
+      hint_front,
+      hint_back,
       target_item_ids,
       inspectable_terms
     ) values (
@@ -513,6 +517,9 @@ begin
       v_item.ordinality,
       'vocabulary',
       v_item.value->>'activityType',
+      v_item.value->>'difficulty',
+      v_item.value->>'mode',
+      'understanding',
       v_item.value->>'prompt',
       v_item.value->>'cue',
       coalesce(
@@ -525,7 +532,8 @@ begin
         '{}'
       ),
       v_item.value->>'explanation',
-      coalesce(v_item.value->>'hint', ''),
+      coalesce(v_item.value->>'hintFront', ''),
+      coalesce(v_item.value->>'hintBack', ''),
       coalesce(
         array(
           select value::uuid
@@ -546,13 +554,17 @@ begin
       position,
       phase,
       activity_type,
+      difficulty,
+      mode,
+      skill,
       prompt,
       cue,
       choices,
       correct_answer,
       accepted_answers,
       explanation,
-      hint,
+      hint_front,
+      hint_back,
       target_item_ids,
       inspectable_terms
     ) values (
@@ -560,6 +572,9 @@ begin
       v_item.ordinality,
       'grammar',
       v_item.value->>'activityType',
+      v_item.value->>'difficulty',
+      coalesce(v_item.value->>'mode', 'grammar'),
+      v_item.value->>'skill',
       v_item.value->>'prompt',
       v_item.value->>'cue',
       coalesce(
@@ -572,7 +587,8 @@ begin
         '{}'
       ),
       v_item.value->>'explanation',
-      coalesce(v_item.value->>'hint', ''),
+      coalesce(v_item.value->>'hintFront', ''),
+      coalesce(v_item.value->>'hintBack', ''),
       coalesce(
         array(
           select value::uuid
@@ -864,4 +880,3 @@ revoke all on function public.store_generated_lesson_package_v2(uuid, jsonb, int
   from public;
 grant execute on function public.store_generated_lesson_package_v2(uuid, jsonb, integer)
   to authenticated;
-
