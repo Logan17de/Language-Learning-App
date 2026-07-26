@@ -1,7 +1,8 @@
 "use client";
 
-import { ArrowRight, RotateCcw } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { vocabularyQuestions } from "@/data/mock-activities";
+import type { ExerciseDifficulty } from "@/data/mock-activities";
 import type { LessonSession } from "@/types/lesson-session";
 import { evaluateAnswer, upsertVocabularyAnswer } from "@/lib/scoring-utils";
 import { MultipleChoiceCard } from "@/components/exercises/multiple-choice-card";
@@ -16,15 +17,19 @@ export function VocabularyPhase({
   session: LessonSession;
   onChange: (session: LessonSession) => void;
 }) {
-  const completedCount = vocabularyQuestions.filter((question) =>
+  const answeredCount = vocabularyQuestions.filter((question) =>
+    session.vocabularyAnswers.some((answer) => answer.questionId === question.id),
+  ).length;
+  const correctCount = vocabularyQuestions.filter((question) =>
     session.vocabularyAnswers.some((answer) => answer.questionId === question.id && answer.correct),
   ).length;
   const currentIndex = Math.min(session.activityIndex, vocabularyQuestions.length - 1);
   const question = vocabularyQuestions[currentIndex];
   const answer = session.vocabularyAnswers.find((item) => item.questionId === question.id);
-  const phaseComplete = completedCount === vocabularyQuestions.length;
+  const isLastQuestion = currentIndex === vocabularyQuestions.length - 1;
 
   function select(selectedAnswer: string) {
+    if (answer) return;
     const correct = evaluateAnswer(selectedAnswer, question.correctAnswer);
     onChange({
       ...session,
@@ -38,27 +43,30 @@ export function VocabularyPhase({
     });
   }
 
-  if (phaseComplete) {
-    return (
-      <div className="mx-auto max-w-2xl py-12 text-center">
-        <span className="mx-auto grid size-20 place-items-center rounded-4xl bg-moss-100 text-3xl">語</span>
-        <Badge className="mt-7">5 of 5 complete</Badge>
-        <h2 className="mt-4 text-3xl font-semibold">Words ready for context.</h2>
-        <p className="mt-3 text-stone-500">You practiced every item across four recognition directions.</p>
-      </div>
-    );
+  function nextQuestion() {
+    if (!answer || isLastQuestion) return;
+    onChange({
+      ...session,
+      activityIndex: currentIndex + 1,
+    });
   }
 
   return (
     <div className="mx-auto max-w-3xl">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <Badge tone="orange">{question.modeLabel}</Badge>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge tone={difficultyTone(question.difficulty)}>{question.difficulty}</Badge>
+            <Badge tone="neutral">{question.modeLabel}</Badge>
+          </div>
           <h2 className="mt-4 text-3xl font-semibold tracking-tight">Vocabulary & kanji</h2>
+          <p className="mt-2 text-sm leading-6 text-stone-500">Ten questions build from direct recognition to vocabulary in context.</p>
         </div>
-        <p className="text-sm font-semibold text-stone-500">{currentIndex + 1} / {vocabularyQuestions.length}</p>
+        <p className="shrink-0 text-sm font-semibold text-stone-500">{currentIndex + 1} / {vocabularyQuestions.length}</p>
       </div>
-      <ProgressBar value={(completedCount / vocabularyQuestions.length) * 100} className="mt-5" />
+
+      <ProgressBar value={(answeredCount / vocabularyQuestions.length) * 100} className="mt-5" />
+
       <div className="mt-9 rounded-4xl border border-black/[.06] bg-white p-6 shadow-card sm:p-9">
         <MultipleChoiceCard
           prompt={question.prompt}
@@ -68,24 +76,32 @@ export function VocabularyPhase({
           explanation={question.explanation}
           selectedAnswer={answer?.selectedAnswer}
           answered={Boolean(answer)}
+          lockAfterAnswer
           onSelect={select}
         />
-        {answer && !answer.correct && (
-          <Button type="button" variant="secondary" className="mt-5" onClick={() => onChange({
-            ...session,
-            vocabularyAnswers: session.vocabularyAnswers.map((item) =>
-              item.questionId === question.id ? { ...item, selectedAnswer: "" } : item,
-            ),
-          })}>
-            <RotateCcw className="size-4" /> Try again
+
+        {answer && !isLastQuestion && (
+          <Button type="button" className="mt-6" onClick={nextQuestion}>
+            Next question <ArrowRight className="size-4" />
           </Button>
         )}
-        {answer?.correct && (
-          <Button type="button" className="mt-5" onClick={() => onChange({ ...session, activityIndex: Math.min(currentIndex + 1, vocabularyQuestions.length - 1) })}>
-            Next word <ArrowRight className="size-4" />
-          </Button>
+
+        {answer && isLastQuestion && (
+          <div className="mt-6 flex items-start gap-3 rounded-2xl bg-moss-50 p-4 text-sm text-moss-800">
+            <CheckCircle2 className="mt-0.5 size-5 shrink-0" />
+            <div>
+              <p className="font-semibold">Vocabulary round complete</p>
+              <p className="mt-1 text-moss-700">{correctCount} of 10 correct. Continue to Grammar when you are ready.</p>
+            </div>
+          </div>
         )}
       </div>
     </div>
   );
+}
+
+function difficultyTone(difficulty: ExerciseDifficulty): "moss" | "orange" | "neutral" {
+  if (difficulty === "Hard") return "orange";
+  if (difficulty === "Medium") return "neutral";
+  return "moss";
 }
