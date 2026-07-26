@@ -32,6 +32,7 @@ const requiredFunctions = [
   "claim_review_reward", "publish_lesson_version", "reset_learner_progress",
   "save_lesson_draft",
   "assign_next_lesson", "begin_custom_lesson_generation", "store_generated_lesson_package",
+  "begin_custom_lesson_generation_v2", "enrich_custom_lesson_library",
 ];
 const missingFunctions = requiredFunctions.filter((name) => !sql.includes(`function public.${name}`));
 

@@ -108,7 +108,7 @@ export interface Database {
       lessons: TableDef<LessonRow>;
       lesson_versions: TableDef<LessonVersionRow>;
       lesson_story_lines: TableDef<ContentRow & { japanese_text: string; translation: string; tappable_terms: string[]; image_asset_id: string | null; audio_asset_id: string | null }>;
-      lesson_story_words: TableDef<ContentRow & { story_line_id: string; surface: string; reading: string; meaning: string; script_type: "kanji" | "hiragana" | "katakana"; meaning_score: number; recognition_score: number; pronunciation_score: number }>;
+      lesson_story_words: TableDef<ContentRow & { story_line_id: string; surface: string; reading: string; meaning: string; script_type: "kanji" | "hiragana" | "katakana"; meaning_score: number; recognition_score: number; pronunciation_score: number; library_id: string | null; library_type: "kanji" | "vocabulary" | null }>;
       lesson_vocabulary: TableDef<ContentRow & { vocabulary_id: string | null; written_form: string; reading: string; meaning: string; part_of_speech: string; example_sentence: string | null }>;
       lesson_grammar: TableDef<ContentRow & { grammar_id: string | null; pattern: string; meaning: string; structure: string; usage_notes: string; example: string; translation: string; common_mistake: string }>;
       lesson_reading_sections: TableDef<ContentRow & { speaker: string; japanese_text: string; translation: string; tappable_terms: string[] }>;
@@ -123,7 +123,7 @@ export interface Database {
       lesson_events: TableDef<OwnedRow & { lesson_session_id: string; client_event_id: string; phase: string; event_type: string; event_data: Json; occurred_at: string }>;
       lesson_completions: TableDef<OwnedRow & { lesson_id: string; lesson_version_id: string; lesson_session_id: string; score: number; xp_awarded: number; duration_minutes: number; completion_data: Json; completed_at: string }>;
       lesson_assignments: TableDef<Timestamps & { id: string; user_id: string; lesson_id: string; lesson_version_id: string; selection_mode: "free_random" | "pro_interest" | "pro_custom"; status: "assigned" | "started" | "completed"; algorithm_version: string; interest_matches: string[]; assigned_at: string; started_at: string | null; completed_at: string | null }>;
-      learner_mastery: TableDef<OwnedRow & { item_type: string; item_key: string; mastery: number; confidence: number; last_reviewed_at: string | null; next_review_at: string | null; evidence_count: number }>;
+      learner_mastery: TableDef<OwnedRow & { item_type: string; item_key: string; mastery: number; confidence: number; last_reviewed_at: string | null; next_review_at: string | null; evidence_count: number; meaning_score: number; recognition_score: number; pronunciation_score: number }>;
       review_queue: TableDef<OwnedRow & { item_type: string; item_key: string; prompt_data: Json; due_at: string; confidence: number; reason: string; status: string }>;
       review_sessions: TableDef<OwnedRow & { status: Database["public"]["Enums"]["session_status"]; started_at: string; completed_at: string | null; score: number | null; xp_awarded: number; reward_claimed_at: string | null }>;
       review_activity_answers: TableDef<OwnedRow & { review_session_id: string; review_queue_id: string | null; activity_id: string; activity_type: string; selected_answer: string; correct: boolean; answer_data: Json }>;
@@ -209,6 +209,14 @@ export interface Database {
       };
       begin_custom_lesson_generation: {
         Args: { p_topic: string; p_duration_minutes: number; p_focus: string; p_speaking_difficulty: string; p_note: string };
+        Returns: Json;
+      };
+      begin_custom_lesson_generation_v2: {
+        Args: { p_topic: string; p_level: Database["public"]["Enums"]["jlpt_level"] };
+        Returns: Json;
+      };
+      enrich_custom_lesson_library: {
+        Args: { p_level: Database["public"]["Enums"]["jlpt_level"]; p_seed: Json };
         Returns: Json;
       };
       store_generated_lesson_package: {

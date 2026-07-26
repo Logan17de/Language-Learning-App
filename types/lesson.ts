@@ -33,6 +33,8 @@ export type StoryWordScript = "kanji" | "hiragana" | "katakana";
 
 export interface StoryWord {
   id: string;
+  libraryId?: string;
+  libraryType?: "kanji" | "vocabulary";
   position: number;
   surface: string;
   reading: string;

@@ -7,6 +7,7 @@ const functions = readFileSync("supabase/migrations/20260724090200_functions_vie
 const legacyImport = readFileSync("supabase/migrations/20260724090300_legacy_import.sql", "utf8");
 const authoring = readFileSync("supabase/migrations/20260724090400_draft_authoring.sql", "utf8");
 const assignment = readFileSync("supabase/migrations/20260725090000_adaptive_lesson_assignment.sql", "utf8");
+const customLessonEngine = readFileSync("supabase/migrations/20260726220000_custom_lesson_library_engine.sql", "utf8");
 
 describe("Supabase integration contract", () => {
   it("pins sessions to a lesson version and makes rewards database-idempotent", () => {
@@ -63,5 +64,17 @@ describe("Supabase integration contract", () => {
     expect(assignment).toContain("generated_for_user_id = auth.uid()");
     expect(assignment).toContain("function public.store_generated_lesson_package");
     expect(assignment).toContain("'pro_custom'");
+  });
+
+  it("allows empty custom-lesson libraries to be enriched and tracked per learner", () => {
+    expect(customLessonEngine).toContain("function public.begin_custom_lesson_generation_v2");
+    expect(customLessonEngine).toContain("function public.enrich_custom_lesson_library");
+    expect(customLessonEngine).toContain("on conflict (character) do nothing");
+    expect(customLessonEngine).toContain("on conflict (pattern, jlpt_level) do nothing");
+    expect(customLessonEngine).toContain("meaning_score integer not null default 100");
+    expect(customLessonEngine).toContain("recognition_score integer not null default 100");
+    expect(customLessonEngine).toContain("pronunciation_score integer not null default 100");
+    expect(customLessonEngine).toContain("insert into public.learner_mastery");
+    expect(customLessonEngine).toContain("insert into public.lesson_story_words");
   });
 });

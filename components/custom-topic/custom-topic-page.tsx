@@ -3,7 +3,6 @@
 import { useState, type FormEvent } from "react";
 import { ArrowLeft, CheckCircle2, Crown, Sparkles, WandSparkles } from "lucide-react";
 import { generateCustomLesson } from "@/lib/custom-lesson-utils";
-import type { LessonFocus } from "@/types/app-preferences";
 import type { JLPTLevel } from "@/types/lesson";
 import { useAppStore } from "@/store/app-store";
 import { Badge } from "@/components/ui/badge";
@@ -21,13 +20,11 @@ export function CustomTopicPage() {
   const addGenerated = useAppStore((state) => state.addGeneratedLesson);
   const addRequest = useAppStore((state) => state.addCustomLessonRequest);
   const [topic, setTopic] = useState("");
-  const [duration, setDuration] = useState<15 | 30 | 45 | 60>(30);
-  const [focus, setFocus] = useState<LessonFocus>("balanced");
-  const [speaking, setSpeaking] = useState<"easy" | "medium" | "hard">("medium");
-  const [note, setNote] = useState("");
+  const [level, setLevel] = useState<JLPTLevel>(
+    learnerLevel(onboarding.level ?? user.level),
+  );
   const [state, setState] = useState<GenerationState>("idle");
   const [error, setError] = useState("");
-  const level = learnerLevel(onboarding.level ?? user.level);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -37,7 +34,7 @@ export function CustomTopicPage() {
     if (getBackendMode() === "demo") {
       window.setTimeout(() => {
         const lesson = generateCustomLesson(
-          { topic, level, durationMinutes: duration, focus, speakingDifficulty: speaking },
+          { topic, level, durationMinutes: 30, focus: "balanced", speakingDifficulty: "medium" },
           generated.length + 1,
         );
         addGenerated(lesson);
@@ -45,10 +42,10 @@ export function CustomTopicPage() {
           id: `custom_request_${generated.length + 1}`,
           topic,
           level,
-          durationMinutes: duration,
-          focus,
-          speakingDifficulty: speaking,
-          note,
+          durationMinutes: 30,
+          focus: "balanced",
+          speakingDifficulty: "medium",
+          note: "",
           outcome: "new",
           generatedLessonId: lesson.id,
           createdAt: "Just now",
@@ -61,7 +58,7 @@ export function CustomTopicPage() {
     const response = await fetch("/api/custom-lessons/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic, durationMinutes: duration, focus, speakingDifficulty: speaking, note }),
+      body: JSON.stringify({ topic, level }),
     });
     const result: unknown = await response.json().catch(() => null);
     if (!response.ok) {
@@ -96,20 +93,24 @@ export function CustomTopicPage() {
         <ButtonLink href="/learn" variant="ghost" className="px-0"><ArrowLeft className="size-4" /> My learning path</ButtonLink>
         <p className="section-kicker mt-6">Pro custom topic</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight">What should your next story be about?</h1>
-        <p className="mt-3 max-w-2xl leading-7 text-stone-500">AIko creates a new lesson at your profile level, weaves in your interests where natural, validates the package, and saves it to your learning path.</p>
+        <p className="mt-3 max-w-2xl leading-7 text-stone-500">Choose a topic and level. AIko selects the kanji and grammar, builds an encouraging lesson, checks its reusable language library, and saves the completed package to your path.</p>
       </header>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
         <Card className="p-6 sm:p-7">
           <form className="space-y-5" onSubmit={submit}>
             <Field label="Topic"><input required minLength={2} maxLength={120} value={topic} onChange={(event) => setTopic(event.target.value)} className="form-input" placeholder="A sustainable farm, my first day at work…" /></Field>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Your profile level"><div className="form-input flex items-center bg-stone-50 font-semibold text-moss-700">{level} · managed from your profile</div></Field>
-              <Field label="Lesson length"><select value={duration} onChange={(event) => setDuration(Number(event.target.value) as 15 | 30 | 45 | 60)} className="form-input">{[15, 30, 45, 60].map((item) => <option key={item} value={item}>{item} minutes</option>)}</select></Field>
-              <Field label="Preferred focus"><select value={focus} onChange={(event) => setFocus(event.target.value as LessonFocus)} className="form-input">{["balanced", "conversation", "vocabulary", "grammar", "reading", "speaking", "workplace Japanese"].map((item) => <option key={item} className="capitalize">{item}</option>)}</select></Field>
-              <Field label="Speaking difficulty"><select value={speaking} onChange={(event) => setSpeaking(event.target.value as "easy" | "medium" | "hard")} className="form-input">{["easy", "medium", "hard"].map((item) => <option key={item} className="capitalize">{item}</option>)}</select></Field>
-            </div>
-            <Field label="Optional note"><textarea maxLength={500} value={note} onChange={(event) => setNote(event.target.value)} className="form-input min-h-28 resize-none py-3" placeholder="A situation, vocabulary preference, or learning need…" /></Field>
+            <Field label="Level">
+              <select
+                value={level}
+                onChange={(event) => setLevel(event.target.value as JLPTLevel)}
+                className="form-input"
+              >
+                {(["N5", "N4", "N3", "N2", "N1"] as JLPTLevel[]).map((item) => (
+                  <option key={item} value={item}>{item}</option>
+                ))}
+              </select>
+            </Field>
             {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
             <Button type="submit" disabled={state === "generating"} className="w-full"><WandSparkles className="size-4" /> {state === "generating" ? "Creating and checking…" : "Create my lesson"}</Button>
           </form>
@@ -128,13 +129,13 @@ export function CustomTopicPage() {
             <div>
               <span className="mx-auto grid size-16 animate-pulse place-items-center rounded-3xl bg-persimmon-100 text-persimmon-600"><Sparkles className="size-7" /></span>
               <h2 className="mt-6 text-2xl font-semibold">Building the full lesson package…</h2>
-              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">AIko is writing the story, creating activities, checking answer consistency, and storing the result. This can take about a minute.</p>
+              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">AIko is selecting your targets, enriching any missing reusable language records, writing the activities, and checking answer consistency. This can take about a minute.</p>
             </div>
           ) : (
             <div>
               <WandSparkles className="mx-auto size-11 text-moss-300" />
               <h2 className="mt-5 text-xl font-semibold">Your topic, inside a structured path</h2>
-              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-stone-500">You choose the topic. AIko keeps the level fixed, incorporates your interests, and creates the same seven connected stages as every curated lesson.</p>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-stone-500">You choose only the topic and level. AIko handles the encouraging tone, target language, reusable library records, and seven connected stages.</p>
             </div>
           )}
         </Card>

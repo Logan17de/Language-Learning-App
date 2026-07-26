@@ -90,6 +90,8 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
         .sort((left, right) => left.position - right.position)
         .map((word) => ({
           id: word.id,
+          libraryId: word.library_id ?? undefined,
+          libraryType: word.library_type ?? undefined,
           position: word.position,
           surface: word.surface,
           reading: word.reading,

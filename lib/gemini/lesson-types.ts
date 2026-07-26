@@ -56,6 +56,41 @@ export interface SelectedLessonTargets {
   knownKanji: string[];
 }
 
+export interface LibrarySeedKanji {
+  character: string;
+  meanings: string[];
+  readings: string[];
+  onyomi: string[];
+  kunyomi: string[];
+  exampleWords: string[];
+  strokeCount: number;
+}
+
+export interface LibrarySeedGrammar {
+  pattern: string;
+  meaning: string;
+  formation: string;
+  usageNotes: string;
+  nuance: string;
+  exampleSentences: string[];
+}
+
+export interface LibrarySeedVocabulary {
+  writtenForm: string;
+  reading: string;
+  meaning: string;
+  partOfSpeech: string;
+  tags: string[];
+  exampleSentence: string;
+  linkedKanjiCharacters: string[];
+}
+
+export interface LessonLibrarySeed {
+  kanji: LibrarySeedKanji[];
+  grammar: LibrarySeedGrammar[];
+  vocabulary: LibrarySeedVocabulary[];
+}
+
 export interface LessonGenerationInput {
   topic: string;
   level: JLPTLevel;
@@ -64,6 +99,7 @@ export interface LessonGenerationInput {
   focus: string;
   speakingDifficulty: Difficulty;
   note: string;
+  tone: "encouraging";
   targets: SelectedLessonTargets;
 }
 

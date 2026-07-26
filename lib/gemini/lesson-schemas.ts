@@ -20,6 +20,93 @@ const inspectableTermSchema: JsonSchema = {
   },
 };
 
+export const lessonLibrarySeedSchema: JsonSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["kanji", "grammar", "vocabulary"],
+  properties: {
+    kanji: {
+      type: "array",
+      minItems: 5,
+      maxItems: 5,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "character",
+          "meanings",
+          "readings",
+          "onyomi",
+          "kunyomi",
+          "exampleWords",
+          "strokeCount",
+        ],
+        properties: {
+          character: { type: "string" },
+          meanings: stringArray(1, 6),
+          readings: stringArray(1, 10),
+          onyomi: stringArray(0, 8),
+          kunyomi: stringArray(0, 8),
+          exampleWords: stringArray(2, 8),
+          strokeCount: { type: "integer", minimum: 1, maximum: 64 },
+        },
+      },
+    },
+    grammar: {
+      type: "array",
+      minItems: 3,
+      maxItems: 3,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "pattern",
+          "meaning",
+          "formation",
+          "usageNotes",
+          "nuance",
+          "exampleSentences",
+        ],
+        properties: {
+          pattern: { type: "string" },
+          meaning: { type: "string" },
+          formation: { type: "string" },
+          usageNotes: { type: "string" },
+          nuance: { type: "string" },
+          exampleSentences: stringArray(2, 6),
+        },
+      },
+    },
+    vocabulary: {
+      type: "array",
+      minItems: 24,
+      maxItems: 36,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "writtenForm",
+          "reading",
+          "meaning",
+          "partOfSpeech",
+          "tags",
+          "exampleSentence",
+          "linkedKanjiCharacters",
+        ],
+        properties: {
+          writtenForm: { type: "string" },
+          reading: { type: "string" },
+          meaning: { type: "string" },
+          partOfSpeech: { type: "string" },
+          tags: stringArray(1, 8),
+          exampleSentence: { type: "string" },
+          linkedKanjiCharacters: stringArray(0, 8),
+        },
+      },
+    },
+  },
+};
+
 const exerciseSchema: JsonSchema = {
   type: "object",
   additionalProperties: false,

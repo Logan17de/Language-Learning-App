@@ -1,10 +1,12 @@
 import "server-only";
 
 import type { Json } from "@/types/database";
+import type { JLPTLevel } from "@/types/lesson";
 import {
   blueprintSchema,
   grammarSchema,
   interactiveSchema,
+  lessonLibrarySeedSchema,
   listeningSchema,
   readingSchema,
   speakingSchema,
@@ -19,6 +21,7 @@ import type {
   InteractiveSection,
   LessonBlueprint,
   LessonGenerationInput,
+  LessonLibrarySeed,
   ListeningSection,
   ReadingSection,
   SpeakingSection,
@@ -190,6 +193,7 @@ function promptHeader(input: LessonGenerationInput): string {
     `Duration: ${input.durationMinutes} minutes`,
     `Focus: ${input.focus}`,
     `Speaking difficulty preference: ${input.speakingDifficulty}`,
+    `Tone: ${input.tone}. Keep feedback and learner-facing instructions warm, calm, and encouraging.`,
     `Learner note: ${input.note || "none"}`,
     "Use all 5 target kanji and all 3 target grammar patterns naturally.",
     "Use only supplied kanji, grammar, and vocabulary library IDs in reference fields.",
@@ -198,7 +202,59 @@ function promptHeader(input: LessonGenerationInput): string {
     "Keep questionContent and answerData separate. Never leak a correct answer into an instruction, hint, or inspectable term.",
     "Do not add furigana or readings in parentheses to Japanese text. The renderer adds surface（reading） only for kanji outside the learner's known-kanji list.",
     "Do not mention databases, local storage, schemas, scoring implementation, or AI generation to the learner.",
+    "Every meaningful Japanese content word or kanji shown in question content must reference its matching supplied library ID in the relevant inspectable-terms array.",
   ].join("\n");
+}
+
+function librarySeedIssues(value: unknown): string[] {
+  if (!isRecord(value)) return ["Library seed must be an object."];
+  const kanji = Array.isArray(value.kanji) ? value.kanji : [];
+  const grammar = Array.isArray(value.grammar) ? value.grammar : [];
+  const vocabulary = Array.isArray(value.vocabulary) ? value.vocabulary : [];
+  const issues: string[] = [];
+  if (kanji.length !== 5) issues.push(`Library seed requires 5 kanji; received ${kanji.length}.`);
+  if (grammar.length !== 3) issues.push(`Library seed requires 3 grammar records; received ${grammar.length}.`);
+  if (vocabulary.length < 24 || vocabulary.length > 36) {
+    issues.push(`Library seed requires 24-36 vocabulary records; received ${vocabulary.length}.`);
+  }
+  const unique = (items: unknown[], key: string) =>
+    new Set(items.flatMap((item) =>
+      isRecord(item) && stringValue(item[key]) ? [item[key] as string] : []));
+  if (unique(kanji, "character").size !== kanji.length) issues.push("Generated kanji must be unique.");
+  if (unique(grammar, "pattern").size !== grammar.length) issues.push("Generated grammar patterns must be unique.");
+  if (unique(vocabulary, "writtenForm").size < Math.min(20, vocabulary.length)) {
+    issues.push("Generated vocabulary contains too many duplicate written forms.");
+  }
+  return issues;
+}
+
+export async function generateLessonLibrarySeed(input: {
+  topic: string;
+  level: JLPTLevel;
+  existingKanji: string[];
+  existingGrammar: string[];
+  existingVocabulary: string[];
+}): Promise<LessonLibrarySeed> {
+  const prompt = [
+    "You maintain AIko's reusable Japanese learning library.",
+    "Return only the structured JSON required by the supplied response schema.",
+    `Create level-appropriate reusable records for JLPT ${input.level}. Do not exceed that level.`,
+    `The immediate lesson topic is: ${input.topic}`,
+    "Create exactly 5 useful kanji, exactly 3 grammar patterns, and 24-36 vocabulary records.",
+    "Prefer words that support the topic while remaining broadly reusable in future lessons.",
+    "Readings must be kana, meanings must be concise English, and examples must be natural Japanese.",
+    "Vocabulary linkedKanjiCharacters may contain only characters included in the kanji output or the existing kanji list.",
+    `Avoid duplicating these kanji: ${JSON.stringify(input.existingKanji)}`,
+    `Avoid duplicating these grammar patterns: ${JSON.stringify(input.existingGrammar)}`,
+    `Avoid duplicating these vocabulary forms: ${JSON.stringify(input.existingVocabulary)}`,
+  ].join("\n");
+  const result = await generateSection<LessonLibrarySeed>({
+    name: "blueprint",
+    schema: lessonLibrarySeedSchema,
+    prompt,
+    validate: librarySeedIssues,
+  });
+  return result.value;
 }
 
 function targetContext(input: LessonGenerationInput): string {

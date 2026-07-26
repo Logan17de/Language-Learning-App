@@ -38,22 +38,26 @@ export async function POST(request: NextRequest) {
   }
   const value = body as Record<string, unknown>;
   const topic = typeof value.topic === "string" ? value.topic.trim() : "";
-  const durationMinutes = typeof value.durationMinutes === "number" ? value.durationMinutes : 30;
-  const focus = typeof value.focus === "string" ? value.focus : "balanced";
-  const speakingDifficulty = value.speakingDifficulty === "easy" || value.speakingDifficulty === "hard" ? value.speakingDifficulty : "medium";
-  const note = typeof value.note === "string" ? value.note.trim() : "";
-  if (topic.length < 2 || topic.length > 120 || ![15, 30, 45, 60].includes(durationMinutes) || note.length > 500) {
-    return NextResponse.json({ error: "Check the topic, lesson length, and note." }, { status: 400 });
+  const requestedLevel = value.level;
+  const validLevel =
+    requestedLevel === "N5" ||
+    requestedLevel === "N4" ||
+    requestedLevel === "N3" ||
+    requestedLevel === "N2" ||
+    requestedLevel === "N1";
+  if (topic.length < 2 || topic.length > 120 || !validLevel) {
+    return NextResponse.json({ error: "Enter a topic and select a valid JLPT level." }, { status: 400 });
   }
+  const durationMinutes = 30;
+  const focus = "balanced";
+  const speakingDifficulty = "medium";
+  const note = "";
 
   const client = await createClient();
   if (!client) return NextResponse.json({ error: "Backend is not configured." }, { status: 503 });
-  const begun = await client.rpc("begin_custom_lesson_generation", {
+  const begun = await client.rpc("begin_custom_lesson_generation_v2", {
     p_topic: topic,
-    p_duration_minutes: durationMinutes,
-    p_focus: focus,
-    p_speaking_difficulty: speakingDifficulty,
-    p_note: note,
+    p_level: requestedLevel,
   });
   if (begun.error) return NextResponse.json({ error: begun.error.message }, { status: begun.error.code === "42501" ? 403 : 400 });
   const generation = beginResult(begun.data);
@@ -76,6 +80,7 @@ export async function POST(request: NextRequest) {
       focus,
       speakingDifficulty,
       note,
+      tone: "encouraging",
       targets,
     });
     const stored = await client.rpc("store_generated_lesson_package", {

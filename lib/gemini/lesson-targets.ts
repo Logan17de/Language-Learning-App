@@ -1,8 +1,9 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "@/types/database";
+import type { Database, Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
+import { generateLessonLibrarySeed } from "@/lib/gemini/lesson-generation";
 import type {
   GrammarTarget,
   KanjiTarget,
@@ -67,6 +68,7 @@ export async function selectLessonTargets(
   level: JLPTLevel,
   topic: string,
   interests: string[],
+  enrichIfNeeded = true,
 ): Promise<SelectedLessonTargets> {
   const levels = allowedLevels(level);
   const [kanjiResult, grammarResult, vocabularyResult, masteryResult] = await Promise.all([
@@ -144,10 +146,37 @@ export async function selectLessonTargets(
     };
   }).sort((left, right) => compareTuple(left.priority, right.priority));
 
+  const vocabularyRows = vocabularyResult.data ?? [];
+  const libraryNeedsEnrichment =
+    rankedKanji.length < 5 ||
+    rankedGrammar.length < 3 ||
+    vocabularyRows.length < 20;
+
+  if (libraryNeedsEnrichment && enrichIfNeeded) {
+    const seed = await generateLessonLibrarySeed({
+      topic,
+      level,
+      existingKanji: rankedKanji.map((item) => item.target.character),
+      existingGrammar: rankedGrammar.map((item) => item.target.pattern),
+      existingVocabulary: vocabularyRows.map((item) => item.written_form),
+    });
+    const enriched = await client.rpc("enrich_custom_lesson_library", {
+      p_level: level,
+      p_seed: {
+        kanji: rankedKanji.length < 5 ? seed.kanji : [],
+        grammar: rankedGrammar.length < 3 ? seed.grammar : [],
+        vocabulary: vocabularyRows.length < 20 ? seed.vocabulary : [],
+      } as unknown as Json,
+    });
+    if (enriched.error) {
+      throw new Error(`The lesson library could not be enriched: ${enriched.error.message}`);
+    }
+    return selectLessonTargets(client, userId, level, topic, interests, false);
+  }
+
   if (rankedKanji.length < 5 || rankedGrammar.length < 3) {
     throw new Error(
-      `The ${level} and lower lesson library needs at least 5 kanji and 3 grammar records `
-      + `(found ${rankedKanji.length} kanji and ${rankedGrammar.length} grammar).`,
+      `AIko could not prepare 5 kanji and 3 grammar records for ${level}.`,
     );
   }
 
@@ -156,7 +185,7 @@ export async function selectLessonTargets(
   const targetKanjiIds = new Set(kanji.flatMap((item) => [item.id, item.legacyId].filter(Boolean)));
   const searchTerms = [topic, ...interests].join(" ").toLocaleLowerCase();
 
-  const vocabulary = (vocabularyResult.data ?? [])
+  const vocabulary = vocabularyRows
     .map((row) => {
       const linkedTarget = row.linked_kanji_ids.some((id) => targetKanjiIds.has(id))
         || kanji.some((item) => row.written_form.includes(item.character));
@@ -189,9 +218,7 @@ export async function selectLessonTargets(
     .map(({ item }) => item);
 
   if (vocabulary.length < 20) {
-    throw new Error(
-      `The ${level} and lower vocabulary library needs at least 20 active records (found ${vocabulary.length}).`,
-    );
+    throw new Error(`AIko could not prepare enough reusable vocabulary for ${level}.`);
   }
 
   const knownKanji = rankedKanji
