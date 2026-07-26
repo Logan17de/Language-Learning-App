@@ -43,7 +43,7 @@ export const reviewRepository = {
     const records = answers.map((answer) => ({
       user_id: auth.user!.id,
       review_session_id: sessionId,
-      review_queue_id: null,
+      review_queue_id: answer.queueItemId,
       activity_id: answer.activityId,
       activity_type: "deterministic",
       selected_answer: answer.selectedAnswer,
