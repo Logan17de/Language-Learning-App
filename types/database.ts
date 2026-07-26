@@ -215,6 +215,10 @@ export interface Database {
         Args: { p_request_id: string; p_package: Json; p_generation_seconds: number };
         Returns: Json;
       };
+      attach_generated_lesson_package: {
+        Args: { p_request_id: string; p_lesson_version_id: string; p_generation_package: Json };
+        Returns: boolean;
+      };
       fail_custom_lesson_generation: {
         Args: { p_request_id: string; p_error: string };
         Returns: undefined;

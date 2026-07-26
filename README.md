@@ -41,8 +41,9 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 # Legacy alternative: NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-OPENAI_API_KEY=
-OPENAI_LESSON_MODEL=gpt-5.6
+GEMINI_API_KEY=
+GEMINI_LESSON_MODEL=gemini-3-flash-preview
+GEMINI_LESSON_FALLBACK_MODEL=gemini-3.1-flash-lite
 ```
 
 `SUPABASE_SERVICE_ROLE_KEY` is imported only by server-only modules and trusted route handlers. Never expose it through a `NEXT_PUBLIC_` variable.
@@ -79,7 +80,7 @@ The seed includes JLPT levels, vocabulary, kanji, grammar, assets, operational r
 - Pro accounts rank eligible current-level lessons using profile interests.
 - A unique learner/lesson assignment prevents any assigned lesson from being selected again.
 - Lesson-session inserts require a valid active assignment through a restrictive RLS policy.
-- Pro custom topics use the server-only OpenAI Responses API with Structured Outputs. The validated seven-stage package is persisted, privately scoped to its owner, and immediately assigned.
+- Pro custom topics use the server-only Gemini Interactions API with JSON Schema output. The engine selects exactly five weak/unseen kanji and three weak/unseen grammar records, generates a shared blueprint, validates each section, repairs only failed sections, falls back to Gemini 3.1 Flash-Lite after technical failures, persists the universal package, and immediately assigns the compatible lesson.
 - Review evidence reports strengths and weaknesses and automatically drives the learning system; there is no learner-managed lesson starring.
 
 ## Authentication and admin setup
@@ -141,7 +142,7 @@ Tests cover scoring validation, migration parsing, canonical lesson merge rules,
 ## Known Phase 5 limitations
 
 - Speech recognition, TTS, image generation, email delivery, and Stripe are not yet implemented.
-- Pro lesson generation requires `OPENAI_API_KEY`; the local demo retains a deterministic no-network fallback.
+- Pro lesson generation requires `GEMINI_API_KEY`; apply all Supabase migrations so the universal package is retained in lesson-version metadata.
 - Billing state is persisted but remains mocked.
 - Account deletion remains a documented future privileged workflow; progress reset is transactional now.
 - Local Supabase execution requires Docker. Static migration/seed validation and mocked tests remain available without it.

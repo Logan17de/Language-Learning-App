@@ -1,9 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { authorize } from "@/lib/auth/server-authorization";
-import { generateLessonPackage } from "@/lib/openai/lesson-generation";
+import { generateLessonPackage } from "@/lib/gemini/lesson-generation";
+import { selectLessonTargets } from "@/lib/gemini/lesson-targets";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
+
+export const maxDuration = 300;
 
 interface BeginResult {
   request_id: string;
@@ -58,6 +61,13 @@ export async function POST(request: NextRequest) {
 
   const startedAt = Date.now();
   try {
+    const targets = await selectLessonTargets(
+      client,
+      auth.userId,
+      generation.level,
+      topic,
+      generation.interests,
+    );
     const lesson = await generateLessonPackage({
       topic,
       level: generation.level,
@@ -66,6 +76,7 @@ export async function POST(request: NextRequest) {
       focus,
       speakingDifficulty,
       note,
+      targets,
     });
     const stored = await client.rpc("store_generated_lesson_package", {
       p_request_id: generation.request_id,
@@ -73,7 +84,38 @@ export async function POST(request: NextRequest) {
       p_generation_seconds: Math.round((Date.now() - startedAt) / 1000),
     });
     if (stored.error) throw new Error(stored.error.message);
-    return NextResponse.json({ requestId: generation.request_id, jobId: generation.job_id, ...stored.data as object });
+    const storedValue = stored.data && typeof stored.data === "object" && !Array.isArray(stored.data)
+      ? stored.data
+      : {};
+    const lessonVersionId = typeof storedValue.lesson_version_id === "string"
+      ? storedValue.lesson_version_id
+      : null;
+    const lessonValue = lesson && typeof lesson === "object" && !Array.isArray(lesson)
+      ? lesson as Record<string, Json | undefined>
+      : {};
+    const generationPackage = lessonValue.generationPackage;
+    let generationPackageStored = false;
+    let generationPackageWarning: string | undefined;
+    if (lessonVersionId && generationPackage) {
+      const attached = await client.rpc("attach_generated_lesson_package", {
+        p_request_id: generation.request_id,
+        p_lesson_version_id: lessonVersionId,
+        p_generation_package: generationPackage,
+      });
+      generationPackageStored = !attached.error;
+      if (attached.error) {
+        generationPackageWarning = attached.error.code === "PGRST202"
+          ? "Apply the latest Supabase migration to retain the universal generation package."
+          : attached.error.message;
+      }
+    }
+    return NextResponse.json({
+      requestId: generation.request_id,
+      jobId: generation.job_id,
+      ...storedValue,
+      generationPackageStored,
+      ...(generationPackageWarning ? { generationPackageWarning } : {}),
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Lesson generation failed.";
     await client.rpc("fail_custom_lesson_generation", { p_request_id: generation.request_id, p_error: message });
