@@ -4,6 +4,7 @@ export type LessonSource = "curated_seed" | "generated" | "user_generated" | "co
 
 export interface GrammarPoint {
   id: string;
+  libraryId?: string;
   pattern: string;
   meaning: string;
   structure: string;
@@ -14,6 +15,7 @@ export interface GrammarPoint {
 }
 
 export interface KanjiItem {
+  libraryId?: string;
   character: string;
   reading: string;
   meaning: string;
@@ -21,6 +23,7 @@ export interface KanjiItem {
 }
 
 export interface VocabularyItem {
+  libraryId?: string;
   term: string;
   reading: string;
   meaning: string;
@@ -76,6 +79,44 @@ export interface ChoiceExercise {
   transcript?: string;
   audioAssetId?: string;
   questionType?: "multiple-choice" | "ordering" | "fill-blank" | "true-false";
+  category?: "kanji" | "vocabulary" | "grammar" | "listening" | "speaking";
+  targetItemIds?: string[];
+  inspectableTerms?: StoryWord[];
+}
+
+export type ExerciseDifficulty = "Easy" | "Medium" | "Hard";
+
+export interface VocabularyQuestion {
+  id: string;
+  mode: "kanji-reading" | "reading-meaning" | "meaning-japanese" | "mixed";
+  modeLabel: string;
+  difficulty: ExerciseDifficulty;
+  prompt: string;
+  cue: string;
+  choices: string[];
+  correctAnswer: string;
+  acceptedAnswers: string[];
+  explanation: string;
+  targetItemIds: string[];
+  inspectableTerms: StoryWord[];
+}
+
+export interface GrammarQuestion {
+  id: string;
+  type: "multiple-choice" | "fill-blank" | "sentence-order" | "natural-sentence";
+  skill: "understanding" | "production";
+  difficulty: ExerciseDifficulty;
+  answerMode: "choice" | "text";
+  prompt: string;
+  cue: string;
+  choices: string[];
+  correctAnswer: string;
+  acceptedAnswers: string[];
+  explanation: string;
+  hintFront: string;
+  hintBack: string;
+  targetItemIds: string[];
+  inspectableTerms: StoryWord[];
 }
 
 export interface SpeakingExercise {
@@ -87,6 +128,8 @@ export interface SpeakingExercise {
   mediumPrompt?: string;
   hardPrompt?: string;
   expectedAnswer?: string;
+  targetItemIds?: string[];
+  inspectableTerms?: StoryWord[];
 }
 
 export interface LessonPhase {
@@ -110,6 +153,8 @@ export interface LessonPackage {
   grammar: GrammarPoint[];
   kanji: KanjiItem[];
   vocabulary: VocabularyItem[];
+  vocabularyQuestions: VocabularyQuestion[];
+  grammarQuestions: GrammarQuestion[];
   reviewItems: string[];
   story: StoryLine[];
   images: LessonImage[];
