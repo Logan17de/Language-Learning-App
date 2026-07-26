@@ -6,6 +6,7 @@ import { AlertTriangle } from "lucide-react";
 import type { LessonPackage } from "@/types/lesson";
 import type { LessonPhaseId, LessonSession } from "@/types/lesson-session";
 import { calculateLessonCompletion } from "@/lib/scoring-utils";
+import { grammarQuestions, vocabularyQuestions } from "@/data/mock-activities";
 import {
   normalizeLessonSession,
   useAppStore,
@@ -201,9 +202,9 @@ function phaseIsComplete(session: LessonSession, phaseId: LessonPhaseId): boolea
     case "story":
       return session.storyComplete;
     case "vocabulary":
-      return new Set(session.vocabularyAnswers.map((answer) => answer.questionId)).size >= 10;
+      return vocabularyQuestions.every((question) => session.vocabularyAnswers.some((answer) => answer.questionId === question.id));
     case "grammar":
-      return new Set(session.grammarAnswers.map((answer) => answer.questionId)).size >= 10;
+      return grammarQuestions.every((question) => session.grammarAnswers.some((answer) => answer.questionId === question.id));
     case "reading":
       return session.readingComplete;
     case "listening":
