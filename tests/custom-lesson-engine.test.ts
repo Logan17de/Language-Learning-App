@@ -5,6 +5,10 @@ const form = readFileSync("components/custom-topic/custom-topic-page.tsx", "utf8
 const route = readFileSync("app/api/custom-lessons/generate/route.ts", "utf8");
 const targets = readFileSync("lib/gemini/lesson-targets.ts", "utf8");
 const generation = readFileSync("lib/gemini/lesson-generation.ts", "utf8");
+const quota = readFileSync(
+  "supabase/migrations/20260727003000_failed_custom_lessons_do_not_consume_quota.sql",
+  "utf8",
+);
 const catalog = JSON.parse(readFileSync("data/jlpt-catalog.json", "utf8")) as {
   counts: {
     kanji: Record<string, number>;
@@ -46,5 +50,10 @@ describe("custom lesson engine contract", () => {
     expect(catalog.grammar).toHaveLength(641);
     expect(catalog.counts.kanji).toEqual({ N5: 80, N4: 170, N3: 370, N2: 380, N1: 1136 });
     expect(catalog.counts.grammar).toEqual({ N5: 82, N4: 112, N3: 136, N2: 124, N1: 187 });
+  });
+
+  it("does not charge failed generation attempts against the daily allowance", () => {
+    expect(quota).toContain("and status <> 'failed'");
+    expect(quota).toContain("Daily custom lesson limit reached");
   });
 });
