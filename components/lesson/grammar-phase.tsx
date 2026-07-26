@@ -33,7 +33,17 @@ export function GrammarPhase({
   const correctCount = grammarQuestions.filter((question) =>
     session.grammarAnswers.some((answer) => answer.questionId === question.id && answer.correct),
   ).length;
-  const currentIndex = Math.min(session.activityIndex, grammarQuestions.length - 1);
+  const savedIndex = Math.min(session.activityIndex, grammarQuestions.length - 1);
+  const earliestUnansweredIndex = grammarQuestions.findIndex(
+    (question) => !session.grammarAnswers.some((answer) => answer.questionId === question.id),
+  );
+  const savedQuestionAnswered = session.grammarAnswers.some(
+    (answer) => answer.questionId === grammarQuestions[savedIndex].id,
+  );
+  const currentIndex =
+    savedQuestionAnswered && earliestUnansweredIndex >= 0 && earliestUnansweredIndex < savedIndex
+      ? earliestUnansweredIndex
+      : savedIndex;
   const question = grammarQuestions[currentIndex];
   const answer = session.grammarAnswers.find((item) => item.questionId === question.id);
   const isLastQuestion = currentIndex === grammarQuestions.length - 1;
