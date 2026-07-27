@@ -240,9 +240,23 @@ function phaseIsComplete(
     case "reading":
       return session.readingComplete;
     case "listening":
-      return session.listeningComplete;
+      return (
+        session.listeningComplete &&
+        lesson.listeningExercises.every((exercise) =>
+          session.listeningEvents.some(
+            (event) => event.type === "answer" && event.questionId === exercise.id,
+          ),
+        )
+      );
     case "speaking":
-      return session.speakingComplete;
+      return (
+        session.speakingComplete &&
+        lesson.speakingExercises.every((exercise) =>
+          session.speakingEvents.some(
+            (event) => event.exerciseId === exercise.id,
+          ),
+        )
+      );
     case "review":
       return session.reviewResult?.totalCount === lesson.reviewQuestions.length;
   }
