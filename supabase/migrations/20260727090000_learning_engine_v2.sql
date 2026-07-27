@@ -1197,9 +1197,12 @@ set search_path = public
 as $$
 declare
   v_level public.jlpt_level;
-  v_total_lessons integer;
-  v_completed_lessons integer;
-  v_active_progress integer;
+  v_levels public.jlpt_level[];
+  v_total_kanji integer;
+  v_mastered_kanji integer;
+  v_total_grammar integer;
+  v_mastered_grammar integer;
+  v_dimension_count integer;
   v_level_completion integer;
 begin
   select current_jlpt_level
@@ -1211,50 +1214,75 @@ begin
     raise exception 'Active learner profile required' using errcode = '42501';
   end if;
 
+  v_levels := case v_level
+    when 'N5' then array['N5']::public.jlpt_level[]
+    when 'N4' then array['N5', 'N4']::public.jlpt_level[]
+    when 'N3' then array['N5', 'N4', 'N3']::public.jlpt_level[]
+    when 'N2' then array['N5', 'N4', 'N3', 'N2']::public.jlpt_level[]
+    else array['N5', 'N4', 'N3', 'N2', 'N1']::public.jlpt_level[]
+  end;
+
   select count(*)
-  into v_total_lessons
-  from public.lessons lesson
-  where lesson.jlpt_level = v_level
-    and lesson.status = 'published'
-    and lesson.archived_at is null
-    and lesson.reusable;
+  into v_total_kanji
+  from public.kanji_catalog catalog
+  where catalog.active
+    and catalog.jlpt_level = any(v_levels);
 
-  select count(distinct completion.lesson_id)
-  into v_completed_lessons
-  from public.lesson_completions completion
-  join public.lessons lesson on lesson.id = completion.lesson_id
-  where completion.user_id = auth.uid()
-    and lesson.jlpt_level = v_level;
+  select count(distinct mastery.item_key)
+  into v_mastered_kanji
+  from public.learner_mastery mastery
+  join public.kanji_records kanji_record
+    on kanji_record.id::text = mastery.item_key
+  join public.kanji_catalog catalog
+    on catalog.character = kanji_record.character
+   and catalog.jlpt_level = kanji_record.jlpt_level
+   and catalog.active
+  where mastery.user_id = auth.uid()
+    and mastery.item_type = 'kanji'
+    and mastery.mastery >= 70
+    and kanji_record.jlpt_level = any(v_levels);
 
-  select coalesce(
-    max(
-      least(
-        99,
-        round((session.current_phase_index::numeric / 7) * 100)::integer
-      )
-    ),
-    0
-  )
-  into v_active_progress
-  from public.lesson_sessions session
-  join public.lessons lesson on lesson.id = session.lesson_id
-  where session.user_id = auth.uid()
-    and session.status = 'active'
-    and lesson.jlpt_level = v_level;
+  select count(*)
+  into v_total_grammar
+  from public.grammar_catalog catalog
+  where catalog.active
+    and catalog.jlpt_level = any(v_levels);
+
+  select count(distinct mastery.item_key)
+  into v_mastered_grammar
+  from public.learner_mastery mastery
+  join public.grammar_records grammar_record
+    on grammar_record.id::text = mastery.item_key
+  join public.grammar_catalog catalog
+    on catalog.pattern = grammar_record.pattern
+   and catalog.jlpt_level = grammar_record.jlpt_level
+   and catalog.active
+  where mastery.user_id = auth.uid()
+    and mastery.item_type = 'grammar'
+    and mastery.mastery >= 70
+    and grammar_record.jlpt_level = any(v_levels);
+
+  v_dimension_count :=
+    case when v_total_kanji > 0 then 1 else 0 end
+    + case when v_total_grammar > 0 then 1 else 0 end;
 
   v_level_completion := case
-    when v_total_lessons = 0 then 0
+    when v_dimension_count = 0 then 0
     else least(
       100,
       round(
-        (
-          v_completed_lessons * 100
+        100 * (
+          case
+            when v_total_kanji > 0
+              then v_mastered_kanji::numeric / v_total_kanji
+            else 0
+          end
           + case
-              when v_completed_lessons < v_total_lessons
-                then v_active_progress
+              when v_total_grammar > 0
+                then v_mastered_grammar::numeric / v_total_grammar
               else 0
             end
-        )::numeric / v_total_lessons
+        ) / v_dimension_count
       )::integer
     )
   end;
