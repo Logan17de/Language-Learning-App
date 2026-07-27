@@ -1,6 +1,5 @@
 import type { CanonicalLesson } from "@/lib/repositories/lesson-repository";
 import type {
-  ChoiceExercise,
   GrammarQuestion,
   KanjiItem,
   LessonPackage,
@@ -477,4 +476,3 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
   };
   return result;
 }
-
