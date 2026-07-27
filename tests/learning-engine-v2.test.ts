@@ -79,6 +79,23 @@ describe("learning engine V2 contracts", () => {
     expect(migration).not.toMatch(/\bdrop\s+(table|schema|database)\b/i);
   });
 
+  it("deduplicates hiragana and katakana through one normalized kana table", () => {
+    const migration = readFileSync(
+      resolve(
+        process.cwd(),
+        "supabase/migrations/20260727090000_learning_engine_v2.sql",
+      ),
+      "utf8",
+    );
+
+    expect(migration).toContain("create table if not exists public.kana_records");
+    expect(migration).toContain("unique (normalized_value)");
+    expect(migration).toContain("normalize(btrim(value), NFKC)");
+    expect(migration).toContain("script_type in ('hiragana', 'katakana', 'mixed')");
+    expect(migration).toContain("on conflict (normalized_value) do update");
+    expect(migration).toContain("alter column kana_id set not null");
+  });
+
   it("maps weak answers to the lesson library instead of demo terms", () => {
     const lesson: LessonPackage = {
       ...commuteLesson,
