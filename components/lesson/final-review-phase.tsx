@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, RotateCcw, Trophy } from "lucide-react";
+import { appendInspectableInteraction } from "@/lib/lesson-support";
 import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession, ReviewAnswer } from "@/types/lesson-session";
 import { calculateReviewResult, evaluateAnswer } from "@/lib/scoring-utils";
@@ -106,6 +107,8 @@ export function FinalReviewPhase({
             selectedAnswer={answer?.selectedAnswer}
             answered={Boolean(answer)}
             answerCorrect={answer?.correct}
+            inspectableTerms={question.inspectableTerms ?? lesson.story.flatMap((line) => line.words)}
+            onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
             onSelect={select}
           />
         </div>
