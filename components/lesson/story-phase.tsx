@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   BookOpen,
   Check,
@@ -40,8 +40,55 @@ export function StoryPhase({
   onChange: (session: LessonSession) => void;
 }) {
   const interactionCounter = useRef(session.storyInteractions.length);
+  const supportRef = useRef<HTMLDivElement | null>(null);
+  const dismissTimerRef = useRef<number | null>(null);
   const [activeSupport, setActiveSupport] =
     useState<ActiveWordSupport | null>(null);
+  const [supportClosing, setSupportClosing] = useState(false);
+
+  const dismissSupport = useCallback(() => {
+    if (!activeSupport || supportClosing) return;
+    setSupportClosing(true);
+    dismissTimerRef.current = window.setTimeout(() => {
+      setActiveSupport(null);
+      setSupportClosing(false);
+      dismissTimerRef.current = null;
+    }, 140);
+  }, [activeSupport, supportClosing]);
+
+  useEffect(() => {
+    if (!activeSupport) return;
+    function handlePointerDown(event: PointerEvent) {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (supportRef.current?.contains(target)) return;
+      if (
+        target instanceof Element &&
+        target.closest("[data-word-support-trigger]")
+      ) {
+        return;
+      }
+      dismissSupport();
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") dismissSupport();
+    }
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeSupport, dismissSupport]);
+
+  useEffect(
+    () => () => {
+      if (dismissTimerRef.current !== null) {
+        window.clearTimeout(dismissTimerRef.current);
+      }
+    },
+    [],
+  );
 
   function addInteraction(interaction: Omit<StoryInteraction, "id">) {
     interactionCounter.current += 1;
@@ -97,6 +144,11 @@ export function StoryPhase({
     word: StoryWord,
     target: HTMLElement,
   ) {
+    if (dismissTimerRef.current !== null) {
+      window.clearTimeout(dismissTimerRef.current);
+      dismissTimerRef.current = null;
+    }
+    setSupportClosing(false);
     const interactions = evidenceFor(lineId, word);
     const readingRevealed = interactions.some(
       (item) => item.type === "reading-revealed",
@@ -297,6 +349,7 @@ export function StoryPhase({
                           }`}
                           aria-label={`Get help with ${word.surface}`}
                           aria-expanded={isOpen}
+                          data-word-support-trigger
                         >
                           {word.surface}
                         </button>
@@ -312,9 +365,12 @@ export function StoryPhase({
 
       {activeSupport && activeDetails && (
         <div
+          ref={supportRef}
           role="dialog"
           aria-label={`Help for ${activeSupport.word.surface}`}
-          className="fixed z-50 overflow-visible rounded-2xl border border-moss-700 bg-moss-900 text-white shadow-2xl"
+          className={`fixed z-50 overflow-visible rounded-2xl border border-moss-700 bg-moss-900 text-white shadow-2xl transition duration-150 ease-out ${
+            supportClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"
+          }`}
           style={{
             left: activeSupport.x,
             top: activeSupport.y,
