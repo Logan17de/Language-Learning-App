@@ -68,6 +68,7 @@ export interface ConversationLine {
   speaker: string;
   japanese: string;
   english: string;
+  audioAssetId?: string;
 }
 
 export interface ChoiceExercise {
@@ -129,6 +130,7 @@ export interface SpeakingExercise {
   mediumPrompt?: string;
   hardPrompt?: string;
   expectedAnswer?: string;
+  audioAssetId?: string;
   targetItemIds?: string[];
   inspectableTerms?: StoryWord[];
 }
