@@ -230,13 +230,11 @@ function phaseIsComplete(
     case "story":
       return session.storyComplete;
     case "vocabulary":
-      return lesson.vocabularyQuestions.every((question) =>
-        session.vocabularyAnswers.some((answer) => answer.questionId === question.id),
-      );
+      return session.vocabularyAnswers.length >=
+        Math.min(10, lesson.vocabularyQuestions.length);
     case "grammar":
-      return lesson.grammarQuestions.every((question) =>
-        session.grammarAnswers.some((answer) => answer.questionId === question.id),
-      );
+      return session.grammarAnswers.length >=
+        Math.min(10, lesson.grammarQuestions.length);
     case "reading":
       return session.readingComplete;
     case "listening":
