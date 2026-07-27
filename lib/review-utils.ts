@@ -3,7 +3,7 @@ import type { ReviewQueueItem } from "@/types/progress";
 
 function choices(correct: string, candidates: Array<string | undefined>): string[] {
   const result = [correct, ...candidates.filter((item): item is string => Boolean(item))]
-    .filter((item, index, all) => item !== correct || index === 0)
+    .filter((item, index) => item !== correct || index === 0)
     .filter((item, index, all) => all.indexOf(item) === index);
   while (result.length < 4) {
     result.push(`None of these ${result.length}`);
@@ -102,4 +102,3 @@ function activityFor(
     explanation: `${item.term}${item.reading ? `（${item.reading}）` : ""} means ${correct}.`,
   };
 }
-
