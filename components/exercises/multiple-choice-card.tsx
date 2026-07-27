@@ -17,6 +17,7 @@ export function MultipleChoiceCard({
   answerCorrect,
   lockAfterAnswer = false,
   inspectableTerms = [],
+  inspectChoices = true,
   onInspect,
   onSelect,
 }: {
@@ -30,6 +31,7 @@ export function MultipleChoiceCard({
   answerCorrect?: boolean;
   lockAfterAnswer?: boolean;
   inspectableTerms?: StoryWord[];
+  inspectChoices?: boolean;
   onInspect?: (word: StoryWord, reveal: "reading" | "meaning") => void;
   onSelect: (answer: string) => void;
 }) {
@@ -71,7 +73,11 @@ export function MultipleChoiceCard({
               <span className="grid size-7 shrink-0 place-items-center rounded-full border border-current/20 text-xs">
                 {correctChoice ? <Check className="size-4" /> : selected ? <Circle className="size-3 fill-current" /> : String.fromCharCode(65 + index)}
               </span>
-              <InspectableText text={choice} terms={inspectableTerms} onReveal={onInspect} />
+              {inspectChoices ? (
+                <InspectableText text={choice} terms={inspectableTerms} onReveal={onInspect} />
+              ) : (
+                <span>{choice}</span>
+              )}
             </button>
           );
         })}
