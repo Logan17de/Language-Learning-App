@@ -11,6 +11,9 @@ export function AnswerFeedback({
   compact?: boolean;
 }) {
   const Icon = correct ? CheckCircle2 : XCircle;
+  const detail = correct
+    ? explanation
+    : "Check the correct answer and compare it with your response.";
   return (
     <div
       role="status"
@@ -23,7 +26,7 @@ export function AnswerFeedback({
         <Icon className="mt-0.5 size-5 shrink-0" />
         <div>
           <p className="text-sm font-semibold">{correct ? "Correct." : "Not correct yet."}</p>
-          {!compact && <p className="mt-1 text-sm leading-6 opacity-75">{explanation}</p>}
+          {!compact && <p className="mt-1 text-sm leading-6 opacity-75">{detail}</p>}
         </div>
       </div>
     </div>
