@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Check, Headphones, MessageSquareText } from "lucide-react";
+import { appendInspectableInteraction } from "@/lib/lesson-support";
 import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession, ListeningEvent } from "@/types/lesson-session";
 import { evaluateAnswer } from "@/lib/scoring-utils";
@@ -122,7 +123,7 @@ export function ListeningPhase({
 
       <Card className="mt-8 p-6 sm:p-8">
         <ProgressBar value={(answeredIds.size / exercises.length) * 100} className="mb-6" />
-        <AudioControl replayCount={replayCount} onPlay={play} label="Play conversation" large />
+        <AudioControl replayCount={replayCount} onPlay={play} text={exercise.transcript} audioAssetId={exercise.audioAssetId} label="Play conversation" large />
         <div className="mt-4 flex items-center justify-between text-xs text-stone-400">
           <span>Replay {replayCount} · first replay has no penalty</span>
           {replayCount >= 3 && <span className="font-semibold text-persimmon-600">Difficulty signal noted</span>}
@@ -137,6 +138,8 @@ export function ListeningPhase({
             selectedAnswer={priorAnswer?.selectedAnswer}
             answered={Boolean(priorAnswer)}
             answerCorrect={priorAnswer?.correct}
+            inspectableTerms={exercise.inspectableTerms ?? lesson.story.flatMap((line) => line.words)}
+            onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, exercise.id, word, reveal))}
             onSelect={answer}
           />
         </div>

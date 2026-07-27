@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { appendInspectableInteraction } from "@/lib/lesson-support";
 import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession } from "@/types/lesson-session";
 import { evaluateAnswer, upsertVocabularyAnswer } from "@/lib/scoring-utils";
@@ -98,6 +99,8 @@ export function VocabularyPhase({
           answered={Boolean(answer)}
           answerCorrect={answer?.correct}
           lockAfterAnswer
+          inspectableTerms={question.inspectableTerms.length ? question.inspectableTerms : lesson.story.flatMap((line) => line.words)}
+          onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
           onSelect={select}
         />
 

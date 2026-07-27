@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, LoaderCircle } from "lucide-react";
 import type { LessonPackage } from "@/types/lesson";
 import type { LessonPhaseId, LessonSession } from "@/types/lesson-session";
 import { calculateLessonCompletion } from "@/lib/scoring-utils";
@@ -34,6 +34,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
   const [session, setSession] = useState<LessonSession | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [showExit, setShowExit] = useState(false);
+  const [isSavingExit, setIsSavingExit] = useState(false);
   const restoredLessonRef = useRef<string | null>(null);
   const initialPersistedSessionRef = useRef(persistedSession);
 
@@ -170,12 +171,17 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
     });
   }
 
-  function exit() {
-    if (!session) return;
+  async function exit() {
+    if (!session || isSavingExit) return;
+    setIsSavingExit(true);
     const checkpoint = { ...session, elapsedSeconds };
     saveLessonSession(checkpoint);
-    void syncLessonProgress(lesson, checkpoint).catch(() => undefined);
-    router.push(`/lesson/${lesson.id}/preview`);
+    try {
+      await syncLessonProgress(lesson, checkpoint);
+    } catch {
+      // The sync layer keeps a retryable offline checkpoint.
+    }
+    router.push("/learn?paused=1");
   }
 
   return (
@@ -209,10 +215,13 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
           <div className="w-full max-w-md rounded-4xl bg-white p-7 shadow-float">
             <span className="grid size-12 place-items-center rounded-2xl bg-persimmon-100 text-persimmon-600"><AlertTriangle className="size-5" /></span>
             <h2 id="exit-title" className="mt-6 text-2xl font-semibold">Pause this lesson?</h2>
-            <p className="mt-3 leading-7 text-stone-500">You can leave now and continue from {phase.label} when you return.</p>
+            <p className="mt-3 leading-7 text-stone-500">AIko will save this checkpoint and the kanji, vocabulary, grammar, and speaking evidence from every activity you attempted. You can resume from {phase.label} or start a new lesson later.</p>
             <div className="mt-6 flex gap-3">
-              <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowExit(false)}>Keep learning</Button>
-              <Button type="button" className="flex-1" onClick={exit}>Exit lesson</Button>
+              <Button type="button" variant="secondary" className="flex-1" disabled={isSavingExit} onClick={() => setShowExit(false)}>Keep learning</Button>
+              <Button type="button" className="flex-1" disabled={isSavingExit} onClick={() => void exit()}>
+                {isSavingExit ? <LoaderCircle className="size-4 animate-spin" /> : null}
+                {isSavingExit ? "Saving…" : "Save and exit"}
+              </Button>
             </div>
           </div>
         </div>

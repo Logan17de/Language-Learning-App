@@ -5,6 +5,7 @@ import { Check, Clock3, Mic2, Pause, Play, RotateCcw, Square, Waves } from "luci
 import type { LessonPackage } from "@/types/lesson";
 import type { LessonSession, ReadingEvent } from "@/types/lesson-session";
 import { createReadingEvent, createStopEvent } from "@/lib/reading-event-utils";
+import { AudioControl } from "@/components/exercises/audio-control";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -187,7 +188,18 @@ export function ReadingPhase({
           {lesson.readingConversation.map((line, lineIndex) => (
             <div key={`${line.speaker}-${lineIndex}`} className="grid gap-3 sm:grid-cols-[5rem_1fr]">
               <p className="text-sm font-semibold text-moss-700">{line.speaker}</p>
-              <p className="font-serif text-xl leading-9">{line.japanese}</p>
+              <div>
+                <p className="font-serif text-xl leading-9">{line.japanese}</p>
+                <div className="mt-2">
+                  <AudioControl
+                    replayCount={0}
+                    onPlay={() => undefined}
+                    text={line.japanese}
+                    audioAssetId={line.audioAssetId}
+                    label="Hear this line"
+                  />
+                </div>
+              </div>
             </div>
           ))}
           <div className="flex flex-wrap gap-2 border-t border-stone-100 pt-5" aria-label="Expected phrase progression">
