@@ -16,20 +16,14 @@ export function SpeakingFeedback({
           <CheckCircle2 className="size-5 text-moss-700" />
           <div>
             <p className="font-semibold">Speaking attempt saved</p>
-            <p className="text-xs text-stone-500">
-              Attempt {event.attempt} · no pronunciation score was generated
-            </p>
+            <p className="text-xs text-stone-500">Attempt {event.attempt} · speech match unavailable</p>
           </div>
         </div>
         <div className="rounded-2xl bg-white p-4">
-          <p className="flex items-center gap-2 text-xs font-semibold text-moss-700">
-            <WandSparkles className="size-4" /> Model answer
-          </p>
+          <p className="flex items-center gap-2 text-xs font-semibold text-moss-700"><WandSparkles className="size-4" /> Model answer</p>
           <p className="mt-2 font-serif text-lg">{modelAnswer}</p>
         </div>
-        <p className="text-xs leading-5 text-stone-500">
-          AIko will add pronunciation and grammar feedback after speech evaluation is connected.
-        </p>
+        <p className="text-xs leading-5 text-stone-500">Your attempt remains saved. Try again when speech recognition is available.</p>
       </div>
     );
   }
@@ -37,16 +31,22 @@ export function SpeakingFeedback({
     <div className="space-y-4 rounded-3xl border border-moss-200 bg-moss-50 p-5" role="status">
       <div className="flex items-center gap-3">
         <CheckCircle2 className="size-5 text-moss-700" />
-        <div><p className="font-semibold">Speaking check complete</p><p className="text-xs text-stone-500">Attempt {event.attempt}</p></div>
+        <div><p className="font-semibold">Speaking check complete</p><p className="text-xs text-stone-500">OpenAI transcription · attempt {event.attempt}</p></div>
       </div>
+      {event.transcript && (
+        <div className="rounded-2xl bg-white p-4">
+          <p className="text-xs font-semibold text-moss-700">AIko heard</p>
+          <p className="mt-2 font-serif text-lg">{event.transcript}</p>
+        </div>
+      )}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Metric label="Pronunciation confidence" value={event.pronunciationConfidence} />
-        <Metric label="Grammar accuracy" value={event.grammarAccuracy} />
+        <Metric label="Speech match" value={event.pronunciationConfidence} />
+        <Metric label="Answer match" value={event.grammarAccuracy} />
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-2xl bg-white p-4">
-          <p className="flex items-center gap-2 text-xs font-semibold text-moss-700"><MessageCircleMore className="size-4" /> Recognized words</p>
-          <p className="mt-2 text-sm">{event.recognizedWords.join(" · ")}</p>
+          <p className="flex items-center gap-2 text-xs font-semibold text-moss-700"><MessageCircleMore className="size-4" /> Recognized lesson words</p>
+          <p className="mt-2 text-sm">{event.recognizedWords.length ? event.recognizedWords.join(" · ") : "No target words matched"}</p>
         </div>
         <div className="rounded-2xl bg-white p-4">
           <p className="flex items-center gap-2 text-xs font-semibold text-persimmon-600"><Gauge className="size-4" /> Missed or uncertain</p>
@@ -54,9 +54,10 @@ export function SpeakingFeedback({
         </div>
       </div>
       <div className="rounded-2xl bg-white p-4">
-        <p className="flex items-center gap-2 text-xs font-semibold text-moss-700"><WandSparkles className="size-4" /> Natural Japanese suggestion</p>
+        <p className="flex items-center gap-2 text-xs font-semibold text-moss-700"><WandSparkles className="size-4" /> Model answer</p>
         <p className="mt-2 font-serif text-lg">{modelAnswer}</p>
       </div>
+      <p className="text-xs leading-5 text-stone-500">Speech-to-text measures what was recognized. Detailed phoneme-level pronunciation scoring can be added later.</p>
     </div>
   );
 }
