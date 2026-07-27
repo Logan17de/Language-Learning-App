@@ -423,6 +423,10 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
       speaker: item.speaker,
       japanese: item.japanese_text,
       english: item.translation,
+      audioAssetId:
+        "audio_asset_id" in item && typeof item.audio_asset_id === "string"
+          ? item.audio_asset_id
+          : undefined,
     })),
     listeningExercises: value.listening.map((item, index) => ({
       id: item.id,
@@ -452,6 +456,10 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
       mediumPrompt: item.medium_prompt ?? undefined,
       hardPrompt: item.hard_prompt ?? undefined,
       expectedAnswer: item.expected_answer ?? undefined,
+      audioAssetId:
+        "audio_asset_id" in item && typeof item.audio_asset_id === "string"
+          ? item.audio_asset_id
+          : undefined,
       targetItemIds: item.target_item_ids,
       inspectableTerms: inspectableTerms(item.inspectable_terms),
     })),
