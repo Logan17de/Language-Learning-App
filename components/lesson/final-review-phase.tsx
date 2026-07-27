@@ -79,7 +79,6 @@ export function FinalReviewPhase({
         <div className="mt-5">
           <MultipleChoiceCard
             prompt={question.prompt}
-            cue={question.cue}
             choices={question.choices}
             correctAnswer={question.correctAnswer}
             explanation={question.explanation}
