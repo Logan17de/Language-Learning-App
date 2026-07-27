@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ArrowRight, CheckCircle2, Lightbulb } from "lucide-react";
 import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession } from "@/types/lesson-session";
@@ -47,10 +47,6 @@ export function GrammarPhase({
   const answer = session.grammarAnswers.find((item) => item.questionId === question.id);
   const isLastQuestion = currentIndex === grammarQuestions.length - 1;
   const showHint = hintQuestionId === question.id;
-
-  useEffect(() => {
-    setTypedAnswer(answer?.selectedAnswer ?? "");
-  }, [answer?.selectedAnswer, question.id]);
 
   function submitAnswer(selectedAnswer: string) {
     if (answer || !selectedAnswer.trim()) return;
