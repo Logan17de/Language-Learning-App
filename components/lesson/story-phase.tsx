@@ -17,6 +17,7 @@ import {
   STORY_MEANING_PENALTY,
   STORY_RECOGNITION_PENALTY,
 } from "@/lib/story-support";
+import { AudioControl } from "@/components/exercises/audio-control";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -401,6 +402,32 @@ export function StoryPhase({
               </p>
             </div>
           )}
+          <div className="relative border-t border-white/15 px-4 py-3">
+            <AudioControl
+              replayCount={session.storyInteractions.filter(
+                (item) =>
+                  item.type === "audio-played" &&
+                  item.lineId === activeSupport.lineId &&
+                  item.wordId === activeSupport.word.id,
+              ).length}
+              onPlay={() =>
+                addInteraction({
+                  lineId: activeSupport.lineId,
+                  wordId: activeSupport.word.id,
+                  term: activeSupport.word.surface,
+                  type: "audio-played",
+                  scoreDelta: 0,
+                  meaningDelta: 0,
+                  recognitionDelta: 0,
+                  pronunciationDelta: 0,
+                  script:
+                    activeSupport.word.scriptType === "kanji" ? "kanji" : "kana",
+                })
+              }
+              text={activeSupport.word.reading}
+              label="Hear pronunciation"
+            />
+          </div>
         </div>
       )}
 
