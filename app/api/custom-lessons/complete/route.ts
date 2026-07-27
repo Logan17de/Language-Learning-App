@@ -81,7 +81,7 @@ async function prepareAudio(
       })
       .eq("request_id", draft.request_id);
     if (saved.error) throw new Error(saved.error.message);
-    return prepared;
+    return { ...prepared };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Audio preparation failed.";
     await admin
