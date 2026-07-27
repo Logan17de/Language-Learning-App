@@ -215,10 +215,12 @@ export async function POST(request: NextRequest) {
       .from("progressive_lesson_drafts")
       .update({ status: "activities_failed", last_error: internalMessage.slice(0, 1_000) })
       .eq("request_id", requestId);
-    await client.rpc("fail_custom_lesson_generation", {
-      p_request_id: requestId,
-      p_error: internalMessage,
-    });
+    if (draft.build_attempts + 1 >= 3) {
+      await client.rpc("fail_custom_lesson_generation", {
+        p_request_id: requestId,
+        p_error: internalMessage,
+      });
+    }
     console.error("Progressive custom lesson completion failed.", {
       requestId,
       message: internalMessage,
