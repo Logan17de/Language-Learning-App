@@ -7,6 +7,7 @@ import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession } from "@/types/lesson-session";
 import { upsertGrammarAnswer } from "@/lib/scoring-utils";
 import { MultipleChoiceCard } from "@/components/exercises/multiple-choice-card";
+import { InspectableText } from "@/components/exercises/inspectable-text";
 import { AnswerFeedback } from "@/components/exercises/answer-feedback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -185,7 +186,11 @@ export function GrammarPhase({
         ) : (
           <section aria-labelledby="grammar-question-prompt">
             <p id="grammar-question-prompt" className="text-sm font-semibold text-stone-500">
-              {safeProductionPrompt(question.prompt, question.cue)}
+              <InspectableText
+                text={safeProductionPrompt(question.prompt, question.cue)}
+                terms={question.inspectableTerms.length ? question.inspectableTerms : lesson.story.flatMap((line) => line.words)}
+                onReveal={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
+              />
             </p>
             <label className="mt-7 block text-sm font-semibold text-stone-600" htmlFor="grammar-translation">
               Your answer
