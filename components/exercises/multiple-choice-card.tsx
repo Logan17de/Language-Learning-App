@@ -12,6 +12,7 @@ export function MultipleChoiceCard({
   correctAnswer,
   explanation,
   answered,
+  answerCorrect,
   lockAfterAnswer = false,
   onSelect,
 }: {
@@ -22,10 +23,11 @@ export function MultipleChoiceCard({
   correctAnswer: string;
   explanation: string;
   answered: boolean;
+  answerCorrect?: boolean;
   lockAfterAnswer?: boolean;
   onSelect: (answer: string) => void;
 }) {
-  const isCorrect = selectedAnswer === correctAnswer;
+  const isCorrect = answerCorrect ?? selectedAnswer === correctAnswer;
   const locked = answered && lockAfterAnswer;
 
   return (
