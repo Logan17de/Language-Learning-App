@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 const form = readFileSync("components/custom-topic/custom-topic-page.tsx", "utf8");
 const route = readFileSync("app/api/custom-lessons/generate/route.ts", "utf8");
+const completionRoute = readFileSync("app/api/custom-lessons/complete/route.ts", "utf8");
 const targets = readFileSync("lib/gemini/lesson-targets.ts", "utf8");
 const generation = readFileSync("lib/gemini/lesson-generation.ts", "utf8");
 const quota = readFileSync(
@@ -27,17 +28,22 @@ describe("custom lesson engine contract", () => {
     expect(form).not.toContain('<Field label="Speaking difficulty">');
     expect(form).not.toContain('<Field label="Optional note">');
     expect(form).toContain("JSON.stringify({ topic, level })");
-    expect(route).toContain("const durationMinutes = 30");
-    expect(route).toContain('tone: "encouraging"');
+    expect(route).toContain('begin_custom_lesson_generation_v3');
+    expect(route).toContain('p_topic: topic');
+    expect(route).toContain('p_level: level');
   });
 
-  it("shows an unmistakable, accessible generation state", () => {
+  it("shows the story first while the rest of the lesson is built", () => {
     expect(form).toContain('role="status"');
-    expect(form).toContain("Our AI is creating a lesson for you.");
-    expect(form).toContain("Selecting 5 kanji and 3 grammar targets");
-    expect(form).toContain("Writing your story and practice activities");
-    expect(form).toContain("Checking answers and saving your lesson");
+    expect(form).toContain("AIko is preparing your reading.");
+    expect(form).toContain("Story ready");
+    expect(form).toContain("Building practice and audio");
+    expect(form).toContain("You can read now.");
+    expect(form).toContain("AbortSignal.timeout(180_000)");
     expect(form).toContain("AbortSignal.timeout(300_000)");
+    expect(route).toContain('status: "story_ready"');
+    expect(completionRoute).toContain("generatePlayableLesson");
+    expect(completionRoute).toContain("prepareStoredLessonAudio");
   });
 
   it("enriches only missing library categories before selecting targets", () => {
