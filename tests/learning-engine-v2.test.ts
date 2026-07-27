@@ -83,12 +83,12 @@ describe("learning engine V2 contracts", () => {
     const migration = readFileSync(
       resolve(
         process.cwd(),
-        "supabase/migrations/20260727090000_learning_engine_v2.sql",
+        "supabase/migrations/20260727092000_normalized_kana_library.sql",
       ),
       "utf8",
     );
 
-    expect(migration).toContain("create table if not exists public.kana_records");
+    expect(migration).toContain("create table public.kana_records");
     expect(migration).toContain("unique (normalized_value)");
     expect(migration).toContain("normalize(btrim(value), NFKC)");
     expect(migration).toContain("script_type in ('hiragana', 'katakana', 'mixed')");
