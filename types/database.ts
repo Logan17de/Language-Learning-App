@@ -245,6 +245,10 @@ export interface Database {
         Args: { p_level: Database["public"]["Enums"]["jlpt_level"]; p_seed: Json; p_source_model: string };
         Returns: Json;
       };
+      get_learner_progress_summary: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
       record_mastery_evidence: {
         Args: { p_session_id: string; p_events: Json };
         Returns: Json;
