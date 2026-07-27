@@ -1,13 +1,14 @@
 "use client";
 
 import { Check, RotateCcw, Trophy } from "lucide-react";
-import type { LessonPackage } from "@/types/lesson";
+import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession, ReviewAnswer } from "@/types/lesson-session";
 import { calculateReviewResult, evaluateAnswer } from "@/lib/scoring-utils";
 import { MultipleChoiceCard } from "@/components/exercises/multiple-choice-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { selectNextAdaptiveQuestionIndex } from "@/lib/adaptive-difficulty";
 
 export function FinalReviewPhase({
   lesson,
@@ -20,8 +21,24 @@ export function FinalReviewPhase({
 }) {
   const finalReviewQuestions = lesson.reviewQuestions;
   const attemptedCount = session.reviewAnswers.length;
-  const currentIndex = Math.min(session.activityIndex, finalReviewQuestions.length - 1);
+  const adaptiveQuestions = finalReviewQuestions.map((item, index) => ({
+    ...item,
+    difficulty:
+      item.difficulty ??
+      reviewDifficulty(index, finalReviewQuestions.length),
+  }));
+  const initialIndex =
+    selectNextAdaptiveQuestionIndex(
+      adaptiveQuestions,
+      session.reviewAnswers,
+      { targetCount: finalReviewQuestions.length },
+    ) ?? 0;
+  const currentIndex =
+    session.reviewAnswers.length === 0
+      ? initialIndex
+      : Math.min(session.activityIndex, finalReviewQuestions.length - 1);
   const question = finalReviewQuestions[currentIndex];
+  const difficulty = adaptiveQuestions[currentIndex].difficulty;
   const answer = session.reviewAnswers.find((item) => item.questionId === question.id);
   const complete = session.reviewResult?.totalCount === finalReviewQuestions.length;
 
@@ -36,6 +53,7 @@ export function FinalReviewPhase({
     const answers = [...session.reviewAnswers, nextAnswer];
     onChange({
       ...session,
+      activityIndex: currentIndex,
       reviewAnswers: answers,
       reviewResult: answers.length === finalReviewQuestions.length ? calculateReviewResult(answers) : null,
     });
@@ -75,7 +93,10 @@ export function FinalReviewPhase({
       </div>
       <ProgressBar value={(attemptedCount / finalReviewQuestions.length) * 100} className="mt-5" />
       <div className="mt-8 rounded-4xl border border-black/[.06] bg-white p-6 shadow-card sm:p-9">
-        <Badge tone="neutral" className="capitalize">{question.category}</Badge>
+        <div className="flex flex-wrap gap-2">
+          <Badge tone="neutral" className="capitalize">{question.category}</Badge>
+          <Badge tone={difficultyTone(difficulty)}>{difficulty}</Badge>
+        </div>
         <div className="mt-5">
           <MultipleChoiceCard
             prompt={question.prompt}
@@ -84,13 +105,45 @@ export function FinalReviewPhase({
             explanation={question.explanation}
             selectedAnswer={answer?.selectedAnswer}
             answered={Boolean(answer)}
+            answerCorrect={answer?.correct}
             onSelect={select}
           />
         </div>
         {answer && attemptedCount < finalReviewQuestions.length && (
-          <Button type="button" className="mt-5" onClick={() => onChange({ ...session, activityIndex: Math.min(currentIndex + 1, finalReviewQuestions.length - 1) })}>Next question</Button>
+          <Button
+            type="button"
+            className="mt-5"
+            onClick={() => {
+              const nextIndex = selectNextAdaptiveQuestionIndex(
+                adaptiveQuestions,
+                session.reviewAnswers,
+                { targetCount: finalReviewQuestions.length },
+              );
+              if (nextIndex !== null) {
+                onChange({ ...session, activityIndex: nextIndex });
+              }
+            }}
+          >
+            Next question
+          </Button>
         )}
       </div>
     </div>
   );
+}
+
+function reviewDifficulty(
+  index: number,
+  total: number,
+): ExerciseDifficulty {
+  if (index === total - 1) return "Hard";
+  return index < 2 ? "Easy" : "Medium";
+}
+
+function difficultyTone(
+  difficulty: ExerciseDifficulty,
+): "moss" | "orange" | "neutral" {
+  if (difficulty === "Hard") return "orange";
+  if (difficulty === "Medium") return "neutral";
+  return "moss";
 }
