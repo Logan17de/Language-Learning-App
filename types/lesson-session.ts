@@ -68,6 +68,7 @@ export interface SpeakingEvent {
   evaluationAvailable?: boolean;
   pronunciationConfidence: number;
   grammarAccuracy: number;
+  transcript?: string;
   recognizedWords: string[];
   missedWords: string[];
   successfulRetry: boolean;
