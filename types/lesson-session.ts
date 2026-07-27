@@ -52,6 +52,7 @@ export type ListeningEventType = "play" | "replay" | "difficulty-signal" | "answ
 
 export interface ListeningEvent {
   id: string;
+  questionId?: string;
   type: ListeningEventType;
   replayCount: number;
   correct?: boolean;
@@ -61,8 +62,10 @@ export interface ListeningEvent {
 
 export interface SpeakingEvent {
   id: string;
+  exerciseId?: string;
   mode: "easy" | "medium" | "hard";
   attempt: number;
+  evaluationAvailable?: boolean;
   pronunciationConfidence: number;
   grammarAccuracy: number;
   recognizedWords: string[];
