@@ -22,7 +22,7 @@ export function AnswerFeedback({
       <div className="flex items-start gap-3">
         <Icon className="mt-0.5 size-5 shrink-0" />
         <div>
-          <p className="text-sm font-semibold">{correct ? "That’s right." : "Not quite yet."}</p>
+          <p className="text-sm font-semibold">{correct ? "Correct." : "Not correct yet."}</p>
           {!compact && <p className="mt-1 text-sm leading-6 opacity-75">{explanation}</p>}
         </div>
       </div>
