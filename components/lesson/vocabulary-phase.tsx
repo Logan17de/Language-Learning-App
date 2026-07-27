@@ -8,6 +8,9 @@ import { MultipleChoiceCard } from "@/components/exercises/multiple-choice-card"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { selectNextAdaptiveQuestionIndex } from "@/lib/adaptive-difficulty";
+
+const QUESTION_TARGET = 10;
 
 export function VocabularyPhase({
   lesson,
@@ -19,26 +22,25 @@ export function VocabularyPhase({
   onChange: (session: LessonSession) => void;
 }) {
   const vocabularyQuestions = lesson.vocabularyQuestions;
-  const answeredCount = vocabularyQuestions.filter((question) =>
-    session.vocabularyAnswers.some((answer) => answer.questionId === question.id),
+  const answeredCount = session.vocabularyAnswers.filter((answer) =>
+    vocabularyQuestions.some((question) => question.id === answer.questionId),
   ).length;
   const correctCount = vocabularyQuestions.filter((question) =>
     session.vocabularyAnswers.some((answer) => answer.questionId === question.id && answer.correct),
   ).length;
-  const savedIndex = Math.min(session.activityIndex, vocabularyQuestions.length - 1);
-  const earliestUnansweredIndex = vocabularyQuestions.findIndex(
-    (question) => !session.vocabularyAnswers.some((answer) => answer.questionId === question.id),
-  );
-  const savedQuestionAnswered = session.vocabularyAnswers.some(
-    (answer) => answer.questionId === vocabularyQuestions[savedIndex].id,
-  );
+  const initialIndex =
+    selectNextAdaptiveQuestionIndex(
+      vocabularyQuestions,
+      session.vocabularyAnswers,
+      { targetCount: QUESTION_TARGET },
+    ) ?? 0;
   const currentIndex =
-    savedQuestionAnswered && earliestUnansweredIndex >= 0 && earliestUnansweredIndex < savedIndex
-      ? earliestUnansweredIndex
-      : savedIndex;
+    session.vocabularyAnswers.length === 0
+      ? initialIndex
+      : Math.min(session.activityIndex, vocabularyQuestions.length - 1);
   const question = vocabularyQuestions[currentIndex];
   const answer = session.vocabularyAnswers.find((item) => item.questionId === question.id);
-  const isLastQuestion = currentIndex === vocabularyQuestions.length - 1;
+  const roundComplete = answeredCount >= Math.min(QUESTION_TARGET, vocabularyQuestions.length);
 
   function select(selectedAnswer: string) {
     if (answer) return;
@@ -56,10 +58,16 @@ export function VocabularyPhase({
   }
 
   function nextQuestion() {
-    if (!answer || isLastQuestion) return;
+    if (!answer || roundComplete) return;
+    const nextIndex = selectNextAdaptiveQuestionIndex(
+      vocabularyQuestions,
+      session.vocabularyAnswers,
+      { targetCount: QUESTION_TARGET },
+    );
+    if (nextIndex === null) return;
     onChange({
       ...session,
-      activityIndex: currentIndex + 1,
+      activityIndex: nextIndex,
     });
   }
 
@@ -74,10 +82,10 @@ export function VocabularyPhase({
           <h2 className="mt-4 text-3xl font-semibold tracking-tight">Vocabulary & kanji</h2>
           <p className="mt-2 text-sm leading-6 text-stone-500">Ten questions build from direct recognition to vocabulary in context.</p>
         </div>
-        <p className="shrink-0 text-sm font-semibold text-stone-500">{currentIndex + 1} / {vocabularyQuestions.length}</p>
+        <p className="shrink-0 text-sm font-semibold text-stone-500">{Math.min(answeredCount + (answer ? 0 : 1), QUESTION_TARGET)} / {Math.min(QUESTION_TARGET, vocabularyQuestions.length)}</p>
       </div>
 
-      <ProgressBar value={(answeredCount / vocabularyQuestions.length) * 100} className="mt-5" />
+      <ProgressBar value={(answeredCount / Math.min(QUESTION_TARGET, vocabularyQuestions.length)) * 100} className="mt-5" />
 
       <div className="mt-9 rounded-4xl border border-black/[.06] bg-white p-6 shadow-card sm:p-9">
         <MultipleChoiceCard
@@ -88,22 +96,23 @@ export function VocabularyPhase({
           explanation={question.explanation}
           selectedAnswer={answer?.selectedAnswer}
           answered={Boolean(answer)}
+          answerCorrect={answer?.correct}
           lockAfterAnswer
           onSelect={select}
         />
 
-        {answer && !isLastQuestion && (
+        {answer && !roundComplete && (
           <Button type="button" className="mt-6" onClick={nextQuestion}>
             Next question <ArrowRight className="size-4" />
           </Button>
         )}
 
-        {answer && isLastQuestion && (
+        {answer && roundComplete && (
           <div className="mt-6 flex items-start gap-3 rounded-2xl bg-moss-50 p-4 text-sm text-moss-800">
             <CheckCircle2 className="mt-0.5 size-5 shrink-0" />
             <div>
               <p className="font-semibold">Vocabulary round complete</p>
-              <p className="mt-1 text-moss-700">{correctCount} of 10 correct. Continue to Grammar when you are ready.</p>
+              <p className="mt-1 text-moss-700">{correctCount} of {answeredCount} correct. Continue to Grammar when you are ready.</p>
             </div>
           </div>
         )}
