@@ -99,11 +99,39 @@ export function calculateLessonCompletion(
         );
       })
       .map((item) => item.word.surface),
-    ...session.vocabularyAnswers.filter((answer) => !answer.correct).map((answer) => answer.questionId.includes("kaisatsu") ? "改札" : "一緒に"),
+    ...session.vocabularyAnswers
+      .filter((answer) => !answer.correct)
+      .flatMap((answer) =>
+        exerciseTerms(
+          lesson,
+          lesson.vocabularyQuestions.find(
+            (question) => question.id === answer.questionId,
+          )?.targetItemIds,
+        ),
+      ),
+    ...session.grammarAnswers
+      .filter((answer) => !answer.correct)
+      .flatMap((answer) =>
+        exerciseTerms(
+          lesson,
+          lesson.grammarQuestions.find(
+            (question) => question.id === answer.questionId,
+          )?.targetItemIds,
+        ),
+      ),
     ...session.readingEvents
       .filter((event) => ["paused-before-word", "pronunciation-issue", "stopped-at-word"].includes(event.type))
       .map((event) => event.term),
-    ...session.reviewAnswers.filter((answer) => !answer.correct).map((answer) => reviewTerm(answer.questionId)),
+    ...session.reviewAnswers
+      .filter((answer) => !answer.correct)
+      .flatMap((answer) =>
+        exerciseTerms(
+          lesson,
+          lesson.reviewQuestions.find(
+            (question) => question.id === answer.questionId,
+          )?.targetItemIds,
+        ),
+      ),
   ]).slice(0, 4);
 
   const speaking = session.speakingEvents.at(-1);
@@ -113,10 +141,13 @@ export function calculateLessonCompletion(
     xpGained: 80 + Math.round(score * 0.7),
     durationMinutes: Math.max(1, Math.round(session.elapsedSeconds / 60)),
     recognitionChange: score >= 80 ? 4 : 2,
-    pronunciationChange: speaking ? Math.max(1, Math.round((speaking.pronunciationConfidence - 60) / 8)) : 1,
+    pronunciationChange:
+      speaking?.evaluationAvailable
+        ? Math.max(0, Math.round((speaking.pronunciationConfidence - 60) / 8))
+        : 0,
     grammarUnderstandingChange: Math.max(1, Math.round(grammarAccuracy * 4)),
     grammarProductionChange: Math.max(1, Math.round(grammarAccuracy * 3)),
-    wordsNeedingReview: wordsNeedingReview.length ? wordsNeedingReview : ["改札"],
+    wordsNeedingReview,
     completedAt: new Date().toISOString(),
   };
 }
@@ -129,9 +160,21 @@ function unique(values: string[]): string[] {
   return Array.from(new Set(values.filter(Boolean)));
 }
 
-function reviewTerm(questionId: string): string {
-  if (questionId.includes("kanji")) return "改札";
-  if (questionId.includes("vocabulary")) return "一緒に";
-  if (questionId.includes("grammar")) return "〜ながら";
-  return "Listening detail";
+function exerciseTerms(
+  lesson: LessonPackage,
+  targetItemIds: string[] | undefined,
+): string[] {
+  if (!targetItemIds?.length) return [];
+  const targetIds = new Set(targetItemIds);
+  return [
+    ...lesson.kanji
+      .filter((item) => item.libraryId && targetIds.has(item.libraryId))
+      .map((item) => item.character),
+    ...lesson.vocabulary
+      .filter((item) => item.libraryId && targetIds.has(item.libraryId))
+      .map((item) => item.term),
+    ...lesson.grammar
+      .filter((item) => item.libraryId && targetIds.has(item.libraryId))
+      .map((item) => item.pattern),
+  ];
 }
