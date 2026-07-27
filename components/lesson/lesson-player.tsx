@@ -1,12 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
 import type { LessonPackage } from "@/types/lesson";
 import type { LessonPhaseId, LessonSession } from "@/types/lesson-session";
 import { calculateLessonCompletion } from "@/lib/scoring-utils";
-import { grammarQuestions, vocabularyQuestions } from "@/data/mock-activities";
 import {
   normalizeLessonSession,
   useAppStore,
@@ -21,7 +20,10 @@ import { ListeningPhase } from "@/components/lesson/listening-phase";
 import { SpeakingPhase } from "@/components/lesson/speaking-phase";
 import { FinalReviewPhase } from "@/components/lesson/final-review-phase";
 import { LessonReportDialog } from "@/components/support/lesson-report-dialog";
-import { syncLessonProgress } from "@/lib/sync/backend-sync";
+import {
+  restoreLessonProgress,
+  syncLessonProgress,
+} from "@/lib/sync/backend-sync";
 
 export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
   const router = useRouter();
@@ -32,20 +34,37 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
   const [session, setSession] = useState<LessonSession | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [showExit, setShowExit] = useState(false);
+  const restoredLessonRef = useRef<string | null>(null);
+  const initialPersistedSessionRef = useRef(persistedSession);
 
   useEffect(() => {
-    if (!hasHydrated) return;
-    const next = normalizeLessonSession(
+    if (!hasHydrated || restoredLessonRef.current === lesson.id) return;
+    restoredLessonRef.current = lesson.id;
+    let active = true;
+    const fallback = normalizeLessonSession(
       lesson.id,
-      persistedSession ?? startOrResumeLesson(lesson.id),
+      initialPersistedSessionRef.current ?? startOrResumeLesson(lesson.id),
     );
-    if (next.completed && next.completionResult) {
-      router.replace(`/lesson/${lesson.id}/complete`);
-      return;
-    }
-    setSession(next);
-    setElapsedSeconds(next.elapsedSeconds);
-  }, [hasHydrated, lesson.id, persistedSession, router, startOrResumeLesson]);
+    void restoreLessonProgress(lesson, fallback).then((next) => {
+      if (!active) return;
+      if (next.completed && next.completionResult) {
+        router.replace(`/lesson/${lesson.id}/complete`);
+        return;
+      }
+      setSession(next);
+      setElapsedSeconds(next.elapsedSeconds);
+      saveLessonSession(next);
+    });
+    return () => {
+      active = false;
+    };
+  }, [
+    hasHydrated,
+    lesson,
+    router,
+    saveLessonSession,
+    startOrResumeLesson,
+  ]);
 
   useEffect(() => {
     if (!session) return;
@@ -76,12 +95,16 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
       const withTime = { ...next, elapsedSeconds };
       setSession(withTime);
       saveLessonSession(withTime);
+      void syncLessonProgress(lesson, withTime).catch(() => undefined);
     },
-    [elapsedSeconds, saveLessonSession],
+    [elapsedSeconds, lesson, saveLessonSession],
   );
 
   const phase = lesson.phases[session?.currentPhaseIndex ?? 0];
-  const canContinue = useMemo(() => session ? phaseIsComplete(session, phase.id) : false, [phase.id, session]);
+  const canContinue = useMemo(
+    () => (session ? phaseIsComplete(session, phase.id, lesson) : false),
+    [lesson, phase.id, session],
+  );
   const progress = session ? Math.round(((session.currentPhaseIndex + (canContinue ? 1 : 0.35)) / lesson.phases.length) * 100) : 0;
 
   if (!hasHydrated || !session) {
@@ -108,7 +131,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
         [currentPhase.id]: {
           phaseId: currentPhase.id,
           activityIndex: session.activityIndex,
-          completed: phaseIsComplete(session, currentPhase.id),
+          completed: phaseIsComplete(session, currentPhase.id, lesson),
           attempts: 1,
         },
       },
@@ -125,7 +148,6 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
       const result = calculateLessonCompletion(lesson, timedSession);
       const completeSession = { ...timedSession, completionResult: result };
       updateSession(completeSession);
-      void syncLessonProgress(lesson, completeSession).catch(() => undefined);
       router.push(`/lesson/${lesson.id}/complete`);
       return;
     }
@@ -150,7 +172,9 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
 
   function exit() {
     if (!session) return;
-    saveLessonSession({ ...session, elapsedSeconds });
+    const checkpoint = { ...session, elapsedSeconds };
+    saveLessonSession(checkpoint);
+    void syncLessonProgress(lesson, checkpoint).catch(() => undefined);
     router.push(`/lesson/${lesson.id}/preview`);
   }
 
@@ -172,12 +196,12 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
           <LessonReportDialog lessonId={lesson.id} lessonTitle={lesson.title} phase={phase.label} activityId={`${phase.id}_${session.activityIndex}`} compact />
         </div>
         {phase.id === "story" && <StoryPhase lesson={lesson} session={session} onChange={updateSession} />}
-        {phase.id === "vocabulary" && <VocabularyPhase session={session} onChange={updateSession} />}
+        {phase.id === "vocabulary" && <VocabularyPhase lesson={lesson} session={session} onChange={updateSession} />}
         {phase.id === "grammar" && <GrammarPhase lesson={lesson} session={session} onChange={updateSession} />}
         {phase.id === "reading" && <ReadingPhase lesson={lesson} session={session} onChange={updateSession} />}
         {phase.id === "listening" && <ListeningPhase lesson={lesson} session={session} onChange={updateSession} />}
         {phase.id === "speaking" && <SpeakingPhase lesson={lesson} session={session} onChange={updateSession} />}
-        {phase.id === "review" && <FinalReviewPhase session={session} onChange={updateSession} />}
+        {phase.id === "review" && <FinalReviewPhase lesson={lesson} session={session} onChange={updateSession} />}
       </LessonPlayerShell>
 
       {showExit && (
@@ -197,22 +221,44 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
   );
 }
 
-function phaseIsComplete(session: LessonSession, phaseId: LessonPhaseId): boolean {
+function phaseIsComplete(
+  session: LessonSession,
+  phaseId: LessonPhaseId,
+  lesson: LessonPackage,
+): boolean {
   switch (phaseId) {
     case "story":
       return session.storyComplete;
     case "vocabulary":
-      return vocabularyQuestions.every((question) => session.vocabularyAnswers.some((answer) => answer.questionId === question.id));
+      return lesson.vocabularyQuestions.every((question) =>
+        session.vocabularyAnswers.some((answer) => answer.questionId === question.id),
+      );
     case "grammar":
-      return grammarQuestions.every((question) => session.grammarAnswers.some((answer) => answer.questionId === question.id));
+      return lesson.grammarQuestions.every((question) =>
+        session.grammarAnswers.some((answer) => answer.questionId === question.id),
+      );
     case "reading":
       return session.readingComplete;
     case "listening":
-      return session.listeningComplete;
+      return (
+        session.listeningComplete &&
+        lesson.listeningExercises.every((exercise) =>
+          session.listeningEvents.some(
+            (event) => event.type === "answer" && event.questionId === exercise.id,
+          ),
+        )
+      );
     case "speaking":
-      return session.speakingComplete;
+      return (
+        session.speakingComplete &&
+        lesson.speakingExercises.every((exercise) =>
+          session.speakingEvents.some(
+            (event) => event.exerciseId === exercise.id,
+          ),
+        )
+      );
     case "review":
-      return session.reviewResult?.totalCount === 5;
+      return session.reviewResult?.totalCount === lesson.reviewQuestions.length;
   }
 }
 

@@ -16,7 +16,10 @@ function mockStoryLine(
   };
 }
 
-export const commuteLesson: LessonPackage = {
+const commuteLessonBase: Omit<
+  LessonPackage,
+  "vocabularyQuestions" | "grammarQuestions"
+> = {
   id: "lesson_n4_commute_001",
   title: "Going to Work",
   japaneseTitle: "会社へ行く朝",
@@ -116,6 +119,85 @@ export const commuteLesson: LessonPackage = {
     { id: "speaking", label: "Speaking", description: "Produce natural Japanese" },
     { id: "review", label: "Final review", description: "Retrieve without hints" },
   ],
+};
+
+function seedChoices(values: string[], answer: string): string[] {
+  return [answer, ...values.filter((value) => value !== answer)].slice(0, 4);
+}
+
+function seedVocabularyQuestions(
+  vocabulary: LessonPackage["vocabulary"],
+): LessonPackage["vocabularyQuestions"] {
+  const readings = vocabulary.map((item) => item.reading);
+  const meanings = vocabulary.map((item) => item.meaning);
+
+  return vocabulary.flatMap((item, index) => [
+    {
+      id: `seed_vocab_reading_${index + 1}`,
+      mode: "kanji-reading" as const,
+      modeLabel: "Kanji → reading",
+      difficulty: "Easy" as const,
+      prompt: `How do you read ${item.term}?`,
+      cue: item.term,
+      choices: seedChoices(readings, item.reading),
+      correctAnswer: item.reading,
+      acceptedAnswers: [item.reading],
+      explanation: `${item.term} is read ${item.reading}.`,
+      targetItemIds: item.libraryId ? [item.libraryId] : [],
+      inspectableTerms: [],
+    },
+    {
+      id: `seed_vocab_meaning_${index + 1}`,
+      mode: "reading-meaning" as const,
+      modeLabel: "Reading → meaning",
+      difficulty: "Easy" as const,
+      prompt: `What does ${item.reading} mean?`,
+      cue: item.reading,
+      choices: seedChoices(meanings, item.meaning),
+      correctAnswer: item.meaning,
+      acceptedAnswers: [item.meaning],
+      explanation: `${item.reading} means ${item.meaning}.`,
+      targetItemIds: item.libraryId ? [item.libraryId] : [],
+      inspectableTerms: [],
+    },
+  ]);
+}
+
+function seedGrammarQuestions(
+  grammar: LessonPackage["grammar"],
+): LessonPackage["grammarQuestions"] {
+  const meanings = [
+    ...grammar.map((point) => point.meaning),
+    "because of",
+    "even though",
+  ];
+
+  return Array.from({ length: 10 }, (_, index) => {
+    const point = grammar[index % grammar.length];
+    return {
+      id: `seed_grammar_${index + 1}`,
+      type: "multiple-choice" as const,
+      skill: "understanding" as const,
+      difficulty: index < 4 ? ("Easy" as const) : ("Medium" as const),
+      answerMode: "choice" as const,
+      prompt: `What does ${point.pattern} express?`,
+      cue: point.example,
+      choices: seedChoices(meanings, point.meaning),
+      correctAnswer: point.meaning,
+      acceptedAnswers: [point.meaning],
+      explanation: point.usage,
+      hintFront: point.structure,
+      hintBack: point.meaning,
+      targetItemIds: point.libraryId ? [point.libraryId] : [],
+      inspectableTerms: [],
+    };
+  });
+}
+
+export const commuteLesson: LessonPackage = {
+  ...commuteLessonBase,
+  vocabularyQuestions: seedVocabularyQuestions(commuteLessonBase.vocabulary),
+  grammarQuestions: seedGrammarQuestions(commuteLessonBase.grammar),
 };
 
 function lessonVariant(

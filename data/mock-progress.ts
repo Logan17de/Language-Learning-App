@@ -1,6 +1,10 @@
 import type { LearnerProgress } from "@/types/progress";
 
 export const mockProgress: LearnerProgress = {
+  levelCompletion: 60,
+  learnedVocabularyCount: 70,
+  learnedKanjiCount: 30,
+  learnedGrammarCount: 6,
   weeklyActivity: [
     { day: "M", minutes: 28, goal: 30 },
     { day: "T", minutes: 34, goal: 30 },

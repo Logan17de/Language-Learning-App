@@ -1,14 +1,37 @@
 import type { ReviewActivity, ReviewSession } from "@/types/review-session";
 import type { ReviewQueueItem } from "@/types/progress";
 
-export function buildReviewActivities(queue: ReviewQueueItem[], limit = 7): ReviewActivity[] {
-  const seen = new Set(queue.map((item) => item.id));
-  const source = [...queue, ...fallbackQueue.filter((item) => !seen.has(item.id))];
-  const desired = Math.max(5, Math.min(limit, source.length));
-  return source.slice(0, desired).map((item, index) => activityFor(item, index));
+function choices(correct: string, candidates: Array<string | undefined>): string[] {
+  const result = [correct, ...candidates.filter((item): item is string => Boolean(item))]
+    .filter((item, index) => item !== correct || index === 0)
+    .filter((item, index, all) => all.indexOf(item) === index);
+  while (result.length < 4) {
+    result.push(`None of these ${result.length}`);
+  }
+  return result.slice(0, 4);
 }
 
-export function createReviewSession(queue: ReviewQueueItem[], sequence: number): ReviewSession {
+export function buildReviewActivities(
+  queue: ReviewQueueItem[],
+  limit = 7,
+): ReviewActivity[] {
+  const weakItems = queue
+    .filter((item) => item.confidence < 85)
+    .sort(
+      (left, right) =>
+        Number(Boolean(right.overdue)) - Number(Boolean(left.overdue)) ||
+        left.confidence - right.confidence,
+    )
+    .slice(0, Math.max(0, limit));
+  return weakItems.map((item, index) =>
+    activityFor(item, index, weakItems),
+  );
+}
+
+export function createReviewSession(
+  queue: ReviewQueueItem[],
+  sequence: number,
+): ReviewSession {
   return {
     id: `review_session_${String(sequence).padStart(3, "0")}`,
     activities: buildReviewActivities(queue),
@@ -21,62 +44,61 @@ export function createReviewSession(queue: ReviewQueueItem[], sequence: number):
   };
 }
 
-function activityFor(item: ReviewQueueItem, index: number): ReviewActivity {
+function activityFor(
+  item: ReviewQueueItem,
+  index: number,
+  queue: ReviewQueueItem[],
+): ReviewActivity {
   if (item.type === "grammar") {
+    const correct = item.meaning ?? item.term;
     return {
       id: `review_${item.id}_${index}`,
       queueItemId: item.id,
-      type: index % 2 ? "grammar-production" : "grammar-mcq",
-      prompt: "Choose the natural completion.",
-      cue: `電車が遅れた＿＿、少し遅くなりました。`,
-      choices: ["ので", "ながら", "ように", "でも"],
-      correctAnswer: "ので",
-      explanation: "〜ので gives a reason in a neutral, natural way.",
+      type: "grammar-mcq",
+      prompt: "What does this grammar pattern express?",
+      cue: item.term,
+      choices: choices(
+        correct,
+        queue
+          .filter((candidate) => candidate.type === "grammar")
+          .map((candidate) => candidate.meaning),
+      ),
+      correctAnswer: correct,
+      explanation: `${item.term} means ${correct}.`,
     };
   }
-  if (item.type === "listening") {
+
+  const askForReading =
+    item.type === "kanji" ||
+    (item.type === "vocabulary" && index % 2 === 0 && Boolean(item.reading));
+  if (askForReading && item.reading) {
     return {
       id: `review_${item.id}_${index}`,
       queueItemId: item.id,
-      type: "listening",
-      prompt: "In the simulated audio, where will they meet?",
-      choices: ["At the ticket gate", "At home", "At the café", "At the office"],
-      correctAnswer: "At the ticket gate",
-      explanation: "改札で会います means “We will meet at the ticket gate.”",
+      type: "kanji-reading",
+      prompt: "Choose the correct reading.",
+      cue: item.term,
+      choices: choices(
+        item.reading,
+        queue.map((candidate) => candidate.reading),
+      ),
+      correctAnswer: item.reading,
+      explanation: `${item.term} is read ${item.reading}.`,
     };
   }
-  if (item.type === "speaking") {
-    return {
-      id: `review_${item.id}_${index}`,
-      queueItemId: item.id,
-      type: "speaking",
-      prompt: "Choose the natural sentence to say aloud.",
-      choices: ["音楽を聞きながら、歩きます。", "音楽ながらを歩きます。", "歩きます音楽をながら。", "ながら音楽歩きます。"],
-      correctAnswer: "音楽を聞きながら、歩きます。",
-      explanation: "The secondary action uses the verb stem + ながら before the main action.",
-    };
-  }
-  const reading = item.reading ?? (item.term === "駅" ? "えき" : "かいさつ");
+
+  const correct = item.meaning ?? item.term;
   return {
     id: `review_${item.id}_${index}`,
     queueItemId: item.id,
-    type: index % 3 === 0 ? "kanji-reading" : index % 3 === 1 ? "reading-meaning" : "meaning-japanese",
-    prompt: index % 3 === 0 ? "Choose the reading." : index % 3 === 1 ? "Choose the meaning." : "Choose the Japanese word.",
-    cue: index % 3 === 2 ? item.meaning : index % 3 === 1 ? reading : item.term,
-    choices: index % 3 === 0
-      ? [reading, "かいしゃ", "いっしょに", "はたらく"]
-      : index % 3 === 1
-        ? [item.meaning ?? "station", "company", "together", "to work"]
-        : [item.term, "会社", "一緒に", "働く"],
-    correctAnswer: index % 3 === 0 ? reading : index % 3 === 1 ? item.meaning ?? "station" : item.term,
-    explanation: `${item.term}${reading ? `（${reading}）` : ""} means ${item.meaning ?? "this review item"}.`,
+    type: "reading-meaning",
+    prompt: "Choose the closest meaning.",
+    cue: item.reading ?? item.term,
+    choices: choices(
+      correct,
+      queue.map((candidate) => candidate.meaning),
+    ),
+    correctAnswer: correct,
+    explanation: `${item.term}${item.reading ? `（${item.reading}）` : ""} means ${correct}.`,
   };
 }
-
-const fallbackQueue: ReviewQueueItem[] = [
-  { id: "fallback_kaisatsu", type: "kanji", term: "改札", reading: "かいさつ", meaning: "ticket gate", dueLabel: "Today", confidence: 45 },
-  { id: "fallback_eki", type: "vocabulary", term: "駅", reading: "えき", meaning: "station", dueLabel: "Today", confidence: 60 },
-  { id: "fallback_node", type: "grammar", term: "〜ので", meaning: "because", dueLabel: "Today", confidence: 58 },
-  { id: "fallback_listen", type: "listening", term: "改札で会います", dueLabel: "Today", confidence: 52 },
-  { id: "fallback_speak", type: "speaking", term: "〜ながら", dueLabel: "Today", confidence: 55 },
-];

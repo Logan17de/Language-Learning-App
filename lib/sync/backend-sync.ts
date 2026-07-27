@@ -14,6 +14,146 @@ function json(value: unknown): Json {
   return JSON.parse(JSON.stringify(value)) as Json;
 }
 
+type MasteryItemType = "kanji" | "vocabulary" | "grammar";
+type MasteryDimension = "meaning" | "recognition" | "pronunciation";
+type MasterySignal =
+  | "revealed_reading"
+  | "revealed_meaning"
+  | "correct"
+  | "incorrect";
+
+function masteryItemType(
+  lesson: LessonPackage,
+  itemKey: string,
+): MasteryItemType | null {
+  if (lesson.kanji.some((item) => item.libraryId === itemKey)) return "kanji";
+  if (lesson.vocabulary.some((item) => item.libraryId === itemKey)) {
+    return "vocabulary";
+  }
+  if (lesson.grammar.some((item) => item.libraryId === itemKey)) return "grammar";
+  return null;
+}
+
+function masteryEvidence(
+  lesson: LessonPackage,
+  session: LessonSession,
+): Json[] {
+  const result: Json[] = [];
+  const add = (input: {
+    clientEventId: string;
+    itemKey: string;
+    dimension: MasteryDimension;
+    signal: MasterySignal;
+    data?: Record<string, unknown>;
+  }) => {
+    const itemType = masteryItemType(lesson, input.itemKey);
+    if (!itemType) return;
+    result.push(
+      json({
+        clientEventId: input.clientEventId,
+        itemType,
+        itemKey: input.itemKey,
+        dimension: input.dimension,
+        signal: input.signal,
+        data: input.data ?? {},
+      }),
+    );
+  };
+
+  for (const interaction of session.storyInteractions) {
+    if (
+      interaction.type !== "reading-revealed" &&
+      interaction.type !== "meaning-revealed"
+    ) {
+      continue;
+    }
+    const line = lesson.story.find((item) => item.id === interaction.lineId);
+    const word =
+      line?.words.find((item) => item.id === interaction.wordId) ??
+      line?.words.find((item) => item.surface === interaction.term);
+    if (!word?.libraryId) continue;
+    if (interaction.type === "reading-revealed") {
+      add({
+        clientEventId: `story:${interaction.id}:recognition`,
+        itemKey: word.libraryId,
+        dimension: "recognition",
+        signal: "revealed_reading",
+        data: { surface: word.surface },
+      });
+    } else {
+      add({
+        clientEventId: `story:${interaction.id}:meaning`,
+        itemKey: word.libraryId,
+        dimension: "meaning",
+        signal: "revealed_meaning",
+        data: { surface: word.surface },
+      });
+      if (word.scriptType !== "kanji") {
+        add({
+          clientEventId: `story:${interaction.id}:recognition`,
+          itemKey: word.libraryId,
+          dimension: "recognition",
+          signal: "revealed_meaning",
+          data: { surface: word.surface },
+        });
+      }
+    }
+  }
+
+  for (const answer of session.vocabularyAnswers) {
+    const question = lesson.vocabularyQuestions.find(
+      (item) => item.id === answer.questionId,
+    );
+    if (!question) continue;
+    const dimension: MasteryDimension =
+      question.mode === "reading-meaning" ? "meaning" : "recognition";
+    for (const itemKey of question.targetItemIds) {
+      add({
+        clientEventId: `vocabulary:${answer.questionId}:${itemKey}`,
+        itemKey,
+        dimension,
+        signal: answer.correct ? "correct" : "incorrect",
+        data: { selectedAnswer: answer.selectedAnswer, mode: question.mode },
+      });
+    }
+  }
+
+  for (const answer of session.grammarAnswers) {
+    const question = lesson.grammarQuestions.find(
+      (item) => item.id === answer.questionId,
+    );
+    if (!question) continue;
+    for (const itemKey of question.targetItemIds) {
+      add({
+        clientEventId: `grammar:${answer.questionId}:${itemKey}`,
+        itemKey,
+        dimension: "meaning",
+        signal: answer.correct ? "correct" : "incorrect",
+        data: { selectedAnswer: answer.selectedAnswer, skill: answer.skill },
+      });
+    }
+  }
+
+  for (const answer of session.reviewAnswers) {
+    const question = lesson.reviewQuestions.find(
+      (item) => item.id === answer.questionId,
+    );
+    if (!question) continue;
+    for (const itemKey of question.targetItemIds ?? []) {
+      add({
+        clientEventId: `review:${answer.questionId}:${itemKey}`,
+        itemKey,
+        dimension:
+          answer.category === "speaking" ? "pronunciation" : "meaning",
+        signal: answer.correct ? "correct" : "incorrect",
+        data: { selectedAnswer: answer.selectedAnswer, category: answer.category },
+      });
+    }
+  }
+
+  return result;
+}
+
 async function persistLesson(lesson: LessonPackage, session: LessonSession, complete: boolean): Promise<boolean> {
   const canonical = await lessonRepository.getPlayable(lesson.id);
   if (!canonical.ok) return false;
@@ -82,11 +222,15 @@ async function persistLesson(lesson: LessonPackage, session: LessonSession, comp
       occurred_at: session.updatedAt,
     })),
   ];
-  const [answersResult, eventsResult] = await Promise.all([
+  const [answersResult, eventsResult, masteryResult] = await Promise.all([
     lessonSessionRepository.saveAnswers(answers),
     lessonSessionRepository.saveEvents(events),
+    lessonSessionRepository.recordMasteryEvidence(
+      backendSession.data.id,
+      masteryEvidence(lesson, session),
+    ),
   ]);
-  if (!answersResult.ok || !eventsResult.ok) return false;
+  if (!answersResult.ok || !eventsResult.ok || !masteryResult.ok) return false;
   const phase = lesson.phases[session.currentPhaseIndex]?.id ?? "story";
   const checkpoint = await lessonSessionRepository.saveCheckpoint(backendSession.data.id, {
     current_phase: phase,

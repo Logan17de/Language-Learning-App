@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, RotateCcw, Trophy } from "lucide-react";
-import { finalReviewQuestions } from "@/data/mock-activities";
+import type { LessonPackage } from "@/types/lesson";
 import type { LessonSession, ReviewAnswer } from "@/types/lesson-session";
 import { calculateReviewResult, evaluateAnswer } from "@/lib/scoring-utils";
 import { MultipleChoiceCard } from "@/components/exercises/multiple-choice-card";
@@ -10,12 +10,15 @@ import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ui/progress-bar";
 
 export function FinalReviewPhase({
+  lesson,
   session,
   onChange,
 }: {
+  lesson: LessonPackage;
   session: LessonSession;
   onChange: (session: LessonSession) => void;
 }) {
+  const finalReviewQuestions = lesson.reviewQuestions;
   const attemptedCount = session.reviewAnswers.length;
   const currentIndex = Math.min(session.activityIndex, finalReviewQuestions.length - 1);
   const question = finalReviewQuestions[currentIndex];
@@ -26,7 +29,7 @@ export function FinalReviewPhase({
     if (answer) return;
     const nextAnswer: ReviewAnswer = {
       questionId: question.id,
-      category: question.category,
+      category: question.category ?? "vocabulary",
       selectedAnswer,
       correct: evaluateAnswer(selectedAnswer, question.correctAnswer),
     };
@@ -76,7 +79,6 @@ export function FinalReviewPhase({
         <div className="mt-5">
           <MultipleChoiceCard
             prompt={question.prompt}
-            cue={question.cue}
             choices={question.choices}
             correctAnswer={question.correctAnswer}
             explanation={question.explanation}

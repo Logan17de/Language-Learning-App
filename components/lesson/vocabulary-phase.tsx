@@ -1,8 +1,7 @@
 "use client";
 
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { vocabularyQuestions } from "@/data/mock-activities";
-import type { ExerciseDifficulty } from "@/data/mock-activities";
+import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession } from "@/types/lesson-session";
 import { evaluateAnswer, upsertVocabularyAnswer } from "@/lib/scoring-utils";
 import { MultipleChoiceCard } from "@/components/exercises/multiple-choice-card";
@@ -11,12 +10,15 @@ import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
 
 export function VocabularyPhase({
+  lesson,
   session,
   onChange,
 }: {
+  lesson: LessonPackage;
   session: LessonSession;
   onChange: (session: LessonSession) => void;
 }) {
+  const vocabularyQuestions = lesson.vocabularyQuestions;
   const answeredCount = vocabularyQuestions.filter((question) =>
     session.vocabularyAnswers.some((answer) => answer.questionId === question.id),
   ).length;

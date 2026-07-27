@@ -44,6 +44,10 @@ export interface Achievement {
 }
 
 export interface LearnerProgress {
+  levelCompletion: number;
+  learnedVocabularyCount: number;
+  learnedKanjiCount: number;
+  learnedGrammarCount: number;
   weeklyActivity: WeeklyActivity[];
   weakKanji: MasteryItem[];
   weakVocabulary: MasteryItem[];
