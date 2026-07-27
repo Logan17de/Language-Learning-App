@@ -3,7 +3,10 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { commuteLesson } from "@/data/mock-lessons";
 import { buildReviewActivities } from "@/lib/review-utils";
+import { calculateLessonCompletion } from "@/lib/scoring-utils";
 import { storyLengthRange } from "@/lib/story-support";
+import { createEmptyLessonSession } from "@/store/app-store";
+import type { LessonPackage } from "@/types/lesson";
 import type { ReviewQueueItem } from "@/types/progress";
 
 function queueItem(
@@ -74,5 +77,82 @@ describe("learning engine V2 contracts", () => {
     expect(migration).toContain("from public.grammar_catalog catalog");
     expect(migration).not.toContain("v_total_lessons");
     expect(migration).not.toMatch(/\bdrop\s+(table|schema|database)\b/i);
+  });
+
+  it("maps weak answers to the lesson library instead of demo terms", () => {
+    const lesson: LessonPackage = {
+      ...commuteLesson,
+      kanji: commuteLesson.kanji.map((item, index) => ({
+        ...item,
+        libraryId: `kanji-${index}`,
+      })),
+      vocabulary: commuteLesson.vocabulary.map((item, index) => ({
+        ...item,
+        libraryId: `vocabulary-${index}`,
+      })),
+      grammar: commuteLesson.grammar.map((item, index) => ({
+        ...item,
+        libraryId: `grammar-${index}`,
+      })),
+      vocabularyQuestions: commuteLesson.vocabularyQuestions.map(
+        (question, index) => ({
+          ...question,
+          targetItemIds: [`vocabulary-${index % commuteLesson.vocabulary.length}`],
+        }),
+      ),
+      grammarQuestions: commuteLesson.grammarQuestions.map((question, index) => ({
+        ...question,
+        targetItemIds: [`grammar-${index % commuteLesson.grammar.length}`],
+      })),
+      reviewQuestions: commuteLesson.reviewQuestions.map((question) => ({
+        ...question,
+        targetItemIds: ["kanji-0"],
+      })),
+    };
+    const session = createEmptyLessonSession(lesson.id);
+    session.vocabularyAnswers = [{
+      questionId: lesson.vocabularyQuestions[0].id,
+      mode: lesson.vocabularyQuestions[0].mode,
+      selectedAnswer: "wrong",
+      correct: false,
+      attempts: 1,
+    }];
+    session.grammarAnswers = [{
+      questionId: lesson.grammarQuestions[0].id,
+      type: lesson.grammarQuestions[0].type,
+      selectedAnswer: "wrong",
+      correct: false,
+      skill: lesson.grammarQuestions[0].skill,
+      attempts: 1,
+    }];
+    session.reviewAnswers = [{
+      questionId: lesson.reviewQuestions[0].id,
+      category: "kanji",
+      selectedAnswer: "wrong",
+      correct: false,
+    }];
+
+    expect(calculateLessonCompletion(lesson, session).wordsNeedingReview).toEqual([
+      lesson.vocabulary[0].term,
+      lesson.grammar[0].pattern,
+      lesson.kanji[0].character,
+    ]);
+  });
+
+  it("does not contain commute-specific player fallbacks", () => {
+    const playerSources = [
+      "components/lesson/reading-phase.tsx",
+      "components/lesson/listening-phase.tsx",
+      "components/lesson/speaking-phase.tsx",
+      "components/exercises/speaking-feedback.tsx",
+      "lib/scoring-utils.ts",
+    ]
+      .map((file) => readFileSync(resolve(process.cwd(), file), "utf8"))
+      .join("\n");
+
+    expect(playerSources).not.toContain("Morning at the station");
+    expect(playerSources).not.toContain("Yuki met Tanaka");
+    expect(playerSources).not.toContain("Mock evaluation");
+    expect(playerSources).not.toContain('wordsNeedingReview : ["改札"]');
   });
 });
