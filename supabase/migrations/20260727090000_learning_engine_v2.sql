@@ -610,6 +610,118 @@ begin
 end
 $$;
 
+create or replace function public.apply_review_answer_mastery()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_queue public.review_queue%rowtype;
+  v_dimension text;
+  v_delta integer;
+  v_inserted integer;
+  v_mastery public.learner_mastery%rowtype;
+  v_calculated_mastery integer;
+begin
+  if new.review_queue_id is null then
+    return new;
+  end if;
+
+  select *
+  into v_queue
+  from public.review_queue
+  where id = new.review_queue_id
+    and user_id = new.user_id;
+
+  if not found
+     or v_queue.item_type not in ('kanji', 'vocabulary', 'grammar') then
+    return new;
+  end if;
+
+  v_dimension := case
+    when v_queue.item_type = 'kanji' then 'recognition'
+    else 'meaning'
+  end;
+  v_delta := case when new.correct then 8 else -6 end;
+
+  insert into public.learner_mastery_events (
+    user_id,
+    client_event_id,
+    item_type,
+    item_key,
+    dimension,
+    signal,
+    score_delta,
+    event_data
+  ) values (
+    new.user_id,
+    'review:' || new.review_session_id::text || ':' || new.activity_id,
+    v_queue.item_type,
+    v_queue.item_key,
+    v_dimension,
+    case when new.correct then 'correct' else 'incorrect' end,
+    v_delta,
+    jsonb_build_object(
+      'reviewQueueId', new.review_queue_id,
+      'selectedAnswer', new.selected_answer
+    )
+  )
+  on conflict (user_id, client_event_id) do nothing;
+
+  get diagnostics v_inserted = row_count;
+  if v_inserted = 0 then
+    return new;
+  end if;
+
+  update public.learner_mastery
+  set meaning_score = case
+        when v_dimension = 'meaning'
+          then greatest(0, least(100, meaning_score + v_delta))
+        else meaning_score
+      end,
+      recognition_score = case
+        when v_dimension = 'recognition'
+          then greatest(0, least(100, recognition_score + v_delta))
+        else recognition_score
+      end,
+      evidence_count = evidence_count + 1,
+      last_reviewed_at = now(),
+      updated_at = now()
+  where user_id = new.user_id
+    and item_type = v_queue.item_type
+    and item_key = v_queue.item_key
+  returning * into v_mastery;
+
+  if found then
+    v_calculated_mastery := case
+      when v_queue.item_type = 'grammar' then v_mastery.meaning_score
+      else round(
+        (v_mastery.meaning_score + v_mastery.recognition_score)::numeric / 2
+      )::integer
+    end;
+    update public.learner_mastery
+    set mastery = v_calculated_mastery,
+        confidence = least(100, v_mastery.evidence_count * 5),
+        next_review_at = case
+          when v_calculated_mastery < 60 then now()
+          when v_calculated_mastery < 80 then now() + interval '1 day'
+          else now() + interval '7 days'
+        end,
+        updated_at = now()
+    where id = v_mastery.id;
+  end if;
+
+  return new;
+end
+$$;
+
+drop trigger if exists review_answer_mastery
+  on public.review_activity_answers;
+create trigger review_answer_mastery
+after insert or update on public.review_activity_answers
+for each row execute function public.apply_review_answer_mastery();
+
 -- ---------------------------------------------------------------------------
 -- Reuse before generation
 -- ---------------------------------------------------------------------------
@@ -1076,13 +1188,115 @@ begin
 end
 $$;
 
+create or replace function public.get_learner_progress_summary()
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+declare
+  v_level public.jlpt_level;
+  v_total_lessons integer;
+  v_completed_lessons integer;
+  v_active_progress integer;
+  v_level_completion integer;
+begin
+  select current_jlpt_level
+  into v_level
+  from public.profiles
+  where id = auth.uid() and status = 'active';
+
+  if not found then
+    raise exception 'Active learner profile required' using errcode = '42501';
+  end if;
+
+  select count(*)
+  into v_total_lessons
+  from public.lessons lesson
+  where lesson.jlpt_level = v_level
+    and lesson.status = 'published'
+    and lesson.archived_at is null
+    and lesson.reusable;
+
+  select count(distinct completion.lesson_id)
+  into v_completed_lessons
+  from public.lesson_completions completion
+  join public.lessons lesson on lesson.id = completion.lesson_id
+  where completion.user_id = auth.uid()
+    and lesson.jlpt_level = v_level;
+
+  select coalesce(
+    max(
+      least(
+        99,
+        round((session.current_phase_index::numeric / 7) * 100)::integer
+      )
+    ),
+    0
+  )
+  into v_active_progress
+  from public.lesson_sessions session
+  join public.lessons lesson on lesson.id = session.lesson_id
+  where session.user_id = auth.uid()
+    and session.status = 'active'
+    and lesson.jlpt_level = v_level;
+
+  v_level_completion := case
+    when v_total_lessons = 0 then 0
+    else least(
+      100,
+      round(
+        (
+          v_completed_lessons * 100
+          + case
+              when v_completed_lessons < v_total_lessons
+                then v_active_progress
+              else 0
+            end
+        )::numeric / v_total_lessons
+      )::integer
+    )
+  end;
+
+  return jsonb_build_object(
+    'level', v_level,
+    'level_completion', v_level_completion,
+    'learned_vocabulary', (
+      select count(*)
+      from public.learner_mastery
+      where user_id = auth.uid()
+        and item_type = 'vocabulary'
+        and mastery >= 70
+    ),
+    'learned_kanji', (
+      select count(*)
+      from public.learner_mastery
+      where user_id = auth.uid()
+        and item_type = 'kanji'
+        and mastery >= 70
+    ),
+    'learned_grammar', (
+      select count(*)
+      from public.learner_mastery
+      where user_id = auth.uid()
+        and item_type = 'grammar'
+        and mastery >= 70
+    )
+  );
+end
+$$;
+
 revoke all on function public.normalize_lesson_topic(text) from public;
 revoke all on function public.mastery_prompt_data(text, text) from public;
 revoke all on function public.record_mastery_evidence(uuid, jsonb) from public;
+revoke all on function public.apply_review_answer_mastery() from public;
 revoke all on function public.begin_custom_lesson_generation_v3(text, public.jlpt_level) from public;
 revoke all on function public.enrich_custom_lesson_library_v2(public.jlpt_level, jsonb, text) from public;
+revoke all on function public.get_learner_progress_summary() from public;
 
 grant execute on function public.normalize_lesson_topic(text) to authenticated;
 grant execute on function public.record_mastery_evidence(uuid, jsonb) to authenticated;
 grant execute on function public.begin_custom_lesson_generation_v3(text, public.jlpt_level) to authenticated;
 grant execute on function public.enrich_custom_lesson_library_v2(public.jlpt_level, jsonb, text) to authenticated;
+grant execute on function public.get_learner_progress_summary() to authenticated;
