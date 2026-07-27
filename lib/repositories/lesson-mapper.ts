@@ -424,7 +424,7 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
       japanese: item.japanese_text,
       english: item.translation,
     })),
-    listeningExercises: value.listening.map((item) => ({
+    listeningExercises: value.listening.map((item, index) => ({
       id: item.id,
       prompt: item.prompt,
       choices: item.choices,
@@ -435,6 +435,12 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
       questionType: "multiple-choice",
       targetItemIds: item.target_item_ids,
       inspectableTerms: inspectableTerms(item.inspectable_terms),
+      difficulty:
+        index === value.listening.length - 1
+          ? ("Hard" as const)
+          : index === 0
+            ? ("Easy" as const)
+            : ("Medium" as const),
     })),
     speakingExercises: value.speaking.map((item) => ({
       id: item.id,

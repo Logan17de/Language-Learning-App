@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight, Check, Headphones, MessageSquareText } from "lucide-react";
-import type { LessonPackage } from "@/types/lesson";
+import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession, ListeningEvent } from "@/types/lesson-session";
 import { evaluateAnswer } from "@/lib/scoring-utils";
 import { AudioControl } from "@/components/exercises/audio-control";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { selectNextAdaptiveQuestionIndex } from "@/lib/adaptive-difficulty";
 
 export function ListeningPhase({
   lesson,
@@ -27,8 +28,36 @@ export function ListeningPhase({
       .map((event) => event.questionId)
       .filter(Boolean),
   );
-  const currentIndex = Math.min(session.activityIndex, exercises.length - 1);
+  const adaptiveExercises = exercises.map((item, index) => ({
+    ...item,
+    difficulty:
+      item.difficulty ??
+      listeningDifficulty(index, exercises.length),
+  }));
+  const listeningAnswers = session.listeningEvents
+    .filter(
+      (event): event is ListeningEvent & {
+        questionId: string;
+        correct: boolean;
+      } =>
+        event.type === "answer" &&
+        typeof event.questionId === "string" &&
+        typeof event.correct === "boolean",
+    )
+    .map((event) => ({
+      questionId: event.questionId,
+      correct: event.correct,
+    }));
+  const initialIndex =
+    selectNextAdaptiveQuestionIndex(adaptiveExercises, listeningAnswers, {
+      targetCount: exercises.length,
+    }) ?? 0;
+  const currentIndex =
+    listeningAnswers.length === 0
+      ? initialIndex
+      : Math.min(session.activityIndex, exercises.length - 1);
   const exercise = exercises[currentIndex];
+  const difficulty = adaptiveExercises[currentIndex].difficulty;
   const priorAnswer = session.listeningEvents.findLast(
     (event) => event.type === "answer" && event.questionId === exercise.id,
   );
@@ -68,15 +97,24 @@ export function ListeningPhase({
   }
 
   function nextQuestion() {
-    if (!priorAnswer || currentIndex >= exercises.length - 1) return;
-    onChange({ ...session, activityIndex: currentIndex + 1 });
+    if (!priorAnswer || answeredIds.size >= exercises.length) return;
+    const nextIndex = selectNextAdaptiveQuestionIndex(
+      adaptiveExercises,
+      listeningAnswers,
+      { targetCount: exercises.length },
+    );
+    if (nextIndex === null) return;
+    onChange({ ...session, activityIndex: nextIndex });
   }
 
   return (
     <div className="mx-auto max-w-3xl">
       <div className="text-center">
         <span className="mx-auto grid size-20 place-items-center rounded-4xl bg-moss-900 text-white"><Headphones className="size-8" /></span>
-        <Badge className="mt-6">Listen for meaning</Badge>
+        <div className="mt-6 flex justify-center gap-2">
+          <Badge>Listen for meaning</Badge>
+          <Badge tone={difficultyTone(difficulty)}>{difficulty}</Badge>
+        </div>
         <h2 className="mt-4 text-3xl font-semibold">{lesson.japaneseTitle}</h2>
         <p className="mt-3 text-stone-500">The transcript stays hidden until you answer.</p>
         <p className="mt-3 text-sm font-semibold text-stone-400">{currentIndex + 1} / {exercises.length}</p>
@@ -98,6 +136,7 @@ export function ListeningPhase({
             explanation={exercise.explanation}
             selectedAnswer={priorAnswer?.selectedAnswer}
             answered={Boolean(priorAnswer)}
+            answerCorrect={priorAnswer?.correct}
             onSelect={answer}
           />
         </div>
@@ -111,7 +150,7 @@ export function ListeningPhase({
             <p className="mt-4 flex items-center gap-2 text-xs font-semibold text-moss-700"><Check className="size-4" /> Listening answer saved</p>
           </div>
         )}
-        {priorAnswer && currentIndex < exercises.length - 1 && (
+        {priorAnswer && answeredIds.size < exercises.length && (
           <Button type="button" className="mt-5" onClick={nextQuestion}>
             Next listening question <ArrowRight className="size-4" />
           </Button>
@@ -119,4 +158,21 @@ export function ListeningPhase({
       </Card>
     </div>
   );
+}
+
+function listeningDifficulty(
+  index: number,
+  total: number,
+): ExerciseDifficulty {
+  if (index === total - 1) return "Hard";
+  if (index === 0) return "Easy";
+  return "Medium";
+}
+
+function difficultyTone(
+  difficulty: ExerciseDifficulty,
+): "moss" | "orange" | "neutral" {
+  if (difficulty === "Hard") return "orange";
+  if (difficulty === "Medium") return "neutral";
+  return "moss";
 }

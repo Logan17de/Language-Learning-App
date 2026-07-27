@@ -5,9 +5,18 @@ import { commuteLesson } from "@/data/mock-lessons";
 import { buildReviewActivities } from "@/lib/review-utils";
 import { calculateLessonCompletion } from "@/lib/scoring-utils";
 import { storyLengthRange } from "@/lib/story-support";
+import {
+  selectNextAdaptiveQuestionIndex,
+} from "@/lib/adaptive-difficulty";
+import {
+  japaneseInputPreview,
+  romajiToHiragana,
+  safeProductionPrompt,
+} from "@/lib/japanese-input";
 import { createEmptyLessonSession } from "@/store/app-store";
 import type { LessonPackage } from "@/types/lesson";
 import type { ReviewQueueItem } from "@/types/progress";
+import type { ExerciseDifficulty } from "@/types/lesson";
 
 function queueItem(
   id: string,
@@ -46,6 +55,92 @@ describe("learning engine V2 contracts", () => {
         (question) => question.choices.includes(question.correctAnswer),
       ),
     ).toBe(true);
+  });
+
+  it("serves five easy questions first and promotes a strong learner to three hard questions", () => {
+    const questions = adaptiveBank();
+    const answers: Array<{ questionId: string; correct: boolean }> = [];
+    const served: ExerciseDifficulty[] = [];
+
+    for (let index = 0; index < 10; index += 1) {
+      const nextIndex = selectNextAdaptiveQuestionIndex(questions, answers, {
+        targetCount: 10,
+      });
+      expect(nextIndex).not.toBeNull();
+      const question = questions[nextIndex ?? 0];
+      served.push(question.difficulty);
+      answers.push({ questionId: question.id, correct: true });
+    }
+
+    expect(served.slice(0, 5)).toEqual([
+      "Easy",
+      "Easy",
+      "Easy",
+      "Easy",
+      "Easy",
+    ]);
+    expect(served.filter((item) => item === "Medium")).toHaveLength(2);
+    expect(served.filter((item) => item === "Hard")).toHaveLength(3);
+    expect(served.at(-1)).toBe("Hard");
+  });
+
+  it("repeats medium after a miss and still reserves the last question for hard", () => {
+    const questions = adaptiveBank();
+    const answers: Array<{ questionId: string; correct: boolean }> = [];
+    const served: ExerciseDifficulty[] = [];
+
+    for (let index = 0; index < 10; index += 1) {
+      const nextIndex = selectNextAdaptiveQuestionIndex(questions, answers, {
+        targetCount: 10,
+      });
+      const question = questions[nextIndex ?? 0];
+      served.push(question.difficulty);
+      answers.push({
+        questionId: question.id,
+        correct: question.difficulty !== "Medium",
+      });
+    }
+
+    expect(served.slice(0, 5).every((item) => item === "Easy")).toBe(true);
+    expect(served.filter((item) => item === "Medium")).toHaveLength(4);
+    expect(served.filter((item) => item === "Hard")).toHaveLength(1);
+    expect(served.at(-1)).toBe("Hard");
+  });
+
+  it("converts romaji input without leaking the stored Japanese answer", () => {
+    expect(romajiToHiragana("hana wa kirei datta")).toBe(
+      "はな わ きれい だった",
+    );
+    expect(japaneseInputPreview("datta")).toBe("だった");
+    expect(
+      safeProductionPrompt(
+        "Translate the ending: The flower was beautiful (plain). はなは きれい ___。",
+        "はなは きれい だった。",
+      ),
+    ).toBe("Translate the ending: The flower was beautiful (plain).");
+  });
+
+  it("stores adaptive candidate banks without changing older ten-question lessons", () => {
+    const migration = readFileSync(
+      resolve(
+        process.cwd(),
+        "supabase/migrations/20260727100000_adaptive_question_banks.sql",
+      ),
+      "utf8",
+    );
+    const engine = readFileSync(
+      resolve(process.cwd(), "lib/gemini/lesson-engine-v2.ts"),
+      "utf8",
+    );
+
+    expect(migration).toContain(
+      "jsonb_array_length(p_package->'vocabularyQuestions') not between 10 and 13",
+    );
+    expect(migration).toContain(
+      "jsonb_array_length(p_package->'grammarQuestions') not between 10 and 13",
+    );
+    expect(engine).toContain("exactly 6 Easy, 4 Medium, and 3 Hard");
+    expect(engine).toContain("objectArray(13, 13");
   });
 
   it("builds review only from real weak items and never invents fallbacks", () => {
@@ -173,3 +268,23 @@ describe("learning engine V2 contracts", () => {
     expect(playerSources).not.toContain('wordsNeedingReview : ["改札"]');
   });
 });
+
+function adaptiveBank(): Array<{
+  id: string;
+  difficulty: ExerciseDifficulty;
+}> {
+  return [
+    ...Array.from({ length: 6 }, (_, index) => ({
+      id: `easy-${index + 1}`,
+      difficulty: "Easy" as const,
+    })),
+    ...Array.from({ length: 4 }, (_, index) => ({
+      id: `medium-${index + 1}`,
+      difficulty: "Medium" as const,
+    })),
+    ...Array.from({ length: 3 }, (_, index) => ({
+      id: `hard-${index + 1}`,
+      difficulty: "Hard" as const,
+    })),
+  ];
+}

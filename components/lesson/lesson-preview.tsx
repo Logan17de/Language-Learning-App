@@ -3,7 +3,6 @@
 import {
   ArrowLeft,
   ArrowRight,
-  BookOpenText,
   Check,
   Clock3,
   Layers3,
@@ -90,19 +89,6 @@ export function LessonPreview({ lesson }: { lesson: LessonPackage }) {
               </div>
             </Card>
 
-            <Card className="overflow-hidden p-0">
-              <div className="bg-[radial-gradient(circle_at_20%_30%,rgba(229,119,72,.18),transparent_32%),linear-gradient(135deg,#e2eee7,#f7f4ed)] p-8 sm:p-10">
-                <div className="max-w-xl">
-                  <Badge tone="neutral">Story preview</Badge>
-                  <p className="mt-6 font-serif text-3xl leading-relaxed text-ink">{lesson.storyPreview}</p>
-                  <p className="mt-4 leading-7 text-stone-500">Yuki’s commute becomes the thread connecting every word, pattern, and practice activity.</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 border-t border-black/[.05] p-5 text-sm text-stone-500">
-                <BookOpenText className="size-5 text-moss-600" />
-                Full story: {lesson.story.length} short Japanese lines with optional translations
-              </div>
-            </Card>
           </div>
 
           <aside>

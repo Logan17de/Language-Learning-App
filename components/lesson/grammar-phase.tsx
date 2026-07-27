@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, CheckCircle2, Lightbulb } from "lucide-react";
+import { ArrowRight, CheckCircle2, Languages, Lightbulb } from "lucide-react";
 import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession } from "@/types/lesson-session";
 import { upsertGrammarAnswer } from "@/lib/scoring-utils";
@@ -11,6 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import {
+  japaneseInputPreview,
+  safeProductionPrompt,
+} from "@/lib/japanese-input";
+import { selectNextAdaptiveQuestionIndex } from "@/lib/adaptive-difficulty";
+
+const QUESTION_TARGET = 10;
 
 export function GrammarPhase({
   lesson,
@@ -26,27 +33,27 @@ export function GrammarPhase({
   const [hintQuestionId, setHintQuestionId] = useState<string | null>(null);
   const grammarQuestions = lesson.grammarQuestions;
 
-  const answeredCount = grammarQuestions.filter((question) =>
-    session.grammarAnswers.some((answer) => answer.questionId === question.id),
+  const answeredCount = session.grammarAnswers.filter((answer) =>
+    grammarQuestions.some((question) => question.id === answer.questionId),
   ).length;
   const correctCount = grammarQuestions.filter((question) =>
     session.grammarAnswers.some((answer) => answer.questionId === question.id && answer.correct),
   ).length;
-  const savedIndex = Math.min(session.activityIndex, grammarQuestions.length - 1);
-  const earliestUnansweredIndex = grammarQuestions.findIndex(
-    (question) => !session.grammarAnswers.some((answer) => answer.questionId === question.id),
-  );
-  const savedQuestionAnswered = session.grammarAnswers.some(
-    (answer) => answer.questionId === grammarQuestions[savedIndex].id,
-  );
+  const initialIndex =
+    selectNextAdaptiveQuestionIndex(
+      grammarQuestions,
+      session.grammarAnswers,
+      { targetCount: QUESTION_TARGET },
+    ) ?? 0;
   const currentIndex =
-    savedQuestionAnswered && earliestUnansweredIndex >= 0 && earliestUnansweredIndex < savedIndex
-      ? earliestUnansweredIndex
-      : savedIndex;
+    session.grammarAnswers.length === 0
+      ? initialIndex
+      : Math.min(session.activityIndex, grammarQuestions.length - 1);
   const question = grammarQuestions[currentIndex];
   const answer = session.grammarAnswers.find((item) => item.questionId === question.id);
-  const isLastQuestion = currentIndex === grammarQuestions.length - 1;
+  const roundComplete = answeredCount >= Math.min(QUESTION_TARGET, grammarQuestions.length);
   const showHint = hintQuestionId === question.id;
+  const convertedAnswer = japaneseInputPreview(typedAnswer);
 
   function submitAnswer(selectedAnswer: string) {
     if (answer || !selectedAnswer.trim()) return;
@@ -68,12 +75,18 @@ export function GrammarPhase({
   }
 
   function nextQuestion() {
-    if (!answer || isLastQuestion) return;
+    if (!answer || roundComplete) return;
+    const nextIndex = selectNextAdaptiveQuestionIndex(
+      grammarQuestions,
+      session.grammarAnswers,
+      { targetCount: QUESTION_TARGET },
+    );
+    if (nextIndex === null) return;
     setTypedAnswer("");
     setHintQuestionId(null);
     onChange({
       ...session,
-      activityIndex: currentIndex + 1,
+      activityIndex: nextIndex,
     });
   }
 
@@ -126,10 +139,10 @@ export function GrammarPhase({
           <h2 className="mt-4 text-3xl font-semibold">Grammar practice</h2>
           <p className="mt-2 text-sm leading-6 text-stone-500">Particles and connectors first, lesson patterns next, full-sentence translation last.</p>
         </div>
-        <p className="shrink-0 text-sm font-semibold text-stone-500">{currentIndex + 1} / {grammarQuestions.length}</p>
+        <p className="shrink-0 text-sm font-semibold text-stone-500">{Math.min(answeredCount + (answer ? 0 : 1), QUESTION_TARGET)} / {Math.min(QUESTION_TARGET, grammarQuestions.length)}</p>
       </div>
 
-      <ProgressBar value={(answeredCount / grammarQuestions.length) * 100} className="mt-5" />
+      <ProgressBar value={(answeredCount / Math.min(QUESTION_TARGET, grammarQuestions.length)) * 100} className="mt-5" />
 
       <div className="mt-9 rounded-4xl border border-black/[.06] bg-white p-6 shadow-card sm:p-9">
         <div className="mb-6 flex flex-wrap items-center gap-3">
@@ -160,17 +173,19 @@ export function GrammarPhase({
             choices={question.choices}
             correctAnswer={question.correctAnswer}
             explanation={question.explanation}
-            selectedAnswer={answer?.selectedAnswer}
-            answered={Boolean(answer)}
+          selectedAnswer={answer?.selectedAnswer}
+          answered={Boolean(answer)}
+          answerCorrect={answer?.correct}
             lockAfterAnswer
             onSelect={submitAnswer}
           />
         ) : (
           <section aria-labelledby="grammar-question-prompt">
-            <p id="grammar-question-prompt" className="text-sm font-semibold text-stone-500">{question.prompt}</p>
-            <p className="mt-5 text-2xl font-semibold leading-relaxed text-ink sm:text-3xl">{question.cue}</p>
+            <p id="grammar-question-prompt" className="text-sm font-semibold text-stone-500">
+              {safeProductionPrompt(question.prompt, question.cue)}
+            </p>
             <label className="mt-7 block text-sm font-semibold text-stone-600" htmlFor="grammar-translation">
-              Your Japanese translation
+              Your answer
             </label>
             <textarea
               id="grammar-translation"
@@ -178,15 +193,25 @@ export function GrammarPhase({
               value={answer?.selectedAnswer ?? typedAnswer}
               disabled={Boolean(answer)}
               onChange={(event) => setTypedAnswer(event.target.value)}
-              placeholder="Type the complete sentence in Japanese"
+              placeholder="Type Japanese or romaji, for example: hana wa kirei datta"
               className="mt-2 w-full resize-none rounded-2xl border border-stone-200 bg-white px-4 py-3 font-serif text-lg leading-7 outline-none transition focus:border-moss-500 focus:ring-4 focus:ring-moss-100 disabled:cursor-default disabled:bg-stone-50"
             />
+            {!answer && convertedAnswer && (
+              <div className="mt-3 rounded-2xl border border-moss-100 bg-moss-50 p-4" role="status">
+                <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-moss-600">
+                  <Languages className="size-4" /> Japanese input preview
+                </p>
+                <p className="mt-2 font-serif text-xl leading-8 text-ink">
+                  {convertedAnswer}
+                </p>
+              </div>
+            )}
             {!answer && (
               <Button
                 type="button"
                 className="mt-4"
                 disabled={!typedAnswer.trim()}
-                onClick={() => submitAnswer(typedAnswer)}
+                onClick={() => submitAnswer(convertedAnswer ?? typedAnswer)}
               >
                 Check answer
               </Button>
@@ -205,18 +230,18 @@ export function GrammarPhase({
           </section>
         )}
 
-        {answer && !isLastQuestion && (
+        {answer && !roundComplete && (
           <Button type="button" className="mt-6" onClick={nextQuestion}>
             Next question <ArrowRight className="size-4" />
           </Button>
         )}
 
-        {answer && isLastQuestion && (
+        {answer && roundComplete && (
           <div className="mt-6 flex items-start gap-3 rounded-2xl bg-moss-50 p-4 text-sm text-moss-800">
             <CheckCircle2 className="mt-0.5 size-5 shrink-0" />
             <div>
               <p className="font-semibold">Grammar round complete</p>
-              <p className="mt-1 text-moss-700">{correctCount} of 10 correct. Continue to Reading when you are ready.</p>
+              <p className="mt-1 text-moss-700">{correctCount} of {answeredCount} correct. Continue to Reading when you are ready.</p>
             </div>
           </div>
         )}
