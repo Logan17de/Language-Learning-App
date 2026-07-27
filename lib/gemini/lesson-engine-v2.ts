@@ -167,6 +167,7 @@ interface RawReadingLine {
 }
 
 interface RawListeningExercise {
+  difficulty: "Easy" | "Medium" | "Hard";
   prompt: string;
   transcript: string;
   choices: string[];
@@ -722,8 +723,8 @@ function activitiesSchema(): JsonSchema {
       "reviewQuestions",
     ],
     properties: {
-      vocabularyQuestions: objectArray(10, 10, practiceSchema("vocabulary")),
-      grammarQuestions: objectArray(10, 10, practiceSchema("grammar")),
+      vocabularyQuestions: objectArray(13, 13, practiceSchema("vocabulary")),
+      grammarQuestions: objectArray(13, 13, practiceSchema("grammar")),
       readingConversation: objectArray(6, 6, {
         type: "object",
         additionalProperties: false,
@@ -739,6 +740,7 @@ function activitiesSchema(): JsonSchema {
         type: "object",
         additionalProperties: false,
         required: [
+          "difficulty",
           "prompt",
           "transcript",
           "choices",
@@ -747,6 +749,7 @@ function activitiesSchema(): JsonSchema {
           "targetItemIds",
         ],
         properties: {
+          difficulty: { type: "string", enum: ["Easy", "Medium", "Hard"] },
           prompt: { type: "string" },
           transcript: { type: "string" },
           choices: stringArray(4, 4),
@@ -818,8 +821,8 @@ function activitiesIssues(
     ...library.vocabulary.map((item) => item.libraryId),
   ]);
   const expectedCounts: Record<string, number> = {
-    vocabularyQuestions: 10,
-    grammarQuestions: 10,
+    vocabularyQuestions: 13,
+    grammarQuestions: 13,
     readingConversation: 6,
     listeningExercises: 3,
     speakingExercises: 3,
@@ -852,6 +855,23 @@ function activitiesIssues(
       }
     }
   }
+  for (const key of ["vocabularyQuestions", "grammarQuestions"]) {
+    const items = value[key];
+    if (!Array.isArray(items)) continue;
+    const counts = difficultyCounts(items);
+    if (counts.Easy !== 6 || counts.Medium !== 4 || counts.Hard !== 3) {
+      issues.push(
+        `${key} needs a 6 Easy / 4 Medium / 3 Hard adaptive bank.`,
+      );
+    }
+  }
+  const listening = value.listeningExercises;
+  if (Array.isArray(listening)) {
+    const counts = difficultyCounts(listening);
+    if (counts.Easy !== 1 || counts.Medium !== 1 || counts.Hard !== 1) {
+      issues.push("Listening needs one Easy, one Medium, and one Hard item.");
+    }
+  }
   const review = Array.isArray(value.reviewQuestions)
     ? value.reviewQuestions
     : [];
@@ -870,6 +890,24 @@ function activitiesIssues(
     issues.push("Review needs one question for each lesson skill.");
   }
   return unique(issues);
+}
+
+function difficultyCounts(items: unknown[]): Record<
+  "Easy" | "Medium" | "Hard",
+  number
+> {
+  const counts = { Easy: 0, Medium: 0, Hard: 0 };
+  for (const item of items) {
+    if (!isRecord(item)) continue;
+    if (
+      item.difficulty === "Easy" ||
+      item.difficulty === "Medium" ||
+      item.difficulty === "Hard"
+    ) {
+      counts[item.difficulty] += 1;
+    }
+  }
+  return counts;
 }
 
 function inspectableTerms(
@@ -967,11 +1005,15 @@ export async function generatePlayableLesson(input: {
     `JLPT ceiling: ${input.level}`,
     `Topic: ${input.topic}`,
     "Use only the supplied library IDs and facts.",
-    "Create 10 vocabulary questions, 10 grammar questions, 6 reading lines,",
+    "Create a 13-item bank for vocabulary and grammar: exactly 6 Easy, 4 Medium, and 3 Hard.",
+    "The player will adaptively serve exactly 10 questions from each bank.",
+    "Create 6 reading lines,",
     "3 listening questions, 3 speaking tasks, and 5 final review questions.",
-    "Difficulty should rise gradually. Feedback must always be encouraging.",
+    "Listening must contain exactly one Easy, one Medium, and one Hard question.",
+    "Feedback must be encouraging but must never praise an incorrect answer.",
     "Multiple-choice items need four distinct choices including the answer.",
-    "Text-input items need accepted answers. Do not reveal answers in prompts.",
+    "Text-input items need accepted answers. Production prompts must contain English only.",
+    "Never place the Japanese model answer, a partial Japanese answer, or answer blanks in a prompt or cue.",
     "Review must include one each: kanji, vocabulary, grammar, listening, speaking.",
     JSON.stringify(generationContext),
   ].join("\n");
