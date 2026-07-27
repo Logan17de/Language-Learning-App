@@ -56,6 +56,10 @@ export function GrammarPhase({
   const roundComplete = answeredCount >= Math.min(QUESTION_TARGET, grammarQuestions.length);
   const showHint = hintQuestionId === question.id;
   const convertedAnswer = japaneseInputPreview(typedAnswer);
+  const inspectableTerms = question.inspectableTerms.length
+    ? question.inspectableTerms
+    : lesson.story.flatMap((line) => line.words);
+  const productionStem = question.hintFront.trim();
 
   function submitAnswer(selectedAnswer: string) {
     if (answer || !selectedAnswer.trim()) return;
@@ -179,7 +183,8 @@ export function GrammarPhase({
           answered={Boolean(answer)}
           answerCorrect={answer?.correct}
             lockAfterAnswer
-            inspectableTerms={question.inspectableTerms.length ? question.inspectableTerms : lesson.story.flatMap((line) => line.words)}
+            inspectChoices={false}
+            inspectableTerms={inspectableTerms}
             onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
             onSelect={submitAnswer}
           />
@@ -188,10 +193,22 @@ export function GrammarPhase({
             <p id="grammar-question-prompt" className="text-sm font-semibold text-stone-500">
               <InspectableText
                 text={safeProductionPrompt(question.prompt, question.cue)}
-                terms={question.inspectableTerms.length ? question.inspectableTerms : lesson.story.flatMap((line) => line.words)}
+                terms={inspectableTerms}
                 onReveal={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
               />
             </p>
+            {productionStem && (
+              <p className="mt-5 rounded-2xl bg-moss-50 px-5 py-4 font-serif text-xl leading-9 text-ink">
+                <InspectableText
+                  text={productionStem}
+                  terms={inspectableTerms}
+                  onReveal={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
+                />
+                <span className="ml-2 tracking-widest text-stone-400" aria-label="Complete the sentence">
+                  ＿＿
+                </span>
+              </p>
+            )}
             <label className="mt-7 block text-sm font-semibold text-stone-600" htmlFor="grammar-translation">
               Your answer
             </label>
