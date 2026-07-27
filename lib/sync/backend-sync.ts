@@ -62,6 +62,14 @@ export function buildMasteryEvidence(
     );
   };
 
+  const inspectableWords = [
+    ...lesson.vocabularyQuestions.flatMap((item) => item.inspectableTerms),
+    ...lesson.grammarQuestions.flatMap((item) => item.inspectableTerms),
+    ...lesson.listeningExercises.flatMap((item) => item.inspectableTerms ?? []),
+    ...lesson.speakingExercises.flatMap((item) => item.inspectableTerms ?? []),
+    ...lesson.reviewQuestions.flatMap((item) => item.inspectableTerms ?? []),
+  ];
+
   for (const interaction of session.storyInteractions) {
     if (
       interaction.type !== "reading-revealed" &&
@@ -72,7 +80,13 @@ export function buildMasteryEvidence(
     const line = lesson.story.find((item) => item.id === interaction.lineId);
     const word =
       line?.words.find((item) => item.id === interaction.wordId) ??
-      line?.words.find((item) => item.surface === interaction.term);
+      line?.words.find((item) => item.surface === interaction.term) ??
+      inspectableWords.find(
+        (item) =>
+          item.id === interaction.wordId ||
+          item.libraryId === interaction.wordId ||
+          item.surface === interaction.term,
+      );
     if (!word?.libraryId) continue;
     if (interaction.type === "reading-revealed") {
       add({
