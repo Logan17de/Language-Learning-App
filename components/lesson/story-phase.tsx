@@ -362,6 +362,33 @@ export function StoryPhase({
             </p>
           ))}
         </div>
+        <div className="mt-8 grid gap-3 border-t border-stone-100 pt-6 sm:grid-cols-2">
+          {lesson.story.map((line) => (
+            <AudioControl
+              key={`story-audio-${line.id}`}
+              replayCount={session.storyInteractions.filter(
+                (item) =>
+                  item.type === "audio-played" &&
+                  item.lineId === line.id &&
+                  !item.wordId,
+              ).length}
+              onPlay={() =>
+                addInteraction({
+                  lineId: line.id,
+                  term: line.japanese,
+                  type: "audio-played",
+                  scoreDelta: 0,
+                  meaningDelta: 0,
+                  recognitionDelta: 0,
+                  pronunciationDelta: 0,
+                })
+              }
+              text={line.japanese}
+              audioAssetId={line.audioAssetId}
+              label="Hear story line"
+            />
+          ))}
+        </div>
       </Card>
 
       {activeSupport && activeDetails && (
