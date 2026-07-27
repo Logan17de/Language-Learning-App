@@ -82,6 +82,7 @@ export interface ChoiceExercise {
   category?: "kanji" | "vocabulary" | "grammar" | "listening" | "speaking";
   targetItemIds?: string[];
   inspectableTerms?: StoryWord[];
+  difficulty?: ExerciseDifficulty;
 }
 
 export type ExerciseDifficulty = "Easy" | "Medium" | "Hard";
