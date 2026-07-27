@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { commuteLesson } from "@/data/mock-lessons";
 import { buildReviewActivities } from "@/lib/review-utils";
 import { storyLengthRange } from "@/lib/story-support";
@@ -57,5 +59,20 @@ describe("learning engine V2 contracts", () => {
     ]);
     expect(buildReviewActivities([])).toEqual([]);
     expect(buildReviewActivities([queueItem("mastered", 100)])).toEqual([]);
+  });
+
+  it("keeps level completion tied to finite JLPT catalogs", () => {
+    const migration = readFileSync(
+      resolve(
+        process.cwd(),
+        "supabase/migrations/20260727090000_learning_engine_v2.sql",
+      ),
+      "utf8",
+    );
+
+    expect(migration).toContain("from public.kanji_catalog catalog");
+    expect(migration).toContain("from public.grammar_catalog catalog");
+    expect(migration).not.toContain("v_total_lessons");
+    expect(migration).not.toMatch(/\bdrop\s+(table|schema|database)\b/i);
   });
 });
