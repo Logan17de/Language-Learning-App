@@ -261,6 +261,10 @@ function uniqueBy<T>(items: T[], key: (item: T) => string): T[] {
   });
 }
 
+function normalizedJapanese(value: string): string {
+  return value.normalize("NFKC").trim();
+}
+
 function contextFor(
   draft: StoryDraft,
   surface: string,
@@ -349,8 +353,8 @@ export async function resolveLessonLibrary(
   const requestedVocabulary = uniqueBy(
     input.draft.lines.flatMap((line) =>
       line.terms.map((term) => ({
-        surface: term.surface,
-        readingHint: term.readingHint,
+        surface: normalizedJapanese(term.surface),
+        readingHint: normalizedJapanese(term.readingHint),
       })),
     ),
     (item) => `${item.surface}:${item.readingHint}`,
