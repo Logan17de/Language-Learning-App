@@ -45,96 +45,6 @@ alter table public.vocabulary_records
     check (usage_count >= 0),
   add column if not exists last_used_at timestamptz;
 
--- Kana is a shared pronunciation form. Hiragana and katakana live in one
--- normalized table so homophones can reuse one kana row without merging the
--- distinct vocabulary entries that reference it.
-create table if not exists public.kana_records (
-  id uuid primary key default gen_random_uuid(),
-  value text not null,
-  normalized_value text generated always as (
-    normalize(btrim(value), NFKC)
-  ) stored,
-  script_type text not null
-    check (script_type in ('hiragana', 'katakana', 'mixed')),
-  usage_count integer not null default 0 check (usage_count >= 0),
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  check (
-    normalized_value <> ''
-    and normalized_value ~ '^[ぁ-ゖゝゞァ-ヺヽヾー]+$'
-  ),
-  check (
-    (script_type = 'hiragana' and normalized_value ~ '^[ぁ-ゖゝゞー]+$')
-    or (script_type = 'katakana' and normalized_value ~ '^[ァ-ヺヽヾー]+$')
-    or (
-      script_type = 'mixed'
-      and normalized_value ~ '[ぁ-ゖゝゞ]'
-      and normalized_value ~ '[ァ-ヺヽヾ]'
-    )
-  ),
-  unique (normalized_value)
-);
-
-alter table public.kana_records enable row level security;
-
-create policy kana_records_authenticated_read
-  on public.kana_records for select to authenticated
-  using (public.current_app_role() is not null);
-
-create policy kana_records_staff_all
-  on public.kana_records for all to authenticated
-  using (public.has_app_role(array['admin','content_editor']::public.app_role[]))
-  with check (public.has_app_role(array['admin','content_editor']::public.app_role[]));
-
-grant select on public.kana_records to authenticated;
-grant insert, update, delete on public.kana_records to authenticated;
-
-drop trigger if exists kana_records_updated_at on public.kana_records;
-create trigger kana_records_updated_at
-before update on public.kana_records
-for each row execute function public.set_updated_at();
-
-insert into public.kana_records (value, script_type)
-select distinct on (normalize(btrim(reading), NFKC))
-  normalize(btrim(reading), NFKC),
-  case
-    when normalize(btrim(reading), NFKC) ~ '^[ぁ-ゖゝゞー]+$'
-      then 'hiragana'
-    when normalize(btrim(reading), NFKC) ~ '^[ァ-ヺヽヾー]+$'
-      then 'katakana'
-    else 'mixed'
-  end
-from public.vocabulary_records
-where normalize(btrim(reading), NFKC) ~ '^[ぁ-ゖゝゞァ-ヺヽヾー]+$'
-order by normalize(btrim(reading), NFKC)
-on conflict (normalized_value) do nothing;
-
-alter table public.vocabulary_records
-  add column if not exists kana_id uuid references public.kana_records(id)
-    on delete restrict;
-
-update public.vocabulary_records vocabulary
-set kana_id = kana.id,
-    reading = kana.normalized_value
-from public.kana_records kana
-where kana.normalized_value = normalize(btrim(vocabulary.reading), NFKC)
-  and vocabulary.kana_id is null;
-
-do $$
-begin
-  if exists (
-    select 1
-    from public.vocabulary_records
-    where kana_id is null
-  ) then
-    raise exception 'Every vocabulary reading must contain only hiragana or katakana';
-  end if;
-end
-$$;
-
-alter table public.vocabulary_records
-  alter column kana_id set not null;
-
 create index if not exists kanji_records_generation_lookup_idx
   on public.kanji_records (character)
   where archived_at is null and quality_status <> 'rejected';
@@ -145,10 +55,6 @@ create index if not exists grammar_records_generation_lookup_idx
 
 create index if not exists vocabulary_records_generation_lookup_idx
   on public.vocabulary_records (written_form, reading)
-  where archived_at is null and quality_status <> 'rejected';
-
-create index if not exists vocabulary_records_kana_lookup_idx
-  on public.vocabulary_records (kana_id)
   where archived_at is null and quality_status <> 'rejected';
 
 -- Empty mastery records mean "not learned", not "perfectly learned".
@@ -1029,8 +935,6 @@ declare
   v_profile public.profiles%rowtype;
   v_item jsonb;
   v_linked_kanji uuid[];
-  v_kana_id uuid;
-  v_reading text;
   v_inserted_kanji integer := 0;
   v_inserted_grammar integer := 0;
   v_inserted_vocabulary integer := 0;
@@ -1202,11 +1106,8 @@ begin
 
   for v_item in select value from jsonb_array_elements(p_seed->'vocabulary')
   loop
-    v_reading := normalize(trim(coalesce(v_item->>'reading', '')), NFKC);
-
     if length(trim(coalesce(v_item->>'writtenForm', ''))) < 1
-       or length(v_reading) < 1
-       or v_reading !~ '^[ぁ-ゖゝゞァ-ヺヽヾー]+$'
+       or length(trim(coalesce(v_item->>'reading', ''))) < 1
        or length(trim(coalesce(v_item->>'meaning', ''))) < 1
        or length(trim(coalesce(v_item->>'partOfSpeech', ''))) < 1
        or (
@@ -1244,26 +1145,9 @@ begin
       and record.archived_at is null
       and record.quality_status <> 'rejected';
 
-    insert into public.kana_records (
-      value,
-      script_type
-    ) values (
-      v_reading,
-      case
-        when v_reading ~ '^[ぁ-ゖゝゞー]+$' then 'hiragana'
-        when v_reading ~ '^[ァ-ヺヽヾー]+$' then 'katakana'
-        else 'mixed'
-      end
-    )
-    on conflict (normalized_value) do update
-      set usage_count = public.kana_records.usage_count + 1,
-          updated_at = now()
-    returning id into v_kana_id;
-
     insert into public.vocabulary_records (
       written_form,
       reading,
-      kana_id,
       meaning,
       part_of_speech,
       jlpt_level,
@@ -1275,9 +1159,8 @@ begin
       quality_status,
       source_payload
     ) values (
-      normalize(trim(v_item->>'writtenForm'), NFKC),
-      v_reading,
-      v_kana_id,
+      trim(v_item->>'writtenForm'),
+      trim(v_item->>'reading'),
       trim(v_item->>'meaning'),
       trim(v_item->>'partOfSpeech'),
       p_level,
