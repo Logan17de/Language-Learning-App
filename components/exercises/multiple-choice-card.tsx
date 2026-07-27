@@ -1,7 +1,9 @@
 "use client";
 
 import { Check, Circle } from "lucide-react";
+import type { StoryWord } from "@/types/lesson";
 import { cn } from "@/lib/utils";
+import { InspectableText } from "@/components/exercises/inspectable-text";
 import { AnswerFeedback } from "@/components/exercises/answer-feedback";
 
 export function MultipleChoiceCard({
@@ -14,6 +16,8 @@ export function MultipleChoiceCard({
   answered,
   answerCorrect,
   lockAfterAnswer = false,
+  inspectableTerms = [],
+  onInspect,
   onSelect,
 }: {
   prompt: string;
@@ -25,6 +29,8 @@ export function MultipleChoiceCard({
   answered: boolean;
   answerCorrect?: boolean;
   lockAfterAnswer?: boolean;
+  inspectableTerms?: StoryWord[];
+  onInspect?: (word: StoryWord, reveal: "reading" | "meaning") => void;
   onSelect: (answer: string) => void;
 }) {
   const isCorrect = answerCorrect ?? selectedAnswer === correctAnswer;
@@ -32,8 +38,14 @@ export function MultipleChoiceCard({
 
   return (
     <section aria-labelledby="question-prompt">
-      <p id="question-prompt" className="text-sm font-semibold text-stone-500">{prompt}</p>
-      {cue && <p className="mt-5 font-serif text-3xl font-semibold leading-relaxed text-ink sm:text-4xl">{cue}</p>}
+      <p id="question-prompt" className="text-sm font-semibold text-stone-500">
+        <InspectableText text={prompt} terms={inspectableTerms} onReveal={onInspect} />
+      </p>
+      {cue && (
+        <p className="mt-5 font-serif text-3xl font-semibold leading-relaxed text-ink sm:text-4xl">
+          <InspectableText text={cue} terms={inspectableTerms} onReveal={onInspect} />
+        </p>
+      )}
       <div className="mt-7 grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label={prompt}>
         {choices.map((choice, index) => {
           const selected = selectedAnswer === choice;
@@ -59,7 +71,7 @@ export function MultipleChoiceCard({
               <span className="grid size-7 shrink-0 place-items-center rounded-full border border-current/20 text-xs">
                 {correctChoice ? <Check className="size-4" /> : selected ? <Circle className="size-3 fill-current" /> : String.fromCharCode(65 + index)}
               </span>
-              {choice}
+              <InspectableText text={choice} terms={inspectableTerms} onReveal={onInspect} />
             </button>
           );
         })}
