@@ -122,7 +122,7 @@ export function ListeningPhase({
 
       <Card className="mt-8 p-6 sm:p-8">
         <ProgressBar value={(answeredIds.size / exercises.length) * 100} className="mb-6" />
-        <AudioControl replayCount={replayCount} onPlay={play} label="Play conversation" large />
+        <AudioControl replayCount={replayCount} onPlay={play} text={exercise.transcript} audioAssetId={exercise.audioAssetId} label="Play conversation" large />
         <div className="mt-4 flex items-center justify-between text-xs text-stone-400">
           <span>Replay {replayCount} · first replay has no penalty</span>
           {replayCount >= 3 && <span className="font-semibold text-persimmon-600">Difficulty signal noted</span>}
