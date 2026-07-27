@@ -17,7 +17,18 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getBackendMode } from "@/lib/supabase/config";
 
-type GenerationState = "idle" | "generating" | "ready" | "error";
+type GenerationState = "idle" | "generating" | "story" | "ready" | "error";
+
+type GenerationResult = {
+  requestId?: string;
+  status?: string;
+  lesson_id?: string;
+  error?: string;
+  story?: {
+    japaneseTitle?: string;
+    lines?: Array<{ japanese?: string; english?: string }>;
+  };
+};
 
 export function CustomTopicPage() {
   const subscription = useAppStore((state) => state.subscription);
@@ -32,11 +43,43 @@ export function CustomTopicPage() {
   );
   const [state, setState] = useState<GenerationState>("idle");
   const [lessonId, setLessonId] = useState<string | null>(null);
+  const [requestId, setRequestId] = useState<string | null>(null);
+  const [storyTitle, setStoryTitle] = useState("");
+  const [storyLines, setStoryLines] = useState<Array<{ japanese: string; english: string }>>([]);
   const [error, setError] = useState("");
+
+  async function completeLesson(id: string) {
+    try {
+      const response = await fetch("/api/custom-lessons/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId: id }),
+        signal: AbortSignal.timeout(300_000),
+      });
+      const result = (await response.json().catch(() => null)) as GenerationResult | null;
+      if (!response.ok || !result?.lesson_id) {
+        setError(result?.error || "The story is safe, but the remaining activities could not be completed. Try again.");
+        setState("story");
+        return;
+      }
+      setLessonId(result.lesson_id);
+      setState("ready");
+    } catch (requestError) {
+      const timedOut = requestError instanceof DOMException &&
+        (requestError.name === "TimeoutError" || requestError.name === "AbortError");
+      setError(
+        timedOut
+          ? "The story is safe. The remaining activities need more time—tap retry."
+          : "The story is safe, but the connection stopped while building the remaining activities.",
+      );
+      setState("story");
+    }
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setStoryLines([]);
     setState("generating");
 
     if (getBackendMode() === "demo") {
@@ -69,36 +112,47 @@ export function CustomTopicPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic, level }),
-        signal: AbortSignal.timeout(300_000),
+        signal: AbortSignal.timeout(180_000),
       });
-      const result: unknown = await response.json().catch(() => null);
+      const result = (await response.json().catch(() => null)) as GenerationResult | null;
       if (!response.ok) {
-        const message = result && typeof result === "object" && !Array.isArray(result)
-          && "error" in result && typeof result.error === "string"
-          ? result.error
-          : "AIko could not create this lesson. Please try again.";
-        setError(message);
+        setError(result?.error || "AIko could not create this story. Please try again.");
         setState("error");
         return;
       }
-      const generatedLessonId =
-        result && typeof result === "object" && !Array.isArray(result)
-          && "lesson_id" in result && typeof result.lesson_id === "string"
-          ? result.lesson_id
-          : null;
-      if (!generatedLessonId) {
-        setError("The lesson was saved, but its link was not returned. Open Learn to continue.");
+      if (result?.status === "published" && result.lesson_id) {
+        setLessonId(result.lesson_id);
+        setState("ready");
+        return;
+      }
+      if (!result?.requestId || !Array.isArray(result.story?.lines)) {
+        setError("The story response was incomplete. Please try again.");
         setState("error");
         return;
       }
-      setLessonId(generatedLessonId);
-      setState("ready");
+      const lines = result.story.lines.flatMap((line) =>
+        typeof line.japanese === "string" && typeof line.english === "string"
+          ? [{ japanese: line.japanese, english: line.english }]
+          : [],
+      );
+      if (!lines.length) {
+        setError("The story response was incomplete. Please try again.");
+        setState("error");
+        return;
+      }
+      setRequestId(result.requestId);
+      setStoryTitle(result.story.japaneseTitle || "Your new story");
+      setStoryLines(lines);
+      setState("story");
+      await completeLesson(result.requestId);
     } catch (requestError) {
-      const timedOut = requestError instanceof DOMException
-        && (requestError.name === "TimeoutError" || requestError.name === "AbortError");
-      setError(timedOut
-        ? "Lesson generation is taking longer than expected. Please try again."
-        : "The connection was interrupted while creating your lesson. Please try again.");
+      const timedOut = requestError instanceof DOMException &&
+        (requestError.name === "TimeoutError" || requestError.name === "AbortError");
+      setError(
+        timedOut
+          ? "Story generation is taking longer than expected. Please try again."
+          : "The connection was interrupted while creating your story. Please try again.",
+      );
       setState("error");
     }
   }
@@ -110,12 +164,14 @@ export function CustomTopicPage() {
           <Crown className="size-9 text-persimmon-400" />
           <Badge tone="orange" className="mt-7">Pro feature</Badge>
           <h1 className="mt-4 max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">Turn your topic into a complete Japanese lesson.</h1>
-          <p className="mt-5 max-w-xl leading-7 text-white/65">Pro combines your topic, profile interests, and current JLPT level to create a story and the full seven-stage lesson package.</p>
+          <p className="mt-5 max-w-xl leading-7 text-white/65">Pro combines your topic and current JLPT level to create a story and the full seven-stage lesson package.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row"><ButtonLink href="/subscription" className="bg-persimmon-500 hover:bg-persimmon-600">See Pro plans</ButtonLink><ButtonLink href="/learn" variant="secondary" className="border-white/20 bg-white/10 text-white hover:bg-white/15">Return to my lesson</ButtonLink></div>
         </div>
       </div>
     );
   }
+
+  const busy = state === "generating" || state === "story";
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-7 sm:px-8 sm:py-10">
@@ -123,73 +179,62 @@ export function CustomTopicPage() {
         <ButtonLink href="/learn" variant="ghost" className="px-0"><ArrowLeft className="size-4" /> My learning path</ButtonLink>
         <p className="section-kicker mt-6">Pro custom topic</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight">What should your next story be about?</h1>
-        <p className="mt-3 max-w-2xl leading-7 text-stone-500">Choose a topic and level. AIko selects the kanji and grammar, builds an encouraging lesson, checks its reusable language library, and saves the completed package to your path.</p>
+        <p className="mt-3 max-w-2xl leading-7 text-stone-500">Choose only a topic and level. AIko selects the language targets, checks the reusable library, returns the story first, and builds the remaining practice while you read.</p>
       </header>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
+      <div className="mt-8 grid gap-6 lg:grid-cols-[.8fr_1.2fr]">
         <Card className="p-6 sm:p-7">
           <form className="space-y-5" onSubmit={submit}>
-            <Field label="Topic"><input required minLength={2} maxLength={120} value={topic} onChange={(event) => setTopic(event.target.value)} disabled={state === "generating"} className="form-input disabled:cursor-not-allowed disabled:opacity-60" placeholder="A sustainable farm, my first day at work…" /></Field>
+            <Field label="Topic"><input required minLength={2} maxLength={120} value={topic} onChange={(event) => setTopic(event.target.value)} disabled={busy} className="form-input disabled:cursor-not-allowed disabled:opacity-60" placeholder="A sustainable farm, my first day at work…" /></Field>
             <Field label="Level">
-              <select
-                value={level}
-                onChange={(event) => setLevel(event.target.value as JLPTLevel)}
-                disabled={state === "generating"}
-                className="form-input disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {(["N5", "N4", "N3", "N2", "N1"] as JLPTLevel[]).map((item) => (
-                  <option key={item} value={item}>{item}</option>
-                ))}
+              <select value={level} onChange={(event) => setLevel(event.target.value as JLPTLevel)} disabled={busy} className="form-input disabled:cursor-not-allowed disabled:opacity-60">
+                {(["N5", "N4", "N3", "N2", "N1"] as JLPTLevel[]).map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </Field>
             {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
-            <Button type="submit" disabled={state === "generating"} className="w-full"><WandSparkles className="size-4" /> {state === "generating" ? "Creating and checking…" : "Create my lesson"}</Button>
+            <Button type="submit" disabled={busy} className="w-full"><WandSparkles className="size-4" /> {state === "generating" ? "Writing your story…" : "Create my lesson"}</Button>
+            {state === "story" && error && requestId && (
+              <Button type="button" variant="secondary" className="w-full" onClick={() => { setError(""); void completeLesson(requestId); }}>
+                <Sparkles className="size-4" /> Retry remaining lesson
+              </Button>
+            )}
           </form>
         </Card>
 
-        <Card className="grid min-h-[34rem] place-items-center p-8 text-center">
+        <Card className="min-h-[34rem] p-7 sm:p-9">
           {state === "ready" ? (
-            <div>
-              <CheckCircle2 className="mx-auto size-12 text-moss-600" />
-              <Badge tone="moss" className="mt-6">Saved to your path</Badge>
-              <h2 className="mt-4 text-2xl font-semibold">Your complete lesson is ready.</h2>
-              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">The story, vocabulary, grammar, reading, listening, speaking, and review package has been saved and assigned without changing your level.</p>
-              <ButtonLink href={lessonId ? `/lesson/${lessonId}/preview` : "/learn"} className="mt-7">Open my assigned lesson</ButtonLink>
+            <div className="grid min-h-[28rem] place-items-center text-center">
+              <div>
+                <CheckCircle2 className="mx-auto size-12 text-moss-600" />
+                <Badge tone="moss" className="mt-6">Saved to your path</Badge>
+                <h2 className="mt-4 text-2xl font-semibold">Your complete lesson is ready.</h2>
+                <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">The activities are saved, and reusable Google audio has been prepared in the background.</p>
+                <ButtonLink href={lessonId ? `/lesson/${lessonId}/preview` : "/learn"} className="mt-7">Open my assigned lesson</ButtonLink>
+              </div>
+            </div>
+          ) : state === "story" ? (
+            <div aria-live="polite">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div><Badge tone="moss">Story ready</Badge><h2 className="mt-3 text-2xl font-semibold">{storyTitle}</h2></div>
+                {!error && <span className="flex items-center gap-2 text-xs font-semibold text-moss-700"><LoaderCircle className="size-4 animate-spin" /> Building practice and audio</span>}
+              </div>
+              <div className="mt-6 space-y-4 rounded-3xl bg-moss-50 p-5 sm:p-7">
+                {storyLines.map((line, index) => (
+                  <div key={`${line.japanese}-${index}`} className="border-b border-moss-100 pb-4 last:border-0 last:pb-0">
+                    <p className="font-serif text-xl leading-9 text-ink">{line.japanese}</p>
+                    <p className="mt-1 text-sm leading-6 text-stone-500">{line.english}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-5 text-center text-xs leading-5 text-stone-400">You can read now. AIko is creating vocabulary, grammar, reading, listening, speaking, review, and reusable audio without changing this story.</p>
             </div>
           ) : state === "generating" ? (
-            <div role="status" aria-live="polite" className="w-full max-w-lg">
-              <div className="relative mx-auto grid size-24 place-items-center">
-                <span className="absolute inset-0 rounded-full border border-moss-100 bg-gradient-to-br from-moss-50 to-persimmon-50 shadow-sm" />
-                <LoaderCircle className="absolute size-24 animate-spin text-moss-500 [animation-duration:1.8s]" strokeWidth={1.2} />
-                <span className="relative grid size-14 place-items-center rounded-full bg-white text-persimmon-500 shadow-sm">
-                  <Sparkles className="size-6 animate-pulse" />
-                </span>
-              </div>
-
-              <Badge tone="moss" className="mt-6">AI lesson studio is working</Badge>
-              <h2 className="mt-4 text-2xl font-semibold">Our AI is creating a lesson for you.</h2>
-              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">
-                AIko is turning your topic into a connected Japanese lesson. Keep this page open while it writes, checks, and saves your package.
-              </p>
-
-              <div className="mx-auto mt-7 space-y-2.5 text-left">
-                <GenerationStep delay="0ms">Selecting 5 kanji and 3 grammar targets</GenerationStep>
-                <GenerationStep delay="300ms">Writing your story and practice activities</GenerationStep>
-                <GenerationStep delay="600ms">Checking answers and saving your lesson</GenerationStep>
-              </div>
-
-              <div className="mt-7 overflow-hidden rounded-full bg-stone-100 p-1">
-                <div className="h-1.5 w-full animate-pulse rounded-full bg-gradient-to-r from-moss-500 via-persimmon-400 to-moss-500" />
-              </div>
-              <p className="mt-3 text-xs font-medium text-stone-400">
-                A complete lesson usually takes one or two minutes.
-              </p>
+            <div className="grid min-h-[28rem] place-items-center text-center" role="status" aria-live="polite">
+              <div><LoaderCircle className="mx-auto size-16 animate-spin text-moss-500" /><Badge tone="moss" className="mt-6">Writing the story first</Badge><h2 className="mt-4 text-2xl font-semibold">AIko is preparing your reading.</h2><p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">The validated story appears as soon as it is ready. Practice and audio continue afterward.</p></div>
             </div>
           ) : (
-            <div>
-              <WandSparkles className="mx-auto size-11 text-moss-300" />
-              <h2 className="mt-5 text-xl font-semibold">Your topic, inside a structured path</h2>
-              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-stone-500">You choose only the topic and level. AIko handles the encouraging tone, target language, reusable library records, and seven connected stages.</p>
+            <div className="grid min-h-[28rem] place-items-center text-center">
+              <div><WandSparkles className="mx-auto size-11 text-moss-300" /><h2 className="mt-5 text-xl font-semibold">Your topic, inside a structured path</h2><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-stone-500">You choose only the topic and level. AIko handles the encouraging tone, target language, reusable records, and seven connected stages.</p></div>
             </div>
           )}
         </Card>
@@ -200,19 +245,6 @@ export function CustomTopicPage() {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <label className="block"><span className="mb-2 block text-sm font-semibold">{label}</span>{children}</label>;
-}
-
-function GenerationStep({ children, delay }: { children: React.ReactNode; delay: string }) {
-  return (
-    <div className="flex items-center gap-3 rounded-2xl border border-stone-100 bg-white/75 px-4 py-3 shadow-sm">
-      <span
-        aria-hidden="true"
-        className="size-2.5 shrink-0 animate-pulse rounded-full bg-moss-500"
-        style={{ animationDelay: delay }}
-      />
-      <span className="text-sm font-medium text-stone-600">{children}</span>
-    </div>
-  );
 }
 
 function learnerLevel(level: string | null): JLPTLevel {
