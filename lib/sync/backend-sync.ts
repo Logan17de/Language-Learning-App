@@ -20,7 +20,9 @@ type MasterySignal =
   | "revealed_reading"
   | "revealed_meaning"
   | "correct"
-  | "incorrect";
+  | "incorrect"
+  | "pronunciation_correct"
+  | "pronunciation_incorrect";
 
 function masteryItemType(
   lesson: LessonPackage,
@@ -34,7 +36,7 @@ function masteryItemType(
   return null;
 }
 
-function masteryEvidence(
+export function buildMasteryEvidence(
   lesson: LessonPackage,
   session: LessonSession,
 ): Json[] {
@@ -134,6 +136,32 @@ function masteryEvidence(
     }
   }
 
+  for (const event of session.speakingEvents) {
+    if (!event.evaluationAvailable) continue;
+    const exercise = lesson.speakingExercises.find(
+      (item) => item.id === event.exerciseId,
+    );
+    if (!exercise) continue;
+    const score = Math.max(
+      event.pronunciationConfidence,
+      event.grammarAccuracy,
+    );
+    for (const itemKey of exercise.targetItemIds ?? []) {
+      add({
+        clientEventId: `speaking:${event.id}:${itemKey}`,
+        itemKey,
+        dimension: "pronunciation",
+        signal:
+          score >= 70 ? "pronunciation_correct" : "pronunciation_incorrect",
+        data: {
+          transcript: event.transcript ?? "",
+          speechMatch: event.pronunciationConfidence,
+          answerMatch: event.grammarAccuracy,
+        },
+      });
+    }
+  }
+
   for (const answer of session.reviewAnswers) {
     const question = lesson.reviewQuestions.find(
       (item) => item.id === answer.questionId,
@@ -227,7 +255,7 @@ async function persistLesson(lesson: LessonPackage, session: LessonSession, comp
     lessonSessionRepository.saveEvents(events),
     lessonSessionRepository.recordMasteryEvidence(
       backendSession.data.id,
-      masteryEvidence(lesson, session),
+      buildMasteryEvidence(lesson, session),
     ),
   ]);
   if (!answersResult.ok || !eventsResult.ok || !masteryResult.ok) return false;
@@ -282,14 +310,20 @@ async function persistReview(session: ReviewSession, complete: boolean): Promise
   return result.ok;
 }
 
-export async function syncLessonProgress(lesson: LessonPackage, session: LessonSession): Promise<void> {
-  if (getBackendMode() !== "supabase") return;
+export async function syncLessonProgress(lesson: LessonPackage, session: LessonSession): Promise<boolean> {
+  if (getBackendMode() !== "supabase") return true;
   const complete = Boolean(session.completed && session.completionResult);
   const kind = complete ? "lesson_completion" : "lesson_checkpoint";
   const key = `${kind}:${lesson.id}`;
-  if (!navigator.onLine || !(await persistLesson(lesson, session, complete))) {
-    enqueueSync(kind, key, json({ lesson, session }), navigator.onLine ? "Database request failed." : "Offline");
+  if (!navigator.onLine) {
+    enqueueSync(kind, key, json({ lesson, session }), "Offline");
+    return false;
   }
+  const synced = await persistLesson(lesson, session, complete);
+  if (!synced) {
+    enqueueSync(kind, key, json({ lesson, session }), "Database request failed.");
+  }
+  return synced;
 }
 
 export async function syncReviewCompletion(session: ReviewSession): Promise<void> {
