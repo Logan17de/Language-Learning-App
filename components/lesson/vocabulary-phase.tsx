@@ -99,6 +99,7 @@ export function VocabularyPhase({
           answered={Boolean(answer)}
           answerCorrect={answer?.correct}
           lockAfterAnswer
+          inspectChoices={false}
           inspectableTerms={question.inspectableTerms.length ? question.inspectableTerms : lesson.story.flatMap((line) => line.words)}
           onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
           onSelect={select}
