@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { cn } from "@/lib/utils";
+import { recommendedDifficultyFromAccuracy } from "@/lib/adaptive-difficulty";
 
 type SpeakingMode = "easy" | "medium" | "hard";
 
@@ -31,8 +32,27 @@ export function SpeakingPhase({
   const exerciseEvents = session.speakingEvents.filter(
     (event) => event.exerciseId === exercise.id,
   );
+  const recommendedMode = recommendedDifficultyFromAccuracy([
+    ...session.vocabularyAnswers,
+    ...session.grammarAnswers,
+    ...session.listeningEvents
+      .filter(
+        (event): event is typeof event & {
+          questionId: string;
+          correct: boolean;
+        } =>
+          event.type === "answer" &&
+          typeof event.questionId === "string" &&
+          typeof event.correct === "boolean",
+      )
+      .map((event) => ({
+        questionId: event.questionId,
+        correct: event.correct,
+      })),
+    ...session.reviewAnswers,
+  ]).toLocaleLowerCase() as SpeakingMode;
   const [mode, setMode] = useState<SpeakingMode>(
-    exerciseEvents.at(-1)?.mode ?? exercise.mode,
+    exerciseEvents.at(-1)?.mode ?? recommendedMode ?? exercise.mode,
   );
   const [speaking, setSpeaking] = useState(false);
   const [showModelAnswer, setShowModelAnswer] = useState(false);
@@ -67,7 +87,7 @@ export function SpeakingPhase({
     if (!latest || currentIndex >= exercises.length - 1) return;
     setSpeaking(false);
     setShowModelAnswer(false);
-    setMode(exercises[currentIndex + 1].mode);
+    setMode(recommendedMode);
     onChange({ ...session, activityIndex: currentIndex + 1 });
   }
 
