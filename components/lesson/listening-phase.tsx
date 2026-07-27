@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Check, Headphones, MessageSquareText } from "lucide-react";
+import { appendInspectableInteraction } from "@/lib/lesson-support";
 import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession, ListeningEvent } from "@/types/lesson-session";
 import { evaluateAnswer } from "@/lib/scoring-utils";
@@ -137,6 +138,8 @@ export function ListeningPhase({
             selectedAnswer={priorAnswer?.selectedAnswer}
             answered={Boolean(priorAnswer)}
             answerCorrect={priorAnswer?.correct}
+            inspectableTerms={exercise.inspectableTerms ?? lesson.story.flatMap((line) => line.words)}
+            onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, exercise.id, word, reveal))}
             onSelect={answer}
           />
         </div>
