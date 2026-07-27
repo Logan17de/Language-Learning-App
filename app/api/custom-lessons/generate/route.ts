@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
 import {
-  generatePlayableLesson,
   generateStoryDraft,
   type GenerationAuditEntry,
 } from "@/lib/gemini/lesson-engine-v2";
@@ -9,11 +9,13 @@ import {
   resolveLessonLibrary,
   selectLessonPlan,
 } from "@/lib/gemini/lesson-library-v2";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
 
-export const maxDuration = 300;
+export const runtime = "nodejs";
+export const maxDuration = 180;
 
 interface BeginResult {
   requestId: string;
@@ -59,12 +61,6 @@ function beginResult(value: Json): BeginResult | null {
       : null;
   }
   return result.jobId ? result : null;
-}
-
-function storedResult(value: Json): Record<string, Json | undefined> {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? value
-    : {};
 }
 
 export async function POST(request: NextRequest) {
@@ -135,7 +131,6 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const startedAt = Date.now();
   try {
     const plan = await selectLessonPlan(
       client,
@@ -158,29 +153,35 @@ export async function POST(request: NextRequest) {
       story.audit,
       ...(resolved.audit ? [resolved.audit] : []),
     ];
-    const lesson = await generatePlayableLesson({
-      topic,
-      level: generation.level,
-      draft: story.draft,
-      library: resolved.library,
-      audit,
-    });
-    const stored = await client.rpc("store_generated_lesson_package_v2", {
-      p_request_id: generation.requestId,
-      p_package: lesson as unknown as Json,
-      p_generation_seconds: Math.round((Date.now() - startedAt) / 1000),
-    });
-    if (stored.error) throw new Error(stored.error.message);
+    const admin = createAdminClient() as unknown as SupabaseClient;
+    const saved = await admin.from("progressive_lesson_drafts").upsert(
+      {
+        request_id: generation.requestId,
+        job_id: generation.jobId,
+        user_id: auth.userId,
+        topic,
+        jlpt_level: generation.level,
+        story_draft: story.draft,
+        library_snapshot: resolved.library,
+        generation_audit: audit,
+        status: "story_ready",
+        last_error: null,
+      },
+      { onConflict: "request_id" },
+    );
+    if (saved.error) throw new Error(saved.error.message);
 
     return NextResponse.json({
       requestId: generation.requestId,
       jobId: generation.jobId,
-      ...storedResult(stored.data),
+      status: "story_ready",
+      reused: false,
+      story: story.draft,
     });
   } catch (error) {
     const internalMessage =
       error instanceof Error ? error.message : "Lesson generation failed.";
-    console.error("Custom lesson generation failed.", {
+    console.error("Custom lesson story generation failed.", {
       requestId: generation.requestId,
       level: generation.level,
       message: internalMessage,
@@ -194,7 +195,7 @@ export async function POST(request: NextRequest) {
       {
         error: catalogMissing
           ? internalMessage
-          : "AIko could not finish this lesson. Please try the topic again.",
+          : "AIko could not prepare this story. Please try the topic again.",
       },
       { status: catalogMissing ? 409 : 502 },
     );
