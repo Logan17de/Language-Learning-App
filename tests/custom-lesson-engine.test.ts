@@ -78,19 +78,13 @@ describe("custom lesson engine contract", () => {
     expect(durableMigration).toContain("completed_groups");
   });
 
-  it("learns AI-confirmed grammar aliases without weakening kanji identity", () => {
+  it("keeps model-controlled identifiers out of library enrichment", () => {
     const engine = readFileSync("lib/gemini/lesson-engine-v2.ts", "utf8");
-    const learning = readFileSync("lib/gemini/grammar-pattern-learning.ts", "utf8");
-    const migration = readFileSync(
-      "supabase/migrations/20260728020000_learned_grammar_patterns.sql",
-      "utf8",
-    );
-    expect(engine).toContain("Grammar identifiers are canonicalized after semantic alias validation");
-    expect(engine).toContain("Kanji output must exactly match the requested characters");
-    expect(learning).toContain("learn_grammar_pattern_alias");
-    expect(learning).toContain("accepted_patterns");
-    expect(learning).toContain("CONFIDENCE_THRESHOLD = 0.95");
-    expect(migration).toContain("accepted_patterns");
+    const mapping = readFileSync("lib/gemini/library-enrichment-mapping.ts", "utf8");
+    expect(engine).toContain("mapLibraryEnrichment");
+    expect(mapping).toContain("requestIndex");
+    expect(mapping).toContain("Do not output character, pattern, writtenForm");
+    expect(mapping).toContain("linkedKanjiForWord");
   });
 
   it("publishes lesson content before audio and limits TTS to voice activities", () => {

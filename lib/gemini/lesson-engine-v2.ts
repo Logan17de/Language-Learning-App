@@ -4,6 +4,13 @@ import type { JLPTLevel } from "@/types/lesson";
 import { storyLengthRange, storyWordScript } from "@/lib/story-support";
 import { storyUsesGrammarPattern } from "@/lib/gemini/lesson-validation";
 import {
+  libraryEnrichmentIssues,
+  libraryEnrichmentPrompt,
+  libraryEnrichmentSchema,
+  mapLibraryEnrichment,
+  type RawLibraryEnrichment,
+} from "@/lib/gemini/library-enrichment-mapping";
+import {
   generateStructured,
   type JsonSchema,
 } from "@/lib/gemini/structured-output";
@@ -497,144 +504,6 @@ export async function generateStoryDraft(input: {
   };
 }
 
-function librarySchema(request: LibraryEnrichmentRequest): JsonSchema {
-  return {
-    type: "object",
-    additionalProperties: false,
-    required: ["kanji", "grammar", "vocabulary"],
-    properties: {
-      kanji: objectArray(request.kanji.length, request.kanji.length, {
-        type: "object",
-        additionalProperties: false,
-        required: [
-          "character",
-          "meanings",
-          "readings",
-          "onyomi",
-          "kunyomi",
-          "exampleWords",
-          "strokeCount",
-        ],
-        properties: {
-          character: { type: "string" },
-          meanings: stringArray(1, 5),
-          readings: stringArray(1, 10),
-          onyomi: stringArray(0, 8),
-          kunyomi: stringArray(0, 8),
-          exampleWords: stringArray(2, 6),
-          strokeCount: { type: "integer", minimum: 1, maximum: 64 },
-        },
-      }),
-      grammar: objectArray(request.grammar.length, request.grammar.length, {
-        type: "object",
-        additionalProperties: false,
-        required: [
-          "pattern",
-          "meaning",
-          "formation",
-          "usageNotes",
-          "nuance",
-          "exampleSentences",
-        ],
-        properties: {
-          pattern: { type: "string" },
-          meaning: { type: "string" },
-          formation: { type: "string" },
-          usageNotes: { type: "string" },
-          nuance: { type: "string" },
-          exampleSentences: stringArray(2, 5),
-        },
-      }),
-      vocabulary: objectArray(
-        request.vocabulary.length,
-        request.vocabulary.length,
-        {
-          type: "object",
-          additionalProperties: false,
-          required: [
-            "writtenForm",
-            "reading",
-            "meaning",
-            "partOfSpeech",
-            "tags",
-            "exampleSentence",
-            "linkedKanjiCharacters",
-          ],
-          properties: {
-            writtenForm: { type: "string" },
-            reading: { type: "string" },
-            meaning: { type: "string" },
-            partOfSpeech: { type: "string" },
-            tags: stringArray(1, 6),
-            exampleSentence: { type: "string" },
-            linkedKanjiCharacters: stringArray(0, 8),
-          },
-        },
-      ),
-    },
-  };
-}
-
-function sameSet(actual: string[], expected: string[]): boolean {
-  const left = unique(actual).sort();
-  const right = unique(expected).sort();
-  return (
-    left.length === right.length &&
-    left.every((item, index) => item === right[index])
-  );
-}
-
-function libraryIssues(
-  value: unknown,
-  request: LibraryEnrichmentRequest,
-): string[] {
-  if (
-    !isRecord(value) ||
-    !Array.isArray(value.kanji) ||
-    !Array.isArray(value.grammar) ||
-    !Array.isArray(value.vocabulary)
-  ) {
-    return ["Library response is incomplete."];
-  }
-  const issues: string[] = [];
-  const kanji = value.kanji.flatMap((item) =>
-    isRecord(item) && stringValue(item.character) ? [item.character] : [],
-  );
-  const grammar = value.grammar.flatMap((item) =>
-    isRecord(item) && stringValue(item.pattern) ? [item.pattern] : [],
-  );
-  const vocabulary = value.vocabulary.flatMap((item) =>
-    isRecord(item) && stringValue(item.writtenForm) ? [item.writtenForm] : [],
-  );
-  if (!sameSet(kanji, request.kanji)) {
-    issues.push("Kanji output must exactly match the requested characters.");
-  }
-  // Grammar identifiers are canonicalized after semantic alias validation.
-  // Kanji and vocabulary identity checks remain strict.
-  if (
-    !sameSet(
-      vocabulary,
-      request.vocabulary.map((item) => item.writtenForm),
-    )
-  ) {
-    issues.push("Vocabulary output must exactly match the requested words.");
-  }
-  for (const item of value.vocabulary) {
-    if (!isRecord(item)) continue;
-    const linked = Array.isArray(item.linkedKanjiCharacters)
-      ? item.linkedKanjiCharacters.filter(
-          (entry): entry is string => typeof entry === "string",
-        )
-      : [];
-    if (linked.some((character) => !request.allowedKanji.includes(character))) {
-      issues.push(
-        `Vocabulary ${String(item.writtenForm)} links an unrequested kanji.`,
-      );
-    }
-  }
-  return unique(issues);
-}
-
 export async function generateLibraryEnrichment(
   request: LibraryEnrichmentRequest,
 ): Promise<{
@@ -642,26 +511,15 @@ export async function generateLibraryEnrichment(
   model: string;
   audit: GenerationAuditEntry;
 }> {
-  const prompt = [
-    "Fill only these missing records in AIko's permanent Japanese library.",
-    `JLPT ceiling: ${request.level}`,
-    `Topic context: ${request.topic}`,
-    `Kanji: ${JSON.stringify(request.kanji)}`,
-    `Allowed linked kanji: ${JSON.stringify(request.allowedKanji)}`,
-    `Grammar: ${JSON.stringify(request.grammar)}`,
-    `Vocabulary with context: ${JSON.stringify(request.vocabulary)}`,
-    "Return every requested record exactly once and no extra records.",
-    "Use kana readings, concise English meanings, and natural Japanese examples.",
-    "linkedKanjiCharacters may contain only requested kanji that occur in the word.",
-  ].join("\n");
-  const result = await generateStructured<LibrarySeed>({
+  const result = await generateStructured<RawLibraryEnrichment>({
     name: "library enrichment",
-    prompt,
-    schema: librarySchema(request),
-    validate: (value) => libraryIssues(value, request),
+    prompt: libraryEnrichmentPrompt(request),
+    schema: libraryEnrichmentSchema(request),
+    validate: (value) => libraryEnrichmentIssues(value, request),
   });
+  const seed = mapLibraryEnrichment(result.value, request) as LibrarySeed;
   return {
-    seed: result.value,
+    seed,
     model: result.model,
     audit: {
       stage: "library",
