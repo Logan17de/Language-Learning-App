@@ -1,11 +1,9 @@
 import { Check, Circle, LoaderCircle } from "lucide-react";
-import type { CustomLessonGenerationStage } from "@/types/app-preferences";
-
 export function GenerationProgress({
   stages,
   currentIndex,
 }: {
-  stages: CustomLessonGenerationStage[];
+  stages: string[];
   currentIndex: number;
 }) {
   return (

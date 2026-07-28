@@ -116,7 +116,7 @@ export interface Database {
       user_subscriptions: TableDef<OwnedRow & { plan: Database["public"]["Enums"]["subscription_plan"]; status: Database["public"]["Enums"]["subscription_status"]; billing_interval: string | null; starts_at: string; renews_at: string | null; cancelled_at: string | null; mock_payment_status: string }>;
       curriculum_levels: TableDef<Timestamps & { id: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; title: string; description: string; sequence_order: number }>;
       curriculum_items: TableDef<Timestamps & { id: string; curriculum_level_id: string; item_type: string; label: string; sequence_order: number; required: boolean; prerequisite_ids: string[]; archived_at: string | null }>;
-      grammar_catalog: TableDef<Timestamps & { id: string; pattern: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; source_order: number; active: boolean }>;
+      grammar_catalog: TableDef<Timestamps & { id: string; pattern: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; source_order: number; active: boolean; accepted_patterns: string[] }>;
       grammar_records: TableDef<Timestamps & LibraryMetadata & { id: string; legacy_id: string | null; pattern: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; meaning: string; formation: string; usage_notes: string; nuance: string; example_sentences: string[]; common_mistakes: string[]; prerequisite_ids: string[]; similar_grammar_ids: string[]; contrast_grammar_ids: string[]; archived_at: string | null }>;
       kanji_catalog: TableDef<Timestamps & { id: string; character: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; source_order: number; active: boolean }>;
       kanji_records: TableDef<Timestamps & LibraryMetadata & { id: string; legacy_id: string | null; character: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; meanings: string[]; readings: string[]; onyomi: string[]; kunyomi: string[]; example_words: string[]; stroke_count: number; prerequisite_kanji: string[]; archived_at: string | null }>;
@@ -245,6 +245,10 @@ export interface Database {
       enrich_custom_lesson_library_v2: {
         Args: { p_level: Database["public"]["Enums"]["jlpt_level"]; p_seed: Json; p_source_model: string };
         Returns: Json;
+      };
+      learn_grammar_pattern_alias: {
+        Args: { p_canonical_pattern: string; p_alias: string; p_confidence: number };
+        Returns: boolean;
       };
       get_learner_progress_summary: {
         Args: Record<string, never>;

@@ -140,8 +140,6 @@ export async function getSignedAudioUrl(
 
 type LinkTarget = {
   table:
-    | "lesson_story_lines"
-    | "lesson_reading_sections"
     | "lesson_listening_activities"
     | "lesson_speaking_activities";
   id: string;
@@ -184,61 +182,20 @@ export async function prepareStoredLessonAudio(
   client?: AdminClient,
 ): Promise<PreparedLessonAudio> {
   const admin = client ?? adminClient();
-  const [story, reading, listening, speaking, words, vocabulary, grammar] =
-    await Promise.all([
-      admin
-        .from("lesson_story_lines")
-        .select("id,japanese_text,audio_asset_id")
-        .eq("lesson_version_id", lessonVersionId),
-      admin
-        .from("lesson_reading_sections")
-        .select("id,japanese_text,audio_asset_id")
-        .eq("lesson_version_id", lessonVersionId),
-      admin
-        .from("lesson_listening_activities")
-        .select("id,transcript,audio_asset_id")
-        .eq("lesson_version_id", lessonVersionId),
-      admin
-        .from("lesson_speaking_activities")
-        .select("id,model_answer,audio_asset_id")
-        .eq("lesson_version_id", lessonVersionId),
-      admin
-        .from("lesson_story_words")
-        .select("reading")
-        .eq("lesson_version_id", lessonVersionId),
-      admin
-        .from("lesson_vocabulary")
-        .select("reading")
-        .eq("lesson_version_id", lessonVersionId),
-      admin
-        .from("lesson_grammar")
-        .select("pattern,example")
-        .eq("lesson_version_id", lessonVersionId),
-    ]);
-  const failed = [story, reading, listening, speaking, words, vocabulary, grammar].find(
-    (result) => result.error,
-  );
+  const [listening, speaking] = await Promise.all([
+    admin
+      .from("lesson_listening_activities")
+      .select("id,transcript,audio_asset_id")
+      .eq("lesson_version_id", lessonVersionId),
+    admin
+      .from("lesson_speaking_activities")
+      .select("id,model_answer,audio_asset_id")
+      .eq("lesson_version_id", lessonVersionId),
+  ]);
+  const failed = [listening, speaking].find((result) => result.error);
   if (failed?.error) throw new Error(failed.error.message);
 
   const work = new Map<string, TextWork>();
-  for (const row of story.data ?? []) {
-    const item = row as Record<string, unknown>;
-    if (!item.audio_asset_id) {
-      addWork(work, item.japanese_text, {
-        table: "lesson_story_lines",
-        id: String(item.id),
-      });
-    }
-  }
-  for (const row of reading.data ?? []) {
-    const item = row as Record<string, unknown>;
-    if (!item.audio_asset_id) {
-      addWork(work, item.japanese_text, {
-        table: "lesson_reading_sections",
-        id: String(item.id),
-      });
-    }
-  }
   for (const row of listening.data ?? []) {
     const item = row as Record<string, unknown>;
     if (!item.audio_asset_id) {
@@ -256,13 +213,6 @@ export async function prepareStoredLessonAudio(
         id: String(item.id),
       });
     }
-  }
-  for (const row of words.data ?? []) addWork(work, (row as Record<string, unknown>).reading);
-  for (const row of vocabulary.data ?? []) addWork(work, (row as Record<string, unknown>).reading);
-  for (const row of grammar.data ?? []) {
-    const item = row as Record<string, unknown>;
-    addWork(work, item.pattern);
-    addWork(work, item.example);
   }
 
   let generated = 0;
