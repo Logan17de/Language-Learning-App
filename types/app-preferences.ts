@@ -57,13 +57,9 @@ export interface CustomLessonRequest {
 }
 
 export type CustomLessonGenerationStage =
-  | "Understanding your topic"
-  | "Checking previous lessons"
-  | "Planning a new variation"
-  | "Creating lesson content"
-  | "Checking grammar and level"
-  | "Checking answers and exercises"
-  | "Adding lesson to the library"
+  | "Writing your story"
+  | "Building lesson activities"
+  | "Preparing lesson audio"
   | "Ready";
 
 export interface CustomLessonMatch {
