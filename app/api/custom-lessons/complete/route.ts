@@ -16,6 +16,8 @@ import type { JLPTLevel } from "@/types/lesson";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
+type CompletionAction = "activities" | "audio";
+
 interface ProgressiveDraft {
   request_id: string;
   user_id: string;
@@ -39,6 +41,10 @@ function text(value: unknown): string | null {
   return typeof value === "string" && value.length > 0 ? value : null;
 }
 
+function completionAction(value: unknown): CompletionAction {
+  return value === "audio" ? "audio" : "activities";
+}
+
 function resultRecord(value: Json): Record<string, Json | undefined> {
   return value && typeof value === "object" && !Array.isArray(value)
     ? value
@@ -58,12 +64,11 @@ async function prepareAudio(
   if (recentBuild) return { status: "building" };
   if (draft.audio_attempts >= 3) return { status: "failed" };
 
-  const attempts = draft.audio_attempts + 1;
   const claimed = await admin
     .from("progressive_lesson_drafts")
     .update({
       audio_status: "building",
-      audio_attempts: attempts,
+      audio_attempts: draft.audio_attempts + 1,
       audio_started_at: new Date().toISOString(),
       audio_error: null,
     })
@@ -81,7 +86,7 @@ async function prepareAudio(
       })
       .eq("request_id", draft.request_id);
     if (saved.error) throw new Error(saved.error.message);
-    return { ...prepared };
+    return { ...prepared, status: "ready" };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Audio preparation failed.";
     await admin
@@ -106,6 +111,10 @@ export async function POST(request: NextRequest) {
     body && typeof body === "object" && !Array.isArray(body)
       ? text((body as Record<string, unknown>).requestId)
       : null;
+  const action =
+    body && typeof body === "object" && !Array.isArray(body)
+      ? completionAction((body as Record<string, unknown>).action)
+      : "activities";
   if (!requestId) {
     return NextResponse.json({ error: "A generation request is required." }, { status: 400 });
   }
@@ -129,7 +138,13 @@ export async function POST(request: NextRequest) {
   }
   let draft = found.data as ProgressiveDraft;
 
-  if (draft.status === "completed" && draft.lesson_id && draft.lesson_version_id) {
+  if (action === "audio") {
+    if (draft.status !== "completed" || !draft.lesson_id || !draft.lesson_version_id) {
+      return NextResponse.json(
+        { error: "The lesson activities must be completed before preparing audio." },
+        { status: 409 },
+      );
+    }
     const audio = await prepareAudio(draft, admin);
     return NextResponse.json({
       requestId,
@@ -138,6 +153,17 @@ export async function POST(request: NextRequest) {
       assignment_id: draft.assignment_id,
       status: "published",
       audio,
+    });
+  }
+
+  if (draft.status === "completed" && draft.lesson_id && draft.lesson_version_id) {
+    return NextResponse.json({
+      requestId,
+      lesson_id: draft.lesson_id,
+      lesson_version_id: draft.lesson_version_id,
+      assignment_id: draft.assignment_id,
+      status: "activities_ready",
+      audio: { status: draft.audio_status },
     });
   }
   if (draft.build_attempts >= 3) {
@@ -201,12 +227,12 @@ export async function POST(request: NextRequest) {
       .single();
     if (completed.error) throw new Error(completed.error.message);
     draft = completed.data as ProgressiveDraft;
-    const audio = await prepareAudio(draft, admin);
 
     return NextResponse.json({
       requestId,
       ...storedValue,
-      audio,
+      status: "activities_ready",
+      audio: { status: draft.audio_status },
     });
   } catch (error) {
     const internalMessage =
