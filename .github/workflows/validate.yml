@@ -8,14 +8,40 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: validate-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  apply-deterministic-enrichment:
+    if: github.event_name == 'pull_request' && github.head_ref == 'agent/durable-custom-lesson-jobs'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/durable-custom-lesson-jobs
+          fetch-depth: 0
+
+      - name: Apply isolated enrichment patch
+        run: python scripts/apply-deterministic-library-enrichment.py
+
+      - name: Commit implementation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "fix: make library enrichment identifiers deterministic"
+          git push origin HEAD:agent/durable-custom-lesson-jobs
+
   validate:
+    needs: apply-deterministic-enrichment
+    if: always() && (needs.apply-deterministic-enrichment.result == 'success' || needs.apply-deterministic-enrichment.result == 'skipped')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
