@@ -88,7 +88,7 @@ export function AudioControl({
   large?: boolean;
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const preloadRef = useRef<Promise<HTMLAudioElement> | null>(null);
+  const preloadRef = useRef<Promise<HTMLAudioElement | null> | null>(null);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
@@ -125,7 +125,7 @@ export function AudioControl({
           setReady(false);
           setError("Audio could not be prepared.");
         }
-        throw new Error("Audio preload failed.");
+        return null;
       });
 
     preloadRef.current = preload;
