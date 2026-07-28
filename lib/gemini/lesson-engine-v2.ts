@@ -138,7 +138,16 @@ export interface ResolvedLessonLibrary {
 }
 
 export interface GenerationAuditEntry {
-  stage:\n    | "story"\n    | "library"\n    | "activities"\n    | "vocabulary_activities"\n    | "grammar_reading_activities"\n    | "communication_activities"\n    | "review_activities"\n    | "lesson_assembly"\n    | "audio";
+  stage:
+    | "story"
+    | "library"
+    | "activities"
+    | "vocabulary_activities"
+    | "grammar_reading_activities"
+    | "communication_activities"
+    | "review_activities"
+    | "lesson_assembly"
+    | "audio";
   model: string;
   repaired: boolean;
 }
