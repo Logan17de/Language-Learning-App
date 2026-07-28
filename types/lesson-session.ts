@@ -38,7 +38,8 @@ export type ReadingEventType =
   | "meaning-revealed"
   | "pronunciation-issue"
   | "successful-retry"
-  | "stopped-at-word";
+  | "stopped-at-word"
+  | "voice-evaluation";
 
 export interface ReadingEvent {
   id: string;
@@ -46,6 +47,9 @@ export interface ReadingEvent {
   term: string;
   confidence: ConfidenceLevel;
   elapsedSeconds: number;
+  evaluationAvailable?: boolean;
+  speechMatch?: number;
+  transcript?: string;
 }
 
 export type ListeningEventType = "play" | "replay" | "difficulty-signal" | "answer";
