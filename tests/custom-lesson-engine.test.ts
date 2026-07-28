@@ -4,6 +4,15 @@ import { describe, expect, it } from "vitest";
 const form = readFileSync("components/custom-topic/custom-topic-page.tsx", "utf8");
 const route = readFileSync("app/api/custom-lessons/generate/route.ts", "utf8");
 const completionRoute = readFileSync("app/api/custom-lessons/complete/route.ts", "utf8");
+const statusRoute = readFileSync("app/api/custom-lessons/status/route.ts", "utf8");
+const workerRoute = readFileSync("app/api/internal/custom-lessons/process/route.ts", "utf8");
+const runner = readFileSync("lib/custom-lessons/job-runner.ts", "utf8");
+const groups = readFileSync("lib/gemini/lesson-activity-groups.ts", "utf8");
+const audio = readFileSync("lib/audio/audio-library.ts", "utf8");
+const durableMigration = readFileSync(
+  "supabase/migrations/20260728010000_durable_custom_lesson_jobs.sql",
+  "utf8",
+);
 const targets = readFileSync("lib/gemini/lesson-targets.ts", "utf8");
 const generation = readFileSync("lib/gemini/lesson-generation.ts", "utf8");
 const quota = readFileSync(
@@ -33,17 +42,50 @@ describe("custom lesson engine contract", () => {
     expect(route).toContain('p_level: level');
   });
 
-  it("shows the story first while the rest of the lesson is built", () => {
+  it("shows the resolved story first and polls durable backend progress", () => {
     expect(form).toContain('role="status"');
     expect(form).toContain("AIko is preparing your reading.");
     expect(form).toContain("Story ready");
-    expect(form).toContain("Building practice and audio");
-    expect(form).toContain("You can read now.");
+    expect(form).toContain("/api/custom-lessons/status?requestId=");
+    expect(form).toContain('url.searchParams.set("requestId", requestId)');
+    expect(form).toContain("Refreshing or leaving this page will not restart generation.");
+    expect(form).toContain("showAudio={false}");
     expect(form).toContain("AbortSignal.timeout(180_000)");
-    expect(form).toContain("AbortSignal.timeout(300_000)");
     expect(route).toContain('status: "story_ready"');
-    expect(completionRoute).toContain("generatePlayableLesson");
-    expect(completionRoute).toContain("prepareStoredLessonAudio");
+    expect(route).toContain("buildInteractiveStory");
+    expect(route).toContain("after(async () =>");
+    expect(route).toContain("processCustomLessonJobs");
+    expect(completionRoute).not.toContain("generatePlayableLesson");
+    expect(completionRoute).toContain("status: \"activities_queued\"");
+    expect(statusRoute).toContain('.eq("user_id", auth.userId)');
+  });
+
+  it("uses durable atomic claims and independently persisted parallel groups", () => {
+    expect(workerRoute).toContain("CUSTOM_LESSON_WORKER_SECRET");
+    expect(workerRoute).toContain("CRON_SECRET");
+    expect(runner).toContain("Promise.allSettled(executions)");
+    expect(runner).toContain('rpc("claim_progressive_lesson_job"');
+    expect(runner).toContain('rpc("save_progressive_lesson_group"');
+    expect(runner).toContain('rpc("store_generated_lesson_package_background"');
+    expect(groups).toContain("generateVocabularyAndKanjiActivities");
+    expect(groups).toContain("generateGrammarAndReadingActivities");
+    expect(groups).toContain("generateListeningAndSpeakingActivities");
+    expect(groups).toContain("generateFinalReviewActivities");
+    expect(groups).toContain("6 Easy, 4 Medium, 3 Hard");
+    expect(groups).toContain("visible Japanese sentence beginning in hintFront");
+    expect(durableMigration).toContain("for update skip locked");
+    expect(durableMigration).toContain("interval '10 minutes'");
+    expect(durableMigration).toContain("completed_groups");
+  });
+
+  it("publishes lesson content before audio and limits TTS to voice activities", () => {
+    expect(runner.indexOf('status: "lesson_ready"')).toBeLessThan(
+      runner.indexOf("prepareAudioJob(admin, refreshed.request_id)"),
+    );
+    expect(audio).toContain('.from("lesson_listening_activities")');
+    expect(audio).toContain('.from("lesson_speaking_activities")');
+    expect(audio).not.toContain('.from("lesson_story_lines")');
+    expect(audio).not.toContain('.from("lesson_reading_sections")');
   });
 
   it("enriches only missing library categories before selecting targets", () => {
