@@ -253,7 +253,7 @@ export function CustomTopicPage() {
   useEffect(() => {
     if (!requestId || getBackendMode() === "demo") return;
     let cancelled = false;
-    let timer: ReturnType<typeof window.setTimeout> | null = null;
+    let timer: number | null = null;
     let running = false;
 
     async function poll() {
