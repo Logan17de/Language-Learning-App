@@ -122,12 +122,18 @@ function asJob(value: unknown): ProgressiveLessonJob | null {
 
 function auditEntries(value: Json): GenerationAuditEntry[] {
   if (!Array.isArray(value)) return [];
-  return value.filter((entry): entry is GenerationAuditEntry => {
-    if (!isRecord(entry)) return false;
-    return typeof entry.stage === "string" &&
+  const entries: GenerationAuditEntry[] = [];
+  for (const entry of value) {
+    if (
+      isRecord(entry) &&
+      typeof entry.stage === "string" &&
       typeof entry.model === "string" &&
-      typeof entry.repaired === "boolean";
-  });
+      typeof entry.repaired === "boolean"
+    ) {
+      entries.push(entry as unknown as GenerationAuditEntry);
+    }
+  }
+  return entries;
 }
 
 function resultRecord(value: unknown): Record<string, unknown> {
