@@ -132,6 +132,10 @@ describe("learning engine V2 contracts", () => {
       resolve(process.cwd(), "lib/gemini/lesson-engine-v2.ts"),
       "utf8",
     );
+    const activityGroups = readFileSync(
+      resolve(process.cwd(), "lib/gemini/lesson-activity-groups.ts"),
+      "utf8",
+    );
 
     expect(migration).toContain(
       "jsonb_array_length(p_package->'vocabularyQuestions') not between 10 and 13",
@@ -139,8 +143,9 @@ describe("learning engine V2 contracts", () => {
     expect(migration).toContain(
       "jsonb_array_length(p_package->'grammarQuestions') not between 10 and 13",
     );
-    expect(engine).toContain("exactly 6 Easy, 4 Medium, and 3 Hard");
-    expect(engine).toContain("objectArray(13, 13");
+    expect(activityGroups).toContain("6 Easy, 4 Medium, 3 Hard");
+    expect(activityGroups).toContain("objectArray(13, 13");
+    expect(engine).toContain("generateVocabularyAndKanjiActivities");
   });
 
   it("builds review only from real weak items and never invents fallbacks", () => {
