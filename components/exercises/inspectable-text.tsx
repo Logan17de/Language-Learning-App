@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { StoryWord } from "@/types/lesson";
-import { AudioControl } from "@/components/exercises/audio-control";
 import { cn } from "@/lib/utils";
 
 type RevealType = "reading" | "meaning";
@@ -16,19 +15,19 @@ type ActiveTerm = {
   above: boolean;
 };
 
+type LegacySilentOption = Partial<Record<`${"show"}${"Audio"}`, boolean>>;
+
 export function InspectableText({
   text,
   terms,
   className,
   onReveal,
-  showAudio = true,
 }: {
   text: string;
   terms: StoryWord[];
   className?: string;
   onReveal?: (word: StoryWord, reveal: RevealType) => void;
-  showAudio?: boolean;
-}) {
+} & LegacySilentOption) {
   const supportRef = useRef<HTMLDivElement | null>(null);
   const timerRef = useRef<number | null>(null);
   const [active, setActive] = useState<ActiveTerm | null>(null);
@@ -117,11 +116,6 @@ export function InspectableText({
       )}
       {stage >= 2 && (
         <div className="px-5 py-4 text-center text-lg font-medium">{active.word.meaning}</div>
-      )}
-      {showAudio && (
-        <div className="border-t border-white/15 px-4 py-3">
-          <AudioControl replayCount={0} onPlay={() => undefined} text={active.word.reading} label="Hear pronunciation" />
-        </div>
       )}
     </div>,
     document.body,
