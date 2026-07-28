@@ -25,6 +25,7 @@ export function InspectableText({
   terms: StoryWord[];
   className?: string;
   onReveal?: (word: StoryWord, reveal: RevealType) => void;
+  showAudio?: boolean;
 }) {
   const supportRef = useRef<HTMLDivElement | null>(null);
   const timerRef = useRef<number | null>(null);
