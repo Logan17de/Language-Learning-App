@@ -15,18 +15,38 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
+  finalize-enrichment:
+    if: github.event_name == 'pull_request' && github.head_ref == 'agent/durable-custom-lesson-jobs'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
     steps:
       - name: Check out PR branch
         uses: actions/checkout@v4
         with:
           ref: agent/durable-custom-lesson-jobs
           fetch-depth: 0
+
+      - name: Apply final mapping fix
+        run: python scripts/finalize-deterministic-enrichment.py
+
+      - name: Commit clean implementation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: prevent model identifiers from overriding canonical keys"
+          git push origin HEAD:agent/durable-custom-lesson-jobs
+
+  validate:
+    needs: finalize-enrichment
+    if: always() && (needs.finalize-enrichment.result == 'success' || needs.finalize-enrichment.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -40,23 +60,8 @@ jobs:
       - name: Type-check
         run: npm run typecheck
 
-      - name: Run tests and capture failure
-        shell: bash
-        run: |
-          set +e
-          npm test > /tmp/test-output.txt 2>&1
-          status=$?
-          set -e
-          if [ "$status" -ne 0 ]; then
-            mkdir -p diagnostics
-            tail -n 240 /tmp/test-output.txt > diagnostics/test-failure.txt
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add diagnostics/test-failure.txt
-            git commit -m "chore: capture test failure diagnostics" || true
-            git push origin HEAD:agent/durable-custom-lesson-jobs
-            exit "$status"
-          fi
+      - name: Run tests
+        run: npm test
 
       - name: Build
         run: npm run build
