@@ -1,22 +1,22 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import {
   ArrowLeft,
   CheckCircle2,
   Crown,
   LoaderCircle,
-  Sparkles,
+  RotateCcw,
   WandSparkles,
 } from "lucide-react";
 import { generateCustomLesson } from "@/lib/custom-lesson-utils";
-import type { JLPTLevel } from "@/types/lesson";
-import type { CustomLessonGenerationStage } from "@/types/app-preferences";
+import type { JLPTLevel, StoryWord } from "@/types/lesson";
 import { useAppStore } from "@/store/app-store";
 import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { GenerationProgress } from "@/components/custom-topic/generation-progress";
+import { InspectableText } from "@/components/exercises/inspectable-text";
 import { getBackendMode } from "@/lib/supabase/config";
 
 type GenerationState =
@@ -28,31 +28,149 @@ type GenerationState =
   | "ready"
   | "error";
 
+type StoryLineResult = {
+  japanese?: string;
+  english?: string;
+  words?: Array<{
+    libraryId?: string;
+    libraryType?: "kanji" | "vocabulary";
+    surface?: string;
+    reading?: string;
+    meaning?: string;
+    scriptType?: "kanji" | "hiragana" | "katakana";
+  }>;
+};
+
 type GenerationResult = {
   requestId?: string;
   status?: string;
+  currentStage?: string;
+  progressPercent?: number;
+  lessonReady?: boolean;
+  lessonId?: string | null;
   lesson_id?: string;
+  lessonVersionId?: string | null;
+  assignmentId?: string | null;
   error?: string;
-  audio?: { status?: string };
+  message?: string;
+  audioStatus?: string;
+  completedGroups?: string[];
+  failedGroups?: string[];
+  retryable?: boolean;
+  permanentFailure?: boolean;
   story?: {
     japaneseTitle?: string;
-    lines?: Array<{ japanese?: string; english?: string }>;
-  };
+    lines?: StoryLineResult[];
+  } | null;
 };
 
-const generationStages: CustomLessonGenerationStage[] = [
+type PreviewStoryLine = {
+  japanese: string;
+  english: string;
+  words: StoryWord[];
+};
+
+const generationStages = [
   "Writing your story",
-  "Building lesson activities",
-  "Preparing lesson audio",
+  "Story ready",
+  "Creating lesson activities",
+  "Checking lesson quality",
+  "Saving your lesson",
+  "Preparing activity audio",
   "Ready",
 ];
 
-function progressIndex(state: GenerationState): number {
+function stageIndex(
+  state: GenerationState,
+  currentStage: string,
+  lessonReady: boolean,
+  audioStatus: string,
+): number {
   if (state === "generating") return 0;
-  if (state === "story" || state === "activities") return 1;
-  if (state === "audio") return 2;
-  if (state === "ready") return generationStages.length;
-  return 0;
+  if (state === "ready" && (audioStatus === "ready" || audioStatus === "failed")) {
+    return generationStages.length;
+  }
+  if (lessonReady) return audioStatus === "ready" ? 7 : 5;
+  if (currentStage === "quality_check" || currentStage === "activities_validating") return 3;
+  if (currentStage === "saving_lesson" || currentStage === "lesson_saving") return 4;
+  if (
+    currentStage === "audio" ||
+    currentStage === "audio_queued" ||
+    currentStage === "audio_building"
+  ) {
+    return 5;
+  }
+  if (
+    currentStage.includes("activit") ||
+    currentStage.includes("vocabulary") ||
+    currentStage.includes("grammar") ||
+    currentStage.includes("listening") ||
+    currentStage.includes("review") ||
+    currentStage === "retrying_activity_groups"
+  ) {
+    return 2;
+  }
+  return state === "story" || state === "activities" ? 1 : 0;
+}
+
+function statusLabel(currentStage: string, lessonReady: boolean, audioStatus: string): string {
+  if (lessonReady && audioStatus === "building") return "Preparing listening and speaking audio";
+  if (lessonReady && audioStatus === "queued") return "Audio queued";
+  if (lessonReady) return "Lesson ready";
+  if (currentStage === "vocabulary_and_kanji") return "Vocabulary and kanji ready";
+  if (currentStage === "grammar_and_reading") return "Grammar and reading ready";
+  if (currentStage === "listening_and_speaking") return "Listening and speaking ready";
+  if (currentStage === "final_review") return "Final review ready";
+  if (currentStage === "quality_check" || currentStage === "activities_validating") {
+    return "Checking lesson quality";
+  }
+  if (currentStage === "saving_lesson" || currentStage === "lesson_saving") {
+    return "Saving your lesson";
+  }
+  if (currentStage === "retrying_activity_groups") return "Retrying an activity group";
+  return "Creating lesson activities";
+}
+
+function previewLines(source: StoryLineResult[] | undefined): PreviewStoryLine[] {
+  if (!Array.isArray(source)) return [];
+  return source.flatMap((line, lineIndex) => {
+    if (typeof line.japanese !== "string" || typeof line.english !== "string") return [];
+    const words = Array.isArray(line.words)
+      ? line.words.flatMap((word, wordIndex): StoryWord[] => {
+          if (
+            typeof word.surface !== "string" ||
+            typeof word.reading !== "string" ||
+            typeof word.meaning !== "string" ||
+            (word.scriptType !== "kanji" &&
+              word.scriptType !== "hiragana" &&
+              word.scriptType !== "katakana")
+          ) {
+            return [];
+          }
+          return [{
+            id: word.libraryId ?? `preview_word_${lineIndex}_${wordIndex}`,
+            libraryId: word.libraryId,
+            libraryType: word.libraryType,
+            position: wordIndex,
+            surface: word.surface,
+            reading: word.reading,
+            meaning: word.meaning,
+            scriptType: word.scriptType,
+            baseMeaningScore: 0,
+            baseRecognitionScore: 0,
+            basePronunciationScore: 0,
+          }];
+        })
+      : [];
+    return [{ japanese: line.japanese, english: line.english, words }];
+  });
+}
+
+function setRequestInUrl(requestId: string | null) {
+  const url = new URL(window.location.href);
+  if (requestId) url.searchParams.set("requestId", requestId);
+  else url.searchParams.delete("requestId");
+  window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
 }
 
 export function CustomTopicPage() {
@@ -69,71 +187,155 @@ export function CustomTopicPage() {
   const [state, setState] = useState<GenerationState>("idle");
   const [lessonId, setLessonId] = useState<string | null>(null);
   const [requestId, setRequestId] = useState<string | null>(null);
+  const [currentStage, setCurrentStage] = useState("");
+  const [progressPercent, setProgressPercent] = useState(0);
   const [storyTitle, setStoryTitle] = useState("");
-  const [storyLines, setStoryLines] = useState<Array<{ japanese: string; english: string }>>([]);
+  const [storyLines, setStoryLines] = useState<PreviewStoryLine[]>([]);
+  const [completedGroups, setCompletedGroups] = useState<string[]>([]);
   const [error, setError] = useState("");
-  const [audioWarning, setAudioWarning] = useState("");
+  const [audioStatus, setAudioStatus] = useState("pending");
 
-  async function prepareAudio(id: string, completedLessonId: string) {
-    setState("audio");
-    try {
-      const response = await fetch("/api/custom-lessons/complete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requestId: id, action: "audio" }),
-        signal: AbortSignal.timeout(300_000),
-      });
-      const result = (await response.json().catch(() => null)) as GenerationResult | null;
-      const audioReady = response.ok && result?.audio?.status === "ready";
-      if (!audioReady) {
-        setAudioWarning(
-          "Your lesson is ready, but some audio could not be prepared yet. It can still be generated when needed.",
-        );
+  const applyResult = useCallback((result: GenerationResult) => {
+    if (result.story?.lines) {
+      const lines = previewLines(result.story.lines);
+      if (lines.length > 0) {
+        setStoryLines(lines);
+        setStoryTitle(result.story.japaneseTitle || "Your new story");
       }
-    } catch {
-      setAudioWarning(
-        "Your lesson is ready, but audio preparation was interrupted. It can still be generated when needed.",
-      );
     }
-    setLessonId(completedLessonId);
-    setState("ready");
-  }
+    if (typeof result.currentStage === "string") setCurrentStage(result.currentStage);
+    if (typeof result.progressPercent === "number") setProgressPercent(result.progressPercent);
+    if (Array.isArray(result.completedGroups)) setCompletedGroups(result.completedGroups);
+    if (typeof result.audioStatus === "string") setAudioStatus(result.audioStatus);
 
-  async function completeLesson(id: string) {
-    setState("activities");
-    try {
-      const response = await fetch("/api/custom-lessons/complete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requestId: id, action: "activities" }),
-        signal: AbortSignal.timeout(300_000),
-      });
-      const result = (await response.json().catch(() => null)) as GenerationResult | null;
-      if (!response.ok || !result?.lesson_id) {
-        setError(result?.error || "The story is safe, but the remaining activities could not be completed. Try again.");
-        setState("story");
-        return;
+    const readyLessonId = result.lessonId ?? result.lesson_id ?? null;
+    if (readyLessonId) {
+      setLessonId(readyLessonId);
+      setState("ready");
+      if (result.audioStatus === "failed") {
+        setError("Your lesson is ready. Listening and speaking audio can be retried later.");
+      } else {
+        setError("");
       }
-      setLessonId(result.lesson_id);
-      await prepareAudio(id, result.lesson_id);
-    } catch (requestError) {
-      const timedOut = requestError instanceof DOMException &&
-        (requestError.name === "TimeoutError" || requestError.name === "AbortError");
-      setError(
-        timedOut
-          ? "The story is safe. The remaining activities need more time—tap retry."
-          : "The story is safe, but the connection stopped while building the remaining activities.",
-      );
+      return;
+    }
+
+    if (result.permanentFailure || result.status === "failed") {
+      setError(result.message || "AIko could not finish this lesson. You can retry the remaining activities.");
       setState("story");
+      return;
     }
+    if (result.status === "activities_failed") {
+      setError("Your story is safe. One activity group needs another attempt.");
+      setState("story");
+      return;
+    }
+    if (result.status === "audio_building" || result.currentStage === "audio") {
+      setState("audio");
+      return;
+    }
+    if (result.status && result.status !== "story_ready") {
+      setState("activities");
+      return;
+    }
+    setState("story");
+  }, []);
+
+  useEffect(() => {
+    const activeRequest = new URL(window.location.href).searchParams.get("requestId");
+    if (activeRequest) {
+      setRequestId(activeRequest);
+      setState("story");
+      setCurrentStage("restoring");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!requestId || getBackendMode() === "demo") return;
+    let cancelled = false;
+    let timer: ReturnType<typeof window.setTimeout> | null = null;
+    let running = false;
+
+    async function poll() {
+      if (cancelled || running) return;
+      running = true;
+      try {
+        const response = await fetch(
+          `/api/custom-lessons/status?requestId=${encodeURIComponent(requestId!)}`,
+          { cache: "no-store" },
+        );
+        const result = (await response.json().catch(() => null)) as GenerationResult | null;
+        if (cancelled) return;
+        if (!response.ok || !result) {
+          setError(result?.error || "AIko could not restore this lesson's progress.");
+          return;
+        }
+        applyResult(result);
+        const terminal =
+          result.permanentFailure ||
+          (result.lessonReady &&
+            (result.audioStatus === "ready" || result.audioStatus === "failed"));
+        if (!terminal) {
+          const delay = document.hidden
+            ? 10_000
+            : result.lessonReady
+              ? 5_000
+              : 2_500;
+          timer = window.setTimeout(() => void poll(), delay);
+        }
+      } catch {
+        if (!cancelled) {
+          timer = window.setTimeout(() => void poll(), document.hidden ? 10_000 : 4_000);
+        }
+      } finally {
+        running = false;
+      }
+    }
+
+    function visibilityChanged() {
+      if (document.hidden || cancelled) return;
+      if (timer !== null) window.clearTimeout(timer);
+      timer = null;
+      void poll();
+    }
+
+    void poll();
+    document.addEventListener("visibilitychange", visibilityChanged);
+    return () => {
+      cancelled = true;
+      if (timer !== null) window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", visibilityChanged);
+    };
+  }, [applyResult, requestId]);
+
+  async function retryRemaining() {
+    if (!requestId) return;
+    setError("");
+    setState("activities");
+    const response = await fetch("/api/custom-lessons/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ requestId, action: "activities" }),
+    });
+    const result = (await response.json().catch(() => null)) as GenerationResult | null;
+    if (!response.ok) {
+      setError(result?.error || "The remaining activities could not be queued.");
+      setState("story");
+      return;
+    }
+    setCurrentStage("activities_queued");
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
-    setAudioWarning("");
     setRequestId(null);
+    setRequestInUrl(null);
     setLessonId(null);
+    setCurrentStage("writing_story");
+    setProgressPercent(0);
+    setCompletedGroups([]);
+    setAudioStatus("pending");
     setStoryTitle("");
     setStoryLines([]);
     setState("generating");
@@ -159,7 +361,7 @@ export function CustomTopicPage() {
         });
         setLessonId(lesson.id);
         setState("ready");
-      }, 1200);
+      }, 1_200);
       return;
     }
 
@@ -186,21 +388,15 @@ export function CustomTopicPage() {
         setState("error");
         return;
       }
-      const lines = result.story.lines.flatMap((line) =>
-        typeof line.japanese === "string" && typeof line.english === "string"
-          ? [{ japanese: line.japanese, english: line.english }]
-          : [],
-      );
-      if (!lines.length) {
-        setError("The story response was incomplete. Please try again.");
+      const lines = previewLines(result.story.lines);
+      if (!lines.length || lines.some((line) => line.words.length < 1)) {
+        setError("The story support library was incomplete. Please try again.");
         setState("error");
         return;
       }
       setRequestId(result.requestId);
-      setStoryTitle(result.story.japaneseTitle || "Your new story");
-      setStoryLines(lines);
-      setState("story");
-      await completeLesson(result.requestId);
+      setRequestInUrl(result.requestId);
+      applyResult(result);
     } catch (requestError) {
       const timedOut = requestError instanceof DOMException &&
         (requestError.name === "TimeoutError" || requestError.name === "AbortError");
@@ -227,15 +423,19 @@ export function CustomTopicPage() {
     );
   }
 
-  const busy = state === "generating" || state === "story" || state === "activities" || state === "audio";
+  const lessonReady = Boolean(lessonId);
+  const busy =
+    state === "generating" ||
+    state === "activities" ||
+    state === "audio" ||
+    (state === "story" && !error);
   const buttonLabel =
     state === "generating"
       ? "Writing your story…"
-      : state === "story" || state === "activities"
-        ? "Building lesson activities…"
-        : state === "audio"
-          ? "Preparing lesson audio…"
-          : "Create my lesson";
+      : busy
+        ? "Building your lesson…"
+        : "Create my lesson";
+  const progress = stageIndex(state, currentStage, lessonReady, audioStatus);
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-7 sm:px-8 sm:py-10">
@@ -243,7 +443,7 @@ export function CustomTopicPage() {
         <ButtonLink href="/learn" variant="ghost" className="px-0"><ArrowLeft className="size-4" /> My learning path</ButtonLink>
         <p className="section-kicker mt-6">Pro custom topic</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight">What should your next story be about?</h1>
-        <p className="mt-3 max-w-2xl leading-7 text-stone-500">Choose only a topic and level. AIko returns the story first, builds the lesson activities, and then prepares reusable audio.</p>
+        <p className="mt-3 max-w-2xl leading-7 text-stone-500">Choose only a topic and level. Your library-backed story appears first; AIko builds the remaining activities in the background.</p>
       </header>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[.8fr_1.2fr]">
@@ -255,58 +455,84 @@ export function CustomTopicPage() {
                 {(["N5", "N4", "N3", "N2", "N1"] as JLPTLevel[]).map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </Field>
-            {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
-            {audioWarning && <p role="status" className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">{audioWarning}</p>}
+            {error && <p role="alert" className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">{error}</p>}
             <Button type="submit" disabled={busy} className="w-full"><WandSparkles className="size-4" /> {buttonLabel}</Button>
-            {state === "story" && error && requestId && (
-              <Button type="button" variant="secondary" className="w-full" onClick={() => { setError(""); void completeLesson(requestId); }}>
-                <Sparkles className="size-4" /> Retry remaining lesson
+            {requestId && error && !lessonReady && (
+              <Button type="button" variant="secondary" className="w-full" onClick={() => void retryRemaining()}>
+                <RotateCcw className="size-4" /> Retry remaining activities
               </Button>
             )}
           </form>
 
-          {busy && (
+          {(busy || lessonReady) && (
             <div className="mt-7 border-t border-stone-100 pt-6" role="status" aria-live="polite">
-              <GenerationProgress stages={generationStages} currentIndex={progressIndex(state)} />
+              <GenerationProgress stages={generationStages} currentIndex={progress} />
+              <div className="mt-4 flex items-center justify-between text-xs text-stone-500">
+                <span>{statusLabel(currentStage, lessonReady, audioStatus)}</span>
+                <span>{Math.max(progressPercent, lessonReady ? 90 : 0)}%</span>
+              </div>
+              {completedGroups.length > 0 && !lessonReady && (
+                <p className="mt-2 text-xs text-moss-700">
+                  {completedGroups.length} of 4 activity groups safely stored
+                </p>
+              )}
             </div>
           )}
         </Card>
 
         <Card className="min-h-[34rem] p-7 sm:p-9">
-          {state === "ready" ? (
-            <div className="grid min-h-[28rem] place-items-center text-center">
-              <div>
-                <CheckCircle2 className="mx-auto size-12 text-moss-600" />
-                <Badge tone="moss" className="mt-6">Saved to your path</Badge>
-                <h2 className="mt-4 text-2xl font-semibold">Your complete lesson is ready.</h2>
-                <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">The activities are saved. Reusable audio was prepared when available.</p>
-                <ButtonLink href={lessonId ? `/lesson/${lessonId}/preview` : "/learn"} className="mt-7">Open my assigned lesson</ButtonLink>
-              </div>
-            </div>
-          ) : state === "story" || state === "activities" || state === "audio" ? (
+          {storyLines.length > 0 ? (
             <div aria-live="polite">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div><Badge tone="moss">Story ready</Badge><h2 className="mt-3 text-2xl font-semibold">{storyTitle}</h2></div>
-                {!error && (
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <Badge tone="moss">Story ready</Badge>
+                  <h2 className="mt-3 text-2xl font-semibold">{storyTitle}</h2>
+                  <p className="mt-2 max-w-lg text-sm leading-6 text-stone-500">
+                    Touch a supported word for reading and meaning. Story audio is intentionally off.
+                  </p>
+                </div>
+                {lessonReady ? (
+                  <ButtonLink href={`/lesson/${lessonId}/preview`}>
+                    <CheckCircle2 className="size-4" /> Open lesson
+                  </ButtonLink>
+                ) : !error ? (
                   <span className="flex items-center gap-2 text-xs font-semibold text-moss-700">
                     <LoaderCircle className="size-4 animate-spin" />
-                    {state === "audio" ? "Preparing audio" : "Building lesson activities"}
+                    {statusLabel(currentStage, false, audioStatus)}
                   </span>
-                )}
+                ) : null}
               </div>
+              {lessonReady && audioStatus !== "ready" && audioStatus !== "failed" && (
+                <p className="mt-5 rounded-2xl bg-moss-50 px-4 py-3 text-sm text-moss-800">
+                  Your lesson is ready. Listening and speaking audio is still being prepared.
+                </p>
+              )}
               <div className="mt-6 space-y-4 rounded-3xl bg-moss-50 p-5 sm:p-7">
                 {storyLines.map((line, index) => (
                   <div key={`${line.japanese}-${index}`} className="border-b border-moss-100 pb-4 last:border-0 last:pb-0">
-                    <p className="font-serif text-xl leading-9 text-ink">{line.japanese}</p>
+                    <p className="font-serif text-xl leading-9 text-ink">
+                      <InspectableText text={line.japanese} terms={line.words} showAudio={false} />
+                    </p>
                     <p className="mt-1 text-sm leading-6 text-stone-500">{line.english}</p>
                   </div>
                 ))}
               </div>
-              <p className="mt-5 text-center text-xs leading-5 text-stone-400">You can read now. The progress list shows the actual backend phase currently running.</p>
+              <p className="mt-5 text-center text-xs leading-5 text-stone-400">
+                This story and its word library are already stored. Refreshing or leaving this page will not restart generation.
+              </p>
+            </div>
+          ) : state === "ready" ? (
+            <div className="grid min-h-[28rem] place-items-center text-center">
+              <div>
+                <CheckCircle2 className="mx-auto size-12 text-moss-600" />
+                <Badge tone="moss" className="mt-6">Saved to your path</Badge>
+                <h2 className="mt-4 text-2xl font-semibold">Your lesson is ready.</h2>
+                <ButtonLink href={lessonId ? `/lesson/${lessonId}/preview` : "/learn"} className="mt-7">Open my assigned lesson</ButtonLink>
+              </div>
             </div>
           ) : state === "generating" ? (
             <div className="grid min-h-[28rem] place-items-center text-center" role="status" aria-live="polite">
-              <div><LoaderCircle className="mx-auto size-16 animate-spin text-moss-500" /><Badge tone="moss" className="mt-6">Writing the story first</Badge><h2 className="mt-4 text-2xl font-semibold">AIko is preparing your reading.</h2><p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">The validated story appears as soon as it is ready.</p></div>
+              <div><LoaderCircle className="mx-auto size-16 animate-spin text-moss-500" /><Badge tone="moss" className="mt-6">Writing the story first</Badge><h2 className="mt-4 text-2xl font-semibold">AIko is preparing your reading.</h2><p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">It appears only after every supported word has a permanent library record.</p></div>
             </div>
           ) : state === "error" ? (
             <div className="grid min-h-[28rem] place-items-center text-center">
