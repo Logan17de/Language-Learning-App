@@ -1,6 +1,8 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
+import { processCustomLessonJobs } from "@/lib/custom-lessons/job-runner";
+import { buildInteractiveStory } from "@/lib/gemini/lesson-activity-groups";
 import {
   generateStoryDraft,
   type GenerationAuditEntry,
@@ -15,7 +17,7 @@ import type { Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
 
 export const runtime = "nodejs";
-export const maxDuration = 180;
+export const maxDuration = 300;
 
 interface BeginResult {
   requestId: string;
@@ -149,6 +151,10 @@ export async function POST(request: NextRequest) {
       plan,
       draft: story.draft,
     });
+    const interactiveStory = buildInteractiveStory(
+      story.draft,
+      resolved.library,
+    );
     const audit: GenerationAuditEntry[] = [
       story.audit,
       ...(resolved.audit ? [resolved.audit] : []),
@@ -164,19 +170,37 @@ export async function POST(request: NextRequest) {
         story_draft: story.draft,
         library_snapshot: resolved.library,
         generation_audit: audit,
-        status: "story_ready",
+        status: "activities_queued",
+        current_stage: "activities_queued",
+        progress_percent: 20,
+        completed_groups: [],
+        failed_groups: [],
         last_error: null,
       },
       { onConflict: "request_id" },
     );
     if (saved.error) throw new Error(saved.error.message);
 
+    after(async () => {
+      try {
+        await processCustomLessonJobs({
+          requestId: generation.requestId,
+          maxCycles: 2,
+        });
+      } catch (error) {
+        console.error("Custom lesson background worker stopped.", {
+          requestId: generation.requestId,
+          message: error instanceof Error ? error.message : "Unknown worker error.",
+        });
+      }
+    });
+
     return NextResponse.json({
       requestId: generation.requestId,
       jobId: generation.jobId,
       status: "story_ready",
       reused: false,
-      story: story.draft,
+      story: interactiveStory,
     });
   } catch (error) {
     const internalMessage =
