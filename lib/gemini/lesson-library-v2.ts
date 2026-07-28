@@ -3,6 +3,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
+import { canonicalizeLearnedGrammarPatterns } from "@/lib/gemini/grammar-pattern-learning";
 import {
   generateLibraryEnrichment,
   type CanonicalGrammar,
@@ -406,9 +407,17 @@ export async function resolveLessonLibrary(
       grammar: unknownGrammar,
       vocabulary: unknownVocabulary,
     });
+    const learnedGrammar = await canonicalizeLearnedGrammarPatterns({
+      requestedPatterns: unknownGrammar,
+      generatedGrammar: enrichment.seed.grammar,
+    });
+    const canonicalSeed = {
+      ...enrichment.seed,
+      grammar: learnedGrammar,
+    };
     const stored = await client.rpc("enrich_custom_lesson_library_v2", {
       p_level: input.level,
-      p_seed: enrichment.seed as unknown as Json,
+      p_seed: canonicalSeed as unknown as Json,
       p_source_model: enrichment.model,
     });
     if (stored.error) {

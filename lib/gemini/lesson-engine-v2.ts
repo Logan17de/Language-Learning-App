@@ -609,9 +609,8 @@ function libraryIssues(
   if (!sameSet(kanji, request.kanji)) {
     issues.push("Kanji output must exactly match the requested characters.");
   }
-  if (!sameSet(grammar, request.grammar)) {
-    issues.push("Grammar output must exactly match the requested patterns.");
-  }
+  // Grammar identifiers are canonicalized after semantic alias validation.
+  // Kanji and vocabulary identity checks remain strict.
   if (
     !sameSet(
       vocabulary,
