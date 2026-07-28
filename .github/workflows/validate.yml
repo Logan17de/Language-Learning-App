@@ -8,37 +8,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: validate-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  finalize-enrichment:
-    if: github.event_name == 'pull_request' && github.head_ref == 'agent/durable-custom-lesson-jobs'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out PR branch
-        uses: actions/checkout@v4
-        with:
-          ref: agent/durable-custom-lesson-jobs
-          fetch-depth: 0
-
-      - name: Apply final mapping fix
-        run: python scripts/finalize-deterministic-enrichment.py
-
-      - name: Commit clean implementation
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "fix: prevent model identifiers from overriding canonical keys"
-          git push origin HEAD:agent/durable-custom-lesson-jobs
-
   validate:
-    needs: finalize-enrichment
-    if: always() && (needs.finalize-enrichment.result == 'success' || needs.finalize-enrichment.result == 'skipped')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:

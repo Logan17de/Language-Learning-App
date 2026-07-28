@@ -322,20 +322,37 @@ export function mapLibraryEnrichment(
 
   return {
     kanji: request.kanji.map((character, requestIndex) => {
-      const { requestIndex: _ignored, ...metadata } = kanjiByIndex.get(requestIndex)!;
-      return { character, ...metadata };
+      const item = kanjiByIndex.get(requestIndex)!;
+      return {
+        meanings: item.meanings,
+        readings: item.readings,
+        onyomi: item.onyomi,
+        kunyomi: item.kunyomi,
+        exampleWords: item.exampleWords,
+        strokeCount: item.strokeCount,
+        character,
+      };
     }),
     grammar: request.grammar.map((pattern, requestIndex) => {
-      const { requestIndex: _ignored, ...metadata } = grammarByIndex.get(requestIndex)!;
-      return { pattern, ...metadata };
+      const item = grammarByIndex.get(requestIndex)!;
+      return {
+        meaning: item.meaning,
+        formation: item.formation,
+        usageNotes: item.usageNotes,
+        nuance: item.nuance,
+        exampleSentences: item.exampleSentences,
+        pattern,
+      };
     }),
     vocabulary: request.vocabulary.map((requested, requestIndex) => {
-      const { requestIndex: _ignored, reading: _modelReading, ...metadata } =
-        vocabularyByIndex.get(requestIndex)!;
+      const item = vocabularyByIndex.get(requestIndex)!;
       return {
+        meaning: item.meaning,
+        partOfSpeech: item.partOfSpeech,
+        tags: item.tags,
+        exampleSentence: item.exampleSentence,
         writtenForm: normalizeJapaneseLookup(requested.writtenForm),
         reading: normalizeJapaneseLookup(requested.readingHint),
-        ...metadata,
         linkedKanjiCharacters: linkedKanjiForWord(
           requested.writtenForm,
           request.allowedKanji,
