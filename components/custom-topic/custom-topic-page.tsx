@@ -11,24 +11,49 @@ import {
 } from "lucide-react";
 import { generateCustomLesson } from "@/lib/custom-lesson-utils";
 import type { JLPTLevel } from "@/types/lesson";
+import type { CustomLessonGenerationStage } from "@/types/app-preferences";
 import { useAppStore } from "@/store/app-store";
 import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { GenerationProgress } from "@/components/custom-topic/generation-progress";
 import { getBackendMode } from "@/lib/supabase/config";
 
-type GenerationState = "idle" | "generating" | "story" | "ready" | "error";
+type GenerationState =
+  | "idle"
+  | "generating"
+  | "story"
+  | "activities"
+  | "audio"
+  | "ready"
+  | "error";
 
 type GenerationResult = {
   requestId?: string;
   status?: string;
   lesson_id?: string;
   error?: string;
+  audio?: { status?: string };
   story?: {
     japaneseTitle?: string;
     lines?: Array<{ japanese?: string; english?: string }>;
   };
 };
+
+const generationStages: CustomLessonGenerationStage[] = [
+  "Writing your story",
+  "Building lesson activities",
+  "Preparing lesson audio",
+  "Ready",
+];
+
+function progressIndex(state: GenerationState): number {
+  if (state === "generating") return 0;
+  if (state === "story" || state === "activities") return 1;
+  if (state === "audio") return 2;
+  if (state === "ready") return generationStages.length;
+  return 0;
+}
 
 export function CustomTopicPage() {
   const subscription = useAppStore((state) => state.subscription);
@@ -47,13 +72,40 @@ export function CustomTopicPage() {
   const [storyTitle, setStoryTitle] = useState("");
   const [storyLines, setStoryLines] = useState<Array<{ japanese: string; english: string }>>([]);
   const [error, setError] = useState("");
+  const [audioWarning, setAudioWarning] = useState("");
 
-  async function completeLesson(id: string) {
+  async function prepareAudio(id: string, completedLessonId: string) {
+    setState("audio");
     try {
       const response = await fetch("/api/custom-lessons/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requestId: id }),
+        body: JSON.stringify({ requestId: id, action: "audio" }),
+        signal: AbortSignal.timeout(300_000),
+      });
+      const result = (await response.json().catch(() => null)) as GenerationResult | null;
+      const audioReady = response.ok && result?.audio?.status === "ready";
+      if (!audioReady) {
+        setAudioWarning(
+          "Your lesson is ready, but some audio could not be prepared yet. It can still be generated when needed.",
+        );
+      }
+    } catch {
+      setAudioWarning(
+        "Your lesson is ready, but audio preparation was interrupted. It can still be generated when needed.",
+      );
+    }
+    setLessonId(completedLessonId);
+    setState("ready");
+  }
+
+  async function completeLesson(id: string) {
+    setState("activities");
+    try {
+      const response = await fetch("/api/custom-lessons/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId: id, action: "activities" }),
         signal: AbortSignal.timeout(300_000),
       });
       const result = (await response.json().catch(() => null)) as GenerationResult | null;
@@ -63,7 +115,7 @@ export function CustomTopicPage() {
         return;
       }
       setLessonId(result.lesson_id);
-      setState("ready");
+      await prepareAudio(id, result.lesson_id);
     } catch (requestError) {
       const timedOut = requestError instanceof DOMException &&
         (requestError.name === "TimeoutError" || requestError.name === "AbortError");
@@ -79,6 +131,10 @@ export function CustomTopicPage() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setAudioWarning("");
+    setRequestId(null);
+    setLessonId(null);
+    setStoryTitle("");
     setStoryLines([]);
     setState("generating");
 
@@ -171,7 +227,15 @@ export function CustomTopicPage() {
     );
   }
 
-  const busy = state === "generating" || state === "story";
+  const busy = state === "generating" || state === "story" || state === "activities" || state === "audio";
+  const buttonLabel =
+    state === "generating"
+      ? "Writing your story…"
+      : state === "story" || state === "activities"
+        ? "Building lesson activities…"
+        : state === "audio"
+          ? "Preparing lesson audio…"
+          : "Create my lesson";
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-7 sm:px-8 sm:py-10">
@@ -179,7 +243,7 @@ export function CustomTopicPage() {
         <ButtonLink href="/learn" variant="ghost" className="px-0"><ArrowLeft className="size-4" /> My learning path</ButtonLink>
         <p className="section-kicker mt-6">Pro custom topic</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight">What should your next story be about?</h1>
-        <p className="mt-3 max-w-2xl leading-7 text-stone-500">Choose only a topic and level. AIko selects the language targets, checks the reusable library, returns the story first, and builds the remaining practice while you read.</p>
+        <p className="mt-3 max-w-2xl leading-7 text-stone-500">Choose only a topic and level. AIko returns the story first, builds the lesson activities, and then prepares reusable audio.</p>
       </header>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[.8fr_1.2fr]">
@@ -192,13 +256,20 @@ export function CustomTopicPage() {
               </select>
             </Field>
             {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
-            <Button type="submit" disabled={busy} className="w-full"><WandSparkles className="size-4" /> {state === "generating" ? "Writing your story…" : "Create my lesson"}</Button>
+            {audioWarning && <p role="status" className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">{audioWarning}</p>}
+            <Button type="submit" disabled={busy} className="w-full"><WandSparkles className="size-4" /> {buttonLabel}</Button>
             {state === "story" && error && requestId && (
               <Button type="button" variant="secondary" className="w-full" onClick={() => { setError(""); void completeLesson(requestId); }}>
                 <Sparkles className="size-4" /> Retry remaining lesson
               </Button>
             )}
           </form>
+
+          {busy && (
+            <div className="mt-7 border-t border-stone-100 pt-6" role="status" aria-live="polite">
+              <GenerationProgress stages={generationStages} currentIndex={progressIndex(state)} />
+            </div>
+          )}
         </Card>
 
         <Card className="min-h-[34rem] p-7 sm:p-9">
@@ -208,15 +279,20 @@ export function CustomTopicPage() {
                 <CheckCircle2 className="mx-auto size-12 text-moss-600" />
                 <Badge tone="moss" className="mt-6">Saved to your path</Badge>
                 <h2 className="mt-4 text-2xl font-semibold">Your complete lesson is ready.</h2>
-                <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">The activities are saved, and reusable Google audio has been prepared in the background.</p>
+                <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">The activities are saved. Reusable audio was prepared when available.</p>
                 <ButtonLink href={lessonId ? `/lesson/${lessonId}/preview` : "/learn"} className="mt-7">Open my assigned lesson</ButtonLink>
               </div>
             </div>
-          ) : state === "story" ? (
+          ) : state === "story" || state === "activities" || state === "audio" ? (
             <div aria-live="polite">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div><Badge tone="moss">Story ready</Badge><h2 className="mt-3 text-2xl font-semibold">{storyTitle}</h2></div>
-                {!error && <span className="flex items-center gap-2 text-xs font-semibold text-moss-700"><LoaderCircle className="size-4 animate-spin" /> Building practice and audio</span>}
+                {!error && (
+                  <span className="flex items-center gap-2 text-xs font-semibold text-moss-700">
+                    <LoaderCircle className="size-4 animate-spin" />
+                    {state === "audio" ? "Preparing audio" : "Building lesson activities"}
+                  </span>
+                )}
               </div>
               <div className="mt-6 space-y-4 rounded-3xl bg-moss-50 p-5 sm:p-7">
                 {storyLines.map((line, index) => (
@@ -226,15 +302,19 @@ export function CustomTopicPage() {
                   </div>
                 ))}
               </div>
-              <p className="mt-5 text-center text-xs leading-5 text-stone-400">You can read now. AIko is creating vocabulary, grammar, reading, listening, speaking, review, and reusable audio without changing this story.</p>
+              <p className="mt-5 text-center text-xs leading-5 text-stone-400">You can read now. The progress list shows the actual backend phase currently running.</p>
             </div>
           ) : state === "generating" ? (
             <div className="grid min-h-[28rem] place-items-center text-center" role="status" aria-live="polite">
-              <div><LoaderCircle className="mx-auto size-16 animate-spin text-moss-500" /><Badge tone="moss" className="mt-6">Writing the story first</Badge><h2 className="mt-4 text-2xl font-semibold">AIko is preparing your reading.</h2><p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">The validated story appears as soon as it is ready. Practice and audio continue afterward.</p></div>
+              <div><LoaderCircle className="mx-auto size-16 animate-spin text-moss-500" /><Badge tone="moss" className="mt-6">Writing the story first</Badge><h2 className="mt-4 text-2xl font-semibold">AIko is preparing your reading.</h2><p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">The validated story appears as soon as it is ready.</p></div>
+            </div>
+          ) : state === "error" ? (
+            <div className="grid min-h-[28rem] place-items-center text-center">
+              <div><WandSparkles className="mx-auto size-11 text-red-300" /><h2 className="mt-5 text-xl font-semibold">The lesson could not be started.</h2><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-stone-500">Your topic is still in the form. Review the error and try again.</p></div>
             </div>
           ) : (
             <div className="grid min-h-[28rem] place-items-center text-center">
-              <div><WandSparkles className="mx-auto size-11 text-moss-300" /><h2 className="mt-5 text-xl font-semibold">Your topic, inside a structured path</h2><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-stone-500">You choose only the topic and level. AIko handles the encouraging tone, target language, reusable records, and seven connected stages.</p></div>
+              <div><WandSparkles className="mx-auto size-11 text-moss-300" /><h2 className="mt-5 text-xl font-semibold">Your topic, inside a structured path</h2><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-stone-500">You choose the topic and level. AIko creates the connected lesson.</p></div>
             </div>
           )}
         </Card>
