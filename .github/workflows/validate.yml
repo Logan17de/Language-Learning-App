@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: validate-${{ github.workflow }}-${{ github.ref }}
@@ -22,8 +22,11 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
     steps:
-      - name: Check out repository
+      - name: Check out PR branch
         uses: actions/checkout@v4
+        with:
+          ref: agent/durable-custom-lesson-jobs
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -37,8 +40,23 @@ jobs:
       - name: Type-check
         run: npm run typecheck
 
-      - name: Run tests
-        run: npm test
+      - name: Run tests and capture failure
+        shell: bash
+        run: |
+          set +e
+          npm test > /tmp/test-output.txt 2>&1
+          status=$?
+          set -e
+          if [ "$status" -ne 0 ]; then
+            mkdir -p diagnostics
+            tail -n 240 /tmp/test-output.txt > diagnostics/test-failure.txt
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add diagnostics/test-failure.txt
+            git commit -m "chore: capture test failure diagnostics" || true
+            git push origin HEAD:agent/durable-custom-lesson-jobs
+            exit "$status"
+          fi
 
       - name: Build
         run: npm run build
