@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     return response({ error: "The lesson generation request was not found." }, 404);
   }
 
-  const row = found.data as Record<string, unknown>;
+  const row = found.data as unknown as Record<string, unknown>;
   let story: ReturnType<typeof buildInteractiveStory> | null = null;
   try {
     story = buildInteractiveStory(
