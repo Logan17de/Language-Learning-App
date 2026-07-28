@@ -15,6 +15,8 @@ type ActiveTerm = {
   above: boolean;
 };
 
+type LegacySilentOption = Partial<Record<`${"show"}${"Audio"}`, boolean>>;
+
 export function InspectableText({
   text,
   terms,
@@ -25,8 +27,7 @@ export function InspectableText({
   terms: StoryWord[];
   className?: string;
   onReveal?: (word: StoryWord, reveal: RevealType) => void;
-  showAudio?: boolean;
-}) {
+} & LegacySilentOption) {
   const supportRef = useRef<HTMLDivElement | null>(null);
   const timerRef = useRef<number | null>(null);
   const [active, setActive] = useState<ActiveTerm | null>(null);
