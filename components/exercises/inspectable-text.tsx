@@ -21,11 +21,13 @@ export function InspectableText({
   terms,
   className,
   onReveal,
+  showAudio = true,
 }: {
   text: string;
   terms: StoryWord[];
   className?: string;
   onReveal?: (word: StoryWord, reveal: RevealType) => void;
+  showAudio?: boolean;
 }) {
   const supportRef = useRef<HTMLDivElement | null>(null);
   const timerRef = useRef<number | null>(null);
@@ -116,9 +118,11 @@ export function InspectableText({
       {stage >= 2 && (
         <div className="px-5 py-4 text-center text-lg font-medium">{active.word.meaning}</div>
       )}
-      <div className="border-t border-white/15 px-4 py-3">
-        <AudioControl replayCount={0} onPlay={() => undefined} text={active.word.reading} label="Hear pronunciation" />
-      </div>
+      {showAudio && (
+        <div className="border-t border-white/15 px-4 py-3">
+          <AudioControl replayCount={0} onPlay={() => undefined} text={active.word.reading} label="Hear pronunciation" />
+        </div>
+      )}
     </div>,
     document.body,
   ) : null;
