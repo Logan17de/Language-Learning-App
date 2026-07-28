@@ -7,6 +7,13 @@ import {
   generateStructured,
   type JsonSchema,
 } from "@/lib/gemini/structured-output";
+import {
+  assemblePlayableLesson,
+  generateFinalReviewActivities,
+  generateGrammarAndReadingActivities,
+  generateListeningAndSpeakingActivities,
+  generateVocabularyAndKanjiActivities,
+} from "@/lib/gemini/lesson-activity-groups";
 
 export interface PlannedKanji {
   character: string;
@@ -665,321 +672,6 @@ export async function generateLibraryEnrichment(
   };
 }
 
-const targetIdsSchema = stringArray(1, 5);
-
-function practiceSchema(phase: "vocabulary" | "grammar"): JsonSchema {
-  return {
-    type: "object",
-    additionalProperties: false,
-    required: [
-      "activityType",
-      "difficulty",
-      "mode",
-      "skill",
-      "prompt",
-      "cue",
-      "choices",
-      "correctAnswer",
-      "acceptedAnswers",
-      "explanation",
-      "hintFront",
-      "hintBack",
-      "targetItemIds",
-    ],
-    properties: {
-      activityType: {
-        type: "string",
-        enum:
-          phase === "vocabulary"
-            ? ["multiple_choice"]
-            : ["multiple_choice", "text_input"],
-      },
-      difficulty: { type: "string", enum: ["Easy", "Medium", "Hard"] },
-      mode: {
-        type: "string",
-        enum:
-          phase === "vocabulary"
-            ? ["kanji-reading", "reading-meaning", "meaning-japanese", "mixed"]
-            : ["grammar"],
-      },
-      skill: {
-        type: "string",
-        enum: ["understanding", "production"],
-      },
-      prompt: { type: "string" },
-      cue: { type: "string" },
-      choices: stringArray(0, 4),
-      correctAnswer: { type: "string" },
-      acceptedAnswers: stringArray(1, 5),
-      explanation: { type: "string" },
-      hintFront: { type: "string" },
-      hintBack: { type: "string" },
-      targetItemIds: targetIdsSchema,
-    },
-  };
-}
-
-function activitiesSchema(): JsonSchema {
-  return {
-    type: "object",
-    additionalProperties: false,
-    required: [
-      "vocabularyQuestions",
-      "grammarQuestions",
-      "readingConversation",
-      "listeningExercises",
-      "speakingExercises",
-      "reviewQuestions",
-    ],
-    properties: {
-      vocabularyQuestions: objectArray(13, 13, practiceSchema("vocabulary")),
-      grammarQuestions: objectArray(13, 13, practiceSchema("grammar")),
-      readingConversation: objectArray(6, 6, {
-        type: "object",
-        additionalProperties: false,
-        required: ["speaker", "japanese", "english", "targetItemIds"],
-        properties: {
-          speaker: { type: "string" },
-          japanese: { type: "string" },
-          english: { type: "string" },
-          targetItemIds: targetIdsSchema,
-        },
-      }),
-      listeningExercises: objectArray(3, 3, {
-        type: "object",
-        additionalProperties: false,
-        required: [
-          "difficulty",
-          "prompt",
-          "transcript",
-          "choices",
-          "correctAnswer",
-          "explanation",
-          "targetItemIds",
-        ],
-        properties: {
-          difficulty: { type: "string", enum: ["Easy", "Medium", "Hard"] },
-          prompt: { type: "string" },
-          transcript: { type: "string" },
-          choices: stringArray(4, 4),
-          correctAnswer: { type: "string" },
-          explanation: { type: "string" },
-          targetItemIds: targetIdsSchema,
-        },
-      }),
-      speakingExercises: objectArray(3, 3, {
-        type: "object",
-        additionalProperties: false,
-        required: [
-          "mode",
-          "prompt",
-          "easyPrompt",
-          "mediumPrompt",
-          "hardPrompt",
-          "expectedAnswer",
-          "modelAnswer",
-          "targetItemIds",
-        ],
-        properties: {
-          mode: { type: "string", enum: ["easy", "medium", "hard"] },
-          prompt: { type: "string" },
-          easyPrompt: { type: "string" },
-          mediumPrompt: { type: "string" },
-          hardPrompt: { type: "string" },
-          expectedAnswer: { type: "string" },
-          modelAnswer: { type: "string" },
-          targetItemIds: targetIdsSchema,
-        },
-      }),
-      reviewQuestions: objectArray(5, 5, {
-        type: "object",
-        additionalProperties: false,
-        required: [
-          "category",
-          "prompt",
-          "choices",
-          "correctAnswer",
-          "explanation",
-          "targetItemIds",
-        ],
-        properties: {
-          category: {
-            type: "string",
-            enum: ["kanji", "vocabulary", "grammar", "listening", "speaking"],
-          },
-          prompt: { type: "string" },
-          choices: stringArray(4, 4),
-          correctAnswer: { type: "string" },
-          explanation: { type: "string" },
-          targetItemIds: targetIdsSchema,
-        },
-      }),
-    },
-  };
-}
-
-function activitiesIssues(
-  value: unknown,
-  library: ResolvedLessonLibrary,
-): string[] {
-  if (!isRecord(value)) return ["Activities must be an object."];
-  const issues: string[] = [];
-  const allowedIds = new Set([
-    ...library.kanji.map((item) => item.libraryId),
-    ...library.grammar.map((item) => item.libraryId),
-    ...library.vocabulary.map((item) => item.libraryId),
-  ]);
-  const expectedCounts: Record<string, number> = {
-    vocabularyQuestions: 13,
-    grammarQuestions: 13,
-    readingConversation: 6,
-    listeningExercises: 3,
-    speakingExercises: 3,
-    reviewQuestions: 5,
-  };
-  for (const [key, count] of Object.entries(expectedCounts)) {
-    const items = value[key];
-    if (!Array.isArray(items) || items.length !== count) {
-      issues.push(`${key} needs exactly ${count} items.`);
-      continue;
-    }
-    for (const [index, item] of items.entries()) {
-      if (!isRecord(item) || !Array.isArray(item.targetItemIds)) {
-        issues.push(`${key} item ${index + 1} needs targetItemIds.`);
-        continue;
-      }
-      if (
-        item.targetItemIds.some(
-          (id) => typeof id !== "string" || !allowedIds.has(id),
-        )
-      ) {
-        issues.push(`${key} item ${index + 1} uses an unknown library ID.`);
-      }
-      if (
-        Array.isArray(item.choices) &&
-        item.choices.length > 0 &&
-        !item.choices.includes(item.correctAnswer)
-      ) {
-        issues.push(`${key} item ${index + 1} omits its correct choice.`);
-      }
-    }
-  }
-  for (const key of ["vocabularyQuestions", "grammarQuestions"]) {
-    const items = value[key];
-    if (!Array.isArray(items)) continue;
-    const counts = difficultyCounts(items);
-    if (counts.Easy !== 6 || counts.Medium !== 4 || counts.Hard !== 3) {
-      issues.push(
-        `${key} needs a 6 Easy / 4 Medium / 3 Hard adaptive bank.`,
-      );
-    }
-  }
-  const listening = value.listeningExercises;
-  if (Array.isArray(listening)) {
-    const counts = difficultyCounts(listening);
-    if (counts.Easy !== 1 || counts.Medium !== 1 || counts.Hard !== 1) {
-      issues.push("Listening needs one Easy, one Medium, and one Hard item.");
-    }
-  }
-  const review = Array.isArray(value.reviewQuestions)
-    ? value.reviewQuestions
-    : [];
-  const categories = review.flatMap((item) =>
-    isRecord(item) && typeof item.category === "string" ? [item.category] : [],
-  );
-  if (
-    !sameSet(categories, [
-      "kanji",
-      "vocabulary",
-      "grammar",
-      "listening",
-      "speaking",
-    ])
-  ) {
-    issues.push("Review needs one question for each lesson skill.");
-  }
-  return unique(issues);
-}
-
-function difficultyCounts(items: unknown[]): Record<
-  "Easy" | "Medium" | "Hard",
-  number
-> {
-  const counts = { Easy: 0, Medium: 0, Hard: 0 };
-  for (const item of items) {
-    if (!isRecord(item)) continue;
-    if (
-      item.difficulty === "Easy" ||
-      item.difficulty === "Medium" ||
-      item.difficulty === "Hard"
-    ) {
-      counts[item.difficulty] += 1;
-    }
-  }
-  return counts;
-}
-
-function inspectableTerms(
-  texts: string[],
-  library: ResolvedLessonLibrary,
-): InspectableTerm[] {
-  const joined = texts.join("\n");
-  const vocabulary = library.vocabulary
-    .filter((item) => joined.includes(item.term))
-    .map((item) => ({
-      libraryId: item.libraryId,
-      libraryType: "vocabulary" as const,
-      surface: item.term,
-      reading: item.reading,
-      meaning: item.meaning,
-      scriptType: storyWordScript(item.term),
-    }));
-  const coveredCharacters = new Set(
-    vocabulary.flatMap((item) => item.surface.match(/\p{Script=Han}/gu) ?? []),
-  );
-  const kanji = library.kanji
-    .filter(
-      (item) =>
-        joined.includes(item.character) &&
-        !coveredCharacters.has(item.character),
-    )
-    .map((item) => ({
-      libraryId: item.libraryId,
-      libraryType: "kanji" as const,
-      surface: item.character,
-      reading: item.readings[0] ?? item.character,
-      meaning: item.meanings[0] ?? item.character,
-      scriptType: "kanji" as const,
-    }));
-  return [...vocabulary, ...kanji];
-}
-
-function storyWords(
-  line: StoryDraftLine,
-  library: ResolvedLessonLibrary,
-): InspectableTerm[] {
-  return line.terms.map((term) => {
-    const exact = library.vocabulary.find(
-      (item) => item.term === term.surface && item.reading === term.readingHint,
-    );
-    const matches = library.vocabulary.filter(
-      (item) => item.term === term.surface,
-    );
-    const vocabulary = exact ?? (matches.length === 1 ? matches[0] : null);
-    if (!vocabulary) {
-      throw new Error(`Library record missing for story word ${term.surface}.`);
-    }
-    return {
-      libraryId: vocabulary.libraryId,
-      libraryType: "vocabulary",
-      surface: vocabulary.term,
-      reading: vocabulary.reading,
-      meaning: vocabulary.meaning,
-      scriptType: storyWordScript(vocabulary.term),
-    };
-  });
-}
-
 export async function generatePlayableLesson(input: {
   topic: string;
   level: JLPTLevel;
@@ -987,129 +679,37 @@ export async function generatePlayableLesson(input: {
   library: ResolvedLessonLibrary;
   audit: GenerationAuditEntry[];
 }): Promise<PlayableLessonPackageV2> {
-  const generationContext = {
-    story: input.draft.lines,
-    kanji: input.library.kanji.map((item) => ({
-      id: item.libraryId,
-      character: item.character,
-      readings: item.readings,
-      meanings: item.meanings,
-    })),
-    vocabulary: input.library.vocabulary.map((item) => ({
-      id: item.libraryId,
-      term: item.term,
-      reading: item.reading,
-      meaning: item.meaning,
-      example: item.exampleSentence,
-    })),
-    grammar: input.library.grammar.map((item) => ({
-      id: item.libraryId,
-      pattern: item.pattern,
-      meaning: item.meaning,
-      formation: item.formation,
-    })),
+  const generationInput = {
+    topic: input.topic,
+    level: input.level,
+    draft: input.draft,
+    library: input.library,
   };
-  const prompt = [
-    "Create the playable activities for this AIko Japanese story.",
-    `JLPT ceiling: ${input.level}`,
-    `Topic: ${input.topic}`,
-    "Use only the supplied library IDs and facts.",
-    "Create a 13-item bank for vocabulary and grammar: exactly 6 Easy, 4 Medium, and 3 Hard.",
-    "The player will adaptively serve exactly 10 questions from each bank.",
-    "Create 6 reading lines,",
-    "3 listening questions, 3 speaking tasks, and 5 final review questions.",
-    "Listening must contain exactly one Easy, one Medium, and one Hard question.",
-    "Feedback must be encouraging but must never praise an incorrect answer.",
-    "Multiple-choice items need four distinct choices including the answer.",
-    "Text-input items need accepted answers. Production prompts must contain English only.",
-    "Never place the Japanese model answer, a partial Japanese answer, or answer blanks in a prompt or cue.",
-    "Review must include one each: kanji, vocabulary, grammar, listening, speaking.",
-    JSON.stringify(generationContext),
-  ].join("\n");
-  const result = await generateStructured<RawActivities>({
-    name: "playable activities",
-    prompt,
-    schema: activitiesSchema(),
-    validate: (value) => activitiesIssues(value, input.library),
-  });
-  const activities = result.value;
-  const withTerms = (
-    question: RawPracticeQuestion,
-  ): PlayablePracticeQuestion => ({
-    ...question,
-    inspectableTerms: inspectableTerms(
-      [question.prompt, question.cue],
-      input.library,
-    ),
-  });
-  const calls = [
-    ...input.audit,
-    {
-      stage: "activities" as const,
-      model: result.model,
-      repaired: result.repaired,
+  const [
+    vocabularyAndKanji,
+    grammarAndReading,
+    communication,
+    review,
+  ] = await Promise.all([
+    generateVocabularyAndKanjiActivities(generationInput),
+    generateGrammarAndReadingActivities(generationInput),
+    generateListeningAndSpeakingActivities(generationInput),
+    generateFinalReviewActivities(generationInput),
+  ]);
+  return assemblePlayableLesson({
+    ...generationInput,
+    groups: {
+      vocabularyAndKanji: vocabularyAndKanji.value,
+      grammarAndReading: grammarAndReading.value,
+      communication: communication.value,
+      review: review.value,
     },
-  ];
-
-  return {
-    schemaVersion: 2,
-    title: input.draft.title,
-    japaneseTitle: input.draft.japaneseTitle,
-    summary: input.draft.summary,
-    storyPreview: input.draft.storyPreview,
-    tags: unique([input.level, input.topic, ...input.draft.tags]).slice(0, 8),
-    kanji: input.library.kanji.map((item) => ({
-      libraryId: item.libraryId,
-      character: item.character,
-      reading: item.readings[0] ?? item.character,
-      meaning: item.meanings[0] ?? item.character,
-    })),
-    vocabulary: input.library.vocabulary,
-    grammar: input.library.grammar.map((item) => ({
-      libraryId: item.libraryId,
-      pattern: item.pattern,
-      meaning: item.meaning,
-      structure: item.formation,
-      usage: item.usageNotes,
-      example: item.examples[0] ?? "",
-      translation: item.nuance || item.meaning,
-      commonMistake: "",
-    })),
-    story: input.draft.lines.map((line) => ({
-      japanese: line.japanese,
-      english: line.english,
-      words: storyWords(line, input.library),
-    })),
-    vocabularyQuestions: activities.vocabularyQuestions.map(withTerms),
-    grammarQuestions: activities.grammarQuestions.map(withTerms),
-    readingConversation: activities.readingConversation.map((line) => ({
-      ...line,
-      inspectableTerms: inspectableTerms(
-        [line.japanese, line.english],
-        input.library,
-      ),
-    })),
-    listeningExercises: activities.listeningExercises.map((exercise) => ({
-      ...exercise,
-      inspectableTerms: inspectableTerms(
-        [exercise.prompt, exercise.transcript],
-        input.library,
-      ),
-    })),
-    speakingExercises: activities.speakingExercises.map((exercise) => ({
-      ...exercise,
-      inspectableTerms: inspectableTerms(
-        [
-          exercise.prompt,
-          exercise.easyPrompt,
-          exercise.mediumPrompt,
-          exercise.hardPrompt,
-          exercise.modelAnswer,
-        ],
-        input.library,
-      ),
-    })),
-    reviewQuestions: activities.reviewQuestions,
-    generationAudit: { calls },
-  };
+    audit: [
+      ...input.audit,
+      vocabularyAndKanji.audit,
+      grammarAndReading.audit,
+      communication.audit,
+      review.audit,
+    ],
+  });
 }
