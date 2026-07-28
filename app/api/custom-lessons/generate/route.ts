@@ -3,10 +3,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
 import { processCustomLessonJobs } from "@/lib/custom-lessons/job-runner";
 import { buildInteractiveStory } from "@/lib/gemini/lesson-activity-groups";
-import {
-  generateStoryDraft,
-  type GenerationAuditEntry,
-} from "@/lib/gemini/lesson-engine-v2";
+import { generateAdaptiveStoryDraft } from "@/lib/gemini/adaptive-story-generation";
+import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
 import {
   resolveLessonLibrary,
   selectLessonPlan,
@@ -140,7 +138,7 @@ export async function POST(request: NextRequest) {
       topic,
       generation.level,
     );
-    const story = await generateStoryDraft({
+    const story = await generateAdaptiveStoryDraft({
       topic,
       level: generation.level,
       plan,
