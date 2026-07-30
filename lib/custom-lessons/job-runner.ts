@@ -2,6 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { prepareStoredLessonAudio } from "@/lib/audio/audio-library";
+import { approveActivityQuestionsWithAI } from "@/lib/gemini/activity-validator-ai";
 import {
   assemblePlayableLesson,
   generateFinalReviewActivities,
@@ -89,6 +90,11 @@ type GroupPayload =
   | CommunicationGroup
   | ReviewGroup;
 
+type AiValidatedPayload =
+  | VocabularyKanjiGroup
+  | GrammarReadingGroup
+  | CommunicationGroup;
+
 function adminClient(): AdminClient {
   return createAdminClient() as unknown as AdminClient;
 }
@@ -112,7 +118,11 @@ function asJob(value: unknown): ProgressiveLessonJob | null {
     !requestId ||
     !userId ||
     !topic ||
-    (level !== "N5" && level !== "N4" && level !== "N3" && level !== "N2" && level !== "N1") ||
+    (level !== "N5" &&
+      level !== "N4" &&
+      level !== "N3" &&
+      level !== "N2" &&
+      level !== "N1") ||
     typeof status !== "string"
   ) {
     return null;
@@ -153,7 +163,10 @@ async function loadJob(
   return asJob(result.data);
 }
 
-function groupPayload(job: ProgressiveLessonJob, group: ActivityGroupName): Json | null {
+function groupPayload(
+  job: ProgressiveLessonJob,
+  group: ActivityGroupName,
+): Json | null {
   if (group === "vocabulary_and_kanji") return job.vocabulary_kanji_group;
   if (group === "grammar_and_reading") return job.grammar_reading_group;
   if (group === "listening_and_speaking") return job.communication_group;
@@ -214,9 +227,10 @@ function incrementAttempts(
   const result: Record<string, number> = {};
   for (const group of activityGroups) {
     const current = source[group];
-    result[group] = typeof current === "number" && Number.isFinite(current)
-      ? Math.max(0, Math.round(current))
-      : 0;
+    result[group] =
+      typeof current === "number" && Number.isFinite(current)
+        ? Math.max(0, Math.round(current))
+        : 0;
   }
   for (const group of groups) result[group] += 1;
   return result;
@@ -232,8 +246,10 @@ function groupsFromJob(job: ProgressiveLessonJob): ActivityGroups | null {
     return null;
   }
   return {
-    vocabularyAndKanji: job.vocabulary_kanji_group as unknown as VocabularyKanjiGroup,
-    grammarAndReading: job.grammar_reading_group as unknown as GrammarReadingGroup,
+    vocabularyAndKanji:
+      job.vocabulary_kanji_group as unknown as VocabularyKanjiGroup,
+    grammarAndReading:
+      job.grammar_reading_group as unknown as GrammarReadingGroup,
     communication: job.communication_group as unknown as CommunicationGroup,
     review: job.review_group as unknown as ReviewGroup,
   };
@@ -246,7 +262,8 @@ async function markActivityFailure(
   errors: string[],
 ): Promise<CustomLessonWorkerResult> {
   const permanent = job.build_attempts >= MAX_BUILD_ATTEMPTS;
-  const internalMessage = errors.join(" | ").slice(0, 1_000) || "Activity generation failed.";
+  const internalMessage =
+    errors.join(" | ").slice(0, 1_000) || "Activity generation failed.";
   const updated = await admin
     .from("progressive_lesson_drafts")
     .update({
@@ -271,7 +288,11 @@ async function markActivityFailure(
         .eq("id", job.request_id),
       admin
         .from("generated_lesson_jobs")
-        .update({ status: "failed", error_message: internalMessage, updated_at: new Date().toISOString() })
+        .update({
+          status: "failed",
+          error_message: internalMessage,
+          updated_at: new Date().toISOString(),
+        })
         .eq("custom_lesson_request_id", job.request_id),
     ]);
   }
@@ -305,7 +326,11 @@ async function prepareAudioJob(
     await prepareStoredLessonAudio(job.lesson_version_id, admin);
     const audit = [
       ...auditEntries(job.generation_audit),
-      { stage: "audio", model: "google-cloud-tts", repaired: false } as GenerationAuditEntry,
+      {
+        stage: "audio",
+        model: "google-cloud-tts",
+        repaired: false,
+      } as GenerationAuditEntry,
     ];
     const saved = await admin
       .from("progressive_lesson_drafts")
@@ -329,7 +354,8 @@ async function prepareAudioJob(
       audioStatus: "ready",
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Audio preparation failed.";
+    const message =
+      error instanceof Error ? error.message : "Audio preparation failed.";
     const retryable = job.audio_attempts < MAX_AUDIO_ATTEMPTS;
     const saved = await admin
       .from("progressive_lesson_drafts")
@@ -380,7 +406,31 @@ async function processActivityJob(
       draft,
       library,
     });
-    await persistGroup(admin, job, group, generated.value, generated.audit);
+
+    let audit = generated.audit;
+    if (group !== "final_review") {
+      // The exact provisional QA is sent to a separate approval model. Nothing
+      // is persisted until every applicable item is approved. Interactive
+      // speaking and final review remain untouched in this patch.
+      const approval = await approveActivityQuestionsWithAI({
+        group,
+        topic: job.topic,
+        level: job.jlpt_level,
+        draft,
+        library,
+        payload: generated.value as AiValidatedPayload,
+      });
+      audit = {
+        ...generated.audit,
+        validator: {
+          model: approval.model,
+          repaired: approval.repaired,
+          checkedItems: approval.checkedItems,
+        },
+      } as unknown as GenerationAuditEntry;
+    }
+
+    await persistGroup(admin, job, group, generated.value, audit);
     return group;
   });
   const settled = await Promise.allSettled(executions);
@@ -389,7 +439,11 @@ async function processActivityJob(
   settled.forEach((result, index) => {
     if (result.status === "fulfilled") return;
     failedGroups.push(missing[index]);
-    errors.push(result.reason instanceof Error ? result.reason.message : String(result.reason));
+    errors.push(
+      result.reason instanceof Error
+        ? result.reason.message
+        : String(result.reason),
+    );
   });
 
   const refreshed = await loadJob(admin, job.request_id);
@@ -423,7 +477,11 @@ async function processActivityJob(
   try {
     const audit = [
       ...auditEntries(refreshed.generation_audit),
-      { stage: "lesson_assembly", model: "deterministic", repaired: false } as GenerationAuditEntry,
+      {
+        stage: "lesson_assembly",
+        model: "deterministic",
+        repaired: false,
+      } as GenerationAuditEntry,
     ];
     const lesson = assemblePlayableLesson({
       topic: refreshed.topic,
@@ -502,7 +560,10 @@ export async function processCustomLessonJobs(options: {
 } = {}): Promise<CustomLessonWorkerResult> {
   const admin = adminClient();
   const startedAt = Date.now();
-  const cycles = Math.max(1, Math.min(options.maxCycles ?? DEFAULT_MAX_CYCLES, 3));
+  const cycles = Math.max(
+    1,
+    Math.min(options.maxCycles ?? DEFAULT_MAX_CYCLES, 3),
+  );
   let latest: CustomLessonWorkerResult | null = null;
 
   for (let cycle = 0; cycle < cycles; cycle += 1) {
