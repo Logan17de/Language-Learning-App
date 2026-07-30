@@ -1,5 +1,6 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { JLPTLevel } from "@/types/lesson";
 import { storyUsesGrammarPattern } from "@/lib/gemini/lesson-validation";
@@ -65,26 +66,36 @@ const storySchema: JsonSchema = {
   },
 };
 
-async function acceptedGrammarForms(
-  patterns: string[],
-): Promise<Map<string, string[]>> {
-  const admin = createAdminClient() as unknown as SupabaseClient;
-  const result = await admin
-    .from("grammar_catalog")
-    .select("pattern,accepted_patterns")
-    .in("pattern", patterns)
-    .eq("active", true);
-  if (result.error) throw new Error(result.error.message);
-  return new Map(
-    (result.data ?? []).map((row) => [
+const cachedAcceptedGrammarForms = unstable_cache(
+  async (patternKey: string): Promise<Array<[string, string[]]>> => {
+    const patterns = patternKey.split("\u0000").filter(Boolean);
+    if (patterns.length < 1) return [];
+    const admin = createAdminClient() as unknown as SupabaseClient;
+    const result = await admin
+      .from("grammar_catalog")
+      .select("pattern,accepted_patterns")
+      .in("pattern", patterns)
+      .eq("active", true);
+    if (result.error) throw new Error(result.error.message);
+    return (result.data ?? []).map((row) => [
       String(row.pattern),
       Array.isArray(row.accepted_patterns)
         ? row.accepted_patterns.filter(
             (item): item is string => typeof item === "string",
           )
         : [],
-    ]),
-  );
+    ]);
+  },
+  ["story-accepted-grammar-forms"],
+  { revalidate: 900 },
+);
+
+async function acceptedGrammarForms(
+  patterns: string[],
+): Promise<Map<string, string[]>> {
+  const normalized = [...new Set(patterns.map((item) => item.trim()).filter(Boolean))]
+    .sort();
+  return new Map(await cachedAcceptedGrammarForms(normalized.join("\u0000")));
 }
 
 function structuralStoryIssues(
