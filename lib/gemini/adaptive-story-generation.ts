@@ -173,6 +173,8 @@ export async function generateAdaptiveStoryDraft(input: {
         ]
       : []),
     "Use every target naturally. Inflected, polite, contracted, and conversational forms are allowed when they preserve the requested grammar.",
+    "For kanji-bearing content words, strongly prefer morphology supported by AIko's deterministic lexicon: dictionary/plain forms, polite non-past/negative/past, plain negative/past, て-form, ている, potential, passive, causative, ～たい, ～てしまう/ちゃう/じゃう, and negative conditional/なきゃ.",
+    "Avoid unnecessary volitional, imperative, honorific-irregular, or deeply chained verb forms. Use one only when a required target grammar specifically needs it, and keep that construction short and conventional.",
     "You may use other useful kanji, including kanji the learner has not seen before. Do not add furigana or bracketed readings inside the story.",
     "Keep the voice natural, coherent, and appropriate for the JLPT ceiling.",
     "Return only story metadata and the Japanese/English story lines.",
