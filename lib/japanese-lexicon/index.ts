@@ -1,12 +1,21 @@
 // Runtime pieces are generated from the independently tested
 // @aiko/japanese-lexicon 6.0.1 package. This TypeScript adapter exposes only
 // the server APIs AIko needs while keeping the package's schema-v4 contract.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const conjugationRuntime = require("./runtime/conjugation.js") as Record<string, unknown>;
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const normalizeRuntime = require("./runtime/normalize.js") as Record<string, unknown>;
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const transformationRuntime = require("./runtime/transformation-policy.js") as Record<string, unknown>;
+import {
+  buildVerbStems as runtimeBuildVerbStems,
+  createGeneratedForm as runtimeCreateGeneratedForm,
+  generateEntryForms as runtimeGenerateEntryForms,
+} from "./runtime/conjugation.js";
+import {
+  canonicalSurface as runtimeCanonicalSurface,
+  containsKanji as runtimeContainsKanji,
+  containsPunctuationOrSpace as runtimeContainsPunctuationOrSpace,
+  normalizeJapanese as runtimeNormalizeJapanese,
+} from "./runtime/normalize.js";
+import {
+  SUPPORTED_VERB_TRANSFORMATION_CHAINS as runtimeSupportedVerbChains,
+  isSupportedTransformationChain as runtimeIsSupportedTransformationChain,
+} from "./runtime/transformation-policy.js";
 
 export const PARTS_OF_SPEECH = [
   "verb",
@@ -124,27 +133,27 @@ interface CompositionState {
   teSource?: FormSpelling;
 }
 
-const buildVerbStems = conjugationRuntime.buildVerbStems as (entry: LexiconEntry) => VerbStems;
-const createGeneratedForm = conjugationRuntime.createGeneratedForm as (
+const buildVerbStems = runtimeBuildVerbStems as (entry: LexiconEntry) => VerbStems;
+const createGeneratedForm = runtimeCreateGeneratedForm as (
   code: FormCode,
   surface: string,
   kana: string,
   transformations?: FormCode[],
 ) => GeneratedForm;
-const generateEntryForms = conjugationRuntime.generateEntryForms as (
+const generateEntryForms = runtimeGenerateEntryForms as (
   entry: LexiconEntry,
 ) => GeneratedForm[];
-export const normalizeJapanese = normalizeRuntime.normalizeJapanese as (value: unknown) => string;
-export const canonicalSurface = normalizeRuntime.canonicalSurface as (
+export const normalizeJapanese = runtimeNormalizeJapanese as (value: unknown) => string;
+export const canonicalSurface = runtimeCanonicalSurface as (
   kanji: unknown,
   kana: unknown,
 ) => string;
-export const containsKanji = normalizeRuntime.containsKanji as (value: unknown) => boolean;
-export const containsPunctuationOrSpace = normalizeRuntime.containsPunctuationOrSpace as (
+export const containsKanji = runtimeContainsKanji as (value: unknown) => boolean;
+export const containsPunctuationOrSpace = runtimeContainsPunctuationOrSpace as (
   value: unknown,
 ) => boolean;
-export const SUPPORTED_VERB_TRANSFORMATION_CHAINS = transformationRuntime.SUPPORTED_VERB_TRANSFORMATION_CHAINS as FormCode[][];
-export const isSupportedTransformationChain = transformationRuntime.isSupportedTransformationChain as (
+export const SUPPORTED_VERB_TRANSFORMATION_CHAINS = runtimeSupportedVerbChains as FormCode[][];
+export const isSupportedTransformationChain = runtimeIsSupportedTransformationChain as (
   entry: LexiconEntry,
   transformations: readonly FormCode[],
 ) => boolean;
@@ -499,7 +508,12 @@ function matchEntrySpelling(
   const normalizedSurface = normalizeJapanese(surface);
   const results: LookupCandidate[] = [];
   for (const transformations of supportedChains(candidateEntry)) {
-    const form = composeEntryForm(candidateEntry, transformations);
+    let form: GeneratedForm | null = null;
+    try {
+      form = composeEntryForm(candidateEntry, transformations);
+    } catch {
+      form = null;
+    }
     if (!form) continue;
     if (form.surface !== normalizedSurface && form.kana !== normalizedSurface) continue;
     results.push({ entry, form, matchedSpelling: spelling, matchedThroughAlias });
