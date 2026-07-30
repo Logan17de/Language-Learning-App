@@ -41,6 +41,36 @@ function isKana(value: string): boolean {
   return /^[\p{Script=Hiragana}\p{Script=Katakana}ー・]+$/u.test(value);
 }
 
+function termSummary(input: {
+  surface: string;
+  observedReading: string;
+  dictionaryForm: string;
+  dictionaryReading: string;
+  partOfSpeech: unknown;
+  conjugationType: unknown;
+  alias: string;
+}): string {
+  return JSON.stringify({
+    surface: input.surface,
+    readingHint: input.observedReading,
+    dictionaryForm: input.dictionaryForm,
+    dictionaryReading: input.dictionaryReading,
+    partOfSpeech: input.partOfSpeech,
+    conjugationType: input.conjugationType,
+    dictionaryAlias: input.alias,
+  });
+}
+
+/**
+ * Validates one lexical term against the deterministic conjugation engine.
+ *
+ * Gemini occasionally returns the dictionary-form reading in `readingHint`
+ * even when the written surface is correctly inflected. When the exact
+ * canonical/alias spelling produces one unambiguous kana surface, the server
+ * replaces only that observed reading with the deterministic value. No lemma,
+ * alias, part of speech, conjugation class, or written surface is corrected
+ * automatically.
+ */
 export function lexicalTermIssues(term: DraftTerm, label: string): string[] {
   const lexical = term as Partial<LexicalDraftTerm>;
   const surface = normalizeJapanese(term.surface);
@@ -100,17 +130,58 @@ export function lexicalTermIssues(term: DraftTerm, label: string): string[] {
     createdAt: "1970-01-01T00:00:00.000Z",
     updatedAt: "1970-01-01T00:00:00.000Z",
   };
-  const candidates = lookupSurface([preview], surface).filter(
+
+  const surfaceCandidates = lookupSurface([preview], surface).filter(
     (candidate) =>
-      candidate.form.kana === observedReading &&
-      (alias
+      alias
         ? candidate.matchedThroughAlias && candidate.matchedSpelling === alias
-        : !candidate.matchedThroughAlias),
+        : !candidate.matchedThroughAlias,
   );
-  if (candidates.length < 1) {
+
+  if (surfaceCandidates.length < 1) {
     issues.push(
-      `${label} surface/reading cannot be recomposed from its exact canonical or alias spelling.`,
+      `${label} written surface cannot be recomposed from its exact canonical or alias spelling. ` +
+      `Correct the dictionary form, part of speech, conjugation type, alias, or lexical boundary; do not store an inflected form as the lemma. ` +
+      `Term: ${termSummary({
+        surface,
+        observedReading,
+        dictionaryForm,
+        dictionaryReading,
+        partOfSpeech: lexical.partOfSpeech,
+        conjugationType: lexical.conjugationType,
+        alias,
+      })}`,
     );
+    return issues;
   }
+
+  const expectedReadings = [...new Set(
+    surfaceCandidates
+      .map((candidate) => normalizeJapanese(candidate.form.kana))
+      .filter(Boolean),
+  )];
+
+  if (!expectedReadings.includes(observedReading)) {
+    if (expectedReadings.length === 1) {
+      // This is a deterministic correction derived from the exact canonical or
+      // alias entry and the accepted ordered transformation chain.
+      term.readingHint = expectedReadings[0];
+    } else {
+      issues.push(
+        `${label} readingHint ${JSON.stringify(observedReading)} does not match the observed surface. ` +
+        `Expected one of ${JSON.stringify(expectedReadings)}. ` +
+        `Term: ${termSummary({
+          surface,
+          observedReading,
+          dictionaryForm,
+          dictionaryReading,
+          partOfSpeech: lexical.partOfSpeech,
+          conjugationType: lexical.conjugationType,
+          alias,
+        })}`,
+      );
+    }
+  }
+
   return issues;
 }
