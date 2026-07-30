@@ -1,6 +1,8 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
 import type { LessonPlanV3 } from "@/lib/gemini/story-pipeline-v3";
@@ -19,6 +21,31 @@ interface InterestRow {
 interface ExposureRow {
   character: string;
   appearance_count: number;
+}
+
+interface CatalogSnapshot {
+  kanjiCatalog: Array<{
+    character: string;
+    jlpt_level: JLPTLevel;
+    source_order: number;
+  }>;
+  grammarCatalog: Array<{
+    pattern: string;
+    jlpt_level: JLPTLevel;
+    source_order: number;
+  }>;
+  kanjiDetails: Array<{
+    id: string;
+    legacy_id: string | null;
+    character: string;
+    jlpt_level: JLPTLevel;
+  }>;
+  grammarDetails: Array<{
+    id: string;
+    legacy_id: string | null;
+    pattern: string;
+    jlpt_level: JLPTLevel;
+  }>;
 }
 
 function allowedLevels(level: JLPTLevel): JLPTLevel[] {
@@ -71,10 +98,54 @@ function normalizedInterests(...sources: unknown[]): string[] {
   )].slice(0, 8);
 }
 
+const cachedCatalogSnapshot = unstable_cache(
+  async (levelKey: string): Promise<CatalogSnapshot> => {
+    const levels = levelKey.split(",") as JLPTLevel[];
+    const admin = createAdminClient() as unknown as SupabaseClient<Database>;
+    const [kanjiCatalog, grammarCatalog, kanjiDetails, grammarDetails] = await Promise.all([
+      admin
+        .from("kanji_catalog")
+        .select("character,jlpt_level,source_order")
+        .in("jlpt_level", levels)
+        .eq("active", true)
+        .limit(2500),
+      admin
+        .from("grammar_catalog")
+        .select("pattern,jlpt_level,source_order")
+        .in("jlpt_level", levels)
+        .eq("active", true)
+        .limit(800),
+      admin
+        .from("kanji_records")
+        .select("id,legacy_id,character,jlpt_level")
+        .in("jlpt_level", levels)
+        .is("archived_at", null)
+        .neq("quality_status", "rejected")
+        .limit(2500),
+      admin
+        .from("grammar_records")
+        .select("id,legacy_id,pattern,jlpt_level")
+        .in("jlpt_level", levels)
+        .is("archived_at", null)
+        .neq("quality_status", "rejected")
+        .limit(800),
+    ]);
+    const error = kanjiCatalog.error ?? grammarCatalog.error ?? kanjiDetails.error ?? grammarDetails.error;
+    if (error) throw new Error(`Lesson catalog could not be loaded: ${error.message}`);
+    return {
+      kanjiCatalog: (kanjiCatalog.data ?? []) as CatalogSnapshot["kanjiCatalog"],
+      grammarCatalog: (grammarCatalog.data ?? []) as CatalogSnapshot["grammarCatalog"],
+      kanjiDetails: (kanjiDetails.data ?? []) as CatalogSnapshot["kanjiDetails"],
+      grammarDetails: (grammarDetails.data ?? []) as CatalogSnapshot["grammarDetails"],
+    };
+  },
+  ["lesson-plan-v3-static-catalog"],
+  { revalidate: 900 },
+);
+
 /**
- * Selects server-owned kanji/grammar targets and reads optional natural
- * interests saved during onboarding. A kanji becomes known only after its
- * recorded story appearance count reaches ten.
+ * Static catalogs are cached for fifteen minutes. Learner mastery, interests,
+ * and kanji exposure remain live and are fetched in parallel for every request.
  */
 export async function selectLessonPlanV3(
   client: SupabaseClient<Database>,
@@ -84,42 +155,8 @@ export async function selectLessonPlanV3(
 ): Promise<LessonPlanV3> {
   const levels = allowedLevels(level);
   const rawClient = client as unknown as SupabaseClient;
-  const [
-    kanjiCatalog,
-    grammarCatalog,
-    kanjiDetails,
-    grammarDetails,
-    masteryResult,
-    preferenceResult,
-    profileResult,
-    exposureResult,
-  ] = await Promise.all([
-    client
-      .from("kanji_catalog")
-      .select("character,jlpt_level,source_order")
-      .in("jlpt_level", levels)
-      .eq("active", true)
-      .limit(2500),
-    client
-      .from("grammar_catalog")
-      .select("pattern,jlpt_level,source_order")
-      .in("jlpt_level", levels)
-      .eq("active", true)
-      .limit(800),
-    client
-      .from("kanji_records")
-      .select("id,legacy_id,character,jlpt_level")
-      .in("jlpt_level", levels)
-      .is("archived_at", null)
-      .neq("quality_status", "rejected")
-      .limit(2500),
-    client
-      .from("grammar_records")
-      .select("id,legacy_id,pattern,jlpt_level")
-      .in("jlpt_level", levels)
-      .is("archived_at", null)
-      .neq("quality_status", "rejected")
-      .limit(800),
+  const [catalog, masteryResult, preferenceResult, profileResult, exposureResult] = await Promise.all([
+    cachedCatalogSnapshot(levels.join(",")),
     client
       .from("learner_mastery")
       .select("item_type,item_key,mastery,evidence_count")
@@ -142,28 +179,20 @@ export async function selectLessonPlanV3(
       .gte("appearance_count", 10),
   ]);
 
-  const firstError = [
-    kanjiCatalog,
-    grammarCatalog,
-    kanjiDetails,
-    grammarDetails,
-    masteryResult,
-    preferenceResult,
-    profileResult,
-    exposureResult,
-  ].find((result) => result.error)?.error;
+  const firstError = [masteryResult, preferenceResult, profileResult, exposureResult]
+    .find((result) => result.error)?.error;
   if (firstError) {
     throw new Error(`Lesson targets could not be loaded: ${firstError.message}`);
   }
 
   const kanjiKeys = new Map<string, string>();
-  for (const row of kanjiDetails.data ?? []) {
+  for (const row of catalog.kanjiDetails) {
     kanjiKeys.set(row.id, row.character);
     if (row.legacy_id) kanjiKeys.set(row.legacy_id, row.character);
     kanjiKeys.set(row.character, row.character);
   }
   const grammarKeys = new Map<string, string>();
-  for (const row of grammarDetails.data ?? []) {
+  for (const row of catalog.grammarDetails) {
     grammarKeys.set(row.id, row.pattern);
     if (row.legacy_id) grammarKeys.set(row.legacy_id, row.pattern);
     grammarKeys.set(row.pattern, row.pattern);
@@ -183,7 +212,7 @@ export async function selectLessonPlanV3(
     });
   }
 
-  const kanji = (kanjiCatalog.data ?? [])
+  const kanji = catalog.kanjiCatalog
     .map((row) => ({
       character: row.character,
       level: row.jlpt_level,
@@ -196,12 +225,9 @@ export async function selectLessonPlanV3(
     }))
     .sort((left, right) => compare(left.priority, right.priority))
     .slice(0, 5)
-    .map(({ character, level: itemLevel }) => ({
-      character,
-      level: itemLevel,
-    }));
+    .map(({ character, level: itemLevel }) => ({ character, level: itemLevel }));
 
-  const grammar = (grammarCatalog.data ?? [])
+  const grammar = catalog.grammarCatalog
     .map((row) => ({
       pattern: row.pattern,
       level: row.jlpt_level,
@@ -214,10 +240,7 @@ export async function selectLessonPlanV3(
     }))
     .sort((left, right) => compare(left.priority, right.priority))
     .slice(0, 3)
-    .map(({ pattern, level: itemLevel }) => ({
-      pattern,
-      level: itemLevel,
-    }));
+    .map(({ pattern, level: itemLevel }) => ({ pattern, level: itemLevel }));
 
   if (kanji.length !== 5 || grammar.length !== 3) {
     throw new Error(
@@ -228,13 +251,9 @@ export async function selectLessonPlanV3(
   const knownKanji = ((exposureResult.data ?? []) as ExposureRow[])
     .filter((row) => row.appearance_count >= 10)
     .map((row) => row.character);
-
   const preferences = preferenceResult.data as InterestRow | null;
   const profile = profileResult.data as InterestRow | null;
-  const interests = normalizedInterests(
-    preferences?.interests,
-    profile?.interests,
-  );
+  const interests = normalizedInterests(preferences?.interests, profile?.interests);
 
   return { kanji, grammar, knownKanji, interests };
 }
