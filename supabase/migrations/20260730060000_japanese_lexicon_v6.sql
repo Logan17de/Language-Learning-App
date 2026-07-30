@@ -168,7 +168,7 @@ begin
     -- metadata updates, not new vocabulary records.
     perform pg_advisory_xact_lock(
       hashtextextended(
-        v_dictionary_form || chr(0) || v_reading || chr(0) || v_part_of_speech,
+        v_dictionary_form || chr(31) || v_reading || chr(31) || v_part_of_speech,
         0
       )
     );
@@ -211,8 +211,8 @@ begin
             select distinct id
             from unnest(coalesce(linked_kanji_ids, '{}') || coalesce(v_linked_kanji, '{}')) id
           ),
-          source_payload = source_payload || v_item,
-          usage_count = usage_count + 1,
+          source_payload = coalesce(source_payload, '{}'::jsonb) || v_item,
+          usage_count = coalesce(usage_count, 0) + 1,
           last_used_at = now(),
           updated_at = now()
       where id = v_existing.id;
