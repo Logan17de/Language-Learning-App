@@ -85,7 +85,7 @@ describe("custom lesson story pipeline v3", () => {
       runner.indexOf("await persistGroup(admin, job, group, generated.value, audit)"),
     );
     expect(runner).toContain('if (group !== "final_review")');
-    expect(validator).toContain("Interactive speaking and final review are intentionally not");
+    expect(validator).toContain("interactive speaking, and final review are intentionally not");
   });
 
   it("keeps reading STT-only and listening stored-TTS plus MCQ-only", () => {
