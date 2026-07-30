@@ -167,39 +167,31 @@ function decisionIssues(value: unknown, itemCount: number): string[] {
     return ["Validator decision must contain item verdicts."];
   }
   const issues: string[] = [];
-  if (typeof value.approved !== "boolean") {
-    issues.push("approved must be boolean.");
-  }
+  if (typeof value.approved !== "boolean") issues.push("approved must be boolean.");
   if (value.items.length !== itemCount) {
     issues.push(`Validator must return exactly ${itemCount} item verdicts.`);
   }
   const indexes = new Set<number>();
-  let allItemsApproved = true;
+  let allApproved = true;
   value.items.forEach((candidate, position) => {
     if (!isRecord(candidate)) {
       issues.push(`Verdict ${position + 1} must be an object.`);
-      allItemsApproved = false;
+      allApproved = false;
       return;
     }
-    if (
-      !Number.isInteger(candidate.requestIndex) ||
-      Number(candidate.requestIndex) < 0 ||
-      Number(candidate.requestIndex) >= itemCount
-    ) {
+    const requestIndex = Number(candidate.requestIndex);
+    if (!Number.isInteger(requestIndex) || requestIndex < 0 || requestIndex >= itemCount) {
       issues.push(`Verdict ${position + 1} has an invalid requestIndex.`);
     } else {
-      indexes.add(Number(candidate.requestIndex));
+      indexes.add(requestIndex);
     }
     if (typeof candidate.approved !== "boolean") {
       issues.push(`Verdict ${position + 1} approved must be boolean.`);
-      allItemsApproved = false;
+      allApproved = false;
     } else if (!candidate.approved) {
-      allItemsApproved = false;
+      allApproved = false;
     }
-    if (
-      !Array.isArray(candidate.issues) ||
-      !candidate.issues.every((item) => typeof item === "string")
-    ) {
+    if (!Array.isArray(candidate.issues) || !candidate.issues.every((item) => typeof item === "string")) {
       issues.push(`Verdict ${position + 1} issues must be strings.`);
     } else if (candidate.approved && candidate.issues.length > 0) {
       issues.push(`Approved verdict ${position + 1} must not contain issues.`);
@@ -210,7 +202,7 @@ function decisionIssues(value: unknown, itemCount: number): string[] {
   if (indexes.size !== itemCount) {
     issues.push(`requestIndex must cover 0-${Math.max(0, itemCount - 1)} exactly once.`);
   }
-  if (typeof value.approved === "boolean" && value.approved !== allItemsApproved) {
+  if (typeof value.approved === "boolean" && value.approved !== allApproved) {
     issues.push("Overall approval must equal the approval of every item.");
   }
   return [...new Set(issues)];
@@ -227,29 +219,6 @@ function questionsForGroup(
     return (payload as GrammarReadingGroup).grammarQuestions;
   }
   return (payload as CommunicationGroup).listeningExercises;
-}
-
-function payloadWithQuestions(
-  group: ValidatedGroup,
-  payload: AiValidatedPayload,
-  questions: QuestionPayload[],
-): AiValidatedPayload {
-  if (group === "vocabulary_and_kanji") {
-    return {
-      ...(payload as VocabularyKanjiGroup),
-      vocabularyQuestions: questions as PracticeQuestion[],
-    };
-  }
-  if (group === "grammar_and_reading") {
-    return {
-      ...(payload as GrammarReadingGroup),
-      grammarQuestions: questions as PracticeQuestion[],
-    };
-  }
-  return {
-    ...(payload as CommunicationGroup),
-    listeningExercises: questions as ListeningExercise[],
-  };
 }
 
 function allowedLibraryIds(library: ResolvedLessonLibrary): Set<string> {
@@ -271,29 +240,24 @@ function questionStructureIssues(
     ? value.targetItemIds.filter((item): item is string => typeof item === "string")
     : [];
   const allowedIds = allowedLibraryIds(library);
-  if (
-    targetIds.length < 1 ||
-    targetIds.some((id) => !allowedIds.has(id))
-  ) {
+  if (targetIds.length < 1 || targetIds.some((id) => !allowedIds.has(id))) {
     issues.push("The repaired question must preserve valid targetItemIds.");
   }
 
   const choices = Array.isArray(value.choices)
     ? value.choices.filter((item): item is string => typeof item === "string")
     : [];
-  const correctAnswer = normalized(value.correctAnswer);
-  if (!correctAnswer) issues.push("The repaired question needs a correctAnswer.");
+  const answer = normalized(value.correctAnswer);
+  if (!answer) issues.push("The repaired question needs a correctAnswer.");
 
   if (group === "listening_and_speaking") {
     if (choices.length !== 4 || new Set(choices.map(normalized)).size !== 4) {
       issues.push("A listening repair needs four distinct choices.");
     }
-    if (!choices.some((choice) => normalized(choice) === correctAnswer)) {
+    if (!choices.some((choice) => normalized(choice) === answer)) {
       issues.push("A listening repair must include its correct answer among the choices.");
     }
-    if (!normalized(value.transcript)) {
-      issues.push("A listening repair needs its hidden transcript.");
-    }
+    if (!normalized(value.transcript)) issues.push("A listening repair needs its hidden transcript.");
     return issues;
   }
 
@@ -305,7 +269,7 @@ function questionStructureIssues(
     if (choices.length !== 4 || new Set(choices.map(normalized)).size !== 4) {
       issues.push("A multiple-choice repair needs four distinct choices.");
     }
-    if (!choices.some((choice) => normalized(choice) === correctAnswer)) {
+    if (!choices.some((choice) => normalized(choice) === answer)) {
       issues.push("A multiple-choice repair must include its correct answer.");
     }
   } else if (activityType === "text_input") {
@@ -317,11 +281,10 @@ function questionStructureIssues(
   } else {
     issues.push("The repaired question has an unsupported activityType.");
   }
-
-  const acceptedAnswers = Array.isArray(value.acceptedAnswers)
+  const accepted = Array.isArray(value.acceptedAnswers)
     ? value.acceptedAnswers.filter((item): item is string => typeof item === "string")
     : [];
-  if (!acceptedAnswers.some((answer) => normalized(answer) === correctAnswer)) {
+  if (!accepted.some((item) => normalized(item) === answer)) {
     issues.push("acceptedAnswers must contain the correct answer.");
   }
   return issues;
@@ -329,27 +292,24 @@ function questionStructureIssues(
 
 function validationContext(
   library: ResolvedLessonLibrary,
-  questions?: QuestionPayload[],
+  questions: QuestionPayload[],
 ): Record<string, unknown> {
-  const requestedIds = questions
-    ? new Set(questions.flatMap((question) => question.targetItemIds))
-    : null;
-  const wanted = (id: string) => !requestedIds || requestedIds.has(id);
+  const requestedIds = new Set(questions.flatMap((question) => question.targetItemIds));
   return {
-    kanji: library.kanji.filter((item) => wanted(item.libraryId)).map((item) => ({
+    kanji: library.kanji.filter((item) => requestedIds.has(item.libraryId)).map((item) => ({
       id: item.libraryId,
       character: item.character,
       readings: item.readings,
       meanings: item.meanings,
     })),
-    vocabulary: library.vocabulary.filter((item) => wanted(item.libraryId)).map((item) => ({
+    vocabulary: library.vocabulary.filter((item) => requestedIds.has(item.libraryId)).map((item) => ({
       id: item.libraryId,
       term: item.term,
       reading: item.reading,
       meaning: item.meaning,
       partOfSpeech: item.partOfSpeech,
     })),
-    grammar: library.grammar.filter((item) => wanted(item.libraryId)).map((item) => ({
+    grammar: library.grammar.filter((item) => requestedIds.has(item.libraryId)).map((item) => ({
       id: item.libraryId,
       pattern: item.pattern,
       meaning: item.meaning,
@@ -373,27 +333,23 @@ function approvalPrompt(input: {
   library: ResolvedLessonLibrary;
   questions: QuestionPayload[];
 }): string {
-  const indexedQuestions = input.questions.map((question, requestIndex) => ({
-    requestIndex,
-    ...question,
-  }));
   return [
     "Act as AIko's strict, approval-only Japanese question-and-answer validator.",
     `Validate ${groupLabel(input.group)} for JLPT ${input.level}.`,
     `Custom topic: ${input.topic}`,
-    "The generator output below is provisional. Do not rewrite, repair, replace, reorder, add, or remove questions.",
-    "Return exactly one verdict for every requestIndex. Approve an item only when all applicable checks pass:",
-    "1. The requested activity format is followed exactly. Multiple choice has four distinct choices and exactly one defensible answer. Text input has a visible Japanese blank and enough context.",
-    "2. correctAnswer and acceptedAnswers actually answer the prompt. For a blank, mentally insert the answer and confirm the complete Japanese sentence is grammatical and natural.",
-    "3. The question genuinely tests every supplied targetItemId, especially the requested vocabulary or grammar construction, rather than a merely related idea.",
-    "4. The item is unambiguous. Do not approve when another choice or answer is also reasonable from the supplied context.",
-    "5. The prompt, cue, hint, choices, or surrounding text do not expose the answer before the learner responds.",
-    "6. Japanese, English, difficulty, and explanation are appropriate for the JLPT ceiling.",
-    "7. For listening, the hidden transcript must contain enough evidence for the prompt and exactly one MCQ answer. The learner answers by MCQ; do not require speaking or STT.",
-    "Set approved=false and give concise concrete issues whenever any check fails. An approved item must have an empty issues array.",
+    "Do not rewrite, repair, replace, reorder, add, or remove questions.",
+    "Return exactly one verdict for every requestIndex. Approve only when all checks pass:",
+    "1. The requested format is exact. MCQ has four distinct choices and one defensible answer. Text input has a visible Japanese blank and enough context.",
+    "2. The answer fits the prompt. Mentally insert blank answers and confirm the full sentence is grammatical and natural.",
+    "3. The item genuinely tests every supplied targetItemId.",
+    "4. The item is unambiguous and no alternative answer is equally reasonable.",
+    "5. The prompt, cue, hint, choices, or surrounding text do not expose the answer.",
+    "6. Japanese, English, difficulty, and explanation fit the JLPT ceiling.",
+    "7. Listening transcript evidence supports exactly one MCQ answer; never require STT.",
+    "Rejected items need concise concrete issues. Approved items need an empty issues array.",
     `Fixed story: ${JSON.stringify(input.draft.lines)}`,
     `Relevant canonical library region: ${JSON.stringify(validationContext(input.library, input.questions))}`,
-    `Provisional questions: ${JSON.stringify(indexedQuestions)}`,
+    `Provisional questions: ${JSON.stringify(input.questions.map((question, requestIndex) => ({ requestIndex, ...question })))}`,
   ].join("\n");
 }
 
@@ -422,29 +378,22 @@ async function repairOneQuestion(input: {
   question: QuestionPayload;
   requestIndex: number;
   issues: string[];
-}): Promise<{
-  question: QuestionPayload;
-  models: string[];
-  validationCalls: number;
-}> {
-  const prompt = [
-    `Repair only item ${input.requestIndex + 1} from AIko's ${groupLabel(input.group)}.`,
-    "Return exactly one corrected question object and no wrapper or explanation.",
-    "Do not regenerate, mention, or alter any other question. Approved neighboring questions survive unchanged.",
-    "Preserve the original difficulty, activity type, mode, skill, and targetItemIds unless a listed issue explicitly says one of them is invalid.",
-    "Correct every listed issue while keeping exactly one defensible answer and natural JLPT-appropriate Japanese.",
-    `Validator issues: ${JSON.stringify(input.issues)}`,
-    `Fixed story: ${JSON.stringify(input.draft.lines)}`,
-    `Relevant canonical library region: ${JSON.stringify(validationContext(input.library, [input.question]))}`,
-    `Question to repair: ${JSON.stringify(input.question)}`,
-  ].join("\n");
+}): Promise<{ question: QuestionPayload; models: string[] }> {
   const repaired = await generateStructured<QuestionPayload>({
     name: `single ${groupLabel(input.group)} item repair`,
-    prompt,
+    prompt: [
+      `Repair only item ${input.requestIndex + 1} from AIko's ${groupLabel(input.group)}.`,
+      "Return one corrected question object with no wrapper or explanation.",
+      "Do not regenerate, mention, or alter any other question. Approved neighboring questions survive unchanged.",
+      "Preserve difficulty, activity type, mode, skill, and targetItemIds unless a listed issue explicitly says one is invalid.",
+      `Validator issues: ${JSON.stringify(input.issues)}`,
+      `Fixed story: ${JSON.stringify(input.draft.lines)}`,
+      `Relevant canonical library region: ${JSON.stringify(validationContext(input.library, [input.question]))}`,
+      `Question to repair: ${JSON.stringify(input.question)}`,
+    ].join("\n"),
     schema: questionSchema(input.group),
     validate: (value) => questionStructureIssues(input.group, value, input.library),
   });
-
   const approval = await decideQuestions({
     group: input.group,
     topic: input.topic,
@@ -455,27 +404,18 @@ async function repairOneQuestion(input: {
   });
   const verdict = approval.value.items[0];
   if (!verdict?.approved) {
-    const details = verdict?.issues.join(" | ") || "The repaired question was not approved.";
     throw new Error(
-      `${groupLabel(input.group)} item ${input.requestIndex + 1} failed isolated repair: ${details}`,
+      `${groupLabel(input.group)} item ${input.requestIndex + 1} failed isolated repair: ${verdict?.issues.join(" | ") || "not approved"}`,
     );
   }
-
-  return {
-    question: repaired.value,
-    models: [repaired.model, approval.model],
-    validationCalls: 2,
-  };
+  return { question: repaired.value, models: [repaired.model, approval.model] };
 }
 
 /**
- * Each activity group is validated independently while the group generators run
- * in parallel. Approved question regions are retained. Only rejected questions
- * are repaired and re-approved, with those isolated repair calls running in
- * parallel; the generator is never prompted again for already-approved items.
- *
- * Reading lines, interactive speaking, and final review are intentionally not
- * judged here.
+ * Group validators run in parallel with the independently generated activity
+ * groups. Approved question regions stay untouched. Rejected questions alone
+ * are repaired and re-approved in parallel; no already-approved question is
+ * sent back to a generator.
  */
 export async function approveActivityQuestionsWithAI(input: {
   group: ValidatedGroup;
@@ -489,15 +429,7 @@ export async function approveActivityQuestionsWithAI(input: {
   if (questions.length < 1) {
     throw new Error(`${groupLabel(input.group)} cannot be approved because it is empty.`);
   }
-
-  const initial = await decideQuestions({
-    group: input.group,
-    topic: input.topic,
-    level: input.level,
-    draft: input.draft,
-    library: input.library,
-    questions,
-  });
+  const initial = await decideQuestions({ ...input, questions });
   const rejected = [...initial.value.items]
     .sort((left, right) => left.requestIndex - right.requestIndex)
     .filter((item) => !item.approved);
@@ -513,36 +445,30 @@ export async function approveActivityQuestionsWithAI(input: {
     };
   }
 
-  const repairs = await Promise.all(
-    rejected.map((verdict) => repairOneQuestion({
-      group: input.group,
-      topic: input.topic,
-      level: input.level,
-      draft: input.draft,
-      library: input.library,
-      question: questions[verdict.requestIndex]!,
-      requestIndex: verdict.requestIndex,
-      issues: verdict.issues,
-    })),
-  );
-  const repairedQuestions = [...questions];
-  rejected.forEach((verdict, index) => {
-    repairedQuestions[verdict.requestIndex] = repairs[index]!.question;
-  });
-  const models = new Set([
-    initial.model,
-    ...repairs.flatMap((repair) => repair.models),
-  ]);
+  const repairs = await Promise.all(rejected.map((verdict) => repairOneQuestion({
+    group: input.group,
+    topic: input.topic,
+    level: input.level,
+    draft: input.draft,
+    library: input.library,
+    question: questions[verdict.requestIndex]!,
+    requestIndex: verdict.requestIndex,
+    issues: verdict.issues,
+  })));
 
+  // questions is the original array inside generated.value. Replacing only the
+  // rejected indexes means the runner persists the repaired group while every
+  // approved object survives byte-for-byte.
+  rejected.forEach((verdict, index) => {
+    questions[verdict.requestIndex] = repairs[index]!.question;
+  });
+  const models = new Set([initial.model, ...repairs.flatMap((item) => item.models)]);
   return {
     model: [...models].join(","),
     repaired: true,
     checkedItems: questions.length,
     repairedItems: repairs.length,
-    validationCalls: 1 + repairs.reduce(
-      (total, repair) => total + repair.validationCalls,
-      0,
-    ),
-    payload: payloadWithQuestions(input.group, input.payload, repairedQuestions),
+    validationCalls: 1 + repairs.length * 2,
+    payload: input.payload,
   };
 }
