@@ -1,0 +1,222 @@
+import "server-only";
+
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
+import type { JLPTLevel } from "@/types/lesson";
+import type { LessonPlanV3 } from "@/lib/gemini/story-pipeline-v3";
+
+const LEVELS: JLPTLevel[] = ["N5", "N4", "N3", "N2", "N1"];
+
+interface Mastery {
+  mastery: number;
+  evidenceCount: number;
+}
+
+function allowedLevels(level: JLPTLevel): JLPTLevel[] {
+  return LEVELS.slice(0, LEVELS.indexOf(level) + 1);
+}
+
+function stableHash(value: string): number {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function compare(left: number[], right: number[]): number {
+  for (let index = 0; index < Math.max(left.length, right.length); index += 1) {
+    const difference = (left[index] ?? 0) - (right[index] ?? 0);
+    if (difference !== 0) return difference;
+  }
+  return 0;
+}
+
+function priority(
+  itemLevel: JLPTLevel,
+  requestedLevel: JLPTLevel,
+  mastery: Mastery | undefined,
+  seed: string,
+): number[] {
+  return [
+    mastery && mastery.evidenceCount > 0 && mastery.mastery < 75
+      ? 0
+      : !mastery || mastery.evidenceCount === 0
+        ? 1
+        : 2,
+    itemLevel === requestedLevel ? 0 : 1,
+    mastery?.mastery ?? 50,
+    stableHash(seed),
+  ];
+}
+
+function normalizedInterests(...sources: unknown[]): string[] {
+  const values = sources.flatMap((source) =>
+    Array.isArray(source)
+      ? source.filter((item): item is string => typeof item === "string")
+      : [],
+  );
+  return [...new Set(values.map((item) => item.normalize("NFKC").trim()).filter(Boolean))]
+    .slice(0, 8);
+}
+
+/**
+ * Selects the server-owned kanji/grammar targets and reads optional natural
+ * interests saved during onboarding. A kanji becomes known only after its
+ * recorded story appearance count reaches ten.
+ */
+export async function selectLessonPlanV3(
+  client: SupabaseClient<Database>,
+  userId: string,
+  topic: string,
+  level: JLPTLevel,
+): Promise<LessonPlanV3> {
+  const levels = allowedLevels(level);
+  const [
+    kanjiCatalog,
+    grammarCatalog,
+    kanjiDetails,
+    grammarDetails,
+    masteryResult,
+    preferenceResult,
+    profileResult,
+    exposureResult,
+  ] = await Promise.all([
+    client
+      .from("kanji_catalog")
+      .select("character,jlpt_level,source_order")
+      .in("jlpt_level", levels)
+      .eq("active", true)
+      .limit(2500),
+    client
+      .from("grammar_catalog")
+      .select("pattern,jlpt_level,source_order")
+      .in("jlpt_level", levels)
+      .eq("active", true)
+      .limit(800),
+    client
+      .from("kanji_records")
+      .select("id,legacy_id,character,jlpt_level")
+      .in("jlpt_level", levels)
+      .is("archived_at", null)
+      .neq("quality_status", "rejected")
+      .limit(2500),
+    client
+      .from("grammar_records")
+      .select("id,legacy_id,pattern,jlpt_level")
+      .in("jlpt_level", levels)
+      .is("archived_at", null)
+      .neq("quality_status", "rejected")
+      .limit(800),
+    client
+      .from("learner_mastery")
+      .select("item_type,item_key,mastery,evidence_count")
+      .eq("user_id", userId)
+      .in("item_type", ["kanji", "grammar"]),
+    client
+      .from("user_preferences")
+      .select("interests")
+      .eq("user_id", userId)
+      .maybeSingle(),
+    client
+      .from("profiles")
+      .select("interests")
+      .eq("id", userId)
+      .maybeSingle(),
+    client
+      .from("learner_kanji_exposure_progress")
+      .select("character,appearance_count")
+      .eq("user_id", userId)
+      .gte("appearance_count", 10),
+  ]);
+
+  const firstError = [
+    kanjiCatalog,
+    grammarCatalog,
+    kanjiDetails,
+    grammarDetails,
+    masteryResult,
+    preferenceResult,
+    profileResult,
+    exposureResult,
+  ].find((result) => result.error)?.error;
+  if (firstError) {
+    throw new Error(`Lesson targets could not be loaded: ${firstError.message}`);
+  }
+
+  const kanjiKeys = new Map<string, string>();
+  for (const row of kanjiDetails.data ?? []) {
+    kanjiKeys.set(row.id, row.character);
+    if (row.legacy_id) kanjiKeys.set(row.legacy_id, row.character);
+    kanjiKeys.set(row.character, row.character);
+  }
+  const grammarKeys = new Map<string, string>();
+  for (const row of grammarDetails.data ?? []) {
+    grammarKeys.set(row.id, row.pattern);
+    if (row.legacy_id) grammarKeys.set(row.legacy_id, row.pattern);
+    grammarKeys.set(row.pattern, row.pattern);
+  }
+
+  const kanjiMastery = new Map<string, Mastery>();
+  const grammarMastery = new Map<string, Mastery>();
+  for (const row of masteryResult.data ?? []) {
+    const key = row.item_type === "kanji"
+      ? kanjiKeys.get(row.item_key)
+      : grammarKeys.get(row.item_key);
+    if (!key) continue;
+    const target = row.item_type === "kanji" ? kanjiMastery : grammarMastery;
+    target.set(key, {
+      mastery: row.mastery,
+      evidenceCount: row.evidence_count,
+    });
+  }
+
+  const kanji = (kanjiCatalog.data ?? [])
+    .map((row) => ({
+      character: row.character,
+      level: row.jlpt_level,
+      priority: priority(
+        row.jlpt_level,
+        level,
+        kanjiMastery.get(row.character),
+        `${userId}:${topic}:kanji:${row.character}`,
+      ),
+    }))
+    .sort((left, right) => compare(left.priority, right.priority))
+    .slice(0, 5)
+    .map(({ character, level: itemLevel }) => ({ character, level: itemLevel }));
+
+  const grammar = (grammarCatalog.data ?? [])
+    .map((row) => ({
+      pattern: row.pattern,
+      level: row.jlpt_level,
+      priority: priority(
+        row.jlpt_level,
+        level,
+        grammarMastery.get(row.pattern),
+        `${userId}:${topic}:grammar:${row.pattern}`,
+      ),
+    }))
+    .sort((left, right) => compare(left.priority, right.priority))
+    .slice(0, 3)
+    .map(({ pattern, level: itemLevel }) => ({ pattern, level: itemLevel }));
+
+  if (kanji.length !== 5 || grammar.length !== 3) {
+    throw new Error(
+      `Import the ${level} kanji and grammar catalogs before generating lessons.`,
+    );
+  }
+
+  const knownKanji = (exposureResult.data ?? [])
+    .filter((row) => row.appearance_count >= 10)
+    .map((row) => row.character)
+    .filter((character) => !kanji.some((target) => target.character === character));
+
+  const interests = normalizedInterests(
+    preferenceResult.data?.interests,
+    profileResult.data?.interests,
+  );
+
+  return { kanji, grammar, knownKanji, interests };
+}
