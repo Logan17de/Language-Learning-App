@@ -6,7 +6,7 @@ import { generateAdaptiveStoryDraft } from "@/lib/gemini/adaptive-story-generati
 import { buildInteractiveStoryForLearner } from "@/lib/gemini/interactive-story-v3";
 import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
 import { selectLessonPlanV3 } from "@/lib/gemini/lesson-plan-v3";
-import { enrichStoryAndResolveLibraryV3 } from "@/lib/gemini/story-enrichment-v3";
+import { resolveStoryLibraryV4 } from "@/lib/gemini/story-enrichment-v4";
 import type { StoryOnlyDraft } from "@/lib/gemini/story-pipeline-v3";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -171,10 +171,10 @@ export async function POST(request: NextRequest) {
     storyMs = Date.now() - stageStartedAt;
 
     stageStartedAt = Date.now();
-    // Gemini API call 2: fixed-story tokenization, kana/meaning enrichment,
-    // canonical lookup, and insertion of only missing shared-library records.
-    const resolved = await enrichStoryAndResolveLibraryV3(client, {
-      topic,
+    // Resolve known words through the DB and deterministic morphology first.
+    // Gemini API call 2 runs only for unresolved word spans and never receives
+    // the complete story.
+    const resolved = await resolveStoryLibraryV4(client, {
       level: generation.level,
       plan,
       draft: story.draft,
@@ -186,15 +186,10 @@ export async function POST(request: NextRequest) {
       resolved.library,
       plan.knownKanji,
     );
-    const audit: GenerationAuditEntry[] = [
-      story.audit,
-      ...resolved.audits,
-    ];
+    const audit: GenerationAuditEntry[] = [story.audit, ...resolved.audits];
     const admin = createAdminClient() as unknown as SupabaseClient;
 
     stageStartedAt = Date.now();
-    // The draft snapshot and learner-specific kanji exposure write do not
-    // depend on each other, so keep them off the sequential critical path.
     const [saved, exposure] = await Promise.all([
       admin.from("progressive_lesson_drafts").upsert(
         {
@@ -223,7 +218,9 @@ export async function POST(request: NextRequest) {
     persistenceMs = Date.now() - stageStartedAt;
     if (saved.error) throw new Error(saved.error.message);
     if (exposure.error) {
-      throw new Error(`Story kanji progress could not be saved: ${exposure.error.message}`);
+      throw new Error(
+        `Story kanji progress could not be saved: ${exposure.error.message}`,
+      );
     }
 
     console.info("Custom lesson story pipeline timings.", {
@@ -236,6 +233,8 @@ export async function POST(request: NextRequest) {
       persistenceMs,
       storyRepaired: story.audit.repaired,
       enrichmentRepaired: resolved.audits.some((item) => item.repaired),
+      enrichmentModel: resolved.audits.find((item) => item.stage === "library")
+        ?.model,
     });
 
     after(async () => {
@@ -247,7 +246,8 @@ export async function POST(request: NextRequest) {
       } catch (error) {
         console.error("Custom lesson background worker stopped.", {
           requestId: generation.requestId,
-          message: error instanceof Error ? error.message : "Unknown worker error.",
+          message:
+            error instanceof Error ? error.message : "Unknown worker error.",
         });
       }
     });
