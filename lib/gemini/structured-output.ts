@@ -35,6 +35,8 @@ export interface StructuredGeneration<T> {
   model: string;
   repaired: boolean;
   issues: string[];
+  durationMs: number;
+  attempts: number;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -154,20 +156,35 @@ async function callModel(
   throw new Error(`${model} did not return structured output.`);
 }
 
+function configuredModel(name: string, explicit?: string): string {
+  if (explicit?.trim()) return explicit.trim();
+  if (name.includes("story-only")) {
+    return process.env.GEMINI_STORY_MODEL?.trim() || PRIMARY_MODEL;
+  }
+  if (name.includes("story lexical enrichment")) {
+    return process.env.GEMINI_ENRICHMENT_MODEL?.trim() || PRIMARY_MODEL;
+  }
+  if (name.includes("approval") || name.includes("item repair")) {
+    return process.env.GEMINI_VALIDATOR_MODEL?.trim() || PRIMARY_MODEL;
+  }
+  return PRIMARY_MODEL;
+}
+
 async function call(
   prompt: string,
   schema: JsonSchema,
+  preferredModel: string,
 ): Promise<{ value: unknown; model: string }> {
   try {
     return {
-      value: await callModel(PRIMARY_MODEL, prompt, schema),
-      model: PRIMARY_MODEL,
+      value: await callModel(preferredModel, prompt, schema),
+      model: preferredModel,
     };
   } catch (primaryError) {
     if (primaryError instanceof GeminiApiError && !primaryError.allowFallback) {
       throw primaryError;
     }
-    if (PRIMARY_MODEL === FALLBACK_MODEL) throw primaryError;
+    if (preferredModel === FALLBACK_MODEL) throw primaryError;
     return {
       value: await callModel(FALLBACK_MODEL, prompt, schema),
       model: FALLBACK_MODEL,
@@ -180,15 +197,28 @@ export async function generateStructured<T>(input: {
   prompt: string;
   schema: JsonSchema;
   validate: (value: unknown) => string[];
+  model?: string;
 }): Promise<StructuredGeneration<T>> {
-  const first = await call(input.prompt, input.schema);
+  const startedAt = Date.now();
+  const preferredModel = configuredModel(input.name, input.model);
+  const first = await call(input.prompt, input.schema, preferredModel);
   const issues = input.validate(first.value);
   if (issues.length === 0) {
+    const durationMs = Date.now() - startedAt;
+    console.info("Gemini structured generation completed.", {
+      name: input.name,
+      model: first.model,
+      repaired: false,
+      attempts: 1,
+      durationMs,
+    });
     return {
       value: first.value as T,
       model: first.model,
       repaired: false,
       issues: [],
+      durationMs,
+      attempts: 1,
     };
   }
 
@@ -200,17 +230,28 @@ export async function generateStructured<T>(input: {
     "Previous JSON:",
     JSON.stringify(first.value),
   ].join("\n");
-  const repaired = await call(repairPrompt, input.schema);
+  const repaired = await call(repairPrompt, input.schema, preferredModel);
   const repairedIssues = input.validate(repaired.value);
   if (repairedIssues.length > 0) {
     throw new Error(
       `${input.name} validation failed: ${repairedIssues.join(" ")}`,
     );
   }
+  const durationMs = Date.now() - startedAt;
+  console.info("Gemini structured generation completed.", {
+    name: input.name,
+    model: repaired.model,
+    repaired: true,
+    attempts: 2,
+    durationMs,
+    initialIssueCount: issues.length,
+  });
   return {
     value: repaired.value as T,
     model: repaired.model,
     repaired: true,
     issues,
+    durationMs,
+    attempts: 2,
   };
 }
