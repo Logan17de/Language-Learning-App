@@ -19,6 +19,7 @@ const validator = readFileSync(
   "utf8",
 );
 const runner = readFileSync("lib/custom-lessons/job-runner.ts", "utf8");
+const structured = readFileSync("lib/gemini/structured-output.ts", "utf8");
 const inspectable = readFileSync(
   "components/exercises/inspectable-text.tsx",
   "utf8",
@@ -73,19 +74,33 @@ describe("custom lesson story pipeline v3", () => {
     expect(migration).toContain("on conflict (user_id, request_id, character) do nothing");
   });
 
-  it("sends exact provisional QA to a separate approval model before persistence", () => {
+  it("keeps approved QA regions and repairs only rejected questions in parallel", () => {
     expect(validator).toContain("approval-only Japanese question-and-answer validator");
     expect(validator).toContain("Return exactly one verdict for every requestIndex");
-    expect(validator).toContain("mentally insert the answer");
+    expect(validator).toContain("Mentally insert blank answers");
     expect(validator).toContain("genuinely tests every supplied targetItemId");
     expect(validator).toContain("The item is unambiguous");
     expect(validator).toContain("do not expose the answer");
+    expect(validator).toContain("Approved neighboring questions survive unchanged");
+    expect(validator).toContain("Promise.all(rejected.map");
+    expect(validator).toContain("questions[verdict.requestIndex] = repairs[index]!.question");
     expect(runner).toContain("const approval = await approveActivityQuestionsWithAI");
     expect(runner.indexOf("const approval = await approveActivityQuestionsWithAI")).toBeLessThan(
       runner.indexOf("await persistGroup(admin, job, group, generated.value, audit)"),
     );
     expect(runner).toContain('if (group !== "final_review")');
-    expect(validator).toContain("interactive speaking, and final review are intentionally not");
+  });
+
+  it("keeps the two-call architecture while reducing code-side latency", () => {
+    expect(plan).toContain("unstable_cache");
+    expect(plan).toContain("lesson-plan-v3-static-catalog");
+    expect(route).toContain("Custom lesson story pipeline timings");
+    expect(route).toContain("const [saved, exposure] = await Promise.all");
+    expect(structured).toContain("durationMs");
+    expect(structured).toContain("attempts");
+    expect(structured).toContain("GEMINI_STORY_MODEL");
+    expect(structured).toContain("GEMINI_ENRICHMENT_MODEL");
+    expect(structured).toContain("GEMINI_VALIDATOR_MODEL");
   });
 
   it("keeps reading STT-only and listening stored-TTS plus MCQ-only", () => {
