@@ -167,7 +167,9 @@ export function InspectableText({
             }}
           >
             {segment.text}
-            {segment.word.showReading &&
+            {(segment.word.showReading === true ||
+              (segment.word.showReading === undefined &&
+                segment.word.libraryType === "kanji")) &&
               segment.word.scriptType === "kanji" &&
               segment.word.reading && (
                 <span
