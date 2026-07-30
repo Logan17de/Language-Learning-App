@@ -12,6 +12,15 @@ interface Mastery {
   evidenceCount: number;
 }
 
+interface InterestRow {
+  interests: string[];
+}
+
+interface ExposureRow {
+  character: string;
+  appearance_count: number;
+}
+
 function allowedLevels(level: JLPTLevel): JLPTLevel[] {
   return LEVELS.slice(0, LEVELS.indexOf(level) + 1);
 }
@@ -57,12 +66,13 @@ function normalizedInterests(...sources: unknown[]): string[] {
       ? source.filter((item): item is string => typeof item === "string")
       : [],
   );
-  return [...new Set(values.map((item) => item.normalize("NFKC").trim()).filter(Boolean))]
-    .slice(0, 8);
+  return [...new Set(
+    values.map((item) => item.normalize("NFKC").trim()).filter(Boolean),
+  )].slice(0, 8);
 }
 
 /**
- * Selects the server-owned kanji/grammar targets and reads optional natural
+ * Selects server-owned kanji/grammar targets and reads optional natural
  * interests saved during onboarding. A kanji becomes known only after its
  * recorded story appearance count reaches ten.
  */
@@ -73,6 +83,7 @@ export async function selectLessonPlanV3(
   level: JLPTLevel,
 ): Promise<LessonPlanV3> {
   const levels = allowedLevels(level);
+  const rawClient = client as unknown as SupabaseClient;
   const [
     kanjiCatalog,
     grammarCatalog,
@@ -114,17 +125,17 @@ export async function selectLessonPlanV3(
       .select("item_type,item_key,mastery,evidence_count")
       .eq("user_id", userId)
       .in("item_type", ["kanji", "grammar"]),
-    client
+    rawClient
       .from("user_preferences")
       .select("interests")
       .eq("user_id", userId)
       .maybeSingle(),
-    client
+    rawClient
       .from("profiles")
       .select("interests")
       .eq("id", userId)
       .maybeSingle(),
-    client
+    rawClient
       .from("learner_kanji_exposure_progress")
       .select("character,appearance_count")
       .eq("user_id", userId)
@@ -185,7 +196,10 @@ export async function selectLessonPlanV3(
     }))
     .sort((left, right) => compare(left.priority, right.priority))
     .slice(0, 5)
-    .map(({ character, level: itemLevel }) => ({ character, level: itemLevel }));
+    .map(({ character, level: itemLevel }) => ({
+      character,
+      level: itemLevel,
+    }));
 
   const grammar = (grammarCatalog.data ?? [])
     .map((row) => ({
@@ -200,7 +214,10 @@ export async function selectLessonPlanV3(
     }))
     .sort((left, right) => compare(left.priority, right.priority))
     .slice(0, 3)
-    .map(({ pattern, level: itemLevel }) => ({ pattern, level: itemLevel }));
+    .map(({ pattern, level: itemLevel }) => ({
+      pattern,
+      level: itemLevel,
+    }));
 
   if (kanji.length !== 5 || grammar.length !== 3) {
     throw new Error(
@@ -208,14 +225,15 @@ export async function selectLessonPlanV3(
     );
   }
 
-  const knownKanji = (exposureResult.data ?? [])
+  const knownKanji = ((exposureResult.data ?? []) as ExposureRow[])
     .filter((row) => row.appearance_count >= 10)
-    .map((row) => row.character)
-    .filter((character) => !kanji.some((target) => target.character === character));
+    .map((row) => row.character);
 
+  const preferences = preferenceResult.data as InterestRow | null;
+  const profile = profileResult.data as InterestRow | null;
   const interests = normalizedInterests(
-    preferenceResult.data?.interests,
-    profileResult.data?.interests,
+    preferences?.interests,
+    profile?.interests,
   );
 
   return { kanji, grammar, knownKanji, interests };
