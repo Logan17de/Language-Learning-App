@@ -79,6 +79,7 @@ function storyKanjiCounts(draft: StoryOnlyDraft): Array<{
 }
 
 export async function POST(request: NextRequest) {
+  const requestStartedAt = Date.now();
   const auth = await authorize("learn");
   if (!auth.ok) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
@@ -146,21 +147,30 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  let planMs = 0;
+  let storyMs = 0;
+  let enrichmentMs = 0;
+  let persistenceMs = 0;
   try {
+    let stageStartedAt = Date.now();
     const plan = await selectLessonPlanV3(
       client,
       auth.userId,
       topic,
       generation.level,
     );
+    planMs = Date.now() - stageStartedAt;
 
+    stageStartedAt = Date.now();
     // Gemini API call 1: only the 10-12 line story.
     const story = await generateAdaptiveStoryDraft({
       topic,
       level: generation.level,
       plan,
     });
+    storyMs = Date.now() - stageStartedAt;
 
+    stageStartedAt = Date.now();
     // Gemini API call 2: fixed-story tokenization, kana/meaning enrichment,
     // canonical lookup, and insertion of only missing shared-library records.
     const resolved = await enrichStoryAndResolveLibraryV3(client, {
@@ -169,6 +179,7 @@ export async function POST(request: NextRequest) {
       plan,
       draft: story.draft,
     });
+    enrichmentMs = Date.now() - stageStartedAt;
 
     const interactiveStory = buildInteractiveStoryForLearner(
       resolved.draft,
@@ -180,35 +191,52 @@ export async function POST(request: NextRequest) {
       ...resolved.audits,
     ];
     const admin = createAdminClient() as unknown as SupabaseClient;
-    const saved = await admin.from("progressive_lesson_drafts").upsert(
-      {
-        request_id: generation.requestId,
-        job_id: generation.jobId,
-        user_id: auth.userId,
-        topic,
-        jlpt_level: generation.level,
-        story_draft: resolved.draft,
-        library_snapshot: resolved.library,
-        generation_audit: audit,
-        status: "activities_queued",
-        current_stage: "activities_queued",
-        progress_percent: 20,
-        completed_groups: [],
-        failed_groups: [],
-        last_error: null,
-      },
-      { onConflict: "request_id" },
-    );
-    if (saved.error) throw new Error(saved.error.message);
 
-    const rawClient = client as unknown as SupabaseClient;
-    const exposure = await rawClient.rpc("record_story_kanji_exposures", {
-      p_request_id: generation.requestId,
-      p_counts: storyKanjiCounts(story.draft) as unknown as Json,
-    });
+    stageStartedAt = Date.now();
+    // The draft snapshot and learner-specific kanji exposure write do not
+    // depend on each other, so keep them off the sequential critical path.
+    const [saved, exposure] = await Promise.all([
+      admin.from("progressive_lesson_drafts").upsert(
+        {
+          request_id: generation.requestId,
+          job_id: generation.jobId,
+          user_id: auth.userId,
+          topic,
+          jlpt_level: generation.level,
+          story_draft: resolved.draft,
+          library_snapshot: resolved.library,
+          generation_audit: audit,
+          status: "activities_queued",
+          current_stage: "activities_queued",
+          progress_percent: 20,
+          completed_groups: [],
+          failed_groups: [],
+          last_error: null,
+        },
+        { onConflict: "request_id" },
+      ),
+      (client as unknown as SupabaseClient).rpc("record_story_kanji_exposures", {
+        p_request_id: generation.requestId,
+        p_counts: storyKanjiCounts(story.draft) as unknown as Json,
+      }),
+    ]);
+    persistenceMs = Date.now() - stageStartedAt;
+    if (saved.error) throw new Error(saved.error.message);
     if (exposure.error) {
       throw new Error(`Story kanji progress could not be saved: ${exposure.error.message}`);
     }
+
+    console.info("Custom lesson story pipeline timings.", {
+      requestId: generation.requestId,
+      level: generation.level,
+      totalMs: Date.now() - requestStartedAt,
+      planMs,
+      storyMs,
+      enrichmentMs,
+      persistenceMs,
+      storyRepaired: story.audit.repaired,
+      enrichmentRepaired: resolved.audits.some((item) => item.repaired),
+    });
 
     after(async () => {
       try {
@@ -238,6 +266,11 @@ export async function POST(request: NextRequest) {
       requestId: generation.requestId,
       level: generation.level,
       message: internalMessage,
+      totalMs: Date.now() - requestStartedAt,
+      planMs,
+      storyMs,
+      enrichmentMs,
+      persistenceMs,
     });
     await client.rpc("fail_custom_lesson_generation", {
       p_request_id: generation.requestId,
