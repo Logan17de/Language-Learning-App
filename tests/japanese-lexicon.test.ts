@@ -13,7 +13,7 @@ function verb(
   id: string,
   kanji: string,
   kana: string,
-  conjugationType: LexiconEntry["conjugationType"],
+  conjugationType: NonNullable<LexiconEntry["conjugationType"]>,
 ): LexiconEntry {
   return {
     id,
