@@ -6,7 +6,7 @@ const storyCall = readFileSync(
   "utf8",
 );
 const enrichmentCall = readFileSync(
-  "lib/gemini/story-enrichment-v3.ts",
+  "lib/gemini/story-enrichment-v4.ts",
   "utf8",
 );
 const plan = readFileSync("lib/gemini/lesson-plan-v3.ts", "utf8");
@@ -49,18 +49,26 @@ describe("custom lesson story pipeline v3", () => {
     expect(plan).toContain('.from("profiles")');
   });
 
-  it("runs one dedicated second call for lexical enrichment and stores only missing records", () => {
-    expect(enrichmentCall).toContain("API call 2");
-    expect(enrichmentCall).toContain("Do not rewrite, shorten, extend, or correct");
+  it("checks the DB first and sends only unresolved word spans to call 2", () => {
+    expect(enrichmentCall).toContain("resolveStoryLibraryV4");
+    expect(enrichmentCall).toContain("loadVocabularyCandidates");
+    expect(enrichmentCall).toContain("buildFormIndex");
+    expect(enrichmentCall).toContain("resolveRegions");
+    expect(enrichmentCall).toContain("if (preflight.missing.length > 0)");
+    expect(enrichmentCall).toContain("missing-word library enrichment");
+    expect(enrichmentCall).toContain("Missing word requests");
+    expect(enrichmentCall).toContain("The complete story is deliberately not included");
+    expect(enrichmentCall).not.toContain("Fixed story:");
+    expect(enrichmentCall).toContain("contextJapanese");
     expect(enrichmentCall).toContain("dictionaryForm");
     expect(enrichmentCall).toContain("dictionaryReading");
-    expect(enrichmentCall).toContain("meaning");
-    expect(enrichmentCall).toContain("missingVocabulary");
-    expect(enrichmentCall).toContain("unknownKanji");
+    expect(enrichmentCall).toContain("kanjiDetails");
     expect(enrichmentCall).toContain('rpc("enrich_custom_lesson_library_v3"');
+    expect(enrichmentCall).toContain('generated?.model ?? "local-lexicon-db"');
     expect(route.indexOf("generateAdaptiveStoryDraft")).toBeLessThan(
-      route.indexOf("enrichStoryAndResolveLibraryV3"),
+      route.indexOf("resolveStoryLibraryV4"),
     );
+    expect(route).not.toContain("enrichStoryAndResolveLibraryV3");
   });
 
   it("shows readings for unknown kanji and marks them known at ten appearances", () => {
@@ -91,7 +99,7 @@ describe("custom lesson story pipeline v3", () => {
     expect(runner).toContain('if (group !== "final_review")');
   });
 
-  it("keeps the two-call architecture while reducing code-side latency", () => {
+  it("reduces code-side latency without changing the story-first architecture", () => {
     expect(plan).toContain("unstable_cache");
     expect(plan).toContain("lesson-plan-v3-static-catalog");
     expect(route).toContain("Custom lesson story pipeline timings");
