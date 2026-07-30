@@ -9,6 +9,11 @@ import {
   type JsonSchema,
 } from "@/lib/gemini/structured-output";
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  STORY_CONTENT_PARTS,
+  lexicalTermIssues,
+} from "@/lib/gemini/story-lexicon-validation";
+import { VERB_TYPES } from "@/lib/japanese-lexicon";
 import type {
   GenerationAuditEntry,
   LessonPlan,
@@ -62,7 +67,16 @@ function storySchema(level: JLPTLevel): JsonSchema {
           terms: objectArray(1, 10, {
             type: "object",
             additionalProperties: false,
-            required: ["surface", "readingHint", "scriptType"],
+            required: [
+              "surface",
+              "readingHint",
+              "scriptType",
+              "dictionaryForm",
+              "dictionaryReading",
+              "partOfSpeech",
+              "conjugationType",
+              "dictionaryAlias",
+            ],
             properties: {
               surface: { type: "string" },
               readingHint: { type: "string" },
@@ -70,6 +84,17 @@ function storySchema(level: JLPTLevel): JsonSchema {
                 type: "string",
                 enum: ["kanji", "hiragana", "katakana"],
               },
+              dictionaryForm: { type: "string" },
+              dictionaryReading: { type: "string" },
+              partOfSpeech: {
+                type: "string",
+                enum: [...STORY_CONTENT_PARTS],
+              },
+              conjugationType: {
+                type: "string",
+                enum: ["", ...VERB_TYPES],
+              },
+              dictionaryAlias: { type: "string" },
             },
           }),
         },
@@ -113,6 +138,13 @@ function structuralStoryIssues(value: unknown, plan: LessonPlan, level: JLPTLeve
         issues.push(`Story line ${lineIndex + 1}, term ${termIndex + 1} is incomplete.`);
         continue;
       }
+      const label = `Story line ${lineIndex + 1}, term ${termIndex + 1}`;
+      issues.push(
+        ...lexicalTermIssues(
+          term as unknown as StoryDraft["lines"][number]["terms"][number],
+          label,
+        ),
+      );
       const position = line.japanese.indexOf(term.surface, cursor);
       if (position < 0) {
         issues.push(`Term ${term.surface} is missing or out of order in line ${lineIndex + 1}.`);
@@ -254,8 +286,14 @@ export async function generateAdaptiveStoryDraft(input: {
     "Write all other words in kana.",
     "Keep the voice warm and encouraging; do not mention scores or AI.",
     "For each line list tappable content words in exact occurrence order.",
-    "Reuse a focused vocabulary set. Exclude punctuation and standalone particles.",
-    "readingHint is kana only. Do not put furigana inside the Japanese line.",
+    "Reuse a focused vocabulary set. Exclude punctuation, standalone particles, and standalone auxiliaries.",
+    "For every term, surface is the exact text in the sentence and readingHint is the kana reading of that exact observed surface.",
+    "Also return dictionaryForm, dictionaryReading, partOfSpeech, conjugationType, and dictionaryAlias for the permanent word library.",
+    "dictionaryReading is the kana reading of dictionaryForm, not the inflected surface.",
+    "Verbs must use the exact conjugation class. Non-verbs must use an empty conjugationType.",
+    "dictionaryAlias must be empty unless the observed word uses a genuine alternate dictionary spelling of the same lemma, such as 友だち for 友達. Never use a synonym, related word, or conjugated form as an alias.",
+    "Supported morphology includes ordinary polite/casual forms, ている, potential, passive, causative, ～たい, ～てしまう/ちゃう/じゃう, and なければ/なきゃ.",
+    "Do not put furigana inside the Japanese line.",
   ].join("\n");
 
   const result = await generateStructured<StoryDraft>({

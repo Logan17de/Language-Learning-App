@@ -5,10 +5,8 @@ import { processCustomLessonJobs } from "@/lib/custom-lessons/job-runner";
 import { buildInteractiveStory } from "@/lib/gemini/lesson-activity-groups";
 import { generateAdaptiveStoryDraft } from "@/lib/gemini/adaptive-story-generation";
 import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
-import {
-  resolveLessonLibrary,
-  selectLessonPlan,
-} from "@/lib/gemini/lesson-library-v2";
+import { resolveLessonLibraryWithLexicon } from "@/lib/gemini/lexicon-story-resolution";
+import { selectLessonPlan } from "@/lib/gemini/lesson-library-v2";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/types/database";
@@ -143,19 +141,19 @@ export async function POST(request: NextRequest) {
       level: generation.level,
       plan,
     });
-    const resolved = await resolveLessonLibrary(client, {
+    const resolved = await resolveLessonLibraryWithLexicon(client, {
       topic,
       level: generation.level,
       plan,
       draft: story.draft,
     });
     const interactiveStory = buildInteractiveStory(
-      story.draft,
+      resolved.draft,
       resolved.library,
     );
     const audit: GenerationAuditEntry[] = [
       story.audit,
-      ...(resolved.audit ? [resolved.audit] : []),
+      ...resolved.audits,
     ];
     const admin = createAdminClient() as unknown as SupabaseClient;
     const saved = await admin.from("progressive_lesson_drafts").upsert(
@@ -165,7 +163,7 @@ export async function POST(request: NextRequest) {
         user_id: auth.userId,
         topic,
         jlpt_level: generation.level,
-        story_draft: story.draft,
+        story_draft: resolved.draft,
         library_snapshot: resolved.library,
         generation_audit: audit,
         status: "activities_queued",
