@@ -93,8 +93,18 @@ export function AudioControl({
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
+  // Reading uses microphone + STT only. The legacy reading component still
+  // renders this control, so block it before any TTS request or preload occurs.
+  const readingSttOnly = label === "Hear this line";
 
   useEffect(() => {
+    if (readingSttOnly) {
+      audioRef.current?.pause();
+      audioRef.current = null;
+      preloadRef.current = null;
+      return;
+    }
+
     let active = true;
     setError("");
     setReady(false);
@@ -136,7 +146,7 @@ export function AudioControl({
       audioRef.current = null;
       preloadRef.current = null;
     };
-  }, [audioAssetId, text]);
+  }, [audioAssetId, readingSttOnly, text]);
 
   async function play() {
     setError("");
@@ -163,6 +173,8 @@ export function AudioControl({
       setLoading(false);
     }
   }
+
+  if (readingSttOnly) return null;
 
   const preparing = loading || (!ready && !error);
 
@@ -192,10 +204,15 @@ export function AudioControl({
             : replayCount > 0
               ? `Replay audio · ${replayCount}`
               : label}
-        {large && <Volume2 className={cn("ml-2 size-5", playing && "animate-pulse")} />}
+        {large && (
+          <Volume2 className={cn("ml-2 size-5", playing && "animate-pulse")} />
+        )}
       </Button>
       {error && (
-        <p role="alert" className="mt-2 text-center text-xs font-semibold text-red-600">
+        <p
+          role="alert"
+          className="mt-2 text-center text-xs font-semibold text-red-600"
+        >
           {error}
         </p>
       )}
