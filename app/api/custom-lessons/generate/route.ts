@@ -2,11 +2,12 @@ import { after, NextResponse, type NextRequest } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
 import { processCustomLessonJobs } from "@/lib/custom-lessons/job-runner";
-import { buildInteractiveStory } from "@/lib/gemini/lesson-activity-groups";
 import { generateAdaptiveStoryDraft } from "@/lib/gemini/adaptive-story-generation";
+import { buildInteractiveStoryForLearner } from "@/lib/gemini/interactive-story-v3";
 import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
-import { resolveLessonLibraryWithLexicon } from "@/lib/gemini/lexicon-story-resolution";
-import { selectLessonPlan } from "@/lib/gemini/lesson-library-v2";
+import { selectLessonPlanV3 } from "@/lib/gemini/lesson-plan-v3";
+import { enrichStoryAndResolveLibraryV3 } from "@/lib/gemini/story-enrichment-v3";
+import type { StoryOnlyDraft } from "@/lib/gemini/story-pipeline-v3";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/types/database";
@@ -59,6 +60,22 @@ function beginResult(value: Json): BeginResult | null {
       : null;
   }
   return result.jobId ? result : null;
+}
+
+function storyKanjiCounts(draft: StoryOnlyDraft): Array<{
+  character: string;
+  count: number;
+}> {
+  const counts = new Map<string, number>();
+  for (const line of draft.lines) {
+    for (const character of line.japanese.match(/\p{Script=Han}/gu) ?? []) {
+      counts.set(character, (counts.get(character) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()].map(([character, count]) => ({
+    character,
+    count,
+  }));
 }
 
 export async function POST(request: NextRequest) {
@@ -130,26 +147,33 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const plan = await selectLessonPlan(
+    const plan = await selectLessonPlanV3(
       client,
       auth.userId,
       topic,
       generation.level,
     );
+
+    // Gemini API call 1: only the 10-12 line story.
     const story = await generateAdaptiveStoryDraft({
       topic,
       level: generation.level,
       plan,
     });
-    const resolved = await resolveLessonLibraryWithLexicon(client, {
+
+    // Gemini API call 2: fixed-story tokenization, kana/meaning enrichment,
+    // canonical lookup, and insertion of only missing shared-library records.
+    const resolved = await enrichStoryAndResolveLibraryV3(client, {
       topic,
       level: generation.level,
       plan,
       draft: story.draft,
     });
-    const interactiveStory = buildInteractiveStory(
+
+    const interactiveStory = buildInteractiveStoryForLearner(
       resolved.draft,
       resolved.library,
+      plan.knownKanji,
     );
     const audit: GenerationAuditEntry[] = [
       story.audit,
@@ -176,6 +200,15 @@ export async function POST(request: NextRequest) {
       { onConflict: "request_id" },
     );
     if (saved.error) throw new Error(saved.error.message);
+
+    const rawClient = client as unknown as SupabaseClient;
+    const exposure = await rawClient.rpc("record_story_kanji_exposures", {
+      p_request_id: generation.requestId,
+      p_counts: storyKanjiCounts(story.draft) as unknown as Json,
+    });
+    if (exposure.error) {
+      throw new Error(`Story kanji progress could not be saved: ${exposure.error.message}`);
+    }
 
     after(async () => {
       try {

@@ -82,11 +82,17 @@ export function InspectableText({
     }
     if (timerRef.current !== null) window.clearTimeout(timerRef.current);
     setClosing(false);
-    setStages((value) => ({ ...value, [key]: Math.max(value[key] ?? 0, next) }));
+    setStages((value) => ({
+      ...value,
+      [key]: Math.max(value[key] ?? 0, next),
+    }));
     setActive({
       word,
       key,
-      x: Math.max(152, Math.min(window.innerWidth - 152, rect.left + rect.width / 2)),
+      x: Math.max(
+        152,
+        Math.min(window.innerWidth - 152, rect.left + rect.width / 2),
+      ),
       y: rect.bottom + 12,
       above: rect.bottom + 190 > window.innerHeight && rect.top > 190,
     });
@@ -106,16 +112,30 @@ export function InspectableText({
       style={{
         left: active.x,
         top: active.above ? active.y - 24 : active.y,
-        transform: active.above ? "translate(-50%, -100%)" : "translateX(-50%)",
+        transform: active.above
+          ? "translate(-50%, -100%)"
+          : "translateX(-50%)",
       }}
       onClick={(event) => event.stopPropagation()}
     >
-      <span className={cn("absolute left-1/2 size-4 -translate-x-1/2 rotate-45 border-moss-700 bg-moss-900", active.above ? "-bottom-2 border-b border-r" : "-top-2 border-l border-t")} aria-hidden="true" />
+      <span
+        className={cn(
+          "absolute left-1/2 size-4 -translate-x-1/2 rotate-45 border-moss-700 bg-moss-900",
+          active.above
+            ? "-bottom-2 border-b border-r"
+            : "-top-2 border-l border-t",
+        )}
+        aria-hidden="true"
+      />
       {active.word.scriptType === "kanji" && stage >= 1 && (
-        <div className="border-b border-white/15 px-5 py-3 text-center text-lg font-semibold text-persimmon-200">{active.word.reading}</div>
+        <div className="border-b border-white/15 px-5 py-3 text-center text-lg font-semibold text-persimmon-200">
+          {active.word.reading}
+        </div>
       )}
       {stage >= 2 && (
-        <div className="px-5 py-4 text-center text-lg font-medium">{active.word.meaning}</div>
+        <div className="px-5 py-4 text-center text-lg font-medium">
+          {active.word.meaning}
+        </div>
       )}
     </div>,
     document.body,
@@ -147,6 +167,18 @@ export function InspectableText({
             }}
           >
             {segment.text}
+            {(segment.word.showReading === true ||
+              (segment.word.showReading === undefined &&
+                segment.word.libraryType === "kanji")) &&
+              segment.word.scriptType === "kanji" &&
+              segment.word.reading && (
+                <span
+                  className="ml-1 whitespace-nowrap text-[0.72em] font-semibold text-persimmon-600"
+                  aria-label={`Reading ${segment.word.reading}`}
+                >
+                  ［{segment.word.reading}］
+                </span>
+              )}
           </span>
         ),
       )}
@@ -160,7 +192,10 @@ type Segment = string | { text: string; word: StoryWord; key: string };
 function segmentText(text: string, source: StoryWord[]): Segment[] {
   const terms = source
     .filter((item) => item.surface && text.includes(item.surface))
-    .filter((item, index, all) => all.findIndex((value) => value.surface === item.surface) === index)
+    .filter(
+      (item, index, all) =>
+        all.findIndex((value) => value.surface === item.surface) === index,
+    )
     .sort((left, right) => right.surface.length - left.surface.length);
   if (!terms.length) return [text];
   const result: Segment[] = [];
@@ -171,7 +206,12 @@ function segmentText(text: string, source: StoryWord[]): Segment[] {
     for (const term of terms) {
       const index = text.indexOf(term.surface, cursor);
       if (index < 0) continue;
-      if (bestIndex < 0 || index < bestIndex || (index === bestIndex && term.surface.length > (best?.surface.length ?? 0))) {
+      if (
+        bestIndex < 0 ||
+        index < bestIndex ||
+        (index === bestIndex &&
+          term.surface.length > (best?.surface.length ?? 0))
+      ) {
         bestIndex = index;
         best = term;
       }
