@@ -1,6 +1,7 @@
 import { after, NextResponse, type NextRequest } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
+import { withGenerationTraceContext } from "@/lib/custom-lessons/generation-trace";
 import { processCustomLessonJobs } from "@/lib/custom-lessons/job-runner";
 import { generateAdaptiveStoryDraft } from "@/lib/gemini/adaptive-story-generation";
 import { buildInteractiveStoryForLearner } from "@/lib/gemini/interactive-story-v3";
@@ -239,10 +240,14 @@ export async function POST(request: NextRequest) {
 
     after(async () => {
       try {
-        await processCustomLessonJobs({
-          requestId: generation.requestId,
-          maxCycles: 2,
-        });
+        await withGenerationTraceContext(
+          { requestId: generation.requestId },
+          () =>
+            processCustomLessonJobs({
+              requestId: generation.requestId,
+              maxCycles: 2,
+            }),
+        );
       } catch (error) {
         console.error("Custom lesson background worker stopped.", {
           requestId: generation.requestId,
