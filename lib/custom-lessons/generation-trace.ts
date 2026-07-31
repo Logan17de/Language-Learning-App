@@ -1,5 +1,6 @@
 import "server-only";
 
+import { AsyncLocalStorage } from "node:async_hooks";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Json } from "@/types/database";
@@ -33,6 +34,8 @@ interface SaveGenerationTraceInput {
   metadata?: Record<string, unknown>;
 }
 
+const traceStorage = new AsyncLocalStorage<GenerationTraceContext>();
+
 function enabled(): boolean {
   return process.env.CUSTOM_LESSON_GENERATION_TRACES !== "false";
 }
@@ -40,6 +43,23 @@ function enabled(): boolean {
 function jsonValue(value: unknown): Json | null {
   if (value === undefined) return null;
   return value as Json;
+}
+
+export function withGenerationTraceContext<T>(
+  context: GenerationTraceContext,
+  callback: () => T,
+): T {
+  const current = traceStorage.getStore() ?? {};
+  return traceStorage.run({ ...current, ...context }, callback);
+}
+
+function effectiveTrace(
+  explicit: GenerationTraceContext | undefined,
+): GenerationTraceContext {
+  return {
+    ...(traceStorage.getStore() ?? {}),
+    ...(explicit ?? {}),
+  };
 }
 
 /**
@@ -50,12 +70,13 @@ function jsonValue(value: unknown): Json | null {
 export async function saveGenerationTrace(
   input: SaveGenerationTraceInput,
 ): Promise<void> {
-  const requestId = input.trace?.requestId;
+  const trace = effectiveTrace(input.trace);
+  const requestId = trace.requestId;
   if (!enabled() || typeof requestId !== "string" || requestId.length < 1) {
     return;
   }
 
-  const { requestId: _requestId, stage, ...traceMetadata } = input.trace ?? {};
+  const { requestId: _requestId, stage, ...traceMetadata } = trace;
   const admin = createAdminClient() as unknown as SupabaseClient;
   const saved = await admin.from("custom_lesson_generation_traces").insert({
     request_id: requestId,
