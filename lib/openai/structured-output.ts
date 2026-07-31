@@ -11,6 +11,10 @@ import {
   openAIResponsesUrl,
   type OpenAIReasoningEffort,
 } from "@/lib/openai/api-request";
+import {
+  saveGenerationTrace,
+  type GenerationTraceContext,
+} from "@/lib/custom-lessons/generation-trace";
 
 export type JsonSchema = Record<string, unknown>;
 
@@ -43,6 +47,7 @@ interface HttpResult {
 
 interface ModelCallResult {
   value: unknown;
+  rawOutput: string;
   model: string;
   usage: OpenAIUsage;
 }
@@ -54,6 +59,15 @@ export interface StructuredGeneration<T> {
   issues: string[];
   durationMs: number;
   attempts: number;
+}
+
+export interface StructuredGenerationInput {
+  name: string;
+  prompt: string;
+  schema: JsonSchema;
+  validate: (value: unknown) => string[];
+  model?: string;
+  trace?: GenerationTraceContext;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -183,7 +197,7 @@ async function callModel(
   prompt: string,
   schema: JsonSchema,
   reasoningEffort: OpenAIReasoningEffort,
-): Promise<{ value: unknown; usage: OpenAIUsage }> {
+): Promise<{ value: unknown; rawOutput: string; usage: OpenAIUsage }> {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) throw new Error("OPENAI_API_KEY is not configured.");
 
@@ -220,6 +234,7 @@ async function callModel(
   }
   return {
     value: parseStructuredText(model, output),
+    rawOutput: output,
     usage: responseUsage(result.payload),
   };
 }
@@ -326,24 +341,73 @@ function logCompleted(input: {
   });
 }
 
-export async function generateStructured<T>(input: {
+async function traceFailure(input: {
+  trace?: GenerationTraceContext;
   name: string;
+  attempt: number;
+  model: string;
   prompt: string;
-  schema: JsonSchema;
-  validate: (value: unknown) => string[];
-  model?: string;
-}): Promise<StructuredGeneration<T>> {
+  error: unknown;
+  metadata?: Record<string, unknown>;
+}): Promise<void> {
+  await saveGenerationTrace({
+    trace: input.trace,
+    name: input.name,
+    eventType: "generation_failed",
+    attempt: input.attempt,
+    model: input.model,
+    prompt: input.prompt,
+    issues: [input.error instanceof Error ? input.error.message : String(input.error)],
+    metadata: input.metadata,
+  });
+}
+
+export async function generateStructured<T>(
+  input: StructuredGenerationInput,
+): Promise<StructuredGeneration<T>> {
   const startedAt = Date.now();
   const preferredModel = configuredModel(input.name, input.model);
   const effort = configuredReasoningEffort(input.name);
-  const first = await call(
-    input.name,
-    input.prompt,
-    input.schema,
-    preferredModel,
-    effort,
-  );
+  let first: ModelCallResult;
+  try {
+    first = await call(
+      input.name,
+      input.prompt,
+      input.schema,
+      preferredModel,
+      effort,
+    );
+  } catch (error) {
+    await traceFailure({
+      trace: input.trace,
+      name: input.name,
+      attempt: 1,
+      model: preferredModel,
+      prompt: input.prompt,
+      error,
+      metadata: { reasoningEffort: effort },
+    });
+    throw error;
+  }
+
   const issues = input.validate(first.value);
+  await saveGenerationTrace({
+    trace: input.trace,
+    name: input.name,
+    eventType: "initial_response",
+    attempt: 1,
+    model: first.model,
+    prompt: input.prompt,
+    rawResponse: first.rawOutput,
+    response: first.value,
+    issues,
+    metadata: {
+      reasoningEffort: effort,
+      durationMs: Date.now() - startedAt,
+      usage: first.usage,
+    },
+  });
+
   if (issues.length === 0) {
     const durationMs = Date.now() - startedAt;
     logCompleted({
@@ -371,14 +435,53 @@ export async function generateStructured<T>(input: {
     "Previous JSON:",
     JSON.stringify(first.value),
   ].join("\n");
-  const repaired = await call(
-    input.name,
-    repairPrompt,
-    input.schema,
-    first.model,
-    effort,
-  );
+
+  let repaired: ModelCallResult;
+  try {
+    repaired = await call(
+      input.name,
+      repairPrompt,
+      input.schema,
+      first.model,
+      effort,
+    );
+  } catch (error) {
+    await traceFailure({
+      trace: input.trace,
+      name: input.name,
+      attempt: 2,
+      model: first.model,
+      prompt: repairPrompt,
+      error,
+      metadata: {
+        reasoningEffort: effort,
+        initialIssues: issues,
+        previousResponse: first.value,
+      },
+    });
+    throw error;
+  }
+
   const repairedIssues = input.validate(repaired.value);
+  await saveGenerationTrace({
+    trace: input.trace,
+    name: input.name,
+    eventType: "repair_response",
+    attempt: 2,
+    model: repaired.model,
+    prompt: repairPrompt,
+    rawResponse: repaired.rawOutput,
+    response: repaired.value,
+    issues: repairedIssues,
+    metadata: {
+      reasoningEffort: effort,
+      durationMs: Date.now() - startedAt,
+      usage: repaired.usage,
+      initialIssues: issues,
+      previousResponse: first.value,
+    },
+  });
+
   if (repairedIssues.length > 0) {
     throw new Error(
       `${input.name} validation failed: ${repairedIssues.join(" ")}`,
