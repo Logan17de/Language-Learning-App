@@ -6,7 +6,7 @@ import { generateAdaptiveStoryDraft } from "@/lib/gemini/adaptive-story-generati
 import { buildInteractiveStoryForLearner } from "@/lib/gemini/interactive-story-v3";
 import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
 import { selectLessonPlanV3 } from "@/lib/gemini/lesson-plan-v3";
-import { resolveStoryLibraryV4 } from "@/lib/gemini/story-enrichment-v4";
+import { resolveStoryFromExistingLibrary } from "@/lib/gemini/story-library-existing-only";
 import type { StoryOnlyDraft } from "@/lib/gemini/story-pipeline-v3";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
 
   let planMs = 0;
   let storyMs = 0;
-  let enrichmentMs = 0;
+  let libraryLookupMs = 0;
   let persistenceMs = 0;
   try {
     let stageStartedAt = Date.now();
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
     planMs = Date.now() - stageStartedAt;
 
     stageStartedAt = Date.now();
-    // OpenAI Responses API call 1: only the 10-12 line story.
+    // The only model call before the story is shown: generate 10-12 lines.
     const story = await generateAdaptiveStoryDraft({
       topic,
       level: generation.level,
@@ -171,15 +171,15 @@ export async function POST(request: NextRequest) {
     storyMs = Date.now() - stageStartedAt;
 
     stageStartedAt = Date.now();
-    // Resolve known words through the DB and deterministic morphology first.
-    // OpenAI call 2 runs only for unresolved word spans and never receives the
-    // complete story. When every word is known, no enrichment call is made.
-    const resolved = await resolveStoryLibraryV4(client, {
+    // Local/DB-only lookup. Existing canonical, alias, and supported
+    // conjugated forms become tappable. Missing words are left as plain text.
+    // No library enrichment model call and no library write occurs here.
+    const resolved = await resolveStoryFromExistingLibrary(client, {
       level: generation.level,
       plan,
       draft: story.draft,
     });
-    enrichmentMs = Date.now() - stageStartedAt;
+    libraryLookupMs = Date.now() - stageStartedAt;
 
     const interactiveStory = buildInteractiveStoryForLearner(
       resolved.draft,
@@ -229,12 +229,11 @@ export async function POST(request: NextRequest) {
       totalMs: Date.now() - requestStartedAt,
       planMs,
       storyMs,
-      enrichmentMs,
+      libraryLookupMs,
       persistenceMs,
       storyRepaired: story.audit.repaired,
-      enrichmentRepaired: resolved.audits.some((item) => item.repaired),
-      enrichmentModel: resolved.audits.find((item) => item.stage === "library")
-        ?.model,
+      libraryMode: "existing-library-only",
+      tappableVocabularyCount: resolved.library.vocabulary.length,
     });
 
     after(async () => {
@@ -269,7 +268,7 @@ export async function POST(request: NextRequest) {
       totalMs: Date.now() - requestStartedAt,
       planMs,
       storyMs,
-      enrichmentMs,
+      libraryLookupMs,
       persistenceMs,
     });
     await client.rpc("fail_custom_lesson_generation", {
