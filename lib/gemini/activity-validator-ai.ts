@@ -53,6 +53,7 @@ type IsolatedRepairResult = {
 };
 
 const MAX_ISOLATED_REPAIR_ATTEMPTS = 3;
+const MAX_PARALLEL_REPAIRS = 2;
 
 function stringArray(minItems = 0, maxItems = 8): JsonSchema {
   return {
@@ -126,7 +127,7 @@ function practiceQuestionSchema(group: ValidatedGroup): JsonSchema {
       explanation: { type: "string" },
       hintFront: { type: "string" },
       hintBack: { type: "string" },
-      targetItemIds: stringArray(1, 5),
+      targetItemIds: stringArray(1, 1),
     },
   };
 }
@@ -150,7 +151,7 @@ const listeningQuestionSchema: JsonSchema = {
     choices: stringArray(4, 4),
     correctAnswer: { type: "string" },
     explanation: { type: "string" },
-    targetItemIds: stringArray(1, 5),
+    targetItemIds: stringArray(1, 1),
   },
 };
 
@@ -248,8 +249,8 @@ function questionStructureIssues(
     ? value.targetItemIds.filter((item): item is string => typeof item === "string")
     : [];
   const allowedIds = allowedLibraryIds(library);
-  if (targetIds.length < 1 || targetIds.some((id) => !allowedIds.has(id))) {
-    issues.push("The repaired question must preserve valid targetItemIds.");
+  if (targetIds.length !== 1 || targetIds.some((id) => !allowedIds.has(id))) {
+    issues.push("The repaired question must use exactly one valid primary targetItemId.");
   }
 
   const choices = Array.isArray(value.choices)
@@ -349,7 +350,7 @@ function approvalPrompt(input: {
     "Return exactly one verdict for every requestIndex. Approve only when all checks pass:",
     "1. The requested format is exact. MCQ has four distinct choices and one defensible answer. Text input has a visible Japanese blank and enough context.",
     "2. The answer fits the prompt. Mentally insert blank answers and confirm the full sentence is grammatical and natural.",
-    "3. The item genuinely tests every supplied targetItemId.",
+    "3. The item has exactly one primary targetItemId and genuinely tests that target.",
     "4. The item is unambiguous and no alternative answer is equally reasonable.",
     "5. The prompt, cue, hint, choices, or surrounding text do not expose the answer.",
     "6. Japanese, English, difficulty, and explanation fit the JLPT ceiling.",
@@ -402,7 +403,8 @@ async function repairOneQuestion(input: {
           : "Correct every listed issue while preserving all already-valid fields.",
         "Return one corrected question object with no wrapper or explanation.",
         "Do not regenerate, mention, or alter any other question. Approved neighboring questions survive unchanged.",
-        "Preserve difficulty, activity type, mode, skill, and targetItemIds unless a listed issue explicitly says one is invalid.",
+        "Keep exactly one primary targetItemId. When the provisional item has several IDs, retain only the single ID that the repaired question directly tests.",
+        "Preserve difficulty, activity type, mode, and skill unless a listed issue explicitly says one is invalid.",
         `Validator issues: ${JSON.stringify(currentIssues)}`,
         `Fixed story: ${JSON.stringify(input.draft.lines)}`,
         `Relevant canonical library region: ${JSON.stringify(validationContext(input.library, [currentQuestion]))}`,
@@ -457,12 +459,31 @@ async function repairOneQuestion(input: {
   throw new Error(message);
 }
 
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  concurrency: number,
+  run: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let cursor = 0;
+  const workers = Array.from(
+    { length: Math.min(Math.max(1, concurrency), items.length) },
+    async () => {
+      while (cursor < items.length) {
+        const index = cursor;
+        cursor += 1;
+        results[index] = await run(items[index]!);
+      }
+    },
+  );
+  await Promise.all(workers);
+  return results;
+}
+
 /**
- * Group validators run in parallel with the independently generated activity
- * groups. Approved question regions stay untouched. Rejected questions alone
- * are repaired and re-approved in parallel; no already-approved question is
- * sent back to a generator. Each rejected region receives bounded isolated
- * retries before the surrounding group is allowed to fail.
+ * Approved question regions stay untouched. Rejected questions alone are
+ * repaired and re-approved with bounded parallelism so one lesson cannot
+ * create an uncontrolled validator request burst.
  */
 export async function approveActivityQuestionsWithAI(input: {
   group: ValidatedGroup;
@@ -502,20 +523,22 @@ export async function approveActivityQuestionsWithAI(input: {
     })),
   });
 
-  const repairs = await Promise.all(rejected.map((verdict) => repairOneQuestion({
-    group: input.group,
-    topic: input.topic,
-    level: input.level,
-    draft: input.draft,
-    library: input.library,
-    question: questions[verdict.requestIndex]!,
-    requestIndex: verdict.requestIndex,
-    issues: verdict.issues,
-  })));
+  const repairs = await mapWithConcurrency(
+    rejected,
+    MAX_PARALLEL_REPAIRS,
+    (verdict) =>
+      repairOneQuestion({
+        group: input.group,
+        topic: input.topic,
+        level: input.level,
+        draft: input.draft,
+        library: input.library,
+        question: questions[verdict.requestIndex]!,
+        requestIndex: verdict.requestIndex,
+        issues: verdict.issues,
+      }),
+  );
 
-  // questions is the original array inside generated.value. Replacing only the
-  // rejected indexes means the runner persists the repaired group while every
-  // approved object survives byte-for-byte.
   rejected.forEach((verdict, index) => {
     questions[verdict.requestIndex] = repairs[index]!.question;
   });
