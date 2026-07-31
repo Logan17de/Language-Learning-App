@@ -44,7 +44,6 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 OPENAI_API_KEY=
 OPENAI_LESSON_MODEL=gpt-5.6-luna
 OPENAI_STORY_REASONING_EFFORT=low
-OPENAI_ENRICHMENT_REASONING_EFFORT=medium
 OPENAI_VALIDATOR_REASONING_EFFORT=medium
 OPENAI_TRANSCRIPTION_MODEL=gpt-4o-mini-transcribe
 ```
@@ -83,7 +82,7 @@ The seed includes JLPT levels, vocabulary, kanji, grammar, assets, operational r
 - Pro accounts rank eligible current-level lessons using profile interests.
 - A unique learner/lesson assignment prevents any assigned lesson from being selected again.
 - Lesson-session inserts require a valid active assignment through a restrictive RLS policy.
-- Pro custom topics use the server-only OpenAI Responses API with GPT-5.6 Luna and JSON Schema output. The story remains the first isolated model call. AIko then resolves known vocabulary locally, sends only unresolved words for library enrichment, generates activity regions in parallel, preserves approved questions, and repairs only rejected questions. Responses are stateless (`store: false`), and an alternate model is used only when `OPENAI_LESSON_FALLBACK_MODEL` is explicitly configured.
+- Pro custom topics use the server-only OpenAI Responses API with GPT-5.6 Luna and JSON Schema output. The story is the first isolated model call. AIko then resolves only vocabulary already present in the permanent library and attaches those records as taps; unresolved story text remains plain text and never triggers an enrichment model call or library write. Activity regions are generated in parallel, approved questions survive unchanged, and only rejected questions are repaired. Responses are stateless (`store: false`), and an alternate model is used only when `OPENAI_LESSON_FALLBACK_MODEL` is explicitly configured.
 - Review evidence reports strengths and weaknesses and automatically drives the learning system; there is no learner-managed lesson starring.
 
 ## Authentication and admin setup
