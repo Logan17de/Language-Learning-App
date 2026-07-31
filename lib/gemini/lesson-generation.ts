@@ -3,15 +3,9 @@ import "server-only";
 import type { Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
 import {
-  createGeminiApiError,
-  GeminiApiError,
-  getGeminiApiDiagnostics,
-} from "@/lib/gemini/api-error";
-import {
-  buildGenerateContentRequest,
-  buildInteractionsRequest,
-  generateContentUrl,
-} from "@/lib/gemini/api-request";
+  generateStructured,
+  type JsonSchema,
+} from "@/lib/openai/structured-output";
 import {
   createInspectableTermLookup,
   resolveInspectableTerm,
@@ -47,20 +41,12 @@ import type {
   VocabularyLibraryItem,
 } from "@/lib/gemini/lesson-types";
 
-const PRIMARY_MODEL = process.env.GEMINI_LESSON_MODEL?.trim() || "gemini-3-flash-preview";
-const FALLBACK_MODEL = process.env.GEMINI_LESSON_FALLBACK_MODEL?.trim() || "gemini-3.1-flash-lite";
-const GEMINI_GENERATE_CONTENT_BASE = process.env.GEMINI_GENERATE_CONTENT_BASE?.trim()
-  || "https://generativelanguage.googleapis.com/v1beta/models";
-const GEMINI_INTERACTIONS_ENDPOINT = process.env.GEMINI_API_BASE?.trim()
-  || "https://generativelanguage.googleapis.com/v1beta/interactions";
+const PRIMARY_MODEL =
+  process.env.OPENAI_LESSON_MODEL?.trim() || "gpt-5.6-luna";
+const FALLBACK_MODEL =
+  process.env.OPENAI_LESSON_FALLBACK_MODEL?.trim() || PRIMARY_MODEL;
 
-type JsonSchema = Record<string, unknown>;
 type RecordValue = Record<string, unknown>;
-
-interface GeminiResult {
-  value: unknown;
-  model: string;
-}
 
 interface SectionDefinition {
   name: GenerationSectionName;
@@ -74,12 +60,6 @@ interface SectionResult<T> {
   attempts: GenerationAttempt[];
 }
 
-interface GeminiHttpResult {
-  response: Response;
-  payload: unknown;
-  transport: "generateContent" | "interactions";
-}
-
 function isRecord(value: unknown): value is RecordValue {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
@@ -88,167 +68,40 @@ function stringValue(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-function findOutputText(value: unknown): string | null {
-  if (typeof value === "string") return value;
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      const found = findOutputText(item);
-      if (found) return found;
-    }
-    return null;
-  }
-  if (!isRecord(value)) return null;
-  for (const key of ["output_text", "outputText", "text"]) {
-    if (typeof value[key] === "string") return value[key];
-  }
-  if (Array.isArray(value.steps)) {
-    for (const step of [...value.steps].reverse()) {
-      if (isRecord(step) && step.type === "model_output") {
-        const found = findOutputText(step.content);
-        if (found) return found;
-      }
-    }
-  }
-  for (const key of ["candidates", "outputs", "output", "content", "parts", "response"]) {
-    if (key in value) {
-      const found = findOutputText(value[key]);
-      if (found) return found;
-    }
-  }
-  return null;
-}
-
-async function postGemini(
-  url: string,
-  apiKey: string,
-  body: Record<string, unknown>,
-  transport: GeminiHttpResult["transport"],
-  includeApiRevision = false,
-): Promise<GeminiHttpResult> {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-goog-api-key": apiKey,
-      ...(includeApiRevision ? { "Api-Revision": "2026-05-20" } : {}),
-    },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(90_000),
+async function generateSection<T>(
+  definition: SectionDefinition,
+): Promise<SectionResult<T>> {
+  const result = await generateStructured<T>({
+    name: `legacy-${definition.name}`,
+    prompt: definition.prompt,
+    schema: definition.schema,
+    validate: definition.validate,
   });
-  return {
-    response,
-    payload: await response.json().catch(() => null),
-    transport,
-  };
+  const attempts: GenerationAttempt[] = result.repaired
+    ? [
+        {
+section: definition.name,
+model: result.model,
+repaired: false,
+issues: result.issues,
+        },
+        {
+section: definition.name,
+model: result.model,
+repaired: true,
+issues: [],
+        },
+      ]
+    : [
+        {
+section: definition.name,
+model: result.model,
+repaired: false,
+issues: [],
+        },
+      ];
+  return { value: result.value, attempts };
 }
-
-function shouldUseInteractionsFallback(status: number): boolean {
-  return status === 404 || status === 405 || status === 501;
-}
-
-function reportGeminiRejection(model: string, result: GeminiHttpResult): void {
-  const diagnostics = getGeminiApiDiagnostics(result.payload);
-  console.error("Gemini structured request rejected.", {
-    model,
-    transport: result.transport,
-    status: result.response.status,
-    messages: diagnostics.messages.slice(0, 3),
-    reasons: diagnostics.reasons.slice(0, 3),
-    fields: diagnostics.fields.slice(0, 5),
-    descriptions: diagnostics.descriptions.slice(0, 3),
-  });
-}
-
-async function callModel(model: string, prompt: string, schema: JsonSchema): Promise<unknown> {
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
-  if (!apiKey) throw new Error("GEMINI_API_KEY is not configured.");
-  let result = await postGemini(
-    generateContentUrl(GEMINI_GENERATE_CONTENT_BASE, model),
-    apiKey,
-    buildGenerateContentRequest(prompt, schema),
-    "generateContent",
-  );
-  if (!result.response.ok && shouldUseInteractionsFallback(result.response.status)) {
-    result = await postGemini(
-      GEMINI_INTERACTIONS_ENDPOINT,
-      apiKey,
-      buildInteractionsRequest(model, prompt, schema),
-      "interactions",
-      true,
-    );
-  }
-  if (!result.response.ok) {
-    reportGeminiRejection(model, result);
-    throw createGeminiApiError(model, result.response.status, result.payload);
-  }
-
-  const output = findOutputText(result.payload);
-  if (output) {
-    try {
-      return JSON.parse(output);
-    } catch {
-      throw new Error(`${model} returned malformed JSON.`);
-    }
-  }
-  if (isRecord(result.payload)
-    && !("candidates" in result.payload)
-    && !("outputs" in result.payload)
-    && !("output" in result.payload)) {
-    return result.payload;
-  }
-  throw new Error(`${model} did not return structured output.`);
-}
-
-async function callGemini(prompt: string, schema: JsonSchema): Promise<GeminiResult> {
-  try {
-    return { value: await callModel(PRIMARY_MODEL, prompt, schema), model: PRIMARY_MODEL };
-  } catch (primaryError) {
-    if (primaryError instanceof GeminiApiError && !primaryError.allowFallback) {
-      throw primaryError;
-    }
-    if (FALLBACK_MODEL === PRIMARY_MODEL) throw primaryError;
-    try {
-      return { value: await callModel(FALLBACK_MODEL, prompt, schema), model: FALLBACK_MODEL };
-    } catch (fallbackError) {
-      const primary = primaryError instanceof Error ? primaryError.message : "Primary Gemini request failed.";
-      const fallback = fallbackError instanceof Error ? fallbackError.message : "Fallback Gemini request failed.";
-      throw new Error(`Lesson generation failed on both Gemini models. Primary: ${primary} Fallback: ${fallback}`);
-    }
-  }
-}
-
-function repairPrompt(section: GenerationSectionName, prompt: string, value: unknown, issues: string[]): string {
-  return [
-    prompt,
-    "",
-    `The previous ${section} output passed the API schema but failed application validation.`,
-    "Return the COMPLETE corrected section, not a patch and not an explanation.",
-    "Validation issues:",
-    ...issues.map((issue) => `- ${issue}`),
-    "Previous output:",
-    JSON.stringify(value),
-  ].join("\n");
-}
-
-async function generateSection<T>(definition: SectionDefinition): Promise<SectionResult<T>> {
-  const attempts: GenerationAttempt[] = [];
-  const first = await callGemini(definition.prompt, definition.schema);
-  const firstIssues = definition.validate(first.value);
-  attempts.push({ section: definition.name, model: first.model, repaired: false, issues: firstIssues });
-  if (firstIssues.length === 0) return { value: first.value as T, attempts };
-
-  const repaired = await callGemini(
-    repairPrompt(definition.name, definition.prompt, first.value, firstIssues),
-    definition.schema,
-  );
-  const repairIssues = definition.validate(repaired.value);
-  attempts.push({ section: definition.name, model: repaired.model, repaired: true, issues: repairIssues });
-  if (repairIssues.length > 0) {
-    throw new Error(`Gemini could not repair ${definition.name}: ${repairIssues.join(" ")}`);
-  }
-  return { value: repaired.value as T, attempts };
-}
-
 function promptHeader(input: LessonGenerationInput): string {
   return [
     "You are AIko's Japanese lesson generation engine.",

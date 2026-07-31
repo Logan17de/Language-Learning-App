@@ -19,7 +19,11 @@ const validator = readFileSync(
   "utf8",
 );
 const runner = readFileSync("lib/custom-lessons/job-runner.ts", "utf8");
-const structured = readFileSync("lib/gemini/structured-output.ts", "utf8");
+const structured = readFileSync("lib/openai/structured-output.ts", "utf8");
+const compatibilityExport = readFileSync(
+  "lib/gemini/structured-output.ts",
+  "utf8",
+);
 const inspectable = readFileSync(
   "components/exercises/inspectable-text.tsx",
   "utf8",
@@ -71,6 +75,19 @@ describe("custom lesson story pipeline v3", () => {
     expect(route).not.toContain("enrichStoryAndResolveLibraryV3");
   });
 
+  it("uses GPT-5.6 Luna through the stateless OpenAI Responses API", () => {
+    expect(structured).toContain('"gpt-5.6-luna"');
+    expect(structured).toContain("OPENAI_API_KEY");
+    expect(structured).toContain("OPENAI_STORY_MODEL");
+    expect(structured).toContain("OPENAI_ENRICHMENT_MODEL");
+    expect(structured).toContain("OPENAI_VALIDATOR_MODEL");
+    expect(structured).toContain("OPENAI_STORY_REASONING_EFFORT");
+    expect(structured).toContain("OpenAI structured generation completed");
+    expect(structured).not.toContain("GEMINI_");
+    expect(compatibilityExport).toContain("@/lib/openai/structured-output");
+    expect(route).toContain("OpenAI Responses API call 1");
+  });
+
   it("shows readings for unknown kanji and marks them known at ten appearances", () => {
     expect(inspectable).toContain("［{segment.word.reading}］");
     expect(inspectable).toContain("text-persimmon-600");
@@ -106,9 +123,7 @@ describe("custom lesson story pipeline v3", () => {
     expect(route).toContain("const [saved, exposure] = await Promise.all");
     expect(structured).toContain("durationMs");
     expect(structured).toContain("attempts");
-    expect(structured).toContain("GEMINI_STORY_MODEL");
-    expect(structured).toContain("GEMINI_ENRICHMENT_MODEL");
-    expect(structured).toContain("GEMINI_VALIDATOR_MODEL");
+    expect(structured).toContain("cachedInputTokens");
   });
 
   it("keeps reading STT-only and listening stored-TTS plus MCQ-only", () => {

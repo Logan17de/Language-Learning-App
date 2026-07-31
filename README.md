@@ -41,12 +41,15 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 # Legacy alternative: NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-GEMINI_API_KEY=
-GEMINI_LESSON_MODEL=gemini-3-flash-preview
-GEMINI_LESSON_FALLBACK_MODEL=gemini-3.1-flash-lite
+OPENAI_API_KEY=
+OPENAI_LESSON_MODEL=gpt-5.6-luna
+OPENAI_STORY_REASONING_EFFORT=low
+OPENAI_ENRICHMENT_REASONING_EFFORT=medium
+OPENAI_VALIDATOR_REASONING_EFFORT=medium
+OPENAI_TRANSCRIPTION_MODEL=gpt-4o-mini-transcribe
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY` is imported only by server-only modules and trusted route handlers. Never expose it through a `NEXT_PUBLIC_` variable.
+`SUPABASE_SERVICE_ROLE_KEY` and `OPENAI_API_KEY` are imported only by server-only modules and trusted route handlers. Never expose either through a `NEXT_PUBLIC_` variable.
 
 Start a local Supabase stack (Docker Desktop must be running):
 
@@ -80,7 +83,7 @@ The seed includes JLPT levels, vocabulary, kanji, grammar, assets, operational r
 - Pro accounts rank eligible current-level lessons using profile interests.
 - A unique learner/lesson assignment prevents any assigned lesson from being selected again.
 - Lesson-session inserts require a valid active assignment through a restrictive RLS policy.
-- Pro custom topics use the server-only Gemini Interactions API with JSON Schema output. The engine selects exactly five weak/unseen kanji and three weak/unseen grammar records, generates a shared blueprint, validates each section, repairs only failed sections, falls back to Gemini 3.1 Flash-Lite after technical failures, persists the universal package, and immediately assigns the compatible lesson.
+- Pro custom topics use the server-only OpenAI Responses API with GPT-5.6 Luna and JSON Schema output. The story remains the first isolated model call. AIko then resolves known vocabulary locally, sends only unresolved words for library enrichment, generates activity regions in parallel, preserves approved questions, and repairs only rejected questions. Responses are stateless (`store: false`), and an alternate model is used only when `OPENAI_LESSON_FALLBACK_MODEL` is explicitly configured.
 - Review evidence reports strengths and weaknesses and automatically drives the learning system; there is no learner-managed lesson starring.
 
 ## Authentication and admin setup
@@ -142,7 +145,7 @@ Tests cover scoring validation, migration parsing, canonical lesson merge rules,
 ## Known Phase 5 limitations
 
 - Speech recognition, TTS, image generation, email delivery, and Stripe are not yet implemented.
-- Pro lesson generation requires `GEMINI_API_KEY`; apply all Supabase migrations so the universal package is retained in lesson-version metadata.
+- Pro lesson generation requires `OPENAI_API_KEY`; apply all Supabase migrations so the universal package is retained in lesson-version metadata.
 - Billing state is persisted but remains mocked.
 - Account deletion remains a documented future privileged workflow; progress reset is transactional now.
 - Local Supabase execution requires Docker. Static migration/seed validation and mocked tests remain available without it.

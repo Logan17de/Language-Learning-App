@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
     planMs = Date.now() - stageStartedAt;
 
     stageStartedAt = Date.now();
-    // Gemini API call 1: only the 10-12 line story.
+    // OpenAI Responses API call 1: only the 10-12 line story.
     const story = await generateAdaptiveStoryDraft({
       topic,
       level: generation.level,
@@ -172,8 +172,8 @@ export async function POST(request: NextRequest) {
 
     stageStartedAt = Date.now();
     // Resolve known words through the DB and deterministic morphology first.
-    // Gemini API call 2 runs only for unresolved word spans and never receives
-    // the complete story.
+    // OpenAI call 2 runs only for unresolved word spans and never receives the
+    // complete story. When every word is known, no enrichment call is made.
     const resolved = await resolveStoryLibraryV4(client, {
       level: generation.level,
       plan,
