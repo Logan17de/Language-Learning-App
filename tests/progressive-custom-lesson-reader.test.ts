@@ -34,6 +34,7 @@ describe("progressive custom lesson reader", () => {
     expect(progressiveReader).toContain("totalPhases={7}");
     expect(progressiveReader).toContain("<InspectableText");
     expect(progressiveReader).toContain("Story audio is off");
+    expect(progressiveReader).not.toContain("<AudioControl");
   });
 
   it("shows background readiness beside the reading", () => {
