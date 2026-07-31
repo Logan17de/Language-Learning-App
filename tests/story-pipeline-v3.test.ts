@@ -5,7 +5,7 @@ const storyCall = readFileSync(
   "lib/gemini/adaptive-story-generation.ts",
   "utf8",
 );
-const enrichmentCall = readFileSync(
+const libraryLookup = readFileSync(
   "lib/gemini/story-enrichment-v4.ts",
   "utf8",
 );
@@ -53,22 +53,18 @@ describe("custom lesson story pipeline v3", () => {
     expect(plan).toContain('.from("profiles")');
   });
 
-  it("checks the DB first and sends only unresolved word spans to call 2", () => {
-    expect(enrichmentCall).toContain("resolveStoryLibraryV4");
-    expect(enrichmentCall).toContain("loadVocabularyCandidates");
-    expect(enrichmentCall).toContain("buildFormIndex");
-    expect(enrichmentCall).toContain("resolveRegions");
-    expect(enrichmentCall).toContain("if (preflight.missing.length > 0)");
-    expect(enrichmentCall).toContain("missing-word library enrichment");
-    expect(enrichmentCall).toContain("Missing word requests");
-    expect(enrichmentCall).toContain("The complete story is deliberately not included");
-    expect(enrichmentCall).not.toContain("Fixed story:");
-    expect(enrichmentCall).toContain("contextJapanese");
-    expect(enrichmentCall).toContain("dictionaryForm");
-    expect(enrichmentCall).toContain("dictionaryReading");
-    expect(enrichmentCall).toContain("kanjiDetails");
-    expect(enrichmentCall).toContain('rpc("enrich_custom_lesson_library_v3"');
-    expect(enrichmentCall).toContain('generated?.model ?? "local-lexicon-db"');
+  it("uses only existing permanent-library records for story taps", () => {
+    expect(libraryLookup).toContain("resolveStoryLibraryV4");
+    expect(libraryLookup).toContain("loadVocabularyCandidates");
+    expect(libraryLookup).toContain("buildFormIndex");
+    expect(libraryLookup).toContain("resolveKnownOccurrences");
+    expect(libraryLookup).toContain("Unresolved story text remains plain text");
+    expect(libraryLookup).toContain('model: "local-lexicon-db"');
+    expect(libraryLookup).not.toContain("generateStructured");
+    expect(libraryLookup).not.toContain("missing-word library enrichment");
+    expect(libraryLookup).not.toContain("Missing word requests");
+    expect(libraryLookup).not.toContain("enrich_custom_lesson_library_v3");
+    expect(libraryLookup).not.toContain("kanjiDetails");
     expect(route.indexOf("generateAdaptiveStoryDraft")).toBeLessThan(
       route.indexOf("resolveStoryLibraryV4"),
     );
@@ -79,16 +75,16 @@ describe("custom lesson story pipeline v3", () => {
     expect(structured).toContain('"gpt-5.6-luna"');
     expect(structured).toContain("OPENAI_API_KEY");
     expect(structured).toContain("OPENAI_STORY_MODEL");
-    expect(structured).toContain("OPENAI_ENRICHMENT_MODEL");
     expect(structured).toContain("OPENAI_VALIDATOR_MODEL");
     expect(structured).toContain("OPENAI_STORY_REASONING_EFFORT");
     expect(structured).toContain("OpenAI structured generation completed");
     expect(structured).not.toContain("GEMINI_");
     expect(compatibilityExport).toContain("@/lib/openai/structured-output");
+    expect(compatibilityExport).not.toContain("missing-word library enrichment");
     expect(route).toContain("OpenAI Responses API call 1");
   });
 
-  it("shows readings for unknown kanji and marks them known at ten appearances", () => {
+  it("shows readings for available unknown-kanji taps and marks kanji known at ten appearances", () => {
     expect(inspectable).toContain("［{segment.word.reading}］");
     expect(inspectable).toContain("text-persimmon-600");
     expect(route).toContain('rpc("record_story_kanji_exposures"');
@@ -116,7 +112,7 @@ describe("custom lesson story pipeline v3", () => {
     expect(runner).toContain('if (group !== "final_review")');
   });
 
-  it("reduces code-side latency without changing the story-first architecture", () => {
+  it("keeps story-first lookup and persistence efficient", () => {
     expect(plan).toContain("unstable_cache");
     expect(plan).toContain("lesson-plan-v3-static-catalog");
     expect(route).toContain("Custom lesson story pipeline timings");
