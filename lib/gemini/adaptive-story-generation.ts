@@ -160,10 +160,11 @@ function structuralStoryIssues(
 
 /**
  * API call 1. This call is intentionally limited to the story itself.
- * Tokenization, readings, meanings, library enrichment, and activities happen
- * only after this response has passed story validation.
+ * Existing library taps and all activities are resolved only after this
+ * response has passed story validation.
  */
 export async function generateAdaptiveStoryDraft(input: {
+  requestId: string;
   topic: string;
   level: JLPTLevel;
   plan: LessonPlanV3;
@@ -189,7 +190,7 @@ export async function generateAdaptiveStoryDraft(input: {
     "You may use other useful kanji, including kanji the learner has not seen before. Do not add furigana or bracketed readings inside the story.",
     "Keep the voice natural, coherent, and appropriate for the JLPT ceiling.",
     "Return only story metadata and the Japanese/English story lines.",
-    "Do not return vocabulary terms, tokenization, readings, dictionary forms, meanings, grammar explanations, exercises, questions, answers, or audio instructions. A separate enrichment call handles all of those later.",
+    "Do not return vocabulary terms, tokenization, readings, dictionary forms, meanings, grammar explanations, exercises, questions, answers, or audio instructions.",
   ].join("\n");
 
   const result = await generateStructured<StoryOnlyDraft>({
@@ -198,6 +199,11 @@ export async function generateAdaptiveStoryDraft(input: {
     schema: storySchema,
     validate: (value) =>
       structuralStoryIssues(value, input.plan, acceptedForms),
+    trace: {
+      requestId: input.requestId,
+      stage: "story",
+      level: input.level,
+    },
   });
 
   return {
