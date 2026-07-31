@@ -164,6 +164,7 @@ export async function POST(request: NextRequest) {
     stageStartedAt = Date.now();
     // The only model call before the story is shown: generate 10-12 lines.
     const story = await generateAdaptiveStoryDraft({
+      requestId: generation.requestId,
       topic,
       level: generation.level,
       plan,
