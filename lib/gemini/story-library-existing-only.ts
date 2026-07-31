@@ -62,7 +62,7 @@ const PARTICLES = new Set([
 ]);
 const JAPANESE = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
 const STORY_PARTS = new Set<PartOfSpeech>([
-  "noun", "verb", "adjective-i", "adjective-na", "adverb", "expression", "other",
+  "noun", "verb", "i-adjective", "na-adjective", "adverb", "expression", "other",
 ]);
 
 function uniqueBy<T>(items: T[], key: (item: T) => string): T[] {
@@ -191,6 +191,7 @@ function buildFormIndex(rows: VocabularyRow[]): Map<string, FormMatch[]> {
       for (const chain of supportedChains(entry)) {
         try {
           const form = composeEntryForm(entry, chain);
+          if (!form) continue;
           const match: FormMatch = {
             row,
             entry: canonical,
