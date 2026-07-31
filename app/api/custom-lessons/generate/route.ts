@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
 
   let planMs = 0;
   let storyMs = 0;
-  let enrichmentMs = 0;
+  let libraryLookupMs = 0;
   let persistenceMs = 0;
   try {
     let stageStartedAt = Date.now();
@@ -171,15 +171,14 @@ export async function POST(request: NextRequest) {
     storyMs = Date.now() - stageStartedAt;
 
     stageStartedAt = Date.now();
-    // Resolve known words through the DB and deterministic morphology first.
-    // OpenAI call 2 runs only for unresolved word spans and never receives the
-    // complete story. When every word is known, no enrichment call is made.
+    // Attach only taps that can be resolved from the existing permanent
+    // library. Unresolved text stays plain and never triggers another AI call.
     const resolved = await resolveStoryLibraryV4(client, {
       level: generation.level,
       plan,
       draft: story.draft,
     });
-    enrichmentMs = Date.now() - stageStartedAt;
+    libraryLookupMs = Date.now() - stageStartedAt;
 
     const interactiveStory = buildInteractiveStoryForLearner(
       resolved.draft,
@@ -229,11 +228,10 @@ export async function POST(request: NextRequest) {
       totalMs: Date.now() - requestStartedAt,
       planMs,
       storyMs,
-      enrichmentMs,
+      libraryLookupMs,
       persistenceMs,
       storyRepaired: story.audit.repaired,
-      enrichmentRepaired: resolved.audits.some((item) => item.repaired),
-      enrichmentModel: resolved.audits.find((item) => item.stage === "library")
+      libraryLookupModel: resolved.audits.find((item) => item.stage === "library")
         ?.model,
     });
 
@@ -269,7 +267,7 @@ export async function POST(request: NextRequest) {
       totalMs: Date.now() - requestStartedAt,
       planMs,
       storyMs,
-      enrichmentMs,
+      libraryLookupMs,
       persistenceMs,
     });
     await client.rpc("fail_custom_lesson_generation", {
