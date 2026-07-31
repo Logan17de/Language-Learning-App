@@ -5,7 +5,9 @@ import {
   generateStructured as generateStructuredWithOpenAI,
   type JsonSchema,
   type StructuredGeneration,
+  type StructuredGenerationInput,
 } from "@/lib/openai/structured-output";
+import { saveGenerationTrace } from "@/lib/custom-lessons/generation-trace";
 
 export type { JsonSchema, StructuredGeneration };
 
@@ -89,13 +91,9 @@ async function sleep(milliseconds: number): Promise<void> {
  * failures are deliberately not repeated here because their regional repair
  * belongs to the caller.
  */
-export async function generateStructured<T>(input: {
-  name: string;
-  prompt: string;
-  schema: JsonSchema;
-  validate: (value: unknown) => string[];
-  model?: string;
-}): Promise<StructuredGeneration<T>> {
+export async function generateStructured<T>(
+  input: StructuredGenerationInput,
+): Promise<StructuredGeneration<T>> {
   const release = await acquireCallSlot();
   try {
     for (let attempt = 0; ; attempt += 1) {
@@ -105,13 +103,29 @@ export async function generateStructured<T>(input: {
         if (attempt >= TRANSIENT_RETRIES || !transientModelError(error)) {
           throw error;
         }
-        const delayMs = retryDelayMs(attempt + 1);
+        const retry = attempt + 1;
+        const delayMs = retryDelayMs(retry);
+        const message = error instanceof Error ? error.message : String(error);
+        await saveGenerationTrace({
+          trace: input.trace,
+          name: input.name,
+          eventType: "transport_retry",
+          attempt: retry,
+          model: input.model,
+          prompt: input.prompt,
+          issues: [message],
+          metadata: {
+            retry,
+            maxRetries: TRANSIENT_RETRIES,
+            delayMs,
+          },
+        });
         console.warn("Retrying transient OpenAI structured generation.", {
           name: input.name,
-          retry: attempt + 1,
+          retry,
           maxRetries: TRANSIENT_RETRIES,
           delayMs,
-          message: error instanceof Error ? error.message : String(error),
+          message,
         });
         await sleep(delayMs);
       }
