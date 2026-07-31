@@ -46,6 +46,14 @@ export interface ActivityValidationApproval {
 type ValidatedGroup = Exclude<ActivityGroupName, "final_review">;
 type QuestionPayload = PracticeQuestion | ListeningExercise;
 
+type IsolatedRepairResult = {
+  question: QuestionPayload;
+  models: string[];
+  validationCalls: number;
+};
+
+const MAX_ISOLATED_REPAIR_ATTEMPTS = 3;
+
 function stringArray(minItems = 0, maxItems = 8): JsonSchema {
   return {
     type: "array",
@@ -378,44 +386,83 @@ async function repairOneQuestion(input: {
   question: QuestionPayload;
   requestIndex: number;
   issues: string[];
-}): Promise<{ question: QuestionPayload; models: string[] }> {
-  const repaired = await generateStructured<QuestionPayload>({
-    name: `single ${groupLabel(input.group)} item repair`,
-    prompt: [
-      `Repair only item ${input.requestIndex + 1} from AIko's ${groupLabel(input.group)}.`,
-      "Return one corrected question object with no wrapper or explanation.",
-      "Do not regenerate, mention, or alter any other question. Approved neighboring questions survive unchanged.",
-      "Preserve difficulty, activity type, mode, skill, and targetItemIds unless a listed issue explicitly says one is invalid.",
-      `Validator issues: ${JSON.stringify(input.issues)}`,
-      `Fixed story: ${JSON.stringify(input.draft.lines)}`,
-      `Relevant canonical library region: ${JSON.stringify(validationContext(input.library, [input.question]))}`,
-      `Question to repair: ${JSON.stringify(input.question)}`,
-    ].join("\n"),
-    schema: questionSchema(input.group),
-    validate: (value) => questionStructureIssues(input.group, value, input.library),
-  });
-  const approval = await decideQuestions({
-    group: input.group,
-    topic: input.topic,
-    level: input.level,
-    draft: input.draft,
-    library: input.library,
-    questions: [repaired.value],
-  });
-  const verdict = approval.value.items[0];
-  if (!verdict?.approved) {
-    throw new Error(
-      `${groupLabel(input.group)} item ${input.requestIndex + 1} failed isolated repair: ${verdict?.issues.join(" | ") || "not approved"}`,
-    );
+}): Promise<IsolatedRepairResult> {
+  let currentQuestion = input.question;
+  let currentIssues = input.issues;
+  const models: string[] = [];
+
+  for (let attempt = 1; attempt <= MAX_ISOLATED_REPAIR_ATTEMPTS; attempt += 1) {
+    const repaired = await generateStructured<QuestionPayload>({
+      name: `single ${groupLabel(input.group)} item repair`,
+      prompt: [
+        `Repair only item ${input.requestIndex + 1} from AIko's ${groupLabel(input.group)}.`,
+        `This is isolated repair attempt ${attempt} of ${MAX_ISOLATED_REPAIR_ATTEMPTS}.`,
+        attempt === MAX_ISOLATED_REPAIR_ATTEMPTS
+          ? "Rebuild this one question cleanly from its canonical targets rather than making another minimal edit."
+          : "Correct every listed issue while preserving all already-valid fields.",
+        "Return one corrected question object with no wrapper or explanation.",
+        "Do not regenerate, mention, or alter any other question. Approved neighboring questions survive unchanged.",
+        "Preserve difficulty, activity type, mode, skill, and targetItemIds unless a listed issue explicitly says one is invalid.",
+        `Validator issues: ${JSON.stringify(currentIssues)}`,
+        `Fixed story: ${JSON.stringify(input.draft.lines)}`,
+        `Relevant canonical library region: ${JSON.stringify(validationContext(input.library, [currentQuestion]))}`,
+        `Question to repair: ${JSON.stringify(currentQuestion)}`,
+      ].join("\n"),
+      schema: questionSchema(input.group),
+      validate: (value) => questionStructureIssues(input.group, value, input.library),
+    });
+    const approval = await decideQuestions({
+      group: input.group,
+      topic: input.topic,
+      level: input.level,
+      draft: input.draft,
+      library: input.library,
+      questions: [repaired.value],
+    });
+    models.push(repaired.model, approval.model);
+
+    const verdict = approval.value.items[0];
+    if (verdict?.approved) {
+      return {
+        question: repaired.value,
+        models,
+        validationCalls: attempt * 2,
+      };
+    }
+
+    currentQuestion = repaired.value;
+    currentIssues = verdict?.issues.length
+      ? verdict.issues
+      : ["The validator did not approve the isolated replacement."];
+    console.warn("Custom lesson question repair needs another isolated attempt.", {
+      group: input.group,
+      requestIndex: input.requestIndex,
+      itemNumber: input.requestIndex + 1,
+      attempt,
+      maxAttempts: MAX_ISOLATED_REPAIR_ATTEMPTS,
+      issues: currentIssues,
+    });
   }
-  return { question: repaired.value, models: [repaired.model, approval.model] };
+
+  const message =
+    `${groupLabel(input.group)} item ${input.requestIndex + 1} failed after ` +
+    `${MAX_ISOLATED_REPAIR_ATTEMPTS} isolated repairs: ${currentIssues.join(" | ")}`;
+  console.error("Custom lesson isolated question repair exhausted.", {
+    group: input.group,
+    requestIndex: input.requestIndex,
+    itemNumber: input.requestIndex + 1,
+    attempts: MAX_ISOLATED_REPAIR_ATTEMPTS,
+    issues: currentIssues,
+  });
+  throw new Error(message);
 }
 
 /**
  * Group validators run in parallel with the independently generated activity
  * groups. Approved question regions stay untouched. Rejected questions alone
  * are repaired and re-approved in parallel; no already-approved question is
- * sent back to a generator.
+ * sent back to a generator. Each rejected region receives bounded isolated
+ * retries before the surrounding group is allowed to fail.
  */
 export async function approveActivityQuestionsWithAI(input: {
   group: ValidatedGroup;
@@ -445,6 +492,16 @@ export async function approveActivityQuestionsWithAI(input: {
     };
   }
 
+  console.info("Custom lesson validator isolated rejected questions.", {
+    group: input.group,
+    checkedItems: questions.length,
+    rejectedItems: rejected.map((item) => ({
+      requestIndex: item.requestIndex,
+      itemNumber: item.requestIndex + 1,
+      issues: item.issues,
+    })),
+  });
+
   const repairs = await Promise.all(rejected.map((verdict) => repairOneQuestion({
     group: input.group,
     topic: input.topic,
@@ -468,7 +525,8 @@ export async function approveActivityQuestionsWithAI(input: {
     repaired: true,
     checkedItems: questions.length,
     repairedItems: repairs.length,
-    validationCalls: 1 + repairs.length * 2,
+    validationCalls:
+      1 + repairs.reduce((total, item) => total + item.validationCalls, 0),
     payload: input.payload,
   };
 }
