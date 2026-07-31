@@ -361,6 +361,20 @@ export function StoryPhase({
             </p>
           ))}
         </div>
+
+        <div className="mt-10 border-t border-stone-200 pt-8">
+          <p className="section-kicker">English story</p>
+          <div className="mt-4 space-y-4">
+            {lesson.story.map((line) => (
+              <p
+                key={`${line.id}_english`}
+                className="text-base leading-7 text-stone-600 sm:text-lg"
+              >
+                {line.english}
+              </p>
+            ))}
+          </div>
+        </div>
       </Card>
 
       {activeSupport && activeDetails && (

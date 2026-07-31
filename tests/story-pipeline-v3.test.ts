@@ -28,6 +28,14 @@ const inspectable = readFileSync(
   "components/exercises/inspectable-text.tsx",
   "utf8",
 );
+const progressiveStory = readFileSync(
+  "components/lesson/progressive-story-page.tsx",
+  "utf8",
+);
+const storyPhase = readFileSync(
+  "components/lesson/story-phase.tsx",
+  "utf8",
+);
 const audioControl = readFileSync(
   "components/exercises/audio-control.tsx",
   "utf8",
@@ -68,6 +76,20 @@ describe("custom lesson story pipeline v3", () => {
     expect(route).not.toContain("resolveStoryLibraryV4");
     expect(route).not.toContain("enrichmentRepaired");
     expect(route).not.toContain("enrichmentModel");
+  });
+
+  it("shows the English story below the complete Japanese story", () => {
+    expect(progressiveStory).toContain("english: string");
+    expect(progressiveStory).toContain('English story');
+    expect(progressiveStory).toContain('{line.english}');
+    expect(progressiveStory.indexOf('English story')).toBeGreaterThan(
+      progressiveStory.indexOf('<InspectableText text={line.japanese}'),
+    );
+    expect(storyPhase).toContain('English story');
+    expect(storyPhase).toContain('{line.english}');
+    expect(storyPhase.indexOf('English story')).toBeGreaterThan(
+      storyPhase.indexOf('segmentStoredStoryLine(line.japanese'),
+    );
   });
 
   it("uses GPT-5.6 Luna through the stateless OpenAI Responses API", () => {

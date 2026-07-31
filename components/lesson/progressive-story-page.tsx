@@ -70,6 +70,7 @@ type GenerationResult = {
 type ReaderLine = {
   id: string;
   japanese: string;
+  english: string;
   words: StoryWord[];
 };
 
@@ -108,6 +109,7 @@ function readerLines(source: StoryLineResult[] | undefined): ReaderLine[] {
     return [{
       id: `progressive_story_line_${lineIndex}`,
       japanese: line.japanese,
+      english: typeof line.english === "string" ? line.english : "",
       words,
     }];
   });
@@ -408,6 +410,20 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
                   <InspectableText text={line.japanese} terms={line.words} />
                 </p>
               ))}
+            </div>
+
+            <div className="mt-10 border-t border-stone-200 pt-8">
+              <p className="section-kicker">English story</p>
+              <div className="mt-4 space-y-4">
+                {lines.map((line) => (
+                  <p
+                    key={`${line.id}_english`}
+                    className="text-base leading-7 text-stone-600 sm:text-lg"
+                  >
+                    {line.english}
+                  </p>
+                ))}
+              </div>
             </div>
           </Card>
 
