@@ -93,7 +93,7 @@ describe("custom lesson story pipeline v3", () => {
     expect(migration).toContain("on conflict (user_id, request_id, character) do nothing");
   });
 
-  it("keeps approved QA regions and repairs only rejected questions in parallel", () => {
+  it("keeps approved QA regions and retries only rejected questions in parallel", () => {
     expect(validator).toContain("approval-only Japanese question-and-answer validator");
     expect(validator).toContain("Return exactly one verdict for every requestIndex");
     expect(validator).toContain("Mentally insert blank answers");
@@ -101,8 +101,13 @@ describe("custom lesson story pipeline v3", () => {
     expect(validator).toContain("The item is unambiguous");
     expect(validator).toContain("do not expose the answer");
     expect(validator).toContain("Approved neighboring questions survive unchanged");
+    expect(validator).toContain("const MAX_ISOLATED_REPAIR_ATTEMPTS = 3");
+    expect(validator).toContain("for (let attempt = 1; attempt <= MAX_ISOLATED_REPAIR_ATTEMPTS");
+    expect(validator).toContain("Rebuild this one question cleanly from its canonical targets");
+    expect(validator).toContain("Custom lesson question repair needs another isolated attempt");
     expect(validator).toContain("Promise.all(rejected.map");
     expect(validator).toContain("questions[verdict.requestIndex] = repairs[index]!.question");
+    expect(validator).toContain("repairs.reduce((total, item) => total + item.validationCalls, 0)");
     expect(runner).toContain("const approval = await approveActivityQuestionsWithAI");
     expect(runner.indexOf("const approval = await approveActivityQuestionsWithAI")).toBeLessThan(
       runner.indexOf("await persistGroup(admin, job, group, generated.value, audit)"),
