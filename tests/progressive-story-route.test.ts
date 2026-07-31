@@ -1,9 +1,8 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-const customRoute = readFileSync("app/custom-topic/page.tsx", "utf8");
-const transition = readFileSync(
-  "components/custom-topic/custom-topic-route-client.tsx",
+const customTopic = readFileSync(
+  "components/custom-topic/custom-topic-page.tsx",
   "utf8",
 );
 const progressive = readFileSync(
@@ -17,26 +16,36 @@ const buildingRoute = readFileSync(
 
 describe("progressive custom lesson reading", () => {
   it("leaves the custom-topic builder as soon as the story request is ready", () => {
-    expect(customRoute).toContain("CustomTopicRouteClient");
-    expect(transition).toContain('searchParams.get("requestId")');
-    expect(transition).toContain("/lesson/building/");
-    expect(transition).toContain("router.replace");
+    expect(customTopic).toContain('searchParams.get("requestId")');
+    expect(customTopic).toContain(
+      "router.replace(`/lesson/building/${encodeURIComponent(activeRequest)}`)",
+    );
+    expect(customTopic).toContain(
+      "router.replace(`/lesson/building/${encodeURIComponent(result.requestId)}`)",
+    );
+    expect(customTopic).not.toContain("<InspectableText");
   });
 
-  it("renders the story in a lesson route with readiness on the right", () => {
+  it("renders the story in the real lesson player with readiness on the right", () => {
     expect(buildingRoute).toContain("ProgressiveStoryPage");
-    expect(progressive).toContain("Read the real lesson now");
+    expect(progressive).toContain("<LessonPlayerShell");
+    expect(progressive).toContain('phaseName="Story"');
     expect(progressive).toContain("Lesson readiness");
-    expect(progressive).toContain("lg:grid-cols-[minmax(0,1fr)_320px]");
-    expect(progressive).toContain("lg:sticky lg:top-6");
-    expect(progressive).toContain("InspectableText");
+    expect(progressive).toContain("lg:grid-cols-[minmax(0,1fr)_19rem]");
+    expect(progressive).toContain("lg:sticky lg:top-28");
+    expect(progressive).toContain("<InspectableText");
+    expect(progressive).toContain("Story audio is off");
+    expect(progressive).not.toContain("<AudioControl");
   });
 
-  it("polls background readiness and opens the completed lesson", () => {
+  it("polls background readiness and advances the completed story to vocabulary", () => {
     expect(progressive).toContain("/api/custom-lessons/status?requestId=");
     expect(progressive).toContain("2_500");
     expect(progressive).toContain("completedGroups");
-    expect(progressive).toContain("/lesson/${result.lessonId}/play");
-    expect(progressive).toContain("Continue full lesson");
+    expect(progressive).toContain("createEmptyLessonSession(lessonId)");
+    expect(progressive).toContain("session.currentPhaseIndex = 1");
+    expect(progressive).toContain("session.storyComplete = true");
+    expect(progressive).toContain("router.push(`/lesson/${lessonId}/play`)");
+    expect(progressive).toContain('continueLabel={lessonReady ? "Vocabulary"');
   });
 });
