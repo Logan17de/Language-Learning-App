@@ -82,6 +82,16 @@ describe("custom lesson story pipeline v3", () => {
     expect(route).toContain("The only model call before the story is shown");
   });
 
+  it("throttles and retries only transient structured model failures", () => {
+    expect(compatibilityExport).toContain("OPENAI_STRUCTURED_MAX_CONCURRENCY");
+    expect(compatibilityExport).toContain("OPENAI_STRUCTURED_RETRIES");
+    expect(compatibilityExport).toContain("acquireCallSlot");
+    expect(compatibilityExport).toContain("transientModelError");
+    expect(compatibilityExport).toContain("Retrying transient OpenAI structured generation");
+    expect(compatibilityExport).toContain("finally");
+    expect(compatibilityExport).toContain("release()");
+  });
+
   it("shows readings for unknown kanji and marks them known at ten appearances", () => {
     expect(inspectable).toContain("［{segment.word.reading}］");
     expect(inspectable).toContain("text-persimmon-600");
@@ -93,26 +103,39 @@ describe("custom lesson story pipeline v3", () => {
     expect(migration).toContain("on conflict (user_id, request_id, character) do nothing");
   });
 
-  it("keeps approved QA regions and retries only rejected questions in parallel", () => {
+  it("keeps approved QA regions and repairs rejected questions with bounded load", () => {
     expect(validator).toContain("approval-only Japanese question-and-answer validator");
     expect(validator).toContain("Return exactly one verdict for every requestIndex");
     expect(validator).toContain("Mentally insert blank answers");
-    expect(validator).toContain("genuinely tests every supplied targetItemId");
+    expect(validator).toContain("exactly one primary targetItemId");
     expect(validator).toContain("The item is unambiguous");
     expect(validator).toContain("do not expose the answer");
     expect(validator).toContain("Approved neighboring questions survive unchanged");
     expect(validator).toContain("const MAX_ISOLATED_REPAIR_ATTEMPTS = 3");
+    expect(validator).toContain("const MAX_PARALLEL_REPAIRS = 2");
     expect(validator).toContain("for (let attempt = 1; attempt <= MAX_ISOLATED_REPAIR_ATTEMPTS");
     expect(validator).toContain("Rebuild this one question cleanly from its canonical targets");
     expect(validator).toContain("Custom lesson question repair needs another isolated attempt");
-    expect(validator).toContain("Promise.all(rejected.map");
+    expect(validator).toContain("mapWithConcurrency");
+    expect(validator).not.toContain("Promise.all(rejected.map");
     expect(validator).toContain("questions[verdict.requestIndex] = repairs[index]!.question");
     expect(validator).toContain("repairs.reduce((total, item) => total + item.validationCalls, 0)");
     expect(runner).toContain("const approval = await approveActivityQuestionsWithAI");
     expect(runner.indexOf("const approval = await approveActivityQuestionsWithAI")).toBeLessThan(
-      runner.indexOf("await persistGroup(admin, job, group, generated.value, audit)"),
+      runner.indexOf("await persistGroup(admin, job, group, payload, audit)"),
     );
+    expect(runner).toContain("payload = approval.payload as GroupPayload");
     expect(runner).toContain('if (group !== "final_review")');
+  });
+
+  it("records exact group errors and does not mislabel finalization failures", () => {
+    expect(runner).toContain('console.error("Custom lesson activity groups failed."');
+    expect(runner).toContain("failures: details");
+    expect(runner).toContain("failedGroups.map((group, index)");
+    expect(runner).toContain("markFinalizationFailure");
+    expect(runner).toContain('console.error("Custom lesson finalization failed."');
+    expect(runner).toContain("libraryCounts");
+    expect(runner).toContain("return markFinalizationFailure(admin, refreshed, error)");
   });
 
   it("keeps the story-first flow fast after the single story call", () => {

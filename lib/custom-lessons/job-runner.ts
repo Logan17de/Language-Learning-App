@@ -107,6 +107,10 @@ function stringValue(value: unknown): string | null {
   return typeof value === "string" && value.length > 0 ? value : null;
 }
 
+function errorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : String(error || fallback);
+}
+
 function asJob(value: unknown): ProgressiveLessonJob | null {
   if (!isRecord(value)) return null;
   const requestId = stringValue(value.request_id);
@@ -255,6 +259,27 @@ function groupsFromJob(job: ProgressiveLessonJob): ActivityGroups | null {
   };
 }
 
+async function failRequestPermanently(
+  admin: AdminClient,
+  requestId: string,
+  internalMessage: string,
+): Promise<void> {
+  await Promise.all([
+    admin
+      .from("custom_lesson_requests")
+      .update({ status: "failed", updated_at: new Date().toISOString() })
+      .eq("id", requestId),
+    admin
+      .from("generated_lesson_jobs")
+      .update({
+        status: "failed",
+        error_message: internalMessage,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("custom_lesson_request_id", requestId),
+  ]);
+}
+
 async function markActivityFailure(
   admin: AdminClient,
   job: ProgressiveLessonJob,
@@ -262,8 +287,17 @@ async function markActivityFailure(
   errors: string[],
 ): Promise<CustomLessonWorkerResult> {
   const permanent = job.build_attempts >= MAX_BUILD_ATTEMPTS;
+  const details = failedGroups.map((group, index) => ({
+    group,
+    message: errors[index] ?? "Activity generation failed.",
+  }));
   const internalMessage =
-    errors.join(" | ").slice(0, 1_000) || "Activity generation failed.";
+    details
+      .map((detail) => `${detail.group}: ${detail.message}`)
+      .join(" | ")
+      .slice(0, 1_000) ||
+    errors.join(" | ").slice(0, 1_000) ||
+    "Activity generation failed.";
   const updated = await admin
     .from("progressive_lesson_drafts")
     .update({
@@ -281,25 +315,72 @@ async function markActivityFailure(
   if (updated.error) throw new Error(updated.error.message);
 
   if (permanent) {
-    await Promise.all([
-      admin
-        .from("custom_lesson_requests")
-        .update({ status: "failed", updated_at: new Date().toISOString() })
-        .eq("id", job.request_id),
-      admin
-        .from("generated_lesson_jobs")
-        .update({
-          status: "failed",
-          error_message: internalMessage,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("custom_lesson_request_id", job.request_id),
-    ]);
+    await failRequestPermanently(admin, job.request_id, internalMessage);
   }
   console.error("Custom lesson activity groups failed.", {
     requestId: job.request_id,
     failedGroups,
+    failures: details,
     buildAttempt: job.build_attempts,
+    permanent,
+  });
+  return {
+    claimed: true,
+    requestId: job.request_id,
+    status: permanent ? "failed" : "activities_failed",
+    lessonReady: false,
+    retryable: !permanent,
+  };
+}
+
+async function markFinalizationFailure(
+  admin: AdminClient,
+  job: ProgressiveLessonJob,
+  error: unknown,
+): Promise<CustomLessonWorkerResult> {
+  const permanent = job.build_attempts >= MAX_BUILD_ATTEMPTS;
+  const internalMessage = errorMessage(error, "Lesson finalization failed.").slice(
+    0,
+    1_000,
+  );
+  const updated = await admin
+    .from("progressive_lesson_drafts")
+    .update({
+      status: permanent ? "failed" : "activities_failed",
+      current_stage: permanent ? "failed" : "retrying_lesson_finalization",
+      failed_groups: [],
+      last_error: internalMessage,
+      worker_token: null,
+      claimed_at: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("request_id", job.request_id)
+    .eq("worker_token", job.worker_token);
+  if (updated.error) throw new Error(updated.error.message);
+
+  if (permanent) {
+    await failRequestPermanently(admin, job.request_id, internalMessage);
+  }
+  console.error("Custom lesson finalization failed.", {
+    requestId: job.request_id,
+    currentStage: job.current_stage,
+    buildAttempt: job.build_attempts,
+    permanent,
+    message: internalMessage,
+    libraryCounts: {
+      kanji: Array.isArray((job.library_snapshot as Record<string, unknown>)?.kanji)
+        ? ((job.library_snapshot as Record<string, unknown>).kanji as unknown[]).length
+        : null,
+      vocabulary: Array.isArray(
+        (job.library_snapshot as Record<string, unknown>)?.vocabulary,
+      )
+        ? ((job.library_snapshot as Record<string, unknown>).vocabulary as unknown[])
+            .length
+        : null,
+      grammar: Array.isArray((job.library_snapshot as Record<string, unknown>)?.grammar)
+        ? ((job.library_snapshot as Record<string, unknown>).grammar as unknown[]).length
+        : null,
+    },
   });
   return {
     claimed: true,
@@ -354,8 +435,7 @@ async function prepareAudioJob(
       audioStatus: "ready",
     };
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Audio preparation failed.";
+    const message = errorMessage(error, "Audio preparation failed.");
     const retryable = job.audio_attempts < MAX_AUDIO_ATTEMPTS;
     const saved = await admin
       .from("progressive_lesson_drafts")
@@ -372,6 +452,7 @@ async function prepareAudioJob(
     console.error("Custom lesson audio failed without blocking the lesson.", {
       requestId: job.request_id,
       audioAttempt: job.audio_attempts,
+      message,
     });
     return {
       claimed: true,
@@ -407,11 +488,9 @@ async function processActivityJob(
       library,
     });
 
+    let payload = generated.value;
     let audit = generated.audit;
     if (group !== "final_review") {
-      // The exact provisional QA is sent to a separate approval model. Nothing
-      // is persisted until every applicable item is approved. Interactive
-      // speaking and final review remain untouched in this patch.
       const approval = await approveActivityQuestionsWithAI({
         group,
         topic: job.topic,
@@ -420,17 +499,20 @@ async function processActivityJob(
         library,
         payload: generated.value as AiValidatedPayload,
       });
+      payload = approval.payload as GroupPayload;
       audit = {
         ...generated.audit,
         validator: {
           model: approval.model,
           repaired: approval.repaired,
           checkedItems: approval.checkedItems,
+          repairedItems: approval.repairedItems,
+          validationCalls: approval.validationCalls,
         },
       } as unknown as GenerationAuditEntry;
     }
 
-    await persistGroup(admin, job, group, generated.value, audit);
+    await persistGroup(admin, job, group, payload, audit);
     return group;
   });
   const settled = await Promise.allSettled(executions);
@@ -439,11 +521,7 @@ async function processActivityJob(
   settled.forEach((result, index) => {
     if (result.status === "fulfilled") return;
     failedGroups.push(missing[index]);
-    errors.push(
-      result.reason instanceof Error
-        ? result.reason.message
-        : String(result.reason),
-    );
+    errors.push(errorMessage(result.reason, "Activity generation failed."));
   });
 
   const refreshed = await loadJob(admin, job.request_id);
@@ -545,12 +623,7 @@ async function processActivityJob(
       audioStatus: "queued",
     };
   } catch (error) {
-    return markActivityFailure(
-      admin,
-      refreshed,
-      [],
-      [error instanceof Error ? error.message : "Lesson assembly failed."],
-    );
+    return markFinalizationFailure(admin, refreshed, error);
   }
 }
 
