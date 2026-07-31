@@ -6,7 +6,7 @@ import { generateAdaptiveStoryDraft } from "@/lib/gemini/adaptive-story-generati
 import { buildInteractiveStoryForLearner } from "@/lib/gemini/interactive-story-v3";
 import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
 import { selectLessonPlanV3 } from "@/lib/gemini/lesson-plan-v3";
-import { resolveStoryLibraryV4 } from "@/lib/gemini/story-enrichment-v4";
+import { resolveStoryFromExistingLibrary } from "@/lib/gemini/story-library-existing-only";
 import type { StoryOnlyDraft } from "@/lib/gemini/story-pipeline-v3";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
     planMs = Date.now() - stageStartedAt;
 
     stageStartedAt = Date.now();
-    // OpenAI Responses API call 1: only the 10-12 line story.
+    // The only model call before the story is shown: generate 10-12 lines.
     const story = await generateAdaptiveStoryDraft({
       topic,
       level: generation.level,
@@ -171,9 +171,10 @@ export async function POST(request: NextRequest) {
     storyMs = Date.now() - stageStartedAt;
 
     stageStartedAt = Date.now();
-    // Attach only taps that can be resolved from the existing permanent
-    // library. Unresolved text stays plain and never triggers another AI call.
-    const resolved = await resolveStoryLibraryV4(client, {
+    // Local/DB-only lookup. Existing canonical, alias, and supported
+    // conjugated forms become tappable. Missing words are left as plain text.
+    // No library enrichment model call and no library write occurs here.
+    const resolved = await resolveStoryFromExistingLibrary(client, {
       level: generation.level,
       plan,
       draft: story.draft,
@@ -231,8 +232,8 @@ export async function POST(request: NextRequest) {
       libraryLookupMs,
       persistenceMs,
       storyRepaired: story.audit.repaired,
-      libraryLookupModel: resolved.audits.find((item) => item.stage === "library")
-        ?.model,
+      libraryMode: "existing-library-only",
+      tappableVocabularyCount: resolved.library.vocabulary.length,
     });
 
     after(async () => {
