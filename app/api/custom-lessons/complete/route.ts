@@ -1,6 +1,7 @@
 import { after, NextResponse, type NextRequest } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
+import { withGenerationTraceContext } from "@/lib/custom-lessons/generation-trace";
 import { processCustomLessonJobs } from "@/lib/custom-lessons/job-runner";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -121,7 +122,9 @@ export async function POST(request: NextRequest) {
 
   after(async () => {
     try {
-      await processCustomLessonJobs({ requestId, maxCycles: 2 });
+      await withGenerationTraceContext({ requestId }, () =>
+        processCustomLessonJobs({ requestId, maxCycles: 2 }),
+      );
     } catch (error) {
       console.error("Custom lesson retry worker stopped.", {
         requestId,
