@@ -1,0 +1,151 @@
+name: One-time OpenAI lesson generation migration
+
+on:
+  push:
+    branches:
+      - agent/replace-gemini-with-gpt-5-6-luna
+    paths:
+      - .github/workflows/one-time-openai-lesson-generation-migration.yml
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/replace-gemini-with-gpt-5-6-luna
+
+      - name: Replace the remaining legacy Gemini transport
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path("lib/gemini/lesson-generation.ts")
+          source = path.read_text(encoding="utf-8")
+          marker = "function promptHeader(input: LessonGenerationInput): string {"
+          if marker not in source:
+              raise SystemExit("lesson-generation.ts marker was not found")
+
+          tail = marker + source.split(marker, 1)[1]
+          prefix = '''import "server-only";
+
+          import type { Json } from "@/types/database";
+          import type { JLPTLevel } from "@/types/lesson";
+          import {
+            generateStructured,
+            type JsonSchema,
+          } from "@/lib/openai/structured-output";
+          import {
+            createInspectableTermLookup,
+            resolveInspectableTerm,
+            type InspectableTermLookup,
+          } from "@/lib/gemini/inspectable-canonicalization";
+          import { storyUsesGrammarPattern } from "@/lib/gemini/lesson-validation";
+          import {
+            blueprintSchema,
+            grammarSchema,
+            interactiveSchema,
+            lessonLibrarySeedSchema,
+            listeningSchema,
+            readingSchema,
+            speakingSchema,
+            storySchema,
+            vocabularySchema,
+          } from "@/lib/gemini/lesson-schemas";
+          import type {
+            ExerciseSection,
+            GenerationAttempt,
+            GenerationSectionName,
+            InspectableTerm,
+            InteractiveSection,
+            LessonBlueprint,
+            LessonGenerationInput,
+            LessonLibrarySeed,
+            ListeningSection,
+            ReadingSection,
+            SpeakingSection,
+            StorySection,
+            UniversalExercise,
+            UniversalLessonPackage,
+            VocabularyLibraryItem,
+          } from "@/lib/gemini/lesson-types";
+
+          const PRIMARY_MODEL =
+            process.env.OPENAI_LESSON_MODEL?.trim() || "gpt-5.6-luna";
+          const FALLBACK_MODEL =
+            process.env.OPENAI_LESSON_FALLBACK_MODEL?.trim() || PRIMARY_MODEL;
+
+          type RecordValue = Record<string, unknown>;
+
+          interface SectionDefinition {
+            name: GenerationSectionName;
+            schema: JsonSchema;
+            prompt: string;
+            validate: (value: unknown) => string[];
+          }
+
+          interface SectionResult<T> {
+            value: T;
+            attempts: GenerationAttempt[];
+          }
+
+          function isRecord(value: unknown): value is RecordValue {
+            return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+          }
+
+          function stringValue(value: unknown): value is string {
+            return typeof value === "string" && value.trim().length > 0;
+          }
+
+          async function generateSection<T>(
+            definition: SectionDefinition,
+          ): Promise<SectionResult<T>> {
+            const result = await generateStructured<T>({
+              name: `legacy-${definition.name}`,
+              prompt: definition.prompt,
+              schema: definition.schema,
+              validate: definition.validate,
+            });
+            const attempts: GenerationAttempt[] = result.repaired
+              ? [
+                  {
+                    section: definition.name,
+                    model: result.model,
+                    repaired: false,
+                    issues: result.issues,
+                  },
+                  {
+                    section: definition.name,
+                    model: result.model,
+                    repaired: true,
+                    issues: [],
+                  },
+                ]
+              : [
+                  {
+                    section: definition.name,
+                    model: result.model,
+                    repaired: false,
+                    issues: [],
+                  },
+                ];
+            return { value: result.value, attempts };
+          }
+
+          '''
+          prefix = "\n".join(line[10:] if line.startswith("          ") else line for line in prefix.splitlines())
+          path.write_text(prefix + tail, encoding="utf-8")
+
+          workflow = Path(".github/workflows/one-time-openai-lesson-generation-migration.yml")
+          workflow.unlink()
+
+      - name: Commit migration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/gemini/lesson-generation.ts .github/workflows/one-time-openai-lesson-generation-migration.yml
+          git commit -m "Migrate legacy lesson generator to OpenAI"
+          git push origin HEAD:agent/replace-gemini-with-gpt-5-6-luna
