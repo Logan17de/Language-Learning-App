@@ -2,6 +2,10 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const form = readFileSync("components/custom-topic/custom-topic-page.tsx", "utf8");
+const progressiveReader = readFileSync(
+  "components/custom-topic/progressive-lesson-page.tsx",
+  "utf8",
+);
 const route = readFileSync("app/api/custom-lessons/generate/route.ts", "utf8");
 const completionRoute = readFileSync("app/api/custom-lessons/complete/route.ts", "utf8");
 const statusRoute = readFileSync("app/api/custom-lessons/status/route.ts", "utf8");
@@ -42,14 +46,18 @@ describe("custom lesson engine contract", () => {
     expect(route).toContain('p_level: level');
   });
 
-  it("shows the resolved story first and polls durable backend progress", () => {
+  it("opens the resolved story in the real reader and polls durable backend progress", () => {
     expect(form).toContain('role="status"');
-    expect(form).toContain("AIko is preparing your reading.");
-    expect(form).toContain("Story ready");
-    expect(form).toContain("/api/custom-lessons/status?requestId=");
-    expect(form).toContain('url.searchParams.set("requestId", requestId)');
-    expect(form).toContain("Refreshing or leaving this page will not restart generation.");
-    expect(form).toContain("showAudio={false}");
+    expect(form).toContain("AIko is preparing the first phase.");
+    expect(form).toContain("Opening the lesson reader");
+    expect(form).toContain(
+      "router.replace(`/lesson/building/${encodeURIComponent(result.requestId)}`)",
+    );
+    expect(progressiveReader).toContain("<LessonPlayerShell");
+    expect(progressiveReader).toContain("/api/custom-lessons/status?requestId=");
+    expect(progressiveReader).toContain("Story audio is off");
+    expect(progressiveReader).toContain("Lesson readiness");
+    expect(progressiveReader).not.toContain("<AudioControl");
     expect(form).toContain("AbortSignal.timeout(180_000)");
     expect(route).toContain('status: "story_ready"');
     expect(route).toContain("buildInteractiveStory");
