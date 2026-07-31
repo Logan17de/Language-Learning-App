@@ -5,8 +5,8 @@ const storyCall = readFileSync(
   "lib/gemini/adaptive-story-generation.ts",
   "utf8",
 );
-const enrichmentCall = readFileSync(
-  "lib/gemini/story-enrichment-v4.ts",
+const existingLibrary = readFileSync(
+  "lib/gemini/story-library-existing-only.ts",
   "utf8",
 );
 const plan = readFileSync("lib/gemini/lesson-plan-v3.ts", "utf8");
@@ -53,39 +53,33 @@ describe("custom lesson story pipeline v3", () => {
     expect(plan).toContain('.from("profiles")');
   });
 
-  it("checks the DB first and sends only unresolved word spans to call 2", () => {
-    expect(enrichmentCall).toContain("resolveStoryLibraryV4");
-    expect(enrichmentCall).toContain("loadVocabularyCandidates");
-    expect(enrichmentCall).toContain("buildFormIndex");
-    expect(enrichmentCall).toContain("resolveRegions");
-    expect(enrichmentCall).toContain("if (preflight.missing.length > 0)");
-    expect(enrichmentCall).toContain("missing-word library enrichment");
-    expect(enrichmentCall).toContain("Missing word requests");
-    expect(enrichmentCall).toContain("The complete story is deliberately not included");
-    expect(enrichmentCall).not.toContain("Fixed story:");
-    expect(enrichmentCall).toContain("contextJapanese");
-    expect(enrichmentCall).toContain("dictionaryForm");
-    expect(enrichmentCall).toContain("dictionaryReading");
-    expect(enrichmentCall).toContain("kanjiDetails");
-    expect(enrichmentCall).toContain('rpc("enrich_custom_lesson_library_v3"');
-    expect(enrichmentCall).toContain('generated?.model ?? "local-lexicon-db"');
-    expect(route.indexOf("generateAdaptiveStoryDraft")).toBeLessThan(
-      route.indexOf("resolveStoryLibraryV4"),
-    );
-    expect(route).not.toContain("enrichStoryAndResolveLibraryV3");
+  it("uses only existing library records for story taps and never enriches them", () => {
+    expect(existingLibrary).toContain("resolveStoryFromExistingLibrary");
+    expect(existingLibrary).toContain("buildFormIndex");
+    expect(existingLibrary).toContain("composeEntryForm");
+    expect(existingLibrary).toContain("Story words become tappable");
+    expect(existingLibrary).toContain('model: "existing-library-only"');
+    expect(existingLibrary).not.toContain("generateStructured");
+    expect(existingLibrary).not.toContain("OPENAI_API_KEY");
+    expect(existingLibrary).not.toContain("enrich_custom_lesson_library_v3");
+    expect(route).toContain("resolveStoryFromExistingLibrary");
+    expect(route).toContain("Missing words are left as plain text");
+    expect(route).toContain('libraryMode: "existing-library-only"');
+    expect(route).not.toContain("resolveStoryLibraryV4");
+    expect(route).not.toContain("enrichmentRepaired");
+    expect(route).not.toContain("enrichmentModel");
   });
 
   it("uses GPT-5.6 Luna through the stateless OpenAI Responses API", () => {
     expect(structured).toContain('"gpt-5.6-luna"');
     expect(structured).toContain("OPENAI_API_KEY");
     expect(structured).toContain("OPENAI_STORY_MODEL");
-    expect(structured).toContain("OPENAI_ENRICHMENT_MODEL");
     expect(structured).toContain("OPENAI_VALIDATOR_MODEL");
     expect(structured).toContain("OPENAI_STORY_REASONING_EFFORT");
     expect(structured).toContain("OpenAI structured generation completed");
     expect(structured).not.toContain("GEMINI_");
     expect(compatibilityExport).toContain("@/lib/openai/structured-output");
-    expect(route).toContain("OpenAI Responses API call 1");
+    expect(route).toContain("The only model call before the story is shown");
   });
 
   it("shows readings for unknown kanji and marks them known at ten appearances", () => {
@@ -116,11 +110,13 @@ describe("custom lesson story pipeline v3", () => {
     expect(runner).toContain('if (group !== "final_review")');
   });
 
-  it("reduces code-side latency without changing the story-first architecture", () => {
+  it("keeps the story-first flow fast after the single story call", () => {
     expect(plan).toContain("unstable_cache");
     expect(plan).toContain("lesson-plan-v3-static-catalog");
     expect(route).toContain("Custom lesson story pipeline timings");
     expect(route).toContain("const [saved, exposure] = await Promise.all");
+    expect(route).toContain("libraryLookupMs");
+    expect(route).toContain("tappableVocabularyCount");
     expect(structured).toContain("durationMs");
     expect(structured).toContain("attempts");
     expect(structured).toContain("cachedInputTokens");
