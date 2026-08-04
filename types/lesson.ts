@@ -138,6 +138,7 @@ export interface SpeakingExercise {
   modelAnswer: string;
   mode: "easy" | "medium" | "hard";
   questionType?:
+    | "read_aloud"
     | "direct_information"
     | "sequence_of_events"
     | "speaker_intention"

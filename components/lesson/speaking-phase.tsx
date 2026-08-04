@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Eye, LoaderCircle, Mic2, RotateCcw, Square } from "lucide-react";
+import { ArrowRight, LoaderCircle, Mic2, RotateCcw, Square } from "lucide-react";
 import type { LessonPackage } from "@/types/lesson";
 import type { LessonSession, SpeakingEvent } from "@/types/lesson-session";
 import { AudioControl } from "@/components/exercises/audio-control";
@@ -33,7 +33,6 @@ export function SpeakingPhase({
   );
   const [speaking, setSpeaking] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
-  const [showModelAnswer, setShowModelAnswer] = useState(false);
   const [error, setError] = useState("");
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -92,7 +91,7 @@ export function SpeakingPhase({
     setTranscribing(true);
     const attempt = exerciseEvents.length + 1;
     const retry = attempt > 1;
-    const expected = exercise.expectedAnswer ?? exercise.modelAnswer;
+    const expected = exercise.modelAnswer;
     let event: SpeakingEvent;
     try {
       const form = new FormData();
@@ -115,20 +114,19 @@ export function SpeakingPhase({
       );
       const recognizedWords = targets.filter((item) => normalized(transcript).includes(normalized(item)));
       const missedWords = targets.filter((item) => !recognizedWords.includes(item));
-      const answerMatch = similarity(transcript, expected);
-      const modelMatch = similarity(transcript, exercise.modelAnswer);
+      const sentenceMatch = similarity(transcript, expected);
       event = {
         id: `speaking_${exercise.id}_${attempt}`,
         exerciseId: exercise.id,
         mode: exercise.mode,
         attempt,
         evaluationAvailable: true,
-        pronunciationConfidence: modelMatch,
-        grammarAccuracy: answerMatch,
+        pronunciationConfidence: sentenceMatch,
+        grammarAccuracy: sentenceMatch,
         transcript,
         recognizedWords,
         missedWords,
-        successfulRetry: retry && Math.max(answerMatch, modelMatch) >= 70,
+        successfulRetry: retry && sentenceMatch >= 70,
       };
     } catch {
       setError("The recording was saved, but speech recognition failed. You can retry.");
@@ -160,7 +158,6 @@ export function SpeakingPhase({
   function nextExercise() {
     if (!latest || currentIndex >= exercises.length - 1) return;
     setSpeaking(false);
-    setShowModelAnswer(false);
     setError("");
     onChange({ ...session, activityIndex: currentIndex + 1 });
   }
@@ -169,11 +166,11 @@ export function SpeakingPhase({
     <div className="mx-auto max-w-3xl">
       <div className="text-center">
         <div className="flex justify-center gap-2">
-          <Badge tone="orange">{questionTypeLabel(exercise.questionType)}</Badge>
+          <Badge tone="orange">Read aloud</Badge>
           <Badge>{exercise.mode}</Badge>
         </div>
-        <h2 className="mt-4 text-3xl font-semibold">Say it your way.</h2>
-        <p className="mt-3 text-stone-500">Answer aloud in Japanese. Equivalent wording is accepted when it communicates the required meaning.</p>
+        <h2 className="mt-4 text-3xl font-semibold">Read the sentence aloud.</h2>
+        <p className="mt-3 text-stone-500">Speak the Japanese sentence exactly as it appears. AIko will transcribe your reading and compare it with the displayed text.</p>
         <p className="mt-3 text-sm font-semibold text-stone-400">{currentIndex + 1} / {exercises.length}</p>
       </div>
       <ProgressBar value={(completedIds.size / exercises.length) * 100} className="mt-6" />
@@ -181,7 +178,7 @@ export function SpeakingPhase({
         <div className="min-h-28 rounded-3xl bg-moss-50 p-6 text-center">
           <p className="font-serif text-2xl leading-10">
             <InspectableText
-              text={exercise.prompt}
+              text={exercise.modelAnswer}
               terms={exercise.inspectableTerms ?? []}
               onReveal={(word, reveal) =>
                 onChange(appendInspectableInteraction(session, exercise.id, word, reveal))
@@ -191,12 +188,9 @@ export function SpeakingPhase({
         </div>
 
         <div className="mt-5">
-          <AudioControl key={exercise.id} replayCount={0} onPlay={() => undefined} text={exercise.modelAnswer} audioAssetId={exercise.audioAssetId} browserTts={lesson.runtimeAudio === "browser_tts"} label="Hear a model answer" />
+          <AudioControl key={exercise.id} replayCount={0} onPlay={() => undefined} text={exercise.modelAnswer} audioAssetId={exercise.audioAssetId} browserTts={lesson.runtimeAudio === "browser_tts"} label="Hear the sentence" />
         </div>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Button type="button" variant="secondary" disabled={speaking || transcribing} onClick={() => setShowModelAnswer((value) => !value)}>
-            <Eye className="size-4" /> {showModelAnswer ? "Hide model answer" : "Show model answer"}
-          </Button>
           {!speaking ? (
             <Button type="button" disabled={transcribing} onClick={startRecording}>
               {transcribing ? <LoaderCircle className="size-4 animate-spin" /> : <Mic2 className="size-4" />}
@@ -208,23 +202,17 @@ export function SpeakingPhase({
         </div>
         {speaking && (
           <div className="mt-6 flex items-center justify-center gap-3 rounded-2xl bg-persimmon-50 p-4 text-sm font-semibold text-persimmon-600" role="status">
-            <span className="size-3 animate-pulse rounded-full bg-persimmon-500" /> Recording… speak clearly, then tap Stop and check
+            <span className="size-3 animate-pulse rounded-full bg-persimmon-500" /> Recording… read clearly, then tap Stop and check
           </div>
         )}
         {error && <p role="alert" className="mt-5 rounded-2xl bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</p>}
-        {showModelAnswer && (
-          <div className="mt-5 rounded-2xl bg-stone-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Model answer</p>
-            <p className="mt-2 font-serif text-lg">{exercise.modelAnswer}</p>
-          </div>
-        )}
         {latest && (
           <div className="mt-7">
-            <SpeakingFeedback event={latest} modelAnswer={exercise.modelAnswer} />
+            <SpeakingFeedback event={latest} targetSentence={exercise.modelAnswer} />
             <Button type="button" variant="secondary" className="mt-4" disabled={speaking || transcribing} onClick={startRecording}><RotateCcw className="size-4" /> Try Again</Button>
             {currentIndex < exercises.length - 1 && (
               <Button type="button" className="mt-4 sm:ml-3" disabled={speaking || transcribing} onClick={nextExercise}>
-                Next speaking prompt <ArrowRight className="size-4" />
+                Next sentence <ArrowRight className="size-4" />
               </Button>
             )}
           </div>
@@ -232,15 +220,6 @@ export function SpeakingPhase({
       </Card>
     </div>
   );
-}
-
-function questionTypeLabel(type: LessonPackage["speakingExercises"][number]["questionType"]): string {
-  if (type === "direct_information") return "Direct information";
-  if (type === "sequence_of_events") return "Sequence";
-  if (type === "speaker_intention") return "Speaker intention";
-  if (type === "reason_or_purpose") return "Reason or purpose";
-  if (type === "simple_inference") return "Simple inference";
-  return "Speaking";
 }
 
 function normalized(value: string): string {

@@ -116,7 +116,7 @@ const listeningMigration = readFileSync(
   "utf8",
 );
 const speakingMigration = readFileSync(
-  "supabase/migrations/20260804180000_speaking_question_contract.sql",
+  "supabase/migrations/20260804220000_speaking_read_aloud_contract.sql",
   "utf8",
 );
 
@@ -341,36 +341,34 @@ describe("custom lesson story pipeline v3", () => {
     expect(listeningMigration).toContain("jsonb_array_length(p_package->'listeningExercises') <> 5");
   });
 
-  it("creates five story-grounded speaking questions with the fixed difficulty mix", () => {
-    expect(speakingContract).toContain("Create exactly 5 Japanese speaking questions");
+  it("creates five story-grounded read-aloud sentences with the fixed difficulty mix", () => {
+    expect(speakingContract).toContain("Create exactly 5 Japanese sentences for read-aloud speaking practice");
     expect(speakingContract).toContain("2 easy, 2 medium, and 1 hard");
-    expect(speakingContract).toContain("Direct information");
-    expect(speakingContract).toContain("Speaker intention");
-    expect(speakingContract).toContain("Sequence of events");
-    expect(speakingContract).toContain("Reason or purpose");
-    expect(speakingContract).toContain("Simple inference");
-    expect(speakingGeneration).toContain('name: "speaking_questions"');
+    expect(speakingContract).toContain("Do not ask the learner a question");
+    expect(speakingContract).toContain("Do not use interrogative sentences");
+    expect(speakingGeneration).toContain('name: "speaking_read_aloud"');
     expect(speakingGeneration).toContain("strictSchema: true");
     expect(speakingGeneration).toContain("exactSchemaName: true");
     expect(speakingGeneration).toContain('name: "speaking_vocabulary"');
-    expect(speakingGeneration.indexOf("prompt: speakingQuestionsPrompt")).toBeLessThan(
+    expect(speakingGeneration.indexOf("prompt: speakingReadAloudPrompt")).toBeLessThan(
       speakingGeneration.indexOf("prompt: storyEnrichmentPrompt(speakingText)"),
     );
     expect(activityGroups).toContain("generateSpeakingRegion");
-    expect(speakingMigration).toContain("add column question_type text");
     expect(speakingMigration).toContain("v_easy <> 2 or v_medium <> 2 or v_hard <> 1");
-    expect(speakingMigration).toContain("v_type_count <> 5");
+    expect(speakingMigration).toContain("question_type = 'read_aloud'");
   });
 
-  it("places speaking between grammar and reading and uses each generated question as-is", () => {
+  it("places speaking between grammar and reading and shows the target sentence", () => {
     expect(lessonMapper.indexOf('id: "grammar"')).toBeLessThan(
       lessonMapper.indexOf('id: "speaking"'),
     );
     expect(lessonMapper.indexOf('id: "speaking"')).toBeLessThan(
       lessonMapper.indexOf('id: "reading"'),
     );
-    expect(speaking).toContain("questionTypeLabel(exercise.questionType)");
-    expect(speaking).toContain("Equivalent wording is accepted");
+    expect(speaking).toContain("Read the sentence aloud");
+    expect(speaking).toContain("text={exercise.modelAnswer}");
+    expect(speaking).not.toContain("questionTypeLabel");
+    expect(speaking).not.toContain("Show model answer");
     expect(speaking).toContain("exercise.mode");
     expect(speaking).not.toContain("setSelectedMode");
   });

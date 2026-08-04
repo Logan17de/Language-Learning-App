@@ -29,7 +29,7 @@ const defaultPhases: LessonPhase[] = [
   {
     id: "speaking",
     label: "Speaking",
-    description: "Answer the story questions aloud",
+    description: "Read each displayed sentence aloud",
   },
   {
     id: "reading",

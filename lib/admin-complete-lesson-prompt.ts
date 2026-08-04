@@ -29,7 +29,7 @@ CONTENT CONTRACT
 - Grammar: exactly 3.
 - Vocabulary/kanji practice: exactly 13 questions: 6 Easy, 4 Medium, 3 Hard. Use only vocabulary and kanji appearing in the story.
 - Grammar practice: exactly 10 questions: 3 Easy, 4 Medium, 3 Hard. Easy covers small conjunctions, connecting words, and particles; Medium covers difficult particle usage and target patterns; Hard includes whole-sentence production. Difficult questions include partial front/back hints.
-- Speaking: exactly 5 Japanese questions grounded in the main story: direct_information and sequence_of_events are easy; speaker_intention and reason_or_purpose are medium; simple_inference is hard. Model answers are short complete Japanese sentences. Expected concepts and semantic criteria accept equivalent wording.
+- Speaking: exactly 5 Japanese read-aloud statements grounded in the main story: 2 easy, 2 medium, and 1 hard. The learner only reads the displayed sentence. Use questionType "read_aloud", and put the same Japanese sentence in prompt, modelAnswer, and expectedAnswer. Do not ask questions.
 - Reading: create a separate coherent 10–15 sentence Japanese passage related to the same topic, split into 1–6 paragraphs, with complete English translation. Add exactly 5 essay questions answered in Japanese: 2 easy, 2 medium, 1 hard.
 - Listening: exactly 5 questions. Each has a natural 5–10 line Japanese conversation between at least two speakers and a four-choice comprehension question.
 - Final review: exactly 5 four-choice questions covering kanji, vocabulary, grammar, listening, and speaking once each.
@@ -114,14 +114,12 @@ RETURN THIS EXACT SHAPE
   ],
   "speakingExercises": [
     {
-      "id": "speaking_q_1",
+      "id": "speaking_read_1",
       "mode": "easy",
-      "questionType": "direct_information",
-      "prompt": "主人公は何を食べたいですか。",
+      "questionType": "read_aloud",
+      "prompt": "主人公はラーメンを食べたいです。",
       "modelAnswer": "主人公はラーメンを食べたいです。",
       "expectedAnswer": "主人公はラーメンを食べたいです。",
-      "expectedConcepts": ["主人公", "ラーメン", "食べたい"],
-      "semanticCriteria": ["The answer identifies ramen as what the protagonist wants to eat."],
       "targetRefs": ["grammar:～たい", "vocabulary:食べたい"]
     }
   ],

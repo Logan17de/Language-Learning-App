@@ -350,7 +350,7 @@ begin
       {"id":"story","label":"Story","description":"Meet today''s Japanese in context."},
       {"id":"vocabulary","label":"Words & kanji","description":"Build meaning and recognition."},
       {"id":"grammar","label":"Grammar","description":"Use the selected patterns."},
-      {"id":"speaking","label":"Speaking","description":"Answer the story questions aloud."},
+      {"id":"speaking","label":"Speaking","description":"Read each displayed sentence aloud."},
       {"id":"reading","label":"Reading","description":"Read closely and answer in Japanese."},
       {"id":"listening","label":"Listening","description":"Listen for meaning."},
       {"id":"review","label":"Review","description":"Retrieve the lesson without hints."}

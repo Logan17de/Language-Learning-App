@@ -26,7 +26,7 @@ import { generateReadingRegion } from "@/lib/gemini/reading-region-generation";
 import type { RawReadingQuestion } from "@/lib/gemini/reading-comprehension-contract";
 import { generateListeningRegion } from "@/lib/gemini/listening-region-generation";
 import { generateSpeakingRegion } from "@/lib/gemini/speaking-region-generation";
-import type { SpeakingQuestionType } from "@/lib/gemini/speaking-question-contract";
+import type { SpeakingActivityType } from "@/lib/gemini/speaking-question-contract";
 import {
   vocabularyQuestionsPrompt,
   vocabularyQuestionsSchema,
@@ -86,7 +86,7 @@ export interface ListeningExercise {
 
 export interface SpeakingExercise {
   mode: "easy" | "medium" | "hard";
-  questionType: SpeakingQuestionType;
+  questionType: SpeakingActivityType;
   prompt: string;
   easyPrompt: string;
   mediumPrompt: string;

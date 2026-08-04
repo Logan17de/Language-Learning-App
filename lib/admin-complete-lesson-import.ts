@@ -10,7 +10,7 @@ export interface CompleteLessonCounts {
   grammar: number;
   vocabularyQuestions: number;
   grammarQuestions: number;
-  speakingQuestions: number;
+  speakingSentences: number;
   readingPassages: number;
   readingQuestions: number;
   listeningQuestions: number;
@@ -22,14 +22,6 @@ export interface CompleteLessonValidation {
   errors: string[];
   counts: CompleteLessonCounts;
 }
-
-const speakingDifficulties = {
-  direct_information: "easy",
-  sequence_of_events: "easy",
-  speaker_intention: "medium",
-  reason_or_purpose: "medium",
-  simple_inference: "hard",
-} as const;
 
 function record(value: unknown): value is JsonRecord {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -118,7 +110,7 @@ export function validateCompleteLessonImport(value: unknown): CompleteLessonVali
     grammar: grammar.length,
     vocabularyQuestions: vocabularyQuestions.length,
     grammarQuestions: grammarQuestions.length,
-    speakingQuestions: speaking.length,
+    speakingSentences: speaking.length,
     readingPassages: reading.length,
     readingQuestions: readingQuestions.length,
     listeningQuestions: listening.length,
@@ -245,28 +237,26 @@ export function validateCompleteLessonImport(value: unknown): CompleteLessonVali
     else if (answerMode !== "text") errors.push(`Grammar question ${index + 1} answerMode must be choice or text.`);
   });
 
-  if (speaking.length !== 5) errors.push("Speaking needs exactly 5 questions.");
-  const speakingTypes = new Set<string>();
+  if (speaking.length !== 5) errors.push("Speaking needs exactly 5 read-aloud sentences.");
   const speakingSplit = { easy: 0, medium: 0, hard: 0 };
-  speaking.forEach((question, index) => {
-    const type = text(question, "questionType") as keyof typeof speakingDifficulties;
-    const mode = text(question, "mode");
-    if (!(type in speakingDifficulties)) errors.push(`Speaking question ${index + 1} has an invalid questionType.`);
-    else {
-      speakingTypes.add(type);
-      if (mode !== speakingDifficulties[type]) errors.push(`Speaking question ${index + 1} has the wrong difficulty for ${type}.`);
+  speaking.forEach((sentence, index) => {
+    const mode = text(sentence, "mode");
+    if (text(sentence, "questionType") !== "read_aloud") {
+      errors.push(`Speaking sentence ${index + 1} must use questionType read_aloud.`);
     }
     if (mode === "easy" || mode === "medium" || mode === "hard") speakingSplit[mode] += 1;
-    if (!text(question, "prompt") || !text(question, "modelAnswer")) {
-      errors.push(`Speaking question ${index + 1} needs a Japanese prompt and modelAnswer.`);
+    const prompt = text(sentence, "prompt");
+    const target = text(sentence, "modelAnswer");
+    if (!prompt || !target) {
+      errors.push(`Speaking sentence ${index + 1} needs prompt and modelAnswer.`);
     }
-    if (!uniqueStrings(record(question) ? question.expectedConcepts : []).length || !uniqueStrings(record(question) ? question.semanticCriteria : []).length) {
-      errors.push(`Speaking question ${index + 1} needs expectedConcepts and semanticCriteria.`);
+    if (prompt && target && normalized(prompt) !== normalized(target)) {
+      errors.push(`Speaking sentence ${index + 1} must use the same text for prompt and modelAnswer.`);
     }
-    validateTargetRefs(question, `Speaking question ${index + 1}`);
+    validateTargetRefs(sentence, `Speaking sentence ${index + 1}`);
   });
-  if (speakingTypes.size !== 5 || speakingSplit.easy !== 2 || speakingSplit.medium !== 2 || speakingSplit.hard !== 1) {
-    errors.push("Speaking must use all five types once with a 2 Easy, 2 Medium, 1 Hard split.");
+  if (speakingSplit.easy !== 2 || speakingSplit.medium !== 2 || speakingSplit.hard !== 1) {
+    errors.push("Speaking needs a 2 Easy, 2 Medium, 1 Hard read-aloud split.");
   }
 
   if (reading.length < 1 || reading.length > 6) errors.push("Reading needs 1–6 passage blocks.");

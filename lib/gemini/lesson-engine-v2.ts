@@ -207,12 +207,7 @@ interface RawListeningExercise {
 
 interface RawSpeakingExercise {
   mode: "easy" | "medium" | "hard";
-  questionType:
-    | "direct_information"
-    | "sequence_of_events"
-    | "speaker_intention"
-    | "reason_or_purpose"
-    | "simple_inference";
+  questionType: "read_aloud";
   prompt: string;
   easyPrompt: string;
   mediumPrompt: string;
