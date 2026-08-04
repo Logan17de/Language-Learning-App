@@ -60,6 +60,14 @@ const listeningGeneration = readFileSync(
   "lib/gemini/listening-region-generation.ts",
   "utf8",
 );
+const speakingContract = readFileSync(
+  "lib/gemini/speaking-question-contract.ts",
+  "utf8",
+);
+const speakingGeneration = readFileSync(
+  "lib/gemini/speaking-region-generation.ts",
+  "utf8",
+);
 const generatedVocabularyStorage = readFileSync(
   "lib/gemini/generated-vocabulary-storage.ts",
   "utf8",
@@ -88,6 +96,8 @@ const audioControl = readFileSync(
 );
 const reading = readFileSync("components/lesson/reading-phase.tsx", "utf8");
 const listening = readFileSync("components/lesson/listening-phase.tsx", "utf8");
+const speaking = readFileSync("components/lesson/speaking-phase.tsx", "utf8");
+const lessonMapper = readFileSync("lib/repositories/lesson-mapper.ts", "utf8");
 const storedAudio = readFileSync("lib/audio/audio-library.ts", "utf8");
 const migration = readFileSync(
   "supabase/migrations/20260730070000_story_pipeline_and_kanji_exposure.sql",
@@ -103,6 +113,10 @@ const readingMigration = readFileSync(
 );
 const listeningMigration = readFileSync(
   "supabase/migrations/20260804170000_listening_question_contract.sql",
+  "utf8",
+);
+const speakingMigration = readFileSync(
+  "supabase/migrations/20260804180000_speaking_question_contract.sql",
   "utf8",
 );
 
@@ -297,9 +311,42 @@ describe("custom lesson story pipeline v3", () => {
       listeningGeneration.indexOf("prompt: storyEnrichmentPrompt(listeningText)"),
     );
     expect(activityGroups).toContain("generateListeningRegion");
-    expect(activityGroups).toContain('name: "interactive speaking activities"');
     expect(listeningMigration).toContain("add column conversation_lines text[]");
     expect(listeningMigration).toContain("jsonb_array_length(p_package->'listeningExercises') <> 5");
+  });
+
+  it("creates five story-grounded speaking questions with the fixed difficulty mix", () => {
+    expect(speakingContract).toContain("Create exactly 5 Japanese speaking questions");
+    expect(speakingContract).toContain("2 easy, 2 medium, and 1 hard");
+    expect(speakingContract).toContain("Direct information");
+    expect(speakingContract).toContain("Speaker intention");
+    expect(speakingContract).toContain("Sequence of events");
+    expect(speakingContract).toContain("Reason or purpose");
+    expect(speakingContract).toContain("Simple inference");
+    expect(speakingGeneration).toContain('name: "speaking_questions"');
+    expect(speakingGeneration).toContain("strictSchema: true");
+    expect(speakingGeneration).toContain("exactSchemaName: true");
+    expect(speakingGeneration).toContain('name: "speaking_vocabulary"');
+    expect(speakingGeneration.indexOf("prompt: speakingQuestionsPrompt")).toBeLessThan(
+      speakingGeneration.indexOf("prompt: storyEnrichmentPrompt(speakingText)"),
+    );
+    expect(activityGroups).toContain("generateSpeakingRegion");
+    expect(speakingMigration).toContain("add column question_type text");
+    expect(speakingMigration).toContain("v_easy <> 2 or v_medium <> 2 or v_hard <> 1");
+    expect(speakingMigration).toContain("v_type_count <> 5");
+  });
+
+  it("places speaking between grammar and reading and uses each generated question as-is", () => {
+    expect(lessonMapper.indexOf('id: "grammar"')).toBeLessThan(
+      lessonMapper.indexOf('id: "speaking"'),
+    );
+    expect(lessonMapper.indexOf('id: "speaking"')).toBeLessThan(
+      lessonMapper.indexOf('id: "reading"'),
+    );
+    expect(speaking).toContain("questionTypeLabel(exercise.questionType)");
+    expect(speaking).toContain("Equivalent wording is accepted");
+    expect(speaking).toContain("exercise.mode");
+    expect(speaking).not.toContain("setSelectedMode");
   });
 
   it("records exact group errors and does not mislabel finalization failures", () => {
@@ -344,7 +391,7 @@ describe("custom lesson story pipeline v3", () => {
     expect(storedAudio).not.toContain('.from("lesson_reading_sections")');
   });
 
-  it("leaves speaking and final review generation intact", () => {
+  it("keeps the migrated speaking group and final review generation intact", () => {
     expect(runner).toContain("generateListeningAndSpeakingActivities");
     expect(runner).toContain("generateFinalReviewActivities");
     expect(validator).not.toContain("speakingExercises:");

@@ -29,6 +29,11 @@ import {
   listeningQuestionsPrompt,
   listeningQuestionsSchema,
 } from "@/lib/gemini/listening-question-contract";
+import {
+  speakingQuestionIssues,
+  speakingQuestionsPrompt,
+  speakingQuestionsSchema,
+} from "@/lib/gemini/speaking-question-contract";
 
 describe("tested story and enrichment API contracts", () => {
   it("uses the exact story_test.py generation prompt", () => {
@@ -246,6 +251,52 @@ Requirements:
         },
       },
     });
+  });
+
+  it("uses the five-question speaking contract and semantic answer format", () => {
+    const prompt = speakingQuestionsPrompt({
+      languageLevel: "JLPT N4",
+      japaneseStory: "ゆきさんは駅へ行きました。それから友達に会いました。",
+      grammarPatterns: ["〜てから"],
+    });
+    expect(prompt).toContain("Create exactly 5 Japanese speaking questions");
+    expect(prompt).toContain("2 easy, 2 medium, and 1 hard");
+    expect(prompt).toContain("Use each question type exactly once");
+    expect(prompt).toContain("Direct information and sequence of events must be easy");
+    expect(prompt).toContain("Speaker intention and reason or purpose must be medium");
+    expect(prompt).toContain("Simple inference must be hard");
+    expect(prompt).toContain("equivalent meaning");
+    expect(speakingQuestionsSchema).toMatchObject({
+      type: "object",
+      required: ["questions"],
+      additionalProperties: false,
+      properties: {
+        questions: {
+          minItems: 5,
+          maxItems: 5,
+          items: {
+            required: [
+              "difficulty",
+              "question_type",
+              "question",
+              "model_answer",
+              "expected_concepts",
+              "semantic_criteria",
+            ],
+            additionalProperties: false,
+          },
+        },
+      },
+    });
+    expect(speakingQuestionIssues({
+      questions: [
+        { difficulty: "easy", question_type: "direct_information", question: "だれが駅へ行きましたか。", model_answer: "ゆきさんが駅へ行きました。", expected_concepts: ["ゆきさん", "駅"], semantic_criteria: ["主語と行き先を伝える"] },
+        { difficulty: "easy", question_type: "sequence_of_events", question: "駅へ行った後、何をしましたか。", model_answer: "友達に会いました。", expected_concepts: ["友達に会う"], semantic_criteria: ["次の出来事を伝える"] },
+        { difficulty: "medium", question_type: "speaker_intention", question: "ゆきさんは何をしたかったと思いますか。", model_answer: "友達に会いたかったと思います。", expected_concepts: ["友達に会いたい"], semantic_criteria: ["意図を伝える"] },
+        { difficulty: "medium", question_type: "reason_or_purpose", question: "なぜ駅へ行きましたか。", model_answer: "友達に会うためです。", expected_concepts: ["友達に会うため"], semantic_criteria: ["目的を伝える"] },
+        { difficulty: "hard", question_type: "simple_inference", question: "二人はどんな関係だと考えられますか。", model_answer: "友達だと考えられます。", expected_concepts: ["友達"], semantic_criteria: ["物語に支えられた推測を伝える"] },
+      ],
+    })).toEqual([]);
   });
 
   it("uses the reading_test.py format after a story-format reading call", () => {

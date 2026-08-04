@@ -207,12 +207,20 @@ interface RawListeningExercise {
 
 interface RawSpeakingExercise {
   mode: "easy" | "medium" | "hard";
+  questionType:
+    | "direct_information"
+    | "sequence_of_events"
+    | "speaker_intention"
+    | "reason_or_purpose"
+    | "simple_inference";
   prompt: string;
   easyPrompt: string;
   mediumPrompt: string;
   hardPrompt: string;
   expectedAnswer: string;
   modelAnswer: string;
+  expectedConcepts: string[];
+  semanticCriteria: string[];
   targetItemIds: string[];
 }
 

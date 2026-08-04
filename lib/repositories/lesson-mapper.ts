@@ -27,6 +27,11 @@ const defaultPhases: LessonPhase[] = [
     description: "Understand useful patterns",
   },
   {
+    id: "speaking",
+    label: "Speaking",
+    description: "Answer the story questions aloud",
+  },
+  {
     id: "reading",
     label: "Reading",
     description: "Read closely and answer in Japanese",
@@ -35,11 +40,6 @@ const defaultPhases: LessonPhase[] = [
     id: "listening",
     label: "Listening",
     description: "Listen for meaning",
-  },
-  {
-    id: "speaking",
-    label: "Speaking",
-    description: "Produce natural Japanese",
   },
   {
     id: "review",
@@ -68,7 +68,9 @@ function phases(value: CanonicalLesson["version"]["phases"]): LessonPhase[] {
     }
     return [{ id, label, description } as LessonPhase];
   });
-  return parsed.length === 7 ? parsed : defaultPhases;
+  if (parsed.length !== 7) return defaultPhases;
+  const byId = new Map(parsed.map((phase) => [phase.id, phase]));
+  return defaultPhases.map((phase) => byId.get(phase.id) ?? phase);
 }
 
 function metadataText(metadata: Json, key: string): string | undefined {
@@ -474,6 +476,13 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
       modelAnswer: item.model_answer,
       mode:
         item.mode === "easy" || item.mode === "hard" ? item.mode : "medium",
+      questionType: item.question_type,
+      expectedConcepts: Array.isArray(item.expected_concepts)
+        ? item.expected_concepts
+        : [],
+      semanticCriteria: Array.isArray(item.semantic_criteria)
+        ? item.semantic_criteria
+        : [],
       easyPrompt: item.easy_prompt ?? undefined,
       mediumPrompt: item.medium_prompt ?? undefined,
       hardPrompt: item.hard_prompt ?? undefined,

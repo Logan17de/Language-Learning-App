@@ -137,6 +137,14 @@ export interface SpeakingExercise {
   prompt: string;
   modelAnswer: string;
   mode: "easy" | "medium" | "hard";
+  questionType?:
+    | "direct_information"
+    | "sequence_of_events"
+    | "speaker_intention"
+    | "reason_or_purpose"
+    | "simple_inference";
+  expectedConcepts?: string[];
+  semanticCriteria?: string[];
   easyPrompt?: string;
   mediumPrompt?: string;
   hardPrompt?: string;

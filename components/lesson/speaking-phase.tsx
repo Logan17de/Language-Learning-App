@@ -10,10 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import { cn } from "@/lib/utils";
-import { recommendedDifficultyFromAccuracy } from "@/lib/adaptive-difficulty";
-
-type SpeakingMode = "easy" | "medium" | "hard";
+import { InspectableText } from "@/components/exercises/inspectable-text";
+import { appendInspectableInteraction } from "@/lib/lesson-support";
 
 export function SpeakingPhase({
   lesson,
@@ -32,22 +30,6 @@ export function SpeakingPhase({
   const exercise = exercises[currentIndex];
   const exerciseEvents = session.speakingEvents.filter(
     (event) => event.exerciseId === exercise.id,
-  );
-  const recommendedMode = recommendedDifficultyFromAccuracy([
-    ...session.vocabularyAnswers,
-    ...session.grammarAnswers,
-    ...session.listeningEvents
-      .filter(
-        (event): event is typeof event & { questionId: string; correct: boolean } =>
-          event.type === "answer" &&
-          typeof event.questionId === "string" &&
-          typeof event.correct === "boolean",
-      )
-      .map((event) => ({ questionId: event.questionId, correct: event.correct })),
-    ...session.reviewAnswers,
-  ]).toLocaleLowerCase() as SpeakingMode;
-  const [mode, setMode] = useState<SpeakingMode>(
-    exerciseEvents.at(-1)?.mode ?? recommendedMode ?? exercise.mode,
   );
   const [speaking, setSpeaking] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
@@ -138,7 +120,7 @@ export function SpeakingPhase({
       event = {
         id: `speaking_${exercise.id}_${attempt}`,
         exerciseId: exercise.id,
-        mode,
+        mode: exercise.mode,
         attempt,
         evaluationAvailable: true,
         pronunciationConfidence: modelMatch,
@@ -153,7 +135,7 @@ export function SpeakingPhase({
       event = {
         id: `speaking_${exercise.id}_${attempt}`,
         exerciseId: exercise.id,
-        mode,
+        mode: exercise.mode,
         attempt,
         evaluationAvailable: false,
         pronunciationConfidence: 0,
@@ -180,29 +162,32 @@ export function SpeakingPhase({
     setSpeaking(false);
     setShowModelAnswer(false);
     setError("");
-    setMode(recommendedMode);
     onChange({ ...session, activityIndex: currentIndex + 1 });
   }
 
   return (
     <div className="mx-auto max-w-3xl">
       <div className="text-center">
-        <Badge tone="orange">Output practice</Badge>
+        <div className="flex justify-center gap-2">
+          <Badge tone="orange">{questionTypeLabel(exercise.questionType)}</Badge>
+          <Badge>{exercise.mode}</Badge>
+        </div>
         <h2 className="mt-4 text-3xl font-semibold">Say it your way.</h2>
-        <p className="mt-3 text-stone-500">Record your Japanese. OpenAI transcribes it, and AIko compares the recognized words with this lesson.</p>
+        <p className="mt-3 text-stone-500">Answer aloud in Japanese. Equivalent wording is accepted when it communicates the required meaning.</p>
         <p className="mt-3 text-sm font-semibold text-stone-400">{currentIndex + 1} / {exercises.length}</p>
       </div>
       <ProgressBar value={(completedIds.size / exercises.length) * 100} className="mt-6" />
-      <div className="mt-7 grid grid-cols-3 rounded-2xl bg-stone-100 p-1" role="tablist" aria-label="Speaking difficulty">
-        {(["easy", "medium", "hard"] as SpeakingMode[]).map((item) => (
-          <button key={item} type="button" role="tab" aria-selected={mode === item} disabled={speaking || transcribing} onClick={() => setMode(item)} className={cn("min-h-11 rounded-xl text-sm font-semibold capitalize transition focus:outline-none focus:ring-4 focus:ring-moss-100 disabled:opacity-50", mode === item ? "bg-white text-moss-700 shadow-sm" : "text-stone-500")}>{item}</button>
-        ))}
-      </div>
-
-      <Card className="mt-5 p-6 sm:p-8">
-        <p className="text-sm font-semibold text-stone-500">{exercise.prompt}</p>
-        <div className="mt-5 min-h-28 rounded-3xl bg-moss-50 p-6 text-center">
-          <p className="font-serif text-2xl leading-10">{speakingPrompt(exercise, mode)}</p>
+      <Card className="mt-7 p-6 sm:p-8">
+        <div className="min-h-28 rounded-3xl bg-moss-50 p-6 text-center">
+          <p className="font-serif text-2xl leading-10">
+            <InspectableText
+              text={exercise.prompt}
+              terms={exercise.inspectableTerms ?? []}
+              onReveal={(word, reveal) =>
+                onChange(appendInspectableInteraction(session, exercise.id, word, reveal))
+              }
+            />
+          </p>
         </div>
 
         <div className="mt-5">
@@ -249,13 +234,13 @@ export function SpeakingPhase({
   );
 }
 
-function speakingPrompt(
-  exercise: LessonPackage["speakingExercises"][number],
-  mode: SpeakingMode,
-): string {
-  if (mode === "easy") return exercise.easyPrompt ?? exercise.modelAnswer;
-  if (mode === "hard") return exercise.hardPrompt ?? exercise.prompt;
-  return exercise.mediumPrompt ?? exercise.prompt;
+function questionTypeLabel(type: LessonPackage["speakingExercises"][number]["questionType"]): string {
+  if (type === "direct_information") return "Direct information";
+  if (type === "sequence_of_events") return "Sequence";
+  if (type === "speaker_intention") return "Speaker intention";
+  if (type === "reason_or_purpose") return "Reason or purpose";
+  if (type === "simple_inference") return "Simple inference";
+  return "Speaking";
 }
 
 function normalized(value: string): string {

@@ -114,9 +114,9 @@ const commuteLessonBase: Omit<
     { id: "story", label: "Story", description: "Meet today’s language in context" },
     { id: "vocabulary", label: "Words & kanji", description: "Build fast recognition" },
     { id: "grammar", label: "Grammar", description: "Understand two useful patterns" },
+    { id: "speaking", label: "Speaking", description: "Answer the story questions aloud" },
     { id: "reading", label: "Read aloud", description: "Practice rhythm and recognition" },
     { id: "listening", label: "Listening", description: "Listen for meaning" },
-    { id: "speaking", label: "Speaking", description: "Produce natural Japanese" },
     { id: "review", label: "Final review", description: "Retrieve without hints" },
   ],
 };

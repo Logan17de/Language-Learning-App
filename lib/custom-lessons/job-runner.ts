@@ -184,7 +184,10 @@ function groupPayload(
         isRecord(item) && Array.isArray(item.conversationLines),
       ) &&
       Array.isArray(payload.speakingExercises) &&
-      payload.speakingExercises.length === 3
+      payload.speakingExercises.length === 5 &&
+      payload.speakingExercises.every((item) =>
+        isRecord(item) && typeof item.questionType === "string",
+      )
       ? payload
       : null;
   }

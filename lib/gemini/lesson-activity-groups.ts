@@ -25,6 +25,8 @@ import { storyUsesGrammarPattern } from "@/lib/gemini/lesson-validation";
 import { generateReadingRegion } from "@/lib/gemini/reading-region-generation";
 import type { RawReadingQuestion } from "@/lib/gemini/reading-comprehension-contract";
 import { generateListeningRegion } from "@/lib/gemini/listening-region-generation";
+import { generateSpeakingRegion } from "@/lib/gemini/speaking-region-generation";
+import type { SpeakingQuestionType } from "@/lib/gemini/speaking-question-contract";
 import {
   vocabularyQuestionFormats,
   vocabularyQuestionsPrompt,
@@ -85,13 +87,17 @@ export interface ListeningExercise {
 
 export interface SpeakingExercise {
   mode: "easy" | "medium" | "hard";
+  questionType: SpeakingQuestionType;
   prompt: string;
   easyPrompt: string;
   mediumPrompt: string;
   hardPrompt: string;
   expectedAnswer: string;
   modelAnswer: string;
+  expectedConcepts: string[];
+  semanticCriteria: string[];
   targetItemIds: string[];
+  inspectableTerms?: InspectableTerm[];
 }
 
 export interface ReviewQuestion {
@@ -164,31 +170,6 @@ function stringArray(minItems = 0, maxItems = 100): JsonSchema {
 
 const targetIdsSchema = stringArray(1, 5);
 
-const speakingSchema: JsonSchema = {
-  type: "object",
-  additionalProperties: false,
-  required: [
-    "mode",
-    "prompt",
-    "easyPrompt",
-    "mediumPrompt",
-    "hardPrompt",
-    "expectedAnswer",
-    "modelAnswer",
-    "targetItemIds",
-  ],
-  properties: {
-    mode: { type: "string", enum: ["easy", "medium", "hard"] },
-    prompt: { type: "string" },
-    easyPrompt: { type: "string" },
-    mediumPrompt: { type: "string" },
-    hardPrompt: { type: "string" },
-    expectedAnswer: { type: "string" },
-    modelAnswer: { type: "string" },
-    targetItemIds: targetIdsSchema,
-  },
-};
-
 const reviewSchema: JsonSchema = {
   type: "object",
   additionalProperties: false,
@@ -225,10 +206,6 @@ function normalized(value: string): string {
   return value.normalize("NFKC").trim().toLocaleLowerCase();
 }
 
-function hasJapanese(value: string): boolean {
-  return /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(value);
-}
-
 function duplicateChoices(choices: string[]): boolean {
   const values = choices.map(normalized);
   return new Set(values).size !== values.length;
@@ -260,29 +237,6 @@ function choiceIssues(item: Record<string, unknown>, label: string): string[] {
   }
   if (duplicateChoices(choices)) issues.push(`${label} repeats a choice.`);
   return issues;
-}
-
-function speakingIssues(value: unknown, library: ResolvedLessonLibrary): string[] {
-  if (!isRecord(value)) return ["Speaking activities must be an object."];
-  const speaking = Array.isArray(value.speakingExercises) ? value.speakingExercises : [];
-  const issues: string[] = [];
-  if (speaking.length !== 3) issues.push("Speaking needs exactly 3 exercises.");
-  const modes = speaking.flatMap((item) => isRecord(item) && typeof item.mode === "string" ? [item.mode] : []);
-  if (new Set(modes).size !== 3 || !["easy", "medium", "hard"].every((mode) => modes.includes(mode))) {
-    issues.push("Speaking needs one easy, one medium, and one hard exercise.");
-  }
-  const allowedIds = allowedLibraryIds(library);
-  speaking.forEach((candidate, index) => {
-    if (!isRecord(candidate)) {
-      issues.push(`Speaking item ${index + 1} must be an object.`);
-      return;
-    }
-    issues.push(...targetIssues(candidate, `Speaking item ${index + 1}`, allowedIds));
-    if (typeof candidate.modelAnswer !== "string" || !hasJapanese(candidate.modelAnswer)) {
-      issues.push(`Speaking item ${index + 1} needs a Japanese model answer.`);
-    }
-  });
-  return [...new Set(issues)];
 }
 
 function reviewIssues(value: unknown, library: ResolvedLessonLibrary): string[] {
@@ -805,32 +759,18 @@ export async function generateListeningAndSpeakingActivities(input: {
       level: input.level,
       library: input.library,
     }),
-    generateGroup<{ speakingExercises: SpeakingExercise[] }>({
-      name: "interactive speaking activities",
-      stage: "communication_activities",
-      prompt: [
-        "Create only AIko's interactive speaking activities for the fixed story.",
-        `JLPT ceiling: ${input.level}. Topic: ${input.topic}.`,
-        "Return 3 speaking exercises: exactly one easy, one medium, and one hard.",
-        "AIko presents spoken Japanese and the learner responds.",
-        "Use only supplied library IDs and facts. Do not rewrite or narrate the story.",
-        JSON.stringify(context(input, ["kanji", "vocabulary", "grammar"])),
-      ],
-      schema: {
-        type: "object",
-        additionalProperties: false,
-        required: ["speakingExercises"],
-        properties: {
-          speakingExercises: objectArray(3, 3, speakingSchema),
-        },
-      },
-      validate: (value) => speakingIssues(value, input.library),
+    generateSpeakingRegion({
+      requestId: input.requestId,
+      admin: input.admin,
+      level: input.level,
+      draft: input.draft,
+      library: input.library,
     }),
   ]);
   return {
     value: {
       listeningExercises: listening.exercises,
-      speakingExercises: speaking.value.speakingExercises,
+      speakingExercises: speaking.exercises,
     },
     audit: {
       stage: "communication_activities",
@@ -1035,13 +975,10 @@ export function assemblePlayableLesson(input: {
     })),
     speakingExercises: input.groups.communication.speakingExercises.map((exercise) => ({
       ...exercise,
-      inspectableTerms: inspectableTerms([
-        exercise.prompt,
-        exercise.easyPrompt,
-        exercise.mediumPrompt,
-        exercise.hardPrompt,
-        exercise.modelAnswer,
-      ], input.library),
+      inspectableTerms: exercise.inspectableTerms ?? inspectableTerms([
+          exercise.prompt,
+          exercise.modelAnswer,
+        ], input.library),
     })),
     reviewQuestions: input.groups.review.reviewQuestions,
     generationAudit: { calls: input.audit },
