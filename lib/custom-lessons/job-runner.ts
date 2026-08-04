@@ -490,7 +490,13 @@ async function processActivityJob(
 
     let payload = generated.value;
     let audit = generated.audit;
-    if (group !== "final_review") {
+    // Vocabulary/kanji already uses the exact tested vocab_questions contract
+    // and deterministic story/library checks. Keep the separate AI validator
+    // for the remaining generated question groups only.
+    if (
+      group === "grammar_and_reading" ||
+      group === "listening_and_speaking"
+    ) {
       const approval = await approveActivityQuestionsWithAI({
         group,
         topic: job.topic,

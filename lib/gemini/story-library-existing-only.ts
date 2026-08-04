@@ -29,6 +29,7 @@ import type {
   LessonPlanV3,
   StoryOnlyDraft,
 } from "@/lib/gemini/story-pipeline-v3";
+import { filterStoryPracticeKanji } from "@/lib/gemini/vocabulary-question-contract";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database, Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
@@ -367,8 +368,13 @@ export async function resolveStoryFromExistingLibrary(
     }),
   };
 
-  const kanji = input.plan.kanji.flatMap((target) => {
-    const row = records.kanji.find((item) => item.character === target.character);
+  const practiceKanji = filterStoryPracticeKanji({
+    japaneseStory: input.draft.lines.map((line) => line.japanese).join(""),
+    knownKanji: input.plan.knownKanji,
+    targetKanji: input.plan.kanji.map((item) => item.character),
+  });
+  const kanji = practiceKanji.flatMap((character) => {
+    const row = records.kanji.find((item) => item.character === character);
     return row ? [canonicalKanji(row)] : [];
   });
   const grammar = input.plan.grammar.flatMap((target) => {

@@ -7,6 +7,12 @@ import {
   simpleStoryEnrichmentSchema,
   storyEnrichmentPrompt,
 } from "@/lib/gemini/simple-story-enrichment-contract";
+import {
+  filterStoryPracticeKanji,
+  vocabularyQuestionFormats,
+  vocabularyQuestionsPrompt,
+  vocabularyQuestionsSchema,
+} from "@/lib/gemini/vocabulary-question-contract";
 
 describe("tested story and enrichment API contracts", () => {
   it("uses the exact story_test.py generation prompt", () => {
@@ -101,5 +107,68 @@ Requirements:
       required: ["vocabulary"],
       additionalProperties: false,
     });
+  });
+
+  it("uses the exact vocab_test.py prompt and response format", () => {
+    expect(vocabularyQuestionsPrompt({
+      japaneseStory: "学校へ行きました。",
+      knownKanji: ["学", "校"],
+      questionFormats: [{
+        id: 1,
+        difficulty: ["easy"],
+        name: "Kanji to Reading",
+        question: 'What is the correct reading of "<KANJI_WORD>"?',
+      }],
+    })).toBe(`
+Create vocabulary and kanji questions from this Japanese story.
+
+Story:
+学校へ行きました。
+
+Kanji:
+['学', '校']
+
+Question formats:
+[{"id": 1, "difficulty": ["easy"], "name": "Kanji to Reading", "question": "What is the correct reading of \\"<KANJI_WORD>\\"?"}]
+
+Requirements:
+- Use only the provided question formats.
+- Use vocabulary and kanji from the story.
+- Create exactly 13 questions: 6 easy, 4 medium, and 3 hard.
+- Every question must have four different choices and one correct answer.
+`);
+    expect(vocabularyQuestionFormats).toHaveLength(16);
+    expect(vocabularyQuestionFormats.map((format) => format.id)).toEqual(
+      Array.from({ length: 16 }, (_, index) => index + 1),
+    );
+    expect(vocabularyQuestionsSchema).toMatchObject({
+      type: "object",
+      required: ["questions"],
+      additionalProperties: false,
+      properties: {
+        questions: {
+          type: "array",
+          items: {
+            required: [
+              "format_id",
+              "difficulty",
+              "question",
+              "sentence",
+              "choices",
+              "answer",
+            ],
+            additionalProperties: false,
+          },
+        },
+      },
+    });
+  });
+
+  it("passes only story kanji found in the known-or-target union", () => {
+    expect(filterStoryPracticeKanji({
+      japaneseStory: "学校で友達と未知の本を読みます。",
+      knownKanji: ["学", "友", "達"],
+      targetKanji: ["校", "本"],
+    })).toEqual(["学", "校", "友", "達", "本"]);
   });
 });

@@ -12,6 +12,13 @@ import type {
   ResolvedLessonLibrary,
   StoryDraft,
 } from "@/lib/gemini/lesson-engine-v2";
+import {
+  vocabularyQuestionFormats,
+  vocabularyQuestionsPrompt,
+  vocabularyQuestionsSchema,
+  type RawVocabularyQuestion,
+  type RawVocabularyQuestions,
+} from "@/lib/gemini/vocabulary-question-contract";
 import type { JLPTLevel } from "@/types/lesson";
 
 export type ActivityGroupName =
@@ -508,6 +515,162 @@ function context(input: {
   };
 }
 
+const kanjiQuestionFormatIds = new Set([1, 3, 12, 16]);
+
+function rawDifficulty(value: RawVocabularyQuestion["difficulty"]): Difficulty {
+  if (value === "easy") return "Easy";
+  if (value === "medium") return "Medium";
+  return "Hard";
+}
+
+function vocabularyMode(formatId: number): PracticeQuestion["mode"] {
+  if (formatId === 1 || formatId === 16) return "kanji-reading";
+  if ([2, 3, 6, 7, 8].includes(formatId)) return "reading-meaning";
+  if ([4, 12, 13].includes(formatId)) return "meaning-japanese";
+  return "mixed";
+}
+
+function questionText(question: RawVocabularyQuestion): string {
+  return [question.question, question.sentence ?? "", question.answer]
+    .join("\n")
+    .normalize("NFKC");
+}
+
+function targetIdForVocabularyQuestion(
+  question: RawVocabularyQuestion,
+  library: ResolvedLessonLibrary,
+): string | null {
+  const evidence = questionText(question);
+  const normalizedAnswer = normalized(question.answer);
+
+  if (kanjiQuestionFormatIds.has(question.format_id)) {
+    const kanji = library.kanji.find((item) => evidence.includes(item.character));
+    if (kanji) return kanji.libraryId;
+  }
+
+  const exactVocabulary = library.vocabulary.find((item) =>
+    [item.term, item.reading, item.meaning]
+      .map(normalized)
+      .includes(normalizedAnswer),
+  );
+  if (exactVocabulary) return exactVocabulary.libraryId;
+
+  const contextualVocabulary = library.vocabulary.find((item) =>
+    [item.term, item.reading, item.meaning]
+      .filter(Boolean)
+      .some((value) => evidence.includes(value)),
+  );
+  if (contextualVocabulary) return contextualVocabulary.libraryId;
+
+  return null;
+}
+
+function rawVocabularyQuestionIssues(
+  value: unknown,
+  library: ResolvedLessonLibrary,
+): string[] {
+  if (!isRecord(value) || !Array.isArray(value.questions)) {
+    return ["Vocabulary response must contain questions."];
+  }
+  const questions = value.questions;
+  const issues: string[] = [];
+  if (questions.length !== 13) {
+    issues.push("Vocabulary response needs exactly 13 questions.");
+  }
+  const counts = { easy: 0, medium: 0, hard: 0 };
+  questions.forEach((candidate, index) => {
+    const label = `Vocabulary question ${index + 1}`;
+    if (!isRecord(candidate)) {
+      issues.push(`${label} must be an object.`);
+      return;
+    }
+    const difficulty = candidate.difficulty;
+    if (difficulty === "easy" || difficulty === "medium" || difficulty === "hard") {
+      counts[difficulty] += 1;
+    }
+    const formatId = Number(candidate.format_id);
+    const format = vocabularyQuestionFormats.find((item) => item.id === formatId);
+    if (!format) {
+      issues.push(`${label} uses an unavailable format_id.`);
+    } else if (
+      difficulty !== "easy" &&
+      difficulty !== "medium" &&
+      difficulty !== "hard"
+    ) {
+      issues.push(`${label} has an invalid difficulty.`);
+    } else if (!format.difficulty.includes(difficulty)) {
+      issues.push(`${label} uses format ${formatId} at an unsupported difficulty.`);
+    }
+    if (
+      !Array.isArray(candidate.choices) ||
+      candidate.choices.length !== 4 ||
+      !candidate.choices.every((choice) => typeof choice === "string")
+    ) {
+      issues.push(`${label} needs exactly four string choices.`);
+    } else {
+      const choices = candidate.choices as string[];
+      if (duplicateChoices(choices)) issues.push(`${label} repeats a choice.`);
+      const answer = typeof candidate.answer === "string" ? normalized(candidate.answer) : "";
+      if (!answer || choices.filter((choice) => normalized(choice) === answer).length !== 1) {
+        issues.push(`${label} must contain its answer exactly once.`);
+      }
+    }
+    if (
+      typeof candidate.question !== "string" ||
+      !candidate.question.trim() ||
+      (candidate.sentence !== null && typeof candidate.sentence !== "string") ||
+      typeof candidate.answer !== "string"
+    ) {
+      issues.push(`${label} has incomplete question content.`);
+      return;
+    }
+    const question = candidate as unknown as RawVocabularyQuestion;
+    const targetId = targetIdForVocabularyQuestion(question, library);
+    if (!targetId) {
+      issues.push(`${label} does not target vocabulary or allowed kanji from the story.`);
+    }
+    if (kanjiQuestionFormatIds.has(formatId)) {
+      const evidence = questionText(question);
+      if (!library.kanji.some((item) => evidence.includes(item.character))) {
+        issues.push(`${label} uses a kanji format without an allowed story kanji.`);
+      }
+    }
+  });
+  if (counts.easy !== 6 || counts.medium !== 4 || counts.hard !== 3) {
+    issues.push("Vocabulary response needs 6 easy, 4 medium, and 3 hard questions.");
+  }
+  return [...new Set(issues)];
+}
+
+function adaptVocabularyQuestions(
+  questions: RawVocabularyQuestion[],
+  library: ResolvedLessonLibrary,
+): VocabularyKanjiGroup {
+  return {
+    vocabularyQuestions: questions.map((question) => {
+      const targetId = targetIdForVocabularyQuestion(question, library);
+      if (!targetId) {
+        throw new Error("A vocabulary question could not be linked to its story word.");
+      }
+      return {
+        activityType: "multiple_choice",
+        difficulty: rawDifficulty(question.difficulty),
+        mode: vocabularyMode(question.format_id),
+        skill: "understanding",
+        prompt: question.question,
+        cue: question.sentence ?? "",
+        choices: question.choices,
+        correctAnswer: question.answer,
+        acceptedAnswers: [question.answer],
+        explanation: `The correct answer is ${question.answer}.`,
+        hintFront: "",
+        hintBack: "",
+        targetItemIds: [targetId],
+      } satisfies PracticeQuestion;
+    }),
+  };
+}
+
 async function generateGroup<T>(input: {
   name: string;
   stage: GenerationAuditEntry["stage"];
@@ -537,28 +700,25 @@ export async function generateVocabularyAndKanjiActivities(input: {
   draft: StoryDraft;
   library: ResolvedLessonLibrary;
 }): Promise<ActivityGroupResult<VocabularyKanjiGroup>> {
-  return generateGroup<VocabularyKanjiGroup>({
-    name: "vocabulary and kanji activities",
-    stage: "vocabulary_activities",
-    prompt: [
-      "Create only AIko's vocabulary and kanji practice bank for the fixed story.",
-      `JLPT ceiling: ${input.level}. Topic: ${input.topic}.`,
-      "Return exactly 13 questions: 6 Easy, 4 Medium, 3 Hard.",
-      "Use only supplied library IDs and facts. Do not rewrite the story.",
-      "Every multiple-choice question needs four distinct choices including the answer.",
-      "Keep feedback encouraging, but never praise an incorrect answer.",
-      JSON.stringify(context(input, ["kanji", "vocabulary"])),
-    ],
-    schema: {
-      type: "object",
-      additionalProperties: false,
-      required: ["vocabularyQuestions"],
-      properties: {
-        vocabularyQuestions: objectArray(13, 13, practiceSchema("vocabulary")),
-      },
-    },
-    validate: (value) => practiceIssues(value, "vocabularyQuestions", input.library),
+  const generated = await generateStructured<RawVocabularyQuestions>({
+    name: "vocab_questions",
+    prompt: vocabularyQuestionsPrompt({
+      japaneseStory: input.draft.lines.map((line) => line.japanese).join(""),
+      knownKanji: input.library.kanji.map((item) => item.character),
+    }),
+    schema: vocabularyQuestionsSchema,
+    strictSchema: true,
+    exactSchemaName: true,
+    validate: (value) => rawVocabularyQuestionIssues(value, input.library),
   });
+  return {
+    value: adaptVocabularyQuestions(generated.value.questions, input.library),
+    audit: {
+      stage: "vocabulary_activities",
+      model: generated.model,
+      repaired: generated.repaired,
+    },
+  };
 }
 
 export async function generateGrammarAndReadingActivities(input: {

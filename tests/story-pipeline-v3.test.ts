@@ -32,6 +32,14 @@ const validator = readFileSync(
   "utf8",
 );
 const runner = readFileSync("lib/custom-lessons/job-runner.ts", "utf8");
+const activityGroups = readFileSync(
+  "lib/gemini/lesson-activity-groups.ts",
+  "utf8",
+);
+const vocabularyContract = readFileSync(
+  "lib/gemini/vocabulary-question-contract.ts",
+  "utf8",
+);
 const structured = readFileSync("lib/openai/structured-output.ts", "utf8");
 const structuredText = readFileSync("lib/openai/structured-text.ts", "utf8");
 const compatibilityExport = readFileSync(
@@ -212,7 +220,23 @@ describe("custom lesson story pipeline v3", () => {
       runner.indexOf("await persistGroup(admin, job, group, payload, audit)"),
     );
     expect(runner).toContain("payload = approval.payload as GroupPayload");
-    expect(runner).toContain('if (group !== "final_review")');
+    expect(runner).toContain('group === "grammar_and_reading"');
+    expect(runner).toContain('group === "listening_and_speaking"');
+    expect(runner).not.toContain('if (group !== "final_review")');
+  });
+
+  it("creates vocabulary questions from the exact sample contract", () => {
+    expect(activityGroups).toContain('name: "vocab_questions"');
+    expect(activityGroups).toContain("vocabularyQuestionsPrompt");
+    expect(activityGroups).toContain("vocabularyQuestionsSchema");
+    expect(activityGroups).toContain("strictSchema: true");
+    expect(activityGroups).toContain("exactSchemaName: true");
+    expect(vocabularyContract).toContain("Create vocabulary and kanji questions from this Japanese story.");
+    expect(vocabularyContract).toContain("Create exactly 13 questions: 6 easy, 4 medium, and 3 hard.");
+    expect(vocabularyContract).toContain('required: [\n          "format_id"');
+    expect(existingLibrary).toContain("filterStoryPracticeKanji");
+    expect(existingLibrary).toContain("knownKanji: input.plan.knownKanji");
+    expect(existingLibrary).toContain("targetKanji: input.plan.kanji.map");
   });
 
   it("records exact group errors and does not mislabel finalization failures", () => {
