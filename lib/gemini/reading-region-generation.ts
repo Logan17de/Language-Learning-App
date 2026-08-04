@@ -2,6 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { generateStructured } from "@/lib/gemini/structured-output";
+import { storeGeneratedVocabularyTerms } from "@/lib/gemini/generated-vocabulary-storage";
 import {
   readingPassagePrompt,
   readingPassageSchema,
@@ -14,7 +15,6 @@ import {
 import {
   simpleStoryEnrichmentSchema,
   storyEnrichmentPrompt,
-  type RawStoryVocabulary,
   type SimpleStoryEnrichment,
 } from "@/lib/gemini/simple-story-enrichment-contract";
 import type {
@@ -23,7 +23,6 @@ import type {
   ResolvedLessonLibrary,
   StoryDraft,
 } from "@/lib/gemini/lesson-engine-v2";
-import type { Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
 
 export interface GeneratedReadingLine {
@@ -40,13 +39,6 @@ export interface GeneratedReadingRegion {
   lines: GeneratedReadingLine[];
   questions: RawReadingQuestion[];
   audit: GenerationAuditEntry;
-}
-
-interface StoredVocabularyRow {
-  vocabulary_id: string;
-  word: string;
-  reading: string;
-  meaning: string;
 }
 
 function normalized(value: string): string {
@@ -96,70 +88,6 @@ function readingQuestionIssues(value: unknown): string[] {
     issues.push("Reading response needs at least one easy, medium, and hard question.");
   }
   return [...new Set(issues)];
-}
-
-function scriptType(word: string): InspectableTerm["scriptType"] {
-  if (/\p{Script=Han}/u.test(word)) return "kanji";
-  if (/\p{Script=Katakana}/u.test(word)) return "katakana";
-  return "hiragana";
-}
-
-function vocabularyKey(word: string, reading: string, meaning: string): string {
-  return [word, reading, meaning].map(normalized).join("\u0000");
-}
-
-async function storedInspectableTerms(input: {
-  admin?: SupabaseClient;
-  requestId?: string;
-  level: JLPTLevel;
-  vocabulary: RawStoryVocabulary[];
-  model: string;
-  library: ResolvedLessonLibrary;
-}): Promise<InspectableTerm[]> {
-  let storedRows: StoredVocabularyRow[] = [];
-  if (input.admin && input.requestId) {
-    const stored = await input.admin.rpc("store_story_vocabulary_enrichment", {
-      p_request_id: input.requestId,
-      p_level: input.level,
-      p_vocabulary: input.vocabulary as unknown as Json,
-      p_source_model: input.model,
-    });
-    if (stored.error) {
-      throw new Error(`Reading vocabulary could not be stored: ${stored.error.message}`);
-    }
-    const rows = await input.admin
-      .from("story_vocabulary_enrichments")
-      .select("vocabulary_id,word,reading,meaning")
-      .eq("request_id", input.requestId);
-    if (rows.error) {
-      throw new Error(`Reading vocabulary could not be loaded: ${rows.error.message}`);
-    }
-    storedRows = (rows.data ?? []) as StoredVocabularyRow[];
-  }
-
-  const storedByKey = new Map(
-    storedRows.map((row) => [
-      vocabularyKey(row.word, row.reading, row.meaning),
-      row.vocabulary_id,
-    ]),
-  );
-  return input.vocabulary.flatMap((item) => {
-    const storedId = storedByKey.get(vocabularyKey(item.word, item.reading, item.meaning));
-    const existing = input.library.vocabulary.find((candidate) =>
-      normalized(candidate.term) === normalized(item.word) &&
-      normalized(candidate.reading) === normalized(item.reading),
-    );
-    const libraryId = storedId ?? existing?.libraryId;
-    if (!libraryId) return [];
-    return [{
-      libraryId,
-      libraryType: "vocabulary" as const,
-      surface: item.word,
-      reading: item.reading,
-      meaning: item.meaning,
-      scriptType: scriptType(item.word),
-    }];
-  });
 }
 
 function sentences(value: string, japanese: boolean): string[] {
@@ -234,7 +162,7 @@ export async function generateReadingRegion(input: {
     validate: () => [],
     trace: { requestId: input.requestId, stage: "reading_enrichment" },
   });
-  const terms = await storedInspectableTerms({
+  const terms = await storeGeneratedVocabularyTerms({
     admin: input.admin,
     requestId: input.requestId,
     level: input.level,

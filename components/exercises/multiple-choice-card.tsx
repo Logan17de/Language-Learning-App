@@ -16,6 +16,7 @@ export function MultipleChoiceCard({
   answered,
   answerCorrect,
   lockAfterAnswer = false,
+  disabled = false,
   inspectableTerms = [],
   inspectChoices = true,
   onInspect,
@@ -30,13 +31,14 @@ export function MultipleChoiceCard({
   answered: boolean;
   answerCorrect?: boolean;
   lockAfterAnswer?: boolean;
+  disabled?: boolean;
   inspectableTerms?: StoryWord[];
   inspectChoices?: boolean;
   onInspect?: (word: StoryWord, reveal: "reading" | "meaning") => void;
   onSelect: (answer: string) => void;
 }) {
   const isCorrect = answerCorrect ?? selectedAnswer === correctAnswer;
-  const locked = answered && lockAfterAnswer;
+  const locked = disabled || (answered && lockAfterAnswer);
 
   return (
     <section aria-labelledby="question-prompt">

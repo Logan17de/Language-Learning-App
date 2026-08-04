@@ -75,6 +75,7 @@ function createPreloadedAudio(url: string): Promise<HTMLAudioElement> {
 export function AudioControl({
   replayCount,
   onPlay,
+  onEnded,
   text,
   audioAssetId,
   label = "Play audio",
@@ -82,6 +83,7 @@ export function AudioControl({
 }: {
   replayCount: number;
   onPlay: () => void;
+  onEnded?: () => void;
   text?: string;
   audioAssetId?: string;
   label?: string;
@@ -89,6 +91,7 @@ export function AudioControl({
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const preloadRef = useRef<Promise<HTMLAudioElement | null> | null>(null);
+  const onEndedRef = useRef(onEnded);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
@@ -96,6 +99,10 @@ export function AudioControl({
   // Reading uses microphone + STT only. The legacy reading component still
   // renders this control, so block it before any TTS request or preload occurs.
   const readingSttOnly = label === "Hear this line";
+
+  useEffect(() => {
+    onEndedRef.current = onEnded;
+  }, [onEnded]);
 
   useEffect(() => {
     if (readingSttOnly) {
@@ -115,7 +122,10 @@ export function AudioControl({
     const preload = requestAudioUrl(text, audioAssetId)
       .then(createPreloadedAudio)
       .then((audio) => {
-        audio.onended = () => setPlaying(false);
+        audio.onended = () => {
+          setPlaying(false);
+          onEndedRef.current?.();
+        };
         audio.onerror = () => {
           setPlaying(false);
           setReady(false);

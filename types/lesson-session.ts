@@ -57,7 +57,12 @@ export interface ReadingComprehensionAnswer {
   response: string;
 }
 
-export type ListeningEventType = "play" | "replay" | "difficulty-signal" | "answer";
+export type ListeningEventType =
+  | "play"
+  | "replay"
+  | "complete"
+  | "difficulty-signal"
+  | "answer";
 
 export interface ListeningEvent {
   id: string;

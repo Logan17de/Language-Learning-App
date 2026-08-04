@@ -25,6 +25,10 @@ import {
   readingQuestionsPrompt,
   readingQuestionsSchema,
 } from "@/lib/gemini/reading-comprehension-contract";
+import {
+  listeningQuestionsPrompt,
+  listeningQuestionsSchema,
+} from "@/lib/gemini/listening-question-contract";
 
 describe("tested story and enrichment API contracts", () => {
   it("uses the exact story_test.py generation prompt", () => {
@@ -293,6 +297,67 @@ Requirements:
               answer: { type: "string" },
             },
             required: ["difficulty", "question", "answer"],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ["questions"],
+      additionalProperties: false,
+    });
+  });
+
+  it("uses the exact listening_test.py prompt and response format", () => {
+    expect(listeningQuestionsPrompt({
+      languageLevel: "JLPT N5",
+      knownPatterns: [],
+    })).toBe(`
+Create exactly 5 listening-comprehension questions for JLPT N5 learners.
+
+grammar patterns:
+[]
+
+Requirements:
+- Create exactly 5 listening questions.
+- Each question must include a natural Japanese conversation of 5–10 lines.
+- The conversation should be between 2 or more speakers.
+- The learner should answer only after listening to the entire conversation.
+- The question should test understanding of the conversation, not memorization.
+- Include a mix of:
+  - Direct information
+  - Speaker intention
+  - Sequence of events
+  - Reason or purpose
+  - Simple inference
+- Provide four unique answer choices with exactly one correct answer.
+- Keep everything appropriate for JLPT N5.
+`);
+    expect(listeningQuestionsSchema).toEqual({
+      type: "object",
+      properties: {
+        questions: {
+          type: "array",
+          minItems: 5,
+          maxItems: 5,
+          items: {
+            type: "object",
+            properties: {
+              difficulty: { type: "string", enum: ["easy", "medium", "hard"] },
+              conversation: {
+                type: "array",
+                minItems: 5,
+                maxItems: 10,
+                items: { type: "string" },
+              },
+              question: { type: "string" },
+              choices: {
+                type: "array",
+                minItems: 4,
+                maxItems: 4,
+                items: { type: "string" },
+              },
+              answer: { type: "string" },
+            },
+            required: ["difficulty", "conversation", "question", "choices", "answer"],
             additionalProperties: false,
           },
         },

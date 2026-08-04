@@ -438,24 +438,36 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
       question: item.question,
       answer: item.answer,
     })),
-    listeningExercises: value.listening.map((item, index) => ({
-      id: item.id,
-      prompt: item.prompt,
-      choices: item.choices,
-      correctAnswer: item.correct_answer,
-      explanation: item.explanation,
-      transcript: item.transcript,
-      audioAssetId: item.audio_asset_id ?? undefined,
-      questionType: "multiple-choice",
-      targetItemIds: item.target_item_ids,
-      inspectableTerms: inspectableTerms(item.inspectable_terms),
-      difficulty:
-        index === value.listening.length - 1
-          ? ("Hard" as const)
-          : index === 0
-            ? ("Easy" as const)
-            : ("Medium" as const),
-    })),
+    listeningExercises: value.listening.map((item, index) => {
+      const conversationLines = Array.isArray(item.conversation_lines)
+        ? item.conversation_lines
+        : [];
+      return {
+        id: item.id,
+        prompt: item.prompt,
+        choices: item.choices,
+        correctAnswer: item.correct_answer,
+        explanation: item.explanation,
+        transcript: item.transcript,
+        conversationLines,
+        audioAssetId: item.audio_asset_id ?? undefined,
+        questionType: "multiple-choice" as const,
+        targetItemIds: item.target_item_ids,
+        inspectableTerms: inspectableTerms(item.inspectable_terms),
+        difficulty:
+          conversationLines.length > 0
+            ? item.difficulty === "hard"
+              ? ("Hard" as const)
+              : item.difficulty === "easy"
+                ? ("Easy" as const)
+                : ("Medium" as const)
+            : index === value.listening.length - 1
+              ? ("Hard" as const)
+              : index === 0
+                ? ("Easy" as const)
+                : ("Medium" as const),
+      };
+    }),
     speakingExercises: value.speaking.map((item) => ({
       id: item.id,
       prompt: item.prompt,

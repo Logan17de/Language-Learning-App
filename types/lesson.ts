@@ -88,6 +88,7 @@ export interface ChoiceExercise {
   correctAnswer: string;
   explanation: string;
   transcript?: string;
+  conversationLines?: string[];
   audioAssetId?: string;
   questionType?: "multiple-choice" | "ordering" | "fill-blank" | "true-false";
   category?: "kanji" | "vocabulary" | "grammar" | "listening" | "speaking";

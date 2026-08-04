@@ -52,6 +52,18 @@ const readingGeneration = readFileSync(
   "lib/gemini/reading-region-generation.ts",
   "utf8",
 );
+const listeningContract = readFileSync(
+  "lib/gemini/listening-question-contract.ts",
+  "utf8",
+);
+const listeningGeneration = readFileSync(
+  "lib/gemini/listening-region-generation.ts",
+  "utf8",
+);
+const generatedVocabularyStorage = readFileSync(
+  "lib/gemini/generated-vocabulary-storage.ts",
+  "utf8",
+);
 const structured = readFileSync("lib/openai/structured-output.ts", "utf8");
 const structuredText = readFileSync("lib/openai/structured-text.ts", "utf8");
 const compatibilityExport = readFileSync(
@@ -87,6 +99,10 @@ const enrichmentMigration = readFileSync(
 );
 const readingMigration = readFileSync(
   "supabase/migrations/20260804160000_reading_comprehension_pipeline.sql",
+  "utf8",
+);
+const listeningMigration = readFileSync(
+  "supabase/migrations/20260804170000_listening_question_contract.sql",
   "utf8",
 );
 
@@ -214,31 +230,12 @@ describe("custom lesson story pipeline v3", () => {
     expect(migration).toContain("on conflict (user_id, request_id, character) do nothing");
   });
 
-  it("keeps approved QA regions and repairs rejected questions with bounded load", () => {
-    expect(validator).toContain("approval-only Japanese question-and-answer validator");
-    expect(validator).toContain("Return exactly one verdict for every requestIndex");
-    expect(validator).toContain("Mentally insert blank answers");
-    expect(validator).toContain("exactly one primary targetItemId");
-    expect(validator).toContain("The item is unambiguous");
-    expect(validator).toContain("do not expose the answer");
-    expect(validator).toContain("Approved neighboring questions survive unchanged");
-    expect(validator).toContain("const MAX_ISOLATED_REPAIR_ATTEMPTS = 3");
-    expect(validator).toContain("const MAX_PARALLEL_REPAIRS = 2");
-    expect(validator).toContain("for (let attempt = 1; attempt <= MAX_ISOLATED_REPAIR_ATTEMPTS");
-    expect(validator).toContain("Rebuild this one question cleanly from its canonical targets");
-    expect(validator).toContain("Custom lesson question repair needs another isolated attempt");
-    expect(validator).toContain("mapWithConcurrency");
-    expect(validator).not.toContain("Promise.all(rejected.map");
-    expect(validator).toContain("questions[verdict.requestIndex] = repairs[index]!.question");
-    expect(validator).toContain("repairs.reduce((total, item) => total + item.validationCalls, 0)");
-    expect(runner).toContain("const approval = await approveActivityQuestionsWithAI");
-    expect(runner.indexOf("const approval = await approveActivityQuestionsWithAI")).toBeLessThan(
-      runner.indexOf("await persistGroup(admin, job, group, payload, audit)"),
+  it("persists tested strict question responses without a second model prompt", () => {
+    expect(runner).not.toContain("approveActivityQuestionsWithAI");
+    expect(runner).toContain("Every migrated question region now uses its tested strict response");
+    expect(runner).toContain(
+      "await persistGroup(admin, job, group, generated.value, generated.audit)",
     );
-    expect(runner).toContain("payload = approval.payload as GroupPayload");
-    expect(runner).toContain('group === "listening_and_speaking"');
-    expect(runner).not.toContain('group === "grammar_and_reading" ||');
-    expect(runner).not.toContain('if (group !== "final_review")');
   });
 
   it("creates vocabulary questions from the exact sample contract", () => {
@@ -283,9 +280,26 @@ describe("custom lesson story pipeline v3", () => {
     expect(readingGeneration).toContain('name: "reading_lesson"');
     expect(readingGeneration).toContain('name: "reading_vocabulary"');
     expect(readingGeneration).toContain('name: "reading_questions"');
-    expect(readingGeneration).toContain('rpc("store_story_vocabulary_enrichment"');
+    expect(generatedVocabularyStorage).toContain('rpc("store_story_vocabulary_enrichment"');
     expect(readingMigration).toContain("create table public.lesson_reading_questions");
     expect(readingMigration).toContain("jsonb_array_length(p_package->'readingQuestions')");
+  });
+
+  it("creates five enriched listening conversations from the exact sample contract", () => {
+    expect(listeningContract).toContain("Create exactly 5 listening-comprehension questions");
+    expect(listeningContract).toContain("natural Japanese conversation of 5–10 lines");
+    expect(listeningContract).toContain('required: [\n          "difficulty"');
+    expect(listeningGeneration).toContain('name: "listening_questions"');
+    expect(listeningGeneration).toContain("strictSchema: true");
+    expect(listeningGeneration).toContain("exactSchemaName: true");
+    expect(listeningGeneration).toContain('name: "listening_vocabulary"');
+    expect(listeningGeneration.indexOf("prompt: listeningQuestionsPrompt")).toBeLessThan(
+      listeningGeneration.indexOf("prompt: storyEnrichmentPrompt(listeningText)"),
+    );
+    expect(activityGroups).toContain("generateListeningRegion");
+    expect(activityGroups).toContain('name: "interactive speaking activities"');
+    expect(listeningMigration).toContain("add column conversation_lines text[]");
+    expect(listeningMigration).toContain("jsonb_array_length(p_package->'listeningExercises') <> 5");
   });
 
   it("records exact group errors and does not mislabel finalization failures", () => {
@@ -319,6 +333,10 @@ describe("custom lesson story pipeline v3", () => {
     expect(audioControl).toContain('const readingSttOnly = label === "Hear this line"');
     expect(audioControl).toContain("if (readingSttOnly) return null");
     expect(listening).toContain("<AudioControl");
+    expect(listening).toContain("onEnded={finishListening}");
+    expect(listening).toContain("Listen to the complete conversation to unlock the answers.");
+    expect(listening).toContain("disabled={!heardEntireConversation}");
+    expect(listening).toContain("lockAfterAnswer");
     expect(listening).toContain("<MultipleChoiceCard");
     expect(listening).not.toContain("MediaRecorder");
     expect(listening).not.toContain("/api/audio/transcribe");

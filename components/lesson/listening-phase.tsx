@@ -62,6 +62,9 @@ export function ListeningPhase({
   const priorAnswer = session.listeningEvents.findLast(
     (event) => event.type === "answer" && event.questionId === exercise.id,
   );
+  const heardEntireConversation = session.listeningEvents.some(
+    (event) => event.type === "complete" && event.questionId === exercise.id,
+  );
   const replayCount = session.listeningEvents.filter(
     (event) =>
       event.questionId === exercise.id &&
@@ -81,6 +84,7 @@ export function ListeningPhase({
   }
 
   function answer(value: string) {
+    if (!heardEntireConversation || priorAnswer) return;
     const correct = evaluateAnswer(value, exercise.correctAnswer);
     const otherEvents = session.listeningEvents.filter(
       (event) => !(event.type === "answer" && event.questionId === exercise.id),
@@ -93,6 +97,23 @@ export function ListeningPhase({
       listeningEvents: [
         ...otherEvents,
         { id: `answer_${exercise.id}_${session.listeningEvents.length + 1}`, questionId: exercise.id, type: "answer", replayCount, correct, selectedAnswer: value, elapsedSeconds: session.elapsedSeconds },
+      ],
+    });
+  }
+
+  function finishListening() {
+    if (heardEntireConversation) return;
+    onChange({
+      ...session,
+      listeningEvents: [
+        ...session.listeningEvents,
+        {
+          id: `complete_${exercise.id}_${session.listeningEvents.length + 1}`,
+          questionId: exercise.id,
+          type: "complete",
+          replayCount,
+          elapsedSeconds: session.elapsedSeconds,
+        },
       ],
     });
   }
@@ -123,13 +144,18 @@ export function ListeningPhase({
 
       <Card className="mt-8 p-6 sm:p-8">
         <ProgressBar value={(answeredIds.size / exercises.length) * 100} className="mb-6" />
-        <AudioControl replayCount={replayCount} onPlay={play} text={exercise.transcript} audioAssetId={exercise.audioAssetId} label="Play conversation" large />
+        <AudioControl replayCount={replayCount} onPlay={play} onEnded={finishListening} text={exercise.transcript} audioAssetId={exercise.audioAssetId} label="Play conversation" large />
         <div className="mt-4 flex items-center justify-between text-xs text-stone-400">
           <span>Replay {replayCount} · first replay has no penalty</span>
           {replayCount >= 3 && <span className="font-semibold text-persimmon-600">Difficulty signal noted</span>}
         </div>
 
         <div className="mt-8 border-t border-stone-100 pt-8">
+          {!heardEntireConversation && (
+            <p className="mb-5 rounded-2xl bg-stone-50 p-4 text-center text-sm font-semibold text-stone-500">
+              Listen to the complete conversation to unlock the answers.
+            </p>
+          )}
           <MultipleChoiceCard
             prompt={exercise.prompt}
             choices={exercise.choices}
@@ -138,6 +164,8 @@ export function ListeningPhase({
             selectedAnswer={priorAnswer?.selectedAnswer}
             answered={Boolean(priorAnswer)}
             answerCorrect={priorAnswer?.correct}
+            disabled={!heardEntireConversation}
+            lockAfterAnswer
             inspectableTerms={exercise.inspectableTerms ?? lesson.story.flatMap((line) => line.words)}
             onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, exercise.id, word, reveal))}
             onSelect={answer}

@@ -2,7 +2,6 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { prepareStoredLessonAudio } from "@/lib/audio/audio-library";
-import { approveActivityQuestionsWithAI } from "@/lib/gemini/activity-validator-ai";
 import {
   assemblePlayableLesson,
   generateFinalReviewActivities,
@@ -90,11 +89,6 @@ type GroupPayload =
   | CommunicationGroup
   | ReviewGroup;
 
-type AiValidatedPayload =
-  | VocabularyKanjiGroup
-  | GrammarReadingGroup
-  | CommunicationGroup;
-
 function adminClient(): AdminClient {
   return createAdminClient() as unknown as AdminClient;
 }
@@ -181,7 +175,19 @@ function groupPayload(
       ? payload
       : null;
   }
-  if (group === "listening_and_speaking") return job.communication_group;
+  if (group === "listening_and_speaking") {
+    const payload = job.communication_group;
+    return isRecord(payload) &&
+      Array.isArray(payload.listeningExercises) &&
+      payload.listeningExercises.length === 5 &&
+      payload.listeningExercises.every((item) =>
+        isRecord(item) && Array.isArray(item.conversationLines),
+      ) &&
+      Array.isArray(payload.speakingExercises) &&
+      payload.speakingExercises.length === 3
+      ? payload
+      : null;
+  }
   return job.review_group;
 }
 
@@ -500,34 +506,10 @@ async function processActivityJob(
       library,
     });
 
-    let payload = generated.value;
-    let audit = generated.audit;
-    // Vocabulary/kanji and grammar use their tested strict question contracts
-    // plus deterministic story/library checks. Keep the separate AI validator
-    // only for the remaining legacy question group.
-    if (group === "listening_and_speaking") {
-      const approval = await approveActivityQuestionsWithAI({
-        group,
-        topic: job.topic,
-        level: job.jlpt_level,
-        draft,
-        library,
-        payload: generated.value as AiValidatedPayload,
-      });
-      payload = approval.payload as GroupPayload;
-      audit = {
-        ...generated.audit,
-        validator: {
-          model: approval.model,
-          repaired: approval.repaired,
-          checkedItems: approval.checkedItems,
-          repairedItems: approval.repairedItems,
-          validationCalls: approval.validationCalls,
-        },
-      } as unknown as GenerationAuditEntry;
-    }
-
-    await persistGroup(admin, job, group, payload, audit);
+    // Every migrated question region now uses its tested strict response
+    // contract directly. Do not insert a second model prompt between the
+    // recorded response and deterministic lesson assembly.
+    await persistGroup(admin, job, group, generated.value, generated.audit);
     return group;
   });
   const settled = await Promise.allSettled(executions);

@@ -24,6 +24,7 @@ import {
 import { storyUsesGrammarPattern } from "@/lib/gemini/lesson-validation";
 import { generateReadingRegion } from "@/lib/gemini/reading-region-generation";
 import type { RawReadingQuestion } from "@/lib/gemini/reading-comprehension-contract";
+import { generateListeningRegion } from "@/lib/gemini/listening-region-generation";
 import {
   vocabularyQuestionFormats,
   vocabularyQuestionsPrompt,
@@ -72,12 +73,14 @@ export interface ReadingLine {
 
 export interface ListeningExercise {
   difficulty: Difficulty;
+  conversationLines: string[];
   prompt: string;
   transcript: string;
   choices: string[];
   correctAnswer: string;
   explanation: string;
   targetItemIds: string[];
+  inspectableTerms?: InspectableTerm[];
 }
 
 export interface SpeakingExercise {
@@ -161,29 +164,6 @@ function stringArray(minItems = 0, maxItems = 100): JsonSchema {
 
 const targetIdsSchema = stringArray(1, 5);
 
-const listeningSchema: JsonSchema = {
-  type: "object",
-  additionalProperties: false,
-  required: [
-    "difficulty",
-    "prompt",
-    "transcript",
-    "choices",
-    "correctAnswer",
-    "explanation",
-    "targetItemIds",
-  ],
-  properties: {
-    difficulty: { type: "string", enum: ["Easy", "Medium", "Hard"] },
-    prompt: { type: "string" },
-    transcript: { type: "string" },
-    choices: stringArray(4, 4),
-    correctAnswer: { type: "string" },
-    explanation: { type: "string" },
-    targetItemIds: targetIdsSchema,
-  },
-};
-
 const speakingSchema: JsonSchema = {
   type: "object",
   additionalProperties: false,
@@ -254,17 +234,6 @@ function duplicateChoices(choices: string[]): boolean {
   return new Set(values).size !== values.length;
 }
 
-function difficultyCounts(items: unknown[]): Record<Difficulty, number> {
-  const counts: Record<Difficulty, number> = { Easy: 0, Medium: 0, Hard: 0 };
-  for (const item of items) {
-    if (!isRecord(item)) continue;
-    if (item.difficulty === "Easy" || item.difficulty === "Medium" || item.difficulty === "Hard") {
-      counts[item.difficulty] += 1;
-    }
-  }
-  return counts;
-}
-
 function targetIssues(
   item: Record<string, unknown>,
   label: string,
@@ -293,33 +262,16 @@ function choiceIssues(item: Record<string, unknown>, label: string): string[] {
   return issues;
 }
 
-function communicationIssues(value: unknown, library: ResolvedLessonLibrary): string[] {
-  if (!isRecord(value)) return ["Communication activities must be an object."];
-  const listening = Array.isArray(value.listeningExercises) ? value.listeningExercises : [];
+function speakingIssues(value: unknown, library: ResolvedLessonLibrary): string[] {
+  if (!isRecord(value)) return ["Speaking activities must be an object."];
   const speaking = Array.isArray(value.speakingExercises) ? value.speakingExercises : [];
   const issues: string[] = [];
-  if (listening.length !== 3) issues.push("Listening needs exactly 3 exercises.");
   if (speaking.length !== 3) issues.push("Speaking needs exactly 3 exercises.");
-  const counts = difficultyCounts(listening);
-  if (counts.Easy !== 1 || counts.Medium !== 1 || counts.Hard !== 1) {
-    issues.push("Listening needs one Easy, one Medium, and one Hard exercise.");
-  }
   const modes = speaking.flatMap((item) => isRecord(item) && typeof item.mode === "string" ? [item.mode] : []);
   if (new Set(modes).size !== 3 || !["easy", "medium", "hard"].every((mode) => modes.includes(mode))) {
     issues.push("Speaking needs one easy, one medium, and one hard exercise.");
   }
   const allowedIds = allowedLibraryIds(library);
-  listening.forEach((candidate, index) => {
-    if (!isRecord(candidate)) {
-      issues.push(`Listening item ${index + 1} must be an object.`);
-      return;
-    }
-    issues.push(...targetIssues(candidate, `Listening item ${index + 1}`, allowedIds));
-    issues.push(...choiceIssues(candidate, `Listening item ${index + 1}`));
-    if (!Array.isArray(candidate.choices) || candidate.choices.length !== 4) {
-      issues.push(`Listening item ${index + 1} needs exactly four choices.`);
-    }
-  });
   speaking.forEach((candidate, index) => {
     if (!isRecord(candidate)) {
       issues.push(`Speaking item ${index + 1} must be an object.`);
@@ -839,35 +791,55 @@ export async function generateGrammarAndReadingActivities(input: {
 }
 
 export async function generateListeningAndSpeakingActivities(input: {
+  requestId?: string;
+  admin?: SupabaseClient;
   topic: string;
   level: JLPTLevel;
   draft: StoryDraft;
   library: ResolvedLessonLibrary;
 }): Promise<ActivityGroupResult<CommunicationGroup>> {
-  return generateGroup<CommunicationGroup>({
-    name: "listening and interactive speaking activities",
-    stage: "communication_activities",
-    prompt: [
-      "Create only AIko's listening and interactive speaking activities for the fixed story.",
-      `JLPT ceiling: ${input.level}. Topic: ${input.topic}.`,
-      "Return 3 listening exercises: exactly one Easy, one Medium, and one Hard.",
-      "Return 3 speaking exercises: exactly one easy, one medium, and one hard.",
-      "Voice belongs here: AIko presents spoken Japanese and the learner responds.",
-      "Use only supplied library IDs and facts. Do not rewrite or narrate the story.",
-      "Listening choices must be four distinct choices containing the correct answer.",
-      JSON.stringify(context(input, ["kanji", "vocabulary", "grammar"])),
-    ],
-    schema: {
-      type: "object",
-      additionalProperties: false,
-      required: ["listeningExercises", "speakingExercises"],
-      properties: {
-        listeningExercises: objectArray(3, 3, listeningSchema),
-        speakingExercises: objectArray(3, 3, speakingSchema),
+  const [listening, speaking] = await Promise.all([
+    generateListeningRegion({
+      requestId: input.requestId,
+      admin: input.admin,
+      level: input.level,
+      library: input.library,
+    }),
+    generateGroup<{ speakingExercises: SpeakingExercise[] }>({
+      name: "interactive speaking activities",
+      stage: "communication_activities",
+      prompt: [
+        "Create only AIko's interactive speaking activities for the fixed story.",
+        `JLPT ceiling: ${input.level}. Topic: ${input.topic}.`,
+        "Return 3 speaking exercises: exactly one easy, one medium, and one hard.",
+        "AIko presents spoken Japanese and the learner responds.",
+        "Use only supplied library IDs and facts. Do not rewrite or narrate the story.",
+        JSON.stringify(context(input, ["kanji", "vocabulary", "grammar"])),
+      ],
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["speakingExercises"],
+        properties: {
+          speakingExercises: objectArray(3, 3, speakingSchema),
+        },
       },
+      validate: (value) => speakingIssues(value, input.library),
+    }),
+  ]);
+  return {
+    value: {
+      listeningExercises: listening.exercises,
+      speakingExercises: speaking.value.speakingExercises,
     },
-    validate: (value) => communicationIssues(value, input.library),
-  });
+    audit: {
+      stage: "communication_activities",
+      model: listening.audit.model === speaking.audit.model
+        ? speaking.audit.model
+        : `${listening.audit.model}, ${speaking.audit.model}`,
+      repaired: listening.audit.repaired || speaking.audit.repaired,
+    },
+  };
 }
 
 export async function generateFinalReviewActivities(input: {
@@ -1058,7 +1030,8 @@ export function assemblePlayableLesson(input: {
     ),
     listeningExercises: input.groups.communication.listeningExercises.map((exercise) => ({
       ...exercise,
-      inspectableTerms: inspectableTerms([exercise.prompt, exercise.transcript], input.library),
+      inspectableTerms: exercise.inspectableTerms ??
+        inspectableTerms([exercise.prompt, exercise.transcript], input.library),
     })),
     speakingExercises: input.groups.communication.speakingExercises.map((exercise) => ({
       ...exercise,

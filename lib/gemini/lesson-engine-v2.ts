@@ -196,6 +196,7 @@ interface RawReadingLine {
 
 interface RawListeningExercise {
   difficulty: "Easy" | "Medium" | "Hard";
+  conversationLines: string[];
   prompt: string;
   transcript: string;
   choices: string[];
