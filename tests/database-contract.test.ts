@@ -13,6 +13,10 @@ const generatedLessonVocabularyCapacity = readFileSync(
   "supabase/migrations/20260804200000_generated_lesson_package_vocabulary_capacity.sql",
   "utf8",
 );
+const generatedLessonPgcryptoSearchPath = readFileSync(
+  "supabase/migrations/20260804210000_generated_lesson_pgcrypto_search_path.sql",
+  "utf8",
+);
 
 describe("Supabase integration contract", () => {
   it("pins sessions to a lesson version and makes rewards database-idempotent", () => {
@@ -100,6 +104,12 @@ describe("Supabase integration contract", () => {
     );
     expect(generatedLessonVocabularyCapacity).toContain(
       "perform public.assert_playable_lesson_package_shape(p_package)",
+    );
+    expect(generatedLessonPgcryptoSearchPath).toContain(
+      "set search_path = public, extensions",
+    );
+    expect(generatedLessonPgcryptoSearchPath).toContain(
+      "alter function public.store_generated_lesson_package_v2",
     );
   });
 });
