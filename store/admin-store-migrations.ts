@@ -3,13 +3,27 @@ import type { AdminStoreState } from "@/store/admin-store-types";
 
 const memoryStorage = new Map<string, string>();
 
+function readableStoredValue(value: string | null): string | null {
+  if (value === null) return null;
+  JSON.parse(value);
+  return value;
+}
+
 export const adminSafeStorage: StateStorage = {
   getItem: (name) => {
     try {
-      if (typeof window === "undefined") return memoryStorage.get(name) ?? null;
-      return window.localStorage.getItem(name);
+      if (typeof window === "undefined") {
+        return readableStoredValue(memoryStorage.get(name) ?? null);
+      }
+      return readableStoredValue(window.localStorage.getItem(name));
     } catch {
-      return memoryStorage.get(name) ?? null;
+      try {
+        if (typeof window !== "undefined") window.localStorage.removeItem(name);
+        return readableStoredValue(memoryStorage.get(name) ?? null);
+      } catch {
+        memoryStorage.delete(name);
+        return null;
+      }
     }
   },
   setItem: (name, value) => {
