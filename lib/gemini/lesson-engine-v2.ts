@@ -149,6 +149,11 @@ export interface ResolvedLessonLibrary {
   kanji: CanonicalKanji[];
   grammar: CanonicalGrammar[];
   vocabulary: CanonicalVocabulary[];
+  generationContext?: {
+    interests: string[];
+    targetGrammar: string[];
+    targetKanji: string[];
+  };
 }
 
 export interface GenerationAuditEntry {
@@ -272,9 +277,17 @@ export interface PlayableLessonPackageV2 {
   }>;
   vocabularyQuestions: PlayablePracticeQuestion[];
   grammarQuestions: PlayablePracticeQuestion[];
+  readingTitle: string;
+  readingJapaneseTitle: string;
   readingConversation: Array<
     RawReadingLine & { inspectableTerms: InspectableTerm[] }
   >;
+  readingQuestions: Array<{
+    id: string;
+    difficulty: "easy" | "medium" | "hard";
+    question: string;
+    answer: string;
+  }>;
   listeningExercises: Array<
     RawListeningExercise & { inspectableTerms: InspectableTerm[] }
   >;

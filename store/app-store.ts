@@ -164,6 +164,7 @@ export function createEmptyLessonSession(lessonId: string): LessonSession {
     storyComplete: false,
     vocabularyAnswers: [],
     grammarAnswers: [],
+    readingAnswers: [],
     readingEvents: [],
     readingComplete: false,
     listeningEvents: [],
@@ -227,6 +228,9 @@ export function normalizeLessonSession(
       : [],
     grammarAnswers: Array.isArray(session.grammarAnswers)
       ? session.grammarAnswers
+      : [],
+    readingAnswers: Array.isArray(session.readingAnswers)
+      ? session.readingAnswers
       : [],
     readingEvents: Array.isArray(session.readingEvents)
       ? session.readingEvents

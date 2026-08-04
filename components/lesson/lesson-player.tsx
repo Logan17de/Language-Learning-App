@@ -245,7 +245,9 @@ function phaseIsComplete(
       return session.grammarAnswers.length >=
         Math.min(10, lesson.grammarQuestions.length);
     case "reading":
-      return session.readingComplete;
+      return lesson.readingQuestions?.length
+        ? (session.readingAnswers ?? []).length >= lesson.readingQuestions.length
+        : session.readingComplete;
     case "listening":
       return (
         session.listeningComplete &&

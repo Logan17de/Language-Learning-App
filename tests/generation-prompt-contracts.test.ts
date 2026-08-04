@@ -19,6 +19,12 @@ import {
   vocabularyQuestionsPrompt,
   vocabularyQuestionsSchema,
 } from "@/lib/gemini/vocabulary-question-contract";
+import {
+  readingPassagePrompt,
+  readingPassageSchema,
+  readingQuestionsPrompt,
+  readingQuestionsSchema,
+} from "@/lib/gemini/reading-comprehension-contract";
 
 describe("tested story and enrichment API contracts", () => {
   it("uses the exact story_test.py generation prompt", () => {
@@ -235,6 +241,64 @@ Requirements:
           },
         },
       },
+    });
+  });
+
+  it("uses the reading_test.py format after a story-format reading call", () => {
+    const passagePrompt = readingPassagePrompt({
+      languageLevel: "JLPT N5",
+      topic: "A day at school",
+      naturalInterests: ["Books"],
+      targetGrammar: ["～たい"],
+      targetKanji: ["学"],
+    });
+    expect(passagePrompt).toContain("Generate a Japanese language-learning story for reading.");
+    expect(passagePrompt).toContain("Write one coherent story containing 10–15 natural Japanese sentences.");
+    expect(readingPassageSchema).toBe(storyGenerationSchema);
+
+    expect(readingQuestionsPrompt({
+      languageLevel: "JLPT N5",
+      japaneseStory: "太郎は学校へ行きました。",
+    })).toBe(`
+Create reading-comprehension questions from the following Japanese story.
+
+Language level: JLPT N5
+
+Story:
+太郎は学校へ行きました。
+
+Requirements:
+- Base every question only on the story.
+- Write essay-style questions in Japanese.
+- Require answers in short, complete Japanese sentences.
+- Include direct-detail, sequence, reason, and simple inference questions.
+- Keep the questions appropriate for JLPT N5.
+- Do not create questions that cannot be answered from the story.
+- Do not copy full sentences from the story as answers unless necessary.
+- Easy questions must have answers stated directly in the story.
+- Medium questions must combine information from two or more story sentences.
+- Hard questions must require a simple inference supported by the story.
+- Return only the required JSON.
+`);
+    expect(readingQuestionsSchema).toEqual({
+      type: "object",
+      properties: {
+        questions: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              difficulty: { type: "string", enum: ["easy", "medium", "hard"] },
+              question: { type: "string" },
+              answer: { type: "string" },
+            },
+            required: ["difficulty", "question", "answer"],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ["questions"],
+      additionalProperties: false,
     });
   });
 

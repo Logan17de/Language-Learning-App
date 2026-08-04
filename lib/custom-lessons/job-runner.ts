@@ -172,7 +172,15 @@ function groupPayload(
   group: ActivityGroupName,
 ): Json | null {
   if (group === "vocabulary_and_kanji") return job.vocabulary_kanji_group;
-  if (group === "grammar_and_reading") return job.grammar_reading_group;
+  if (group === "grammar_and_reading") {
+    const payload = job.grammar_reading_group;
+    return isRecord(payload) &&
+      Array.isArray(payload.grammarQuestions) &&
+      Array.isArray(payload.readingConversation) &&
+      Array.isArray(payload.readingQuestions)
+      ? payload
+      : null;
+  }
   if (group === "listening_and_speaking") return job.communication_group;
   return job.review_group;
 }
@@ -187,6 +195,8 @@ const activityGroups: ActivityGroupName[] = [
 async function generateGroup(
   group: ActivityGroupName,
   input: {
+    requestId: string;
+    admin: AdminClient;
     topic: string;
     level: JLPTLevel;
     draft: StoryDraft;
@@ -482,6 +492,8 @@ async function processActivityJob(
   const startedAt = Date.now();
   const executions = missing.map(async (group) => {
     const generated = await generateGroup(group, {
+      requestId: job.request_id,
+      admin,
       topic: job.topic,
       level: job.jlpt_level,
       draft,

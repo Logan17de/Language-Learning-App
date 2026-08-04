@@ -71,6 +71,14 @@ export interface ConversationLine {
   japanese: string;
   english: string;
   audioAssetId?: string;
+  inspectableTerms?: StoryWord[];
+}
+
+export interface ReadingComprehensionQuestion {
+  id: string;
+  difficulty: "easy" | "medium" | "hard";
+  question: string;
+  answer: string;
 }
 
 export interface ChoiceExercise {
@@ -163,7 +171,10 @@ export interface LessonPackage {
   reviewItems: string[];
   story: StoryLine[];
   images: LessonImage[];
+  readingTitle?: string;
+  readingJapaneseTitle?: string;
   readingConversation: ConversationLine[];
+  readingQuestions?: ReadingComprehensionQuestion[];
   listeningExercises: ChoiceExercise[];
   speakingExercises: SpeakingExercise[];
   reviewQuestions: ChoiceExercise[];

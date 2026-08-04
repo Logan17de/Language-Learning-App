@@ -20,6 +20,7 @@ export interface CanonicalLesson {
   grammar: Database["public"]["Tables"]["lesson_grammar"]["Row"][];
   practice: Database["public"]["Tables"]["lesson_practice_activities"]["Row"][];
   reading: Database["public"]["Tables"]["lesson_reading_sections"]["Row"][];
+  readingQuestions: Database["public"]["Tables"]["lesson_reading_questions"]["Row"][];
   listening: Database["public"]["Tables"]["lesson_listening_activities"]["Row"][];
   speaking: Database["public"]["Tables"]["lesson_speaking_activities"]["Row"][];
   review: Database["public"]["Tables"]["lesson_review_activities"]["Row"][];
@@ -83,6 +84,7 @@ async function loadContent(
     grammar,
     practice,
     reading,
+    readingQuestions,
     listening,
     speaking,
     review,
@@ -121,6 +123,11 @@ async function loadContent(
       .eq("lesson_version_id", versionId)
       .order("position"),
     client
+      .from("lesson_reading_questions")
+      .select("*")
+      .eq("lesson_version_id", versionId)
+      .order("position"),
+    client
       .from("lesson_listening_activities")
       .select("*")
       .eq("lesson_version_id", versionId)
@@ -144,6 +151,10 @@ async function loadContent(
     storyWords.error?.code === "42P01" ||
     storyWords.error?.code === "PGRST205" ||
     storyWords.error?.message?.includes("lesson_story_words") === true;
+  const readingQuestionTableMissing =
+    readingQuestions.error?.code === "42P01" ||
+    readingQuestions.error?.code === "PGRST205" ||
+    readingQuestions.error?.message?.includes("lesson_reading_questions") === true;
   const firstError = [
     story,
     vocabulary,
@@ -154,6 +165,7 @@ async function loadContent(
     speaking,
     review,
     knownKanji,
+    ...(readingQuestionTableMissing ? [] : [readingQuestions]),
     ...(storyWordTableMissing ? [] : [storyWords]),
   ].find((result) => result.error)?.error;
   if (firstError) {
@@ -168,6 +180,7 @@ async function loadContent(
     grammar: grammar.data ?? [],
     practice: practice.data ?? [],
     reading: reading.data ?? [],
+    readingQuestions: readingQuestionTableMissing ? [] : (readingQuestions.data ?? []),
     listening: listening.data ?? [],
     speaking: speaking.data ?? [],
     review: review.data ?? [],

@@ -52,6 +52,11 @@ export interface ReadingEvent {
   transcript?: string;
 }
 
+export interface ReadingComprehensionAnswer {
+  questionId: string;
+  response: string;
+}
+
 export type ListeningEventType = "play" | "replay" | "difficulty-signal" | "answer";
 
 export interface ListeningEvent {
@@ -131,6 +136,7 @@ export interface LessonSession {
   storyComplete: boolean;
   vocabularyAnswers: VocabularyAnswer[];
   grammarAnswers: GrammarAnswer[];
+  readingAnswers: ReadingComprehensionAnswer[];
   readingEvents: ReadingEvent[];
   readingComplete: boolean;
   listeningEvents: ListeningEvent[];

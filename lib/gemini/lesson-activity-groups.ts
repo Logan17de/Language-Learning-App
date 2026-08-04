@@ -1,6 +1,7 @@
 import "server-only";
 
 import { storyWordScript } from "@/lib/story-support";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   generateStructured,
   type JsonSchema,
@@ -21,6 +22,8 @@ import {
   type RawGrammarQuestions,
 } from "@/lib/gemini/grammar-question-contract";
 import { storyUsesGrammarPattern } from "@/lib/gemini/lesson-validation";
+import { generateReadingRegion } from "@/lib/gemini/reading-region-generation";
+import type { RawReadingQuestion } from "@/lib/gemini/reading-comprehension-contract";
 import {
   vocabularyQuestionFormats,
   vocabularyQuestionsPrompt,
@@ -64,6 +67,7 @@ export interface ReadingLine {
   japanese: string;
   english: string;
   targetItemIds: string[];
+  inspectableTerms?: InspectableTerm[];
 }
 
 export interface ListeningExercise {
@@ -102,7 +106,10 @@ export interface VocabularyKanjiGroup {
 
 export interface GrammarReadingGroup {
   grammarQuestions: PracticeQuestion[];
+  readingTitle: string;
+  readingJapaneseTitle: string;
   readingConversation: ReadingLine[];
+  readingQuestions: RawReadingQuestion[];
 }
 
 export interface CommunicationGroup {
@@ -153,18 +160,6 @@ function stringArray(minItems = 0, maxItems = 100): JsonSchema {
 }
 
 const targetIdsSchema = stringArray(1, 5);
-
-const readingLineSchema: JsonSchema = {
-  type: "object",
-  additionalProperties: false,
-  required: ["speaker", "japanese", "english", "targetItemIds"],
-  properties: {
-    speaker: { type: "string" },
-    japanese: { type: "string" },
-    english: { type: "string" },
-    targetItemIds: targetIdsSchema,
-  },
-};
 
 const listeningSchema: JsonSchema = {
   type: "object",
@@ -296,24 +291,6 @@ function choiceIssues(item: Record<string, unknown>, label: string): string[] {
   }
   if (duplicateChoices(choices)) issues.push(`${label} repeats a choice.`);
   return issues;
-}
-
-function readingIssues(value: unknown, library: ResolvedLessonLibrary): string[] {
-  if (!isRecord(value) || !Array.isArray(value.readingConversation) || value.readingConversation.length !== 6) {
-    return ["readingConversation needs exactly 6 lines."];
-  }
-  const allowedIds = allowedLibraryIds(library);
-  return value.readingConversation.flatMap((candidate, index) => {
-    if (!isRecord(candidate)) return [`Reading line ${index + 1} must be an object.`];
-    const issues = targetIssues(candidate, `Reading line ${index + 1}`, allowedIds);
-    if (typeof candidate.japanese !== "string" || !hasJapanese(candidate.japanese)) {
-      issues.push(`Reading line ${index + 1} needs Japanese text.`);
-    }
-    if (typeof candidate.english !== "string" || !candidate.english.trim()) {
-      issues.push(`Reading line ${index + 1} needs an English translation.`);
-    }
-    return issues;
-  });
 }
 
 function communicationIssues(value: unknown, library: ResolvedLessonLibrary): string[] {
@@ -809,6 +786,8 @@ export async function generateVocabularyAndKanjiActivities(input: {
 }
 
 export async function generateGrammarAndReadingActivities(input: {
+  requestId?: string;
+  admin?: SupabaseClient;
   topic: string;
   level: JLPTLevel;
   draft: StoryDraft;
@@ -831,32 +810,23 @@ export async function generateGrammarAndReadingActivities(input: {
       exactSchemaName: true,
       validate: (value) => rawGrammarQuestionIssues(value, targets),
     }),
-    generateGroup<{ readingConversation: ReadingLine[] }>({
-      name: "reading conversation activities",
-      stage: "grammar_reading_activities",
-      prompt: [
-        "Create only AIko's six-line reading conversation for the fixed story.",
-        `JLPT ceiling: ${input.level}. Topic: ${input.topic}.`,
-        "Use only supplied library IDs and facts. Do not rewrite the story.",
-        "Return exactly six natural Japanese lines with accurate English translations.",
-        JSON.stringify(context(input, ["vocabulary", "grammar"])),
-      ],
-      schema: {
-        type: "object",
-        additionalProperties: false,
-        required: ["readingConversation"],
-        properties: {
-          readingConversation: objectArray(6, 6, readingLineSchema),
-        },
-      },
-      validate: (value) => readingIssues(value, input.library),
+    generateReadingRegion({
+      requestId: input.requestId,
+      admin: input.admin,
+      topic: input.topic,
+      level: input.level,
+      draft: input.draft,
+      library: input.library,
     }),
   ]);
 
   return {
     value: {
       grammarQuestions: adaptGrammarQuestions(grammar.value.questions, targets),
-      readingConversation: reading.value.readingConversation,
+      readingTitle: reading.title,
+      readingJapaneseTitle: reading.japaneseTitle,
+      readingConversation: reading.lines,
+      readingQuestions: reading.questions,
     },
     audit: {
       stage: "grammar_reading_activities",
@@ -1001,6 +971,31 @@ export function buildInteractiveStory(
   };
 }
 
+function sentenceParts(value: string, japanese: boolean): string[] {
+  const matcher = japanese
+    ? /[^。！？!?]+[。！？!?]?/gu
+    : /[^.!?]+[.!?]?/gu;
+  return (value.match(matcher) ?? [value])
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function playableStoryLines(
+  draft: StoryDraft,
+  library: ResolvedLessonLibrary,
+): Array<{ japanese: string; english: string; words: InspectableTerm[] }> {
+  return draft.lines.flatMap((line) => {
+    const japanese = sentenceParts(line.japanese, true);
+    const english = sentenceParts(line.english, false);
+    const words = storyWords(line, library);
+    return japanese.map((sentence, index) => ({
+      japanese: sentence,
+      english: english[index] ?? "",
+      words: words.filter((word) => sentence.includes(word.surface)),
+    }));
+  });
+}
+
 export function assemblePlayableLesson(input: {
   topic: string;
   level: JLPTLevel;
@@ -1014,6 +1009,13 @@ export function assemblePlayableLesson(input: {
     inspectableTerms: inspectableTerms([question.prompt, question.cue], input.library),
   });
   const unique = <T,>(items: T[]): T[] => [...new Set(items)];
+  const targetKanji = input.library.generationContext?.targetKanji ?? [];
+  const packageKanji = targetKanji.length > 0
+    ? targetKanji.flatMap((character) => {
+        const item = input.library.kanji.find((candidate) => candidate.character === character);
+        return item ? [item] : [];
+      })
+    : input.library.kanji.slice(0, 5);
   return {
     schemaVersion: 2,
     title: input.draft.title,
@@ -1021,7 +1023,7 @@ export function assemblePlayableLesson(input: {
     summary: input.draft.summary,
     storyPreview: input.draft.storyPreview,
     tags: unique([input.level, input.topic, ...input.draft.tags]).slice(0, 8),
-    kanji: input.library.kanji.map((item) => ({
+    kanji: packageKanji.map((item) => ({
       libraryId: item.libraryId,
       character: item.character,
       reading: item.readings[0] ?? item.character,
@@ -1038,17 +1040,22 @@ export function assemblePlayableLesson(input: {
       translation: item.nuance || item.meaning,
       commonMistake: "",
     })),
-    story: input.draft.lines.map((line) => ({
-      japanese: line.japanese,
-      english: line.english,
-      words: storyWords(line, input.library),
-    })),
+    story: playableStoryLines(input.draft, input.library),
     vocabularyQuestions: input.groups.vocabularyAndKanji.vocabularyQuestions.map(withTerms),
     grammarQuestions: input.groups.grammarAndReading.grammarQuestions.map(withTerms),
+    readingTitle: input.groups.grammarAndReading.readingTitle,
+    readingJapaneseTitle: input.groups.grammarAndReading.readingJapaneseTitle,
     readingConversation: input.groups.grammarAndReading.readingConversation.map((line) => ({
       ...line,
-      inspectableTerms: inspectableTerms([line.japanese, line.english], input.library),
+      inspectableTerms: line.inspectableTerms ??
+        inspectableTerms([line.japanese, line.english], input.library),
     })),
+    readingQuestions: input.groups.grammarAndReading.readingQuestions.map(
+      (question, index) => ({
+        id: `reading-question-${index + 1}`,
+        ...question,
+      }),
+    ),
     listeningExercises: input.groups.communication.listeningExercises.map((exercise) => ({
       ...exercise,
       inspectableTerms: inspectableTerms([exercise.prompt, exercise.transcript], input.library),

@@ -44,6 +44,14 @@ const grammarContract = readFileSync(
   "lib/gemini/grammar-question-contract.ts",
   "utf8",
 );
+const readingContract = readFileSync(
+  "lib/gemini/reading-comprehension-contract.ts",
+  "utf8",
+);
+const readingGeneration = readFileSync(
+  "lib/gemini/reading-region-generation.ts",
+  "utf8",
+);
 const structured = readFileSync("lib/openai/structured-output.ts", "utf8");
 const structuredText = readFileSync("lib/openai/structured-text.ts", "utf8");
 const compatibilityExport = readFileSync(
@@ -75,6 +83,10 @@ const migration = readFileSync(
 );
 const enrichmentMigration = readFileSync(
   "supabase/migrations/20260804090000_simple_story_vocabulary_enrichment.sql",
+  "utf8",
+);
+const readingMigration = readFileSync(
+  "supabase/migrations/20260804160000_reading_comprehension_pipeline.sql",
   "utf8",
 );
 
@@ -256,6 +268,26 @@ describe("custom lesson story pipeline v3", () => {
     expect(grammarContract).toContain('required: [\n          "format_id"');
   });
 
+  it("generates, enriches, and questions a separate reading passage in order", () => {
+    expect(readingContract).toContain("Generate a Japanese language-learning story for reading.");
+    expect(readingContract).toContain("Create reading-comprehension questions from the following Japanese story.");
+    expect(readingContract).toContain("Write essay-style questions in Japanese.");
+    expect(readingContract).toContain("Medium questions must combine information from two or more story sentences.");
+    expect(readingContract).toContain('required: ["difficulty", "question", "answer"]');
+    expect(readingGeneration.indexOf("prompt: readingPassagePrompt")).toBeLessThan(
+      readingGeneration.indexOf("prompt: storyEnrichmentPrompt(passage.value.japanese_story)"),
+    );
+    expect(readingGeneration.indexOf("prompt: storyEnrichmentPrompt(passage.value.japanese_story)")).toBeLessThan(
+      readingGeneration.indexOf("prompt: readingQuestionsPrompt"),
+    );
+    expect(readingGeneration).toContain('name: "reading_lesson"');
+    expect(readingGeneration).toContain('name: "reading_vocabulary"');
+    expect(readingGeneration).toContain('name: "reading_questions"');
+    expect(readingGeneration).toContain('rpc("store_story_vocabulary_enrichment"');
+    expect(readingMigration).toContain("create table public.lesson_reading_questions");
+    expect(readingMigration).toContain("jsonb_array_length(p_package->'readingQuestions')");
+  });
+
   it("records exact group errors and does not mislabel finalization failures", () => {
     expect(runner).toContain('console.error("Custom lesson activity groups failed."');
     expect(runner).toContain("failures: details");
@@ -278,9 +310,12 @@ describe("custom lesson story pipeline v3", () => {
     expect(structured).toContain("cachedInputTokens");
   });
 
-  it("keeps reading STT-only and listening stored-TTS plus MCQ-only", () => {
-    expect(reading).toContain("MediaRecorder");
-    expect(reading).toContain('/api/audio/transcribe');
+  it("keeps reading written and inspectable while listening stays stored-TTS plus MCQ-only", () => {
+    expect(reading).toContain("lesson.readingQuestions ?? []");
+    expect(reading).toContain("<InspectableText");
+    expect(reading).toContain("<textarea");
+    expect(reading).not.toContain("MediaRecorder");
+    expect(reading).not.toContain("/api/audio/transcribe");
     expect(audioControl).toContain('const readingSttOnly = label === "Hear this line"');
     expect(audioControl).toContain("if (readingSttOnly) return null");
     expect(listening).toContain("<AudioControl");

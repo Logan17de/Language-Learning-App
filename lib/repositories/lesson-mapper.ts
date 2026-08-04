@@ -28,8 +28,8 @@ const defaultPhases: LessonPhase[] = [
   },
   {
     id: "reading",
-    label: "Read aloud",
-    description: "Practice rhythm and recognition",
+    label: "Reading",
+    description: "Read closely and answer in Japanese",
   },
   {
     id: "listening",
@@ -419,14 +419,24 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
       };
     }),
     images: [],
+    readingTitle: metadataText(value.version.metadata, "readingTitle") || undefined,
+    readingJapaneseTitle:
+      metadataText(value.version.metadata, "readingJapaneseTitle") || undefined,
     readingConversation: value.reading.map((item) => ({
       speaker: item.speaker,
       japanese: item.japanese_text,
       english: item.translation,
+      inspectableTerms: inspectableTerms(item.inspectable_terms),
       audioAssetId:
         "audio_asset_id" in item && typeof item.audio_asset_id === "string"
           ? item.audio_asset_id
           : undefined,
+    })),
+    readingQuestions: value.readingQuestions.map((item) => ({
+      id: item.id,
+      difficulty: item.difficulty,
+      question: item.question,
+      answer: item.answer,
     })),
     listeningExercises: value.listening.map((item, index) => ({
       id: item.id,

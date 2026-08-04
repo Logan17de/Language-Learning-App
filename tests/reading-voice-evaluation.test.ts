@@ -3,34 +3,38 @@ import { describe, expect, it } from "vitest";
 
 const reading = readFileSync("components/lesson/reading-phase.tsx", "utf8");
 const sessionTypes = readFileSync("types/lesson-session.ts", "utf8");
+const lessonTypes = readFileSync("types/lesson.ts", "utf8");
 
-describe("reading voice evaluation contract", () => {
-  it("records and transcribes before completing the reading phase", () => {
-    expect(reading).toContain("navigator.mediaDevices.getUserMedia({ audio: true })");
-    expect(reading).toContain("new MediaRecorder");
-    expect(reading).toContain('fetch("/api/audio/transcribe"');
-    expect(reading).toContain('type: "voice-evaluation"');
-    expect(reading).toContain("speechMatch");
-    expect(reading).toContain("readingComplete: true");
-    expect(reading.indexOf('fetch("/api/audio/transcribe"')).toBeLessThan(
-      reading.indexOf("readingComplete: true"),
-    );
+describe("reading comprehension contract", () => {
+  it("uses a written Japanese question flow without speaking controls", () => {
+    expect(reading).toContain("lesson.readingQuestions ?? []");
+    expect(reading).toContain("日本語で答えてください");
+    expect(reading).toContain("<textarea");
+    expect(reading).toContain("Save answer");
+    expect(reading).not.toContain("MediaRecorder");
+    expect(reading).not.toContain("/api/audio/transcribe");
   });
 
-  it("does not create confidence from timer position alone", () => {
-    expect(reading).not.toContain("Timer only · no recording");
-    expect(reading).not.toContain("createStopEvent");
-    expect(reading).not.toContain("Medium confidence");
-    expect(reading).not.toContain("Retry marked phrase");
-    expect(reading).toContain("Nothing was scored. Try again.");
-    expect(reading).toContain("No reading result is created without a recording.");
+  it("locks submitted answers and shows a reference without exact-match scoring", () => {
+    expect(reading).toContain("disabled={Boolean(submitted)}");
+    expect(reading).toContain("Reference answer");
+    expect(reading).toContain("Your wording may be different");
+    expect(reading).not.toContain("response === question.answer");
+    expect(reading).not.toContain("pronunciation");
   });
 
-  it("labels transcription comparison without claiming pronunciation scoring", () => {
-    expect(sessionTypes).toContain('| "voice-evaluation"');
-    expect(sessionTypes).toContain("speechMatch?: number");
-    expect(sessionTypes).toContain("transcript?: string");
-    expect(reading).toContain("Speech match");
-    expect(reading).toContain("It is not phoneme-level pronunciation scoring.");
+  it("stores answers and completes only after all questions are answered", () => {
+    expect(sessionTypes).toContain("interface ReadingComprehensionAnswer");
+    expect(sessionTypes).toContain("readingAnswers: ReadingComprehensionAnswer[]");
+    expect(lessonTypes).toContain("interface ReadingComprehensionQuestion");
+    expect(reading).toContain("readingAnswers: nextAnswers");
+    expect(reading).toContain("readingComplete: nextAnswers.length >= questions.length");
+  });
+
+  it("keeps the reading passage inspectable and reveals English after completion", () => {
+    expect(reading).toContain("<InspectableText");
+    expect(reading).toContain("inspectableTerms");
+    expect(reading).toContain("View English translation");
+    expect(reading).toContain("complete || session.readingComplete");
   });
 });
