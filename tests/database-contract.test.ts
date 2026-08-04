@@ -9,6 +9,10 @@ const authoring = readFileSync("supabase/migrations/20260724090400_draft_authori
 const assignment = readFileSync("supabase/migrations/20260725090000_adaptive_lesson_assignment.sql", "utf8");
 const customLessonEngine = readFileSync("supabase/migrations/20260726220000_custom_lesson_library_engine.sql", "utf8");
 const jlptCatalogs = readFileSync("supabase/migrations/20260726230000_jlpt_catalogs.sql", "utf8");
+const generatedLessonVocabularyCapacity = readFileSync(
+  "supabase/migrations/20260804200000_generated_lesson_package_vocabulary_capacity.sql",
+  "utf8",
+);
 
 describe("Supabase integration contract", () => {
   it("pins sessions to a lesson version and makes rewards database-idempotent", () => {
@@ -85,5 +89,17 @@ describe("Supabase integration contract", () => {
     expect(jlptCatalogs).toContain("kanji_catalog_authenticated_read");
     expect(jlptCatalogs).toContain("grammar_catalog_authenticated_read");
     expect(jlptCatalogs.match(/\('.*', 'N[1-5]'::public\.jlpt_level, \d+\)/g)?.length).toBe(2777);
+  });
+
+  it("stores complete story enrichment with actionable package diagnostics", () => {
+    expect(generatedLessonVocabularyCapacity).toContain(
+      "not between 8 and 200",
+    );
+    expect(generatedLessonVocabularyCapacity).toContain(
+      "vocabulary must contain 8 to 200 items (received %)",
+    );
+    expect(generatedLessonVocabularyCapacity).toContain(
+      "perform public.assert_playable_lesson_package_shape(p_package)",
+    );
   });
 });
