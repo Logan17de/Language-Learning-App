@@ -40,6 +40,10 @@ const vocabularyContract = readFileSync(
   "lib/gemini/vocabulary-question-contract.ts",
   "utf8",
 );
+const grammarContract = readFileSync(
+  "lib/gemini/grammar-question-contract.ts",
+  "utf8",
+);
 const structured = readFileSync("lib/openai/structured-output.ts", "utf8");
 const structuredText = readFileSync("lib/openai/structured-text.ts", "utf8");
 const compatibilityExport = readFileSync(
@@ -220,8 +224,8 @@ describe("custom lesson story pipeline v3", () => {
       runner.indexOf("await persistGroup(admin, job, group, payload, audit)"),
     );
     expect(runner).toContain("payload = approval.payload as GroupPayload");
-    expect(runner).toContain('group === "grammar_and_reading"');
     expect(runner).toContain('group === "listening_and_speaking"');
+    expect(runner).not.toContain('group === "grammar_and_reading" ||');
     expect(runner).not.toContain('if (group !== "final_review")');
   });
 
@@ -237,6 +241,19 @@ describe("custom lesson story pipeline v3", () => {
     expect(existingLibrary).toContain("filterStoryPracticeKanji");
     expect(existingLibrary).toContain("knownKanji: input.plan.knownKanji");
     expect(existingLibrary).toContain("targetKanji: input.plan.kanji.map");
+  });
+
+  it("creates grammar questions from the corrected grammar sample contract", () => {
+    expect(activityGroups).toContain('name: "grammar_questions"');
+    expect(activityGroups).toContain("grammarQuestionsPrompt");
+    expect(activityGroups).toContain("grammarQuestionsSchema");
+    expect(activityGroups).toContain("rawGrammarQuestionIssues");
+    expect(activityGroups).toContain("adaptGrammarQuestions");
+    expect(activityGroups).toContain("filterStoryGrammarPatterns");
+    expect(grammarContract).toContain("Create grammar questions from this Japanese story.");
+    expect(grammarContract).toContain("Create exactly 10 questions: 3 easy, 4 medium, and 3 hard.");
+    expect(grammarContract).toContain("Do not create questions using grammar patterns that do not appear in the story.");
+    expect(grammarContract).toContain('required: [\n          "format_id"');
   });
 
   it("records exact group errors and does not mislabel finalization failures", () => {

@@ -80,8 +80,8 @@ describe("custom lesson engine contract", () => {
     expect(groups).toContain("generateGrammarAndReadingActivities");
     expect(groups).toContain("generateListeningAndSpeakingActivities");
     expect(groups).toContain("generateFinalReviewActivities");
-    expect(groups).toContain("6 Easy, 4 Medium, 3 Hard");
-    expect(groups).toContain("visible Japanese sentence beginning in hintFront");
+    expect(groups).toContain("vocabularyQuestionsPrompt");
+    expect(groups).toContain("grammarQuestionsPrompt");
     expect(durableMigration).toContain("for update skip locked");
     expect(durableMigration).toContain("interval '10 minutes'");
     expect(durableMigration).toContain("completed_groups");

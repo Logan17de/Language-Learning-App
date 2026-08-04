@@ -13,6 +13,15 @@ import type {
   StoryDraft,
 } from "@/lib/gemini/lesson-engine-v2";
 import {
+  filterStoryGrammarPatterns,
+  grammarQuestionFormats,
+  grammarQuestionsPrompt,
+  grammarQuestionsSchema,
+  type RawGrammarQuestion,
+  type RawGrammarQuestions,
+} from "@/lib/gemini/grammar-question-contract";
+import { storyUsesGrammarPattern } from "@/lib/gemini/lesson-validation";
+import {
   vocabularyQuestionFormats,
   vocabularyQuestionsPrompt,
   vocabularyQuestionsSchema,
@@ -144,53 +153,6 @@ function stringArray(minItems = 0, maxItems = 100): JsonSchema {
 }
 
 const targetIdsSchema = stringArray(1, 5);
-
-function practiceSchema(phase: "vocabulary" | "grammar"): JsonSchema {
-  return {
-    type: "object",
-    additionalProperties: false,
-    required: [
-      "activityType",
-      "difficulty",
-      "mode",
-      "skill",
-      "prompt",
-      "cue",
-      "choices",
-      "correctAnswer",
-      "acceptedAnswers",
-      "explanation",
-      "hintFront",
-      "hintBack",
-      "targetItemIds",
-    ],
-    properties: {
-      activityType: {
-        type: "string",
-        enum: phase === "vocabulary"
-          ? ["multiple_choice"]
-          : ["multiple_choice", "text_input"],
-      },
-      difficulty: { type: "string", enum: ["Easy", "Medium", "Hard"] },
-      mode: {
-        type: "string",
-        enum: phase === "vocabulary"
-          ? ["kanji-reading", "reading-meaning", "meaning-japanese", "mixed"]
-          : ["grammar"],
-      },
-      skill: { type: "string", enum: ["understanding", "production"] },
-      prompt: { type: "string" },
-      cue: { type: "string" },
-      choices: stringArray(0, 4),
-      correctAnswer: { type: "string" },
-      acceptedAnswers: stringArray(1, 5),
-      explanation: { type: "string" },
-      hintFront: { type: "string" },
-      hintBack: { type: "string" },
-      targetItemIds: targetIdsSchema,
-    },
-  };
-}
 
 const readingLineSchema: JsonSchema = {
   type: "object",
@@ -334,67 +296,6 @@ function choiceIssues(item: Record<string, unknown>, label: string): string[] {
   }
   if (duplicateChoices(choices)) issues.push(`${label} repeats a choice.`);
   return issues;
-}
-
-function practiceIssues(
-  value: unknown,
-  key: "vocabularyQuestions" | "grammarQuestions",
-  library: ResolvedLessonLibrary,
-): string[] {
-  if (!isRecord(value) || !Array.isArray(value[key]) || value[key].length !== 13) {
-    return [`${key} needs exactly 13 items.`];
-  }
-  const items = value[key] as unknown[];
-  const issues: string[] = [];
-  const counts = difficultyCounts(items);
-  if (counts.Easy !== 6 || counts.Medium !== 4 || counts.Hard !== 3) {
-    issues.push(`${key} needs 6 Easy, 4 Medium, and 3 Hard items.`);
-  }
-  const allowedIds = allowedLibraryIds(library);
-  items.forEach((candidate, index) => {
-    const label = `${key} item ${index + 1}`;
-    if (!isRecord(candidate)) {
-      issues.push(`${label} must be an object.`);
-      return;
-    }
-    issues.push(...targetIssues(candidate, label, allowedIds));
-    issues.push(...choiceIssues(candidate, label));
-    const answer = typeof candidate.correctAnswer === "string"
-      ? normalized(candidate.correctAnswer)
-      : "";
-    const accepted = Array.isArray(candidate.acceptedAnswers)
-      ? candidate.acceptedAnswers.filter((item): item is string => typeof item === "string")
-      : [];
-    if (!answer || accepted.length < 1 || !accepted.some((item) => normalized(item) === answer)) {
-      issues.push(`${label} needs acceptedAnswers containing the correct answer.`);
-    }
-    if (candidate.activityType === "multiple_choice" && (candidate.choices as unknown[]).length !== 4) {
-      issues.push(`${label} needs exactly four choices.`);
-    }
-    if (candidate.activityType === "text_input") {
-      if ((candidate.choices as unknown[]).length !== 0) {
-        issues.push(`${label} text input must not include choices.`);
-      }
-      const stem = typeof candidate.hintFront === "string" ? candidate.hintFront.trim() : "";
-      if (!stem || !/_{2,}|＿{2,}|…/.test(stem)) {
-        issues.push(`${label} needs a visible Japanese sentence stem with a blank in hintFront.`);
-      }
-      if (answer && normalized(stem).includes(answer)) {
-        issues.push(`${label} leaks its answer in hintFront.`);
-      }
-    }
-    if (candidate.skill === "production") {
-      const prompt = typeof candidate.prompt === "string" ? candidate.prompt : "";
-      const cue = typeof candidate.cue === "string" ? candidate.cue : "";
-      if (hasJapanese(prompt) || hasJapanese(cue)) {
-        issues.push(`${label} production prompt and cue must be English-only.`);
-      }
-      if (answer && `${normalized(prompt)} ${normalized(cue)}`.includes(answer)) {
-        issues.push(`${label} leaks its answer in the prompt.`);
-      }
-    }
-  });
-  return [...new Set(issues)];
 }
 
 function readingIssues(value: unknown, library: ResolvedLessonLibrary): string[] {
@@ -671,6 +572,192 @@ function adaptVocabularyQuestions(
   };
 }
 
+function grammarQuestionText(
+  question: RawGrammarQuestion,
+  includeDistractors: boolean,
+): string {
+  const filledSentence = (question.sentence ?? "").replace(
+    /_{2,}|＿{2,}|<[^>]*BLANK[^>]*>/giu,
+    question.answer,
+  );
+  return [
+    question.question,
+    question.sentence ?? "",
+    filledSentence,
+    question.answer,
+    ...(includeDistractors ? question.choices : []),
+  ]
+    .join("\n")
+    .normalize("NFKC")
+    .replace(/\s+/gu, "");
+}
+
+function storyGrammarTargets(
+  draft: StoryDraft,
+  library: ResolvedLessonLibrary,
+): ResolvedLessonLibrary["grammar"] {
+  const story = draft.lines.map((line) => line.japanese).join("");
+  const allowedPatterns = new Set(filterStoryGrammarPatterns({
+    japaneseStory: story,
+    targetGrammarPatterns: library.grammar.map((item) => item.pattern),
+  }));
+  return library.grammar.filter((item) =>
+    allowedPatterns.has(item.pattern),
+  );
+}
+
+function grammarTargetsForQuestion(
+  question: RawGrammarQuestion,
+  targets: ResolvedLessonLibrary["grammar"],
+): ResolvedLessonLibrary["grammar"] {
+  const primaryEvidence = grammarQuestionText(question, false);
+  const primary = targets.filter((item) =>
+    storyUsesGrammarPattern(primaryEvidence, item.pattern),
+  );
+  if (primary.length > 0) return primary;
+
+  const fallbackEvidence = grammarQuestionText(question, true);
+  return targets.filter((item) =>
+    storyUsesGrammarPattern(fallbackEvidence, item.pattern),
+  );
+}
+
+function matchesQuestionTemplate(value: string, template: string): boolean {
+  const expression = template
+    .split(/(<[^>]+>)/gu)
+    .map((part) => part.startsWith("<") && part.endsWith(">")
+      ? ".+"
+      : part.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&"))
+    .join("");
+  return new RegExp(`^${expression}$`, "u").test(value.trim());
+}
+
+function rawGrammarQuestionIssues(
+  value: unknown,
+  targets: ResolvedLessonLibrary["grammar"],
+): string[] {
+  if (!isRecord(value) || !Array.isArray(value.questions)) {
+    return ["Grammar response must contain questions."];
+  }
+  const questions = value.questions;
+  const issues: string[] = [];
+  const coveredTargetIds = new Set<string>();
+  if (questions.length !== 10) {
+    issues.push("Grammar response needs exactly 10 questions.");
+  }
+  const counts = { easy: 0, medium: 0, hard: 0 };
+  questions.forEach((candidate, index) => {
+    const label = `Grammar question ${index + 1}`;
+    if (!isRecord(candidate)) {
+      issues.push(`${label} must be an object.`);
+      return;
+    }
+    const difficulty = candidate.difficulty;
+    if (difficulty === "easy" || difficulty === "medium" || difficulty === "hard") {
+      counts[difficulty] += 1;
+    }
+    const formatId = Number(candidate.format_id);
+    const format = grammarQuestionFormats.find((item) => Number(item.id) === formatId);
+    if (!format) {
+      issues.push(`${label} uses an unavailable format_id.`);
+    } else if (
+      difficulty !== "easy" &&
+      difficulty !== "medium" &&
+      difficulty !== "hard"
+    ) {
+      issues.push(`${label} has an invalid difficulty.`);
+    } else if (!format.difficulty.includes(difficulty)) {
+      issues.push(`${label} uses format ${formatId} at an unsupported difficulty.`);
+    }
+    if (
+      format &&
+      typeof candidate.question === "string" &&
+      !matchesQuestionTemplate(candidate.question, format.question)
+    ) {
+      issues.push(`${label} does not follow question format ${formatId} exactly.`);
+    }
+    if (format?.sentence) {
+      if (typeof candidate.sentence !== "string" || !candidate.sentence.trim()) {
+        issues.push(`${label} needs the sentence required by format ${formatId}.`);
+      } else if (
+        format.sentence.includes("WITH_BLANK") &&
+        !/_{2,}|＿{2,}|<[^>]*BLANK[^>]*>/iu.test(candidate.sentence)
+      ) {
+        issues.push(`${label} needs a visible blank in its sentence.`);
+      }
+    } else if (candidate.sentence !== null) {
+      issues.push(`${label} must use a null sentence for format ${formatId}.`);
+    }
+    if (
+      !Array.isArray(candidate.choices) ||
+      candidate.choices.length !== 4 ||
+      !candidate.choices.every((choice) => typeof choice === "string")
+    ) {
+      issues.push(`${label} needs exactly four string choices.`);
+    } else {
+      const choices = candidate.choices as string[];
+      if (duplicateChoices(choices)) issues.push(`${label} repeats a choice.`);
+      const answer = typeof candidate.answer === "string" ? normalized(candidate.answer) : "";
+      if (!answer || choices.filter((choice) => normalized(choice) === answer).length !== 1) {
+        issues.push(`${label} must contain its answer exactly once.`);
+      }
+    }
+    if (
+      typeof candidate.question !== "string" ||
+      !candidate.question.trim() ||
+      (candidate.sentence !== null && typeof candidate.sentence !== "string") ||
+      typeof candidate.answer !== "string"
+    ) {
+      issues.push(`${label} has incomplete question content.`);
+      return;
+    }
+    const matchedTargets = grammarTargetsForQuestion(
+      candidate as unknown as RawGrammarQuestion,
+      targets,
+    );
+    if (matchedTargets.length < 1) {
+      issues.push(`${label} does not test a provided grammar pattern from the story.`);
+    }
+    matchedTargets.forEach((target) => coveredTargetIds.add(target.libraryId));
+  });
+  if (counts.easy !== 3 || counts.medium !== 4 || counts.hard !== 3) {
+    issues.push("Grammar response needs 3 easy, 4 medium, and 3 hard questions.");
+  }
+  for (const target of targets) {
+    if (!coveredTargetIds.has(target.libraryId)) {
+      issues.push(`Grammar response does not test target pattern ${target.pattern}.`);
+    }
+  }
+  return [...new Set(issues)];
+}
+
+function adaptGrammarQuestions(
+  questions: RawGrammarQuestion[],
+  targets: ResolvedLessonLibrary["grammar"],
+): PracticeQuestion[] {
+  return questions.map((question) => {
+    const target = grammarTargetsForQuestion(question, targets)[0];
+    if (!target) {
+      throw new Error("A grammar question could not be linked to its story pattern.");
+    }
+    return {
+      activityType: "multiple_choice",
+      difficulty: rawDifficulty(question.difficulty),
+      mode: "grammar",
+      skill: "understanding",
+      prompt: question.question,
+      cue: question.sentence ?? "",
+      choices: question.choices,
+      correctAnswer: question.answer,
+      acceptedAnswers: [question.answer],
+      explanation: `The correct answer is ${question.answer}.`,
+      hintFront: "",
+      hintBack: "",
+      targetItemIds: [target.libraryId],
+    } satisfies PracticeQuestion;
+  });
+}
+
 async function generateGroup<T>(input: {
   name: string;
   stage: GenerationAuditEntry["stage"];
@@ -727,34 +814,58 @@ export async function generateGrammarAndReadingActivities(input: {
   draft: StoryDraft;
   library: ResolvedLessonLibrary;
 }): Promise<ActivityGroupResult<GrammarReadingGroup>> {
-  return generateGroup<GrammarReadingGroup>({
-    name: "grammar and reading activities",
-    stage: "grammar_reading_activities",
-    prompt: [
-      "Create only AIko's grammar bank and reading conversation for the fixed story.",
-      `JLPT ceiling: ${input.level}. Topic: ${input.topic}.`,
-      "Return 13 grammar questions (6 Easy, 4 Medium, 3 Hard) and exactly 6 reading lines.",
-      "Use only supplied library IDs and facts. Do not rewrite the story.",
-      "Production prompt and cue must be English-only and must never contain the Japanese answer.",
-      "For every text-input question, put the visible Japanese sentence beginning in hintFront and replace only the requested ending with ___. The learner must always see enough Japanese context to answer.",
-      "Multiple-choice questions need four distinct choices including the answer.",
-      "Keep feedback encouraging, but never praise an incorrect answer.",
-      JSON.stringify(context(input, ["vocabulary", "grammar"])),
-    ],
-    schema: {
-      type: "object",
-      additionalProperties: false,
-      required: ["grammarQuestions", "readingConversation"],
-      properties: {
-        grammarQuestions: objectArray(13, 13, practiceSchema("grammar")),
-        readingConversation: objectArray(6, 6, readingLineSchema),
+  const targets = storyGrammarTargets(input.draft, input.library);
+  if (targets.length < 1) {
+    throw new Error("No target grammar patterns appear in the generated story.");
+  }
+
+  const [grammar, reading] = await Promise.all([
+    generateStructured<RawGrammarQuestions>({
+      name: "grammar_questions",
+      prompt: grammarQuestionsPrompt({
+        japaneseStory: input.draft.lines.map((line) => line.japanese).join(""),
+        targetGrammarPatterns: targets.map((item) => item.pattern),
+      }),
+      schema: grammarQuestionsSchema,
+      strictSchema: true,
+      exactSchemaName: true,
+      validate: (value) => rawGrammarQuestionIssues(value, targets),
+    }),
+    generateGroup<{ readingConversation: ReadingLine[] }>({
+      name: "reading conversation activities",
+      stage: "grammar_reading_activities",
+      prompt: [
+        "Create only AIko's six-line reading conversation for the fixed story.",
+        `JLPT ceiling: ${input.level}. Topic: ${input.topic}.`,
+        "Use only supplied library IDs and facts. Do not rewrite the story.",
+        "Return exactly six natural Japanese lines with accurate English translations.",
+        JSON.stringify(context(input, ["vocabulary", "grammar"])),
+      ],
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["readingConversation"],
+        properties: {
+          readingConversation: objectArray(6, 6, readingLineSchema),
+        },
       },
+      validate: (value) => readingIssues(value, input.library),
+    }),
+  ]);
+
+  return {
+    value: {
+      grammarQuestions: adaptGrammarQuestions(grammar.value.questions, targets),
+      readingConversation: reading.value.readingConversation,
     },
-    validate: (value) => [
-      ...practiceIssues(value, "grammarQuestions", input.library),
-      ...readingIssues(value, input.library),
-    ],
-  });
+    audit: {
+      stage: "grammar_reading_activities",
+      model: grammar.model === reading.audit.model
+        ? grammar.model
+        : `${grammar.model}, ${reading.audit.model}`,
+      repaired: grammar.repaired || reading.audit.repaired,
+    },
+  };
 }
 
 export async function generateListeningAndSpeakingActivities(input: {

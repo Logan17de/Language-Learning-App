@@ -136,6 +136,14 @@ describe("learning engine V2 contracts", () => {
       resolve(process.cwd(), "lib/gemini/lesson-activity-groups.ts"),
       "utf8",
     );
+    const vocabularyContract = readFileSync(
+      resolve(process.cwd(), "lib/gemini/vocabulary-question-contract.ts"),
+      "utf8",
+    );
+    const grammarContract = readFileSync(
+      resolve(process.cwd(), "lib/gemini/grammar-question-contract.ts"),
+      "utf8",
+    );
 
     expect(migration).toContain(
       "jsonb_array_length(p_package->'vocabularyQuestions') not between 10 and 13",
@@ -143,8 +151,10 @@ describe("learning engine V2 contracts", () => {
     expect(migration).toContain(
       "jsonb_array_length(p_package->'grammarQuestions') not between 10 and 13",
     );
-    expect(activityGroups).toContain("6 Easy, 4 Medium, 3 Hard");
-    expect(activityGroups).toContain("objectArray(13, 13");
+    expect(vocabularyContract).toContain("6 easy, 4 medium, and 3 hard");
+    expect(grammarContract).toContain("3 easy, 4 medium, and 3 hard");
+    expect(activityGroups).toContain('name: "vocab_questions"');
+    expect(activityGroups).toContain('name: "grammar_questions"');
     expect(engine).toContain("generateVocabularyAndKanjiActivities");
   });
 

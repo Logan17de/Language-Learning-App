@@ -8,6 +8,12 @@ import {
   storyEnrichmentPrompt,
 } from "@/lib/gemini/simple-story-enrichment-contract";
 import {
+  filterStoryGrammarPatterns,
+  grammarQuestionFormats,
+  grammarQuestionsPrompt,
+  grammarQuestionsSchema,
+} from "@/lib/gemini/grammar-question-contract";
+import {
   filterStoryPracticeKanji,
   vocabularyQuestionFormats,
   vocabularyQuestionsPrompt,
@@ -170,5 +176,72 @@ Requirements:
       knownKanji: ["学", "友", "達"],
       targetKanji: ["校", "本"],
     })).toEqual(["学", "校", "友", "達", "本"]);
+  });
+
+  it("uses the corrected grammar_test.py contract and grammar formats", () => {
+    expect(grammarQuestionsPrompt({
+      japaneseStory: "音楽を聞きながら、学校へ行きます。",
+      targetGrammarPatterns: ["～ながら"],
+      questionFormats: [{
+        id: "1",
+        difficulty: ["easy"],
+        name: "Fill in the Blank",
+        question: "Choose the correct grammar to complete the sentence.",
+        sentence: "<JP_SENTENCE_WITH_BLANK>",
+      }],
+    })).toBe(`
+Create grammar questions from this Japanese story.
+
+Story:
+音楽を聞きながら、学校へ行きます。
+
+Grammar patterns:
+['～ながら']
+
+Question formats:
+[{"id": "1", "difficulty": ["easy"], "name": "Fill in the Blank", "question": "Choose the correct grammar to complete the sentence.", "sentence": "<JP_SENTENCE_WITH_BLANK>"}]
+
+Requirements:
+- Use only the provided question formats.
+- Use only the provided grammar patterns that appear in the story.
+- Create story-related questions in the most appropriate format for each pattern and difficulty.
+- Create exactly 10 questions: 3 easy, 4 medium, and 3 hard.
+- Every question must have four different choices and one correct answer.
+- Do not create questions using grammar patterns that do not appear in the story.
+- Follow the provided question formats exactly.
+- Return only the required JSON.
+`);
+    expect(grammarQuestionFormats).toHaveLength(10);
+    expect(grammarQuestionFormats.map((format) => format.id)).toEqual(
+      Array.from({ length: 10 }, (_, index) => String(index + 1)),
+    );
+    expect(grammarQuestionsSchema).toMatchObject({
+      type: "object",
+      required: ["questions"],
+      additionalProperties: false,
+      properties: {
+        questions: {
+          type: "array",
+          items: {
+            required: [
+              "format_id",
+              "difficulty",
+              "question",
+              "sentence",
+              "choices",
+              "answer",
+            ],
+            additionalProperties: false,
+          },
+        },
+      },
+    });
+  });
+
+  it("passes only target grammar patterns that occur in the story", () => {
+    expect(filterStoryGrammarPatterns({
+      japaneseStory: "音楽を聞きながら、学校へ行きます。",
+      targetGrammarPatterns: ["～ながら", "～てもいいですか", "～たい"],
+    })).toEqual(["～ながら"]);
   });
 });
