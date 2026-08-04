@@ -191,7 +191,7 @@ export function SpeakingPhase({
         </div>
 
         <div className="mt-5">
-          <AudioControl replayCount={0} onPlay={() => undefined} text={exercise.modelAnswer} audioAssetId={exercise.audioAssetId} label="Hear a model answer" />
+          <AudioControl key={exercise.id} replayCount={0} onPlay={() => undefined} text={exercise.modelAnswer} audioAssetId={exercise.audioAssetId} browserTts={lesson.runtimeAudio === "browser_tts"} label="Hear a model answer" />
         </div>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Button type="button" variant="secondary" disabled={speaking || transcribing} onClick={() => setShowModelAnswer((value) => !value)}>

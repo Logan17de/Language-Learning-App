@@ -518,6 +518,10 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
     })),
     answerKeys: value.version.answer_keys,
     phases: phases(value.version.phases),
+    runtimeAudio:
+      metadataText(value.version.metadata, "runtimeAudio") === "browser_tts"
+        ? "browser_tts"
+        : "stored_or_api",
   };
   return result;
 }

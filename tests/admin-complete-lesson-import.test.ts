@@ -11,6 +11,9 @@ const migration = readFileSync(
   "supabase/migrations/20260804190000_admin_complete_lesson_import.sql",
   "utf8",
 );
+const audioControl = readFileSync("components/exercises/audio-control.tsx", "utf8");
+const listeningPhase = readFileSync("components/lesson/listening-phase.tsx", "utf8");
+const speakingPhase = readFileSync("components/lesson/speaking-phase.tsx", "utf8");
 
 function choice(id: string, difficulty: "Easy" | "Medium" | "Hard") {
   return {
@@ -183,6 +186,11 @@ describe("complete admin lesson import", () => {
     expect(migration).toContain("public.has_app_role(array['admin', 'content_editor']");
     expect(migration).toContain("'model_api_used', false");
     expect(migration).toContain("public.resolve_admin_lesson_target_ids");
+    expect(migration).toContain("'runtimeAudio', 'browser_tts'");
+    expect(audioControl).toContain("new SpeechSynthesisUtterance(spokenText)");
+    expect(audioControl).toContain("window.speechSynthesis.speak(utterance)");
+    expect(listeningPhase).toContain('browserTts={lesson.runtimeAudio === "browser_tts"}');
+    expect(speakingPhase).toContain('browserTts={lesson.runtimeAudio === "browser_tts"}');
   });
 
   it("ships a copyable whole-lesson chat prompt with every fixed bank size", () => {

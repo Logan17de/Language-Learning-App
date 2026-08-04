@@ -189,4 +189,5 @@ export interface LessonPackage {
   reviewQuestions: ChoiceExercise[];
   answerKeys: string[];
   phases: LessonPhase[];
+  runtimeAudio?: "stored_or_api" | "browser_tts";
 }

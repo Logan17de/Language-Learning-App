@@ -370,6 +370,7 @@ begin
       'readingTitle', p_package->>'readingTitle',
       'readingJapaneseTitle', p_package->>'readingJapaneseTitle',
       'targetKanji', v_target_kanji,
+      'runtimeAudio', 'browser_tts',
       'importedWithoutGenerationApi', true
     ),
     case when p_publish then now() else null end,

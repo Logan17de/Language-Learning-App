@@ -78,6 +78,7 @@ export function AudioControl({
   onEnded,
   text,
   audioAssetId,
+  browserTts = false,
   label = "Play audio",
   large = false,
 }: {
@@ -86,25 +87,44 @@ export function AudioControl({
   onEnded?: () => void;
   text?: string;
   audioAssetId?: string;
+  browserTts?: boolean;
   label?: string;
   large?: boolean;
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const preloadRef = useRef<Promise<HTMLAudioElement | null> | null>(null);
   const onEndedRef = useRef(onEnded);
   const [playing, setPlaying] = useState(false);
+  const [browserPlayingText, setBrowserPlayingText] = useState("");
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
   // Reading uses microphone + STT only. The legacy reading component still
   // renders this control, so block it before any TTS request or preload occurs.
   const readingSttOnly = label === "Hear this line";
+  const browserSpeechReady =
+    browserTts &&
+    typeof window !== "undefined" &&
+    "speechSynthesis" in window &&
+    typeof SpeechSynthesisUtterance !== "undefined" &&
+    Boolean(text?.trim());
+  const browserPlaying = browserSpeechReady && browserPlayingText === text && playing;
 
   useEffect(() => {
     onEndedRef.current = onEnded;
   }, [onEnded]);
 
   useEffect(() => {
+    if (browserTts) {
+      audioRef.current?.pause();
+      audioRef.current = null;
+      preloadRef.current = null;
+      return () => {
+        window.speechSynthesis?.cancel();
+        utteranceRef.current = null;
+      };
+    }
     if (readingSttOnly) {
       audioRef.current?.pause();
       audioRef.current = null;
@@ -113,9 +133,11 @@ export function AudioControl({
     }
 
     let active = true;
+    /* eslint-disable react-hooks/set-state-in-effect -- reset the prior audio source before starting an asynchronous preload */
     setError("");
     setReady(false);
     setPlaying(false);
+    /* eslint-enable react-hooks/set-state-in-effect */
     audioRef.current?.pause();
     audioRef.current = null;
 
@@ -156,10 +178,50 @@ export function AudioControl({
       audioRef.current = null;
       preloadRef.current = null;
     };
-  }, [audioAssetId, readingSttOnly, text]);
+  }, [audioAssetId, browserTts, readingSttOnly, text]);
 
   async function play() {
     setError("");
+    if (browserTts) {
+      if (browserPlaying) {
+        window.speechSynthesis.cancel();
+        utteranceRef.current = null;
+        setBrowserPlayingText("");
+        setPlaying(false);
+        return;
+      }
+      const spokenText = text?.normalize("NFKC").trim() ?? "";
+      if (!spokenText || !browserSpeechReady) {
+        setError("Japanese browser speech is unavailable.");
+        return;
+      }
+      onPlay();
+      const utterance = new SpeechSynthesisUtterance(spokenText);
+      utterance.lang = "ja-JP";
+      utterance.rate = 0.9;
+      const japaneseVoice = window.speechSynthesis
+        .getVoices()
+        .find((voice) => voice.lang.toLocaleLowerCase().startsWith("ja"));
+      if (japaneseVoice) utterance.voice = japaneseVoice;
+      utterance.onend = () => {
+        utteranceRef.current = null;
+        setBrowserPlayingText("");
+        setPlaying(false);
+        onEndedRef.current?.();
+      };
+      utterance.onerror = () => {
+        utteranceRef.current = null;
+        setBrowserPlayingText("");
+        setPlaying(false);
+        setError("Japanese browser speech could not be played.");
+      };
+      utteranceRef.current = utterance;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+      setBrowserPlayingText(text ?? "");
+      setPlaying(true);
+      return;
+    }
     if (playing && audioRef.current) {
       audioRef.current.pause();
       setPlaying(false);
@@ -171,6 +233,8 @@ export function AudioControl({
     try {
       const audio = audioRef.current ?? (await preloadRef.current);
       if (!audio) throw new Error("Audio is unavailable.");
+      // The reusable HTMLAudioElement is intentionally rewound for replay.
+      // eslint-disable-next-line react-hooks/immutability
       audio.currentTime = 0;
       await audio.play();
       setPlaying(true);
@@ -186,21 +250,25 @@ export function AudioControl({
 
   if (readingSttOnly) return null;
 
-  const preparing = loading || (!ready && !error);
+  const visibleError = browserTts && !browserSpeechReady
+    ? "Japanese browser speech is unavailable."
+    : error;
+  const visiblePlaying = browserTts ? browserPlaying : playing;
+  const preparing = !browserTts && (loading || (!ready && !visibleError));
 
   return (
     <div>
       <Button
         type="button"
         onClick={play}
-        disabled={loading || Boolean(error)}
+        disabled={loading || Boolean(visibleError)}
         variant={large ? "dark" : "secondary"}
         className={cn(large && "min-h-24 w-full rounded-3xl text-base")}
-        aria-label={playing ? "Pause audio" : label}
+        aria-label={visiblePlaying ? "Pause audio" : label}
       >
         {preparing ? (
           <LoaderCircle className="size-5 animate-spin" />
-        ) : playing ? (
+        ) : visiblePlaying ? (
           <Pause className="size-5" />
         ) : replayCount > 0 ? (
           <RotateCcw className="size-5" />
@@ -209,21 +277,21 @@ export function AudioControl({
         )}
         {preparing
           ? "Loading audio…"
-          : playing
+          : visiblePlaying
             ? "Playing…"
             : replayCount > 0
               ? `Replay audio · ${replayCount}`
               : label}
         {large && (
-          <Volume2 className={cn("ml-2 size-5", playing && "animate-pulse")} />
+          <Volume2 className={cn("ml-2 size-5", visiblePlaying && "animate-pulse")} />
         )}
       </Button>
-      {error && (
+      {visibleError && (
         <p
           role="alert"
           className="mt-2 text-center text-xs font-semibold text-red-600"
         >
-          {error}
+          {visibleError}
         </p>
       )}
     </div>
