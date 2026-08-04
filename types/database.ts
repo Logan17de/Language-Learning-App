@@ -122,6 +122,7 @@ export interface Database {
       kanji_records: TableDef<Timestamps & LibraryMetadata & { id: string; legacy_id: string | null; character: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; meanings: string[]; readings: string[]; onyomi: string[]; kunyomi: string[]; example_words: string[]; stroke_count: number; prerequisite_kanji: string[]; archived_at: string | null }>;
       kana_records: TableDef<Timestamps & { id: string; value: string; normalized_value: string; script_type: "hiragana" | "katakana" | "mixed"; usage_count: number }>;
       vocabulary_records: TableDef<Timestamps & LibraryMetadata & { id: string; legacy_id: string | null; written_form: string; reading: string; kana_id: string; meaning: string; part_of_speech: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; tags: string[]; example_sentence: string; linked_kanji_ids: string[]; archived_at: string | null }>;
+      story_vocabulary_enrichments: TableDef<{ id: string; request_id: string; user_id: string; vocabulary_id: string; position: number; word: string; reading: string; meaning: string; source_model: string | null; created_at: string }>;
       lessons: TableDef<LessonRow>;
       lesson_versions: TableDef<LessonVersionRow>;
       lesson_story_lines: TableDef<ContentRow & { japanese_text: string; translation: string; tappable_terms: string[]; image_asset_id: string | null; audio_asset_id: string | null }>;
@@ -244,6 +245,10 @@ export interface Database {
       };
       enrich_custom_lesson_library_v2: {
         Args: { p_level: Database["public"]["Enums"]["jlpt_level"]; p_seed: Json; p_source_model: string };
+        Returns: Json;
+      };
+      store_story_vocabulary_enrichment: {
+        Args: { p_request_id: string; p_level: Database["public"]["Enums"]["jlpt_level"]; p_vocabulary: Json; p_source_model: string };
         Returns: Json;
       };
       learn_grammar_pattern_alias: {

@@ -7,6 +7,7 @@ import { generateAdaptiveStoryDraft } from "@/lib/gemini/adaptive-story-generati
 import { buildInteractiveStoryForLearner } from "@/lib/gemini/interactive-story-v3";
 import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
 import { selectLessonPlanV3 } from "@/lib/gemini/lesson-plan-v3";
+import { enrichGeneratedStoryVocabulary } from "@/lib/gemini/simple-story-enrichment";
 import { resolveStoryFromExistingLibrary } from "@/lib/gemini/story-library-existing-only";
 import type { StoryOnlyDraft } from "@/lib/gemini/story-pipeline-v3";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -150,6 +151,7 @@ export async function POST(request: NextRequest) {
 
   let planMs = 0;
   let storyMs = 0;
+  let enrichmentMs = 0;
   let libraryLookupMs = 0;
   let persistenceMs = 0;
   try {
@@ -163,7 +165,8 @@ export async function POST(request: NextRequest) {
     planMs = Date.now() - stageStartedAt;
 
     stageStartedAt = Date.now();
-    // The only model call before the story is shown: generate 10-12 lines.
+    // Generate the fixed passage first. Its Japanese text becomes the complete
+    // input to the separate simple vocabulary-enrichment call below.
     const story = await generateAdaptiveStoryDraft({
       requestId: generation.requestId,
       topic,
@@ -173,9 +176,18 @@ export async function POST(request: NextRequest) {
     storyMs = Date.now() - stageStartedAt;
 
     stageStartedAt = Date.now();
-    // Local/DB-only lookup. Existing canonical, alias, and supported
-    // conjugated forms become tappable. Missing words are left as plain text.
-    // No library enrichment model call and no library write occurs here.
+    const admin = createAdminClient() as unknown as SupabaseClient;
+    const enrichment = await enrichGeneratedStoryVocabulary({
+      admin,
+      requestId: generation.requestId,
+      level: generation.level,
+      draft: story.draft,
+    });
+    enrichmentMs = Date.now() - stageStartedAt;
+
+    stageStartedAt = Date.now();
+    // Resolve the freshly stored raw surface words, together with reusable
+    // records already in the library, into tappable story terms.
     const resolved = await resolveStoryFromExistingLibrary(client, {
       level: generation.level,
       plan,
@@ -188,8 +200,11 @@ export async function POST(request: NextRequest) {
       resolved.library,
       plan.knownKanji,
     );
-    const audit: GenerationAuditEntry[] = [story.audit, ...resolved.audits];
-    const admin = createAdminClient() as unknown as SupabaseClient;
+    const audit: GenerationAuditEntry[] = [
+      story.audit,
+      enrichment.audit,
+      ...resolved.audits,
+    ];
 
     stageStartedAt = Date.now();
     const [saved, exposure] = await Promise.all([
@@ -231,10 +246,11 @@ export async function POST(request: NextRequest) {
       totalMs: Date.now() - requestStartedAt,
       planMs,
       storyMs,
+      enrichmentMs,
       libraryLookupMs,
       persistenceMs,
       storyRepaired: story.audit.repaired,
-      libraryMode: "existing-library-only",
+      libraryMode: "raw-story-enrichment",
       tappableVocabularyCount: resolved.library.vocabulary.length,
     });
 
@@ -274,6 +290,7 @@ export async function POST(request: NextRequest) {
       totalMs: Date.now() - requestStartedAt,
       planMs,
       storyMs,
+      enrichmentMs,
       libraryLookupMs,
       persistenceMs,
     });

@@ -6,6 +6,18 @@ const storyCall = readFileSync(
   "lib/gemini/adaptive-story-generation.ts",
   "utf8",
 );
+const storyContract = readFileSync(
+  "lib/gemini/story-generation-contract.ts",
+  "utf8",
+);
+const simpleEnrichment = readFileSync(
+  "lib/gemini/simple-story-enrichment.ts",
+  "utf8",
+);
+const simpleEnrichmentContract = readFileSync(
+  "lib/gemini/simple-story-enrichment-contract.ts",
+  "utf8",
+);
 const existingLibrary = readFileSync(
   "lib/gemini/story-library-existing-only.ts",
   "utf8",
@@ -49,17 +61,24 @@ const migration = readFileSync(
   "supabase/migrations/20260730070000_story_pipeline_and_kanji_exposure.sql",
   "utf8",
 );
+const enrichmentMigration = readFileSync(
+  "supabase/migrations/20260804090000_simple_story_vocabulary_enrichment.sql",
+  "utf8",
+);
 
 describe("custom lesson story pipeline v3", () => {
   it("makes call 1 a continuous 10-15 sentence passage with one selected interest", () => {
-    expect(storyCall).toContain("const STORY_MIN_SENTENCES = 10");
-    expect(storyCall).toContain("const STORY_MAX_SENTENCES = 15");
-    expect(storyCall).toContain('"selected_interest"');
-    expect(storyCall).toContain('"japanese_story"');
-    expect(storyCall).toContain('"english_translation"');
-    expect(storyCall).toContain("Available learner interests");
-    expect(storyCall).toContain("Select exactly one learner interest");
-    expect(storyCall).toContain("one continuous string, not an array");
+    expect(storyContract).toContain("const STORY_MIN_SENTENCES = 10");
+    expect(storyContract).toContain("const STORY_MAX_SENTENCES = 15");
+    expect(storyContract).toContain('"selected_interest"');
+    expect(storyContract).toContain('"japanese_story"');
+    expect(storyContract).toContain('"english_translation"');
+    expect(storyContract).toContain("Available learner interests");
+    expect(storyContract).toContain("Select exactly one learner interest");
+    expect(storyContract).toContain("one continuous string, not an array");
+    expect(storyCall).toContain('name: "japanese_lesson"');
+    expect(storyCall).toContain("strictSchema: true");
+    expect(storyCall).toContain("exactSchemaName: true");
     expect(storyCall).toContain("normalizeStoryPassage(result.value)");
     expect(storyCall).not.toContain('required: [\n              "surface"');
     expect(plan).toContain('.from("user_preferences")');
@@ -86,7 +105,7 @@ describe("custom lesson story pipeline v3", () => {
     }]);
   });
 
-  it("uses only existing library records for story taps and never enriches them", () => {
+  it("enriches every raw story word before resolving library-backed taps", () => {
     expect(existingLibrary).toContain("resolveStoryFromExistingLibrary");
     expect(existingLibrary).toContain("buildFormIndex");
     expect(existingLibrary).toContain("composeEntryForm");
@@ -94,13 +113,26 @@ describe("custom lesson story pipeline v3", () => {
     expect(existingLibrary).toContain('model: "existing-library-only"');
     expect(existingLibrary).not.toContain("generateStructured");
     expect(existingLibrary).not.toContain("OPENAI_API_KEY");
-    expect(existingLibrary).not.toContain("enrich_custom_lesson_library_v3");
+    expect(simpleEnrichment).toContain('name: "story_vocabulary"');
+    expect(simpleEnrichment).toContain("strictSchema: true");
+    expect(simpleEnrichment).toContain("exactSchemaName: true");
+    expect(simpleEnrichment).toContain("storyEnrichmentPrompt(japaneseStory)");
+    expect(simpleEnrichment).toContain('rpc("store_story_vocabulary_enrichment"');
+    expect(simpleEnrichmentContract).toContain("List every unique vocabulary word exactly as it appears");
+    expect(simpleEnrichmentContract).toContain('required: ["word", "reading", "meaning"]');
     expect(route).toContain("resolveStoryFromExistingLibrary");
-    expect(route).toContain("Missing words are left as plain text");
-    expect(route).toContain('libraryMode: "existing-library-only"');
+    expect(route).toContain("enrichGeneratedStoryVocabulary");
+    expect(route.indexOf("enrichGeneratedStoryVocabulary")).toBeLessThan(
+      route.indexOf("resolveStoryFromExistingLibrary(client"),
+    );
+    expect(route).toContain('libraryMode: "raw-story-enrichment"');
+    expect(enrichmentMigration).toContain("create table if not exists public.story_vocabulary_enrichments");
+    expect(enrichmentMigration).toContain("word text not null");
+    expect(enrichmentMigration).toContain("reading text not null");
+    expect(enrichmentMigration).toContain("meaning text not null");
+    expect(enrichmentMigration).not.toContain("v_dictionary_form :=");
+    expect(enrichmentMigration).toContain("v_word,\n      v_word,\n      v_reading");
     expect(route).not.toContain("resolveStoryLibraryV4");
-    expect(route).not.toContain("enrichmentRepaired");
-    expect(route).not.toContain("enrichmentModel");
   });
 
   it("shows justified Japanese and English passages while retaining old line compatibility", () => {
@@ -134,7 +166,7 @@ describe("custom lesson story pipeline v3", () => {
     expect(structuredText).toContain("Object.assign({}, ...records)");
     expect(structured).not.toContain("GEMINI_");
     expect(compatibilityExport).toContain("@/lib/openai/structured-output");
-    expect(route).toContain("The only model call before the story is shown");
+    expect(route).toContain("separate simple vocabulary-enrichment call");
   });
 
   it("throttles and retries only transient structured model failures", () => {

@@ -4,21 +4,21 @@ import { unstable_cache } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { JLPTLevel } from "@/types/lesson";
 import { storyUsesGrammarPattern } from "@/lib/gemini/lesson-validation";
-import {
-  generateStructured,
-  type JsonSchema,
-} from "@/lib/gemini/structured-output";
+import { generateStructured } from "@/lib/gemini/structured-output";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
+import {
+  STORY_MAX_SENTENCES,
+  STORY_MIN_SENTENCES,
+  storyGenerationPrompt,
+  storyGenerationSchema,
+} from "@/lib/gemini/story-generation-contract";
 import type {
   LessonPlanV3,
   StoryPassageOutput,
   StoryOnlyDraft,
 } from "@/lib/gemini/story-pipeline-v3";
 import { normalizeStoryPassage } from "@/lib/gemini/story-pipeline-v3";
-
-const STORY_MIN_SENTENCES = 10;
-const STORY_MAX_SENTENCES = 15;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -31,25 +31,6 @@ function stringValue(value: unknown): value is string {
 function unique<T>(items: T[]): T[] {
   return [...new Set(items)];
 }
-
-const storySchema: JsonSchema = {
-  type: "object",
-  additionalProperties: false,
-  required: [
-    "selected_interest",
-    "japanese_title",
-    "english_title",
-    "japanese_story",
-    "english_translation",
-  ],
-  properties: {
-    selected_interest: { type: "string" },
-    japanese_title: { type: "string" },
-    english_title: { type: "string" },
-    japanese_story: { type: "string" },
-    english_translation: { type: "string" },
-  },
-};
 
 const cachedAcceptedGrammarForms = unstable_cache(
   async (patternKey: string): Promise<Array<[string, string[]]>> => {
@@ -160,42 +141,20 @@ export async function generateAdaptiveStoryDraft(input: {
   const acceptedForms = await acceptedGrammarForms(
     input.plan.grammar.map((item) => item.pattern),
   );
-  const interestText = input.plan.interests.length > 0
-    ? input.plan.interests.join(", ")
-    : "No learner interests were provided.";
-  const prompt = [
-    "Generate a Japanese language-learning story.",
-    "",
-    "Learner requirements:",
-    `- Language level: JLPT ${input.level}`,
-    `- Story topic: ${input.topic}`,
-    `- Available learner interests: ${interestText}`,
-    `- Target grammar: ${input.plan.grammar.map((item) => item.pattern).join(", ")}`,
-    `- Target kanji: ${input.plan.kanji.map((item) => item.character).join(", ")}`,
-    "",
-    "Story requirements:",
-    "- The story must primarily focus on the given topic.",
-    `- Write one coherent story containing ${STORY_MIN_SENTENCES}-${STORY_MAX_SENTENCES} natural Japanese sentences.`,
-    "- Return the Japanese story as one continuous string, not an array.",
-    "- Select exactly one learner interest that fits the story naturally.",
-    "- When no provided interest fits naturally, choose a suitable interest yourself.",
-    "- When no learner interests are provided, choose a suitable interest yourself.",
-    "- Do not force an interest into the story.",
-    "- Naturally use every provided target grammar pattern at least once.",
-    "- Naturally use every provided target kanji at least once.",
-    `- Keep all other vocabulary and grammar appropriate for JLPT ${input.level}.`,
-    "- Make the story engaging, educational, and easy to follow.",
-    "- Keep romantic interactions respectful and age-appropriate.",
-    "- Use Japanese quotation marks 「」 only for direct speech.",
-    "- Do not place narration inside Japanese quotation marks.",
-    "- Provide an accurate English translation of the complete story.",
-    "- Return the English translation as one continuous string, not an array.",
-  ].join("\n");
+  const prompt = storyGenerationPrompt({
+    languageLevel: `JLPT ${input.level}`,
+    topic: input.topic,
+    naturalInterests: input.plan.interests,
+    targetGrammar: input.plan.grammar.map((item) => item.pattern),
+    targetKanji: input.plan.kanji.map((item) => item.character),
+  });
 
   const result = await generateStructured<StoryPassageOutput>({
-    name: "story-only draft",
+    name: "japanese_lesson",
     prompt,
-    schema: storySchema,
+    schema: storyGenerationSchema,
+    strictSchema: true,
+    exactSchemaName: true,
     validate: (value) =>
       structuralStoryIssues(value, input.plan, acceptedForms),
     trace: {

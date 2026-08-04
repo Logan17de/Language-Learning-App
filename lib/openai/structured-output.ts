@@ -69,6 +69,8 @@ export interface StructuredGenerationInput {
   validate: (value: unknown) => string[];
   model?: string;
   trace?: GenerationTraceContext;
+  strictSchema?: boolean;
+  exactSchemaName?: boolean;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -189,6 +191,8 @@ async function callModel(
   prompt: string,
   schema: JsonSchema,
   reasoningEffort: OpenAIReasoningEffort,
+  strictSchema: boolean,
+  exactSchemaName: boolean,
 ): Promise<{ value: unknown; rawOutput: string; usage: OpenAIUsage }> {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) throw new Error("OPENAI_API_KEY is not configured.");
@@ -206,6 +210,8 @@ async function callModel(
       schema,
       schemaName: name,
       reasoningEffort,
+      strictSchema,
+      exactSchemaName,
     }),
   );
   if (!result.response.ok) {
@@ -233,10 +239,10 @@ async function callModel(
 
 function configuredModel(name: string, explicit?: string): string {
   if (explicit?.trim()) return explicit.trim();
-  if (name.includes("story-only")) {
+  if (name.includes("story-only") || name === "japanese_lesson") {
     return process.env.OPENAI_STORY_MODEL?.trim() || PRIMARY_MODEL;
   }
-  if (name.includes("enrichment")) {
+  if (name.includes("enrichment") || name === "story_vocabulary") {
     return process.env.OPENAI_ENRICHMENT_MODEL?.trim() || PRIMARY_MODEL;
   }
   if (name.includes("approval") || name.includes("item repair")) {
@@ -255,13 +261,13 @@ function reasoningEffort(
 
 function configuredReasoningEffort(name: string): OpenAIReasoningEffort {
   const general = process.env.OPENAI_LESSON_REASONING_EFFORT;
-  if (name.includes("story-only")) {
+  if (name.includes("story-only") || name === "japanese_lesson") {
     return reasoningEffort(
       process.env.OPENAI_STORY_REASONING_EFFORT ?? general,
       "low",
     );
   }
-  if (name.includes("enrichment")) {
+  if (name.includes("enrichment") || name === "story_vocabulary") {
     return reasoningEffort(
       process.env.OPENAI_ENRICHMENT_REASONING_EFFORT ?? general,
       "medium",
@@ -282,6 +288,8 @@ async function call(
   schema: JsonSchema,
   preferredModel: string,
   effort: OpenAIReasoningEffort,
+  strictSchema: boolean,
+  exactSchemaName: boolean,
 ): Promise<ModelCallResult> {
   try {
     const result = await callModel(
@@ -290,6 +298,8 @@ async function call(
       prompt,
       schema,
       effort,
+      strictSchema,
+      exactSchemaName,
     );
     return { ...result, model: preferredModel };
   } catch (primaryError) {
@@ -303,6 +313,8 @@ async function call(
       prompt,
       schema,
       effort,
+      strictSchema,
+      exactSchemaName,
     );
     return { ...result, model: FALLBACK_MODEL };
   }
@@ -368,6 +380,8 @@ export async function generateStructured<T>(
       input.schema,
       preferredModel,
       effort,
+      input.strictSchema === true,
+      input.exactSchemaName === true,
     );
   } catch (error) {
     await traceFailure({
@@ -436,6 +450,8 @@ export async function generateStructured<T>(
       input.schema,
       first.model,
       effort,
+      input.strictSchema === true,
+      input.exactSchemaName === true,
     );
   } catch (error) {
     await traceFailure({

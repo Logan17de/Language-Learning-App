@@ -60,7 +60,10 @@ export function buildOpenAIResponsesRequest(input: {
   schema: OpenAIJsonSchema;
   schemaName: string;
   reasoningEffort: OpenAIReasoningEffort;
+  strictSchema?: boolean;
+  exactSchemaName?: boolean;
 }): Record<string, unknown> {
+  const strict = input.strictSchema === true;
   return {
     model: input.model,
     input: input.prompt,
@@ -71,12 +74,14 @@ export function buildOpenAIResponsesRequest(input: {
       verbosity: "low",
       format: {
         type: "json_schema",
-        name: openAIResponseSchemaName(input.schemaName),
-        schema: simplifyOpenAIJsonSchema(input.schema),
-        // AIko still runs stricter semantic and cardinality validation locally,
-        // then repairs once when needed. Keeping strict=false lets the existing
-        // application schemas retain optional/provider-neutral shapes.
-        strict: false,
+        name: input.exactSchemaName
+          ? input.schemaName
+          : openAIResponseSchemaName(input.schemaName),
+        schema: strict ? input.schema : simplifyOpenAIJsonSchema(input.schema),
+        // Existing provider-neutral schemas default to non-strict mode. Small,
+        // fully required contracts can opt into the exact strict request used
+        // by their tested API samples.
+        strict,
       },
     },
     store: false,

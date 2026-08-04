@@ -50,6 +50,27 @@ describe("OpenAI structured request builder", () => {
     expect(openAIResponseSchemaName("")).toBe("aiko_structured_output");
   });
 
+  it("preserves an exact strict schema contract when requested", () => {
+    expect(buildOpenAIResponsesRequest({
+      model: "gpt-5.6-luna",
+      prompt: "Generate a story.",
+      schema,
+      schemaName: "japanese_lesson",
+      reasoningEffort: "low",
+      strictSchema: true,
+      exactSchemaName: true,
+    })).toMatchObject({
+      text: {
+        format: {
+          type: "json_schema",
+          name: "japanese_lesson",
+          schema,
+          strict: true,
+        },
+      },
+    });
+  });
+
   it("leaves exact counts and ranges to AIko's deterministic validation", () => {
     expect(simplifyOpenAIJsonSchema({
       type: "object",
