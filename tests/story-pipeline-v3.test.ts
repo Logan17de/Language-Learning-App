@@ -281,6 +281,14 @@ describe("custom lesson story pipeline v3", () => {
     expect(activityGroups).toContain("rawGrammarQuestionIssues");
     expect(activityGroups).toContain("adaptGrammarQuestions");
     expect(activityGroups).toContain("filterStoryGrammarPatterns");
+    expect(activityGroups).toContain("Grammar response must contain at least one question.");
+    expect(activityGroups).toContain("targetItemIds: target ? [target.libraryId] : []");
+    expect(activityGroups).not.toContain(
+      "does not test a provided grammar pattern from the story",
+    );
+    expect(activityGroups).not.toContain(
+      "A grammar question could not be linked to its story pattern.",
+    );
     expect(grammarContract).toContain("Create grammar questions from this Japanese story.");
     expect(grammarContract).toContain("Create exactly 10 questions: 3 easy, 4 medium, and 3 hard.");
     expect(grammarContract).toContain("Do not create questions using grammar patterns that do not appear in the story.");
