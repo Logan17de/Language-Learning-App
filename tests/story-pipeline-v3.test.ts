@@ -274,6 +274,16 @@ describe("custom lesson story pipeline v3", () => {
     expect(existingLibrary).toContain("targetKanji: input.plan.kanji.map");
   });
 
+  it("reorders model-provided choices during final lesson assembly", () => {
+    expect(activityGroups).toContain('withTerms(question, "vocabulary")');
+    expect(activityGroups).toContain('withTerms(question, "grammar")');
+    expect(activityGroups).toContain('["listening", exercise.prompt, exercise.correctAnswer]');
+    expect(activityGroups).toContain(
+      '["review", question.category, question.prompt, question.correctAnswer]',
+    );
+    expect(activityGroups).toContain("shuffledChoices(");
+  });
+
   it("creates grammar questions from the corrected grammar sample contract", () => {
     expect(activityGroups).toContain('name: "grammar_questions"');
     expect(activityGroups).toContain("grammarQuestionsPrompt");

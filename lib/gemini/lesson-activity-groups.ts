@@ -1,5 +1,6 @@
 import "server-only";
 
+import { shuffledChoices } from "@/lib/choice-order";
 import { storyWordScript } from "@/lib/story-support";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
@@ -742,8 +743,12 @@ export function assemblePlayableLesson(input: {
   groups: ActivityGroups;
   audit: GenerationAuditEntry[];
 }): PlayableLessonPackageV2 {
-  const withTerms = (question: PracticeQuestion) => ({
+  const withTerms = (question: PracticeQuestion, section: string) => ({
     ...question,
+    choices: shuffledChoices(
+      question.choices,
+      [section, question.prompt, question.cue, question.correctAnswer].join("\n"),
+    ),
     inspectableTerms: inspectableTerms([question.prompt, question.cue], input.library),
   });
   const unique = <T,>(items: T[]): T[] => [...new Set(items)];
@@ -779,8 +784,12 @@ export function assemblePlayableLesson(input: {
       commonMistake: "",
     })),
     story: playableStoryLines(input.draft, input.library),
-    vocabularyQuestions: input.groups.vocabularyAndKanji.vocabularyQuestions.map(withTerms),
-    grammarQuestions: input.groups.grammarAndReading.grammarQuestions.map(withTerms),
+    vocabularyQuestions: input.groups.vocabularyAndKanji.vocabularyQuestions.map(
+      (question) => withTerms(question, "vocabulary"),
+    ),
+    grammarQuestions: input.groups.grammarAndReading.grammarQuestions.map(
+      (question) => withTerms(question, "grammar"),
+    ),
     readingTitle: input.groups.grammarAndReading.readingTitle,
     readingJapaneseTitle: input.groups.grammarAndReading.readingJapaneseTitle,
     readingConversation: input.groups.grammarAndReading.readingConversation.map((line) => ({
@@ -796,6 +805,10 @@ export function assemblePlayableLesson(input: {
     ),
     listeningExercises: input.groups.communication.listeningExercises.map((exercise) => ({
       ...exercise,
+      choices: shuffledChoices(
+        exercise.choices,
+        ["listening", exercise.prompt, exercise.correctAnswer].join("\n"),
+      ),
       inspectableTerms: exercise.inspectableTerms ??
         inspectableTerms([exercise.prompt, exercise.transcript], input.library),
     })),
@@ -806,7 +819,13 @@ export function assemblePlayableLesson(input: {
           exercise.modelAnswer,
         ], input.library),
     })),
-    reviewQuestions: input.groups.review.reviewQuestions,
+    reviewQuestions: input.groups.review.reviewQuestions.map((question) => ({
+      ...question,
+      choices: shuffledChoices(
+        question.choices,
+        ["review", question.category, question.prompt, question.correctAnswer].join("\n"),
+      ),
+    })),
     generationAudit: { calls: input.audit },
   };
 }
