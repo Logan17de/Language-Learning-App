@@ -12,11 +12,13 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
 import type {
   LessonPlanV3,
+  StoryPassageOutput,
   StoryOnlyDraft,
 } from "@/lib/gemini/story-pipeline-v3";
+import { normalizeStoryPassage } from "@/lib/gemini/story-pipeline-v3";
 
-const STORY_MIN_LINES = 10;
-const STORY_MAX_LINES = 12;
+const STORY_MIN_SENTENCES = 10;
+const STORY_MAX_SENTENCES = 15;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -30,39 +32,22 @@ function unique<T>(items: T[]): T[] {
   return [...new Set(items)];
 }
 
-function stringArray(minItems = 0, maxItems = 100): JsonSchema {
-  return {
-    type: "array",
-    minItems,
-    maxItems,
-    items: { type: "string" },
-  };
-}
-
 const storySchema: JsonSchema = {
   type: "object",
   additionalProperties: false,
-  required: ["title", "japaneseTitle", "summary", "storyPreview", "tags", "lines"],
+  required: [
+    "selected_interest",
+    "japanese_title",
+    "english_title",
+    "japanese_story",
+    "english_translation",
+  ],
   properties: {
-    title: { type: "string" },
-    japaneseTitle: { type: "string" },
-    summary: { type: "string" },
-    storyPreview: { type: "string" },
-    tags: stringArray(2, 6),
-    lines: {
-      type: "array",
-      minItems: STORY_MIN_LINES,
-      maxItems: STORY_MAX_LINES,
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["japanese", "english"],
-        properties: {
-          japanese: { type: "string" },
-          english: { type: "string" },
-        },
-      },
-    },
+    selected_interest: { type: "string" },
+    japanese_title: { type: "string" },
+    english_title: { type: "string" },
+    japanese_story: { type: "string" },
+    english_translation: { type: "string" },
   },
 };
 
@@ -98,29 +83,50 @@ async function acceptedGrammarForms(
   return new Map(await cachedAcceptedGrammarForms(normalized.join("\u0000")));
 }
 
+function sentenceCount(value: string): number {
+  return value
+    .split(/(?<=[。！？!?])/u)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean)
+    .length;
+}
+
 function structuralStoryIssues(
   value: unknown,
   plan: LessonPlanV3,
   acceptedForms: Map<string, string[]>,
 ): string[] {
-  if (!isRecord(value) || !Array.isArray(value.lines)) {
-    return ["Story must contain lines."];
+  if (!isRecord(value)) {
+    return ["Story must be an object."];
   }
   const issues: string[] = [];
-  if (
-    value.lines.length < STORY_MIN_LINES ||
-    value.lines.length > STORY_MAX_LINES
-  ) {
-    issues.push(`Story needs ${STORY_MIN_LINES}-${STORY_MAX_LINES} lines.`);
+  const required = [
+    "selected_interest",
+    "japanese_title",
+    "english_title",
+    "japanese_story",
+    "english_translation",
+  ] as const;
+  for (const field of required) {
+    if (!stringValue(value[field])) {
+      issues.push(`Story field ${field} is required.`);
+    }
   }
 
-  const storyText = value.lines
-    .flatMap((line) =>
-      isRecord(line) && typeof line.japanese === "string"
-        ? [line.japanese]
-        : [],
-    )
-    .join("\n");
+  const storyText = typeof value.japanese_story === "string"
+    ? value.japanese_story.trim()
+    : "";
+  if (storyText) {
+    const count = sentenceCount(storyText);
+    if (count < STORY_MIN_SENTENCES || count > STORY_MAX_SENTENCES) {
+      issues.push(
+        `Story needs ${STORY_MIN_SENTENCES}-${STORY_MAX_SENTENCES} sentences; received ${count}.`,
+      );
+    }
+    if (!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(storyText)) {
+      issues.push("Japanese story needs Japanese text.");
+    }
+  }
 
   for (const target of plan.kanji) {
     if (!storyText.includes(target.character)) {
@@ -137,29 +143,11 @@ function structuralStoryIssues(
     }
   }
 
-  for (const [lineIndex, line] of value.lines.entries()) {
-    if (
-      !isRecord(line) ||
-      !stringValue(line.japanese) ||
-      !stringValue(line.english)
-    ) {
-      issues.push(`Story line ${lineIndex + 1} is incomplete.`);
-      continue;
-    }
-    if (
-      !/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(
-        line.japanese,
-      )
-    ) {
-      issues.push(`Story line ${lineIndex + 1} needs Japanese text.`);
-    }
-  }
-
   return unique(issues);
 }
 
 /**
- * API call 1. This call is intentionally limited to the story itself.
+ * API call 1. This call is intentionally limited to one passage-style story.
  * Existing library taps and all activities are resolved only after this
  * response has passed story validation.
  */
@@ -172,28 +160,39 @@ export async function generateAdaptiveStoryDraft(input: {
   const acceptedForms = await acceptedGrammarForms(
     input.plan.grammar.map((item) => item.pattern),
   );
+  const interestText = input.plan.interests.length > 0
+    ? input.plan.interests.join(", ")
+    : "No learner interests were provided.";
   const prompt = [
-    "Create one coherent Japanese learning story for AIko.",
-    `Custom topic: ${input.topic}`,
-    `JLPT ceiling: ${input.level}`,
-    `Length: ${STORY_MIN_LINES}-${STORY_MAX_LINES} short lines.`,
-    `Target kanji that must appear naturally: ${input.plan.kanji.map((item) => item.character).join("、")}`,
-    `Target grammar that must appear naturally: ${input.plan.grammar.map((item) => item.pattern).join("、")}`,
-    ...(input.plan.interests.length > 0
-      ? [
-          `Learner's natural interests: ${input.plan.interests.join("、")}. Use them only when they fit the custom topic naturally.`,
-        ]
-      : []),
-    "Use every target naturally. Inflected, polite, contracted, and conversational forms are allowed when they preserve the requested grammar.",
-    "For kanji-bearing content words, strongly prefer morphology supported by AIko's deterministic lexicon: dictionary/plain forms, polite non-past/negative/past, plain negative/past, て-form, ている, potential, passive, causative, ～たい, ～てしまう/ちゃう/じゃう, and negative conditional/なきゃ.",
-    "Avoid unnecessary volitional, imperative, honorific-irregular, or deeply chained verb forms. Use one only when a required target grammar specifically needs it, and keep that construction short and conventional.",
-    "You may use other useful kanji, including kanji the learner has not seen before. Do not add furigana or bracketed readings inside the story.",
-    "Keep the voice natural, coherent, and appropriate for the JLPT ceiling.",
-    "Return only story metadata and the Japanese/English story lines.",
-    "Do not return vocabulary terms, tokenization, readings, dictionary forms, meanings, grammar explanations, exercises, questions, answers, or audio instructions.",
+    "Generate a Japanese language-learning story.",
+    "",
+    "Learner requirements:",
+    `- Language level: JLPT ${input.level}`,
+    `- Story topic: ${input.topic}`,
+    `- Available learner interests: ${interestText}`,
+    `- Target grammar: ${input.plan.grammar.map((item) => item.pattern).join(", ")}`,
+    `- Target kanji: ${input.plan.kanji.map((item) => item.character).join(", ")}`,
+    "",
+    "Story requirements:",
+    "- The story must primarily focus on the given topic.",
+    `- Write one coherent story containing ${STORY_MIN_SENTENCES}-${STORY_MAX_SENTENCES} natural Japanese sentences.`,
+    "- Return the Japanese story as one continuous string, not an array.",
+    "- Select exactly one learner interest that fits the story naturally.",
+    "- When no provided interest fits naturally, choose a suitable interest yourself.",
+    "- When no learner interests are provided, choose a suitable interest yourself.",
+    "- Do not force an interest into the story.",
+    "- Naturally use every provided target grammar pattern at least once.",
+    "- Naturally use every provided target kanji at least once.",
+    `- Keep all other vocabulary and grammar appropriate for JLPT ${input.level}.`,
+    "- Make the story engaging, educational, and easy to follow.",
+    "- Keep romantic interactions respectful and age-appropriate.",
+    "- Use Japanese quotation marks 「」 only for direct speech.",
+    "- Do not place narration inside Japanese quotation marks.",
+    "- Provide an accurate English translation of the complete story.",
+    "- Return the English translation as one continuous string, not an array.",
   ].join("\n");
 
-  const result = await generateStructured<StoryOnlyDraft>({
+  const result = await generateStructured<StoryPassageOutput>({
     name: "story-only draft",
     prompt,
     schema: storySchema,
@@ -207,7 +206,7 @@ export async function generateAdaptiveStoryDraft(input: {
   });
 
   return {
-    draft: result.value,
+    draft: normalizeStoryPassage(result.value),
     audit: {
       stage: "story",
       model: result.model,

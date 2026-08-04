@@ -286,6 +286,18 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
     () => lines.reduce((total, line) => total + line.words.length, 0),
     [lines],
   );
+  const japanesePassage = useMemo(
+    () => lines.map((line) => line.japanese.trim()).filter(Boolean).join(""),
+    [lines],
+  );
+  const englishPassage = useMemo(
+    () => lines.map((line) => line.english.trim()).filter(Boolean).join(" "),
+    [lines],
+  );
+  const passageWords = useMemo(
+    () => lines.flatMap((line) => line.words),
+    [lines],
+  );
   const readiness = progressIndex(currentStage, lessonReady, audioStatus);
   const canContinue = storyComplete && lessonReady && Boolean(lessonId);
   const canRetry =
@@ -401,29 +413,23 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
           </div>
 
           <Card className="mt-8 p-6 sm:p-10">
-            <div className="space-y-8">
-              {lines.map((line) => (
-                <p
-                  key={line.id}
-                  className="font-serif text-xl leading-[3.4rem] text-ink sm:text-2xl"
-                >
-                  <InspectableText text={line.japanese} terms={line.words} />
-                </p>
-              ))}
-            </div>
+            <p
+              lang="ja"
+              className="font-serif text-xl leading-[3.4rem] text-justify text-ink sm:text-2xl"
+              style={{ textJustify: "inter-character" }}
+            >
+              <InspectableText text={japanesePassage} terms={passageWords} />
+            </p>
 
             <div className="mt-10 border-t border-stone-200 pt-8">
               <p className="section-kicker">English story</p>
-              <div className="mt-4 space-y-4">
-                {lines.map((line) => (
-                  <p
-                    key={`${line.id}_english`}
-                    className="text-base leading-7 text-stone-600 sm:text-lg"
-                  >
-                    {line.english}
-                  </p>
-                ))}
-              </div>
+              <p
+                lang="en"
+                className="mt-4 hyphens-auto text-base leading-7 text-justify text-stone-600 sm:text-lg"
+                style={{ textJustify: "inter-word" }}
+              >
+                {englishPassage}
+              </p>
             </div>
           </Card>
 

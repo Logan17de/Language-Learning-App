@@ -15,6 +15,7 @@ import {
   saveGenerationTrace,
   type GenerationTraceContext,
 } from "@/lib/custom-lessons/generation-trace";
+import { parseJsonOrJsonl } from "@/lib/openai/structured-text";
 
 export type JsonSchema = Record<string, unknown>;
 
@@ -132,18 +133,9 @@ function responseUsage(payload: unknown): OpenAIUsage {
 }
 
 function parseStructuredText(model: string, value: string): unknown {
-  const trimmed = value.trim();
   try {
-    return JSON.parse(trimmed);
+    return parseJsonOrJsonl(value);
   } catch {
-    const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
-    if (fenced?.[1]) {
-      try {
-        return JSON.parse(fenced[1]);
-      } catch {
-        // Fall through to the actionable error below.
-      }
-    }
     throw new Error(`${model} returned malformed JSON.`);
   }
 }

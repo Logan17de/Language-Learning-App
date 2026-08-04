@@ -248,10 +248,6 @@ export function StoryPhase({
     (total, line) => total + line.words.length,
     0,
   );
-  const storyParagraphs: LessonPackage["story"][] = [];
-  for (let index = 0; index < lesson.story.length; index += 2) {
-    storyParagraphs.push(lesson.story.slice(index, index + 2));
-  }
   const activeDetails = activeSupport
     ? wordSupport(activeSupport.lineId, activeSupport.word)
     : null;
@@ -311,69 +307,68 @@ export function StoryPhase({
       </div>
 
       <Card className="mt-8 p-6 sm:p-10">
-        <div className="space-y-8">
-          {storyParagraphs.map((paragraph, paragraphIndex) => (
-            <p
-              key={`story_paragraph_${paragraphIndex}`}
-              className="font-serif text-xl leading-[3.4rem] text-ink sm:text-2xl"
-            >
-              {paragraph.map((line) => (
-                <span key={line.id}>
-                  {segmentStoredStoryLine(line.japanese, line.words).map(
-                    (segment, segmentIndex) => {
-                      if (!segment.word) {
-                        return (
-                          <span key={`${line.id}_text_${segmentIndex}`}>
-                            {segment.text}
-                          </span>
-                        );
+        <p
+          lang="ja"
+          className="font-serif text-xl leading-[3.4rem] text-justify text-ink sm:text-2xl"
+          style={{ textJustify: "inter-character" }}
+        >
+          {lesson.story.map((line) => (
+            <span key={line.id}>
+              {segmentStoredStoryLine(line.japanese, line.words).map(
+                (segment, segmentIndex) => {
+                  if (!segment.word) {
+                    return (
+                      <span key={`${line.id}_text_${segmentIndex}`}>
+                        {segment.text}
+                      </span>
+                    );
+                  }
+                  const word = segment.word;
+                  const support = wordSupport(line.id, word);
+                  const isOpen =
+                    activeSupport?.lineId === line.id &&
+                    activeSupport.word.id === word.id;
+                  return (
+                    <button
+                      key={`${line.id}_${word.id}_${segmentIndex}`}
+                      type="button"
+                      onClick={(event) =>
+                        revealWord(line.id, word, event.currentTarget)
                       }
-                      const word = segment.word;
-                      const support = wordSupport(line.id, word);
-                      const isOpen =
-                        activeSupport?.lineId === line.id &&
-                        activeSupport.word.id === word.id;
-                      return (
-                        <button
-                          key={word.id}
-                          type="button"
-                          onClick={(event) =>
-                            revealWord(line.id, word, event.currentTarget)
-                          }
-                          className={`inline appearance-none border-x-0 border-t-0 bg-transparent p-0 align-baseline font-serif text-inherit leading-[inherit] transition focus:outline-none focus:ring-2 focus:ring-moss-200 ${
-                            isOpen
-                              ? "border-b-2 border-solid border-persimmon-400 text-persimmon-600"
-                              : support.touched
-                                ? "border-b-2 border-dotted border-persimmon-300 text-ink"
-                                : "border-b-2 border-dotted border-stone-300 text-ink hover:border-moss-500"
-                          }`}
-                          aria-label={`Get help with ${word.surface}`}
-                          aria-expanded={isOpen}
-                          data-word-support-trigger
-                        >
-                          {word.surface}
-                        </button>
-                      );
-                    },
-                  )}
-                </span>
-              ))}
-            </p>
+                      className={`inline appearance-none border-x-0 border-t-0 bg-transparent p-0 align-baseline font-serif text-inherit leading-[inherit] transition focus:outline-none focus:ring-2 focus:ring-moss-200 ${
+                        isOpen
+                          ? "border-b-2 border-solid border-persimmon-400 text-persimmon-600"
+                          : support.touched
+                            ? "border-b-2 border-dotted border-persimmon-300 text-ink"
+                            : "border-b-2 border-dotted border-stone-300 text-ink hover:border-moss-500"
+                      }`}
+                      aria-label={`Get help with ${word.surface}`}
+                      aria-expanded={isOpen}
+                      data-word-support-trigger
+                    >
+                      {word.surface}
+                    </button>
+                  );
+                },
+              )}
+            </span>
           ))}
-        </div>
+        </p>
 
         <div className="mt-10 border-t border-stone-200 pt-8">
           <p className="section-kicker">English story</p>
-          <div className="mt-4 space-y-4">
-            {lesson.story.map((line) => (
-              <p
-                key={`${line.id}_english`}
-                className="text-base leading-7 text-stone-600 sm:text-lg"
-              >
+          <p
+            lang="en"
+            className="mt-4 hyphens-auto text-base leading-7 text-justify text-stone-600 sm:text-lg"
+            style={{ textJustify: "inter-word" }}
+          >
+            {lesson.story.map((line, lineIndex) => (
+              <span key={`${line.id}_english`}>
+                {lineIndex > 0 ? " " : ""}
                 {line.english}
-              </p>
+              </span>
             ))}
-          </div>
+          </p>
         </div>
       </Card>
 

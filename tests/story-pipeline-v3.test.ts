@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { normalizeStoryPassage } from "../lib/gemini/story-pipeline-v3";
 
 const storyCall = readFileSync(
   "lib/gemini/adaptive-story-generation.ts",
@@ -20,6 +21,7 @@ const validator = readFileSync(
 );
 const runner = readFileSync("lib/custom-lessons/job-runner.ts", "utf8");
 const structured = readFileSync("lib/openai/structured-output.ts", "utf8");
+const structuredText = readFileSync("lib/openai/structured-text.ts", "utf8");
 const compatibilityExport = readFileSync(
   "lib/gemini/structured-output.ts",
   "utf8",
@@ -49,16 +51,39 @@ const migration = readFileSync(
 );
 
 describe("custom lesson story pipeline v3", () => {
-  it("makes call 1 story-only with 10-12 lines and optional onboarding interests", () => {
-    expect(storyCall).toContain("const STORY_MIN_LINES = 10");
-    expect(storyCall).toContain("const STORY_MAX_LINES = 12");
-    expect(storyCall).toContain("Learner's natural interests");
-    expect(storyCall).toContain("input.plan.interests.length > 0");
-    expect(storyCall).toContain("Return only story metadata");
-    expect(storyCall).toContain("Do not return vocabulary terms, tokenization");
+  it("makes call 1 a continuous 10-15 sentence passage with one selected interest", () => {
+    expect(storyCall).toContain("const STORY_MIN_SENTENCES = 10");
+    expect(storyCall).toContain("const STORY_MAX_SENTENCES = 15");
+    expect(storyCall).toContain('"selected_interest"');
+    expect(storyCall).toContain('"japanese_story"');
+    expect(storyCall).toContain('"english_translation"');
+    expect(storyCall).toContain("Available learner interests");
+    expect(storyCall).toContain("Select exactly one learner interest");
+    expect(storyCall).toContain("one continuous string, not an array");
+    expect(storyCall).toContain("normalizeStoryPassage(result.value)");
     expect(storyCall).not.toContain('required: [\n              "surface"');
     expect(plan).toContain('.from("user_preferences")');
     expect(plan).toContain('.from("profiles")');
+  });
+
+  it("normalizes the new passage response into one backward-compatible reader line", () => {
+    const draft = normalizeStoryPassage({
+      selected_interest: "Travel",
+      japanese_title: "東京の一日",
+      english_title: "A Day in Tokyo",
+      japanese_story: "朝、東京へ行きました。友達と駅で会いました。",
+      english_translation: "I went to Tokyo in the morning. I met my friend at the station.",
+    });
+
+    expect(draft.title).toBe("A Day in Tokyo");
+    expect(draft.japaneseTitle).toBe("東京の一日");
+    expect(draft.tags).toEqual(["Travel"]);
+    expect(draft.storyPreview).toBe("朝、東京へ行きました。");
+    expect(draft.summary).toBe("I went to Tokyo in the morning.");
+    expect(draft.lines).toEqual([{
+      japanese: "朝、東京へ行きました。友達と駅で会いました。",
+      english: "I went to Tokyo in the morning. I met my friend at the station.",
+    }]);
   });
 
   it("uses only existing library records for story taps and never enriches them", () => {
@@ -78,15 +103,20 @@ describe("custom lesson story pipeline v3", () => {
     expect(route).not.toContain("enrichmentModel");
   });
 
-  it("shows the English story below the complete Japanese story", () => {
+  it("shows justified Japanese and English passages while retaining old line compatibility", () => {
     expect(progressiveStory).toContain("english: string");
+    expect(progressiveStory).toContain("japanesePassage");
+    expect(progressiveStory).toContain("englishPassage");
+    expect(progressiveStory).toContain('textJustify: "inter-character"');
+    expect(progressiveStory).toContain('textJustify: "inter-word"');
     expect(progressiveStory).toContain('English story');
-    expect(progressiveStory).toContain('{line.english}');
     expect(progressiveStory.indexOf('English story')).toBeGreaterThan(
-      progressiveStory.indexOf('<InspectableText text={line.japanese}'),
+      progressiveStory.indexOf('<InspectableText text={japanesePassage}'),
     );
     expect(storyPhase).toContain('English story');
     expect(storyPhase).toContain('{line.english}');
+    expect(storyPhase).toContain('textJustify: "inter-character"');
+    expect(storyPhase).toContain('textJustify: "inter-word"');
     expect(storyPhase.indexOf('English story')).toBeGreaterThan(
       storyPhase.indexOf('segmentStoredStoryLine(line.japanese'),
     );
@@ -99,6 +129,9 @@ describe("custom lesson story pipeline v3", () => {
     expect(structured).toContain("OPENAI_VALIDATOR_MODEL");
     expect(structured).toContain("OPENAI_STORY_REASONING_EFFORT");
     expect(structured).toContain("OpenAI structured generation completed");
+    expect(structured).toContain("parseJsonOrJsonl");
+    expect(structuredText).toContain("object-based JSONL");
+    expect(structuredText).toContain("Object.assign({}, ...records)");
     expect(structured).not.toContain("GEMINI_");
     expect(compatibilityExport).toContain("@/lib/openai/structured-output");
     expect(route).toContain("The only model call before the story is shown");
