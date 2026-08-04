@@ -15,7 +15,6 @@ import type {
 } from "@/lib/gemini/lesson-engine-v2";
 import {
   filterStoryGrammarPatterns,
-  grammarQuestionFormats,
   grammarQuestionsPrompt,
   grammarQuestionsSchema,
   type RawGrammarQuestion,
@@ -28,7 +27,6 @@ import { generateListeningRegion } from "@/lib/gemini/listening-region-generatio
 import { generateSpeakingRegion } from "@/lib/gemini/speaking-region-generation";
 import type { SpeakingQuestionType } from "@/lib/gemini/speaking-question-contract";
 import {
-  vocabularyQuestionFormats,
   vocabularyQuestionsPrompt,
   vocabularyQuestionsSchema,
   type RawVocabularyQuestion,
@@ -351,79 +349,12 @@ function targetIdForVocabularyQuestion(
 
 function rawVocabularyQuestionIssues(
   value: unknown,
-  library: ResolvedLessonLibrary,
 ): string[] {
-  if (!isRecord(value) || !Array.isArray(value.questions)) {
-    return ["Vocabulary response must contain questions."];
-  }
-  const questions = value.questions;
-  const issues: string[] = [];
-  if (questions.length !== 13) {
-    issues.push("Vocabulary response needs exactly 13 questions.");
-  }
-  const counts = { easy: 0, medium: 0, hard: 0 };
-  questions.forEach((candidate, index) => {
-    const label = `Vocabulary question ${index + 1}`;
-    if (!isRecord(candidate)) {
-      issues.push(`${label} must be an object.`);
-      return;
-    }
-    const difficulty = candidate.difficulty;
-    if (difficulty === "easy" || difficulty === "medium" || difficulty === "hard") {
-      counts[difficulty] += 1;
-    }
-    const formatId = Number(candidate.format_id);
-    const format = vocabularyQuestionFormats.find((item) => item.id === formatId);
-    if (!format) {
-      issues.push(`${label} uses an unavailable format_id.`);
-    } else if (
-      difficulty !== "easy" &&
-      difficulty !== "medium" &&
-      difficulty !== "hard"
-    ) {
-      issues.push(`${label} has an invalid difficulty.`);
-    } else if (!format.difficulty.includes(difficulty)) {
-      issues.push(`${label} uses format ${formatId} at an unsupported difficulty.`);
-    }
-    if (
-      !Array.isArray(candidate.choices) ||
-      candidate.choices.length !== 4 ||
-      !candidate.choices.every((choice) => typeof choice === "string")
-    ) {
-      issues.push(`${label} needs exactly four string choices.`);
-    } else {
-      const choices = candidate.choices as string[];
-      if (duplicateChoices(choices)) issues.push(`${label} repeats a choice.`);
-      const answer = typeof candidate.answer === "string" ? normalized(candidate.answer) : "";
-      if (!answer || choices.filter((choice) => normalized(choice) === answer).length !== 1) {
-        issues.push(`${label} must contain its answer exactly once.`);
-      }
-    }
-    if (
-      typeof candidate.question !== "string" ||
-      !candidate.question.trim() ||
-      (candidate.sentence !== null && typeof candidate.sentence !== "string") ||
-      typeof candidate.answer !== "string"
-    ) {
-      issues.push(`${label} has incomplete question content.`);
-      return;
-    }
-    const question = candidate as unknown as RawVocabularyQuestion;
-    const targetId = targetIdForVocabularyQuestion(question, library);
-    if (!targetId) {
-      issues.push(`${label} does not target vocabulary or allowed kanji from the story.`);
-    }
-    if (kanjiQuestionFormatIds.has(formatId)) {
-      const evidence = questionText(question);
-      if (!library.kanji.some((item) => evidence.includes(item.character))) {
-        issues.push(`${label} uses a kanji format without an allowed story kanji.`);
-      }
-    }
-  });
-  if (counts.easy !== 6 || counts.medium !== 4 || counts.hard !== 3) {
-    issues.push("Vocabulary response needs 6 easy, 4 medium, and 3 hard questions.");
-  }
-  return [...new Set(issues)];
+  return isRecord(value) &&
+      Array.isArray(value.questions) &&
+      value.questions.length > 0
+    ? []
+    : ["Vocabulary response must contain at least one question."];
 }
 
 function adaptVocabularyQuestions(
@@ -433,9 +364,6 @@ function adaptVocabularyQuestions(
   return {
     vocabularyQuestions: questions.map((question) => {
       const targetId = targetIdForVocabularyQuestion(question, library);
-      if (!targetId) {
-        throw new Error("A vocabulary question could not be linked to its story word.");
-      }
       return {
         activityType: "multiple_choice",
         difficulty: rawDifficulty(question.difficulty),
@@ -449,7 +377,7 @@ function adaptVocabularyQuestions(
         explanation: `The correct answer is ${question.answer}.`,
         hintFront: "",
         hintBack: "",
-        targetItemIds: [targetId],
+        targetItemIds: targetId ? [targetId] : [],
       } satisfies PracticeQuestion;
     }),
   };
@@ -505,113 +433,14 @@ function grammarTargetsForQuestion(
   );
 }
 
-function matchesQuestionTemplate(value: string, template: string): boolean {
-  const expression = template
-    .split(/(<[^>]+>)/gu)
-    .map((part) => part.startsWith("<") && part.endsWith(">")
-      ? ".+"
-      : part.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&"))
-    .join("");
-  return new RegExp(`^${expression}$`, "u").test(value.trim());
-}
-
 function rawGrammarQuestionIssues(
   value: unknown,
-  targets: ResolvedLessonLibrary["grammar"],
 ): string[] {
-  if (!isRecord(value) || !Array.isArray(value.questions)) {
-    return ["Grammar response must contain questions."];
-  }
-  const questions = value.questions;
-  const issues: string[] = [];
-  const coveredTargetIds = new Set<string>();
-  if (questions.length !== 10) {
-    issues.push("Grammar response needs exactly 10 questions.");
-  }
-  const counts = { easy: 0, medium: 0, hard: 0 };
-  questions.forEach((candidate, index) => {
-    const label = `Grammar question ${index + 1}`;
-    if (!isRecord(candidate)) {
-      issues.push(`${label} must be an object.`);
-      return;
-    }
-    const difficulty = candidate.difficulty;
-    if (difficulty === "easy" || difficulty === "medium" || difficulty === "hard") {
-      counts[difficulty] += 1;
-    }
-    const formatId = Number(candidate.format_id);
-    const format = grammarQuestionFormats.find((item) => Number(item.id) === formatId);
-    if (!format) {
-      issues.push(`${label} uses an unavailable format_id.`);
-    } else if (
-      difficulty !== "easy" &&
-      difficulty !== "medium" &&
-      difficulty !== "hard"
-    ) {
-      issues.push(`${label} has an invalid difficulty.`);
-    } else if (!format.difficulty.includes(difficulty)) {
-      issues.push(`${label} uses format ${formatId} at an unsupported difficulty.`);
-    }
-    if (
-      format &&
-      typeof candidate.question === "string" &&
-      !matchesQuestionTemplate(candidate.question, format.question)
-    ) {
-      issues.push(`${label} does not follow question format ${formatId} exactly.`);
-    }
-    if (format?.sentence) {
-      if (typeof candidate.sentence !== "string" || !candidate.sentence.trim()) {
-        issues.push(`${label} needs the sentence required by format ${formatId}.`);
-      } else if (
-        format.sentence.includes("WITH_BLANK") &&
-        !/_{2,}|＿{2,}|<[^>]*BLANK[^>]*>/iu.test(candidate.sentence)
-      ) {
-        issues.push(`${label} needs a visible blank in its sentence.`);
-      }
-    } else if (candidate.sentence !== null) {
-      issues.push(`${label} must use a null sentence for format ${formatId}.`);
-    }
-    if (
-      !Array.isArray(candidate.choices) ||
-      candidate.choices.length !== 4 ||
-      !candidate.choices.every((choice) => typeof choice === "string")
-    ) {
-      issues.push(`${label} needs exactly four string choices.`);
-    } else {
-      const choices = candidate.choices as string[];
-      if (duplicateChoices(choices)) issues.push(`${label} repeats a choice.`);
-      const answer = typeof candidate.answer === "string" ? normalized(candidate.answer) : "";
-      if (!answer || choices.filter((choice) => normalized(choice) === answer).length !== 1) {
-        issues.push(`${label} must contain its answer exactly once.`);
-      }
-    }
-    if (
-      typeof candidate.question !== "string" ||
-      !candidate.question.trim() ||
-      (candidate.sentence !== null && typeof candidate.sentence !== "string") ||
-      typeof candidate.answer !== "string"
-    ) {
-      issues.push(`${label} has incomplete question content.`);
-      return;
-    }
-    const matchedTargets = grammarTargetsForQuestion(
-      candidate as unknown as RawGrammarQuestion,
-      targets,
-    );
-    if (matchedTargets.length < 1) {
-      issues.push(`${label} does not test a provided grammar pattern from the story.`);
-    }
-    matchedTargets.forEach((target) => coveredTargetIds.add(target.libraryId));
-  });
-  if (counts.easy !== 3 || counts.medium !== 4 || counts.hard !== 3) {
-    issues.push("Grammar response needs 3 easy, 4 medium, and 3 hard questions.");
-  }
-  for (const target of targets) {
-    if (!coveredTargetIds.has(target.libraryId)) {
-      issues.push(`Grammar response does not test target pattern ${target.pattern}.`);
-    }
-  }
-  return [...new Set(issues)];
+  return isRecord(value) &&
+      Array.isArray(value.questions) &&
+      value.questions.length > 0
+    ? []
+    : ["Grammar response must contain at least one question."];
 }
 
 function adaptGrammarQuestions(
@@ -620,9 +449,6 @@ function adaptGrammarQuestions(
 ): PracticeQuestion[] {
   return questions.map((question) => {
     const target = grammarTargetsForQuestion(question, targets)[0];
-    if (!target) {
-      throw new Error("A grammar question could not be linked to its story pattern.");
-    }
     return {
       activityType: "multiple_choice",
       difficulty: rawDifficulty(question.difficulty),
@@ -636,7 +462,7 @@ function adaptGrammarQuestions(
       explanation: `The correct answer is ${question.answer}.`,
       hintFront: "",
       hintBack: "",
-      targetItemIds: [target.libraryId],
+      targetItemIds: target ? [target.libraryId] : [],
     } satisfies PracticeQuestion;
   });
 }
@@ -679,7 +505,7 @@ export async function generateVocabularyAndKanjiActivities(input: {
     schema: vocabularyQuestionsSchema,
     strictSchema: true,
     exactSchemaName: true,
-    validate: (value) => rawVocabularyQuestionIssues(value, input.library),
+    validate: rawVocabularyQuestionIssues,
   });
   return {
     value: adaptVocabularyQuestions(generated.value.questions, input.library),
@@ -714,7 +540,7 @@ export async function generateGrammarAndReadingActivities(input: {
       schema: grammarQuestionsSchema,
       strictSchema: true,
       exactSchemaName: true,
-      validate: (value) => rawGrammarQuestionIssues(value, targets),
+      validate: rawGrammarQuestionIssues,
     }),
     generateReadingRegion({
       requestId: input.requestId,

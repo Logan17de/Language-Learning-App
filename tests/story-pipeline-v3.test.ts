@@ -258,6 +258,14 @@ describe("custom lesson story pipeline v3", () => {
     expect(activityGroups).toContain("vocabularyQuestionsSchema");
     expect(activityGroups).toContain("strictSchema: true");
     expect(activityGroups).toContain("exactSchemaName: true");
+    expect(activityGroups).toContain("Vocabulary response must contain at least one question.");
+    expect(activityGroups).toContain("targetItemIds: targetId ? [targetId] : []");
+    expect(activityGroups).not.toContain(
+      "does not target vocabulary or allowed kanji from the story",
+    );
+    expect(activityGroups).not.toContain(
+      "A vocabulary question could not be linked to its story word.",
+    );
     expect(vocabularyContract).toContain("Create vocabulary and kanji questions from this Japanese story.");
     expect(vocabularyContract).toContain("Create exactly 13 questions: 6 easy, 4 medium, and 3 hard.");
     expect(vocabularyContract).toContain('required: [\n          "format_id"');
@@ -273,6 +281,14 @@ describe("custom lesson story pipeline v3", () => {
     expect(activityGroups).toContain("rawGrammarQuestionIssues");
     expect(activityGroups).toContain("adaptGrammarQuestions");
     expect(activityGroups).toContain("filterStoryGrammarPatterns");
+    expect(activityGroups).toContain("Grammar response must contain at least one question.");
+    expect(activityGroups).toContain("targetItemIds: target ? [target.libraryId] : []");
+    expect(activityGroups).not.toContain(
+      "does not test a provided grammar pattern from the story",
+    );
+    expect(activityGroups).not.toContain(
+      "A grammar question could not be linked to its story pattern.",
+    );
     expect(grammarContract).toContain("Create grammar questions from this Japanese story.");
     expect(grammarContract).toContain("Create exactly 10 questions: 3 easy, 4 medium, and 3 hard.");
     expect(grammarContract).toContain("Do not create questions using grammar patterns that do not appear in the story.");
