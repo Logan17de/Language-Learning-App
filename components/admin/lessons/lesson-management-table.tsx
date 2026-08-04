@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Archive, Copy, Download, Eye, FileCheck2, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { Archive, Copy, Download, Eye, FileCheck2, Pencil, Plus, Search, Trash2, Upload } from "lucide-react";
 import { mockLessons } from "@/data/mock-lessons";
 import { mergeCanonicalLessons } from "@/lib/canonical-lessons";
 import { useAdminStore } from "@/store/admin-store";
@@ -95,7 +95,7 @@ export function LessonManagementTable() {
 
   return (
     <>
-      <AdminPageHeader eyebrow="Content management" title="Lesson library" description="Manage curated, generated, draft, approved, published, rejected, archived, and malformed lesson packages from one canonical content view." actions={<ButtonLink href="/admin/lessons/new/edit" className="rounded-xl"><Plus className="size-4" /> Create lesson</ButtonLink>} />
+      <AdminPageHeader eyebrow="Content management" title="Lesson library" description="Manage curated, generated, draft, approved, published, rejected, archived, and malformed lesson packages from one canonical content view." actions={<div className="flex flex-wrap gap-2"><ButtonLink href="/admin/lessons/import" variant="secondary" className="rounded-xl"><Upload className="size-4" /> Import full lesson</ButtonLink><ButtonLink href="/admin/lessons/new/edit" className="rounded-xl"><Plus className="size-4" /> Create lesson</ButtonLink></div>} />
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
           <label className="relative xl:col-span-2"><span className="sr-only">Search lessons</span><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" /><input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} className="min-h-11 w-full rounded-xl border border-slate-200 pl-9 pr-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100" placeholder="Search titles, topics, and tags" /></label>

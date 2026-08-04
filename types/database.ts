@@ -220,6 +220,10 @@ export interface Database {
         Args: { p_lesson_ref: string; p_package: Json };
         Returns: Json;
       };
+      import_complete_lesson: {
+        Args: { p_package: Json; p_publish?: boolean };
+        Returns: Json;
+      };
       current_app_role: {
         Args: Record<string, never>;
         Returns: Database["public"]["Enums"]["app_role"];

@@ -16,6 +16,7 @@ import {
   Languages,
   LibraryBig,
   MessageSquareText,
+  PackagePlus,
   ScrollText,
   Settings,
   Users,
@@ -27,6 +28,7 @@ import { cn } from "@/lib/utils";
 const links = [
   { href: "/admin", label: "Dashboard", icon: Gauge },
   { href: "/admin/lessons", label: "Lessons", icon: BookOpenCheck },
+  { href: "/admin/lessons/import", label: "Import lesson", icon: PackagePlus },
   { href: "/admin/generated", label: "Generated", icon: Bot },
   { href: "/admin/curriculum", label: "Curriculum", icon: GraduationCap },
   { href: "/admin/grammar", label: "Grammar", icon: Languages },
@@ -56,7 +58,11 @@ export function AdminSidebar({ open, onClose }: { open: boolean; onClose: () => 
         <nav className="flex-1 overflow-y-auto p-4" aria-label="Admin navigation">
           <ul className="space-y-1">
             {links.map(({ href, label, icon: Icon }) => {
-              const active = href === "/admin" ? pathname === href : pathname?.startsWith(href);
+              const active = href === "/admin"
+                ? pathname === href
+                : href === "/admin/lessons"
+                  ? pathname?.startsWith(href) && !pathname.startsWith("/admin/lessons/import")
+                  : pathname?.startsWith(href);
               return <li key={href}><Link href={href} onClick={onClose} className={cn("flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-teal-300", active ? "bg-teal-400 text-slate-950" : "text-white/65 hover:bg-white/10 hover:text-white")}><Icon className="size-4.5" />{label}</Link></li>;
             })}
           </ul>
