@@ -167,18 +167,6 @@ export function InspectableText({
             }}
           >
             {segment.text}
-            {(segment.word.showReading === true ||
-              (segment.word.showReading === undefined &&
-                segment.word.libraryType === "kanji")) &&
-              segment.word.scriptType === "kanji" &&
-              segment.word.reading && (
-                <span
-                  className="ml-1 whitespace-nowrap text-[0.72em] font-semibold text-persimmon-600"
-                  aria-label={`Reading ${segment.word.reading}`}
-                >
-                  ［{segment.word.reading}］
-                </span>
-              )}
           </span>
         ),
       )}

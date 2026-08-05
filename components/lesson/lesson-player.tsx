@@ -143,9 +143,9 @@ export function LessonPlayer({
       const withTime = { ...next, elapsedSeconds };
       setSession(withTime);
       saveLessonSession(withTime);
-      void syncLessonProgress(lesson, withTime).catch(() => undefined);
+      return withTime;
     },
-    [elapsedSeconds, lesson, saveLessonSession],
+    [elapsedSeconds, saveLessonSession],
   );
 
   const phase = lesson.phases[session?.currentPhaseIndex ?? 0];
@@ -192,16 +192,26 @@ export function LessonPlayer({
     if (!session || !canContinue) return;
     const currentPhase = lesson.phases[session.currentPhaseIndex];
     if (currentPhase.id === "review") {
-      const timedSession = { ...session, elapsedSeconds, completed: true };
+      const timedSession = {
+        ...session,
+        elapsedSeconds,
+        completed: true,
+        completedPhaseIds: Array.from(
+          new Set([...session.completedPhaseIds, currentPhase.id]),
+        ),
+      };
       const result = calculateLessonCompletion(lesson, timedSession);
       const completeSession = { ...timedSession, completionResult: result };
-      updateSession(completeSession);
+      const saved = updateSession(completeSession);
+      void syncLessonProgress(lesson, saved, currentPhase.id).catch(
+        () => undefined,
+      );
       router.push(`/lesson/${lesson.id}/complete`);
       return;
     }
     const nextIndex = session.currentPhaseIndex + 1;
     const nextPhase = lesson.phases[nextIndex];
-    updateSession({
+    const saved = updateSession({
       ...session,
       completedPhaseIds: Array.from(new Set([...session.completedPhaseIds, currentPhase.id])),
       activities: {
@@ -216,6 +226,9 @@ export function LessonPlayer({
       currentPhaseIndex: nextIndex,
       activityIndex: session.activities[nextPhase.id]?.activityIndex ?? 0,
     });
+    void syncLessonProgress(lesson, saved, currentPhase.id).catch(
+      () => undefined,
+    );
   }
 
   async function exit() {

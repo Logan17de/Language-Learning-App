@@ -13,4 +13,10 @@ describe("tappable word support contract", () => {
     expect(source).not.toContain("Hear pronunciation");
     expect(source).not.toContain("/api/audio/tts");
   });
+
+  it("does not print automatic bracketed kana beside unknown kanji", () => {
+    expect(source).not.toContain("showReading");
+    expect(source).not.toContain("ï¼»{segment.word.reading}ï¼½");
+    expect(source).toContain('word.scriptType === "kanji" && stage >= 1');
+  });
 });

@@ -236,9 +236,12 @@ describe("custom lesson story pipeline v3", () => {
     expect(compatibilityExport).toContain("release()");
   });
 
-  it("shows readings for unknown kanji and marks them known at ten appearances", () => {
-    expect(inspectable).toContain("［{segment.word.reading}］");
-    expect(inspectable).toContain("text-persimmon-600");
+  it("keeps unknown readings behind inspection while recording story appearances", () => {
+    expect(inspectable).not.toContain("［{segment.word.reading}］");
+    expect(inspectable).not.toContain("showReading");
+    expect(inspectable).toContain(
+      'active.word.scriptType === "kanji" && stage >= 1',
+    );
     expect(route).toContain('rpc("record_story_kanji_exposures"');
     expect(plan).toContain('.gte("appearance_count", 10)');
     expect(migration).toContain("appearance_count >= 10");

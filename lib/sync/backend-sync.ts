@@ -1,7 +1,7 @@
 "use client";
 
 import type { LessonPackage } from "@/types/lesson";
-import type { LessonSession } from "@/types/lesson-session";
+import type { LessonPhaseId, LessonSession } from "@/types/lesson-session";
 import type { ReviewSession } from "@/types/review-session";
 import type { Json } from "@/types/database";
 import { getBackendMode } from "@/lib/supabase/config";
@@ -17,6 +17,7 @@ function json(value: unknown): Json {
 type MasteryItemType = "kanji" | "vocabulary" | "grammar";
 type MasteryDimension = "meaning" | "recognition" | "pronunciation";
 type MasterySignal =
+  | "exposure"
   | "revealed_reading"
   | "revealed_meaning"
   | "correct"
@@ -36,10 +37,45 @@ function masteryItemType(
   return null;
 }
 
+function activityPhase(
+  lesson: LessonPackage,
+  activityId: string,
+): LessonPhaseId | null {
+  if (lesson.story.some((item) => item.id === activityId)) return "story";
+  if (lesson.vocabularyQuestions.some((item) => item.id === activityId)) {
+    return "vocabulary";
+  }
+  if (lesson.grammarQuestions.some((item) => item.id === activityId)) {
+    return "grammar";
+  }
+  if (
+    activityId.startsWith("reading-passage:") ||
+    (lesson.readingQuestions ?? []).some((item) => item.id === activityId)
+  ) {
+    return "reading";
+  }
+  if (lesson.listeningExercises.some((item) => item.id === activityId)) {
+    return "listening";
+  }
+  if (lesson.speakingExercises.some((item) => item.id === activityId)) {
+    return "speaking";
+  }
+  if (lesson.reviewQuestions.some((item) => item.id === activityId)) {
+    return "review";
+  }
+  return null;
+}
+
 export function buildMasteryEvidence(
   lesson: LessonPackage,
   session: LessonSession,
+  phaseId: LessonPhaseId,
 ): Json[] {
+  const phaseComplete =
+    session.completedPhaseIds.includes(phaseId) ||
+    (phaseId === "review" && session.completed);
+  if (!phaseComplete) return [];
+
   const result: Json[] = [];
   const add = (input: {
     clientEventId: string;
@@ -65,6 +101,9 @@ export function buildMasteryEvidence(
   const inspectableWords = [
     ...lesson.vocabularyQuestions.flatMap((item) => item.inspectableTerms),
     ...lesson.grammarQuestions.flatMap((item) => item.inspectableTerms),
+    ...lesson.readingConversation.flatMap(
+      (item) => item.inspectableTerms ?? [],
+    ),
     ...lesson.listeningExercises.flatMap((item) => item.inspectableTerms ?? []),
     ...lesson.speakingExercises.flatMap((item) => item.inspectableTerms ?? []),
     ...lesson.reviewQuestions.flatMap((item) => item.inspectableTerms ?? []),
@@ -77,6 +116,7 @@ export function buildMasteryEvidence(
     ) {
       continue;
     }
+    if (activityPhase(lesson, interaction.lineId) !== phaseId) continue;
     const line = lesson.story.find((item) => item.id === interaction.lineId);
     const word =
       line?.words.find((item) => item.id === interaction.wordId) ??
@@ -116,7 +156,42 @@ export function buildMasteryEvidence(
     }
   }
 
-  for (const answer of session.vocabularyAnswers) {
+  const usedHelpForKanji = (activityId: string, character: string) =>
+    session.storyInteractions.some(
+      (interaction) =>
+        interaction.lineId === activityId &&
+        (interaction.type === "reading-revealed" ||
+          interaction.type === "meaning-revealed") &&
+        interaction.term?.includes(character) === true,
+    );
+  const addUnassistedKanji = (
+    activityId: string,
+    visibleText: string,
+    data: Record<string, unknown>,
+  ) => {
+    for (const item of lesson.kanji) {
+      if (
+        !item.libraryId ||
+        !visibleText.includes(item.character) ||
+        usedHelpForKanji(activityId, item.character)
+      ) {
+        continue;
+      }
+      add({
+        clientEventId: `${phaseId}:${activityId}:${item.libraryId}:unassisted`,
+        itemKey: item.libraryId,
+        dimension: "recognition",
+        signal: "exposure",
+        data: {
+          ...data,
+          character: item.character,
+          answeredWithoutHelp: true,
+        },
+      });
+    }
+  };
+
+  for (const answer of phaseId === "vocabulary" ? session.vocabularyAnswers : []) {
     const question = lesson.vocabularyQuestions.find(
       (item) => item.id === answer.questionId,
     );
@@ -132,9 +207,14 @@ export function buildMasteryEvidence(
         data: { selectedAnswer: answer.selectedAnswer, mode: question.mode },
       });
     }
+    addUnassistedKanji(
+      question.id,
+      [question.prompt, question.cue, ...question.choices].join("\n"),
+      { answeredCorrectly: answer.correct, source: "vocabulary" },
+    );
   }
 
-  for (const answer of session.grammarAnswers) {
+  for (const answer of phaseId === "grammar" ? session.grammarAnswers : []) {
     const question = lesson.grammarQuestions.find(
       (item) => item.id === answer.questionId,
     );
@@ -148,9 +228,37 @@ export function buildMasteryEvidence(
         data: { selectedAnswer: answer.selectedAnswer, skill: answer.skill },
       });
     }
+    addUnassistedKanji(
+      question.id,
+      [question.prompt, question.cue, question.hintFront, ...question.choices].join("\n"),
+      { answeredCorrectly: answer.correct, source: "grammar" },
+    );
   }
 
-  for (const event of session.speakingEvents) {
+  for (const answer of phaseId === "reading" ? session.readingAnswers : []) {
+    const question = (lesson.readingQuestions ?? []).find(
+      (item) => item.id === answer.questionId,
+    );
+    if (!question) continue;
+    addUnassistedKanji(question.id, question.question, {
+      source: "reading",
+    });
+  }
+
+  for (const event of phaseId === "listening" ? session.listeningEvents : []) {
+    if (event.type !== "answer" || !event.questionId) continue;
+    const exercise = lesson.listeningExercises.find(
+      (item) => item.id === event.questionId,
+    );
+    if (!exercise) continue;
+    addUnassistedKanji(
+      exercise.id,
+      [exercise.prompt, ...exercise.choices].join("\n"),
+      { answeredCorrectly: event.correct === true, source: "listening" },
+    );
+  }
+
+  for (const event of phaseId === "speaking" ? session.speakingEvents : []) {
     if (!event.evaluationAvailable) continue;
     const exercise = lesson.speakingExercises.find(
       (item) => item.id === event.exerciseId,
@@ -174,9 +282,13 @@ export function buildMasteryEvidence(
         },
       });
     }
+    addUnassistedKanji(exercise.id, exercise.modelAnswer, {
+      evaluationAvailable: event.evaluationAvailable === true,
+      source: "speaking",
+    });
   }
 
-  for (const answer of session.reviewAnswers) {
+  for (const answer of phaseId === "review" ? session.reviewAnswers : []) {
     const question = lesson.reviewQuestions.find(
       (item) => item.id === answer.questionId,
     );
@@ -191,12 +303,22 @@ export function buildMasteryEvidence(
         data: { selectedAnswer: answer.selectedAnswer, category: answer.category },
       });
     }
+    addUnassistedKanji(
+      question.id,
+      [question.prompt, ...question.choices].join("\n"),
+      { answeredCorrectly: answer.correct, source: "review" },
+    );
   }
 
   return result;
 }
 
-async function persistLesson(lesson: LessonPackage, session: LessonSession, complete: boolean): Promise<boolean> {
+async function persistLesson(
+  lesson: LessonPackage,
+  session: LessonSession,
+  complete: boolean,
+  masteryPhase?: LessonPhaseId,
+): Promise<boolean> {
   const canonical = await lessonRepository.getPlayable(lesson.id);
   if (!canonical.ok) return false;
   const backendSession = await lessonSessionRepository.startOrResume(canonical.data.lesson.id, canonical.data.version.id);
@@ -269,7 +391,7 @@ async function persistLesson(lesson: LessonPackage, session: LessonSession, comp
     lessonSessionRepository.saveEvents(events),
     lessonSessionRepository.recordMasteryEvidence(
       backendSession.data.id,
-      buildMasteryEvidence(lesson, session),
+      masteryPhase ? buildMasteryEvidence(lesson, session, masteryPhase) : [],
     ),
   ]);
   if (!answersResult.ok || !eventsResult.ok || !masteryResult.ok) return false;
@@ -324,18 +446,27 @@ async function persistReview(session: ReviewSession, complete: boolean): Promise
   return result.ok;
 }
 
-export async function syncLessonProgress(lesson: LessonPackage, session: LessonSession): Promise<boolean> {
+export async function syncLessonProgress(
+  lesson: LessonPackage,
+  session: LessonSession,
+  masteryPhase?: LessonPhaseId,
+): Promise<boolean> {
   if (getBackendMode() !== "supabase") return true;
   const complete = Boolean(session.completed && session.completionResult);
   const kind = complete ? "lesson_completion" : "lesson_checkpoint";
-  const key = `${kind}:${lesson.id}`;
+  const key = `${kind}:${lesson.id}:${masteryPhase ?? "checkpoint"}`;
   if (!navigator.onLine) {
-    enqueueSync(kind, key, json({ lesson, session }), "Offline");
+    enqueueSync(kind, key, json({ lesson, session, masteryPhase }), "Offline");
     return false;
   }
-  const synced = await persistLesson(lesson, session, complete);
+  const synced = await persistLesson(lesson, session, complete, masteryPhase);
   if (!synced) {
-    enqueueSync(kind, key, json({ lesson, session }), "Database request failed.");
+    enqueueSync(
+      kind,
+      key,
+      json({ lesson, session, masteryPhase }),
+      "Database request failed.",
+    );
   }
   return synced;
 }
@@ -369,9 +500,17 @@ export async function restoreLessonProgress(lesson: LessonPackage, fallback: Les
   return restored as unknown as LessonSession;
 }
 
-function operationPayload(operation: SyncOperation): { lesson?: LessonPackage; session?: LessonSession | ReviewSession } {
+function operationPayload(operation: SyncOperation): {
+  lesson?: LessonPackage;
+  session?: LessonSession | ReviewSession;
+  masteryPhase?: LessonPhaseId;
+} {
   return typeof operation.payload === "object" && operation.payload !== null && !Array.isArray(operation.payload)
-    ? operation.payload as unknown as { lesson?: LessonPackage; session?: LessonSession | ReviewSession }
+    ? operation.payload as unknown as {
+        lesson?: LessonPackage;
+        session?: LessonSession | ReviewSession;
+        masteryPhase?: LessonPhaseId;
+      }
     : {};
 }
 
@@ -381,7 +520,12 @@ export async function retryPendingSync(): Promise<void> {
     const payload = operationPayload(operation);
     let synced = false;
     if ((operation.kind === "lesson_checkpoint" || operation.kind === "lesson_completion") && payload.lesson && payload.session) {
-      synced = await persistLesson(payload.lesson, payload.session as LessonSession, operation.kind === "lesson_completion");
+      synced = await persistLesson(
+        payload.lesson,
+        payload.session as LessonSession,
+        operation.kind === "lesson_completion",
+        payload.masteryPhase,
+      );
     } else if ((operation.kind === "review_checkpoint" || operation.kind === "review_completion") && payload.session) {
       synced = await persistReview(payload.session as ReviewSession, operation.kind === "review_completion");
     }
