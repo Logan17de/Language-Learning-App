@@ -43,8 +43,6 @@ export interface StoryWord {
   reading: string;
   meaning: string;
   scriptType: StoryWordScript;
-  /** Show the kana beside this word because at least one kanji is not known. */
-  showReading?: boolean;
   baseMeaningScore: number;
   baseRecognitionScore: number;
   basePronunciationScore: number;

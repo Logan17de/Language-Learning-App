@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { ArrowRight, BookOpenText, CheckCircle2, Languages } from "lucide-react";
 import type { LessonPackage, StoryWord } from "@/types/lesson";
 import type { LessonSession, ReadingEvent } from "@/types/lesson-session";
+import { appendInspectableInteraction } from "@/lib/lesson-support";
 import { japaneseInputPreview } from "@/lib/japanese-input";
 import { InspectableText } from "@/components/exercises/inspectable-text";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +38,11 @@ export function ReadingPhase({
     [lesson.readingConversation],
   );
 
-  function reveal(word: StoryWord, type: "reading" | "meaning") {
+  function reveal(
+    activityId: string,
+    word: StoryWord,
+    type: "reading" | "meaning",
+  ) {
     const event: ReadingEvent = {
       id: `reading-help-${Date.now()}-${word.id}`,
       type: type === "reading" ? "reading-revealed" : "meaning-revealed",
@@ -45,9 +50,15 @@ export function ReadingPhase({
       confidence: "low",
       elapsedSeconds: session.elapsedSeconds,
     };
+    const withInspection = appendInspectableInteraction(
+      session,
+      activityId,
+      word,
+      type,
+    );
     onChange({
-      ...session,
-      readingEvents: [...session.readingEvents, event],
+      ...withInspection,
+      readingEvents: [...withInspection.readingEvents, event],
     });
   }
 
@@ -102,7 +113,9 @@ export function ReadingPhase({
               <InspectableText
                 text={line.japanese}
                 terms={line.inspectableTerms ?? terms}
-                onReveal={reveal}
+                onReveal={(word, type) =>
+                  reveal(`reading-passage:${index}`, word, type)
+                }
               />
             </p>
           ))}
@@ -126,7 +139,13 @@ export function ReadingPhase({
 
           <Card className="mt-6 p-6 sm:p-8">
             <p className="font-serif text-xl leading-9">
-              <InspectableText text={question.question} terms={terms} onReveal={reveal} />
+              <InspectableText
+                text={question.question}
+                terms={terms}
+                onReveal={(word, type) =>
+                  reveal(question.id, word, type)
+                }
+              />
             </p>
 
             <label className="mt-7 block text-sm font-semibold text-stone-600" htmlFor="reading-answer">

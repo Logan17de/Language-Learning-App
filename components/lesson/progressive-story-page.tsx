@@ -31,7 +31,6 @@ type StoryLineResult = {
     reading?: string;
     meaning?: string;
     scriptType?: "kanji" | "hiragana" | "katakana";
-    showReading?: boolean;
   }>;
 };
 
@@ -87,7 +86,6 @@ function readerLines(source: StoryLineResult[] | undefined): ReaderLine[] {
             reading: word.reading,
             meaning: word.meaning,
             scriptType: word.scriptType,
-            showReading: word.showReading,
             baseMeaningScore: 0,
             baseRecognitionScore: 0,
             basePronunciationScore: 0,

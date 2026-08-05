@@ -222,7 +222,6 @@ export async function POST(request: NextRequest) {
     const interactiveStory = buildInteractiveStoryForLearner(
       resolved.draft,
       resolved.library,
-      plan.knownKanji,
     );
     const audit: GenerationAuditEntry[] = [
       story.audit,
