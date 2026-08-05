@@ -8,7 +8,6 @@ import {
   Check,
   LoaderCircle,
   RotateCcw,
-  Sparkles,
 } from "lucide-react";
 import type { StoryWord } from "@/types/lesson";
 import type { LessonSession } from "@/types/lesson-session";
@@ -18,20 +17,9 @@ import {
 } from "@/store/app-store";
 import { LessonPlayerShell } from "@/components/lesson/lesson-player-shell";
 import { InspectableText } from "@/components/exercises/inspectable-text";
-import { GenerationProgress } from "@/components/custom-topic/generation-progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
-const generationStages = [
-  "Writing your story",
-  "Story ready",
-  "Creating lesson activities",
-  "Checking lesson quality",
-  "Saving your lesson",
-  "Preparing activity audio",
-  "Ready",
-];
 
 type StoryLineResult = {
   japanese?: string;
@@ -115,41 +103,6 @@ function readerLines(source: StoryLineResult[] | undefined): ReaderLine[] {
   });
 }
 
-function progressIndex(
-  currentStage: string,
-  lessonReady: boolean,
-  audioStatus: string,
-): number {
-  if (lessonReady && (audioStatus === "ready" || audioStatus === "failed")) {
-    return generationStages.length;
-  }
-  if (lessonReady) return 5;
-  if (currentStage === "quality_check" || currentStage === "activities_validating") {
-    return 3;
-  }
-  if (currentStage === "saving_lesson" || currentStage === "lesson_saving") {
-    return 4;
-  }
-  if (
-    currentStage === "audio" ||
-    currentStage === "audio_queued" ||
-    currentStage === "audio_building"
-  ) {
-    return 5;
-  }
-  if (
-    currentStage.includes("activit") ||
-    currentStage.includes("vocabulary") ||
-    currentStage.includes("grammar") ||
-    currentStage.includes("listening") ||
-    currentStage.includes("review") ||
-    currentStage === "retrying_activity_groups"
-  ) {
-    return 2;
-  }
-  return 1;
-}
-
 function readinessLabel(
   currentStage: string,
   lessonReady: boolean,
@@ -167,6 +120,208 @@ function readinessLabel(
   }
   if (currentStage === "retrying_activity_groups") return "Retrying an activity group";
   return "Creating lesson activities";
+}
+
+function buildNotice(
+  currentStage: string,
+  lessonReady: boolean,
+  audioStatus: string,
+  completedGroups: number,
+  error: string,
+): { title: string; detail: string; complete: boolean; attention: boolean } {
+  if (error) {
+    return {
+      title: "Lesson preparation needs attention",
+      detail: error,
+      complete: false,
+      attention: true,
+    };
+  }
+  if (lessonReady && (audioStatus === "ready" || audioStatus === "failed")) {
+    return {
+      title: "Your complete lesson is ready",
+      detail: "Vocabulary and every remaining activity are ready to open.",
+      complete: true,
+      attention: false,
+    };
+  }
+  if (lessonReady) {
+    return {
+      title: "Preparing activity audio",
+      detail: "The lesson is playable now while listening audio finishes in the background.",
+      complete: false,
+      attention: false,
+    };
+  }
+
+  const completedDetail = `${completedGroups} of 4 activity groups ready.`;
+  const completedGroupNotices: Record<string, string> = {
+    vocabulary_and_kanji: "Vocabulary & kanji ready",
+    grammar_and_reading: "Grammar & reading ready",
+    listening_and_speaking: "Listening & speaking ready",
+    final_review: "Final review ready",
+  };
+  if (completedGroupNotices[currentStage]) {
+    return {
+      title: completedGroupNotices[currentStage],
+      detail: completedDetail,
+      complete: true,
+      attention: false,
+    };
+  }
+  if (currentStage === "quality_check" || currentStage === "activities_validating") {
+    return {
+      title: "Checking lesson quality",
+      detail: "AIko is checking the complete activity package.",
+      complete: false,
+      attention: false,
+    };
+  }
+  if (currentStage === "saving_lesson" || currentStage === "lesson_saving") {
+    return {
+      title: "Saving your lesson",
+      detail: "Your finished lesson is being added to your learning path.",
+      complete: false,
+      attention: false,
+    };
+  }
+  return {
+    title: readinessLabel(currentStage, lessonReady, audioStatus),
+    detail:
+      completedGroups > 0
+        ? completedDetail
+        : "Vocabulary, grammar, reading, listening, and speaking are being built.",
+    complete: false,
+    attention: false,
+  };
+}
+
+function BuildStatusToast({
+  currentStage,
+  lessonReady,
+  audioStatus,
+  completedGroups,
+  progressPercent,
+  error,
+  canRetry,
+  retrying,
+  onRetry,
+}: {
+  currentStage: string;
+  lessonReady: boolean;
+  audioStatus: string;
+  completedGroups: number;
+  progressPercent: number;
+  error: string;
+  canRetry: boolean;
+  retrying: boolean;
+  onRetry: () => void;
+}) {
+  const nextNotice = useMemo(
+    () => buildNotice(currentStage, lessonReady, audioStatus, completedGroups, error),
+    [audioStatus, completedGroups, currentStage, error, lessonReady],
+  );
+  const nextKey = `${currentStage}:${lessonReady}:${audioStatus}:${completedGroups}:${error}`;
+  const [displayed, setDisplayed] = useState({ key: nextKey, value: nextNotice });
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    if (displayed.key === nextKey) return;
+    const hideTimer = window.setTimeout(() => setVisible(false), 0);
+    const replaceTimer = window.setTimeout(() => {
+      setDisplayed({ key: nextKey, value: nextNotice });
+      setVisible(true);
+    }, 240);
+    return () => {
+      window.clearTimeout(hideTimer);
+      window.clearTimeout(replaceTimer);
+    };
+  }, [displayed.key, nextKey, nextNotice]);
+
+  useEffect(() => {
+    if (!displayed.value.complete || displayed.value.attention) return;
+    const hideTimer = window.setTimeout(() => setVisible(false), 1_800);
+    const continueTimer = lessonReady
+      ? null
+      : window.setTimeout(() => {
+          setDisplayed({
+            key: nextKey,
+            value: {
+              title: "Creating remaining activities",
+              detail: `${completedGroups} of 4 activity groups ready.`,
+              complete: false,
+              attention: false,
+            },
+          });
+          setVisible(true);
+        }, 2_040);
+    return () => {
+      window.clearTimeout(hideTimer);
+      if (continueTimer !== null) window.clearTimeout(continueTimer);
+    };
+  }, [completedGroups, displayed, lessonReady, nextKey]);
+
+  const prepared = Math.max(progressPercent, lessonReady ? 90 : 20);
+  return (
+    <aside
+      className={`fixed right-4 top-24 z-40 w-[min(22rem,calc(100vw-2rem))] transition-all duration-200 sm:right-6 ${
+        visible
+          ? "translate-x-0 opacity-100"
+          : "pointer-events-none translate-x-6 opacity-0"
+      }`}
+      aria-live="polite"
+      aria-atomic="true"
+      data-testid="lesson-build-toast"
+    >
+      <Card className="border-moss-100 bg-white/95 p-4 shadow-float backdrop-blur sm:p-5">
+        <div className="flex items-start gap-3">
+          <span
+            className={`mt-0.5 grid size-9 shrink-0 place-items-center rounded-full ${
+              displayed.value.attention
+                ? "bg-amber-50 text-amber-700"
+                : "bg-moss-50 text-moss-700"
+            }`}
+          >
+            {displayed.value.attention ? (
+              <AlertTriangle className="size-4" />
+            ) : displayed.value.complete ? (
+              <Check className="size-4" />
+            ) : (
+              <LoaderCircle className="size-4 animate-spin" />
+            )}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-ink">{displayed.value.title}</p>
+            <p className="mt-1 text-xs leading-5 text-stone-500">{displayed.value.detail}</p>
+          </div>
+        </div>
+        {!displayed.value.complete && !displayed.value.attention && (
+          <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-moss-50">
+            <span
+              className="block h-full rounded-full bg-moss-600 transition-[width] duration-500"
+              style={{ width: `${Math.min(100, prepared)}%` }}
+            />
+          </div>
+        )}
+        {canRetry && (
+          <Button
+            type="button"
+            variant="secondary"
+            className="mt-4 w-full"
+            disabled={retrying}
+            onClick={onRetry}
+          >
+            {retrying ? (
+              <LoaderCircle className="size-4 animate-spin" />
+            ) : (
+              <RotateCcw className="size-4" />
+            )}
+            {retrying ? "Queuingâ€¦" : "Retry remaining work"}
+          </Button>
+        )}
+      </Card>
+    </aside>
+  );
 }
 
 export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
@@ -298,7 +453,6 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
     () => lines.flatMap((line) => line.words),
     [lines],
   );
-  const readiness = progressIndex(currentStage, lessonReady, audioStatus);
   const canContinue = storyComplete && lessonReady && Boolean(lessonId);
   const canRetry =
     !retrying &&
@@ -387,7 +541,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
       onContinue={continueToLesson}
       onExit={() => router.push("/learn")}
     >
-      <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start">
+      <div>
         <section>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -403,13 +557,6 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
               <p className="font-semibold">{supportedWordCount} library-backed taps</p>
               <p className="mt-1 text-moss-600">Unsupported words remain normal text</p>
             </div>
-          </div>
-
-          <div className="mt-6 flex items-start gap-3 rounded-2xl bg-persimmon-50 p-4 text-sm text-stone-600">
-            <Sparkles className="mt-0.5 size-4 shrink-0 text-persimmon-500" />
-            <p>
-              The rest of the lesson is being prepared beside you. You do not need to wait on the custom-topic form.
-            </p>
           </div>
 
           <Card className="mt-8 p-6 sm:p-10">
@@ -457,60 +604,23 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
           </div>
         </section>
 
-        <aside className="lg:sticky lg:top-28">
-          <Card className="p-5 sm:p-6" aria-live="polite">
-            <p className="section-kicker">Lesson readiness</p>
-            <div className="mt-3 flex items-center gap-2">
-              {readiness >= generationStages.length ? (
-                <Check className="size-5 text-moss-700" />
-              ) : (
-                <LoaderCircle className="size-5 animate-spin text-moss-600" />
-              )}
-              <p className="font-semibold">
-                {readinessLabel(currentStage, lessonReady, audioStatus)}
-              </p>
-            </div>
-            <div className="mt-5">
-              <GenerationProgress stages={generationStages} currentIndex={readiness} />
-            </div>
-            <div className="mt-5 flex items-center justify-between text-xs text-stone-500">
-              <span>{Math.max(progressPercent, lessonReady ? 90 : 20)}% prepared</span>
-              <span>{completedGroups.length} / 4 groups</span>
-            </div>
-            {failedGroups.length > 0 && (
-              <p className="mt-3 rounded-2xl bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
-                {failedGroups.length} activity group needs another attempt.
-              </p>
-            )}
-            {lessonReady && audioStatus !== "ready" && audioStatus !== "failed" && (
-              <p className="mt-4 rounded-2xl bg-moss-50 px-3 py-3 text-xs leading-5 text-moss-800">
-                The lesson is playable now. Listening and speaking audio will keep preparing in the background.
-              </p>
-            )}
-            {error && (
-              <p className="mt-4 rounded-2xl bg-amber-50 px-3 py-3 text-xs leading-5 text-amber-800">
-                {error}
-              </p>
-            )}
-            {canRetry && (
-              <Button
-                type="button"
-                variant="secondary"
-                className="mt-4 w-full"
-                disabled={retrying}
-                onClick={() => void retryRemaining()}
-              >
-                {retrying ? (
-                  <LoaderCircle className="size-4 animate-spin" />
-                ) : (
-                  <RotateCcw className="size-4" />
-                )}
-                {retrying ? "Queuing…" : "Retry remaining work"}
-              </Button>
-            )}
-          </Card>
-        </aside>
       </div>
+      <BuildStatusToast
+        currentStage={currentStage}
+        lessonReady={lessonReady}
+        audioStatus={audioStatus}
+        completedGroups={completedGroups.length}
+        progressPercent={progressPercent}
+        error={
+          error ||
+          (failedGroups.length > 0
+            ? `${failedGroups.length} activity group needs another attempt.`
+            : "")
+        }
+        canRetry={canRetry}
+        retrying={retrying}
+        onRetry={() => void retryRemaining()}
+      />
     </LessonPlayerShell>
   );
 }

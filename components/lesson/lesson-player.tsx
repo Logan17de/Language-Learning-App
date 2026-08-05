@@ -36,7 +36,6 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
   const [showExit, setShowExit] = useState(false);
   const [isSavingExit, setIsSavingExit] = useState(false);
   const restoredLessonRef = useRef<string | null>(null);
-  const initialPersistedSessionRef = useRef(persistedSession);
 
   useEffect(() => {
     if (!hasHydrated || restoredLessonRef.current === lesson.id) return;
@@ -44,10 +43,14 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
     let active = true;
     const fallback = normalizeLessonSession(
       lesson.id,
-      initialPersistedSessionRef.current ?? startOrResumeLesson(lesson.id),
+      persistedSession ?? startOrResumeLesson(lesson.id),
     );
-    void restoreLessonProgress(lesson, fallback).then((next) => {
+    void restoreLessonProgress(lesson, fallback).then((restored) => {
       if (!active) return;
+      const next =
+        fallback.currentPhaseIndex > restored.currentPhaseIndex
+          ? fallback
+          : restored;
       if (next.completed && next.completionResult) {
         router.replace(`/lesson/${lesson.id}/complete`);
         return;
@@ -62,6 +65,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
   }, [
     hasHydrated,
     lesson,
+    persistedSession,
     router,
     saveLessonSession,
     startOrResumeLesson,

@@ -9,6 +9,10 @@ const progressive = readFileSync(
   "components/lesson/progressive-story-page.tsx",
   "utf8",
 );
+const lessonPlayer = readFileSync(
+  "components/lesson/lesson-player.tsx",
+  "utf8",
+);
 const buildingRoute = readFileSync(
   "app/lesson/building/[requestId]/page.tsx",
   "utf8",
@@ -26,13 +30,16 @@ describe("progressive custom lesson reading", () => {
     expect(customTopic).not.toContain("<InspectableText");
   });
 
-  it("renders the story in the real lesson player with readiness on the right", () => {
+  it("renders the story in the real lesson player with transient build notices", () => {
     expect(buildingRoute).toContain("ProgressiveStoryPage");
     expect(progressive).toContain("<LessonPlayerShell");
     expect(progressive).toContain('phaseName="Story"');
-    expect(progressive).toContain("Lesson readiness");
-    expect(progressive).toContain("lg:grid-cols-[minmax(0,1fr)_19rem]");
-    expect(progressive).toContain("lg:sticky lg:top-28");
+    expect(progressive).toContain("<BuildStatusToast");
+    expect(progressive).toContain('data-testid="lesson-build-toast"');
+    expect(progressive).toContain("fixed right-4 top-24");
+    expect(progressive).toContain("setVisible(false)");
+    expect(progressive).not.toContain("Lesson readiness");
+    expect(progressive).not.toContain("lg:sticky lg:top-28");
     expect(progressive).toContain("<InspectableText");
     expect(progressive).toContain("Story audio is off");
     expect(progressive).not.toContain("<AudioControl");
@@ -47,5 +54,12 @@ describe("progressive custom lesson reading", () => {
     expect(progressive).toContain("session.storyComplete = true");
     expect(progressive).toContain("router.push(`/lesson/${lessonId}/play`)");
     expect(progressive).toContain('continueLabel={lessonReady ? "Vocabulary"');
+    expect(lessonPlayer).toContain(
+      "persistedSession ?? startOrResumeLesson(lesson.id)",
+    );
+    expect(lessonPlayer).toContain(
+      "fallback.currentPhaseIndex > restored.currentPhaseIndex",
+    );
+    expect(lessonPlayer).not.toContain("initialPersistedSessionRef");
   });
 });
