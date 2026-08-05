@@ -55,11 +55,15 @@ describe("progressive custom lesson reading", () => {
     expect(progressive).toContain("router.push(`/lesson/${lessonId}/play`)");
     expect(progressive).toContain('continueLabel={lessonReady ? "Vocabulary"');
     expect(lessonPlayer).toContain(
-      "persistedSession ?? startOrResumeLesson(lesson.id)",
+      "useAppStore.getState().lessonSessions[lesson.id]",
     );
+    expect(lessonPlayer).toContain("createEmptyLessonSession(lesson.id)");
+    expect(lessonPlayer).toContain("queueMicrotask");
+    expect(lessonPlayer).toContain("setSession(fallback)");
     expect(lessonPlayer).toContain(
-      "fallback.currentPhaseIndex > restored.currentPhaseIndex",
+      "const next = preferAdvancedSession(local, restored)",
     );
+    expect(lessonPlayer).not.toContain("startOrResumeLesson");
     expect(lessonPlayer).not.toContain("initialPersistedSessionRef");
   });
 });
