@@ -16,6 +16,7 @@ import type {
 } from "@/lib/gemini/lesson-engine-v2";
 import {
   simpleStoryEnrichmentSchema,
+  storyEnrichmentOutputIssues,
   storyEnrichmentPrompt,
   type SimpleStoryEnrichment,
 } from "@/lib/gemini/simple-story-enrichment-contract";
@@ -93,7 +94,7 @@ export async function generateListeningRegion(input: {
     schema: simpleStoryEnrichmentSchema,
     strictSchema: true,
     exactSchemaName: true,
-    validate: () => [],
+    validate: storyEnrichmentOutputIssues,
     trace: { requestId: input.requestId, stage: "listening_enrichment" },
   });
   const terms = await storeGeneratedVocabularyTerms({

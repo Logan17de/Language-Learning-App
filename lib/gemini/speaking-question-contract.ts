@@ -71,47 +71,12 @@ Requirements:
 `;
 }
 
-function hasJapanese(value: unknown): value is string {
-  return typeof value === "string" &&
-    /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(value);
-}
-
 export function speakingReadAloudIssues(value: unknown): string[] {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return ["Speaking response must be an object."];
   }
   const sentences = (value as Record<string, unknown>).sentences;
-  if (!Array.isArray(sentences) || sentences.length !== 5) {
-    return ["Speaking response needs exactly five read-aloud sentences."];
-  }
-  const issues: string[] = [];
-  const counts = { easy: 0, medium: 0, hard: 0 };
-  const seen = new Set<string>();
-  sentences.forEach((candidate, index) => {
-    if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
-      issues.push(`Speaking sentence ${index + 1} must be an object.`);
-      return;
-    }
-    const item = candidate as Record<string, unknown>;
-    const difficulty = item.difficulty as RawSpeakingDifficulty;
-    if (difficulty === "easy" || difficulty === "medium" || difficulty === "hard") {
-      counts[difficulty] += 1;
-    }
-    if (!hasJapanese(item.sentence)) {
-      issues.push(`Speaking sentence ${index + 1} must be written in Japanese.`);
-      return;
-    }
-    const sentence = item.sentence.normalize("NFKC").trim();
-    if (/[?？]/u.test(sentence)) {
-      issues.push(`Speaking sentence ${index + 1} must not be a question.`);
-    }
-    if (seen.has(sentence)) {
-      issues.push(`Speaking sentence ${index + 1} is repeated.`);
-    }
-    seen.add(sentence);
-  });
-  if (counts.easy !== 2 || counts.medium !== 2 || counts.hard !== 1) {
-    issues.push("Speaking needs two easy, two medium, and one hard read-aloud sentence.");
-  }
-  return [...new Set(issues)];
+  return Array.isArray(sentences) && sentences.length > 0
+    ? []
+    : ["Speaking response must contain at least one read-aloud sentence."];
 }

@@ -5,6 +5,7 @@ import { generateStructured } from "@/lib/gemini/structured-output";
 import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
 import {
   simpleStoryEnrichmentSchema,
+  storyEnrichmentOutputIssues,
   storyEnrichmentPrompt,
   type RawStoryVocabulary,
   type SimpleStoryEnrichment,
@@ -14,8 +15,8 @@ import type { Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
 
 /**
- * Run the exact simple enrichment contract from enrichment_test.py and store
- * every returned surface form before the story is resolved for the reader.
+ * Run the exact simple enrichment contract from enrichment_test.py and link
+ * every returned surface form, inserting only words absent from the library.
  */
 export async function enrichGeneratedStoryVocabulary(input: {
   admin: SupabaseClient;
@@ -35,9 +36,9 @@ export async function enrichGeneratedStoryVocabulary(input: {
     schema: simpleStoryEnrichmentSchema,
     strictSchema: true,
     exactSchemaName: true,
-    // The strict response schema is the complete enrichment contract. Do not
-    // add a second semantic validator or change the tested prompt.
-    validate: () => [],
+    // The provider schema owns content shape. Retry only when no vocabulary
+    // was returned; do not semantically re-judge a populated response.
+    validate: storyEnrichmentOutputIssues,
     trace: { requestId: input.requestId, stage: "library" },
   });
 

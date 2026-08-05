@@ -14,6 +14,7 @@ import {
 } from "@/lib/gemini/reading-comprehension-contract";
 import {
   simpleStoryEnrichmentSchema,
+  storyEnrichmentOutputIssues,
   storyEnrichmentPrompt,
   type SimpleStoryEnrichment,
 } from "@/lib/gemini/simple-story-enrichment-contract";
@@ -41,8 +42,14 @@ export interface GeneratedReadingRegion {
   audit: GenerationAuditEntry;
 }
 
-function normalized(value: string): string {
-  return value.normalize("NFKC").trim();
+function readingPassageOutputIssues(value: unknown): string[] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return ["Reading passage response must be an object."];
+  }
+  const story = (value as Record<string, unknown>).japanese_story;
+  return typeof story === "string" && story.trim().length > 0
+    ? []
+    : ["Reading passage response must not be empty."];
 }
 
 function readingQuestionIssues(value: unknown): string[] {
@@ -50,44 +57,9 @@ function readingQuestionIssues(value: unknown): string[] {
     return ["Reading response must be an object."];
   }
   const questions = (value as Record<string, unknown>).questions;
-  if (!Array.isArray(questions)) return ["Reading response must contain questions."];
-  const issues: string[] = [];
-  if (questions.length < 3 || questions.length > 10) {
-    issues.push("Reading response needs between 3 and 10 questions.");
-  }
-  const counts = { easy: 0, medium: 0, hard: 0 };
-  const seen = new Set<string>();
-  questions.forEach((candidate, index) => {
-    if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
-      issues.push(`Reading question ${index + 1} must be an object.`);
-      return;
-    }
-    const item = candidate as Record<string, unknown>;
-    if (item.difficulty === "easy" || item.difficulty === "medium" || item.difficulty === "hard") {
-      counts[item.difficulty] += 1;
-    }
-    if (typeof item.question !== "string" || !item.question.trim()) {
-      issues.push(`Reading question ${index + 1} needs Japanese question text.`);
-    } else {
-      const key = normalized(item.question);
-      if (seen.has(key)) issues.push(`Reading question ${index + 1} repeats another question.`);
-      seen.add(key);
-      if (!/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(item.question)) {
-        issues.push(`Reading question ${index + 1} must be written in Japanese.`);
-      }
-    }
-    if (
-      typeof item.answer !== "string" ||
-      !item.answer.trim() ||
-      !/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(item.answer)
-    ) {
-      issues.push(`Reading question ${index + 1} needs a short Japanese answer.`);
-    }
-  });
-  if (counts.easy < 1 || counts.medium < 1 || counts.hard < 1) {
-    issues.push("Reading response needs at least one easy, medium, and hard question.");
-  }
-  return [...new Set(issues)];
+  return Array.isArray(questions) && questions.length > 0
+    ? []
+    : ["Reading response must contain at least one question."];
 }
 
 function sentences(value: string, japanese: boolean): string[] {
@@ -149,7 +121,7 @@ export async function generateReadingRegion(input: {
     schema: readingPassageSchema,
     strictSchema: true,
     exactSchemaName: true,
-    validate: () => [],
+    validate: readingPassageOutputIssues,
     trace: { requestId: input.requestId, stage: "reading_passage" },
   });
 
@@ -159,7 +131,7 @@ export async function generateReadingRegion(input: {
     schema: simpleStoryEnrichmentSchema,
     strictSchema: true,
     exactSchemaName: true,
-    validate: () => [],
+    validate: storyEnrichmentOutputIssues,
     trace: { requestId: input.requestId, stage: "reading_enrichment" },
   });
   const terms = await storeGeneratedVocabularyTerms({

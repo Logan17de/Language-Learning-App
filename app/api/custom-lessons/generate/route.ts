@@ -210,8 +210,8 @@ export async function POST(request: NextRequest) {
 
     currentStage = "library_lookup";
     stageStartedAt = Date.now();
-    // Resolve the freshly stored raw surface words, together with reusable
-    // records already in the library, into tappable story terms.
+    // Resolve newly inserted or reused raw surface words into tappable story
+    // terms without duplicating vocabulary already present in the library.
     const resolved = await resolveStoryFromExistingLibrary(client, {
       level: generation.level,
       plan,

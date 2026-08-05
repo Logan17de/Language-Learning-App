@@ -31,6 +31,16 @@ export const simpleStoryEnrichmentSchema: JsonSchema = {
   additionalProperties: false,
 };
 
+export function storyEnrichmentOutputIssues(value: unknown): string[] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return ["Vocabulary enrichment response must be an object."];
+  }
+  const vocabulary = (value as Record<string, unknown>).vocabulary;
+  return Array.isArray(vocabulary) && vocabulary.length > 0
+    ? []
+    : ["Vocabulary enrichment response must not be empty."];
+}
+
 export function storyEnrichmentPrompt(japaneseStory: string): string {
   return `
 Extract vocabulary from the following Japanese story.

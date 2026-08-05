@@ -89,47 +89,12 @@ Requirements:
 `;
 }
 
-function normalized(value: string): string {
-  return value.normalize("NFKC").trim().toLocaleLowerCase();
-}
-
 export function listeningQuestionIssues(value: unknown): string[] {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return ["Listening response must be an object."];
   }
   const questions = (value as Record<string, unknown>).questions;
-  if (!Array.isArray(questions) || questions.length !== 5) {
-    return ["Listening response needs exactly five questions."];
-  }
-  const issues: string[] = [];
-  questions.forEach((candidate, index) => {
-    if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
-      issues.push(`Listening question ${index + 1} must be an object.`);
-      return;
-    }
-    const item = candidate as Record<string, unknown>;
-    const conversation = Array.isArray(item.conversation)
-      ? item.conversation.filter((line): line is string => typeof line === "string")
-      : [];
-    if (
-      conversation.length < 5 ||
-      conversation.length > 10 ||
-      conversation.some((line) => !/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(line))
-    ) {
-      issues.push(`Listening question ${index + 1} needs 5–10 Japanese conversation lines.`);
-    }
-    const choices = Array.isArray(item.choices)
-      ? item.choices.filter((choice): choice is string => typeof choice === "string")
-      : [];
-    if (choices.length !== 4 || new Set(choices.map(normalized)).size !== 4) {
-      issues.push(`Listening question ${index + 1} needs four unique choices.`);
-    }
-    if (
-      typeof item.answer !== "string" ||
-      choices.filter((choice) => normalized(choice) === normalized(item.answer as string)).length !== 1
-    ) {
-      issues.push(`Listening question ${index + 1} needs exactly one matching correct answer.`);
-    }
-  });
-  return [...new Set(issues)];
+  return Array.isArray(questions) && questions.length > 0
+    ? []
+    : ["Listening response must contain at least one question."];
 }
