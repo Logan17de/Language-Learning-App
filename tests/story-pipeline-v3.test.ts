@@ -133,6 +133,9 @@ describe("custom lesson story pipeline v3", () => {
     expect(storyCall).toContain('name: "japanese_lesson"');
     expect(storyCall).toContain("strictSchema: true");
     expect(storyCall).toContain("exactSchemaName: true");
+    expect(storyCall).toContain("validate: () => []");
+    expect(storyCall).not.toContain("structuralStoryIssues");
+    expect(storyCall).not.toContain("acceptedGrammarForms");
     expect(storyCall).toContain("normalizeStoryPassage(result.value)");
     expect(storyCall).not.toContain('required: [\n              "surface"');
     expect(plan).toContain('.from("user_preferences")');

@@ -28,6 +28,26 @@ interface BeginResult {
   assignmentId: string | null;
 }
 
+type StoryGenerationStage =
+  | "lesson_plan"
+  | "story"
+  | "vocabulary_enrichment"
+  | "library_lookup"
+  | "story_persistence";
+
+function storyFailureMessage(stage: StoryGenerationStage): string {
+  if (stage === "story") {
+    return "AIko could not finish writing this story. Please try the topic again.";
+  }
+  if (stage === "vocabulary_enrichment" || stage === "library_lookup") {
+    return "AIko wrote the story but could not prepare its tappable vocabulary. Please try again.";
+  }
+  if (stage === "story_persistence") {
+    return "AIko wrote the story but could not save it. Please try again.";
+  }
+  return "AIko could not select the lesson material for this story. Please try again.";
+}
+
 function text(value: unknown): string | null {
   return typeof value === "string" && value.length > 0 ? value : null;
 }
@@ -154,6 +174,7 @@ export async function POST(request: NextRequest) {
   let enrichmentMs = 0;
   let libraryLookupMs = 0;
   let persistenceMs = 0;
+  let currentStage: StoryGenerationStage = "lesson_plan";
   try {
     let stageStartedAt = Date.now();
     const plan = await selectLessonPlanV3(
@@ -164,6 +185,7 @@ export async function POST(request: NextRequest) {
     );
     planMs = Date.now() - stageStartedAt;
 
+    currentStage = "story";
     stageStartedAt = Date.now();
     // Generate the fixed passage first. Its Japanese text becomes the complete
     // input to the separate simple vocabulary-enrichment call below.
@@ -175,6 +197,7 @@ export async function POST(request: NextRequest) {
     });
     storyMs = Date.now() - stageStartedAt;
 
+    currentStage = "vocabulary_enrichment";
     stageStartedAt = Date.now();
     const admin = createAdminClient() as unknown as SupabaseClient;
     const enrichment = await enrichGeneratedStoryVocabulary({
@@ -185,6 +208,7 @@ export async function POST(request: NextRequest) {
     });
     enrichmentMs = Date.now() - stageStartedAt;
 
+    currentStage = "library_lookup";
     stageStartedAt = Date.now();
     // Resolve the freshly stored raw surface words, together with reusable
     // records already in the library, into tappable story terms.
@@ -206,6 +230,7 @@ export async function POST(request: NextRequest) {
       ...resolved.audits,
     ];
 
+    currentStage = "story_persistence";
     stageStartedAt = Date.now();
     const [saved, exposure] = await Promise.all([
       admin.from("progressive_lesson_drafts").upsert(
@@ -286,6 +311,7 @@ export async function POST(request: NextRequest) {
     console.error("Custom lesson story generation failed.", {
       requestId: generation.requestId,
       level: generation.level,
+      currentStage,
       message: internalMessage,
       totalMs: Date.now() - requestStartedAt,
       planMs,
@@ -303,7 +329,10 @@ export async function POST(request: NextRequest) {
       {
         error: catalogMissing
           ? internalMessage
-          : "AIko could not prepare this story. Please try the topic again.",
+          : storyFailureMessage(currentStage),
+        code: "STORY_PIPELINE_FAILED",
+        stage: currentStage,
+        requestId: generation.requestId,
       },
       { status: catalogMissing ? 409 : 502 },
     );
