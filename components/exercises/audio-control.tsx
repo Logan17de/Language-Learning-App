@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const audioUrlCache = new Map<string, Promise<string>>();
+const preloadedAudioCache = new Map<string, Promise<HTMLAudioElement>>();
 
 function audioRequestKey(text?: string, audioAssetId?: string): string {
   if (audioAssetId?.trim()) return `asset:${audioAssetId.trim()}`;
@@ -70,6 +71,39 @@ function createPreloadedAudio(url: string): Promise<HTMLAudioElement> {
       handleReady();
     }
   });
+}
+
+function requestPreloadedAudio(
+  text?: string,
+  audioAssetId?: string,
+): Promise<HTMLAudioElement> {
+  const key = audioRequestKey(text, audioAssetId);
+  const cached = preloadedAudioCache.get(key);
+  if (cached) return cached;
+
+  const pending = requestAudioUrl(text, audioAssetId)
+    .then(createPreloadedAudio)
+    .catch((error) => {
+      preloadedAudioCache.delete(key);
+      throw error;
+    });
+  preloadedAudioCache.set(key, pending);
+  return pending;
+}
+
+export function preloadListeningAudio({
+  text,
+  audioAssetId,
+  browserTts = false,
+}: {
+  text?: string;
+  audioAssetId?: string;
+  browserTts?: boolean;
+}): Promise<HTMLAudioElement | null> {
+  if (browserTts || (!audioAssetId?.trim() && !text?.trim())) {
+    return Promise.resolve(null);
+  }
+  return requestPreloadedAudio(text, audioAssetId);
 }
 
 export function AudioControl({
@@ -141,8 +175,7 @@ export function AudioControl({
     audioRef.current?.pause();
     audioRef.current = null;
 
-    const preload = requestAudioUrl(text, audioAssetId)
-      .then(createPreloadedAudio)
+    const preload = requestPreloadedAudio(text, audioAssetId)
       .then((audio) => {
         audio.onended = () => {
           setPlaying(false);
@@ -155,7 +188,6 @@ export function AudioControl({
         };
         if (!active) {
           audio.pause();
-          audio.src = "";
           return audio;
         }
         audioRef.current = audio;

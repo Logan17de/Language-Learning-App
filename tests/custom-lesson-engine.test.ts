@@ -102,7 +102,8 @@ describe("custom lesson engine contract", () => {
       runner.indexOf("prepareAudioJob(admin, refreshed.request_id)"),
     );
     expect(audio).toContain('.from("lesson_listening_activities")');
-    expect(audio).toContain('.from("lesson_speaking_activities")');
+    expect(audio).not.toContain('.from("lesson_speaking_activities")');
+    expect(audio).toContain('.from("lesson_listening_activities")');
     expect(audio).not.toContain('.from("lesson_story_lines")');
     expect(audio).not.toContain('.from("lesson_reading_sections")');
   });

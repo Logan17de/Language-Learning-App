@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
 
   const input = await request.formData().catch(() => null);
   const audio = input?.get("audio");
-  const expected = input?.get("expected");
   if (!(audio instanceof File) || audio.size === 0) {
     return NextResponse.json({ error: "An audio recording is required." }, { status: 400 });
   }
@@ -54,15 +53,14 @@ export async function POST(request: NextRequest) {
   );
   form.append("language", "ja");
   form.append("response_format", "json");
-  const expectedText = typeof expected === "string" ? expected.trim() : "";
   form.append(
     "prompt",
     [
       "Japanese language-learning speaking practice.",
-      "Return the spoken Japanese exactly, using normal Japanese script and punctuation.",
-      expectedText ? `Possible lesson vocabulary and answer: ${expectedText.slice(0, 600)}` : "",
+      "Transcribe only clearly audible Japanese speech, exactly as spoken, using normal Japanese script and punctuation.",
+      "If there is no intelligible speech, return an empty transcription.",
+      "Never infer, complete, or invent a lesson sentence from silence or unclear audio.",
     ]
-      .filter(Boolean)
       .join("\n"),
   );
 
@@ -88,7 +86,14 @@ export async function POST(request: NextRequest) {
         { status: 502 },
       );
     }
-    return NextResponse.json({ transcript: transcript.trim() });
+    const normalizedTranscript = transcript.trim();
+    if (!normalizedTranscript) {
+      return NextResponse.json(
+        { error: "No speech was detected. Please read the sentence aloud and try again." },
+        { status: 422 },
+      );
+    }
+    return NextResponse.json({ transcript: normalizedTranscript });
   } catch (error) {
     console.error("OpenAI transcription request failed.", {
       userId: auth.userId,
