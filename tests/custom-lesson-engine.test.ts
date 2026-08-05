@@ -56,7 +56,8 @@ describe("custom lesson engine contract", () => {
     expect(progressiveReader).toContain("<LessonPlayerShell");
     expect(progressiveReader).toContain("/api/custom-lessons/status?requestId=");
     expect(progressiveReader).toContain("Story audio is off");
-    expect(progressiveReader).toContain("Lesson readiness");
+    expect(progressiveReader).toContain('data-testid="lesson-build-toast"');
+    expect(progressiveReader).not.toContain("Lesson readiness");
     expect(progressiveReader).toContain("session.currentPhaseIndex = 1");
     expect(progressiveReader).not.toContain("<AudioControl");
     expect(form).toContain("AbortSignal.timeout(180_000)");
