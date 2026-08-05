@@ -7,6 +7,7 @@ import type { LessonPackage } from "@/types/lesson";
 import type { LessonPhaseId, LessonSession } from "@/types/lesson-session";
 import { calculateLessonCompletion } from "@/lib/scoring-utils";
 import {
+  createEmptyLessonSession,
   normalizeLessonSession,
   useAppStore,
 } from "@/store/app-store";
@@ -25,11 +26,29 @@ import {
   syncLessonProgress,
 } from "@/lib/sync/backend-sync";
 
+function preferAdvancedSession(
+  local: LessonSession,
+  candidate: LessonSession,
+): LessonSession {
+  if (local.completed !== candidate.completed) {
+    return candidate.completed ? candidate : local;
+  }
+  if (local.currentPhaseIndex !== candidate.currentPhaseIndex) {
+    return candidate.currentPhaseIndex > local.currentPhaseIndex
+      ? candidate
+      : local;
+  }
+  if (local.activityIndex !== candidate.activityIndex) {
+    return candidate.activityIndex > local.activityIndex ? candidate : local;
+  }
+  return Date.parse(candidate.updatedAt) > Date.parse(local.updatedAt)
+    ? candidate
+    : local;
+}
+
 export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
   const router = useRouter();
   const hasHydrated = useAppStore((state) => state.hasHydrated);
-  const persistedSession = useAppStore((state) => state.lessonSessions[lesson.id]);
-  const startOrResumeLesson = useAppStore((state) => state.startOrResumeLesson);
   const saveLessonSession = useAppStore((state) => state.saveLessonSession);
   const [session, setSession] = useState<LessonSession | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -41,35 +60,43 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
     if (!hasHydrated || restoredLessonRef.current === lesson.id) return;
     restoredLessonRef.current = lesson.id;
     let active = true;
+    const storedSession = useAppStore.getState().lessonSessions[lesson.id];
     const fallback = normalizeLessonSession(
       lesson.id,
-      persistedSession ?? startOrResumeLesson(lesson.id),
+      storedSession ?? createEmptyLessonSession(lesson.id),
     );
-    void restoreLessonProgress(lesson, fallback).then((restored) => {
+
+    // The local checkpoint is authoritative for navigation. Render it without
+    // waiting for Supabase so Story -> Vocabulary can never be held behind a
+    // slow or unavailable restore request.
+    queueMicrotask(() => {
       if (!active) return;
-      const next =
-        fallback.currentPhaseIndex > restored.currentPhaseIndex
-          ? fallback
-          : restored;
-      if (next.completed && next.completionResult) {
-        router.replace(`/lesson/${lesson.id}/complete`);
-        return;
-      }
-      setSession(next);
-      setElapsedSeconds(next.elapsedSeconds);
-      saveLessonSession(next);
+      setSession(fallback);
+      setElapsedSeconds(fallback.elapsedSeconds);
     });
+
+    void restoreLessonProgress(lesson, fallback)
+      .then((restored) => {
+        if (!active) return;
+        const latestLocal = normalizeLessonSession(
+          lesson.id,
+          useAppStore.getState().lessonSessions[lesson.id] ?? fallback,
+        );
+        const local = preferAdvancedSession(latestLocal, fallback);
+        const next = preferAdvancedSession(local, restored);
+        if (next.completed && next.completionResult) {
+          router.replace(`/lesson/${lesson.id}/complete`);
+          return;
+        }
+        setSession(next);
+        setElapsedSeconds(next.elapsedSeconds);
+        saveLessonSession(next);
+      })
+      .catch(() => undefined);
     return () => {
       active = false;
     };
-  }, [
-    hasHydrated,
-    lesson,
-    persistedSession,
-    router,
-    saveLessonSession,
-    startOrResumeLesson,
-  ]);
+  }, [hasHydrated, lesson, router, saveLessonSession]);
 
   useEffect(() => {
     if (!session) return;
