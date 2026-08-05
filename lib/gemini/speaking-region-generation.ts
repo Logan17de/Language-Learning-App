@@ -14,18 +14,18 @@ import {
   type SimpleStoryEnrichment,
 } from "@/lib/gemini/simple-story-enrichment-contract";
 import {
-  speakingQuestionIssues,
-  speakingQuestionsPrompt,
-  speakingQuestionsSchema,
-  type RawSpeakingQuestions,
-  type SpeakingQuestionType,
+  speakingReadAloudIssues,
+  speakingReadAloudPrompt,
+  speakingReadAloudSchema,
+  type RawSpeakingSentences,
+  type SpeakingActivityType,
 } from "@/lib/gemini/speaking-question-contract";
 import { generateStructured } from "@/lib/gemini/structured-output";
 import type { JLPTLevel } from "@/types/lesson";
 
 export interface GeneratedSpeakingExercise {
   mode: "easy" | "medium" | "hard";
-  questionType: SpeakingQuestionType;
+  questionType: SpeakingActivityType;
   prompt: string;
   easyPrompt: string;
   mediumPrompt: string;
@@ -61,24 +61,24 @@ export async function generateSpeakingRegion(input: {
   library: ResolvedLessonLibrary;
 }): Promise<GeneratedSpeakingRegion> {
   const story = input.draft.lines.map((line) => line.japanese).join("");
-  const speaking = await generateStructured<RawSpeakingQuestions>({
-    name: "speaking_questions",
-    prompt: speakingQuestionsPrompt({
+  const speaking = await generateStructured<RawSpeakingSentences>({
+    name: "speaking_read_aloud",
+    prompt: speakingReadAloudPrompt({
       languageLevel: `JLPT ${input.level}`,
       japaneseStory: story,
       grammarPatterns:
         input.library.generationContext?.targetGrammar ??
         input.library.grammar.map((item) => item.pattern),
     }),
-    schema: speakingQuestionsSchema,
+    schema: speakingReadAloudSchema,
     strictSchema: true,
     exactSchemaName: true,
-    validate: speakingQuestionIssues,
-    trace: { requestId: input.requestId, stage: "speaking_questions" },
+    validate: speakingReadAloudIssues,
+    trace: { requestId: input.requestId, stage: "speaking_read_aloud" },
   });
 
-  const speakingText = speaking.value.questions
-    .flatMap((question) => [question.question, question.model_answer])
+  const speakingText = speaking.value.sentences
+    .map((item) => item.sentence)
     .join("\n");
   const enrichment = await generateStructured<SimpleStoryEnrichment>({
     name: "speaking_vocabulary",
@@ -104,11 +104,10 @@ export async function generateSpeakingRegion(input: {
     ...input.library.kanji.map((item) => item.libraryId),
   ];
   return {
-    exercises: speaking.value.questions.map((question, index) => {
+    exercises: speaking.value.sentences.map((item, index) => {
       const inspectableTerms = uniqueTerms(
         terms.filter((term) =>
-          question.question.includes(term.surface) ||
-          question.model_answer.includes(term.surface),
+          item.sentence.includes(term.surface),
         ),
       );
       const termIds = [...new Set(
@@ -118,16 +117,16 @@ export async function generateSpeakingRegion(input: {
         ? fallbackIds[index % fallbackIds.length]
         : undefined;
       return {
-        mode: question.difficulty,
-        questionType: question.question_type,
-        prompt: question.question,
-        easyPrompt: question.difficulty === "easy" ? question.question : "",
-        mediumPrompt: question.difficulty === "medium" ? question.question : "",
-        hardPrompt: question.difficulty === "hard" ? question.question : "",
-        expectedAnswer: question.model_answer,
-        modelAnswer: question.model_answer,
-        expectedConcepts: question.expected_concepts,
-        semanticCriteria: question.semantic_criteria,
+        mode: item.difficulty,
+        questionType: "read_aloud",
+        prompt: item.sentence,
+        easyPrompt: item.difficulty === "easy" ? item.sentence : "",
+        mediumPrompt: item.difficulty === "medium" ? item.sentence : "",
+        hardPrompt: item.difficulty === "hard" ? item.sentence : "",
+        expectedAnswer: item.sentence,
+        modelAnswer: item.sentence,
+        expectedConcepts: [item.sentence],
+        semanticCriteria: ["The transcript should closely match the displayed sentence."],
         targetItemIds: termIds.length > 0
           ? termIds
           : fallbackId

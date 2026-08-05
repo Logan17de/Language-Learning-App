@@ -34,7 +34,7 @@ const emptyCounts: CompleteLessonCounts = {
   grammar: 0,
   vocabularyQuestions: 0,
   grammarQuestions: 0,
-  speakingQuestions: 0,
+  speakingSentences: 0,
   readingPassages: 0,
   readingQuestions: 0,
   listeningQuestions: 0,
@@ -175,7 +175,7 @@ export function CompleteLessonImporter() {
             <Count label="Story" value={`${counts.storyPassages} / ${counts.storyWords} words`} />
             <Count label="Targets" value={`${counts.kanji} kanji · ${counts.grammar} grammar`} />
             <Count label="Practice" value={`${counts.vocabularyQuestions} vocab · ${counts.grammarQuestions} grammar`} />
-            <Count label="Communication" value={`${counts.speakingQuestions} speak · ${counts.readingQuestions} read · ${counts.listeningQuestions} listen`} />
+            <Count label="Communication" value={`${counts.speakingSentences} read aloud · ${counts.readingQuestions} read · ${counts.listeningQuestions} listen`} />
           </div>
 
           <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">

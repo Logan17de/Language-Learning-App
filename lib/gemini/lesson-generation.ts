@@ -673,7 +673,7 @@ function legacyPackage(input: LessonGenerationInput, universal: UniversalLessonP
       { id: "story", label: "Story", description: "Read the lesson story in context." },
       { id: "vocabulary", label: "Words & kanji", description: "Build meaning, recognition, and pronunciation." },
       { id: "grammar", label: "Grammar", description: "Use the lesson patterns from easy to hard." },
-      { id: "speaking", label: "Speaking", description: "Answer the story questions aloud." },
+      { id: "speaking", label: "Speaking", description: "Read each displayed sentence aloud." },
       { id: "reading", label: "Reading", description: "Read a connected conversation." },
       { id: "listening", label: "Listening", description: "Understand natural Japanese audio." },
       { id: "review", label: "Review", description: "Check the lesson's strongest and weakest points." },

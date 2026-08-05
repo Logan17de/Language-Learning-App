@@ -103,21 +103,13 @@ function completeLesson() {
       ...choice(`grammar_q_${index + 1}`, difficulty),
       targetRefs: ["grammar:～ます"],
     })),
-    speakingExercises: [
-      ["direct_information", "easy"],
-      ["sequence_of_events", "easy"],
-      ["speaker_intention", "medium"],
-      ["reason_or_purpose", "medium"],
-      ["simple_inference", "hard"],
-    ].map(([questionType, mode], index) => ({
+    speakingExercises: ["easy", "easy", "medium", "medium", "hard"].map((mode, index) => ({
       id: `speaking_${index + 1}`,
-      questionType,
+      questionType: "read_aloud",
       mode,
-      prompt: "主人公はどこへ行きますか。",
+      prompt: "主人公は学校へ行きます。",
       modelAnswer: "主人公は学校へ行きます。",
       expectedAnswer: "主人公は学校へ行きます。",
-      expectedConcepts: ["主人公", "学校"],
-      semanticCriteria: ["The answer identifies the school."],
       targetRefs: ["vocabulary:学校"],
     })),
     readingTitle: "Another School Morning",
@@ -161,7 +153,7 @@ describe("complete admin lesson import", () => {
     expect(result.counts).toMatchObject({
       vocabularyQuestions: 13,
       grammarQuestions: 10,
-      speakingQuestions: 5,
+      speakingSentences: 5,
       readingQuestions: 5,
       listeningQuestions: 5,
       reviewQuestions: 5,
@@ -199,6 +191,6 @@ describe("complete admin lesson import", () => {
     expect(COMPLETE_LESSON_CHAT_PROMPT).toContain("Grammar: exactly 3");
     expect(COMPLETE_LESSON_CHAT_PROMPT).toContain("exactly 13 questions: 6 Easy, 4 Medium, 3 Hard");
     expect(COMPLETE_LESSON_CHAT_PROMPT).toContain("exactly 10 questions: 3 Easy, 4 Medium, 3 Hard");
-    expect(COMPLETE_LESSON_CHAT_PROMPT).toContain("Speaking: exactly 5 Japanese questions");
+    expect(COMPLETE_LESSON_CHAT_PROMPT).toContain("Speaking: exactly 5 Japanese read-aloud statements");
   });
 });

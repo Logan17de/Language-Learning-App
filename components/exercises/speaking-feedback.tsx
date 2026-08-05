@@ -4,10 +4,10 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 
 export function SpeakingFeedback({
   event,
-  modelAnswer,
+  targetSentence,
 }: {
   event: SpeakingEvent;
-  modelAnswer: string;
+  targetSentence: string;
 }) {
   if (!event.evaluationAvailable) {
     return (
@@ -16,12 +16,12 @@ export function SpeakingFeedback({
           <CheckCircle2 className="size-5 text-moss-700" />
           <div>
             <p className="font-semibold">Speaking attempt saved</p>
-            <p className="text-xs text-stone-500">Attempt {event.attempt} · speech match unavailable</p>
+            <p className="text-xs text-stone-500">Attempt {event.attempt} · sentence match unavailable</p>
           </div>
         </div>
         <div className="rounded-2xl bg-white p-4">
-          <p className="flex items-center gap-2 text-xs font-semibold text-moss-700"><WandSparkles className="size-4" /> Model answer</p>
-          <p className="mt-2 font-serif text-lg">{modelAnswer}</p>
+          <p className="flex items-center gap-2 text-xs font-semibold text-moss-700"><WandSparkles className="size-4" /> Target sentence</p>
+          <p className="mt-2 font-serif text-lg">{targetSentence}</p>
         </div>
         <p className="text-xs leading-5 text-stone-500">Your attempt remains saved. Try again when speech recognition is available.</p>
       </div>
@@ -39,9 +39,8 @@ export function SpeakingFeedback({
           <p className="mt-2 font-serif text-lg">{event.transcript}</p>
         </div>
       )}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Metric label="Speech match" value={event.pronunciationConfidence} />
-        <Metric label="Answer match" value={event.grammarAccuracy} />
+      <div>
+        <Metric label="Sentence match" value={event.pronunciationConfidence} />
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-2xl bg-white p-4">
@@ -54,8 +53,8 @@ export function SpeakingFeedback({
         </div>
       </div>
       <div className="rounded-2xl bg-white p-4">
-        <p className="flex items-center gap-2 text-xs font-semibold text-moss-700"><WandSparkles className="size-4" /> Model answer</p>
-        <p className="mt-2 font-serif text-lg">{modelAnswer}</p>
+        <p className="flex items-center gap-2 text-xs font-semibold text-moss-700"><WandSparkles className="size-4" /> Target sentence</p>
+        <p className="mt-2 font-serif text-lg">{targetSentence}</p>
       </div>
       <p className="text-xs leading-5 text-stone-500">Speech-to-text measures what was recognized. Detailed phoneme-level pronunciation scoring can be added later.</p>
     </div>
