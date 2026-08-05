@@ -139,9 +139,7 @@ export async function getSignedAudioUrl(
 }
 
 type LinkTarget = {
-  table:
-    | "lesson_listening_activities"
-    | "lesson_speaking_activities";
+  table: "lesson_listening_activities";
   id: string;
 };
 
@@ -182,18 +180,11 @@ export async function prepareStoredLessonAudio(
   client?: AdminClient,
 ): Promise<PreparedLessonAudio> {
   const admin = client ?? adminClient();
-  const [listening, speaking] = await Promise.all([
-    admin
-      .from("lesson_listening_activities")
-      .select("id,transcript,audio_asset_id")
-      .eq("lesson_version_id", lessonVersionId),
-    admin
-      .from("lesson_speaking_activities")
-      .select("id,model_answer,audio_asset_id")
-      .eq("lesson_version_id", lessonVersionId),
-  ]);
-  const failed = [listening, speaking].find((result) => result.error);
-  if (failed?.error) throw new Error(failed.error.message);
+  const listening = await admin
+    .from("lesson_listening_activities")
+    .select("id,transcript,audio_asset_id")
+    .eq("lesson_version_id", lessonVersionId);
+  if (listening.error) throw new Error(listening.error.message);
 
   const work = new Map<string, TextWork>();
   for (const row of listening.data ?? []) {
@@ -205,16 +196,6 @@ export async function prepareStoredLessonAudio(
       });
     }
   }
-  for (const row of speaking.data ?? []) {
-    const item = row as Record<string, unknown>;
-    if (!item.audio_asset_id) {
-      addWork(work, item.model_answer, {
-        table: "lesson_speaking_activities",
-        id: String(item.id),
-      });
-    }
-  }
-
   let generated = 0;
   let reused = 0;
   let linked = 0;

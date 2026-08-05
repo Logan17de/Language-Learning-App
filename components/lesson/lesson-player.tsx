@@ -21,6 +21,7 @@ import { ListeningPhase } from "@/components/lesson/listening-phase";
 import { SpeakingPhase } from "@/components/lesson/speaking-phase";
 import { FinalReviewPhase } from "@/components/lesson/final-review-phase";
 import { LessonReportDialog } from "@/components/support/lesson-report-dialog";
+import { preloadListeningAudio } from "@/components/exercises/audio-control";
 import {
   restoreLessonProgress,
   syncLessonProgress,
@@ -61,6 +62,16 @@ export function LessonPlayer({
   const [showExit, setShowExit] = useState(false);
   const [isSavingExit, setIsSavingExit] = useState(false);
   const restoredLessonRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    for (const exercise of lesson.listeningExercises) {
+      void preloadListeningAudio({
+        text: exercise.transcript,
+        audioAssetId: exercise.audioAssetId,
+        browserTts: lesson.runtimeAudio === "browser_tts",
+      }).catch(() => undefined);
+    }
+  }, [lesson]);
 
   useEffect(() => {
     if (!hasHydrated || restoredLessonRef.current === lesson.id) return;

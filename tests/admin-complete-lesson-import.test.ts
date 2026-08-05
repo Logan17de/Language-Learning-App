@@ -182,7 +182,8 @@ describe("complete admin lesson import", () => {
     expect(audioControl).toContain("new SpeechSynthesisUtterance(spokenText)");
     expect(audioControl).toContain("window.speechSynthesis.speak(utterance)");
     expect(listeningPhase).toContain('browserTts={lesson.runtimeAudio === "browser_tts"}');
-    expect(speakingPhase).toContain('browserTts={lesson.runtimeAudio === "browser_tts"}');
+    expect(speakingPhase).not.toContain("AudioControl");
+    expect(speakingPhase).not.toContain('browserTts={lesson.runtimeAudio === "browser_tts"}');
   });
 
   it("ships a copyable whole-lesson chat prompt with every fixed bank size", () => {

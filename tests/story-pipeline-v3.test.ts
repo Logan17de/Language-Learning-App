@@ -373,6 +373,9 @@ describe("custom lesson story pipeline v3", () => {
     );
     expect(speaking).toContain("Read the sentence aloud");
     expect(speaking).toContain("text={exercise.modelAnswer}");
+    expect(speaking).not.toContain("AudioControl");
+    expect(speaking).toContain("RECORDING_LIMIT_SECONDS = 10");
+    expect(speaking).toContain("updateLiveTranscript");
     expect(speaking).not.toContain("questionTypeLabel");
     expect(speaking).not.toContain("Show model answer");
     expect(speaking).toContain("exercise.mode");
