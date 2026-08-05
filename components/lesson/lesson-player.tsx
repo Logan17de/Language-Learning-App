@@ -46,7 +46,13 @@ function preferAdvancedSession(
     : local;
 }
 
-export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
+export function LessonPlayer({
+  lesson,
+  routeLessonId = lesson.id,
+}: {
+  lesson: LessonPackage;
+  routeLessonId?: string;
+}) {
   const router = useRouter();
   const hasHydrated = useAppStore((state) => state.hasHydrated);
   const saveLessonSession = useAppStore((state) => state.saveLessonSession);
@@ -60,11 +66,18 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
     if (!hasHydrated || restoredLessonRef.current === lesson.id) return;
     restoredLessonRef.current = lesson.id;
     let active = true;
-    const storedSession = useAppStore.getState().lessonSessions[lesson.id];
-    const fallback = normalizeLessonSession(
+    const storedSessions = useAppStore.getState().lessonSessions;
+    const canonicalSession = normalizeLessonSession(
       lesson.id,
-      storedSession ?? createEmptyLessonSession(lesson.id),
+      storedSessions[lesson.id] ?? createEmptyLessonSession(lesson.id),
     );
+    const routeSession = storedSessions[routeLessonId];
+    const fallback = routeSession
+      ? preferAdvancedSession(
+          canonicalSession,
+          normalizeLessonSession(lesson.id, routeSession),
+        )
+      : canonicalSession;
 
     // The local checkpoint is authoritative for navigation. Render it without
     // waiting for Supabase so Story -> Vocabulary can never be held behind a
@@ -73,6 +86,9 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
       if (!active) return;
       setSession(fallback);
       setElapsedSeconds(fallback.elapsedSeconds);
+      if (routeLessonId !== lesson.id && routeSession) {
+        saveLessonSession(fallback);
+      }
     });
 
     void restoreLessonProgress(lesson, fallback)
@@ -96,7 +112,7 @@ export function LessonPlayer({ lesson }: { lesson: LessonPackage }) {
     return () => {
       active = false;
     };
-  }, [hasHydrated, lesson, router, saveLessonSession]);
+  }, [hasHydrated, lesson, routeLessonId, router, saveLessonSession]);
 
   useEffect(() => {
     if (!session) return;

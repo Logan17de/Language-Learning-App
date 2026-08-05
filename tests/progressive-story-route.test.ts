@@ -13,6 +13,10 @@ const lessonPlayer = readFileSync(
   "components/lesson/lesson-player.tsx",
   "utf8",
 );
+const lessonResolver = readFileSync(
+  "components/lesson/lesson-route-resolver.tsx",
+  "utf8",
+);
 const buildingRoute = readFileSync(
   "app/lesson/building/[requestId]/page.tsx",
   "utf8",
@@ -55,7 +59,7 @@ describe("progressive custom lesson reading", () => {
     expect(progressive).toContain("router.push(`/lesson/${lessonId}/play`)");
     expect(progressive).toContain('continueLabel={lessonReady ? "Vocabulary"');
     expect(lessonPlayer).toContain(
-      "useAppStore.getState().lessonSessions[lesson.id]",
+      "const storedSessions = useAppStore.getState().lessonSessions",
     );
     expect(lessonPlayer).toContain("createEmptyLessonSession(lesson.id)");
     expect(lessonPlayer).toContain("queueMicrotask");
@@ -65,5 +69,17 @@ describe("progressive custom lesson reading", () => {
     );
     expect(lessonPlayer).not.toContain("startOrResumeLesson");
     expect(lessonPlayer).not.toContain("initialPersistedSessionRef");
+  });
+
+  it("carries a database route checkpoint into a legacy-mapped lesson", () => {
+    expect(lessonResolver).toContain(
+      "<LessonPlayer lesson={lesson} routeLessonId={lessonId} />",
+    );
+    expect(lessonPlayer).toContain("storedSessions[routeLessonId]");
+    expect(lessonPlayer).toContain(
+      "normalizeLessonSession(lesson.id, routeSession)",
+    );
+    expect(lessonPlayer).toContain("routeLessonId !== lesson.id");
+    expect(lessonPlayer).toContain("saveLessonSession(fallback)");
   });
 });

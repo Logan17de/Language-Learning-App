@@ -74,7 +74,11 @@ export function LessonRouteResolver({
       </main>
     );
   }
-  return mode === "preview" ? <LessonPreview lesson={lesson} /> : <LessonPlayer lesson={lesson} />;
+  return mode === "preview" ? (
+    <LessonPreview lesson={lesson} />
+  ) : (
+    <LessonPlayer lesson={lesson} routeLessonId={lessonId} />
+  );
 }
 
 function learnerLevel(level: string | null): JLPTLevel {
