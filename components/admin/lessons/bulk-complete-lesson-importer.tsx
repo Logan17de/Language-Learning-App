@@ -23,6 +23,7 @@ import {
   validateCompleteLessonBatch,
 } from "@/lib/admin-complete-lesson-bulk-import";
 import { COMPLETE_LESSON_CHAT_PROMPT } from "@/lib/admin-complete-lesson-prompt";
+import { adminBulkLessonImportRepository } from "@/lib/repositories/admin-bulk-lesson-import-repository";
 import {
   AdminPageHeader,
   AdminSection,
@@ -137,26 +138,42 @@ export function BulkCompleteLessonImporter() {
     window.setTimeout(() => setCopied(false), 1_800);
   }
 
+  async function kickAutomaticTtsWorker() {
+    const response = await fetch("/api/admin/audio/batches", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ processNext: true }),
+    });
+    if (!response.ok) {
+      throw new Error("Lessons were imported, but the automatic TTS worker could not be started. You can start it manually below.");
+    }
+  }
+
   async function submit() {
     if (!validation.valid || submitting) return;
     setSubmitting(true);
     setMessage("");
+    setTtsError("");
     try {
-      const response = await fetch("/api/admin/lessons/import", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lessons: parsed.lessons, publish }),
-      });
-      const payload: unknown = await response.json().catch(() => null);
-      const body = payload && typeof payload === "object" && !Array.isArray(payload)
-        ? payload as Record<string, unknown>
-        : {};
-      if (!response.ok) {
-        throw new Error(typeof body.error === "string" ? body.error : "Lessons could not be imported.");
-      }
-      setMessage(
-        `${parsed.lessons.length} lesson${parsed.lessons.length === 1 ? "" : "s"} imported${publish ? " and published" : " as draft"}. Listening TTS was added to the durable queue.`,
+      // The large lesson payload goes straight from this authenticated owner
+      // session to Supabase. It does not pass through a Vercel request body.
+      const result = await adminBulkLessonImportRepository.importMany(
+        parsed.lessons,
+        publish,
       );
+      if (!result.ok) throw new Error(result.error.message);
+
+      setMessage(
+        `${result.data.count} lesson${result.data.count === 1 ? "" : "s"} imported directly into Supabase${publish ? " and published" : " as draft"}. Listening TTS was added to the durable queue.`,
+      );
+
+      // If this upload crossed the 100-pending threshold the database already
+      // created the batch. This tiny app request only starts its server worker.
+      try {
+        await kickAutomaticTtsWorker();
+      } catch (error) {
+        setTtsError(error instanceof Error ? error.message : "Automatic TTS could not be started.");
+      }
       await loadTts();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Lessons could not be imported.");
@@ -197,7 +214,7 @@ export function BulkCompleteLessonImporter() {
       <AdminPageHeader
         eyebrow="Bulk lesson ingestion"
         title="Upload complete AIko lessons directly to the database"
-        description="Use the same canonical schema for one lesson or one hundred. The upload is validated first, stored transactionally, and listening audio enters the reusable TTS queue automatically."
+        description="Use the same canonical schema for one lesson or one hundred. Validated lessons go directly to the authenticated Supabase transaction, and listening audio enters the reusable TTS queue automatically."
       />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,.75fr)]">
@@ -292,7 +309,7 @@ export function BulkCompleteLessonImporter() {
               </Button>
             </div>
             <p className="mt-3 text-xs leading-5 text-slate-500">
-              When the pending count reaches 100, the database creates the batch automatically and the import request starts its background worker. Manual send works with any pending count from 1 to 100.
+              When the pending count reaches 100, the database creates the batch automatically and the importer sends only a lightweight worker-start request. Manual send works with any pending count from 1 to 100.
             </p>
             {ttsError && <p className="mt-3 rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{ttsError}</p>}
 
@@ -332,7 +349,7 @@ export function BulkCompleteLessonImporter() {
           <Button type="button" variant="secondary" className="mt-5 w-full rounded-xl" onClick={() => void copyPrompt()}>
             <Clipboard className="size-4" /> Copy exact generator prompt
           </Button>
-          <p className="mt-4 text-xs leading-5 text-slate-500">For a 100-lesson JSON array, repeat this exact object shape 100 times with unique lesson IDs. The app normalizes each package into its canonical lesson/version/activity tables.</p>
+          <p className="mt-4 text-xs leading-5 text-slate-500">For a 100-lesson JSON array, repeat this exact object shape 100 times with unique lesson IDs. The authenticated importer writes directly through Supabase RPC and normalizes each package into its canonical lesson/version/activity tables.</p>
         </AdminSection>
       </div>
     </>
