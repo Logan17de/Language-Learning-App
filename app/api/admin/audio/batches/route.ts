@@ -54,8 +54,24 @@ export async function POST(request: NextRequest) {
   const input = body && typeof body === "object" && !Array.isArray(body)
     ? body as Record<string, unknown>
     : {};
-  const existingBatchId = typeof input.batchId === "string" ? input.batchId.trim() : "";
 
+  // Bulk lesson uploads talk directly to the authenticated Supabase RPC so a
+  // 100-lesson JSON payload never needs to pass through Vercel. They then send
+  // this tiny request to kick any threshold batch the DB just created.
+  if (input.processNext === true) {
+    after(async () => {
+      try {
+        await processLessonTtsBatches();
+      } catch (error) {
+        console.error("Automatic TTS batch processing failed.", {
+          message: error instanceof Error ? error.message : "Unknown TTS batch error.",
+        });
+      }
+    });
+    return NextResponse.json({ status: "processing_if_queued" });
+  }
+
+  const existingBatchId = typeof input.batchId === "string" ? input.batchId.trim() : "";
   if (existingBatchId) {
     after(async () => {
       try {
