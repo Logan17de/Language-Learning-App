@@ -180,7 +180,7 @@ describe("complete admin lesson import", () => {
     expect(route).not.toContain("OPENAI_");
     expect(migration).toContain("create or replace function public.import_complete_lesson");
     expect(migration).toContain("public.has_app_role(array['admin', 'content_editor']");
-    expect(bulkMigration).toContain("public.current_app_role() <> 'admin'::public.app_role");
+    expect(bulkMigration).toContain("coalesce(public.current_app_role(), 'learner'::public.app_role) <> 'admin'::public.app_role");
     expect(bulkMigration).toContain("v_result := public.import_complete_lesson(v_item, p_publish)");
     expect(migration).toContain("'model_api_used', false");
     expect(migration).toContain("public.resolve_admin_lesson_target_ids");
