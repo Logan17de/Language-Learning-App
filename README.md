@@ -31,6 +31,8 @@ Demo admin credentials:
 - Email: `admin@aiko.local`
 - Password: `admin123`
 
+The mock admin is development-only. Production `/admin*` routes fail closed if Supabase is not configured.
+
 ### Backend mode
 
 Copy `.env.example` to `.env.local` and set:
@@ -85,7 +87,7 @@ The seed includes JLPT levels, vocabulary, kanji, grammar, assets, operational r
 - Pro custom topics use the server-only OpenAI Responses API with GPT-5.6 Luna and JSON Schema output. The story is the first isolated model call. AIko then resolves only vocabulary already present in the permanent library and attaches those records as taps; unresolved story text remains plain text and never triggers an enrichment model call or library write. Activity regions are generated in parallel, approved questions survive unchanged, and only rejected questions are repaired. Responses are stateless (`store: false`), and an alternate model is used only when `OPENAI_LESSON_FALLBACK_MODEL` is explicitly configured.
 - Review evidence reports strengths and weaknesses and automatically drives the learning system; there is no learner-managed lesson starring.
 
-## Authentication and admin setup
+## Authentication and owner admin setup
 
 Sign-up creates the Auth user and the `profiles`, `user_preferences`, `user_settings`, and `user_subscriptions` records through a database trigger. Email/password login, Google OAuth, logout, password recovery, PKCE callback exchange, session refresh, and protected routes use the Supabase SSR pattern.
 
@@ -99,20 +101,45 @@ To enable Google sign-in:
 
 Do not put the Google client secret in this repository or in a `NEXT_PUBLIC_*` variable.
 
-Create an account through `/signup`, then promote it locally in SQL:
+Production administration is restricted to a single Supabase Auth user stored in `public.admin_owner`. On an existing database, the owner-only migration seeds that record automatically only when exactly one active `admin` profile exists. Otherwise it leaves the owner unset and all admin authorization fails closed.
+
+On a fresh database, create your account first and then configure the owner from the trusted Supabase SQL editor:
 
 ```sql
+begin;
+
 update public.profiles
 set role = 'admin'
-where email = 'admin@example.com';
+where email = 'YOUR_EMAIL'
+  and status = 'active';
+
+insert into public.admin_owner (singleton, user_id)
+select true, id
+from public.profiles
+where email = 'YOUR_EMAIL'
+  and role = 'admin'
+  and status = 'active'
+on conflict (singleton) do update
+set user_id = excluded.user_id;
+
+commit;
 ```
 
-Supported roles are `learner`, `admin`, `content_editor`, and `support`. The proxy and RLS both enforce permissions. Content editors cannot manage subscriptions or suspensions; support staff cannot publish content.
+Verify it with:
+
+```sql
+select p.id, p.email, p.role, p.status
+from public.admin_owner o
+join public.profiles p on p.id = o.user_id
+where o.singleton = true;
+```
+
+The schema still contains `learner`, `admin`, `content_editor`, and `support` enum values for compatibility, but production operational access is owner-admin only. Client state and profile role strings are not sufficient authorization; Proxy, server authorization, and RLS independently enforce the boundary.
 
 ## Storage
 
-- `lesson-images`: public read; admin/content-editor write
-- `lesson-audio`: authenticated read; admin/content-editor write
+- `lesson-images`: public read; owner-admin write
+- `lesson-audio`: authenticated read; owner-admin write
 - `user-exports`: private per-user paths
 
 The seed inserts metadata and placeholder paths only. No production media is uploaded.
@@ -132,14 +159,14 @@ npm test
 npm run build
 ```
 
-Tests cover scoring validation, migration parsing, canonical lesson merge rules, deterministic review scheduling, idempotency helpers, role permissions, and database security contracts. Production builds do not require a live Supabase project.
+Tests cover scoring validation, migration parsing, canonical lesson merge rules, deterministic review scheduling, idempotency helpers, owner-only permissions, and database security contracts. Production builds do not require a live Supabase project.
 
 ## Important routes
 
 - Public: `/`, `/login`, `/signup`, `/forgot-password`, `/auth/callback`, `/reset-password`
 - Learner: `/home`, `/learn`, `/review`, `/progress`, `/custom-topic`, `/profile`, `/settings`, `/support`, `/lesson/*`
-- Admin: `/admin/*` with a server-verified role gate
-- Trusted APIs: `/api/lesson/complete`, `/api/review/complete`, `/api/custom-lessons/generate`, `/api/account/export`, `/api/account/reset-progress`, and role-restricted admin mutation endpoints
+- Admin: `/admin/*` with an owner-only server/database authorization boundary
+- Trusted APIs: `/api/lesson/complete`, `/api/review/complete`, `/api/custom-lessons/generate`, `/api/account/export`, `/api/account/reset-progress`, and owner-restricted admin mutation endpoints
 
 ## Known Phase 5 limitations
 
@@ -148,4 +175,4 @@ Tests cover scoring validation, migration parsing, canonical lesson merge rules,
 - Billing state is persisted but remains mocked.
 - Account deletion remains a documented future privileged workflow; progress reset is transactional now.
 - Local Supabase execution requires Docker. Static migration/seed validation and mocked tests remain available without it.
-- Phase 4 local admin fixtures remain as a demo fallback; backend repositories and trusted mutations are the production boundary.
+- Phase 4 local admin fixtures remain available only as a development/demo fallback; backend repositories and trusted mutations are the production boundary.
