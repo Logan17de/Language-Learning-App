@@ -9,11 +9,42 @@ export type ServerAuthorization =
 
 export async function authorize(permission?: Permission): Promise<ServerAuthorization> {
   const client = await createClient();
-  if (!client) return { ok: false, status: 401, message: "Backend is not configured." };
+  if (!client) {
+    return { ok: false, status: 401, message: "Backend is not configured." };
+  }
+
   const { data, error } = await client.auth.getUser();
-  if (error || !data.user) return { ok: false, status: 401, message: "Authentication required." };
-  const profile = await client.from("profiles").select("role,status").eq("id", data.user.id).single();
-  if (profile.error || profile.data.status !== "active") return { ok: false, status: 403, message: "Account is not active." };
-  if (permission && !hasPermission(profile.data.role, permission)) return { ok: false, status: 403, message: "Permission denied." };
-  return { ok: true, userId: data.user.id, role: profile.data.role };
+  if (error || !data.user) {
+    return { ok: false, status: 401, message: "Authentication required." };
+  }
+
+  const [profile, effectiveRole] = await Promise.all([
+    client
+      .from("profiles")
+      .select("status")
+      .eq("id", data.user.id)
+      .single(),
+    client.rpc("current_app_role"),
+  ]);
+
+  if (profile.error || profile.data.status !== "active") {
+    return { ok: false, status: 403, message: "Account is not active." };
+  }
+  if (effectiveRole.error || !effectiveRole.data) {
+    return { ok: false, status: 403, message: "Permission denied." };
+  }
+
+  const role = effectiveRole.data;
+
+  // Every operational permission is owner-admin only. Keep this explicit even
+  // though the permission table currently says the same thing so a future role
+  // expansion cannot silently reopen service-role routes.
+  if (permission && permission !== "learn" && role !== "admin") {
+    return { ok: false, status: 403, message: "Permission denied." };
+  }
+  if (permission && !hasPermission(role, permission)) {
+    return { ok: false, status: 403, message: "Permission denied." };
+  }
+
+  return { ok: true, userId: data.user.id, role };
 }

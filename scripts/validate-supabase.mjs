@@ -18,7 +18,7 @@ const requiredTables = [
   "achievements", "user_achievements", "weekly_activity", "custom_lesson_requests",
   "generated_lesson_jobs", "lesson_validation_runs", "lesson_validation_checks",
   "lesson_reports", "support_tickets", "support_messages", "audit_logs", "feature_flags",
-  "service_status", "cost_records", "reward_ledger",
+  "service_status", "cost_records", "reward_ledger", "admin_owner",
   "lesson_assignments",
 ];
 
@@ -31,7 +31,7 @@ const missingRls = requiredTables.filter((table) =>
 const requiredFunctions = [
   "complete_lesson_session", "complete_review_session", "claim_lesson_reward",
   "claim_review_reward", "publish_lesson_version", "reset_learner_progress",
-  "save_lesson_draft",
+  "save_lesson_draft", "current_app_role", "has_app_role",
   "assign_next_lesson", "begin_custom_lesson_generation", "store_generated_lesson_package",
   "begin_custom_lesson_generation_v2", "enrich_custom_lesson_library",
 ];
@@ -47,5 +47,18 @@ if (/to authenticated\s+using\s*\(\s*true\s*\)/i.test(sql)) {
 if (!sql.includes("unique (reward_type, source_id)")) errors.push("Missing reward ledger idempotency constraint.");
 if (!sql.includes("lesson_version_id uuid not null")) errors.push("Lesson sessions are not pinned to a version.");
 
+if (!sql.includes("revoke all on table public.admin_owner from anon, authenticated")) {
+  errors.push("Admin owner table is exposed to browser database roles.");
+}
+if (!sql.includes("from public.admin_owner owner_row")) {
+  errors.push("current_app_role is not bound to the singleton admin owner.");
+}
+if (!sql.includes("when 'admin'::public.app_role then 'admin'::public.app_role = any(allowed)")) {
+  errors.push("Administrative RLS is not restricted to the owner-admin role.");
+}
+if (!sql.includes("set search_path = ''")) {
+  errors.push("Security-definer authorization functions are missing a fixed empty search path.");
+}
+
 if (errors.length) throw new Error(errors.join("\n"));
-console.log(`Validated ${files.length} migrations, ${requiredTables.length} tables, RLS coverage, and ${requiredFunctions.length} trusted functions.`);
+console.log(`Validated ${files.length} migrations, ${requiredTables.length} tables, RLS coverage, owner-only admin authorization, and ${requiredFunctions.length} trusted functions.`);

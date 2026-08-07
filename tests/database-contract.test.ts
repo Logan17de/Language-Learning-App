@@ -17,6 +17,10 @@ const generatedLessonPgcryptoSearchPath = readFileSync(
   "supabase/migrations/20260804210000_generated_lesson_pgcrypto_search_path.sql",
   "utf8",
 );
+const ownerOnlyAdmin = readFileSync(
+  "supabase/migrations/20260807090000_owner_only_admin.sql",
+  "utf8",
+);
 
 describe("Supabase integration contract", () => {
   it("pins sessions to a lesson version and makes rewards database-idempotent", () => {
@@ -96,9 +100,7 @@ describe("Supabase integration contract", () => {
   });
 
   it("stores complete story enrichment with actionable package diagnostics", () => {
-    expect(generatedLessonVocabularyCapacity).toContain(
-      "not between 8 and 200",
-    );
+    expect(generatedLessonVocabularyCapacity).toContain("not between 8 and 200");
     expect(generatedLessonVocabularyCapacity).toContain(
       "vocabulary must contain 8 to 200 items (received %)",
     );
@@ -110,6 +112,20 @@ describe("Supabase integration contract", () => {
     );
     expect(generatedLessonPgcryptoSearchPath).toContain(
       "alter function public.store_generated_lesson_package_v2",
+    );
+  });
+
+  it("makes production administration owner-only and fail-closed", () => {
+    expect(ownerOnlyAdmin).toContain("create table public.admin_owner");
+    expect(ownerOnlyAdmin).toContain(
+      "revoke all on table public.admin_owner from anon, authenticated",
+    );
+    expect(ownerOnlyAdmin).toContain("set search_path = ''");
+    expect(ownerOnlyAdmin).toContain("from public.admin_owner owner_row");
+    expect(ownerOnlyAdmin).toContain("and owner_row.user_id = p.id");
+    expect(ownerOnlyAdmin).toContain("then 'learner'::public.app_role");
+    expect(ownerOnlyAdmin).toContain(
+      "when 'admin'::public.app_role then 'admin'::public.app_role = any(allowed)",
     );
   });
 });
