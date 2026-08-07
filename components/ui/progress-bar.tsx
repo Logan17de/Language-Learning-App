@@ -9,17 +9,22 @@ export function ProgressBar({
   className?: string;
   barClassName?: string;
 }) {
+  const clampedValue = Math.min(100, Math.max(0, value));
+
   return (
     <div
       className={cn("h-2 overflow-hidden rounded-full bg-moss-100", className)}
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={100}
-      aria-valuenow={Math.min(100, Math.max(0, value))}
+      aria-valuenow={clampedValue}
     >
       <div
-        className={cn("h-full rounded-full bg-moss-600 transition-all duration-500", barClassName)}
-        style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+        className={cn(
+          "h-full rounded-full bg-moss-600 transition-[width] duration-280 ease-out motion-reduce:transition-none",
+          barClassName,
+        )}
+        style={{ width: `${clampedValue}%` }}
       />
     </div>
   );
