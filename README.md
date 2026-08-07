@@ -109,6 +109,16 @@ where email = 'admin@example.com';
 
 Supported roles are `learner`, `admin`, `content_editor`, and `support`. The proxy and RLS both enforce permissions. Content editors cannot manage subscriptions or suspensions; support staff cannot publish content.
 
+### Admin workspace behavior
+
+When Supabase is configured, the production admin workspace reads operational data from Supabase instead of deterministic demo stores. Dashboard, analytics, cost, users, subscriptions, generated-content operations, reports, support, audit history, feature flags, service status, curriculum, grammar, kanji/vocabulary, image, and audio views are backend-aware.
+
+Production mutations that already have trusted server operations—user state, subscription state, generated lesson approval/rejection/publishing, report state, support replies/notes, feature flags, and service status—use server-authorized routes and write audit records where applicable.
+
+Some normalized authoring surfaces still do not have a complete server-side mutation contract. Curriculum, permanent grammar/kanji/vocabulary, image metadata, and audio metadata therefore run as live read-only inspectors in backend mode instead of pretending that localStorage changes are production writes. Their deterministic editable tooling remains available only in demo mode until dedicated authoring APIs are added.
+
+Support replies are persisted in `support_messages`, but the learner support page does not yet surface the ticket conversation or send outbound email/push notifications. The admin UI labels this limitation explicitly.
+
 ## Storage
 
 - `lesson-images`: public read; admin/content-editor write
