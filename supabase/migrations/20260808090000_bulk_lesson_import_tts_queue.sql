@@ -87,9 +87,10 @@ begin
   end if;
 
   -- Direct/manual execution is owner-admin or service-role only. The threshold
-  -- trigger also runs under the importer's authenticated admin identity.
+  -- trigger also runs under the importer's authenticated admin identity. NULL
+  -- effective roles explicitly collapse to learner so authorization fails closed.
   if coalesce(auth.role(), '') <> 'service_role'
-     and public.current_app_role() <> 'admin'::public.app_role then
+     and coalesce(public.current_app_role(), 'learner'::public.app_role) <> 'admin'::public.app_role then
     raise exception 'Permission denied' using errcode = '42501';
   end if;
 
@@ -198,7 +199,7 @@ declare
   v_results jsonb := '[]'::jsonb;
   v_count integer;
 begin
-  if public.current_app_role() <> 'admin'::public.app_role then
+  if coalesce(public.current_app_role(), 'learner'::public.app_role) <> 'admin'::public.app_role then
     raise exception 'Permission denied' using errcode = '42501';
   end if;
 
