@@ -17,8 +17,26 @@ const learnerPrefixes = [
 ];
 
 export async function updateSession(request: NextRequest): Promise<NextResponse> {
+  const pathname = request.nextUrl.pathname;
+  const isAdminLogin = pathname === "/admin/login";
+  const anyAdminPath = pathname === "/admin" || pathname.startsWith("/admin/");
+  const protectedAdmin = anyAdminPath && !isAdminLogin;
+  const protectedLearner = learnerPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+
   const config = getSupabasePublicConfig();
-  if (!config) return NextResponse.next({ request });
+  if (!config) {
+    // Demo admin exists only for local development. A production deployment
+    // with missing backend configuration must never fall back to mock admin.
+    if (process.env.NODE_ENV === "production" && anyAdminPath) {
+      return new NextResponse("Not Found", {
+        status: 404,
+        headers: { "Cache-Control": "private, no-store" },
+      });
+    }
+    return NextResponse.next({ request });
+  }
 
   let response = NextResponse.next({ request });
   const supabase = createServerClient<Database>(config.url, config.anonKey, {
@@ -39,13 +57,6 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
   const { data: claimsData } = await supabase.auth.getClaims();
   const userId =
     typeof claimsData?.claims?.sub === "string" ? claimsData.claims.sub : null;
-  const pathname = request.nextUrl.pathname;
-  const isAdminLogin = pathname === "/admin/login";
-  const protectedLearner = learnerPrefixes.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
-  );
-  const protectedAdmin =
-    pathname === "/admin" || (pathname.startsWith("/admin/") && !isAdminLogin);
 
   if (!userId && (protectedLearner || protectedAdmin)) {
     const url = request.nextUrl.clone();
