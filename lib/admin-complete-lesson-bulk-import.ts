@@ -1,6 +1,7 @@
 import { validateCompleteLessonImport } from "@/lib/admin-complete-lesson-import";
 
 type RecordValue = Record<string, unknown>;
+const MAX_LISTENING_TTS_CHARACTERS = 1_200;
 
 export interface BulkLessonIssue {
   index: number;
@@ -21,6 +22,24 @@ function record(value: unknown): value is RecordValue {
 
 function lessonId(value: unknown): string {
   return record(value) && typeof value.id === "string" ? value.id.trim() : "";
+}
+
+function listeningTtsErrors(value: unknown): string[] {
+  if (!record(value) || !Array.isArray(value.listeningExercises)) return [];
+  const errors: string[] = [];
+  value.listeningExercises.forEach((item, index) => {
+    const transcript = record(item) && typeof item.transcript === "string"
+      ? item.transcript.normalize("NFKC").trim()
+      : "";
+    if (!transcript) {
+      errors.push(`Listening question ${index + 1} needs a transcript for stored TTS.`);
+    } else if (transcript.length > MAX_LISTENING_TTS_CHARACTERS) {
+      errors.push(
+        `Listening question ${index + 1} transcript exceeds the ${MAX_LISTENING_TTS_CHARACTERS}-character TTS limit.`,
+      );
+    }
+  });
+  return errors;
 }
 
 /**
@@ -85,7 +104,7 @@ export function validateCompleteLessonBatch(values: unknown[]): BulkLessonValida
   values.forEach((value, index) => {
     const validation = validateCompleteLessonImport(value);
     const id = lessonId(value);
-    const errors = [...validation.errors];
+    const errors = [...validation.errors, ...listeningTtsErrors(value)];
     if (id) {
       const previous = seen.get(id);
       if (previous !== undefined) {
