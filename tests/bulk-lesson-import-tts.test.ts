@@ -18,6 +18,14 @@ const batchRoute = readFileSync("app/api/admin/audio/batches/route.ts", "utf8");
 const worker = readFileSync("lib/audio/lesson-tts-batches.ts", "utf8");
 const audioLibrary = readFileSync("lib/audio/audio-library.ts", "utf8");
 const importPage = readFileSync("app/admin/lessons/import/page.tsx", "utf8");
+const importer = readFileSync(
+  "components/admin/lessons/bulk-complete-lesson-importer.tsx",
+  "utf8",
+);
+const directRepository = readFileSync(
+  "lib/repositories/admin-bulk-lesson-import-repository.ts",
+  "utf8",
+);
 
 function smallRecord(id: string) {
   return { schemaVersion: 1, id };
@@ -64,6 +72,21 @@ describe("bulk complete lesson ingestion", () => {
     ).toBe(true);
   });
 
+  it("rejects a listening transcript that the stored TTS library cannot accept", () => {
+    const value = {
+      ...smallRecord("lesson_n5_tts_limit"),
+      listeningExercises: [
+        { transcript: "あ".repeat(1_201) },
+      ],
+    };
+    const result = validateCompleteLessonBatch([value]);
+    expect(
+      result.issues[0]?.errors.some((error) =>
+        error.includes("transcript exceeds the 1200-character TTS limit"),
+      ),
+    ).toBe(true);
+  });
+
   it("uses the canonical transaction and starts TTS only after DB queuing", () => {
     expect(importRoute).toContain('authorize("manage_content")');
     expect(importRoute).toContain('rpc("import_complete_lessons"');
@@ -77,6 +100,14 @@ describe("bulk complete lesson ingestion", () => {
       "v_result := public.import_complete_lesson(v_item, p_publish)",
     );
   });
+
+  it("uploads large lesson arrays directly from the admin session to Supabase", () => {
+    expect(directRepository).toContain('rpc("import_complete_lessons"');
+    expect(importer).toContain("adminBulkLessonImportRepository.importMany");
+    expect(importer).not.toContain('fetch("/api/admin/lessons/import"');
+    expect(importer).toContain("processNext: true");
+    expect(batchRoute).toContain("input.processNext === true");
+  });
 });
 
 describe("imported lesson TTS batching", () => {
@@ -86,6 +117,12 @@ describe("imported lesson TTS batching", () => {
     expect(queueMigration).toContain("public.create_lesson_tts_batch(100, 'threshold')");
     expect(queueMigration).toContain("p_trigger_source = 'threshold' and v_count < 100");
     expect(queueMigration).toContain("limit v_limit");
+  });
+
+  it("fails closed for a missing effective admin role", () => {
+    expect(queueMigration).toContain(
+      "coalesce(public.current_app_role(), 'learner'::public.app_role) <> 'admin'::public.app_role",
+    );
   });
 
   it("keeps browser access away from TTS queue mutations", () => {
