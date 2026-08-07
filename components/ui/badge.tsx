@@ -11,12 +11,19 @@ export function Badge({
   className?: string;
 }) {
   const tones = {
-    moss: "bg-moss-100 text-moss-700",
-    orange: "bg-persimmon-100 text-persimmon-600",
-    neutral: "bg-stone-100 text-stone-600",
+    moss: "border-moss-200/70 bg-moss-100 text-moss-700",
+    orange: "border-persimmon-200/70 bg-persimmon-100 text-persimmon-700",
+    neutral: "border-border bg-surface-muted text-muted",
   };
+
   return (
-    <span className={cn("inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold", tones[tone], className)}>
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold",
+        tones[tone],
+        className,
+      )}
+    >
       {children}
     </span>
   );
