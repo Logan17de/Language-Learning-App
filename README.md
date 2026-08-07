@@ -136,6 +136,18 @@ where o.singleton = true;
 
 The schema still contains `learner`, `admin`, `content_editor`, and `support` enum values for compatibility, but production operational access is owner-admin only. Client state and profile role strings are not sufficient authorization; Proxy, server authorization, and RLS independently enforce the boundary.
 
+### Admin workspace behavior
+
+When Supabase is configured, the production admin workspace reads operational data from Supabase instead of deterministic demo stores. Dashboard, analytics, cost, users, subscriptions, generated-content operations, reports, support, audit history, feature flags, service status, curriculum, grammar, kanji/vocabulary, image, and audio views are backend-aware.
+
+Production mutations that already have trusted server operations—user state, subscription state, generated lesson approval/rejection/publishing, report state, support replies/notes, feature flags, and service status—use server-authorized routes and write audit records where applicable.
+
+Some normalized authoring surfaces still do not have a complete server-side mutation contract. Curriculum, permanent grammar/kanji/vocabulary, image metadata, and audio metadata therefore run as live read-only inspectors in backend mode instead of pretending that localStorage changes are production writes. Their deterministic editable tooling remains available only in demo mode until dedicated authoring APIs are added.
+
+Support replies are persisted in `support_messages`, but the learner support page does not yet surface the ticket conversation or send outbound email/push notifications. The admin UI labels this limitation explicitly.
+
+The live-admin overhaul is covered by the repository's PR validation pipeline: TypeScript type-checking, the automated test suite, and the Next.js production build all pass on the current admin branch; its Vercel preview deployment is also healthy.
+
 ## Storage
 
 - `lesson-images`: public read; owner-admin write
