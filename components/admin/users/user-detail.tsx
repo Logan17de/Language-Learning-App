@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Download, RefreshCw, RotateCcw, ShieldOff } from "lucide-react";
 import { useAdminStore } from "@/store/admin-store";
 import { useAppStore } from "@/store/app-store";
