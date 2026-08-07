@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { Target } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import { Card } from "@/components/ui/card";
@@ -19,25 +20,25 @@ export function ProgressDashboard() {
     <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
       <header>
         <p className="section-kicker">Progress</p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+        <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
           Your {currentLevel} progress.
         </h1>
-        <p className="mt-3 max-w-2xl leading-7 text-stone-500">
-          A focused view of level completion and language you have learned.
+        <p className="mt-3 max-w-2xl text-base leading-7 text-muted">
+          See level completion and the language you have actually accumulated through lessons.
         </p>
       </header>
 
       <Card className="mt-8 p-6 sm:p-9">
-        <div className="grid gap-8 lg:grid-cols-[auto_1fr] lg:items-center">
+        <div className="grid gap-8 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-12">
           <Ring value={progress.levelCompletion} label={currentLevel} />
           <div>
-            <div className="flex items-center gap-3">
-              <Target className="size-5 text-moss-600" />
+            <div className="flex items-start gap-3">
+              <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-moss-100 text-moss-700">
+                <Target className="size-5" aria-hidden="true" />
+              </span>
               <div>
-                <h2 className="text-2xl font-semibold">
-                  {currentLevel} level completion
-                </h2>
-                <p className="mt-1 text-sm text-stone-400">
+                <h2 className="text-2xl font-semibold">{currentLevel} level completion</h2>
+                <p className="mt-1 text-sm tabular-nums text-muted">
                   {progress.levelCompletion}% complete
                 </p>
               </div>
@@ -48,10 +49,7 @@ export function ProgressDashboard() {
                 value={progress.learnedVocabularyCount}
                 label="vocabulary learned"
               />
-              <LearnedStat
-                value={progress.learnedKanjiCount}
-                label="kanji learned"
-              />
+              <LearnedStat value={progress.learnedKanjiCount} label="kanji learned" />
               <LearnedStat
                 value={progress.learnedGrammarCount}
                 label="grammar learned"
@@ -66,27 +64,32 @@ export function ProgressDashboard() {
 
 function LearnedStat({ value, label }: { value: number; label: string }) {
   return (
-    <div className="rounded-2xl bg-moss-50 p-4">
-      <p className="text-3xl font-semibold text-moss-800">{value}</p>
-      <p className="mt-1 text-xs text-stone-500">{label}</p>
+    <div className="rounded-2xl border border-border/70 bg-surface-muted p-4">
+      <p className="text-3xl font-semibold tabular-nums text-ink">{value}</p>
+      <p className="mt-1 text-xs leading-5 text-muted">{label}</p>
     </div>
   );
 }
 
 function Ring({ value, label }: { value: number; label: string }) {
+  const clampedValue = Math.min(100, Math.max(0, value));
+  const ringStyle = {
+    "--progress-angle": `${clampedValue * 3.6}deg`,
+  } as CSSProperties;
+
   return (
     <div
-      className="mx-auto grid size-36 place-items-center rounded-full"
-      style={{
-        background: `conic-gradient(#4f8068 ${value * 3.6}deg, #e2eee7 0)`,
-      }}
+      className="progress-ring mx-auto grid size-40 place-items-center rounded-full p-2 shadow-soft"
+      style={ringStyle}
       role="img"
-      aria-label={`${label} curriculum ${value}% complete`}
+      aria-label={`${label} curriculum ${clampedValue}% complete`}
     >
-      <div className="grid size-28 place-items-center rounded-full bg-white text-center">
+      <div className="grid size-full place-items-center rounded-full bg-surface text-center shadow-soft">
         <span>
-          <strong className="block text-3xl">{value}%</strong>
-          <span className="text-xs font-semibold text-stone-400">{label}</span>
+          <strong className="block text-3xl font-semibold tabular-nums">
+            {clampedValue}%
+          </strong>
+          <span className="mt-1 block text-xs font-semibold text-muted">{label}</span>
         </span>
       </div>
     </div>
