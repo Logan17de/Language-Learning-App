@@ -5,10 +5,12 @@ import { cn } from "@/lib/utils";
 type Variant = "primary" | "secondary" | "ghost" | "dark";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-moss-600 text-white shadow-lg shadow-moss-600/20 hover:bg-moss-700 active:translate-y-px",
-  secondary: "border border-moss-200 bg-white text-moss-700 hover:bg-moss-50",
-  ghost: "text-ink hover:bg-moss-50",
-  dark: "bg-ink text-white hover:bg-moss-900",
+  primary:
+    "bg-moss-600 text-white shadow-soft hover:bg-moss-700 active:scale-[0.98]",
+  secondary:
+    "border border-border bg-surface text-moss-700 hover:border-moss-200 hover:bg-moss-50 active:scale-[0.98]",
+  ghost: "text-ink hover:bg-surface-muted active:scale-[0.98]",
+  dark: "bg-moss-900 text-white shadow-soft hover:bg-moss-800 active:scale-[0.98]",
 };
 
 interface SharedProps {
@@ -17,6 +19,9 @@ interface SharedProps {
   variant?: Variant;
 }
 
+const baseClass =
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition duration-180 focus:outline-none focus-visible:ring-4 focus-visible:ring-moss-200 focus-visible:ring-offset-2 focus-visible:ring-offset-paper disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100";
+
 export function Button({
   children,
   className,
@@ -24,14 +29,7 @@ export function Button({
   ...props
 }: SharedProps & ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button
-      className={cn(
-        "inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-moss-200 disabled:cursor-not-allowed disabled:opacity-50",
-        variants[variant],
-        className,
-      )}
-      {...props}
-    >
+    <button className={cn(baseClass, variants[variant], className)} {...props}>
       {children}
     </button>
   );
@@ -46,11 +44,7 @@ export function ButtonLink({
   return (
     <Link
       href={href}
-      className={cn(
-        "inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-moss-200",
-        variants[variant],
-        className,
-      )}
+      className={cn("group", baseClass, variants[variant], className)}
     >
       {children}
     </Link>
