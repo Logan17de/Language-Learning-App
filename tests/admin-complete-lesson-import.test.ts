@@ -11,6 +11,10 @@ const migration = readFileSync(
   "supabase/migrations/20260804190000_admin_complete_lesson_import.sql",
   "utf8",
 );
+const bulkMigration = readFileSync(
+  "supabase/migrations/20260808090000_bulk_lesson_import_tts_queue.sql",
+  "utf8",
+);
 const audioControl = readFileSync("components/exercises/audio-control.tsx", "utf8");
 const listeningPhase = readFileSync("components/lesson/listening-phase.tsx", "utf8");
 const speakingPhase = readFileSync("components/lesson/speaking-phase.tsx", "utf8");
@@ -169,13 +173,15 @@ describe("complete admin lesson import", () => {
     expect(result.errors).toContain("Vocabulary question 1 needs four unique choices.");
   });
 
-  it("stores through a staff-only transaction without a generation model call", () => {
+  it("stores through an owner-only transaction without a generation model call", () => {
     expect(route).toContain('authorize("manage_content")');
-    expect(route).toContain('rpc("import_complete_lesson"');
+    expect(route).toContain('rpc("import_complete_lessons"');
     expect(route).not.toContain("generateStructured");
     expect(route).not.toContain("OPENAI_");
     expect(migration).toContain("create or replace function public.import_complete_lesson");
     expect(migration).toContain("public.has_app_role(array['admin', 'content_editor']");
+    expect(bulkMigration).toContain("public.current_app_role() <> 'admin'::public.app_role");
+    expect(bulkMigration).toContain("v_result := public.import_complete_lesson(v_item, p_publish)");
     expect(migration).toContain("'model_api_used', false");
     expect(migration).toContain("public.resolve_admin_lesson_target_ids");
     expect(migration).toContain("'runtimeAudio', 'browser_tts'");
