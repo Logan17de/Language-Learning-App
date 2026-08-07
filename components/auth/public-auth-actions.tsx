@@ -60,7 +60,9 @@ function usePublicAuthState() {
       ? backendSignedIn !== null && (!backendSignedIn || backendPlan !== null)
       : hasHydrated;
   const signedIn =
-    backendMode === "supabase" ? backendSignedIn === true : hasHydrated && isAuthenticated;
+    backendMode === "supabase"
+      ? backendSignedIn === true
+      : hasHydrated && isAuthenticated;
   const plan: PublicPlan =
     backendMode === "supabase"
       ? (backendPlan ?? "free")
@@ -96,7 +98,7 @@ export function PublicHeaderActions() {
   if (!resolved) {
     return (
       <div
-        className="h-10 w-56 animate-pulse rounded-full bg-stone-100"
+        className="h-12 w-56 animate-pulse rounded-full bg-stone-100 motion-reduce:animate-none"
         aria-label="Checking account session"
       />
     );
@@ -108,13 +110,13 @@ export function PublicHeaderActions() {
         <Button
           type="button"
           variant="ghost"
-          className="min-h-10 px-2 text-xs sm:px-4 sm:text-sm"
+          className="px-2 text-xs sm:px-4 sm:text-sm"
           onClick={() => void signOut()}
           disabled={isSigningOut}
         >
           {isSigningOut ? "Signing out…" : "Sign out"}
         </Button>
-        <ButtonLink href="/home" className="min-h-10 px-3 text-xs sm:px-5 sm:text-sm">
+        <ButtonLink href="/home" className="px-3 text-xs sm:px-5 sm:text-sm">
           <span className="sm:hidden">Dashboard</span>
           <span className="hidden sm:inline">Go to dashboard</span>
         </ButtonLink>
@@ -124,14 +126,10 @@ export function PublicHeaderActions() {
 
   return (
     <>
-      <ButtonLink
-        href="/login"
-        variant="ghost"
-        className="min-h-10 px-3 text-xs sm:px-5 sm:text-sm"
-      >
+      <ButtonLink href="/login" variant="ghost" className="px-3 text-xs sm:px-5 sm:text-sm">
         Sign in
       </ButtonLink>
-      <ButtonLink href="/signup" className="min-h-10 px-3 text-xs sm:px-5 sm:text-sm">
+      <ButtonLink href="/signup" className="px-3 text-xs sm:px-5 sm:text-sm">
         Create account
       </ButtonLink>
     </>
@@ -160,7 +158,7 @@ export function PublicPrimaryAction({
   if (!resolved) {
     return (
       <span
-        className="inline-flex min-h-12 w-52 animate-pulse rounded-full bg-moss-100"
+        className="inline-flex min-h-12 w-52 animate-pulse rounded-full bg-moss-100 motion-reduce:animate-none"
         aria-label="Checking account session"
       />
     );
@@ -179,7 +177,7 @@ export function PublicPrimaryAction({
       {showAiIcon && <Sparkles className="size-4" aria-hidden="true" />}
       {signedIn ? signedInLabel : signedOutLabel}
       <ArrowRight
-        className="size-4 transition-transform group-hover:translate-x-1"
+        className="size-4 transition-transform duration-180 group-hover:translate-x-0.5"
         aria-hidden="true"
       />
     </ButtonLink>
