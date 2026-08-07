@@ -111,6 +111,7 @@ export const adminUserRepository = {
     ]);
     const error = firstError([profile, preferences, settings, subscriptions, completions, reviews, requests, reports, tickets, audit, mastery, activity]);
     if (error) return failure(error, "User detail could not be loaded.");
+    if (!profile.data) return failure({ code: "PGRST116" }, "User not found.");
 
     return success({
       profile: profile.data,
