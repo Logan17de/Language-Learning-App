@@ -119,6 +119,8 @@ Some normalized authoring surfaces still do not have a complete server-side muta
 
 Support replies are persisted in `support_messages`, but the learner support page does not yet surface the ticket conversation or send outbound email/push notifications. The admin UI labels this limitation explicitly.
 
+The live-admin overhaul is covered by the repository's PR validation pipeline: TypeScript type-checking, the automated test suite, and the Next.js production build all pass on the current admin branch; its Vercel preview deployment is also healthy.
+
 ## Storage
 
 - `lesson-images`: public read; admin/content-editor write
