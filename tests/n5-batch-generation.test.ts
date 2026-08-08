@@ -46,15 +46,18 @@ describe("JLPT offline lesson Batch staging", () => {
     expect(workspace).toContain('min={1} max={100}');
   });
 
-  it("keeps five-kanji sets unique while allowing grammar sets to repeat", () => {
+  it("keeps five-kanji sets unique while balancing reusable grammar patterns", () => {
     expect(engine).toContain('import { randomInt } from "node:crypto"');
     expect(engine).toContain("TARGET_KANJI_COUNT = 5");
     expect(engine).toContain("TARGET_GRAMMAR_COUNT = 3");
-    expect(engine).toContain('select("target_kanji")');
+    expect(engine).toContain('select("target_kanji,target_grammar")');
     expect(engine).toContain('.eq("jlpt_level", level)');
     expect(engine).toContain("usedKanjiSets.add(targetSetSignature(kanji))");
     expect(engine).toContain("if (!input.used.has(signature))");
-    expect(engine).toContain("targetGrammar: randomTargetSet(grammarKeys, TARGET_GRAMMAR_COUNT)");
+    expect(engine).toContain("chooseBalancedGrammarSet");
+    expect(engine).toContain("const grammarUsage = new Map");
+    expect(engine).toContain("for (const pattern of new Set(strings(row.target_grammar)))");
+    expect(engine).toContain("minimumUsage");
     expect(engine).not.toContain("usedGrammarSets");
     expect(capacity).toContain("Grammar patterns may repeat with different kanji sets");
   });
