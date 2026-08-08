@@ -7,6 +7,7 @@ const migration = readFileSync(
 );
 const legacyEngine = readFileSync("lib/admin-lessons/n5-batch-generation.ts", "utf8");
 const engine = readFileSync("lib/admin-lessons/jlpt-batch-generation.ts", "utf8");
+const capacity = readFileSync("lib/admin-lessons/lesson-generation-capacity.ts", "utf8");
 const adminRoute = readFileSync("app/api/admin/lesson-generation/route.ts", "utf8");
 const requestRoute = readFileSync(
   "app/api/admin/lesson-generation/requests/[requestId]/route.ts",
@@ -45,17 +46,28 @@ describe("JLPT offline lesson Batch staging", () => {
     expect(workspace).toContain('min={1} max={100}');
   });
 
-  it("uses random five-kanji and three-grammar sets and rejects exact DB repeats", () => {
+  it("keeps five-kanji sets unique while balancing reusable grammar patterns", () => {
     expect(engine).toContain('import { randomInt } from "node:crypto"');
     expect(engine).toContain("TARGET_KANJI_COUNT = 5");
     expect(engine).toContain("TARGET_GRAMMAR_COUNT = 3");
     expect(engine).toContain('select("target_kanji,target_grammar")');
     expect(engine).toContain('.eq("jlpt_level", level)');
     expect(engine).toContain("usedKanjiSets.add(targetSetSignature(kanji))");
-    expect(engine).toContain("usedGrammarSets.add(targetSetSignature(grammar))");
     expect(engine).toContain("if (!input.used.has(signature))");
-    expect(engine).toContain("randomTargetSet(input.keys, input.count)");
-    expect(engine).not.toContain("pairScore");
+    expect(engine).toContain("chooseBalancedGrammarSet");
+    expect(engine).toContain("const grammarUsage = new Map");
+    expect(engine).toContain("for (const pattern of new Set(strings(row.target_grammar)))");
+    expect(engine).toContain("minimumUsage");
+    expect(engine).not.toContain("usedGrammarSets");
+    expect(capacity).toContain("Grammar patterns may repeat with different kanji sets");
+  });
+
+  it("preflights exact five-kanji capacity before creating a Batch", () => {
+    expect(capacity).toContain("combinationCount");
+    expect(capacity).toContain("maxSelectableLessons");
+    expect(adminRoute).toContain("getLessonTargetCapacity(level)");
+    expect(adminRoute).toContain("assertLessonTargetCapacity");
+    expect(adminRoute).toContain("status: 409");
   });
 
   it("keeps target comparison order-independent and validates the selected level", () => {

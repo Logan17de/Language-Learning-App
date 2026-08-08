@@ -308,6 +308,30 @@ function chooseUnusedRandomSet(input: {
   );
 }
 
+function chooseBalancedGrammarSet(input: {
+  keys: string[];
+  count: number;
+  usage: Map<string, number>;
+}): string[] {
+  const available = [...input.keys];
+  const selected: string[] = [];
+
+  while (selected.length < input.count) {
+    const minimumUsage = Math.min(
+      ...available.map((pattern) => input.usage.get(pattern) ?? 0),
+    );
+    const leastUsed = available.filter(
+      (pattern) => (input.usage.get(pattern) ?? 0) === minimumUsage,
+    );
+    const chosen = leastUsed[randomInt(leastUsed.length)];
+    selected.push(chosen);
+    input.usage.set(chosen, (input.usage.get(chosen) ?? 0) + 1);
+    available.splice(available.indexOf(chosen), 1);
+  }
+
+  return selected;
+}
+
 async function planRandomUniqueTargets(
   admin: RawClient,
   count: number,
@@ -351,16 +375,17 @@ async function planRandomUniqueTargets(
   }
 
   const usedKanjiSets = new Set<string>();
-  const usedGrammarSets = new Set<string>();
+  const grammarUsage = new Map(grammarKeys.map((pattern) => [pattern, 0]));
   for (const row of historyResult.data ?? []) {
     if (!record(row)) continue;
     const kanji = strings(row.target_kanji);
-    const grammar = strings(row.target_grammar);
     if (kanji.length === TARGET_KANJI_COUNT) {
       usedKanjiSets.add(targetSetSignature(kanji));
     }
-    if (grammar.length === TARGET_GRAMMAR_COUNT) {
-      usedGrammarSets.add(targetSetSignature(grammar));
+    for (const pattern of new Set(strings(row.target_grammar))) {
+      if (grammarUsage.has(pattern)) {
+        grammarUsage.set(pattern, (grammarUsage.get(pattern) ?? 0) + 1);
+      }
     }
   }
 
@@ -373,11 +398,10 @@ async function planRandomUniqueTargets(
         used: usedKanjiSets,
         label: `${level} five-kanji`,
       }),
-      targetGrammar: chooseUnusedRandomSet({
+      targetGrammar: chooseBalancedGrammarSet({
         keys: grammarKeys,
         count: TARGET_GRAMMAR_COUNT,
-        used: usedGrammarSets,
-        label: `${level} three-grammar`,
+        usage: grammarUsage,
       }),
     });
   }
