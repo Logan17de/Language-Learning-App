@@ -1,10 +1,13 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { after, NextResponse, type NextRequest } from "next/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
-import { validateCompleteLessonImport } from "@/lib/admin-complete-lesson-import";
+import { validateCompleteLessonBatch } from "@/lib/admin-complete-lesson-bulk-import";
+import { processLessonTtsBatches } from "@/lib/audio/lesson-tts-batches";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/types/database";
 
 export const runtime = "nodejs";
+export const maxDuration = 300;
 
 export async function POST(request: NextRequest) {
   const auth = await authorize("manage_content");
@@ -15,15 +18,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "A complete lesson package is required." }, { status: 400 });
   }
   const input = body as Record<string, unknown>;
-  const lesson = input.lesson;
+  const lessons = Array.isArray(input.lessons)
+    ? input.lessons
+    : input.lesson
+      ? [input.lesson]
+      : [];
   const publish = input.publish === true;
-  const validation = validateCompleteLessonImport(lesson);
+  const validation = validateCompleteLessonBatch(lessons);
   if (!validation.valid) {
     return NextResponse.json(
       {
-        error: "The lesson package did not pass deterministic validation.",
-        errors: validation.errors,
-        counts: validation.counts,
+        error: "The lesson upload did not pass deterministic validation.",
+        count: validation.count,
+        validCount: validation.validCount,
+        issues: validation.issues,
       },
       { status: 400 },
     );
@@ -31,13 +39,15 @@ export async function POST(request: NextRequest) {
 
   const client = await createClient();
   if (!client) return NextResponse.json({ error: "Backend is not configured." }, { status: 503 });
-  const { data, error } = await client.rpc("import_complete_lesson", {
-    p_package: lesson as Json,
+  const rawClient = client as unknown as SupabaseClient;
+  const { data, error } = await rawClient.rpc("import_complete_lessons", {
+    p_packages: lessons as Json,
     p_publish: publish,
   });
   if (error) {
-    console.error("Complete admin lesson import failed.", {
+    console.error("Complete admin lesson bulk import failed.", {
       userId: auth.userId,
+      lessonCount: lessons.length,
       code: error.code,
       message: error.message,
     });
@@ -46,5 +56,30 @@ export async function POST(request: NextRequest) {
       { status: error.code === "42501" ? 403 : error.code === "23505" ? 409 : 400 },
     );
   }
-  return NextResponse.json({ result: data, counts: validation.counts, modelApiUsed: false });
+
+  // The DB trigger turns the oldest 100 pending imported lesson versions into
+  // a threshold batch. This background call is therefore a no-op until the
+  // threshold has actually been reached.
+  after(async () => {
+    try {
+      await processLessonTtsBatches();
+    } catch (workerError) {
+      console.error("Automatic imported-lesson TTS worker stopped.", {
+        userId: auth.userId,
+        message: workerError instanceof Error ? workerError.message : "Unknown TTS worker error.",
+      });
+    }
+  });
+
+  return NextResponse.json({
+    result: data,
+    count: lessons.length,
+    published: publish,
+    modelApiUsed: false,
+    tts: {
+      queued: true,
+      automaticBatchSize: 100,
+      scope: "listening",
+    },
+  });
 }
