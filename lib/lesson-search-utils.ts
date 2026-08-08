@@ -3,6 +3,7 @@ import type { LessonCardState, LessonLibraryFilter } from "@/types/library";
 import type { LessonSession } from "@/types/lesson-session";
 import type { RecentLesson } from "@/types/progress";
 import type { CustomLessonMatch } from "@/types/app-preferences";
+import { isCanonicalPlayableLesson } from "@/lib/lesson-contract";
 
 export function buildLessonCardStates(
   lessons: LessonPackage[],
@@ -80,15 +81,7 @@ export function matchCustomTopic(
 }
 
 export function isPlayableLesson(lesson: LessonPackage): boolean {
-  return Boolean(
-    lesson.id &&
-    lesson.title &&
-    lesson.phases.length === 7 &&
-    lesson.story.length > 0 &&
-    lesson.vocabulary.length > 0 &&
-    lesson.grammar.length > 0 &&
-    lesson.reviewQuestions.length > 0,
-  );
+  return isCanonicalPlayableLesson(lesson);
 }
 
 export function normalize(value: string): string {
