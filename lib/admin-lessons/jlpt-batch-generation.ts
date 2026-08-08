@@ -31,7 +31,7 @@ export {
 };
 export type { GenerationBatchSummary };
 
-export const SUPPORTED_BATCH_LEVELS = ["N5", "N4"] as const;
+export const SUPPORTED_BATCH_LEVELS = ["N5", "N4", "N3", "N2", "N1"] as const;
 export type SupportedBatchLevel = (typeof SUPPORTED_BATCH_LEVELS)[number];
 
 const MAX_BATCH_LESSONS = 100;
@@ -136,7 +136,9 @@ function numeric(value: unknown): number | null {
 }
 
 export function normalizeBatchLevel(value: unknown): SupportedBatchLevel | null {
-  return value === "N5" || value === "N4" ? value : null;
+  return SUPPORTED_BATCH_LEVELS.includes(value as SupportedBatchLevel)
+    ? value as SupportedBatchLevel
+    : null;
 }
 
 function openAIKey(): string {
@@ -724,7 +726,7 @@ export async function submitLessonBatch(input: {
 }> {
   const count = Math.round(input.count);
   const level = normalizeBatchLevel(input.level);
-  if (!level) throw new Error("Batch lesson generation currently supports N5 and N4.");
+  if (!level) throw new Error("Batch lesson generation supports N5, N4, N3, N2, and N1.");
   if (count < 1 || count > MAX_BATCH_LESSONS) {
     throw new Error(`Batch generation accepts 1-${MAX_BATCH_LESSONS} lessons at a time.`);
   }
