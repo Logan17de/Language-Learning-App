@@ -68,7 +68,6 @@ type StagedRequest = Record<string, unknown> & {
 
 const jlptLevels = ["N5", "N4", "N3", "N2", "N1"] as const;
 type JlptLevel = (typeof jlptLevels)[number];
-const activeStatuses = new Set(["planning", "submitting", "validating", "in_progress", "finalizing"]);
 
 async function jsonRequest(url: string, init?: RequestInit): Promise<Record<string, unknown>> {
   const response = await fetch(url, init);
@@ -149,7 +148,7 @@ export function JLPTBatchGenerationWorkspace() {
         body: JSON.stringify({ action: "create", count, level }),
       });
       const batchId = typeof body.batchId === "string" ? body.batchId : null;
-      setMessage(`${count} ${level} lesson requests with new random target sets were submitted to OpenAI Batch.`);
+      setMessage(`${count} ${level} lesson requests with unique kanji sets and balanced grammar targets were submitted to OpenAI Batch.`);
       await loadBatches();
       if (batchId) {
         setSelectedBatchId(batchId);
@@ -268,7 +267,7 @@ export function JLPTBatchGenerationWorkspace() {
     <AdminPageHeader
       eyebrow="Offline content factory"
       title="Generate JLPT lesson batches"
-      description="Choose N5 through N1 and a lesson count. AIko randomly draws 5 kanji and 3 grammar patterns from that level, rejects any exact target set already stored in generation history, and lets OpenAI choose each topic. Every raw result is staged before validation."
+      description="Choose N5 through N1 and a lesson count. AIko keeps each 5-kanji set unique for that level. Each lesson gets 3 distinct grammar patterns, selected with preference for the least-used patterns in generation history so grammar stays balanced while still being reusable across different kanji sets. OpenAI chooses each topic."
     />
 
     {error && <div className="mb-5 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800"><AlertTriangle className="mt-0.5 size-5 shrink-0" />{error}</div>}
@@ -286,7 +285,7 @@ export function JLPTBatchGenerationWorkspace() {
           <input id="jlpt-batch-count" type="number" min={1} max={100} value={count} onChange={(event) => setCount(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} className="admin-input mt-2 w-full" />
           <div className="mt-4 rounded-xl bg-slate-50 p-4 text-xs leading-5 text-slate-600">
             <strong className="block text-slate-900">Per lesson</strong>
-            5 random {level} kanji · 3 random {level} grammar · exact-set DB duplicate check · AI-selected topic · complete canonical lesson package.
+            5 random {level} kanji in a DB-unique set · 3 distinct {level} grammar patterns balanced by prior usage · AI-selected topic · complete canonical lesson package.
           </div>
           <Button type="button" className="mt-4 w-full rounded-xl" disabled={working === "create"} onClick={() => void createBatch()}>
             {working === "create" ? <LoaderCircle className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
@@ -329,7 +328,7 @@ export function JLPTBatchGenerationWorkspace() {
             {selectedBatch.errorMessage && <p className="mt-3 rounded-xl bg-red-50 p-3 text-xs font-semibold text-red-700">{selectedBatch.errorMessage}</p>}
           </AdminSection>
 
-          <AdminSection title="Lesson requests" description="Every five-kanji set and every three-grammar set is random and must be new for that JLPT level before it is accepted.">
+          <AdminSection title="Lesson requests" description="Every five-kanji set must be new for that JLPT level. Grammar patterns can reappear with different kanji sets, but selection favors the least-used patterns so coverage remains balanced.">
             <div className="max-h-[40rem] space-y-2 overflow-y-auto">
               {(detail?.requests ?? []).map((request) => <button key={request.id} type="button" onClick={() => void openRequest(request.id)} className={`w-full rounded-xl border p-3 text-left ${selectedRequestId === request.id ? "border-teal-400 bg-teal-50" : "border-slate-200 bg-white hover:border-slate-300"}`}>
                 <div className="flex flex-wrap items-center justify-between gap-2"><strong className="text-sm">#{request.sequenceNumber} · {request.targetKanji.join(" ")}</strong><AdminStatus>{request.status}</AdminStatus></div>
