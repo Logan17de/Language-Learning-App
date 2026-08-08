@@ -5,7 +5,8 @@ const migration = readFileSync(
   "supabase/migrations/20260808103000_n5_batch_lesson_generation.sql",
   "utf8",
 );
-const engine = readFileSync("lib/admin-lessons/n5-batch-generation.ts", "utf8");
+const legacyEngine = readFileSync("lib/admin-lessons/n5-batch-generation.ts", "utf8");
+const engine = readFileSync("lib/admin-lessons/jlpt-batch-generation.ts", "utf8");
 const adminRoute = readFileSync("app/api/admin/lesson-generation/route.ts", "utf8");
 const requestRoute = readFileSync(
   "app/api/admin/lesson-generation/requests/[requestId]/route.ts",
@@ -21,7 +22,7 @@ const workspace = readFileSync(
 );
 const sidebar = readFileSync("components/admin/admin-sidebar.tsx", "utf8");
 
-describe("N5 offline lesson Batch staging", () => {
+describe("JLPT offline lesson Batch staging", () => {
   it("preserves provider and model output before repair", () => {
     expect(migration).toContain("raw_provider_line jsonb");
     expect(migration).toContain("raw_response text");
@@ -35,35 +36,57 @@ describe("N5 offline lesson Batch staging", () => {
     );
   });
 
+  it("supports selectable Batch generation from N5 through N1", () => {
+    expect(engine).toContain('["N5", "N4", "N3", "N2", "N1"]');
+    expect(adminRoute).toContain("normalizeBatchLevel(body.level)");
+    expect(adminRoute).toContain("submitLessonBatch({ count, level, userId: auth.userId })");
+    expect(workspace).toContain('const jlptLevels = ["N5", "N4", "N3", "N2", "N1"]');
+    expect(workspace).toContain('body: JSON.stringify({ action: "create", count, level })');
+    expect(workspace).toContain('min={1} max={100}');
+  });
+
+  it("uses random five-kanji and three-grammar sets and rejects exact DB repeats", () => {
+    expect(engine).toContain('import { randomInt } from "node:crypto"');
+    expect(engine).toContain("TARGET_KANJI_COUNT = 5");
+    expect(engine).toContain("TARGET_GRAMMAR_COUNT = 3");
+    expect(engine).toContain('select("target_kanji,target_grammar")');
+    expect(engine).toContain('.eq("jlpt_level", level)');
+    expect(engine).toContain("usedKanjiSets.add(targetSetSignature(kanji))");
+    expect(engine).toContain("usedGrammarSets.add(targetSetSignature(grammar))");
+    expect(engine).toContain("if (!input.used.has(signature))");
+    expect(engine).toContain("randomTargetSet(input.keys, input.count)");
+    expect(engine).not.toContain("pairScore");
+  });
+
+  it("keeps target comparison order-independent and validates the selected level", () => {
+    expect(engine).toContain('sort((left, right) => left.localeCompare(right, "ja"))');
+    expect(engine).toContain("targetSetSignature(left) === targetSetSignature(right)");
+    expect(engine).toContain("Generated lesson level must remain ${level}.");
+    expect(engine).toContain("Target kanji mismatch");
+    expect(engine).toContain("Target grammar mismatch");
+    expect(engine).toContain("is missing from the main story");
+    expect(engine).toContain("is not tested in grammarQuestions");
+  });
+
   it("submits complete lessons through the Responses Batch endpoint", () => {
     expect(engine).toContain('url: "/v1/responses"');
     expect(engine).toContain('endpoint: "/v1/responses"');
     expect(engine).toContain('form.append("purpose", "batch")');
     expect(engine).toContain("buildOpenAIResponsesRequest");
     expect(engine).toContain("COMPLETE_LESSON_CHAT_PROMPT");
-    expect(engine).toContain("Choose an original, natural N5-appropriate topic yourself");
-  });
-
-  it("locks curriculum targets while letting the model choose the topic", () => {
-    expect(engine).toContain("TARGET_KANJI_COUNT = 5");
-    expect(engine).toContain("TARGET_GRAMMAR_COUNT = 3");
-    expect(engine).toContain("Target kanji mismatch");
-    expect(engine).toContain("Target grammar mismatch");
-    expect(engine).toContain("is missing from the main story");
-    expect(engine).toContain("is not tested in grammarQuestions");
-    expect(engine).toContain("pairScore");
+    expect(engine).toContain("Choose an original, natural ${level}-appropriate topic yourself");
   });
 
   it("keeps failed output repairable instead of retrying it away", () => {
     expect(engine).toContain('status: "api_failed"');
     expect(engine).toContain('status: errors.length ? "invalid" : "valid"');
     const manualStart = engine.indexOf("export async function saveManualGenerationLesson");
-    const importStart = engine.indexOf("export async function importValidGenerationRequests");
-    const manualBlock = engine.slice(manualStart, importStart);
+    const manualBlock = engine.slice(manualStart);
     expect(manualBlock).toContain("edited_lesson");
     expect(manualBlock).not.toContain("raw_response:");
     expect(workspace).toContain("Original raw model response");
     expect(workspace).toContain("Save + validate");
+    expect(legacyEngine).toContain("importValidGenerationRequests");
   });
 
   it("keeps all generation controls owner-authorized", () => {
@@ -71,6 +94,6 @@ describe("N5 offline lesson Batch staging", () => {
     expect(requestRoute).toContain('authorize("manage_content")');
     expect(workerRoute).toContain("LESSON_GENERATION_WORKER_SECRET");
     expect(workerRoute).toContain("CRON_SECRET");
-    expect(sidebar).toContain("/admin/lessons/batch-generate");
+    expect(sidebar).toContain("JLPT Batch Lessons");
   });
 });
