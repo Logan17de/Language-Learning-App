@@ -6,7 +6,6 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export type LessonGenerationLevel = "N5" | "N4" | "N3" | "N2" | "N1";
 
 const TARGET_KANJI_COUNT = 5;
-const TARGET_GRAMMAR_COUNT = 3;
 const MAX_BATCH_LESSONS = 100;
 
 type RawClient = SupabaseClient;
@@ -22,7 +21,6 @@ export type TargetCapacity = {
 export type LessonTargetCapacity = {
   level: LessonGenerationLevel;
   kanji: TargetCapacity;
-  grammar: TargetCapacity;
   maxAvailableLessons: string;
   maxSelectableLessons: number;
 };
@@ -92,35 +90,25 @@ export async function getLessonTargetCapacity(
   level: LessonGenerationLevel,
 ): Promise<LessonTargetCapacity> {
   const admin = createAdminClient() as unknown as RawClient;
-  const [kanjiResult, grammarResult, historyResult] = await Promise.all([
+  const [kanjiResult, historyResult] = await Promise.all([
     admin
       .from("kanji_records")
       .select("character,quality_status,archived_at")
       .eq("jlpt_level", level)
       .is("archived_at", null),
     admin
-      .from("grammar_records")
-      .select("pattern,quality_status,archived_at")
-      .eq("jlpt_level", level)
-      .is("archived_at", null),
-    admin
       .from("lesson_generation_requests")
-      .select("target_kanji,target_grammar")
+      .select("target_kanji")
       .eq("jlpt_level", level),
   ]);
 
-  const error = kanjiResult.error || grammarResult.error || historyResult.error;
+  const error = kanjiResult.error || historyResult.error;
   if (error) throw new Error(error.message);
 
   const kanjiKeys = [...new Set(
     (kanjiResult.data ?? [])
       .filter((row) => record(row) && row.quality_status !== "rejected" && text(row.character))
       .map((row) => text(row.character) as string),
-  )];
-  const grammarKeys = [...new Set(
-    (grammarResult.data ?? [])
-      .filter((row) => record(row) && row.quality_status !== "rejected" && text(row.pattern))
-      .map((row) => text(row.pattern) as string),
   )];
 
   const history = (historyResult.data ?? []).filter(record);
@@ -129,24 +117,16 @@ export async function getLessonTargetCapacity(
     targetCount: TARGET_KANJI_COUNT,
     historicalSets: history.map((row) => strings(row.target_kanji)),
   });
-  const grammar = capacityFor({
-    keys: grammarKeys,
-    targetCount: TARGET_GRAMMAR_COUNT,
-    historicalSets: history.map((row) => strings(row.target_grammar)),
-  });
 
-  const availableKanji = BigInt(kanji.availableCombinations);
-  const availableGrammar = BigInt(grammar.availableCombinations);
-  const maxAvailable = availableKanji < availableGrammar ? availableKanji : availableGrammar;
-  const maxSelectable = maxAvailable < BigInt(MAX_BATCH_LESSONS)
-    ? Number(maxAvailable)
+  const available = BigInt(kanji.availableCombinations);
+  const maxSelectable = available < BigInt(MAX_BATCH_LESSONS)
+    ? Number(available)
     : MAX_BATCH_LESSONS;
 
   return {
     level,
     kanji,
-    grammar,
-    maxAvailableLessons: maxAvailable.toString(),
+    maxAvailableLessons: available.toString(),
     maxSelectableLessons: maxSelectable,
   };
 }
@@ -157,20 +137,13 @@ export function assertLessonTargetCapacity(
 ): void {
   if (requestedCount <= capacity.maxSelectableLessons) return;
 
-  const grammarLimited =
-    BigInt(capacity.grammar.availableCombinations) <=
-    BigInt(capacity.kanji.availableCombinations);
-  const limiting = grammarLimited ? "grammar" : "kanji";
-  const targetSize = grammarLimited ? TARGET_GRAMMAR_COUNT : TARGET_KANJI_COUNT;
-  const targetCapacity = grammarLimited ? capacity.grammar : capacity.kanji;
-
   throw new Error(
-    `${capacity.level} cannot create ${requestedCount} new unique lessons with the current DB targets. ` +
-      `Only ${capacity.maxAvailableLessons} unique lesson target set(s) remain. ` +
-      `${capacity.level} has ${targetCapacity.catalogCount} usable ${limiting} records, giving ` +
-      `${targetCapacity.totalCombinations} total ${targetSize}-${limiting} combinations; ` +
-      `${targetCapacity.usedCombinations} are already reserved and ` +
-      `${targetCapacity.availableCombinations} remain. ` +
-      `Add more ${capacity.level} ${limiting} records or request ${capacity.maxSelectableLessons} or fewer lessons.`,
+    `${capacity.level} cannot create ${requestedCount} new lessons because only ` +
+      `${capacity.maxAvailableLessons} unused five-kanji set(s) remain. ` +
+      `${capacity.level} has ${capacity.kanji.catalogCount} usable kanji, giving ` +
+      `${capacity.kanji.totalCombinations} total five-kanji combinations; ` +
+      `${capacity.kanji.usedCombinations} are already reserved. ` +
+      `Grammar patterns may repeat with different kanji sets. ` +
+      `Add more ${capacity.level} kanji or request ${capacity.maxSelectableLessons} or fewer lessons.`,
   );
 }
