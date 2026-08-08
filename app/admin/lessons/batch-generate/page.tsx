@@ -1,5 +1,5 @@
-import { N5BatchGenerationWorkspace } from "@/components/admin/lessons/n5-batch-generation";
+import { JLPTBatchGenerationWorkspace } from "@/components/admin/lessons/n5-batch-generation";
 
-export default function AdminN5BatchGenerationPage() {
-  return <N5BatchGenerationWorkspace />;
+export default function AdminJLPTBatchGenerationPage() {
+  return <JLPTBatchGenerationWorkspace />;
 }

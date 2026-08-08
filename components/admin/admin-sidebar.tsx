@@ -30,7 +30,7 @@ const links = [
   { href: "/admin", label: "Dashboard", icon: Gauge },
   { href: "/admin/lessons", label: "Lessons", icon: BookOpenCheck },
   { href: "/admin/lessons/import", label: "Import lesson", icon: PackagePlus },
-  { href: "/admin/lessons/batch-generate", label: "N5 Batch Lessons", icon: Sparkles },
+  { href: "/admin/lessons/batch-generate", label: "JLPT Batch Lessons", icon: Sparkles },
   { href: "/admin/generated", label: "Generated", icon: Bot },
   { href: "/admin/curriculum", label: "Curriculum", icon: GraduationCap },
   { href: "/admin/grammar", label: "Grammar", icon: Languages },

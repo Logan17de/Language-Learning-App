@@ -1,28 +1,49 @@
-# N5 offline Batch lesson factory
+# JLPT offline Batch lesson factory
 
-AIko can build curated N5 lesson inventory asynchronously without asking an administrator to author each complete JSON package by hand.
+AIko can build curated lesson inventory asynchronously for **N5, N4, N3, N2, and N1** without asking an administrator to author each complete JSON package by hand.
 
 ## Curriculum contract
 
 The application, not the model, chooses the curriculum targets:
 
-- JLPT level: `N5`
-- target kanji: exactly 5
-- target grammar: exactly 3
+- JLPT level: owner selects `N5`, `N4`, `N3`, `N2`, or `N1`
+- lesson count: owner selects `1-100` per Batch request
+- target kanji: exactly 5 randomly selected from the chosen level
+- target grammar: exactly 3 randomly selected from the chosen level
 - topic: chosen by the model
 - output: the existing complete `schemaVersion: 1` lesson package
 
-The scheduler reads active N5 `kanji_records` and `grammar_records`. It favors lower-use targets and adds a penalty when the same targets have repeatedly appeared together. Existing in-flight/valid/imported staged requests count toward coverage; invalid and API-failed requests do not permanently consume coverage.
+### Exact-set uniqueness
 
-The model must return exactly the selected target sets. Every target kanji must appear in the main story, and every target grammar pattern must be referenced by at least one grammar practice question.
+For the selected JLPT level, AIko loads every previously stored `lesson_generation_requests.target_kanji` and `target_grammar` set from the database.
+
+For each new lesson:
+
+1. Randomly draw 5 distinct kanji from the selected level.
+2. Sort/canonicalize the five values and compare them with every stored five-kanji set for that same JLPT level.
+3. If the exact set already exists, discard the draw and randomly draw again.
+4. Once an unused five-kanji set is found, reserve it immediately for the current Batch plan.
+5. Randomly draw 3 distinct grammar patterns.
+6. Canonicalize and compare that three-pattern set with every stored grammar target set for that same level.
+7. If it exists, redraw until an unused set is found.
+
+Order does not matter for duplicate detection. `日・月・火・水・木` is the same target set as `木・火・日・月・水`.
+
+Kanji-set uniqueness and grammar-set uniqueness are independent. An old five-kanji combination can never be reused for another generated lesson at that level even if paired with different grammar. Likewise, an old three-grammar combination cannot be reused with different kanji.
+
+Every stored generation request counts as history, including invalid and API-failed generations. Once a target set has been assigned and stored, it is considered used. History is isolated by JLPT level: an N5 set does not block an N4/N3/N2/N1 set.
+
+The model must return exactly the selected target sets and selected level. Every target kanji must appear in the main story, and every target grammar pattern must be referenced by at least one grammar practice question.
 
 ## Storage-first lifecycle
 
 Generation is deliberately staging-first:
 
 ```text
-N5 catalogs
-  -> balanced target plan
+Selected JLPT level
+  -> level kanji + grammar catalogs
+  -> random unused 5-kanji set
+  -> random unused 3-grammar set
   -> lesson_generation_batches / lesson_generation_requests
   -> exact prompt + exact Responses request body stored
   -> OpenAI Batch input file
@@ -45,11 +66,11 @@ Unmatched or unparseable provider JSONL lines are retained in `lesson_generation
 
 ## OpenAI Batch flow
 
-Each staged lesson becomes one JSONL request:
+Each staged lesson becomes one JSONL request. The custom id includes its selected JLPT level:
 
 ```json
 {
-  "custom_id": "n5_<batch>_001",
+  "custom_id": "n3_<batch>_001",
   "method": "POST",
   "url": "/v1/responses",
   "body": {
@@ -74,21 +95,22 @@ Open:
 /admin/lessons/batch-generate
 ```
 
-1. Choose 1-100 lessons. The default is 100.
-2. Select **Submit N to Batch API**.
-3. AIko stores the target combinations and exact requests before provider submission.
-4. Select the batch and use **Sync OpenAI results** when results are available.
-5. Valid, invalid, API-failed, and imported counts are shown separately.
-6. Use **Import all valid** to publish valid staged lessons through the existing canonical importer.
-7. Open any invalid lesson to see its targets and validation errors.
-8. Edit the JSON and choose **Save + validate**.
-9. When valid, import that lesson individually or use the batch import button.
+1. Choose JLPT level: **N5 / N4 / N3 / N2 / N1**.
+2. Choose **1-100 lessons**. The default is 100.
+3. Select **Submit N LEVEL to Batch API**.
+4. AIko randomly finds unused kanji and grammar target sets and stores every plan/request before provider submission.
+5. Select the batch and use **Sync OpenAI results** when results are available.
+6. Valid, invalid, API-failed, and imported counts are shown separately.
+7. Use **Import all valid** to publish valid staged lessons through the existing canonical importer.
+8. Open any invalid lesson to see its targets and validation errors.
+9. Edit the JSON and choose **Save + validate**.
+10. When valid, import that lesson individually or use the batch import button.
 
-There is intentionally no automatic AI repair loop in this workflow. Failed generation remains evidence and can be corrected manually.
+There is intentionally no automatic AI repair loop. Failed generation remains evidence and can be corrected manually.
 
 ## Background sync
 
-A protected recovery endpoint can sync active provider batches without keeping the admin page open:
+A protected recovery endpoint can sync active provider batches from every JLPT level without keeping the admin page open:
 
 ```text
 GET|POST /api/internal/lesson-generation/sync
@@ -120,9 +142,11 @@ OPENAI_REQUEST_TIMEOUT_MS=120000
 LESSON_GENERATION_WORKER_SECRET=...
 ```
 
-## Database migrations
+## Database
 
-The branch contains the previously missing PR #40 migrations plus the new staging migration:
+No additional migration is required for the N5-to-N1 expansion. The existing staging tables already store `jlpt_level`, `target_kanji`, and `target_grammar` for every request.
+
+The branch still contains:
 
 ```text
 20260808090000_bulk_lesson_import_tts_queue.sql
@@ -130,17 +154,4 @@ The branch contains the previously missing PR #40 migrations plus the new stagin
 20260808103000_n5_batch_lesson_generation.sql
 ```
 
-If the first two were already applied from the old stacked PR branch, Supabase migration history should recognize them by version and only apply the new `103000` migration.
-
-Always inspect first:
-
-```bash
-npx --yes supabase@latest db push --linked --dry-run
-```
-
-Then apply and lint:
-
-```bash
-npx --yes supabase@latest db push --linked
-npx --yes supabase@latest db lint --linked --level error --fail-on error
-```
+The `103000` migration filename predates the all-level expansion, but its tables use the shared JLPT enum and support all five levels.

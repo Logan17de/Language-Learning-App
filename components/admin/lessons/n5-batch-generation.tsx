@@ -66,6 +66,8 @@ type StagedRequest = Record<string, unknown> & {
   import_error?: string | null;
 };
 
+const jlptLevels = ["N5", "N4", "N3", "N2", "N1"] as const;
+type JlptLevel = (typeof jlptLevels)[number];
 const activeStatuses = new Set(["planning", "submitting", "validating", "in_progress", "finalizing"]);
 
 async function jsonRequest(url: string, init?: RequestInit): Promise<Record<string, unknown>> {
@@ -89,7 +91,8 @@ function pretty(value: unknown): string {
   }
 }
 
-export function N5BatchGenerationWorkspace() {
+export function JLPTBatchGenerationWorkspace() {
+  const [level, setLevel] = useState<JlptLevel>("N5");
   const [count, setCount] = useState(100);
   const [batches, setBatches] = useState<BatchSummary[]>([]);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
@@ -143,10 +146,10 @@ export function N5BatchGenerationWorkspace() {
       const body = await jsonRequest("/api/admin/lesson-generation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "create", count }),
+        body: JSON.stringify({ action: "create", count, level }),
       });
       const batchId = typeof body.batchId === "string" ? body.batchId : null;
-      setMessage(`${count} N5 lesson requests planned and submitted to OpenAI Batch.`);
+      setMessage(`${count} ${level} lesson requests with new random target sets were submitted to OpenAI Batch.`);
       await loadBatches();
       if (batchId) {
         setSelectedBatchId(batchId);
@@ -264,8 +267,8 @@ export function N5BatchGenerationWorkspace() {
   return <>
     <AdminPageHeader
       eyebrow="Offline content factory"
-      title="Generate balanced N5 lesson batches"
-      description="AIko chooses balanced 5-kanji and 3-grammar combinations from the N5 libraries. OpenAI chooses each topic and returns the complete canonical lesson. Every raw result is staged before validation, including broken JSON and API failures."
+      title="Generate JLPT lesson batches"
+      description="Choose N5 through N1 and a lesson count. AIko randomly draws 5 kanji and 3 grammar patterns from that level, rejects any exact target set already stored in generation history, and lets OpenAI choose each topic. Every raw result is staged before validation."
     />
 
     {error && <div className="mb-5 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800"><AlertTriangle className="mt-0.5 size-5 shrink-0" />{error}</div>}
@@ -273,16 +276,21 @@ export function N5BatchGenerationWorkspace() {
 
     <div className="grid gap-6 xl:grid-cols-[23rem_minmax(0,1fr)]">
       <div className="space-y-6">
-        <AdminSection title="Create N5 batch" description="Targets are selected by coverage balance; topic selection belongs to the model.">
-          <label className="text-sm font-bold text-slate-700" htmlFor="n5-batch-count">Lessons</label>
-          <input id="n5-batch-count" type="number" min={1} max={100} value={count} onChange={(event) => setCount(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} className="admin-input mt-2 w-full" />
+        <AdminSection title="Create lesson batch" description="Choose the JLPT level and how many complete lessons to generate in this OpenAI Batch request.">
+          <label className="text-sm font-bold text-slate-700" htmlFor="jlpt-batch-level">JLPT level</label>
+          <select id="jlpt-batch-level" value={level} onChange={(event) => setLevel(event.target.value as JlptLevel)} className="admin-input mt-2 w-full">
+            {jlptLevels.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+
+          <label className="mt-4 block text-sm font-bold text-slate-700" htmlFor="jlpt-batch-count">Lessons</label>
+          <input id="jlpt-batch-count" type="number" min={1} max={100} value={count} onChange={(event) => setCount(Math.max(1, Math.min(100, Number(event.target.value) || 1)))} className="admin-input mt-2 w-full" />
           <div className="mt-4 rounded-xl bg-slate-50 p-4 text-xs leading-5 text-slate-600">
             <strong className="block text-slate-900">Per lesson</strong>
-            5 N5 kanji · 3 N5 grammar · AI-selected topic · complete 7-phase canonical package.
+            5 random {level} kanji · 3 random {level} grammar · exact-set DB duplicate check · AI-selected topic · complete canonical lesson package.
           </div>
           <Button type="button" className="mt-4 w-full rounded-xl" disabled={working === "create"} onClick={() => void createBatch()}>
             {working === "create" ? <LoaderCircle className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
-            Submit {count} to Batch API
+            Submit {count} {level} to Batch API
           </Button>
         </AdminSection>
 
@@ -308,7 +316,7 @@ export function N5BatchGenerationWorkspace() {
             <AdminStatCard label="API failed" value={totalFailed} tone={totalFailed ? "red" : "teal"} />
           </div>
 
-          <AdminSection title="Batch controls" description={`Provider ${selectedBatch.providerBatchId ?? "not submitted"} · model ${selectedBatch.model}`}>
+          <AdminSection title="Batch controls" description={`${selectedBatch.jlptLevel} · Provider ${selectedBatch.providerBatchId ?? "not submitted"} · model ${selectedBatch.model}`}>
             <div className="flex flex-wrap gap-2">
               <Button type="button" className="rounded-xl" disabled={!selectedBatch.providerBatchId || working.startsWith("sync:")} onClick={() => void syncBatch(selectedBatch.id)}>
                 {working === `sync:${selectedBatch.id}` ? <LoaderCircle className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}Sync OpenAI results
@@ -321,7 +329,7 @@ export function N5BatchGenerationWorkspace() {
             {selectedBatch.errorMessage && <p className="mt-3 rounded-xl bg-red-50 p-3 text-xs font-semibold text-red-700">{selectedBatch.errorMessage}</p>}
           </AdminSection>
 
-          <AdminSection title="Lesson requests" description="The scheduler deliberately favors under-used targets and penalizes repeatedly pairing the same targets.">
+          <AdminSection title="Lesson requests" description="Every five-kanji set and every three-grammar set is random and must be new for that JLPT level before it is accepted.">
             <div className="max-h-[40rem] space-y-2 overflow-y-auto">
               {(detail?.requests ?? []).map((request) => <button key={request.id} type="button" onClick={() => void openRequest(request.id)} className={`w-full rounded-xl border p-3 text-left ${selectedRequestId === request.id ? "border-teal-400 bg-teal-50" : "border-slate-200 bg-white hover:border-slate-300"}`}>
                 <div className="flex flex-wrap items-center justify-between gap-2"><strong className="text-sm">#{request.sequenceNumber} · {request.targetKanji.join(" ")}</strong><AdminStatus>{request.status}</AdminStatus></div>
@@ -331,7 +339,7 @@ export function N5BatchGenerationWorkspace() {
               </button>)}
             </div>
           </AdminSection>
-        </> : <AdminSection title="Select a batch" description="Create or select an N5 generation batch to inspect its target combinations and provider results."><div className="grid place-items-center py-16 text-center text-slate-400"><Bot className="size-10" /><p className="mt-3 text-sm">No batch selected.</p></div></AdminSection>}
+        </> : <AdminSection title="Select a batch" description="Create or select a JLPT generation batch to inspect its target combinations and provider results."><div className="grid place-items-center py-16 text-center text-slate-400"><Bot className="size-10" /><p className="mt-3 text-sm">No batch selected.</p></div></AdminSection>}
 
         {staged && selectedRequestId && <AdminSection title={`Repair ${String(staged.custom_id ?? "generated lesson")}`} description={`Targets are locked: ${(staged.target_kanji ?? []).join(" ")} · ${(staged.target_grammar ?? []).join(" / ")}. Saving a repair never overwrites the raw model response.`}>
           <div className="mb-4 flex flex-wrap items-center gap-2"><AdminStatus>{String(staged.status ?? "unknown")}</AdminStatus>{staged.edited_lesson ? <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">manual copy exists</span> : null}</div>
