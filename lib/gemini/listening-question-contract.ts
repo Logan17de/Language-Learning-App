@@ -94,7 +94,7 @@ export function listeningQuestionIssues(value: unknown): string[] {
     return ["Listening response must be an object."];
   }
   const questions = (value as Record<string, unknown>).questions;
-  return Array.isArray(questions) && questions.length > 0
+  return Array.isArray(questions) && questions.length === 5
     ? []
-    : ["Listening response must contain at least one question."];
+    : ["Listening response must contain exactly 5 questions."];
 }
