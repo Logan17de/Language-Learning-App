@@ -301,7 +301,15 @@ export function LessonPlayer({
   );
 }
 
-function phaseIsComplete(
+function hasAnswerForEveryQuestion(
+  questionIds: string[],
+  answerIds: string[],
+): boolean {
+  const answered = new Set(answerIds);
+  return questionIds.every((id) => answered.has(id));
+}
+
+export function phaseIsComplete(
   session: LessonSession,
   phaseId: LessonPhaseId,
   lesson: LessonPackage,
@@ -310,15 +318,20 @@ function phaseIsComplete(
     case "story":
       return session.storyComplete;
     case "vocabulary":
-      return session.vocabularyAnswers.length >=
-        Math.min(10, lesson.vocabularyQuestions.length);
+      return hasAnswerForEveryQuestion(
+        lesson.vocabularyQuestions.map((question) => question.id),
+        session.vocabularyAnswers.map((answer) => answer.questionId),
+      );
     case "grammar":
-      return session.grammarAnswers.length >=
-        Math.min(10, lesson.grammarQuestions.length);
+      return hasAnswerForEveryQuestion(
+        lesson.grammarQuestions.map((question) => question.id),
+        session.grammarAnswers.map((answer) => answer.questionId),
+      );
     case "reading":
-      return lesson.readingQuestions?.length
-        ? (session.readingAnswers ?? []).length >= lesson.readingQuestions.length
-        : session.readingComplete;
+      return hasAnswerForEveryQuestion(
+        (lesson.readingQuestions ?? []).map((question) => question.id),
+        (session.readingAnswers ?? []).map((answer) => answer.questionId),
+      );
     case "listening":
       return (
         session.listeningComplete &&
@@ -338,7 +351,10 @@ function phaseIsComplete(
         )
       );
     case "review":
-      return session.reviewResult?.totalCount === lesson.reviewQuestions.length;
+      return hasAnswerForEveryQuestion(
+        lesson.reviewQuestions.map((question) => question.id),
+        session.reviewAnswers.map((answer) => answer.questionId),
+      );
   }
 }
 
