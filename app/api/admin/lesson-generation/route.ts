@@ -4,9 +4,10 @@ import {
   getGenerationBatchDetail,
   importValidGenerationRequests,
   listGenerationBatches,
-  submitN5LessonBatch,
+  normalizeBatchLevel,
+  submitLessonBatch,
   syncGenerationBatch,
-} from "@/lib/admin-lessons/n5-batch-generation";
+} from "@/lib/admin-lessons/jlpt-batch-generation";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -43,10 +44,14 @@ export async function POST(request: NextRequest) {
   try {
     if (action === "create") {
       const count = typeof body.count === "number" ? body.count : Number(body.count);
+      const level = normalizeBatchLevel(body.level);
       if (!Number.isFinite(count)) {
         return NextResponse.json({ error: "count must be a number from 1 to 100." }, { status: 400 });
       }
-      const created = await submitN5LessonBatch({ count, userId: auth.userId });
+      if (!level) {
+        return NextResponse.json({ error: "level must be one of N5, N4, N3, N2, or N1." }, { status: 400 });
+      }
+      const created = await submitLessonBatch({ count, level, userId: auth.userId });
       return NextResponse.json(created, { status: 201 });
     }
 
@@ -71,7 +76,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unknown generation action." }, { status: 400 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Generation operation failed.";
-    console.error("Admin N5 Batch generation operation failed.", {
+    console.error("Admin JLPT Batch generation operation failed.", {
       action,
       userId: auth.userId,
       message,
