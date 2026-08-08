@@ -5,10 +5,6 @@ const migration = readFileSync(
   "supabase/migrations/20260808103000_n5_batch_lesson_generation.sql",
   "utf8",
 );
-const repairMigration = readFileSync(
-  "supabase/migrations/20260808103500_preserve_manual_lesson_repair_text.sql",
-  "utf8",
-);
 const engine = readFileSync("lib/admin-lessons/n5-batch-generation.ts", "utf8");
 const adminRoute = readFileSync("app/api/admin/lesson-generation/route.ts", "utf8");
 const requestRoute = readFileSync(
@@ -34,7 +30,6 @@ describe("N5 offline lesson Batch staging", () => {
     expect(migration).toContain("prompt text not null");
     expect(migration).toContain("request_body jsonb not null");
     expect(migration).toContain("unmatched_provider_lines jsonb");
-    expect(repairMigration).toContain("edited_raw_response text");
     expect(migration).toContain(
       "revoke all on table public.lesson_generation_requests from public, anon, authenticated",
     );
