@@ -39,7 +39,7 @@ N5 catalogs
   -> existing listening TTS queue
 ```
 
-`raw_provider_line` and `raw_response` are never replaced by manual repair. `edited_lesson` is a separate JSON copy. `edited_raw_response` preserves an in-progress manual draft even when it is temporarily malformed JSON.
+`raw_provider_line` and `raw_response` are never replaced by manual repair. Once an owner edit is parseable JSON, its working copy is stored separately in `edited_lesson`; the original provider output remains unchanged.
 
 Unmatched or unparseable provider JSONL lines are retained in `lesson_generation_batches.unmatched_provider_lines` instead of being dropped.
 
@@ -122,16 +122,15 @@ LESSON_GENERATION_WORKER_SECRET=...
 
 ## Database migrations
 
-The branch contains the previously missing PR #40 migrations plus the new staging migrations:
+The branch contains the previously missing PR #40 migrations plus the new staging migration:
 
 ```text
 20260808090000_bulk_lesson_import_tts_queue.sql
 20260808090500_imported_lesson_stored_audio_mode.sql
 20260808103000_n5_batch_lesson_generation.sql
-20260808103500_preserve_manual_lesson_repair_text.sql
 ```
 
-If the first two were already applied from the old stacked PR branch, Supabase migration history should recognize them by version and only apply the new `103000` and `103500` migrations.
+If the first two were already applied from the old stacked PR branch, Supabase migration history should recognize them by version and only apply the new `103000` migration.
 
 Always inspect first:
 
