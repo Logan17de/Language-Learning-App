@@ -326,7 +326,7 @@ async function planRandomUniqueTargets(
       .is("archived_at", null),
     admin
       .from("lesson_generation_requests")
-      .select("target_kanji,target_grammar")
+      .select("target_kanji")
       .eq("jlpt_level", level),
   ]);
   const error = kanjiResult.error || grammarResult.error || historyResult.error;
@@ -351,16 +351,11 @@ async function planRandomUniqueTargets(
   }
 
   const usedKanjiSets = new Set<string>();
-  const usedGrammarSets = new Set<string>();
   for (const row of historyResult.data ?? []) {
     if (!record(row)) continue;
     const kanji = strings(row.target_kanji);
-    const grammar = strings(row.target_grammar);
     if (kanji.length === TARGET_KANJI_COUNT) {
       usedKanjiSets.add(targetSetSignature(kanji));
-    }
-    if (grammar.length === TARGET_GRAMMAR_COUNT) {
-      usedGrammarSets.add(targetSetSignature(grammar));
     }
   }
 
@@ -373,12 +368,7 @@ async function planRandomUniqueTargets(
         used: usedKanjiSets,
         label: `${level} five-kanji`,
       }),
-      targetGrammar: chooseUnusedRandomSet({
-        keys: grammarKeys,
-        count: TARGET_GRAMMAR_COUNT,
-        used: usedGrammarSets,
-        label: `${level} three-grammar`,
-      }),
+      targetGrammar: randomTargetSet(grammarKeys, TARGET_GRAMMAR_COUNT),
     });
   }
   return plans;
