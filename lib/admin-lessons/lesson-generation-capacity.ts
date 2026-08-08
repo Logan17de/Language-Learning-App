@@ -47,10 +47,10 @@ function signature(values: string[]): string {
 
 export function combinationCount(n: number, k: number): bigint {
   if (!Number.isInteger(n) || !Number.isInteger(k) || n < 0 || k < 0 || k > n) {
-    return 0n;
+    return BigInt(0);
   }
   const choose = Math.min(k, n - k);
-  let result = 1n;
+  let result = BigInt(1);
   for (let index = 1; index <= choose; index += 1) {
     result = (result * BigInt(n - choose + index)) / BigInt(index);
   }
@@ -76,7 +76,9 @@ function capacityFor(input: {
   }
 
   const total = combinationCount(usable.size, input.targetCount);
-  const available = total > BigInt(used.size) ? total - BigInt(used.size) : 0n;
+  const available = total > BigInt(used.size)
+    ? total - BigInt(used.size)
+    : BigInt(0);
 
   return {
     catalogCount: usable.size,
