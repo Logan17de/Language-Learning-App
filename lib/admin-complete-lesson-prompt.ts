@@ -15,6 +15,11 @@ OUTPUT RULES
 - Follow the field names, casing, enum values, counts, and nesting below exactly.
 - Keep every section appropriate for the selected JLPT level.
 - Use the same topic, characters, facts, target kanji, target grammar, and core vocabulary consistently across all phases.
+- The 5 target kanji are required focus characters, not a whitelist of all kanji allowed in the lesson.
+- Use every target kanji naturally. A target character may appear alone or inside a natural compound or inflected word such as 食事, 朝食, 食堂, or 食べる.
+- You may freely use other kanji when they are natural and appropriate for the selected JLPT level. Do not force unnatural sentences just to avoid non-target kanji.
+- Keep the top-level kanji array at exactly the 5 supplied target characters. Supporting/non-target kanji may appear in story, vocabulary, reading, questions, listening, and speaking, but do not add them to the top-level target-kanji array.
+- When a vocabulary word contains a target kanji, store the complete natural word in vocabulary/story words and reference both the vocabulary term and the relevant target kanji where useful.
 - Every Japanese question-facing text may be inspected word-by-word in AIko. Put every unique inspectable content word in the top-level vocabulary array with its exact surface form, reading, and English meaning.
 - Do not include particles, punctuation, numbers, or duplicate words in vocabulary or story words.
 - Story words must use the exact surface form found in the story. Do not change them to dictionary form.
