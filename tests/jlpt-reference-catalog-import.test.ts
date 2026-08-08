@@ -1,6 +1,10 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
+const strokeCountMigration = readFileSync(
+  "supabase/migrations/20260808112500_allow_catalog_only_unknown_stroke_count.sql",
+  "utf8",
+);
 const migration = readFileSync(
   "supabase/migrations/20260808113000_import_jlpt_reference_catalogs.sql",
   "utf8",
@@ -30,6 +34,14 @@ describe("JLPT reference catalog import", () => {
     expect(blockCount("gn2")).toBe(124);
     expect(blockCount("gn1")).toBe(187);
     expect(migration).toContain("v_grammar_count <> 641");
+  });
+
+  it("allows unknown stroke count only for explicit catalog-only imports", () => {
+    expect(strokeCountMigration).toContain("stroke_count between 1 and 64");
+    expect(strokeCountMigration).toContain("stroke_count = 0");
+    expect(strokeCountMigration).toContain("source_type = 'imported'");
+    expect(strokeCountMigration).toContain("source_payload @> '{\"catalogOnly\": true}'::jsonb");
+    expect(strokeCountMigration).not.toContain("stroke_count >= 0");
   });
 
   it("preserves rich rows while marking catalog-only library placeholders for review", () => {
