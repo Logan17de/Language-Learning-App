@@ -284,8 +284,8 @@ describe("custom lesson story pipeline v3", () => {
     expect(activityGroups).toContain('withTerms(question, "vocabulary")');
     expect(activityGroups).toContain('withTerms(question, "grammar")');
     expect(activityGroups).toContain('["listening", exercise.prompt, exercise.correctAnswer]');
-    expect(activityGroups).toMatch(
-      /"review",\s*question\.category,\s*question\.prompt,\s*question\.correctAnswer,/s,
+    expect(activityGroups.replace(/\s+/g, " ")).toContain(
+      '"review", question.category, question.prompt, question.correctAnswer,',
     );
     expect(activityGroups).toContain("shuffledChoices(");
   });
