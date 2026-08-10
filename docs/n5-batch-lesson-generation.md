@@ -13,6 +13,8 @@ The application, not the model, chooses the curriculum targets:
 - topic: chosen by the model
 - output: the canonical complete `schemaVersion: 1` lesson package
 
+Batch-generated lessons use the same canonical learner contract as the player/importer. The phase order is **Story → Vocabulary → Grammar → Reading → Listening → Speaking → Review**, with exactly **13 vocabulary, 10 grammar, 5 reading, 5 listening, 5 speaking, and 5 review activities**.
+
 The five target kanji are **focus characters, not a whitelist**. The model must use every focus character naturally, including inside natural words/compounds when appropriate, and may use other level-appropriate kanji throughout the lesson. Only the five selected focus characters belong in the top-level `kanji` target array.
 
 ## Five-kanji uniqueness
