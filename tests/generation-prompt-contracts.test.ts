@@ -331,6 +331,8 @@ Requirements:
       properties: {
         questions: {
           type: "array",
+          minItems: 5,
+          maxItems: 5,
           items: {
             type: "object",
             properties: {
