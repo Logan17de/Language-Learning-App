@@ -1,13 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { authorize } from "@/lib/auth/server-authorization";
 import {
+  submitLessonBatch,
+  syncGenerationBatch,
+} from "@/lib/admin-lessons/lesson-batch-generation";
+import { normalizeBatchLevel } from "@/lib/admin-lessons/lesson-generation-contract";
+import {
   getGenerationBatchDetail,
   importValidGenerationRequests,
   listGenerationBatches,
-  normalizeBatchLevel,
-  submitLessonBatch,
-  syncGenerationBatch,
-} from "@/lib/admin-lessons/jlpt-batch-generation";
+} from "@/lib/admin-lessons/lesson-generation-staging";
 import {
   assertLessonTargetCapacity,
   getLessonTargetCapacity,
