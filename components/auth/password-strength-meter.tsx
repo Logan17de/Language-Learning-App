@@ -23,9 +23,9 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
             <span key={step} className={cn("h-1.5 rounded-full", step <= strength.score ? tones[strength.score] : "bg-stone-200")} />
           ))}
         </div>
-        <span className="min-w-20 text-right text-xs font-semibold text-stone-500">{strength.label}</span>
+        <span className="min-w-20 text-right text-xs font-semibold text-muted">{strength.label}</span>
       </div>
-      <ul className="mt-3 grid gap-1.5 text-xs text-stone-500 sm:grid-cols-2">
+      <ul className="mt-3 grid gap-1.5 text-xs text-muted sm:grid-cols-2">
         {rules.map(([key, label]) => {
           const passed = strength.checks[key];
           return (

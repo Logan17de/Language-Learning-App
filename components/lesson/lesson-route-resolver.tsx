@@ -70,7 +70,7 @@ export function LessonRouteResolver({
   if (!lesson || !isPlayableLesson(lesson)) {
     return (
       <main className="grid min-h-screen place-items-center bg-paper p-6 text-center">
-        <div><p className="section-kicker">Lesson unavailable</p><h1 className="mt-4 text-3xl font-semibold">This lesson could not be loaded.</h1><p className="mt-3 text-stone-500">It may be missing or failed the local structure check.</p><ButtonLink href="/learn" className="mt-6">Return to library</ButtonLink></div>
+        <div><p className="section-kicker">Lesson unavailable</p><h1 className="mt-4 text-3xl font-semibold">This lesson could not be loaded.</h1><p className="mt-3 text-muted">It may be missing or failed the local structure check.</p><ButtonLink href="/learn" className="mt-6">Return to library</ButtonLink></div>
       </main>
     );
   }

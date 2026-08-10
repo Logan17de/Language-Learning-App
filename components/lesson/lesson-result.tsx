@@ -49,12 +49,12 @@ export function LessonResult({ lesson, result }: { lesson: LessonPackage; result
           <span className="mx-auto grid size-24 place-items-center rounded-[2.25rem] bg-moss-900 text-white shadow-float"><PartyPopper className="size-10 text-persimmon-400" /></span>
           <Badge tone="orange" className="mt-7">Lesson Complete</Badge>
           <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">{lesson.title}</h1>
-          <p className="mt-3 font-serif text-xl text-stone-500">{lesson.japaneseTitle}</p>
+          <p className="mt-3 font-serif text-xl text-muted">{lesson.japaneseTitle}</p>
           <div className="mt-8 flex items-end justify-center gap-2">
-            <span className="text-7xl font-semibold tracking-tight text-moss-700">{result.score}</span>
-            <span className="mb-2 text-2xl font-semibold text-stone-400">%</span>
+            <span className="text-7xl font-semibold tracking-tight tabular-nums text-moss-700">{result.score}</span>
+            <span className="mb-2 text-2xl font-semibold text-muted">%</span>
           </div>
-          <p className="mt-2 text-sm text-stone-500">{result.score >= 80 ? "Strong retrieval across today’s lesson." : "A solid session with a clear review path."}</p>
+          <p className="mt-2 text-sm text-muted">{result.score >= 80 ? "Strong retrieval across today’s lesson." : "A solid session with a clear review path."}</p>
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
@@ -67,16 +67,16 @@ export function LessonResult({ lesson, result }: { lesson: LessonPackage; result
           <Card className="p-7">
             <h2 className="flex items-center gap-2 font-semibold"><BookOpenCheck className="size-5 text-moss-600" /> Today’s language</h2>
             <div className="mt-5">
-              <p className="text-xs font-bold uppercase tracking-wide text-stone-400">Kanji practiced</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted">Kanji practiced</p>
               <div className="mt-2 flex gap-2">{lesson.kanji.filter((item) => !item.isReview).map((item) => <span key={item.character} className="grid size-12 place-items-center rounded-2xl bg-moss-50 text-xl font-semibold">{item.character}</span>)}</div>
             </div>
             <div className="mt-6">
-              <p className="text-xs font-bold uppercase tracking-wide text-stone-400">Grammar practiced</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted">Grammar practiced</p>
               <div className="mt-2 flex flex-wrap gap-2">{lesson.grammar.map((item) => <Badge key={item.id}>{item.pattern}</Badge>)}</div>
             </div>
             <div className="mt-6">
-              <p className="text-xs font-bold uppercase tracking-wide text-stone-400">Review recommendation</p>
-              <p className="mt-2 text-sm leading-6 text-stone-500">Spend five minutes tomorrow retrieving {result.wordsNeedingReview.join(" and ")} before your next lesson.</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted">Review recommendation</p>
+              <p className="mt-2 text-sm leading-6 text-muted">Spend five minutes tomorrow retrieving {result.wordsNeedingReview.join(" and ")} before your next lesson.</p>
             </div>
           </Card>
           <Card className="p-7">
@@ -91,13 +91,13 @@ export function LessonResult({ lesson, result }: { lesson: LessonPackage; result
         </div>
 
         <Card className="mt-6 p-6">
-          <button type="button" onClick={() => setShowMistakes((value) => !value)} className="flex min-h-12 w-full items-center gap-3 text-left focus:outline-none focus:ring-4 focus:ring-moss-100">
+          <button type="button" aria-expanded={showMistakes} aria-controls="lesson-review-items" onClick={() => setShowMistakes((value) => !value)} className="flex min-h-12 w-full items-center gap-3 rounded-2xl text-left">
             <RotateCcw className="size-5 text-persimmon-500" />
-            <div className="flex-1"><p className="font-semibold">Review mistakes</p><p className="text-xs text-stone-400">{result.wordsNeedingReview.length} recommended item{result.wordsNeedingReview.length === 1 ? "" : "s"}</p></div>
-            <ChevronDown className={`size-5 text-stone-400 transition ${showMistakes ? "rotate-180" : ""}`} />
+            <div className="flex-1"><p className="font-semibold">Review mistakes</p><p className="text-xs text-muted">{result.wordsNeedingReview.length} recommended item{result.wordsNeedingReview.length === 1 ? "" : "s"}</p></div>
+            <ChevronDown className={`size-5 text-muted transition ${showMistakes ? "rotate-180" : ""}`} aria-hidden="true" />
           </button>
           {showMistakes && (
-            <div className="mt-4 border-t border-stone-100 pt-4">
+            <div id="lesson-review-items" className="mt-4 border-t border-border pt-4">
               {result.wordsNeedingReview.length ? (
                 <div className="flex flex-wrap gap-2">{result.wordsNeedingReview.map((item) => <Badge key={item} tone="orange">{item}</Badge>)}</div>
               ) : (
@@ -113,14 +113,14 @@ export function LessonResult({ lesson, result }: { lesson: LessonPackage; result
           <ButtonLink href={`/lesson/${lesson.id}/preview`}>Continue Learning <ArrowRight className="size-4" /></ButtonLink>
         </div>
         <div className="mt-5 flex justify-center"><LessonReportDialog lessonId={lesson.id} lessonTitle={lesson.title} phase="Lesson results" compact /></div>
-        <p className="mt-5 text-center text-xs text-stone-400">{rewarded ? "Rewards saved once to your AIko profile." : "Saving your rewards…"}</p>
+        <p className="mt-5 text-center text-xs text-muted" role="status">{rewarded ? "Rewards saved once to your AIko profile." : "Saving your rewards…"}</p>
       </div>
     </main>
   );
 }
 
 function ResultStat({ icon: Icon, value, label }: { icon: typeof Trophy; value: string; label: string }) {
-  return <Card className="text-center"><Icon className="mx-auto size-5 text-persimmon-500" /><p className="mt-3 text-2xl font-semibold">{value}</p><p className="mt-1 text-xs text-stone-400">{label}</p></Card>;
+  return <Card className="text-center"><Icon className="mx-auto size-5 text-persimmon-500" aria-hidden="true" /><p className="mt-3 text-2xl font-semibold tabular-nums">{value}</p><p className="mt-1 text-xs text-muted">{label}</p></Card>;
 }
 
 function SkillChange({ label, value, change }: { label: string; value: number; change: number }) {

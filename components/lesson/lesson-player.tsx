@@ -13,6 +13,7 @@ import {
   useAppStore,
 } from "@/store/app-store";
 import { Button } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
 import { LessonPlayerShell } from "@/components/lesson/lesson-player-shell";
 import { StoryPhase } from "@/components/lesson/story-phase";
 import { VocabularyPhase } from "@/components/lesson/vocabulary-phase";
@@ -180,8 +181,11 @@ export function LessonPlayer({
         aria-live="polite"
       >
         <div className="text-center">
-          <span className="mx-auto block size-10 animate-spin rounded-full border-4 border-moss-100 border-t-moss-600" />
-          <p className="mt-4 text-sm font-semibold text-stone-500">
+          <span
+            className="mx-auto block size-10 animate-spin rounded-full border-4 border-moss-100 border-t-moss-600"
+            aria-hidden="true"
+          />
+          <p className="mt-4 text-sm font-semibold text-muted">
             Restoring your lesson…
           </p>
         </div>
@@ -348,50 +352,27 @@ export function LessonPlayer({
         )}
       </LessonPlayerShell>
 
-      {showExit && (
-        <div
-          className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-5 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="exit-title"
-        >
-          <div className="w-full max-w-md rounded-4xl bg-white p-7 shadow-float">
-            <span className="grid size-12 place-items-center rounded-2xl bg-persimmon-100 text-persimmon-600">
-              <AlertTriangle className="size-5" />
-            </span>
-            <h2 id="exit-title" className="mt-6 text-2xl font-semibold">
-              Pause this lesson?
-            </h2>
-            <p className="mt-3 leading-7 text-stone-500">
-              AIko will save this checkpoint and the kanji, vocabulary,
-              grammar, and speaking evidence from every activity you attempted.
-              You can resume from {phase.label} or start a new lesson later.
-            </p>
-            <div className="mt-6 flex gap-3">
-              <Button
-                type="button"
-                variant="secondary"
-                className="flex-1"
-                disabled={isSavingExit}
-                onClick={() => setShowExit(false)}
-              >
-                Keep learning
-              </Button>
-              <Button
-                type="button"
-                className="flex-1"
-                disabled={isSavingExit}
-                onClick={() => void exit()}
-              >
-                {isSavingExit ? (
-                  <LoaderCircle className="size-4 animate-spin" />
-                ) : null}
+      <Dialog
+        open={showExit}
+        onClose={() => {
+          if (!isSavingExit) setShowExit(false);
+        }}
+        labelledBy="exit-title"
+        describedBy="exit-description"
+        closeOnBackdrop={!isSavingExit}
+        panelClassName="max-w-md"
+      >
+            <span className="grid size-12 place-items-center rounded-2xl bg-warning-surface text-warning"><AlertTriangle className="size-5" aria-hidden="true" /></span>
+            <h2 id="exit-title" className="mt-6 text-2xl font-semibold">Pause this lesson?</h2>
+            <p id="exit-description" className="mt-3 leading-7 text-muted">AIko will save this checkpoint and the kanji, vocabulary, grammar, and speaking evidence from every activity you attempted. You can resume from {phase.label} or start a new lesson later.</p>
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
+              <Button type="button" variant="secondary" className="flex-1" disabled={isSavingExit} onClick={() => setShowExit(false)} data-dialog-autofocus>Keep learning</Button>
+              <Button type="button" className="flex-1" disabled={isSavingExit} aria-busy={isSavingExit} onClick={() => void exit()}>
+                {isSavingExit ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : null}
                 {isSavingExit ? "Saving…" : "Save and exit"}
               </Button>
             </div>
-          </div>
-        </div>
-      )}
+      </Dialog>
     </>
   );
 }

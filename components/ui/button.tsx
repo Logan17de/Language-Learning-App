@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "secondary" | "ghost" | "dark";
+type Variant = "primary" | "secondary" | "ghost" | "dark" | "danger";
 
 const variants: Record<Variant, string> = {
   primary:
@@ -11,6 +11,8 @@ const variants: Record<Variant, string> = {
     "border border-border bg-surface text-moss-700 hover:border-moss-200 hover:bg-moss-50 active:scale-[0.98]",
   ghost: "text-ink hover:bg-surface-muted active:scale-[0.98]",
   dark: "bg-moss-900 text-white shadow-soft hover:bg-moss-800 active:scale-[0.98]",
+  danger:
+    "bg-danger text-white shadow-soft hover:bg-danger/90 active:scale-[0.98]",
 };
 
 interface SharedProps {

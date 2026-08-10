@@ -39,6 +39,11 @@ The implementation source of truth is `tailwind.config.ts` plus semantic CSS var
 - `border`: dividers and surface separation.
 - `moss`: primary brand/action family.
 - `persimmon`: warm accent, emphasis, and selected CTA family.
+- `positive`: successful answers, completed actions, and healthy states.
+- `warning`: recoverable cautions and actions that need attention.
+- `danger`: errors, destructive actions, and incorrect-answer emphasis.
+
+Use the matching `*-surface` and `*-border` tokens for feedback containers so status never depends on text color alone.
 
 Do not introduce raw per-screen hex colors when a token can express the role.
 
@@ -72,6 +77,15 @@ Prefer adaptive gutters: 20px on small screens, 32px from small/tablet breakpoin
 - Prefer opacity, color, shadow, and transform; do not animate layout dimensions for decoration.
 - Press feedback may use a subtle `scale(0.98)` without changing layout bounds.
 - Disabled controls must use semantic disabled attributes and clear reduced emphasis.
+- Forms pair every error with its field or a visible `role="alert"`; helper text remains available through `aria-describedby`.
+
+## Dialogs and temporary UI
+
+- Modal dialogs use the shared dialog primitive so focus moves inside, remains contained, and returns to the trigger on close.
+- Escape and backdrop dismissal are supported unless the action is intentionally non-dismissible.
+- Destructive confirmations state the consequence and use the danger action treatment.
+- Inline status messages use the shared alert primitive with an icon and text, never color alone.
+- Popovers that only explain selected vocabulary remain non-modal and must not announce themselves as dialogs.
 
 ## Navigation
 
