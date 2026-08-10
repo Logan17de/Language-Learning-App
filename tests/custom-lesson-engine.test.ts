@@ -14,9 +14,10 @@ const runner = readFileSync("lib/custom-lessons/job-runner.ts", "utf8");
 const groups = readFileSync("lib/gemini/lesson-activity-groups.ts", "utf8");
 const audio = readFileSync("lib/audio/audio-library.ts", "utf8");
 const durableMigration = readFileSync(
-  "supabase/migrations/20260728010000_durable_custom_lesson_jobs.sql",
+  "supabase/migrations/20260810090000_stage_based_custom_lesson_jobs.sql",
   "utf8",
 );
+const scheduler = readFileSync("vercel.json", "utf8");
 const targets = readFileSync("lib/gemini/lesson-targets.ts", "utf8");
 const generation = readFileSync("lib/gemini/lesson-generation.ts", "utf8");
 const quota = readFileSync(
@@ -41,7 +42,7 @@ describe("custom lesson engine contract", () => {
     expect(form).not.toContain('<Field label="Speaking difficulty">');
     expect(form).not.toContain('<Field label="Optional note">');
     expect(form).toContain("JSON.stringify({ topic, level })");
-    expect(route).toContain('begin_custom_lesson_generation_v3');
+    expect(route).toContain('begin_custom_lesson_generation_v4');
     expect(route).toContain('p_topic: topic');
     expect(route).toContain('p_level: level');
   });
@@ -60,21 +61,21 @@ describe("custom lesson engine contract", () => {
     expect(progressiveReader).not.toContain("Lesson readiness");
     expect(progressiveReader).toContain("session.currentPhaseIndex = 1");
     expect(progressiveReader).not.toContain("<AudioControl");
-    expect(form).toContain("AbortSignal.timeout(180_000)");
-    expect(route).toContain('status: "story_ready"');
-    expect(route).toContain("buildInteractiveStory");
+    expect(form).not.toContain("AbortSignal.timeout");
+    expect(route).toContain('status: "queued"');
+    expect(route).toContain('{ status: 202 }');
     expect(route).toContain("after(async () =>");
     expect(route).toContain("processCustomLessonJobs");
     expect(completionRoute).not.toContain("generatePlayableLesson");
-    expect(completionRoute).toContain("status: \"activities_queued\"");
+    expect(completionRoute).toContain("the scheduler will resume it");
     expect(statusRoute).toContain('.eq("user_id", auth.userId)');
+    expect(statusRoute).toContain("row.story_draft && row.library_snapshot");
   });
 
-  it("uses durable atomic claims and independently persisted parallel groups", () => {
+  it("uses durable atomic stage claims and independently persisted groups", () => {
     expect(workerRoute).toContain("CUSTOM_LESSON_WORKER_SECRET");
     expect(workerRoute).toContain("CRON_SECRET");
-    expect(runner).toContain("Promise.allSettled(executions)");
-    expect(runner).toContain('rpc("claim_progressive_lesson_job"');
+    expect(runner).toContain('rpc("claim_custom_lesson_stage"');
     expect(runner).toContain('rpc("save_progressive_lesson_group"');
     expect(runner).toContain('rpc("store_generated_lesson_package_background"');
     expect(groups).toContain("generateVocabularyAndKanjiActivities");
@@ -84,8 +85,19 @@ describe("custom lesson engine contract", () => {
     expect(groups).toContain("vocabularyQuestionsPrompt");
     expect(groups).toContain("grammarQuestionsPrompt");
     expect(durableMigration).toContain("for update skip locked");
-    expect(durableMigration).toContain("interval '10 minutes'");
+    expect(durableMigration).toContain("interval '8 minutes'");
     expect(durableMigration).toContain("completed_groups");
+    expect(durableMigration).toContain("stage_attempts");
+    expect(runner).toContain("group_attempts");
+    expect(scheduler).toContain('/api/internal/custom-lessons/process');
+    expect(scheduler).toContain('"* * * * *"');
+  });
+
+  it("uses exact strict output and deterministic validation for final review", () => {
+    expect(groups).toContain('name: "final_review"');
+    expect(groups).toContain("strictSchema: true");
+    expect(groups).toContain("exactSchemaName: true");
+    expect(groups).toContain('activityGroupCheckpointIssues("final_review"');
   });
 
   it("keeps model-controlled identifiers out of library enrichment", () => {
@@ -98,8 +110,8 @@ describe("custom lesson engine contract", () => {
   });
 
   it("publishes lesson content before audio and limits TTS to voice activities", () => {
-    expect(runner.indexOf('status: "lesson_ready"')).toBeLessThan(
-      runner.indexOf("prepareAudioJob(admin, refreshed.request_id)"),
+    expect(runner.indexOf('finishStage(admin, job, "audio", 90')).toBeLessThan(
+      runner.indexOf("prepareStoredLessonAudio(job.lesson_version_id, admin)"),
     );
     expect(audio).toContain('.from("lesson_listening_activities")');
     expect(audio).not.toContain('.from("lesson_speaking_activities")');

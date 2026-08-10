@@ -22,7 +22,7 @@ const vocabularyMigration = readFileSync(
 );
 
 describe("flexible generated lesson validation", () => {
-  it("accepts populated model regions without semantic recounting", () => {
+  it("keeps flexible legacy regions while final review uses deterministic playable validation", () => {
     expect(listeningQuestionIssues({ questions: [{}] })).toEqual([]);
     expect(speakingReadAloudIssues({ sentences: [{}] })).toEqual([]);
     expect(storyEnrichmentOutputIssues({
@@ -31,9 +31,9 @@ describe("flexible generated lesson validation", () => {
     expect(reading).toContain(
       "Reading response must contain at least one question.",
     );
-    expect(activities).toContain(
-      "Review response must contain at least one question.",
-    );
+    expect(activities).toContain('activityGroupCheckpointIssues("final_review"');
+    expect(activities).toContain("strictSchema: true");
+    expect(activities).toContain("exactSchemaName: true");
     expect(activities).toContain(
       "const targets = storyTargets.length > 0 ? storyTargets : input.library.grammar",
     );

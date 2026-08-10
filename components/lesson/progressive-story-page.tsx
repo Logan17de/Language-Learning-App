@@ -38,6 +38,7 @@ type GenerationResult = {
   requestId?: string;
   status?: string;
   currentStage?: string;
+  resumeStage?: string | null;
   progressPercent?: number;
   lessonReady?: boolean;
   lessonId?: string | null;
@@ -110,14 +111,23 @@ function readinessLabel(
   if (lessonReady && audioStatus === "queued") return "Activity audio queued";
   if (lessonReady && audioStatus === "failed") return "Lesson ready · audio needs retry";
   if (lessonReady) return "Complete lesson ready";
-  if (currentStage === "quality_check" || currentStage === "activities_validating") {
-    return "Checking lesson quality";
-  }
-  if (currentStage === "saving_lesson" || currentStage === "lesson_saving") {
-    return "Saving your lesson";
-  }
-  if (currentStage === "retrying_activity_groups") return "Retrying an activity group";
-  return "Creating lesson activities";
+  const labels: Record<string, string> = {
+    queued: "Lesson queued",
+    story_building: "Writing your story",
+    vocabulary_enrichment: "Enriching story vocabulary",
+    library_resolution: "Resolving the lesson library",
+    activity_groups: "Creating lesson activities",
+    final_validation: "Checking lesson quality",
+    lesson_saving: "Saving your lesson",
+    audio: "Preparing optional audio",
+    retryable_failure: "Retrying a lesson stage",
+    permanent_failure: "Lesson generation stopped",
+    completed: "Complete lesson ready",
+  };
+  const exact = labels[currentStage];
+  if (exact) return exact;
+  if (currentStage.startsWith("activity_groups:")) return "Creating lesson activities";
+  return "Preparing your lesson";
 }
 
 function buildNotice(
@@ -167,7 +177,7 @@ function buildNotice(
       attention: false,
     };
   }
-  if (currentStage === "quality_check" || currentStage === "activities_validating") {
+  if (currentStage === "final_validation") {
     return {
       title: "Checking lesson quality",
       detail: "AIko is checking the complete activity package.",
@@ -175,7 +185,7 @@ function buildNotice(
       attention: false,
     };
   }
-  if (currentStage === "saving_lesson" || currentStage === "lesson_saving") {
+  if (currentStage === "lesson_saving") {
     return {
       title: "Saving your lesson",
       detail: "Your finished lesson is being added to your learning path.",
@@ -314,7 +324,7 @@ function BuildStatusToast({
             ) : (
               <RotateCcw className="size-4" />
             )}
-            {retrying ? "Queuingâ€¦" : "Retry remaining work"}
+            {retrying ? "Queuingâ€¦" : "Retry activity audio"}
           </Button>
         )}
       </Card>
@@ -328,16 +338,13 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
   const [storyTitle, setStoryTitle] = useState("Your new story");
   const [lines, setLines] = useState<ReaderLine[]>([]);
   const [storyComplete, setStoryComplete] = useState(false);
-  const [currentStage, setCurrentStage] = useState("activities_queued");
-  const [generationStatus, setGenerationStatus] = useState("story_ready");
-  const [progressPercent, setProgressPercent] = useState(20);
+  const [currentStage, setCurrentStage] = useState("queued");
+  const [progressPercent, setProgressPercent] = useState(0);
   const [completedGroups, setCompletedGroups] = useState<string[]>([]);
   const [failedGroups, setFailedGroups] = useState<string[]>([]);
   const [lessonId, setLessonId] = useState<string | null>(null);
   const [lessonReady, setLessonReady] = useState(false);
   const [audioStatus, setAudioStatus] = useState("pending");
-  const [retryable, setRetryable] = useState(false);
-  const [permanentFailure, setPermanentFailure] = useState(false);
   const [error, setError] = useState("");
   const [retrying, setRetrying] = useState(false);
   const [pollVersion, setPollVersion] = useState(0);
@@ -350,25 +357,22 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
         setStoryTitle(result.story.japaneseTitle || "Your new story");
       }
     }
-    if (typeof result.currentStage === "string") setCurrentStage(result.currentStage);
-    if (typeof result.status === "string") setGenerationStatus(result.status);
+    if (result.status === "retryable_failure" && typeof result.resumeStage === "string") {
+      setCurrentStage(result.resumeStage);
+    } else if (typeof result.currentStage === "string") {
+      setCurrentStage(result.currentStage);
+    }
     if (typeof result.progressPercent === "number") {
       setProgressPercent(result.progressPercent);
     }
     if (Array.isArray(result.completedGroups)) setCompletedGroups(result.completedGroups);
     if (Array.isArray(result.failedGroups)) setFailedGroups(result.failedGroups);
     if (typeof result.audioStatus === "string") setAudioStatus(result.audioStatus);
-    if (typeof result.retryable === "boolean") setRetryable(result.retryable);
-    if (typeof result.permanentFailure === "boolean") {
-      setPermanentFailure(result.permanentFailure);
-    }
     const nextLessonId = typeof result.lessonId === "string" ? result.lessonId : null;
     if (nextLessonId) setLessonId(nextLessonId);
     setLessonReady(result.lessonReady === true || Boolean(nextLessonId));
-    if (result.permanentFailure || result.status === "failed") {
+    if (result.permanentFailure || result.status === "permanent_failure") {
       setError(result.message || "AIko could not finish the remaining lesson activities.");
-    } else if (result.status === "activities_failed") {
-      setError("Your story is safe. One activity group needs another attempt.");
     } else if (result.audioStatus === "failed") {
       setError("The lesson is ready, but activity audio needs another attempt.");
     } else {
@@ -398,7 +402,6 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
         applyResult(result);
         const terminal =
           result.permanentFailure ||
-          result.status === "activities_failed" ||
           (result.lessonReady &&
             (result.audioStatus === "ready" || result.audioStatus === "failed"));
         if (!terminal) {
@@ -454,10 +457,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
   const canContinue = storyComplete && lessonReady && Boolean(lessonId);
   const canRetry =
     !retrying &&
-    (generationStatus === "activities_failed" ||
-      permanentFailure ||
-      (lessonReady && audioStatus === "failed") ||
-      retryable);
+    lessonReady && audioStatus === "failed";
 
   async function retryRemaining() {
     if (!canRetry) return;
@@ -475,10 +475,8 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
         setError(result?.error || "The remaining lesson work could not be queued.");
         return;
       }
-      setGenerationStatus(action === "audio" ? "audio_queued" : "activities_queued");
       setCurrentStage(action === "audio" ? "audio_queued" : "activities_queued");
       if (action === "audio") setAudioStatus("queued");
-      setPermanentFailure(false);
       setPollVersion((value) => value + 1);
     } finally {
       setRetrying(false);
@@ -502,6 +500,13 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
   }
 
   if (lines.length < 1) {
+    const stageTitle = readinessLabel(currentStage, false, audioStatus);
+    const stageDetails: Record<string, string> = {
+      queued: "Your request is safely queued and can continue without this page open.",
+      story_building: "AIko is selecting targets and writing the checked story passage.",
+      vocabulary_enrichment: "The story is saved. AIko is preparing tappable vocabulary.",
+      library_resolution: "AIko is validating and resolving every teaching record used by the story.",
+    };
     return (
       <main className="grid min-h-screen place-items-center bg-paper p-6" aria-live="polite">
         <div className="text-center">
@@ -511,11 +516,19 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
             <LoaderCircle className="mx-auto size-12 animate-spin text-moss-600" />
           )}
           <h1 className="mt-5 text-2xl font-semibold">
-            {error ? "The story could not be restored." : "Opening your story…"}
+            {error ? "The story could not be prepared." : stageTitle}
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">
-            {error || "AIko is moving the approved story into the lesson reader."}
+            {error || stageDetails[currentStage] || "The durable worker is preparing the next saved checkpoint."}
           </p>
+          {!error && (
+            <div className="mx-auto mt-5 h-2 w-64 overflow-hidden rounded-full bg-stone-200">
+              <div
+                className="h-full rounded-full bg-moss-600 transition-[width] duration-500"
+                style={{ width: `${Math.max(3, progressPercent)}%` }}
+              />
+            </div>
+          )}
           {error && (
             <Button type="button" variant="secondary" className="mt-6" onClick={() => router.push("/custom-topic")}>
               Return to custom topic

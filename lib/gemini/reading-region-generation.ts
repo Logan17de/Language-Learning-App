@@ -25,6 +25,7 @@ import type {
   StoryDraft,
 } from "@/lib/gemini/lesson-engine-v2";
 import type { JLPTLevel } from "@/types/lesson";
+import { partitionReadingPassage } from "@/lib/custom-lessons/reading-lines";
 
 export interface GeneratedReadingLine {
   speaker: string;
@@ -62,38 +63,20 @@ function readingQuestionIssues(value: unknown): string[] {
     : ["Reading response must contain at least one question."];
 }
 
-function sentences(value: string, japanese: boolean): string[] {
-  const matcher = japanese
-    ? /[^。！？!?]+[。！？!?]?/gu
-    : /[^.!?]+[.!?]?/gu;
-  return (value.match(matcher) ?? [value])
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function partitions(items: string[], count: number, separator = ""): string[] {
-  return Array.from({ length: count }, (_, index) => {
-    const start = Math.floor((index * items.length) / count);
-    const end = Math.floor(((index + 1) * items.length) / count);
-    return items.slice(start, end).join(separator);
-  });
-}
-
 function readingLines(
   passage: RawReadingPassage,
   terms: InspectableTerm[],
 ): GeneratedReadingLine[] {
-  const japaneseSentences = sentences(passage.japanese_story, true);
-  const englishSentences = sentences(passage.english_translation, false);
-  const count = Math.min(6, Math.max(4, japaneseSentences.length));
-  const japaneseParts = partitions(japaneseSentences, count);
-  const englishParts = partitions(englishSentences, count, " ");
-  return japaneseParts.map((japanese, index) => {
+  return partitionReadingPassage({
+    japanese: passage.japanese_story,
+    english: passage.english_translation,
+    maximumLines: 6,
+  }).map(({ japanese, english }) => {
     const lineTerms = terms.filter((term) => japanese.includes(term.surface));
     return {
       speaker: "Reading",
       japanese,
-      english: englishParts[index] ?? "",
+      english,
       targetItemIds: [...new Set(lineTerms.map((term) => term.libraryId))].slice(0, 5),
       inspectableTerms: lineTerms,
     };

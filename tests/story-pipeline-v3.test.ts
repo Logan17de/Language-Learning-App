@@ -177,19 +177,19 @@ describe("custom lesson story pipeline v3", () => {
     expect(simpleEnrichment).toContain('rpc("store_story_vocabulary_enrichment"');
     expect(simpleEnrichmentContract).toContain("List every unique vocabulary word exactly as it appears");
     expect(simpleEnrichmentContract).toContain('required: ["word", "reading", "meaning"]');
-    expect(route).toContain("resolveStoryFromExistingLibrary");
-    expect(route).toContain("enrichGeneratedStoryVocabulary");
-    expect(route.indexOf("enrichGeneratedStoryVocabulary")).toBeLessThan(
-      route.indexOf("resolveStoryFromExistingLibrary(client"),
+    expect(runner).toContain("resolveStoryFromExistingLibrary");
+    expect(runner).toContain("enrichGeneratedStoryVocabulary");
+    expect(runner.indexOf("processVocabularyEnrichment")).toBeLessThan(
+      runner.indexOf("processLibraryResolution"),
     );
-    expect(route).toContain('libraryMode: "raw-story-enrichment"');
+    expect(runner).toContain('finishStage(admin, job, "library_resolution"');
     expect(enrichmentMigration).toContain("create table if not exists public.story_vocabulary_enrichments");
     expect(enrichmentMigration).toContain("word text not null");
     expect(enrichmentMigration).toContain("reading text not null");
     expect(enrichmentMigration).toContain("meaning text not null");
     expect(enrichmentMigration).not.toContain("v_dictionary_form :=");
-    expect(enrichmentMigration).toContain("v_word,\n      v_word,\n      v_reading");
-    expect(route).not.toContain("resolveStoryLibraryV4");
+    expect(enrichmentMigration).toMatch(/v_word,\s+v_word,\s+v_reading/u);
+    expect(runner).not.toContain("resolveStoryLibraryV4");
   });
 
   it("shows justified Japanese and English passages while retaining old line compatibility", () => {
@@ -223,7 +223,7 @@ describe("custom lesson story pipeline v3", () => {
     expect(structuredText).toContain("Object.assign({}, ...records)");
     expect(structured).not.toContain("GEMINI_");
     expect(compatibilityExport).toContain("@/lib/openai/structured-output");
-    expect(route).toContain("separate simple vocabulary-enrichment call");
+    expect(runner).toContain("processVocabularyEnrichment");
   });
 
   it("throttles and retries only transient structured model failures", () => {
@@ -242,7 +242,7 @@ describe("custom lesson story pipeline v3", () => {
     expect(inspectable).toContain(
       'active.word.scriptType === "kanji" && stage >= 1',
     );
-    expect(route).toContain('rpc("record_story_kanji_exposures"');
+    expect(runner).toContain('rpc("record_story_kanji_exposures_background"');
     expect(plan).toContain('.gte("appearance_count", 10)');
     expect(migration).toContain("appearance_count >= 10");
     expect(migration).toContain("knownThreshold', 10");
@@ -252,9 +252,9 @@ describe("custom lesson story pipeline v3", () => {
 
   it("persists tested strict question responses without a second model prompt", () => {
     expect(runner).not.toContain("approveActivityQuestionsWithAI");
-    expect(runner).toContain("Every migrated question region now uses its tested strict response");
+    expect(runner).toContain("normalizeGeneratedCheckpoint(generated.value)");
     expect(runner).toContain(
-      "await persistGroup(admin, job, group, generated.value, generated.audit)",
+      "await persistGroup(admin, current, group, normalized, generated.audit)",
     );
   });
 
@@ -264,17 +264,13 @@ describe("custom lesson story pipeline v3", () => {
     expect(activityGroups).toContain("vocabularyQuestionsSchema");
     expect(activityGroups).toContain("strictSchema: true");
     expect(activityGroups).toContain("exactSchemaName: true");
-    expect(activityGroups).toContain("Vocabulary response must contain at least one question.");
-    expect(activityGroups).toContain("targetItemIds: targetId ? [targetId] : []");
-    expect(activityGroups).not.toContain(
-      "does not target vocabulary or allowed kanji from the story",
-    );
-    expect(activityGroups).not.toContain(
-      "A vocabulary question could not be linked to its story word.",
-    );
+    expect(activityGroups).toContain("Vocabulary response must contain exactly 13 questions");
+    expect(activityGroups).toContain("targetItemIds: [targetId]");
+    expect(activityGroups).toContain("does not resolve to a relevant library target");
+    expect(activityGroups).toContain("Vocabulary question does not reference a valid library target.");
     expect(vocabularyContract).toContain("Create vocabulary and kanji questions from this Japanese story.");
     expect(vocabularyContract).toContain("Create exactly 13 questions: 6 easy, 4 medium, and 3 hard.");
-    expect(vocabularyContract).toContain('required: [\n          "format_id"');
+    expect(vocabularyContract).toMatch(/required:\s*\[\s*"format_id"/u);
     expect(existingLibrary).toContain("filterStoryPracticeKanji");
     expect(existingLibrary).toContain("knownKanji: input.plan.knownKanji");
     expect(existingLibrary).toContain("targetKanji: input.plan.kanji.map");
@@ -297,18 +293,14 @@ describe("custom lesson story pipeline v3", () => {
     expect(activityGroups).toContain("rawGrammarQuestionIssues");
     expect(activityGroups).toContain("adaptGrammarQuestions");
     expect(activityGroups).toContain("filterStoryGrammarPatterns");
-    expect(activityGroups).toContain("Grammar response must contain at least one question.");
-    expect(activityGroups).toContain("targetItemIds: target ? [target.libraryId] : []");
-    expect(activityGroups).not.toContain(
-      "does not test a provided grammar pattern from the story",
-    );
-    expect(activityGroups).not.toContain(
-      "A grammar question could not be linked to its story pattern.",
-    );
+    expect(activityGroups).toContain("Grammar response must contain exactly 10 questions");
+    expect(activityGroups).toContain("targetItemIds: [target.libraryId]");
+    expect(activityGroups).toContain("does not resolve to a relevant library target");
+    expect(activityGroups).toContain("Grammar question does not reference a valid library target.");
     expect(grammarContract).toContain("Create grammar questions from this Japanese story.");
     expect(grammarContract).toContain("Create exactly 10 questions: 3 easy, 4 medium, and 3 hard.");
     expect(grammarContract).toContain("Do not create questions using grammar patterns that do not appear in the story.");
-    expect(grammarContract).toContain('required: [\n          "format_id"');
+    expect(grammarContract).toMatch(/required:\s*\[\s*"format_id"/u);
   });
 
   it("generates, enriches, and questions a separate reading passage in order", () => {
@@ -334,7 +326,7 @@ describe("custom lesson story pipeline v3", () => {
   it("creates five enriched listening conversations from the exact sample contract", () => {
     expect(listeningContract).toContain("Create exactly 5 listening-comprehension questions");
     expect(listeningContract).toContain("natural Japanese conversation of 5–10 lines");
-    expect(listeningContract).toContain('required: [\n          "difficulty"');
+    expect(listeningContract).toMatch(/required:\s*\[\s*"difficulty"/u);
     expect(listeningGeneration).toContain('name: "listening_questions"');
     expect(listeningGeneration).toContain("strictSchema: true");
     expect(listeningGeneration).toContain("exactSchemaName: true");
@@ -383,22 +375,21 @@ describe("custom lesson story pipeline v3", () => {
   });
 
   it("records exact group errors and does not mislabel finalization failures", () => {
-    expect(runner).toContain('console.error("Custom lesson activity groups failed."');
-    expect(runner).toContain("failures: details");
-    expect(runner).toContain("failedGroups.map((group, index)");
-    expect(runner).toContain("markFinalizationFailure");
-    expect(runner).toContain('console.error("Custom lesson finalization failed."');
-    expect(runner).toContain("libraryCounts");
-    expect(runner).toContain("return markFinalizationFailure(admin, refreshed, error)");
+    expect(runner).toContain('console.error("Custom lesson stage failed."');
+    expect(runner).toContain("errorClassification: failure.classification");
+    expect(runner).toContain("providerRequestId: failure.providerRequestId");
+    expect(runner).toContain("finalizationFailureAction(error)");
+    expect(runner).toContain('action.kind === "invalidate_group"');
+    expect(runner).toContain('last_action: "invalidated_checkpoint"');
   });
 
   it("keeps the story-first flow fast after the single story call", () => {
     expect(plan).toContain("unstable_cache");
     expect(plan).toContain("lesson-plan-v3-static-catalog");
-    expect(route).toContain("Custom lesson story pipeline timings");
-    expect(route).toContain("const [saved, exposure] = await Promise.all");
-    expect(route).toContain("libraryLookupMs");
-    expect(route).toContain("tappableVocabularyCount");
+    expect(route).toContain('status: "queued"');
+    expect(route).toContain('{ status: 202 }');
+    expect(runner).toContain("SOFT_RUNTIME_LIMIT_MS");
+    expect(runner).toContain("DEFAULT_MAX_CYCLES = 1");
     expect(structured).toContain("durationMs");
     expect(structured).toContain("attempts");
     expect(structured).toContain("cachedInputTokens");

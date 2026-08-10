@@ -26,9 +26,6 @@ type GenerationResult = {
   status?: string;
   lesson_id?: string;
   error?: string;
-  story?: {
-    lines?: Array<{ japanese?: string }>;
-  } | null;
 };
 
 const openingStages = [
@@ -98,7 +95,6 @@ export function CustomTopicPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic, level }),
-        signal: AbortSignal.timeout(180_000),
       });
       const result = (await response.json().catch(() => null)) as GenerationResult | null;
       if (!response.ok) {
@@ -110,21 +106,14 @@ export function CustomTopicPage() {
         router.replace(`/lesson/${result.lesson_id}/play`);
         return;
       }
-      if (!result?.requestId || !Array.isArray(result.story?.lines)) {
-        setError("The story response was incomplete. Please try again.");
+      if (!result?.requestId) {
+        setError("The generation request was not queued. Please try again.");
         setState("error");
         return;
       }
       router.replace(`/lesson/building/${encodeURIComponent(result.requestId)}`);
-    } catch (requestError) {
-      const timedOut =
-        requestError instanceof DOMException &&
-        (requestError.name === "TimeoutError" || requestError.name === "AbortError");
-      setError(
-        timedOut
-          ? "Story generation is taking longer than expected. Please try again."
-          : "The connection was interrupted while creating your story. Please try again.",
-      );
+    } catch {
+      setError("The connection was interrupted while queuing your story. Please try again.");
       setState("error");
     }
   }

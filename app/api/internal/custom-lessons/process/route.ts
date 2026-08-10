@@ -8,11 +8,16 @@ export const dynamic = "force-dynamic";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function authorized(request: NextRequest): boolean {
-  const secret = process.env.CUSTOM_LESSON_WORKER_SECRET ?? process.env.CRON_SECRET;
-  return Boolean(secret) && request.headers.get("authorization") === `Bearer ${secret}`;
+  const header = request.headers.get("authorization");
+  const secrets = [
+    process.env.CUSTOM_LESSON_WORKER_SECRET,
+    process.env.CRON_SECRET,
+  ].filter((value): value is string => Boolean(value));
+  return secrets.some((secret) => header === `Bearer ${secret}`);
 }
 
 async function run(request: NextRequest, requestId?: string) {
+  const startedAt = Date.now();
   if (!authorized(request)) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
@@ -31,6 +36,13 @@ async function run(request: NextRequest, requestId?: string) {
     });
   } catch (error) {
     console.error("Internal custom lesson worker failed.", {
+      requestId: requestId ?? null,
+      stage: "worker",
+      attempt: 1,
+      errorClassification: "transient",
+      providerRequestId: null,
+      durationMs: Date.now() - startedAt,
+      action: "resumed",
       message: error instanceof Error ? error.message : "Unknown worker error.",
     });
     return NextResponse.json(

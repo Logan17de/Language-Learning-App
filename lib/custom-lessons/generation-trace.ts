@@ -19,7 +19,8 @@ export type GenerationTraceEventType =
   | "initial_response"
   | "repair_response"
   | "transport_retry"
-  | "generation_failed";
+  | "generation_failed"
+  | "stage_failure";
 
 interface SaveGenerationTraceInput {
   trace?: GenerationTraceContext;
@@ -70,13 +71,17 @@ function effectiveTrace(
 export async function saveGenerationTrace(
   input: SaveGenerationTraceInput,
 ): Promise<void> {
+  const startedAt = Date.now();
   const trace = effectiveTrace(input.trace);
   const requestId = trace.requestId;
   if (!enabled() || typeof requestId !== "string" || requestId.length < 1) {
     return;
   }
 
-  const { requestId: _requestId, stage, ...traceMetadata } = trace;
+  const stage = trace.stage;
+  const traceMetadata = { ...trace };
+  delete traceMetadata.requestId;
+  delete traceMetadata.stage;
   const admin = createAdminClient() as unknown as SupabaseClient;
   const saved = await admin.from("custom_lesson_generation_traces").insert({
     request_id: requestId,
@@ -98,7 +103,13 @@ export async function saveGenerationTrace(
   if (saved.error) {
     console.warn("Custom lesson generation trace could not be saved.", {
       requestId,
-      name: input.name,
+      stage: typeof stage === "string" && stage.length > 0 ? stage : input.name,
+      group: typeof trace.group === "string" ? trace.group : null,
+      attempt: Math.max(1, Math.round(input.attempt)),
+      errorClassification: "transient",
+      providerRequestId: null,
+      durationMs: Date.now() - startedAt,
+      action: "resumed",
       eventType: input.eventType,
       message: saved.error.message,
     });
