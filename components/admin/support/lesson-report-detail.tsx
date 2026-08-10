@@ -43,7 +43,8 @@ function BackendReportDetail({ reportId }: { reportId: string }) {
   }
 
   useEffect(() => {
-    void load();
+    const timer = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(timer);
   }, [reportId]);
 
   async function updateReport(values: { status?: string; priority?: string; note?: string }) {
