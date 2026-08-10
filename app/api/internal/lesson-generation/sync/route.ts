@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { syncActiveGenerationBatches } from "@/lib/admin-lessons/jlpt-batch-generation";
+import { syncActiveGenerationBatches } from "@/lib/admin-lessons/lesson-batch-generation";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
