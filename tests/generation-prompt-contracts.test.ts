@@ -313,12 +313,12 @@ Story:
 太郎は学校へ行きました。
 
 Requirements:
+- Create exactly 5 questions: 2 easy, 2 medium, and 1 hard.
 - Base every question only on the story.
 - Write essay-style questions in Japanese.
 - Require answers in short, complete Japanese sentences.
 - Include direct-detail, sequence, reason, and simple inference questions.
 - Keep the questions appropriate for JLPT N5.
-- Create exactly 5 questions: 2 easy, 2 medium, and 1 hard.
 - Do not create questions that cannot be answered from the story.
 - Do not copy full sentences from the story as answers unless necessary.
 - Easy questions must have answers stated directly in the story.
