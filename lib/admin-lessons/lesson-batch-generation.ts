@@ -28,18 +28,8 @@ export { normalizeBatchLevel } from "@/lib/admin-lessons/lesson-generation-contr
 export type { SupportedBatchLevel } from "@/lib/admin-lessons/lesson-generation-contract";
 
 const RESERVATION_DRAW_ATTEMPTS = 20_000;
-const TERMINAL_PROVIDER_STATUSES = new Set([
-  "completed",
-  "failed",
-  "expired",
-  "cancelled",
-]);
-const ACTIVE_LOCAL_STATUSES = [
-  "submitting",
-  "validating",
-  "in_progress",
-  "finalizing",
-] as const;
+const TERMINAL_PROVIDER_STATUSES = new Set(["completed", "failed", "expired", "cancelled"]);
+const ACTIVE_LOCAL_STATUSES = ["submitting", "validating", "in_progress", "finalizing"] as const;
 
 type RawClient = SupabaseClient;
 type AnyRecord = Record<string, unknown>;
@@ -87,27 +77,19 @@ function lessonModel(): string {
 }
 
 function reasoningEffort(): OpenAIReasoningEffort {
-  const configured = process.env.OPENAI_STORY_REASONING_EFFORT?.trim();
-  if (
-    configured === "none" ||
-    configured === "low" ||
-    configured === "medium" ||
-    configured === "high" ||
-    configured === "xhigh" ||
-    configured === "max"
-  ) {
-    return configured;
-  }
-  return "low";
+  const value = process.env.OPENAI_STORY_REASONING_EFFORT?.trim();
+  return value === "none" || value === "low" || value === "medium" ||
+    value === "high" || value === "xhigh" || value === "max"
+    ? value
+    : "low";
 }
 
 async function openAIJson(path: string, init: RequestInit): Promise<AnyRecord> {
   const controller = new AbortController();
-  const timeoutMs = Math.max(
-    10_000,
-    Number(process.env.OPENAI_REQUEST_TIMEOUT_MS || 120_000),
+  const timeout = setTimeout(
+    () => controller.abort(),
+    Math.max(10_000, Number(process.env.OPENAI_REQUEST_TIMEOUT_MS || 120_000)),
   );
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const response = await fetch(`${openAIBase()}${path}`, {
       ...init,
@@ -161,14 +143,14 @@ async function uploadBatchInput(
     `aiko-${level.toLowerCase()}-lessons-${batchId}.jsonl`,
   );
   const payload = await openAIJson("/files", { method: "POST", body: form });
-  const fileId = text(payload.id);
-  if (!fileId) throw new Error("OpenAI did not return an input file id.");
-  return fileId;
+  const id = text(payload.id);
+  if (!id) throw new Error("OpenAI did not return an input file id.");
+  return id;
 }
 
 async function createProviderBatch(
   inputFileId: string,
-  localBatchId: string,
+  batchId: string,
   level: SupportedBatchLevel,
 ): Promise<AnyRecord> {
   return openAIJson("/batches", {
@@ -179,7 +161,7 @@ async function createProviderBatch(
       endpoint: "/v1/responses",
       completion_window: "24h",
       metadata: {
-        aiko_batch_id: localBatchId,
+        aiko_batch_id: batchId,
         jlpt_level: level,
         feature: "jlpt_lesson_factory",
       },
@@ -187,24 +169,12 @@ async function createProviderBatch(
   });
 }
 
-async function retrieveProviderBatch(providerBatchId: string): Promise<AnyRecord> {
-  return openAIJson(`/batches/${encodeURIComponent(providerBatchId)}`, { method: "GET" });
-}
-
 function providerStatus(value: unknown): string {
   const status = text(value) || "failed";
   return [
-    "validating",
-    "in_progress",
-    "finalizing",
-    "completed",
-    "failed",
-    "expired",
-    "cancelling",
-    "cancelled",
-  ].includes(status)
-    ? status
-    : "failed";
+    "validating", "in_progress", "finalizing", "completed",
+    "failed", "expired", "cancelling", "cancelled",
+  ].includes(status) ? status : "failed";
 }
 
 function randomTargetSet(keys: string[], count: number): string[] {
@@ -224,9 +194,7 @@ function chooseBalancedGrammarSet(input: {
   const available = [...input.keys];
   const selected: string[] = [];
   while (selected.length < input.count) {
-    const minimumUsage = Math.min(
-      ...available.map((pattern) => input.usage.get(pattern) ?? 0),
-    );
+    const minimumUsage = Math.min(...available.map((pattern) => input.usage.get(pattern) ?? 0));
     const leastUsed = available.filter(
       (pattern) => (input.usage.get(pattern) ?? 0) === minimumUsage,
     );
@@ -243,21 +211,11 @@ async function loadCatalogTargets(
   level: SupportedBatchLevel,
 ): Promise<{ kanji: string[]; grammar: string[]; grammarUsage: Map<string, number> }> {
   const [kanjiResult, grammarResult, historyResult] = await Promise.all([
-    admin
-      .from("kanji_catalog")
-      .select("character")
-      .eq("jlpt_level", level)
-      .eq("active", true)
-      .order("source_order"),
-    admin
-      .from("grammar_catalog")
-      .select("pattern")
-      .eq("jlpt_level", level)
-      .eq("active", true)
-      .order("source_order"),
-    admin
-      .from("lesson_generation_requests")
-      .select("target_grammar")
+    admin.from("kanji_catalog").select("character")
+      .eq("jlpt_level", level).eq("active", true).order("source_order"),
+    admin.from("grammar_catalog").select("pattern")
+      .eq("jlpt_level", level).eq("active", true).order("source_order"),
+    admin.from("lesson_generation_requests").select("target_grammar")
       .eq("jlpt_level", level),
   ]);
   const error = kanjiResult.error || grammarResult.error || historyResult.error;
@@ -266,12 +224,12 @@ async function loadCatalogTargets(
   const kanji = [...new Set(
     (kanjiResult.data ?? [])
       .map((row) => record(row) ? text(row.character) : null)
-      .filter((value): value is string => Boolean(value) && [...value].length === 1),
+      .filter((value): value is string => typeof value === "string" && [...value].length === 1),
   )];
   const grammar = [...new Set(
     (grammarResult.data ?? [])
       .map((row) => record(row) ? text(row.pattern) : null)
-      .filter((value): value is string => Boolean(value)),
+      .filter((value): value is string => typeof value === "string" && value.length > 0),
   )];
 
   if (kanji.length < TARGET_KANJI_COUNT) {
@@ -312,7 +270,8 @@ async function reserveUniqueKanjiSet(input: {
     if (reserved.data === true) return candidate;
   }
   throw new Error(
-    `${input.level} could not reserve another unique five-kanji set after ${RESERVATION_DRAW_ATTEMPTS.toLocaleString()} random draws. Refresh target capacity before retrying.`,
+    `${input.level} could not reserve another unique five-kanji set after ` +
+      `${RESERVATION_DRAW_ATTEMPTS.toLocaleString()} random draws. Refresh target capacity before retrying.`,
   );
 }
 
@@ -359,40 +318,33 @@ function buildLessonRequestBody(
   });
 }
 
-function extractResponseText(body: AnyRecord): {
-  output: string | null;
-  error: unknown | null;
-} {
+function extractResponseText(body: AnyRecord): { output: string | null; error: unknown | null } {
   const direct = text(body.output_text);
   if (direct) return { output: direct, error: null };
   if (!Array.isArray(body.output)) return { output: null, error: body.error ?? null };
-  const parts: string[] = [];
+  const output: string[] = [];
   const refusals: string[] = [];
   for (const item of body.output) {
     if (!record(item) || !Array.isArray(item.content)) continue;
     for (const content of item.content) {
       if (!record(content)) continue;
-      if (content.type === "output_text" && text(content.text)) {
-        parts.push(text(content.text) as string);
+      if (content.type === "output_text") {
+        const value = text(content.text);
+        if (value) output.push(value);
       }
-      if (content.type === "refusal" && text(content.refusal)) {
-        refusals.push(text(content.refusal) as string);
+      if (content.type === "refusal") {
+        const value = text(content.refusal);
+        if (value) refusals.push(value);
       }
     }
   }
   return {
-    output: parts.length ? parts.join("\n") : null,
-    error: refusals.length
-      ? { type: "refusal", messages: refusals }
-      : body.error ?? null,
+    output: output.length ? output.join("\n") : null,
+    error: refusals.length ? { type: "refusal", messages: refusals } : body.error ?? null,
   };
 }
 
-function usageFromBody(body: AnyRecord): {
-  input_tokens: number | null;
-  output_tokens: number | null;
-  total_tokens: number | null;
-} {
+function usageFromBody(body: AnyRecord) {
   const usage = record(body.usage) ? body.usage : {};
   return {
     input_tokens: numeric(usage.input_tokens),
@@ -401,78 +353,45 @@ function usageFromBody(body: AnyRecord): {
   };
 }
 
-async function appendUnmatchedLine(
-  admin: RawClient,
-  batchId: string,
-  raw: unknown,
-): Promise<void> {
-  const current = await admin
-    .from("lesson_generation_batches")
-    .select("unmatched_provider_lines")
-    .eq("id", batchId)
-    .maybeSingle();
+async function appendUnmatchedLine(admin: RawClient, batchId: string, raw: unknown): Promise<void> {
+  const current = await admin.from("lesson_generation_batches")
+    .select("unmatched_provider_lines").eq("id", batchId).maybeSingle();
   if (current.error) throw new Error(current.error.message);
   const existing = current.data && Array.isArray(current.data.unmatched_provider_lines)
     ? current.data.unmatched_provider_lines
     : [];
-  const updated = await admin
-    .from("lesson_generation_batches")
-    .update({
-      unmatched_provider_lines: [...existing, raw] as unknown as Json,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", batchId);
-  if (updated.error) throw new Error(updated.error.message);
+  const saved = await admin.from("lesson_generation_batches").update({
+    unmatched_provider_lines: [...existing, raw] as unknown as Json,
+    updated_at: new Date().toISOString(),
+  }).eq("id", batchId);
+  if (saved.error) throw new Error(saved.error.message);
 }
 
-async function ingestProviderLine(
-  admin: RawClient,
-  batchId: string,
-  line: unknown,
-): Promise<void> {
-  if (!record(line)) {
-    await appendUnmatchedLine(admin, batchId, line);
-    return;
-  }
+async function ingestProviderLine(admin: RawClient, batchId: string, line: unknown): Promise<void> {
+  if (!record(line)) return appendUnmatchedLine(admin, batchId, line);
   const customId = text(line.custom_id);
-  if (!customId) {
-    await appendUnmatchedLine(admin, batchId, line);
-    return;
-  }
+  if (!customId) return appendUnmatchedLine(admin, batchId, line);
 
-  const staged = await admin
-    .from("lesson_generation_requests")
+  const staged = await admin.from("lesson_generation_requests")
     .select("id,target_kanji,target_grammar,jlpt_level")
-    .eq("generation_batch_id", batchId)
-    .eq("custom_id", customId)
-    .maybeSingle();
+    .eq("generation_batch_id", batchId).eq("custom_id", customId).maybeSingle();
   if (staged.error) throw new Error(staged.error.message);
-  if (!staged.data) {
-    await appendUnmatchedLine(admin, batchId, line);
-    return;
-  }
+  if (!staged.data) return appendUnmatchedLine(admin, batchId, line);
 
-  // Store the complete provider line before any response extraction, parsing,
-  // or deterministic validation. Manual repair never mutates this field.
-  const rawSaved = await admin
-    .from("lesson_generation_requests")
-    .update({
-      raw_provider_line: line as unknown as Json,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", staged.data.id);
+  // Persist the complete provider line before extraction, parsing, or validation.
+  const rawSaved = await admin.from("lesson_generation_requests").update({
+    raw_provider_line: line as unknown as Json,
+    updated_at: new Date().toISOString(),
+  }).eq("id", staged.data.id);
   if (rawSaved.error) throw new Error(rawSaved.error.message);
 
   const level = normalizeBatchLevel(staged.data.jlpt_level);
   if (!level) {
-    const failed = await admin
-      .from("lesson_generation_requests")
-      .update({
-        status: "invalid",
-        validation_errors: ["Staged lesson uses an unsupported JLPT level."],
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", staged.data.id);
+    const failed = await admin.from("lesson_generation_requests").update({
+      status: "invalid",
+      validation_errors: ["Staged lesson uses an unsupported JLPT level."],
+      updated_at: new Date().toISOString(),
+    }).eq("id", staged.data.id);
     if (failed.error) throw new Error(failed.error.message);
     return;
   }
@@ -481,19 +400,13 @@ async function ingestProviderLine(
   const statusCode = response ? numeric(response.status_code) : null;
   const body = response && record(response.body) ? response.body : null;
   const lineError = line.error ?? response?.error ?? null;
-
   if (!body || !statusCode || statusCode < 200 || statusCode >= 300) {
-    const failed = await admin
-      .from("lesson_generation_requests")
-      .update({
-        status: "api_failed",
-        provider_error: (lineError ?? { status_code: statusCode }) as Json,
-        validation_errors: [
-          "The Batch request failed before a complete lesson response was available.",
-        ],
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", staged.data.id);
+    const failed = await admin.from("lesson_generation_requests").update({
+      status: "api_failed",
+      provider_error: (lineError ?? { status_code: statusCode }) as Json,
+      validation_errors: ["The Batch request failed before a complete lesson response was available."],
+      updated_at: new Date().toISOString(),
+    }).eq("id", staged.data.id);
     if (failed.error) throw new Error(failed.error.message);
     return;
   }
@@ -501,19 +414,14 @@ async function ingestProviderLine(
   const extracted = extractResponseText(body);
   const usage = usageFromBody(body);
   if (!extracted.output) {
-    const failed = await admin
-      .from("lesson_generation_requests")
-      .update({
-        ...usage,
-        provider_request_id: text(body.id),
-        status: "api_failed",
-        provider_error: (
-          extracted.error ?? { message: "Response contained no output_text." }
-        ) as Json,
-        validation_errors: ["The model returned no lesson JSON text."],
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", staged.data.id);
+    const failed = await admin.from("lesson_generation_requests").update({
+      ...usage,
+      provider_request_id: text(body.id),
+      status: "api_failed",
+      provider_error: (extracted.error ?? { message: "Response contained no output_text." }) as Json,
+      validation_errors: ["The model returned no lesson JSON text."],
+      updated_at: new Date().toISOString(),
+    }).eq("id", staged.data.id);
     if (failed.error) throw new Error(failed.error.message);
     return;
   }
@@ -529,44 +437,36 @@ async function ingestProviderLine(
       level,
     });
   } catch (error) {
-    errors = [
-      `JSON parse failed: ${error instanceof Error ? error.message : "Unknown parse error."}`,
-    ];
+    errors = [`JSON parse failed: ${error instanceof Error ? error.message : "Unknown parse error."}`];
   }
 
-  const saved = await admin
-    .from("lesson_generation_requests")
-    .update({
-      ...usage,
-      raw_response: extracted.output,
-      parsed_lesson: parsed as Json | null,
-      provider_error: extracted.error as Json | null,
-      provider_request_id: text(body.id),
-      status: errors.length ? "invalid" : "valid",
-      validation_errors: errors,
-      last_validated_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", staged.data.id);
+  const saved = await admin.from("lesson_generation_requests").update({
+    ...usage,
+    raw_response: extracted.output,
+    parsed_lesson: parsed as Json | null,
+    provider_error: extracted.error as Json | null,
+    provider_request_id: text(body.id),
+    status: errors.length ? "invalid" : "valid",
+    validation_errors: errors,
+    last_validated_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }).eq("id", staged.data.id);
   if (saved.error) throw new Error(saved.error.message);
 }
 
-async function ingestJsonlFile(
-  admin: RawClient,
-  batchId: string,
-  content: string,
-): Promise<void> {
+async function ingestJsonlFile(admin: RawClient, batchId: string, content: string): Promise<void> {
   for (const rawLine of content.split(/\r?\n/u)) {
-    const trimmed = rawLine.trim();
-    if (!trimmed) continue;
-    let value: unknown;
+    const value = rawLine.trim();
+    if (!value) continue;
     try {
-      value = JSON.parse(trimmed) as unknown;
-    } catch {
-      await appendUnmatchedLine(admin, batchId, { unparseable_line: trimmed });
-      continue;
+      await ingestProviderLine(admin, batchId, JSON.parse(value) as unknown);
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        await appendUnmatchedLine(admin, batchId, { unparseable_line: value });
+        continue;
+      }
+      throw error;
     }
-    await ingestProviderLine(admin, batchId, value);
   }
 }
 
@@ -589,17 +489,13 @@ export async function submitLessonBatch(input: {
 
   const admin = adminClient();
   const model = lessonModel();
-  const created = await admin
-    .from("lesson_generation_batches")
-    .insert({
-      jlpt_level: level,
-      requested_count: count,
-      model,
-      status: "planning",
-      created_by: input.userId,
-    })
-    .select("id")
-    .single();
+  const created = await admin.from("lesson_generation_batches").insert({
+    jlpt_level: level,
+    requested_count: count,
+    model,
+    status: "planning",
+    created_by: input.userId,
+  }).select("id").single();
   if (created.error || !created.data) {
     throw new Error(created.error?.message || "Generation batch could not be created.");
   }
@@ -614,7 +510,6 @@ export async function submitLessonBatch(input: {
         targetKanji: plan.targetKanji,
         targetGrammar: plan.targetGrammar,
       });
-      const requestBody = buildLessonRequestBody(prompt, model, level);
       return {
         generation_batch_id: batchId,
         custom_id: plan.customId,
@@ -623,7 +518,7 @@ export async function submitLessonBatch(input: {
         target_kanji: plan.targetKanji,
         target_grammar: plan.targetGrammar,
         prompt,
-        request_body: requestBody as unknown as Json,
+        request_body: buildLessonRequestBody(prompt, model, level) as unknown as Json,
         model,
         status: "planned",
       };
@@ -631,146 +526,99 @@ export async function submitLessonBatch(input: {
 
     const inserted = await admin.from("lesson_generation_requests").insert(rows);
     if (inserted.error) throw new Error(inserted.error.message);
-
-    const submitting = await admin
-      .from("lesson_generation_batches")
-      .update({ status: "submitting", updated_at: new Date().toISOString() })
-      .eq("id", batchId);
+    const submitting = await admin.from("lesson_generation_batches")
+      .update({ status: "submitting", updated_at: new Date().toISOString() }).eq("id", batchId);
     if (submitting.error) throw new Error(submitting.error.message);
 
-    const jsonl = rows
-      .map((row) => JSON.stringify({
-        custom_id: row.custom_id,
-        method: "POST",
-        url: "/v1/responses",
-        body: row.request_body,
-      }))
-      .join("\n");
+    const jsonl = rows.map((row) => JSON.stringify({
+      custom_id: row.custom_id,
+      method: "POST",
+      url: "/v1/responses",
+      body: row.request_body,
+    })).join("\n");
 
     const inputFileId = await uploadBatchInput(batchId, level, jsonl);
     const provider = await createProviderBatch(inputFileId, batchId, level);
     const providerBatchId = text(provider.id);
     if (!providerBatchId) throw new Error("OpenAI did not return a Batch id.");
-
     const now = new Date().toISOString();
     const [batchSaved, requestsSaved] = await Promise.all([
-      admin
-        .from("lesson_generation_batches")
-        .update({
-          status: providerStatus(provider.status),
-          provider_batch_id: providerBatchId,
-          provider_input_file_id: inputFileId,
-          provider_batch_object: provider as unknown as Json,
-          provider_request_counts: (provider.request_counts ?? {}) as Json,
-          submitted_at: now,
-          last_synced_at: now,
-          updated_at: now,
-        })
-        .eq("id", batchId),
-      admin
-        .from("lesson_generation_requests")
-        .update({ status: "submitted", updated_at: now })
-        .eq("generation_batch_id", batchId),
+      admin.from("lesson_generation_batches").update({
+        status: providerStatus(provider.status),
+        provider_batch_id: providerBatchId,
+        provider_input_file_id: inputFileId,
+        provider_batch_object: provider as unknown as Json,
+        provider_request_counts: (provider.request_counts ?? {}) as Json,
+        submitted_at: now,
+        last_synced_at: now,
+        updated_at: now,
+      }).eq("id", batchId),
+      admin.from("lesson_generation_requests")
+        .update({ status: "submitted", updated_at: now }).eq("generation_batch_id", batchId),
     ]);
     if (batchSaved.error || requestsSaved.error) {
-      throw new Error(
-        batchSaved.error?.message ||
-          requestsSaved.error?.message ||
-          "Batch state could not be saved.",
-      );
+      throw new Error(batchSaved.error?.message || requestsSaved.error?.message || "Batch state could not be saved.");
     }
-
     return { batchId, providerBatchId, requestedCount: count, level };
   } catch (error) {
-    await admin
-      .from("lesson_generation_batches")
-      .update({
-        status: "failed",
-        error_message: error instanceof Error
-          ? error.message.slice(0, 2_000)
-          : "Batch submission failed.",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", batchId);
+    await admin.from("lesson_generation_batches").update({
+      status: "failed",
+      error_message: error instanceof Error ? error.message.slice(0, 2_000) : "Batch submission failed.",
+      updated_at: new Date().toISOString(),
+    }).eq("id", batchId);
     throw error;
   }
 }
 
-export async function syncGenerationBatch(
-  batchId: string,
-): Promise<GenerationBatchSummary> {
+export async function syncGenerationBatch(batchId: string): Promise<GenerationBatchSummary> {
   const admin = adminClient();
-  const local = await admin
-    .from("lesson_generation_batches")
-    .select("*")
-    .eq("id", batchId)
-    .maybeSingle();
+  const local = await admin.from("lesson_generation_batches")
+    .select("*").eq("id", batchId).maybeSingle();
   if (local.error) throw new Error(local.error.message);
   if (!local.data) throw new Error("Generation batch not found.");
   const providerBatchId = text(local.data.provider_batch_id);
-  if (!providerBatchId) {
-    throw new Error("Generation batch has not been submitted to OpenAI yet.");
-  }
+  if (!providerBatchId) throw new Error("Generation batch has not been submitted to OpenAI yet.");
 
-  const provider = await retrieveProviderBatch(providerBatchId);
+  const provider = await openAIJson(`/batches/${encodeURIComponent(providerBatchId)}`, { method: "GET" });
   const status = providerStatus(provider.status);
   const outputFileId = text(provider.output_file_id);
   const errorFileId = text(provider.error_file_id);
   const now = new Date().toISOString();
-  const saved = await admin
-    .from("lesson_generation_batches")
-    .update({
-      status,
-      provider_output_file_id: outputFileId,
-      provider_error_file_id: errorFileId,
-      provider_batch_object: provider as unknown as Json,
-      provider_request_counts: (provider.request_counts ?? {}) as Json,
-      last_synced_at: now,
-      completed_at: TERMINAL_PROVIDER_STATUSES.has(status) ? now : null,
-      updated_at: now,
-    })
-    .eq("id", batchId);
+  const saved = await admin.from("lesson_generation_batches").update({
+    status,
+    provider_output_file_id: outputFileId,
+    provider_error_file_id: errorFileId,
+    provider_batch_object: provider as unknown as Json,
+    provider_request_counts: (provider.request_counts ?? {}) as Json,
+    last_synced_at: now,
+    completed_at: TERMINAL_PROVIDER_STATUSES.has(status) ? now : null,
+    updated_at: now,
+  }).eq("id", batchId);
   if (saved.error) throw new Error(saved.error.message);
 
-  if (outputFileId) {
-    await ingestJsonlFile(admin, batchId, await openAIFileContent(outputFileId));
-  }
-  if (errorFileId) {
-    await ingestJsonlFile(admin, batchId, await openAIFileContent(errorFileId));
-  }
+  if (outputFileId) await ingestJsonlFile(admin, batchId, await openAIFileContent(outputFileId));
+  if (errorFileId) await ingestJsonlFile(admin, batchId, await openAIFileContent(errorFileId));
 
   if (TERMINAL_PROVIDER_STATUSES.has(status) && status !== "completed") {
-    const pending = await admin
-      .from("lesson_generation_requests")
-      .update({
-        status: "api_failed",
-        provider_error: { type: "batch_terminal", batch_status: status } as unknown as Json,
-        validation_errors: [
-          `OpenAI Batch ended with status ${status} before this lesson completed.`,
-        ],
-        updated_at: now,
-      })
-      .eq("generation_batch_id", batchId)
-      .in("status", ["planned", "submitted", "api_completed"]);
+    const pending = await admin.from("lesson_generation_requests").update({
+      status: "api_failed",
+      provider_error: { type: "batch_terminal", batch_status: status } as unknown as Json,
+      validation_errors: [`OpenAI Batch ended with status ${status} before this lesson completed.`],
+      updated_at: now,
+    }).eq("generation_batch_id", batchId).in("status", ["planned", "submitted", "api_completed"]);
     if (pending.error) throw new Error(pending.error.message);
   }
-
   return getGenerationBatchSummary(batchId);
 }
 
-export async function syncActiveGenerationBatches(
-  limit = 10,
-): Promise<GenerationBatchSummary[]> {
+export async function syncActiveGenerationBatches(limit = 10): Promise<GenerationBatchSummary[]> {
   const admin = adminClient();
-  const result = await admin
-    .from("lesson_generation_batches")
-    .select("id")
+  const result = await admin.from("lesson_generation_batches").select("id")
     .in("status", [...ACTIVE_LOCAL_STATUSES])
     .not("provider_batch_id", "is", null)
     .order("created_at", { ascending: true })
     .limit(Math.max(1, Math.min(limit, 20)));
   if (result.error) throw new Error(result.error.message);
-
   const synced: GenerationBatchSummary[] = [];
   for (const row of result.data ?? []) {
     synced.push(await syncGenerationBatch(String(row.id)));
