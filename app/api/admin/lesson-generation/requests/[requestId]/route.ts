@@ -4,7 +4,7 @@ import {
   getGenerationRequest,
   importValidGenerationRequests,
   saveManualGenerationLesson,
-} from "@/lib/admin-lessons/jlpt-batch-generation";
+} from "@/lib/admin-lessons/lesson-generation-staging";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
