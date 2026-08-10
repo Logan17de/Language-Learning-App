@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { normalizeStoryPassage } from "../lib/gemini/story-pipeline-v3";
+import { CANONICAL_LESSON_PHASES } from "../lib/lesson-contract";
 
 const storyCall = readFileSync(
   "lib/gemini/adaptive-story-generation.ts",
@@ -97,7 +98,6 @@ const audioControl = readFileSync(
 const reading = readFileSync("components/lesson/reading-phase.tsx", "utf8");
 const listening = readFileSync("components/lesson/listening-phase.tsx", "utf8");
 const speaking = readFileSync("components/lesson/speaking-phase.tsx", "utf8");
-const lessonMapper = readFileSync("lib/repositories/lesson-mapper.ts", "utf8");
 const storedAudio = readFileSync("lib/audio/audio-library.ts", "utf8");
 const migration = readFileSync(
   "supabase/migrations/20260730070000_story_pipeline_and_kanji_exposure.sql",
@@ -264,7 +264,7 @@ describe("custom lesson story pipeline v3", () => {
     expect(activityGroups).toContain("vocabularyQuestionsSchema");
     expect(activityGroups).toContain("strictSchema: true");
     expect(activityGroups).toContain("exactSchemaName: true");
-    expect(activityGroups).toContain("Vocabulary response must contain at least one question.");
+    expect(activityGroups).toContain("Vocabulary response must contain exactly 13 questions.");
     expect(activityGroups).toContain("targetItemIds: targetId ? [targetId] : []");
     expect(activityGroups).not.toContain(
       "does not target vocabulary or allowed kanji from the story",
@@ -284,8 +284,8 @@ describe("custom lesson story pipeline v3", () => {
     expect(activityGroups).toContain('withTerms(question, "vocabulary")');
     expect(activityGroups).toContain('withTerms(question, "grammar")');
     expect(activityGroups).toContain('["listening", exercise.prompt, exercise.correctAnswer]');
-    expect(activityGroups).toContain(
-      '["review", question.category, question.prompt, question.correctAnswer]',
+    expect(activityGroups.replace(/\s+/g, " ")).toContain(
+      '"review", question.category, question.prompt, question.correctAnswer,',
     );
     expect(activityGroups).toContain("shuffledChoices(");
   });
@@ -297,7 +297,7 @@ describe("custom lesson story pipeline v3", () => {
     expect(activityGroups).toContain("rawGrammarQuestionIssues");
     expect(activityGroups).toContain("adaptGrammarQuestions");
     expect(activityGroups).toContain("filterStoryGrammarPatterns");
-    expect(activityGroups).toContain("Grammar response must contain at least one question.");
+    expect(activityGroups).toContain("Grammar response must contain exactly 10 questions.");
     expect(activityGroups).toContain("targetItemIds: target ? [target.libraryId] : []");
     expect(activityGroups).not.toContain(
       "does not test a provided grammar pattern from the story",
@@ -364,13 +364,16 @@ describe("custom lesson story pipeline v3", () => {
     expect(speakingMigration).toContain("question_type = 'read_aloud'");
   });
 
-  it("places speaking between grammar and reading and shows the target sentence", () => {
-    expect(lessonMapper.indexOf('id: "grammar"')).toBeLessThan(
-      lessonMapper.indexOf('id: "speaking"'),
-    );
-    expect(lessonMapper.indexOf('id: "speaking"')).toBeLessThan(
-      lessonMapper.indexOf('id: "reading"'),
-    );
+  it("keeps canonical phase order and shows the speaking target sentence", () => {
+    expect(CANONICAL_LESSON_PHASES.map((phase) => phase.id)).toEqual([
+      "story",
+      "vocabulary",
+      "grammar",
+      "reading",
+      "listening",
+      "speaking",
+      "review",
+    ]);
     expect(speaking).toContain("Read the sentence aloud");
     expect(speaking).toContain("text={exercise.modelAnswer}");
     expect(speaking).not.toContain("AudioControl");

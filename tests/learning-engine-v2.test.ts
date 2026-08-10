@@ -42,8 +42,8 @@ describe("learning engine V2 contracts", () => {
     expect(storyLengthRange("N1")).toEqual({ min: 18, max: 20 });
   });
 
-  it("keeps seed lessons compatible with the stored ten-question phases", () => {
-    expect(commuteLesson.vocabularyQuestions).toHaveLength(10);
+  it("keeps seed lessons compatible with the canonical activity counts", () => {
+    expect(commuteLesson.vocabularyQuestions).toHaveLength(13);
     expect(commuteLesson.grammarQuestions).toHaveLength(10);
     expect(
       commuteLesson.vocabularyQuestions.every(

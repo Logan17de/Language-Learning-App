@@ -1,5 +1,6 @@
 import type { LessonPackage } from "@/types/lesson";
 import { fallbackStoryWords } from "@/lib/story-support";
+import { canonicalLessonPhases } from "@/lib/lesson-contract";
 
 function mockStoryLine(
   id: string,
@@ -14,6 +15,77 @@ function mockStoryLine(
     tappableTerms,
     words: fallbackStoryWords(id, japanese, tappableTerms, []),
   };
+}
+
+function demoReadingQuestions(): NonNullable<LessonPackage["readingQuestions"]> {
+  const difficulties = ["easy", "easy", "medium", "medium", "hard"] as const;
+  return difficulties.map((difficulty, index) => ({
+    id: `reading_demo_${index + 1}`,
+    difficulty,
+    question: index === 0
+      ? "ゆきさんは何時に起きますか。"
+      : "ゆきさんの朝について日本語で答えてください。",
+    answer: index === 0
+      ? "ゆきさんは六時半に起きます。"
+      : "ゆきさんは朝、準備をして駅へ行きます。",
+  }));
+}
+
+function demoListeningExercises(): LessonPackage["listeningExercises"] {
+  return Array.from({ length: 5 }, (_, index) => ({
+    id: `listen_${index + 1}`,
+    prompt: index === 0
+      ? "Where does Yuki meet Tanaka?"
+      : "What are Yuki and Tanaka talking about?",
+    choices: ["At the ticket gate", "At the café", "At the office", "On the bus"],
+    correctAnswer: "At the ticket gate",
+    explanation: "The conversation says they meet at the ticket gate.",
+    transcript: "田中：おはようございます。\nゆき：おはようございます。\n田中：改札で会いましたね。\nゆき：はい。\n田中：一緒に行きましょう。",
+    conversationLines: [
+      "田中：おはようございます。",
+      "ゆき：おはようございます。",
+      "田中：改札で会いましたね。",
+      "ゆき：はい。",
+      "田中：一緒に行きましょう。",
+    ],
+    difficulty: index < 2 ? ("Easy" as const) : index < 4 ? ("Medium" as const) : ("Hard" as const),
+  }));
+}
+
+function demoSpeakingExercises(): LessonPackage["speakingExercises"] {
+  const modes = ["easy", "easy", "medium", "medium", "hard"] as const;
+  const sentences = [
+    "ゆきさんは駅まで歩きます。",
+    "ゆきさんは会社へ行きます。",
+    "音楽を聞きながら、駅まで歩きます。",
+    "改札で田中さんに会って、一緒に電車に乗ります。",
+    "最近、ゆきさんは早く起きられるようになり、朝の時間を上手に使っています。",
+  ];
+  return modes.map((mode, index) => ({
+    id: `speak_${index + 1}`,
+    prompt: sentences[index],
+    modelAnswer: sentences[index],
+    expectedAnswer: sentences[index],
+    questionType: "read_aloud",
+    mode,
+  }));
+}
+
+function demoReviewQuestions(): LessonPackage["reviewQuestions"] {
+  const categories = ["kanji", "vocabulary", "grammar", "listening", "speaking"] as const;
+  return categories.map((category, index) => ({
+    id: `review_${index + 1}`,
+    category,
+    questionType: "multiple-choice",
+    prompt: index === 0 ? "What is the reading of 駅?" : "Choose the lesson answer.",
+    choices: index === 0
+      ? ["えき", "いき", "えぎ", "いけ"]
+      : ["At the ticket gate", "At the café", "At the office", "On the bus"],
+    correctAnswer: index === 0 ? "えき" : "At the ticket gate",
+    explanation: index === 0
+      ? "駅 is read えき and means station."
+      : "This answer matches the lesson context.",
+  }));
 }
 
 const commuteLessonBase: Omit<
@@ -88,37 +160,12 @@ const commuteLessonBase: Omit<
     { speaker: "ゆき", japanese: "最近、早く起きられるようになったんです。", english: "Recently, I’ve become able to wake up early." },
     { speaker: "田中", japanese: "電車で話しながら行きましょう。", english: "Let’s go while chatting on the train." },
   ],
-  listeningExercises: [
-    {
-      id: "listen_1",
-      prompt: "Where does Yuki meet Tanaka?",
-      choices: ["At the café", "At the ticket gate", "At the office", "On the bus"],
-      correctAnswer: "At the ticket gate",
-      explanation: "The speaker says 改札で田中さんに会います.",
-    },
-  ],
-  speakingExercises: [
-    { id: "speak_1", prompt: "Say what you do while commuting.", modelAnswer: "音楽を聞きながら、会社へ行きます。", mode: "medium" },
-  ],
-  reviewQuestions: [
-    {
-      id: "review_1",
-      prompt: "What is the reading of 駅?",
-      choices: ["えき", "いき", "えぎ", "いけ"],
-      correctAnswer: "えき",
-      explanation: "駅 is read えき and means station.",
-    },
-  ],
+  readingQuestions: demoReadingQuestions(),
+  listeningExercises: demoListeningExercises(),
+  speakingExercises: demoSpeakingExercises(),
+  reviewQuestions: demoReviewQuestions(),
   answerKeys: ["えき", "At the ticket gate", "音楽を聞きながら、会社へ行きます。"],
-  phases: [
-    { id: "story", label: "Story", description: "Meet today’s language in context" },
-    { id: "vocabulary", label: "Words & kanji", description: "Build fast recognition" },
-    { id: "grammar", label: "Grammar", description: "Understand two useful patterns" },
-    { id: "speaking", label: "Speaking", description: "Answer the story questions aloud" },
-    { id: "reading", label: "Read aloud", description: "Practice rhythm and recognition" },
-    { id: "listening", label: "Listening", description: "Listen for meaning" },
-    { id: "review", label: "Final review", description: "Retrieve without hints" },
-  ],
+  phases: canonicalLessonPhases(),
 };
 
 function seedChoices(values: string[], answer: string): string[] {
@@ -131,36 +178,27 @@ function seedVocabularyQuestions(
   const readings = vocabulary.map((item) => item.reading);
   const meanings = vocabulary.map((item) => item.meaning);
 
-  return vocabulary.flatMap((item, index) => [
-    {
-      id: `seed_vocab_reading_${index + 1}`,
-      mode: "kanji-reading" as const,
-      modeLabel: "Kanji → reading",
-      difficulty: "Easy" as const,
-      prompt: `How do you read ${item.term}?`,
-      cue: item.term,
-      choices: seedChoices(readings, item.reading),
-      correctAnswer: item.reading,
-      acceptedAnswers: [item.reading],
-      explanation: `${item.term} is read ${item.reading}.`,
+  return Array.from({ length: 13 }, (_, index) => {
+    const item = vocabulary[index % vocabulary.length];
+    const reading = index % 2 === 0;
+    const difficulty = index < 6 ? ("Easy" as const) : index < 10 ? ("Medium" as const) : ("Hard" as const);
+    return {
+      id: `seed_vocab_${index + 1}`,
+      mode: reading ? ("kanji-reading" as const) : ("reading-meaning" as const),
+      modeLabel: reading ? "Kanji → reading" : "Reading → meaning",
+      difficulty,
+      prompt: reading ? `How do you read ${item.term}?` : `What does ${item.reading} mean?`,
+      cue: reading ? item.term : item.reading,
+      choices: seedChoices(reading ? readings : meanings, reading ? item.reading : item.meaning),
+      correctAnswer: reading ? item.reading : item.meaning,
+      acceptedAnswers: [reading ? item.reading : item.meaning],
+      explanation: reading
+        ? `${item.term} is read ${item.reading}.`
+        : `${item.reading} means ${item.meaning}.`,
       targetItemIds: item.libraryId ? [item.libraryId] : [],
       inspectableTerms: [],
-    },
-    {
-      id: `seed_vocab_meaning_${index + 1}`,
-      mode: "reading-meaning" as const,
-      modeLabel: "Reading → meaning",
-      difficulty: "Easy" as const,
-      prompt: `What does ${item.reading} mean?`,
-      cue: item.reading,
-      choices: seedChoices(meanings, item.meaning),
-      correctAnswer: item.meaning,
-      acceptedAnswers: [item.meaning],
-      explanation: `${item.reading} means ${item.meaning}.`,
-      targetItemIds: item.libraryId ? [item.libraryId] : [],
-      inspectableTerms: [],
-    },
-  ]);
+    };
+  });
 }
 
 function seedGrammarQuestions(
@@ -174,11 +212,12 @@ function seedGrammarQuestions(
 
   return Array.from({ length: 10 }, (_, index) => {
     const point = grammar[index % grammar.length];
+    const difficulty = index < 3 ? ("Easy" as const) : index < 7 ? ("Medium" as const) : ("Hard" as const);
     return {
       id: `seed_grammar_${index + 1}`,
       type: "multiple-choice" as const,
       skill: "understanding" as const,
-      difficulty: index < 4 ? ("Easy" as const) : ("Medium" as const),
+      difficulty,
       answerMode: "choice" as const,
       prompt: `What does ${point.pattern} express?`,
       cue: point.example,

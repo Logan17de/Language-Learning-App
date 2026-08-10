@@ -10,8 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { selectNextAdaptiveQuestionIndex } from "@/lib/adaptive-difficulty";
+import { CANONICAL_LESSON_ACTIVITY_COUNTS } from "@/lib/lesson-contract";
 
-const QUESTION_TARGET = 10;
+const QUESTION_TARGET = CANONICAL_LESSON_ACTIVITY_COUNTS.vocabulary;
 
 export function VocabularyPhase({
   lesson,
@@ -41,7 +42,7 @@ export function VocabularyPhase({
       : Math.min(session.activityIndex, vocabularyQuestions.length - 1);
   const question = vocabularyQuestions[currentIndex];
   const answer = session.vocabularyAnswers.find((item) => item.questionId === question.id);
-  const roundComplete = answeredCount >= Math.min(QUESTION_TARGET, vocabularyQuestions.length);
+  const roundComplete = answeredCount >= QUESTION_TARGET;
 
   function select(selectedAnswer: string) {
     if (answer) return;
@@ -81,12 +82,12 @@ export function VocabularyPhase({
             <Badge tone="neutral">{question.modeLabel}</Badge>
           </div>
           <h2 className="mt-4 text-3xl font-semibold tracking-tight">Vocabulary & kanji</h2>
-          <p className="mt-2 text-sm leading-6 text-stone-500">Ten questions build from direct recognition to vocabulary in context.</p>
+          <p className="mt-2 text-sm leading-6 text-stone-500">Thirteen questions build from direct recognition to vocabulary in context.</p>
         </div>
-        <p className="shrink-0 text-sm font-semibold text-stone-500">{Math.min(answeredCount + (answer ? 0 : 1), QUESTION_TARGET)} / {Math.min(QUESTION_TARGET, vocabularyQuestions.length)}</p>
+        <p className="shrink-0 text-sm font-semibold text-stone-500">{Math.min(answeredCount + (answer ? 0 : 1), QUESTION_TARGET)} / {QUESTION_TARGET}</p>
       </div>
 
-      <ProgressBar value={(answeredCount / Math.min(QUESTION_TARGET, vocabularyQuestions.length)) * 100} className="mt-5" />
+      <ProgressBar value={(answeredCount / QUESTION_TARGET) * 100} className="mt-5" />
 
       <div className="mt-9 rounded-4xl border border-black/[.06] bg-white p-6 shadow-card sm:p-9">
         <MultipleChoiceCard

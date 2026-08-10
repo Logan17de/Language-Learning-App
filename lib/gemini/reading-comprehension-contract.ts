@@ -26,6 +26,8 @@ export const readingQuestionsSchema: JsonSchema = {
   properties: {
     questions: {
       type: "array",
+      minItems: 5,
+      maxItems: 5,
       items: {
         type: "object",
         properties: {
@@ -107,6 +109,7 @@ Story:
 ${input.japaneseStory}
 
 Requirements:
+- Create exactly 5 questions: 2 easy, 2 medium, and 1 hard.
 - Base every question only on the story.
 - Write essay-style questions in Japanese.
 - Require answers in short, complete Japanese sentences.
