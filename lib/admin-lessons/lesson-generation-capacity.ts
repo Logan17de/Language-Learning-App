@@ -69,7 +69,7 @@ export async function getLessonTargetCapacity(
   const kanjiKeys = [...new Set(
     (kanjiResult.data ?? [])
       .map((row) => record(row) ? text(row.character) : null)
-      .filter((value): value is string => Boolean(value) && [...value].length === 1),
+      .filter((value): value is string => typeof value === "string" && [...value].length === 1),
   )];
 
   const total = combinationCount(kanjiKeys.length, TARGET_KANJI_COUNT);
