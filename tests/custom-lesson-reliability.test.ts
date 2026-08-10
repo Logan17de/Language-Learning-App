@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   classifyGenerationError,
@@ -12,6 +12,7 @@ import {
   partitionNonEmptySentences,
   partitionReadingPassage,
 } from "@/lib/custom-lessons/reading-lines";
+import { customLessonWorkerAuthorized } from "@/lib/custom-lessons/worker-authorization";
 
 const migration = readFileSync(
   "supabase/migrations/20260810090000_stage_based_custom_lesson_jobs.sql",
@@ -19,6 +20,15 @@ const migration = readFileSync(
 );
 const statusRoute = readFileSync("app/api/custom-lessons/status/route.ts", "utf8");
 const workerRoute = readFileSync("app/api/internal/custom-lessons/process/route.ts", "utf8");
+const workerAuthorization = readFileSync(
+  "lib/custom-lessons/worker-authorization.ts",
+  "utf8",
+);
+const generateRoute = readFileSync("app/api/custom-lessons/generate/route.ts", "utf8");
+const schedulerMigration = readFileSync(
+  "supabase/migrations/20260810100000_supabase_custom_lesson_scheduler.sql",
+  "utf8",
+);
 
 describe("custom lesson retry reliability", () => {
   it("classifies transient failures and applies bounded exponential backoff", () => {
@@ -74,10 +84,47 @@ describe("custom lesson retry reliability", () => {
   });
 
   it("authorizes both scheduler and manual worker secrets without exposing the route", () => {
-    expect(workerRoute).toContain("process.env.CUSTOM_LESSON_WORKER_SECRET");
-    expect(workerRoute).toContain("process.env.CRON_SECRET");
-    expect(workerRoute).toContain("secrets.some");
+    const environment = {
+      CUSTOM_LESSON_WORKER_SECRET: "scheduler-secret-value",
+      CRON_SECRET: "manual-secret-value",
+    };
+    expect(customLessonWorkerAuthorized(null, environment)).toBe(false);
+    expect(customLessonWorkerAuthorized("Bearer wrong-secret", environment)).toBe(false);
+    expect(customLessonWorkerAuthorized("scheduler-secret-value", environment)).toBe(false);
+    expect(customLessonWorkerAuthorized("Bearer scheduler-secret-value", environment)).toBe(true);
+    expect(customLessonWorkerAuthorized("Bearer manual-secret-value", environment)).toBe(true);
+    expect(workerRoute).toContain("customLessonWorkerAuthorized");
+    expect(workerAuthorization).toContain("timingSafeEqual");
     expect(migration).toContain("Service role required");
+  });
+
+  it("uses one idempotent Supabase schedule with Vault-backed worker credentials", () => {
+    expect(existsSync("vercel.json")).toBe(false);
+    expect(schedulerMigration).toContain("create extension if not exists pg_cron");
+    expect(schedulerMigration).toContain("create extension if not exists pg_net");
+    expect(schedulerMigration).toContain("create extension if not exists supabase_vault");
+    expect(schedulerMigration).toContain("custom_lesson_worker_url");
+    expect(schedulerMigration).toContain("custom_lesson_worker_secret");
+    expect(schedulerMigration).toContain("perform cron.unschedule(v_existing_job_id)");
+    expect(schedulerMigration).toContain("'custom-lesson-worker-every-minute'");
+    expect(schedulerMigration).toContain("'* * * * *'");
+    expect(schedulerMigration).toContain("timeout_milliseconds := 285000");
+    expect(schedulerMigration).toContain("'Authorization', 'Bearer ' || v_worker_secret");
+  });
+
+  it("surfaces missing scheduler configuration before creating a durable job", () => {
+    const diagnosticsCall = generateRoute.indexOf(
+      "await getCustomLessonSchedulerDiagnostics()",
+    );
+    const beginCall = generateRoute.indexOf(
+      'client.rpc("begin_custom_lesson_generation_v4"',
+    );
+    expect(diagnosticsCall).toBeGreaterThan(-1);
+    expect(diagnosticsCall).toBeLessThan(beginCall);
+    expect(generateRoute).toContain("CUSTOM_LESSON_SCHEDULER_UNAVAILABLE");
+    expect(workerRoute).toContain('searchParams.get("diagnostics") === "1"');
+    expect(schedulerMigration).toContain("custom_lesson_scheduler_diagnostics");
+    expect(schedulerMigration).toContain("Custom lesson scheduler");
   });
 
   it("never creates empty Japanese reading lines when the model returns fewer sentences", () => {

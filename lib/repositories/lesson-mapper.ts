@@ -3,74 +3,14 @@ import type {
   GrammarQuestion,
   KanjiItem,
   LessonPackage,
-  LessonPhase,
   StoryWord,
   VocabularyQuestion,
 } from "@/types/lesson";
 import type { Json } from "@/types/database";
-import { fallbackStoryWords } from "@/lib/story-support";
-
-const defaultPhases: LessonPhase[] = [
-  {
-    id: "story",
-    label: "Story",
-    description: "Meet today’s language in context",
-  },
-  {
-    id: "vocabulary",
-    label: "Words & kanji",
-    description: "Build fast recognition",
-  },
-  {
-    id: "grammar",
-    label: "Grammar",
-    description: "Understand useful patterns",
-  },
-  {
-    id: "speaking",
-    label: "Speaking",
-    description: "Read each displayed sentence aloud",
-  },
-  {
-    id: "reading",
-    label: "Reading",
-    description: "Read closely and answer in Japanese",
-  },
-  {
-    id: "listening",
-    label: "Listening",
-    description: "Listen for meaning",
-  },
-  {
-    id: "review",
-    label: "Final review",
-    description: "Retrieve without hints",
-  },
-];
+import { normalizeLessonPhases } from "@/lib/lesson-contract";
 
 function record(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
-}
-
-function phases(value: CanonicalLesson["version"]["phases"]): LessonPhase[] {
-  if (!Array.isArray(value) || value.length !== 7) return defaultPhases;
-  const parsed = value.flatMap((item) => {
-    if (!record(item)) return [];
-    const id = item.id;
-    const label = item.label;
-    const description = item.description;
-    if (
-      !defaultPhases.some((phase) => phase.id === id) ||
-      typeof label !== "string" ||
-      typeof description !== "string"
-    ) {
-      return [];
-    }
-    return [{ id, label, description } as LessonPhase];
-  });
-  if (parsed.length !== 7) return defaultPhases;
-  const byId = new Map(parsed.map((phase) => [phase.id, phase]));
-  return defaultPhases.map((phase) => byId.get(phase.id) ?? phase);
 }
 
 function metadataText(metadata: Json, key: string): string | undefined {
@@ -152,73 +92,6 @@ function inspectableTerms(value: Json | undefined): StoryWord[] {
         basePronunciationScore: 100,
       },
     ];
-  });
-}
-
-function choices(correct: string, pool: string[]): string[] {
-  const result = [
-    correct,
-    ...pool.filter((item) => item && item !== correct),
-  ].filter((item, index, all) => all.indexOf(item) === index);
-  while (result.length < 4) result.push(`Other answer ${result.length}`);
-  return result.slice(0, 4);
-}
-
-function fallbackVocabularyQuestions(
-  vocabulary: LessonPackage["vocabulary"],
-): VocabularyQuestion[] {
-  if (!vocabulary.length) return [];
-  const readings = vocabulary.map((item) => item.reading);
-  const meanings = vocabulary.map((item) => item.meaning);
-  return Array.from({ length: 10 }, (_, index) => {
-    const item = vocabulary[index % vocabulary.length];
-    const reading = index % 2 === 0;
-    return {
-      id: `fallback-vocabulary-${index}-${item.term}`,
-      mode: reading ? "kanji-reading" : "reading-meaning",
-      modeLabel: reading ? "Word → Reading" : "Reading → Meaning",
-      difficulty: index < 3 ? "Easy" : index < 7 ? "Medium" : "Hard",
-      prompt: reading
-        ? "Choose the correct reading."
-        : "Choose the closest meaning.",
-      cue: reading ? item.term : item.reading,
-      choices: choices(
-        reading ? item.reading : item.meaning,
-        reading ? readings : meanings,
-      ),
-      correctAnswer: reading ? item.reading : item.meaning,
-      acceptedAnswers: [reading ? item.reading : item.meaning],
-      explanation: `${item.term}（${item.reading}）means ${item.meaning}.`,
-      targetItemIds: item.libraryId ? [item.libraryId] : [],
-      inspectableTerms: [],
-    };
-  });
-}
-
-function fallbackGrammarQuestions(
-  grammar: LessonPackage["grammar"],
-): GrammarQuestion[] {
-  if (!grammar.length) return [];
-  const meanings = grammar.map((item) => item.meaning);
-  return Array.from({ length: 10 }, (_, index) => {
-    const item = grammar[index % grammar.length];
-    return {
-      id: `fallback-grammar-${index}-${item.id}`,
-      type: "multiple-choice",
-      skill: "understanding",
-      difficulty: index < 3 ? "Easy" : index < 7 ? "Medium" : "Hard",
-      answerMode: "choice",
-      prompt: "Choose the meaning of this grammar pattern.",
-      cue: item.pattern,
-      choices: choices(item.meaning, meanings),
-      correctAnswer: item.meaning,
-      acceptedAnswers: [item.meaning],
-      explanation: `${item.pattern} means ${item.meaning}.`,
-      hintFront: item.structure,
-      hintBack: item.example,
-      targetItemIds: item.libraryId ? [item.libraryId] : [],
-      inspectableTerms: [],
-    };
   });
 }
 
@@ -328,18 +201,7 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
     commonMistake: item.common_mistake,
   }));
   const practice = practiceQuestions(value.practice);
-  const storedKanji = metadataKanji(value.version.metadata);
-  const kanji =
-    storedKanji.length > 0
-      ? storedKanji
-      : value.vocabulary
-          .filter((item) => /\p{Script=Han}/u.test(item.written_form))
-          .slice(0, 5)
-          .map((item) => ({
-            character: item.written_form,
-            reading: item.reading,
-            meaning: item.meaning,
-          }));
+  const kanji = metadataKanji(value.version.metadata);
 
   const result: LessonPackage = {
     id: lesson.legacy_id ?? lesson.id,
@@ -375,17 +237,13 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
     grammar,
     kanji,
     vocabulary,
-    vocabularyQuestions:
-      practice.vocabulary.length > 0
-        ? practice.vocabulary
-        : fallbackVocabularyQuestions(vocabulary),
-    grammarQuestions:
-      practice.grammar.length > 0
-        ? practice.grammar
-        : fallbackGrammarQuestions(grammar),
+    // A missing practice region is malformed lesson data. Do not manufacture
+    // learner-facing questions or distractors in the mapper.
+    vocabularyQuestions: practice.vocabulary,
+    grammarQuestions: practice.grammar,
     reviewItems: value.version.review_items,
     story: value.story.map((item) => {
-      const storedWords = value.storyWords
+      const words = value.storyWords
         .filter((word) => word.story_line_id === item.id)
         .sort((left, right) => left.position - right.position)
         .map((word) => ({
@@ -401,15 +259,6 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
           baseRecognitionScore: word.recognition_score,
           basePronunciationScore: word.pronunciation_score,
         }));
-      const words =
-        storedWords.length > 0
-          ? storedWords
-          : fallbackStoryWords(
-              item.id,
-              item.japanese_text,
-              item.tappable_terms,
-              vocabulary,
-            );
       return {
         id: item.id,
         japanese: item.japanese_text,
@@ -517,7 +366,7 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
       targetItemIds: item.target_item_ids,
     })),
     answerKeys: value.version.answer_keys,
-    phases: phases(value.version.phases),
+    phases: normalizeLessonPhases(value.version.phases),
     runtimeAudio:
       metadataText(value.version.metadata, "runtimeAudio") === "browser_tts"
         ? "browser_tts"

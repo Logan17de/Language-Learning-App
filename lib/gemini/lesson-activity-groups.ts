@@ -155,7 +155,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
-function objectArray(minItems: number, maxItems: number, items: JsonSchema): JsonSchema {
+function objectArray(
+  minItems: number,
+  maxItems: number,
+  items: JsonSchema,
+): JsonSchema {
   return { type: "array", minItems, maxItems, items };
 }
 
@@ -206,41 +210,101 @@ function libraryIds(library: ResolvedLessonLibrary): Set<string> {
   ]);
 }
 
-function reviewIssues(value: unknown, library: ResolvedLessonLibrary): string[] {
-  return activityGroupCheckpointIssues("final_review", value, libraryIds(library));
+function difficultySplitIssues(
+  questions: unknown[],
+  expected: { easy: number; medium: number; hard: number },
+  label: string,
+): string[] {
+  const values = questions.map((question) =>
+    isRecord(question) ? question.difficulty : null,
+  );
+  const easy = values.filter((value) => value === "easy").length;
+  const medium = values.filter((value) => value === "medium").length;
+  const hard = values.filter((value) => value === "hard").length;
+  return easy === expected.easy &&
+    medium === expected.medium &&
+    hard === expected.hard
+    ? []
+    : [
+        `${label} response must contain ${expected.easy} easy, ${expected.medium} medium, and ${expected.hard} hard questions.`,
+      ];
 }
 
-function context(input: {
-  draft: StoryDraft;
-  library: ResolvedLessonLibrary;
-}, include: Array<"kanji" | "vocabulary" | "grammar">): Record<string, unknown> {
+function reviewIssues(
+  value: unknown,
+  library: ResolvedLessonLibrary,
+): string[] {
+  const issues = activityGroupCheckpointIssues(
+    "final_review",
+    value,
+    libraryIds(library),
+  );
+  if (!isRecord(value) || !Array.isArray(value.reviewQuestions)) {
+    return ["Review response must contain exactly 5 questions.", ...issues];
+  }
+  if (value.reviewQuestions.length !== 5) {
+    return ["Review response must contain exactly 5 questions.", ...issues];
+  }
+  const categories = value.reviewQuestions.map((question) =>
+    isRecord(question) ? question.category : null,
+  );
+  const required = [
+    "kanji",
+    "vocabulary",
+    "grammar",
+    "listening",
+    "speaking",
+  ];
+  const categoryIssues = required.every(
+    (category) => categories.filter((value) => value === category).length === 1,
+  )
+    ? []
+    : [
+        "Review response must contain exactly one kanji, vocabulary, grammar, listening, and speaking question.",
+      ];
+  return [...categoryIssues, ...issues];
+}
+
+function context(
+  input: {
+    draft: StoryDraft;
+    library: ResolvedLessonLibrary;
+  },
+  include: Array<"kanji" | "vocabulary" | "grammar">,
+): Record<string, unknown> {
   return {
     fixedStory: input.draft.lines,
-    ...(include.includes("kanji") ? {
-      kanji: input.library.kanji.map((item) => ({
-        id: item.libraryId,
-        character: item.character,
-        readings: item.readings,
-        meanings: item.meanings,
-      })),
-    } : {}),
-    ...(include.includes("vocabulary") ? {
-      vocabulary: input.library.vocabulary.map((item) => ({
-        id: item.libraryId,
-        term: item.term,
-        reading: item.reading,
-        meaning: item.meaning,
-        example: item.exampleSentence,
-      })),
-    } : {}),
-    ...(include.includes("grammar") ? {
-      grammar: input.library.grammar.map((item) => ({
-        id: item.libraryId,
-        pattern: item.pattern,
-        meaning: item.meaning,
-        formation: item.formation,
-      })),
-    } : {}),
+    ...(include.includes("kanji")
+      ? {
+          kanji: input.library.kanji.map((item) => ({
+            id: item.libraryId,
+            character: item.character,
+            readings: item.readings,
+            meanings: item.meanings,
+          })),
+        }
+      : {}),
+    ...(include.includes("vocabulary")
+      ? {
+          vocabulary: input.library.vocabulary.map((item) => ({
+            id: item.libraryId,
+            term: item.term,
+            reading: item.reading,
+            meaning: item.meaning,
+            example: item.exampleSentence,
+          })),
+        }
+      : {}),
+    ...(include.includes("grammar")
+      ? {
+          grammar: input.library.grammar.map((item) => ({
+            id: item.libraryId,
+            pattern: item.pattern,
+            meaning: item.meaning,
+            formation: item.formation,
+          })),
+        }
+      : {}),
   };
 }
 
@@ -284,14 +348,24 @@ function targetIdForVocabularyQuestion(
   );
   if (exactVocabulary) return exactVocabulary.libraryId;
 
-  const contextualVocabulary = library.vocabulary.find((item) =>
-    [item.term, item.reading, item.meaning]
-      .filter(Boolean)
-      .some((value) => evidence.includes(value)),
+  const contextualVocabulary = inputLibraryVocabularyMatch(
+    library,
+    evidence,
   );
   if (contextualVocabulary) return contextualVocabulary.libraryId;
 
   return null;
+}
+
+function inputLibraryVocabularyMatch(
+  library: ResolvedLessonLibrary,
+  evidence: string,
+) {
+  return library.vocabulary.find((item) =>
+    [item.term, item.reading, item.meaning]
+      .filter(Boolean)
+      .some((value) => evidence.includes(value)),
+  );
 }
 
 function rawVocabularyQuestionIssues(
@@ -299,12 +373,17 @@ function rawVocabularyQuestionIssues(
   library: ResolvedLessonLibrary,
 ): string[] {
   if (!isRecord(value) || !Array.isArray(value.questions)) {
-    return ["Vocabulary response must contain a questions array."];
+    return ["Vocabulary response must contain exactly 13 questions."];
   }
   const issues: string[] = [];
   if (value.questions.length !== 13) {
-    issues.push(`Vocabulary response must contain exactly 13 questions; received ${value.questions.length}.`);
+    issues.push("Vocabulary response must contain exactly 13 questions.");
   }
+  issues.push(...difficultySplitIssues(
+    value.questions,
+    { easy: 6, medium: 4, hard: 3 },
+    "Vocabulary",
+  ));
   value.questions.forEach((raw, index) => {
     if (!isRecord(raw)) {
       issues.push(`Vocabulary question ${index + 1} must be an object.`);
@@ -381,13 +460,13 @@ function storyGrammarTargets(
   library: ResolvedLessonLibrary,
 ): ResolvedLessonLibrary["grammar"] {
   const story = draft.lines.map((line) => line.japanese).join("");
-  const allowedPatterns = new Set(filterStoryGrammarPatterns({
-    japaneseStory: story,
-    targetGrammarPatterns: library.grammar.map((item) => item.pattern),
-  }));
-  return library.grammar.filter((item) =>
-    allowedPatterns.has(item.pattern),
+  const allowedPatterns = new Set(
+    filterStoryGrammarPatterns({
+      japaneseStory: story,
+      targetGrammarPatterns: library.grammar.map((item) => item.pattern),
+    }),
   );
+  return library.grammar.filter((item) => allowedPatterns.has(item.pattern));
 }
 
 function grammarTargetsForQuestion(
@@ -411,12 +490,17 @@ function rawGrammarQuestionIssues(
   targets: ResolvedLessonLibrary["grammar"],
 ): string[] {
   if (!isRecord(value) || !Array.isArray(value.questions)) {
-    return ["Grammar response must contain a questions array."];
+    return ["Grammar response must contain exactly 10 questions."];
   }
   const issues: string[] = [];
   if (value.questions.length !== 10) {
-    issues.push(`Grammar response must contain exactly 10 questions; received ${value.questions.length}.`);
+    issues.push("Grammar response must contain exactly 10 questions.");
   }
+  issues.push(...difficultySplitIssues(
+    value.questions,
+    { easy: 3, medium: 4, hard: 3 },
+    "Grammar",
+  ));
   value.questions.forEach((raw, index) => {
     if (!isRecord(raw)) {
       issues.push(`Grammar question ${index + 1} must be an object.`);
@@ -539,9 +623,10 @@ export async function generateGrammarAndReadingActivities(input: {
     },
     audit: {
       stage: "grammar_reading_activities",
-      model: grammar.model === reading.audit.model
-        ? grammar.model
-        : `${grammar.model}, ${reading.audit.model}`,
+      model:
+        grammar.model === reading.audit.model
+          ? grammar.model
+          : `${grammar.model}, ${reading.audit.model}`,
       repaired: grammar.repaired || reading.audit.repaired,
     },
   };
@@ -577,9 +662,10 @@ export async function generateListeningAndSpeakingActivities(input: {
     },
     audit: {
       stage: "communication_activities",
-      model: listening.audit.model === speaking.audit.model
-        ? speaking.audit.model
-        : `${listening.audit.model}, ${speaking.audit.model}`,
+      model:
+        listening.audit.model === speaking.audit.model
+          ? speaking.audit.model
+          : `${listening.audit.model}, ${speaking.audit.model}`,
       repaired: listening.audit.repaired || speaking.audit.repaired,
     },
   };
@@ -641,10 +727,16 @@ function inspectableTerms(
       scriptType: storyWordScript(item.term),
     }));
   const coveredCharacters = new Set(
-    vocabulary.flatMap((item) => item.surface.match(/\p{Script=Han}/gu) ?? []),
+    vocabulary.flatMap(
+      (item) => item.surface.match(/\p{Script=Han}/gu) ?? [],
+    ),
   );
   const kanji = library.kanji
-    .filter((item) => joined.includes(item.character) && !coveredCharacters.has(item.character))
+    .filter(
+      (item) =>
+        joined.includes(item.character) &&
+        !coveredCharacters.has(item.character),
+    )
     .map((item) => ({
       libraryId: item.libraryId,
       libraryType: "kanji" as const,
@@ -662,9 +754,12 @@ function storyWords(
 ): InspectableTerm[] {
   return line.terms.map((term) => {
     const exact = library.vocabulary.find(
-      (item) => item.term === term.surface && item.reading === term.readingHint,
+      (item) =>
+        item.term === term.surface && item.reading === term.readingHint,
     );
-    const matches = library.vocabulary.filter((item) => item.term === term.surface);
+    const matches = library.vocabulary.filter(
+      (item) => item.term === term.surface,
+    );
     const vocabulary = exact ?? (matches.length === 1 ? matches[0] : null);
     if (!vocabulary) {
       throw new Error(`Library record missing for story word ${term.surface}.`);
@@ -720,18 +815,26 @@ export function assemblePlayableLesson(input: {
     ...question,
     choices: shuffledChoices(
       question.choices,
-      [section, question.prompt, question.cue, question.correctAnswer].join("\n"),
+      [section, question.prompt, question.cue, question.correctAnswer].join(
+        "\n",
+      ),
     ),
-    inspectableTerms: inspectableTerms([question.prompt, question.cue], input.library),
+    inspectableTerms: inspectableTerms(
+      [question.prompt, question.cue],
+      input.library,
+    ),
   });
   const unique = <T,>(items: T[]): T[] => [...new Set(items)];
   const targetKanji = input.library.generationContext?.targetKanji ?? [];
-  const packageKanji = targetKanji.length > 0
-    ? targetKanji.flatMap((character) => {
-        const item = input.library.kanji.find((candidate) => candidate.character === character);
-        return item ? [item] : [];
-      })
-    : input.library.kanji.slice(0, 5);
+  const packageKanji =
+    targetKanji.length > 0
+      ? targetKanji.flatMap((character) => {
+          const item = input.library.kanji.find(
+            (candidate) => candidate.character === character,
+          );
+          return item ? [item] : [];
+        })
+      : input.library.kanji.slice(0, 5);
   return {
     schemaVersion: 2,
     title: input.draft.title,
@@ -757,46 +860,65 @@ export function assemblePlayableLesson(input: {
       commonMistake: "",
     })),
     story: playableStoryLines(input.draft, input.library),
-    vocabularyQuestions: input.groups.vocabularyAndKanji.vocabularyQuestions.map(
-      (question) => withTerms(question, "vocabulary"),
-    ),
+    vocabularyQuestions:
+      input.groups.vocabularyAndKanji.vocabularyQuestions.map((question) =>
+        withTerms(question, "vocabulary"),
+      ),
     grammarQuestions: input.groups.grammarAndReading.grammarQuestions.map(
       (question) => withTerms(question, "grammar"),
     ),
     readingTitle: input.groups.grammarAndReading.readingTitle,
     readingJapaneseTitle: input.groups.grammarAndReading.readingJapaneseTitle,
-    readingConversation: input.groups.grammarAndReading.readingConversation.map((line) => ({
-      ...line,
-      inspectableTerms: line.inspectableTerms ??
-        inspectableTerms([line.japanese, line.english], input.library),
-    })),
+    readingConversation: input.groups.grammarAndReading.readingConversation.map(
+      (line) => ({
+        ...line,
+        inspectableTerms:
+          line.inspectableTerms ??
+          inspectableTerms([line.japanese, line.english], input.library),
+      }),
+    ),
     readingQuestions: input.groups.grammarAndReading.readingQuestions.map(
       (question, index) => ({
         id: `reading-question-${index + 1}`,
         ...question,
       }),
     ),
-    listeningExercises: input.groups.communication.listeningExercises.map((exercise) => ({
-      ...exercise,
-      choices: shuffledChoices(
-        exercise.choices,
-        ["listening", exercise.prompt, exercise.correctAnswer].join("\n"),
-      ),
-      inspectableTerms: exercise.inspectableTerms ??
-        inspectableTerms([exercise.prompt, exercise.transcript], input.library),
-    })),
-    speakingExercises: input.groups.communication.speakingExercises.map((exercise) => ({
-      ...exercise,
-      inspectableTerms: exercise.inspectableTerms ?? inspectableTerms([
-          exercise.prompt,
-          exercise.modelAnswer,
-        ], input.library),
-    })),
+    listeningExercises: input.groups.communication.listeningExercises.map(
+      (exercise) => ({
+        ...exercise,
+        choices: shuffledChoices(
+          exercise.choices,
+          ["listening", exercise.prompt, exercise.correctAnswer].join("\n"),
+        ),
+        inspectableTerms:
+          exercise.inspectableTerms ??
+          inspectableTerms(
+            [exercise.prompt, exercise.transcript],
+            input.library,
+          ),
+      }),
+    ),
+    speakingExercises: input.groups.communication.speakingExercises.map(
+      (exercise) => ({
+        ...exercise,
+        inspectableTerms:
+          exercise.inspectableTerms ??
+          inspectableTerms(
+            [exercise.prompt, exercise.modelAnswer],
+            input.library,
+          ),
+      }),
+    ),
     reviewQuestions: input.groups.review.reviewQuestions.map((question) => ({
       ...question,
       choices: shuffledChoices(
         question.choices,
-        ["review", question.category, question.prompt, question.correctAnswer].join("\n"),
+        [
+          "review",
+          question.category,
+          question.prompt,
+          question.correctAnswer,
+        ].join("\n"),
       ),
     })),
     generationAudit: { calls: input.audit },

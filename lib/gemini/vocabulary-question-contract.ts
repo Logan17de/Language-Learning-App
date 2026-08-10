@@ -47,6 +47,8 @@ export const vocabularyQuestionsSchema: JsonSchema = {
   properties: {
     questions: {
       type: "array",
+      minItems: 13,
+      maxItems: 13,
       items: {
         type: "object",
         properties: {

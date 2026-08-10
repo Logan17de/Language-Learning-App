@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { processCustomLessonJobs } from "@/lib/custom-lessons/job-runner";
+import { getCustomLessonSchedulerDiagnostics } from "@/lib/custom-lessons/scheduler-diagnostics";
+import { customLessonWorkerAuthorized } from "@/lib/custom-lessons/worker-authorization";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -8,12 +10,7 @@ export const dynamic = "force-dynamic";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function authorized(request: NextRequest): boolean {
-  const header = request.headers.get("authorization");
-  const secrets = [
-    process.env.CUSTOM_LESSON_WORKER_SECRET,
-    process.env.CRON_SECRET,
-  ].filter((value): value is string => Boolean(value));
-  return secrets.some((secret) => header === `Bearer ${secret}`);
+  return customLessonWorkerAuthorized(request.headers.get("authorization"));
 }
 
 async function run(request: NextRequest, requestId?: string) {
@@ -53,6 +50,24 @@ async function run(request: NextRequest, requestId?: string) {
 }
 
 export async function GET(request: NextRequest) {
+  if (request.nextUrl.searchParams.get("diagnostics") === "1") {
+    if (!authorized(request)) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+    try {
+      const diagnostics = await getCustomLessonSchedulerDiagnostics();
+      return NextResponse.json(
+        { ok: diagnostics.ready, diagnostics },
+        { status: diagnostics.ready ? 200 : 503 },
+      );
+    } catch (error) {
+      console.error("Custom lesson scheduler diagnostics failed.", error);
+      return NextResponse.json(
+        { error: "Scheduler diagnostics are unavailable." },
+        { status: 503 },
+      );
+    }
+  }
   return run(request);
 }
 

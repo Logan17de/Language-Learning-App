@@ -16,22 +16,53 @@ const flexiblePackageMigration = readFileSync(
   "supabase/migrations/20260805090000_flexible_generated_lesson_validation.sql",
   "utf8",
 );
+const canonicalMigration = readFileSync(
+  "supabase/migrations/20260808120000_canonical_lesson_contract.sql",
+  "utf8",
+);
 const vocabularyMigration = readFileSync(
   "supabase/migrations/20260805091000_skip_existing_story_vocabulary.sql",
   "utf8",
 );
 
-describe("flexible generated lesson validation", () => {
-  it("keeps flexible legacy regions while final review uses deterministic playable validation", () => {
-    expect(listeningQuestionIssues({ questions: [{}] })).toEqual([]);
-    expect(speakingReadAloudIssues({ sentences: [{}] })).toEqual([]);
-    expect(storyEnrichmentOutputIssues({
-      vocabulary: [{ word: "猫", reading: "ねこ", meaning: "cat" }],
-    })).toEqual([]);
+describe("generated lesson validation", () => {
+  it("keeps enrichment flexible while fixing and validating learner activity banks", () => {
+    expect(
+      listeningQuestionIssues({
+        questions: Array.from({ length: 5 }, () => ({})),
+      }),
+    ).toEqual([]);
+    expect(
+      speakingReadAloudIssues({
+        sentences: [
+          { difficulty: "easy" },
+          { difficulty: "easy" },
+          { difficulty: "medium" },
+          { difficulty: "medium" },
+          { difficulty: "hard" },
+        ],
+      }),
+    ).toEqual([]);
+    expect(
+      storyEnrichmentOutputIssues({
+        vocabulary: [{ word: "猫", reading: "ねこ", meaning: "cat" }],
+      }),
+    ).toEqual([]);
+
     expect(reading).toContain(
-      "Reading response must contain at least one question.",
+      "Reading response must contain exactly 5 questions.",
     );
-    expect(activities).toContain('activityGroupCheckpointIssues("final_review"');
+    expect(activities).toContain(
+      "Vocabulary response must contain exactly 13 questions.",
+    );
+    expect(activities).toContain(
+      "Grammar response must contain exactly 10 questions.",
+    );
+    expect(activities).toContain(
+      "Review response must contain exactly 5 questions.",
+    );
+    expect(activities).toContain("activityGroupCheckpointIssues(");
+    expect(activities).toContain('"final_review",');
     expect(activities).toContain("strictSchema: true");
     expect(activities).toContain("exactSchemaName: true");
     expect(activities).toContain(
@@ -39,15 +70,24 @@ describe("flexible generated lesson validation", () => {
     );
   });
 
-  it("requests a retry only for empty generated regions", () => {
-    expect(listeningQuestionIssues({ questions: [] })).not.toEqual([]);
-    expect(speakingReadAloudIssues({ sentences: [] })).not.toEqual([]);
+  it("rejects incomplete fixed activity regions before storage", () => {
+    expect(listeningQuestionIssues({ questions: [{}] })).not.toEqual([]);
+    expect(speakingReadAloudIssues({ sentences: [{}] })).not.toEqual([]);
     expect(storyEnrichmentOutputIssues({ vocabulary: [] })).not.toEqual([]);
-    expect(flexiblePackageMigration).toContain(
-      "jsonb_array_length(p_package->v_key) = 0",
-    );
+
+    // Preserve the historical reason PR #32 existed: target/story library
+    // regions can remain variable. Plan 1 only restores exact learner banks.
     expect(flexiblePackageMigration).toContain(
       "Accepts variable generated lesson counts",
+    );
+    expect(canonicalMigration).toContain(
+      "jsonb_array_length(p_package->'vocabularyQuestions') <> 13",
+    );
+    expect(canonicalMigration).toContain(
+      "jsonb_array_length(p_package->'grammarQuestions') <> 10",
+    );
+    expect(canonicalMigration).toContain(
+      "jsonb_array_length(p_package->'readingQuestions') <> 5",
     );
   });
 
@@ -55,7 +95,9 @@ describe("flexible generated lesson validation", () => {
     expect(vocabularyMigration).toContain("record.written_form = v_word");
     expect(vocabularyMigration).toContain("record.reading = v_reading");
     expect(vocabularyMigration).toContain("if v_vocabulary_id is null then");
-    expect(vocabularyMigration).toContain("'reusedVocabulary', v_linked - v_inserted");
+    expect(vocabularyMigration).toContain(
+      "'reusedVocabulary', v_linked - v_inserted",
+    );
     expect(vocabularyMigration).not.toContain(
       "set source_payload = coalesce(public.vocabulary_records.source_payload",
     );

@@ -2,6 +2,7 @@ import { after, NextResponse, type NextRequest } from "next/server";
 import { authorize } from "@/lib/auth/server-authorization";
 import { withGenerationTraceContext } from "@/lib/custom-lessons/generation-trace";
 import { processCustomLessonJobs } from "@/lib/custom-lessons/job-runner";
+import { getCustomLessonSchedulerDiagnostics } from "@/lib/custom-lessons/scheduler-diagnostics";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
@@ -58,6 +59,34 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: "Enter a topic and select a valid JLPT level." },
       { status: 400 },
+    );
+  }
+
+  let scheduler;
+  try {
+    scheduler = await getCustomLessonSchedulerDiagnostics();
+  } catch (error) {
+    console.error("Custom lesson scheduler diagnostics failed.", error);
+    return NextResponse.json(
+      {
+        error: "Custom lesson scheduling is not configured. Ask an administrator to check the scheduler diagnostics.",
+        code: "CUSTOM_LESSON_SCHEDULER_UNAVAILABLE",
+      },
+      { status: 503 },
+    );
+  }
+  if (!scheduler.ready) {
+    return NextResponse.json(
+      {
+        error: "Custom lesson scheduling is not configured. Ask an administrator to check the scheduler diagnostics.",
+        code: "CUSTOM_LESSON_SCHEDULER_UNAVAILABLE",
+        diagnostics: {
+          jobActive: scheduler.jobActive,
+          workerUrlConfigured: scheduler.workerUrlConfigured,
+          workerSecretConfigured: scheduler.workerSecretConfigured,
+        },
+      },
+      { status: 503 },
     );
   }
 

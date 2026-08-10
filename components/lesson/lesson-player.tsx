@@ -6,6 +6,7 @@ import { AlertTriangle, LoaderCircle } from "lucide-react";
 import type { LessonPackage } from "@/types/lesson";
 import type { LessonPhaseId, LessonSession } from "@/types/lesson-session";
 import { calculateLessonCompletion } from "@/lib/scoring-utils";
+import { phaseIsComplete } from "@/lib/lesson-phase-progress";
 import {
   createEmptyLessonSession,
   normalizeLessonSession,
@@ -164,12 +165,26 @@ export function LessonPlayer({
     () => (session ? phaseIsComplete(session, phase.id, lesson) : false),
     [lesson, phase.id, session],
   );
-  const progress = session ? Math.round(((session.currentPhaseIndex + (canContinue ? 1 : 0.35)) / lesson.phases.length) * 100) : 0;
+  const progress = session
+    ? Math.round(
+        ((session.currentPhaseIndex + (canContinue ? 1 : 0.35)) /
+          lesson.phases.length) *
+          100,
+      )
+    : 0;
 
   if (!hasHydrated || !session) {
     return (
-      <main className="grid min-h-screen place-items-center bg-paper" aria-live="polite">
-        <div className="text-center"><span className="mx-auto block size-10 animate-spin rounded-full border-4 border-moss-100 border-t-moss-600" /><p className="mt-4 text-sm font-semibold text-stone-500">Restoring your lesson…</p></div>
+      <main
+        className="grid min-h-screen place-items-center bg-paper"
+        aria-live="polite"
+      >
+        <div className="text-center">
+          <span className="mx-auto block size-10 animate-spin rounded-full border-4 border-moss-100 border-t-moss-600" />
+          <p className="mt-4 text-sm font-semibold text-stone-500">
+            Restoring your lesson…
+          </p>
+        </div>
       </main>
     );
   }
@@ -224,7 +239,9 @@ export function LessonPlayer({
     const nextPhase = lesson.phases[nextIndex];
     const saved = updateSession({
       ...session,
-      completedPhaseIds: Array.from(new Set([...session.completedPhaseIds, currentPhase.id])),
+      completedPhaseIds: Array.from(
+        new Set([...session.completedPhaseIds, currentPhase.id]),
+      ),
       activities: {
         ...session.activities,
         [currentPhase.id]: {
@@ -264,33 +281,111 @@ export function LessonPlayer({
         totalPhases={lesson.phases.length}
         progress={progress}
         canContinue={canContinue}
-        continueLabel={phase.id === "review" ? "See results" : nextLabel(phase.id)}
+        continueLabel={
+          phase.id === "review" ? "See results" : nextLabel(phase.id)
+        }
         onBack={back}
         onContinue={continueLesson}
         onExit={() => setShowExit(true)}
       >
         <div className="mb-5 flex justify-end">
-          <LessonReportDialog lessonId={lesson.id} lessonTitle={lesson.title} phase={phase.label} activityId={`${phase.id}_${session.activityIndex}`} compact />
+          <LessonReportDialog
+            lessonId={lesson.id}
+            lessonTitle={lesson.title}
+            phase={phase.label}
+            activityId={`${phase.id}_${session.activityIndex}`}
+            compact
+          />
         </div>
-        {phase.id === "story" && <StoryPhase lesson={lesson} session={session} onChange={updateSession} />}
-        {phase.id === "vocabulary" && <VocabularyPhase lesson={lesson} session={session} onChange={updateSession} />}
-        {phase.id === "grammar" && <GrammarPhase lesson={lesson} session={session} onChange={updateSession} />}
-        {phase.id === "reading" && <ReadingPhase lesson={lesson} session={session} onChange={updateSession} />}
-        {phase.id === "listening" && <ListeningPhase lesson={lesson} session={session} onChange={updateSession} />}
-        {phase.id === "speaking" && <SpeakingPhase lesson={lesson} session={session} onChange={updateSession} />}
-        {phase.id === "review" && <FinalReviewPhase lesson={lesson} session={session} onChange={updateSession} />}
+        {phase.id === "story" && (
+          <StoryPhase
+            lesson={lesson}
+            session={session}
+            onChange={updateSession}
+          />
+        )}
+        {phase.id === "vocabulary" && (
+          <VocabularyPhase
+            lesson={lesson}
+            session={session}
+            onChange={updateSession}
+          />
+        )}
+        {phase.id === "grammar" && (
+          <GrammarPhase
+            lesson={lesson}
+            session={session}
+            onChange={updateSession}
+          />
+        )}
+        {phase.id === "reading" && (
+          <ReadingPhase
+            lesson={lesson}
+            session={session}
+            onChange={updateSession}
+          />
+        )}
+        {phase.id === "listening" && (
+          <ListeningPhase
+            lesson={lesson}
+            session={session}
+            onChange={updateSession}
+          />
+        )}
+        {phase.id === "speaking" && (
+          <SpeakingPhase
+            lesson={lesson}
+            session={session}
+            onChange={updateSession}
+          />
+        )}
+        {phase.id === "review" && (
+          <FinalReviewPhase
+            lesson={lesson}
+            session={session}
+            onChange={updateSession}
+          />
+        )}
       </LessonPlayerShell>
 
       {showExit && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="exit-title">
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-5 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="exit-title"
+        >
           <div className="w-full max-w-md rounded-4xl bg-white p-7 shadow-float">
-            <span className="grid size-12 place-items-center rounded-2xl bg-persimmon-100 text-persimmon-600"><AlertTriangle className="size-5" /></span>
-            <h2 id="exit-title" className="mt-6 text-2xl font-semibold">Pause this lesson?</h2>
-            <p className="mt-3 leading-7 text-stone-500">AIko will save this checkpoint and the kanji, vocabulary, grammar, and speaking evidence from every activity you attempted. You can resume from {phase.label} or start a new lesson later.</p>
+            <span className="grid size-12 place-items-center rounded-2xl bg-persimmon-100 text-persimmon-600">
+              <AlertTriangle className="size-5" />
+            </span>
+            <h2 id="exit-title" className="mt-6 text-2xl font-semibold">
+              Pause this lesson?
+            </h2>
+            <p className="mt-3 leading-7 text-stone-500">
+              AIko will save this checkpoint and the kanji, vocabulary,
+              grammar, and speaking evidence from every activity you attempted.
+              You can resume from {phase.label} or start a new lesson later.
+            </p>
             <div className="mt-6 flex gap-3">
-              <Button type="button" variant="secondary" className="flex-1" disabled={isSavingExit} onClick={() => setShowExit(false)}>Keep learning</Button>
-              <Button type="button" className="flex-1" disabled={isSavingExit} onClick={() => void exit()}>
-                {isSavingExit ? <LoaderCircle className="size-4 animate-spin" /> : null}
+              <Button
+                type="button"
+                variant="secondary"
+                className="flex-1"
+                disabled={isSavingExit}
+                onClick={() => setShowExit(false)}
+              >
+                Keep learning
+              </Button>
+              <Button
+                type="button"
+                className="flex-1"
+                disabled={isSavingExit}
+                onClick={() => void exit()}
+              >
+                {isSavingExit ? (
+                  <LoaderCircle className="size-4 animate-spin" />
+                ) : null}
                 {isSavingExit ? "Saving…" : "Save and exit"}
               </Button>
             </div>
@@ -299,47 +394,6 @@ export function LessonPlayer({
       )}
     </>
   );
-}
-
-function phaseIsComplete(
-  session: LessonSession,
-  phaseId: LessonPhaseId,
-  lesson: LessonPackage,
-): boolean {
-  switch (phaseId) {
-    case "story":
-      return session.storyComplete;
-    case "vocabulary":
-      return session.vocabularyAnswers.length >=
-        Math.min(10, lesson.vocabularyQuestions.length);
-    case "grammar":
-      return session.grammarAnswers.length >=
-        Math.min(10, lesson.grammarQuestions.length);
-    case "reading":
-      return lesson.readingQuestions?.length
-        ? (session.readingAnswers ?? []).length >= lesson.readingQuestions.length
-        : session.readingComplete;
-    case "listening":
-      return (
-        session.listeningComplete &&
-        lesson.listeningExercises.every((exercise) =>
-          session.listeningEvents.some(
-            (event) => event.type === "answer" && event.questionId === exercise.id,
-          ),
-        )
-      );
-    case "speaking":
-      return (
-        session.speakingComplete &&
-        lesson.speakingExercises.every((exercise) =>
-          session.speakingEvents.some(
-            (event) => event.exerciseId === exercise.id,
-          ),
-        )
-      );
-    case "review":
-      return session.reviewResult?.totalCount === lesson.reviewQuestions.length;
-  }
 }
 
 function nextLabel(phaseId: LessonPhaseId): string {

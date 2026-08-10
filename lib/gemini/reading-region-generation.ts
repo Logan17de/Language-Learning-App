@@ -58,9 +58,20 @@ function readingQuestionIssues(value: unknown): string[] {
     return ["Reading response must be an object."];
   }
   const questions = (value as Record<string, unknown>).questions;
-  return Array.isArray(questions) && questions.length > 0
+  if (!Array.isArray(questions) || questions.length !== 5) {
+    return ["Reading response must contain exactly 5 questions."];
+  }
+  const difficulties = questions.map((question) =>
+    question && typeof question === "object" && !Array.isArray(question)
+      ? (question as Record<string, unknown>).difficulty
+      : null,
+  );
+  const easy = difficulties.filter((value) => value === "easy").length;
+  const medium = difficulties.filter((value) => value === "medium").length;
+  const hard = difficulties.filter((value) => value === "hard").length;
+  return easy === 2 && medium === 2 && hard === 1
     ? []
-    : ["Reading response must contain at least one question."];
+    : ["Reading response must contain 2 easy, 2 medium, and 1 hard question."];
 }
 
 function readingLines(

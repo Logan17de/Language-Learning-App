@@ -10,6 +10,10 @@ const route = readFileSync("app/api/custom-lessons/generate/route.ts", "utf8");
 const completionRoute = readFileSync("app/api/custom-lessons/complete/route.ts", "utf8");
 const statusRoute = readFileSync("app/api/custom-lessons/status/route.ts", "utf8");
 const workerRoute = readFileSync("app/api/internal/custom-lessons/process/route.ts", "utf8");
+const workerAuthorization = readFileSync(
+  "lib/custom-lessons/worker-authorization.ts",
+  "utf8",
+);
 const runner = readFileSync("lib/custom-lessons/job-runner.ts", "utf8");
 const groups = readFileSync("lib/gemini/lesson-activity-groups.ts", "utf8");
 const audio = readFileSync("lib/audio/audio-library.ts", "utf8");
@@ -17,7 +21,10 @@ const durableMigration = readFileSync(
   "supabase/migrations/20260810090000_stage_based_custom_lesson_jobs.sql",
   "utf8",
 );
-const scheduler = readFileSync("vercel.json", "utf8");
+const scheduler = readFileSync(
+  "supabase/migrations/20260810100000_supabase_custom_lesson_scheduler.sql",
+  "utf8",
+);
 const targets = readFileSync("lib/gemini/lesson-targets.ts", "utf8");
 const generation = readFileSync("lib/gemini/lesson-generation.ts", "utf8");
 const quota = readFileSync(
@@ -73,8 +80,9 @@ describe("custom lesson engine contract", () => {
   });
 
   it("uses durable atomic stage claims and independently persisted groups", () => {
-    expect(workerRoute).toContain("CUSTOM_LESSON_WORKER_SECRET");
-    expect(workerRoute).toContain("CRON_SECRET");
+    expect(workerRoute).toContain("customLessonWorkerAuthorized");
+    expect(workerAuthorization).toContain("CUSTOM_LESSON_WORKER_SECRET");
+    expect(workerAuthorization).toContain("CRON_SECRET");
     expect(runner).toContain('rpc("claim_custom_lesson_stage"');
     expect(runner).toContain('rpc("save_progressive_lesson_group"');
     expect(runner).toContain('rpc("store_generated_lesson_package_background"');
@@ -89,15 +97,17 @@ describe("custom lesson engine contract", () => {
     expect(durableMigration).toContain("completed_groups");
     expect(durableMigration).toContain("stage_attempts");
     expect(runner).toContain("group_attempts");
-    expect(scheduler).toContain('/api/internal/custom-lessons/process');
-    expect(scheduler).toContain('"* * * * *"');
+    expect(scheduler).toContain("net.http_post");
+    expect(scheduler).toContain("custom_lesson_worker_url");
+    expect(scheduler).toContain("'* * * * *'");
   });
 
   it("uses exact strict output and deterministic validation for final review", () => {
     expect(groups).toContain('name: "final_review"');
     expect(groups).toContain("strictSchema: true");
     expect(groups).toContain("exactSchemaName: true");
-    expect(groups).toContain('activityGroupCheckpointIssues("final_review"');
+    expect(groups).toContain("activityGroupCheckpointIssues(");
+    expect(groups).toContain('"final_review",');
   });
 
   it("keeps model-controlled identifiers out of library enrichment", () => {

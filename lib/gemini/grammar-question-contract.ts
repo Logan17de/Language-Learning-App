@@ -42,6 +42,8 @@ export const grammarQuestionsSchema: JsonSchema = {
   properties: {
     questions: {
       type: "array",
+      minItems: 10,
+      maxItems: 10,
       items: {
         type: "object",
         properties: {

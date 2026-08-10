@@ -76,7 +76,18 @@ export function speakingReadAloudIssues(value: unknown): string[] {
     return ["Speaking response must be an object."];
   }
   const sentences = (value as Record<string, unknown>).sentences;
-  return Array.isArray(sentences) && sentences.length > 0
+  if (!Array.isArray(sentences) || sentences.length !== 5) {
+    return ["Speaking response must contain exactly 5 read-aloud sentences."];
+  }
+  const difficulties = sentences.map((sentence) =>
+    sentence && typeof sentence === "object" && !Array.isArray(sentence)
+      ? (sentence as Record<string, unknown>).difficulty
+      : null,
+  );
+  const easy = difficulties.filter((value) => value === "easy").length;
+  const medium = difficulties.filter((value) => value === "medium").length;
+  const hard = difficulties.filter((value) => value === "hard").length;
+  return easy === 2 && medium === 2 && hard === 1
     ? []
-    : ["Speaking response must contain at least one read-aloud sentence."];
+    : ["Speaking response must contain 2 easy, 2 medium, and 1 hard sentence."];
 }
