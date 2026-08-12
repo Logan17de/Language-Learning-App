@@ -2,6 +2,14 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
+import {
+  containsKanji,
+  lookupSurface,
+  type LexiconEntry,
+  type PartOfSpeech,
+  type VerbType,
+} from "@/lib/japanese-lexicon";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { StoryOnlyDraft } from "@/lib/gemini/story-pipeline-v3";
 import type { Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
@@ -45,34 +53,24 @@ interface SegmentPart {
   isWordLike?: boolean;
 }
 
-interface JishoJapanese {
-  word?: string;
-  reading?: string;
+interface LocalJmdictRow {
+  entry_key: string;
+  entry_seq: number;
+  dictionary_form: string;
+  reading: string;
+  meaning: string;
+  meanings: string[];
+  part_of_speech: RawStoryVocabulary["partOfSpeech"];
+  conjugation_type: RawStoryVocabulary["conjugationType"];
+  aliases: string[];
+  search_forms: string[];
+  common: boolean;
+  priority: number;
 }
 
-interface JishoSense {
-  english_definitions?: string[];
-  parts_of_speech?: string[];
-}
-
-interface JishoEntry {
-  slug?: string;
-  is_common?: boolean;
-  japanese?: JishoJapanese[];
-  senses?: JishoSense[];
-  attribution?: { jmdict?: boolean };
-}
-
-interface JishoResponse {
-  meta?: { status?: number };
-  data?: JishoEntry[];
-}
-
-const JISHO_WORDS_ENDPOINT = "https://jisho.org/api/v1/search/words";
-export const DICTIONARY_SOURCE_MODEL = "jisho-jmdict";
-const LOOKUP_TIMEOUT_MS = 8_000;
-const LOOKUP_CONCURRENCY = 4;
+export const DICTIONARY_SOURCE_MODEL = "jmdict-local";
 const MAX_LOOKUP_CANDIDATES = 100;
+const MAX_DICTIONARY_ROWS = 750;
 const MIN_REUSABLE_VOCABULARY = 8;
 
 const JAPANESE = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
@@ -86,7 +84,7 @@ const FUNCTION_WORDS = new Set([
 const INFLECTION_TAILS = new Set([
   "ます", "まし", "た", "て", "で", "ない", "なかっ", "ません", "ました",
   "です", "でし", "でした", "たい", "たく", "れる", "られ", "られる",
-  "せる", "させ", "させる",
+  "せる", "させ", "させる", "いる", "しまう", "しまった", "なければ",
 ]);
 const ENGLISH_STOPWORDS = new Set([
   "a", "an", "and", "are", "as", "at", "be", "been", "but", "by", "for",
@@ -131,7 +129,7 @@ function lineCandidates(japanese: string): string[] {
     if (isUsefulSurface(base)) ordinary.push(base);
 
     let combined = base;
-    for (let end = index + 1; end < Math.min(pieces.length, index + 4); end += 1) {
+    for (let end = index + 1; end < Math.min(pieces.length, index + 5); end += 1) {
       const tail = pieces[end]!;
       if (!INFLECTION_TAILS.has(tail)) break;
       combined += tail;
@@ -185,234 +183,119 @@ function definitionOverlap(definitions: string[], context: ReadonlySet<string>):
   );
 }
 
-function isFunctionSense(parts: string[]): boolean {
-  const joined = parts.join(" ").toLocaleLowerCase();
-  return joined.includes("particle") ||
-    joined.includes("auxiliary") ||
-    joined.includes("copula") ||
-    joined.includes("suffix") ||
-    joined.includes("prefix");
+function bestMeaning(row: LocalJmdictRow, context: ReadonlySet<string>): string {
+  const meanings = row.meanings?.length ? row.meanings : [row.meaning];
+  return [...meanings].sort(
+    (left, right) => definitionOverlap([right], context) - definitionOverlap([left], context),
+  )[0] ?? row.meaning;
 }
 
-function godanEnding(joined: string, ending: string): boolean {
-  return joined.includes(`'${ending}' ending`) ||
-    joined.includes(`\"${ending}\" ending`) ||
-    joined.includes(`${ending} ending`);
-}
-
-export function jishoConjugationType(
-  parts: string[],
-  dictionaryForm: string,
-): RawStoryVocabulary["conjugationType"] {
-  const joined = parts.join(" ").toLocaleLowerCase();
-  if (dictionaryForm === "ある") return "aru";
-  if (joined.includes("ichidan verb")) return "ichidan";
-  if (joined.includes("suru verb") || joined.includes("verb taking the aux. verb suru")) return "suru";
-  if (joined.includes("kuru verb")) return "kuru";
-  if (!joined.includes("godan verb")) return null;
-  if (godanEnding(joined, "u")) return "godan-u";
-  if (godanEnding(joined, "ku")) return "godan-ku";
-  if (godanEnding(joined, "gu")) return "godan-gu";
-  if (godanEnding(joined, "su")) return "godan-su";
-  if (godanEnding(joined, "tsu")) return "godan-tsu";
-  if (godanEnding(joined, "nu")) return "godan-nu";
-  if (godanEnding(joined, "bu")) return "godan-bu";
-  if (godanEnding(joined, "mu")) return "godan-mu";
-  if (godanEnding(joined, "ru")) return "godan-ru";
-  return null;
-}
-
-export function jishoPartOfSpeech(
-  parts: string[],
-  dictionaryForm: string,
-): RawStoryVocabulary["partOfSpeech"] {
-  const joined = parts.join(" ").toLocaleLowerCase();
-  if (jishoConjugationType(parts, dictionaryForm)) return "verb";
-  if (joined.includes("i-adjective")) return "i-adjective";
-  if (joined.includes("na-adjective")) return "na-adjective";
-  if (joined.includes("adverb")) return "adverb";
-  if (joined.includes("expression")) return "expression";
-  if (
-    joined.includes("noun") ||
-    joined.includes("pronoun") ||
-    joined.includes("proper noun") ||
-    joined.includes("counter")
-  ) return "noun";
-  return "other";
-}
-
-function commonPrefixLength(left: string, right: string): number {
-  const maximum = Math.min(left.length, right.length);
-  let index = 0;
-  while (index < maximum && left[index] === right[index]) index += 1;
-  return index;
-}
-
-function entryScore(entry: JishoEntry, surface: string): number {
-  let score = entry.is_common ? 10 : 0;
-  if (entry.attribution?.jmdict) score += 5;
-  if (normalize(entry.slug ?? "") === surface) score += 100;
-  for (const form of entry.japanese ?? []) {
-    if (normalize(form.word ?? "") === surface) score = Math.max(score, 120);
-    if (normalize(form.reading ?? "") === surface) score = Math.max(score, 110);
-    const canonical = normalize(form.word ?? form.reading ?? "");
-    if (canonical && commonPrefixLength(canonical, surface) >= 2) score += 20;
-    else if (canonical && /\p{Script=Han}/u.test(canonical[0] ?? "") && canonical[0] === surface[0]) score += 8;
-  }
-  return score;
-}
-
-function selectJapaneseForm(entry: JishoEntry, surface: string): JishoJapanese | null {
-  const forms = entry.japanese ?? [];
-  return forms.find((form) => normalize(form.word ?? "") === surface) ??
-    forms.find((form) => normalize(form.reading ?? "") === surface) ??
-    forms.find((form) => Boolean(normalize(form.word ?? ""))) ??
-    forms[0] ?? null;
-}
-
-function selectSense(entry: JishoEntry, context: ReadonlySet<string>): JishoSense | null {
-  const senses = (entry.senses ?? []).filter((sense) =>
-    (sense.english_definitions?.length ?? 0) > 0 && !isFunctionSense(sense.parts_of_speech ?? []),
-  );
-  if (senses.length < 1) return null;
-  return [...senses].sort((left, right) =>
-    definitionOverlap(right.english_definitions ?? [], context) -
-    definitionOverlap(left.english_definitions ?? [], context),
-  )[0] ?? null;
-}
-
-function dictionaryAliases(
-  entry: JishoEntry,
-  dictionaryForm: string,
-  surface: string,
-): string[] {
-  return [...new Set([
-    ...(entry.japanese ?? []).flatMap((form) => form.word ? [normalize(form.word)] : []),
-    surface,
-  ].filter((value) => value && value !== dictionaryForm))];
-}
-
-async function fetchJisho(surface: string): Promise<JishoResponse> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), LOOKUP_TIMEOUT_MS);
-  try {
-    const response = await fetch(
-      `${JISHO_WORDS_ENDPOINT}?keyword=${encodeURIComponent(surface)}`,
-      {
-        headers: {
-          accept: "application/json",
-          "user-agent": "AIko-Japanese/1.0 dictionary-vocabulary",
-        },
-        cache: "no-store",
-        signal: controller.signal,
-      },
-    );
-    if (!response.ok) {
-      throw new Error(`Japanese dictionary lookup failed with status ${response.status}.`);
-    }
-    const body = await response.json() as JishoResponse;
-    if (typeof body.meta?.status === "number" && body.meta.status !== 200) {
-      throw new Error(`Japanese dictionary lookup returned status ${body.meta.status}.`);
-    }
-    return body;
-  } catch (error) {
-    if (error instanceof Error && error.name === "AbortError") {
-      throw new Error("Japanese dictionary lookup timed out.");
-    }
-    throw error;
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-async function lookupSurface(
-  surface: string,
-  context: ReadonlySet<string>,
-): Promise<RawStoryVocabulary | null> {
-  const response = await fetchJisho(surface);
-  const entry = [...(response.data ?? [])]
-    .filter((candidate) => candidate.attribution?.jmdict !== false)
-    .sort((left, right) => entryScore(right, surface) - entryScore(left, surface))
-    .find((candidate) => selectSense(candidate, context));
-  if (!entry) return null;
-
-  const form = selectJapaneseForm(entry, surface);
-  const sense = selectSense(entry, context);
-  if (!form || !sense) return null;
-  const dictionaryForm = normalize(form.word ?? form.reading ?? entry.slug ?? "");
-  const reading = normalize(form.reading ?? form.word ?? dictionaryForm);
-  if (!dictionaryForm || !reading) return null;
-  const parts = sense.parts_of_speech ?? [];
-  if (isFunctionSense(parts)) return null;
-  const mappedPart = jishoPartOfSpeech(parts, dictionaryForm);
-  const mappedConjugation = jishoConjugationType(parts, dictionaryForm);
-  if (mappedPart === "verb" && !mappedConjugation) return null;
-  const meaning = (sense.english_definitions ?? []).slice(0, 3).join("; ").trim();
-  if (!meaning) return null;
-
+function asLexiconEntry(row: LocalJmdictRow): LexiconEntry {
+  const partOfSpeech = row.part_of_speech as PartOfSpeech;
+  const conjugationType = row.conjugation_type as VerbType | null;
   return {
-    word: surface,
-    dictionaryForm,
-    reading,
-    meaning,
-    partOfSpeech: mappedPart,
-    conjugationType: mappedConjugation,
-    aliases: dictionaryAliases(entry, dictionaryForm, surface),
-    source: "JMdict",
-    sourceEntry: normalize(entry.slug ?? dictionaryForm),
+    id: row.entry_key,
+    kanji: containsKanji(row.dictionary_form) ? row.dictionary_form : "",
+    kana: row.reading,
+    meaning: row.meaning,
+    partOfSpeech,
+    ...(conjugationType ? { conjugationType } : {}),
+    aliases: row.aliases ?? [],
+    source: "migration",
+    createdAt: "1970-01-01T00:00:00.000Z",
+    updatedAt: "1970-01-01T00:00:00.000Z",
   };
-}
-
-async function mapWithConcurrency<T, R>(
-  items: readonly T[],
-  limit: number,
-  mapper: (item: T) => Promise<R>,
-): Promise<R[]> {
-  const output = new Array<R>(items.length);
-  let next = 0;
-  async function worker() {
-    while (true) {
-      const index = next;
-      next += 1;
-      if (index >= items.length) return;
-      output[index] = await mapper(items[index]!);
-    }
-  }
-  await Promise.all(
-    Array.from({ length: Math.min(limit, items.length) }, () => worker()),
-  );
-  return output;
 }
 
 function canonicalIdentity(item: RawStoryVocabulary): string {
   return `${item.dictionaryForm}\u001f${item.reading}\u001f${item.partOfSpeech}`;
 }
 
+function rowMatch(
+  row: LocalJmdictRow,
+  candidates: readonly string[],
+  context: ReadonlySet<string>,
+): { item: RawStoryVocabulary; surfaceIndex: number; score: number } | null {
+  const entry = asLexiconEntry(row);
+  for (let index = 0; index < candidates.length; index += 1) {
+    const surface = candidates[index]!;
+    const matches = lookupSurface([entry], surface);
+    if (matches.length < 1) continue;
+    const match = matches[0]!;
+    const meaning = bestMeaning(row, context);
+    return {
+      surfaceIndex: index,
+      score:
+        1000 - index * 5 +
+        (row.common ? 50 : 0) +
+        Math.min(row.priority ?? 0, 100) +
+        definitionOverlap([meaning], context) * 20,
+      item: {
+        word: surface,
+        dictionaryForm: row.dictionary_form,
+        reading: match.form.kana || row.reading,
+        meaning,
+        partOfSpeech: row.part_of_speech,
+        conjugationType: row.conjugation_type,
+        aliases: [...new Set([
+          ...(row.aliases ?? []),
+          ...(surface !== row.dictionary_form ? [surface] : []),
+        ])],
+        source: "JMdict",
+        sourceEntry: row.entry_key,
+      },
+    };
+  }
+  return null;
+}
+
 export async function lookupJapaneseDictionaryVocabulary(input: {
   japanese: string;
   englishContext?: string;
+  admin?: SupabaseClient;
 }): Promise<RawStoryVocabulary[]> {
   const candidates = japaneseDictionaryCandidates(input.japanese);
-  const context = contextWords(input.englishContext ?? "");
-  const lookedUp = await mapWithConcurrency(
-    candidates,
-    LOOKUP_CONCURRENCY,
-    (surface) => lookupSurface(surface, context),
-  );
-  const seenCanonical = new Set<string>();
-  return lookedUp.flatMap((item) => {
-    if (!item) return [];
-    const identity = canonicalIdentity(item);
-    if (seenCanonical.has(identity)) return [];
-    seenCanonical.add(identity);
-    return [item];
+  if (candidates.length < 1) return [];
+  const admin = input.admin ?? (createAdminClient() as unknown as SupabaseClient);
+  const result = await admin.rpc("lookup_jmdict_vocabulary", {
+    p_surfaces: candidates,
+    p_limit: MAX_DICTIONARY_ROWS,
   });
+  if (result.error) {
+    const error = new Error(`Local JMdict lookup failed: ${result.error.message}`) as Error & { code?: string };
+    error.code = result.error.code;
+    throw error;
+  }
+  const rows = (result.data ?? []) as LocalJmdictRow[];
+  if (rows.length < 1) {
+    throw new Error(
+      "Local JMdict dictionary is empty or has no matching forms. Run npm run jmdict:import after applying the JMdict migration.",
+    );
+  }
+
+  const context = contextWords(input.englishContext ?? "");
+  const matches = rows
+    .map((row) => rowMatch(row, candidates, context))
+    .filter((value): value is NonNullable<typeof value> => Boolean(value))
+    .sort((left, right) => right.score - left.score || left.surfaceIndex - right.surfaceIndex);
+
+  const seenSurface = new Set<string>();
+  const seenCanonical = new Set<string>();
+  const vocabulary: RawStoryVocabulary[] = [];
+  for (const match of matches) {
+    const identity = canonicalIdentity(match.item);
+    if (seenSurface.has(match.item.word) || seenCanonical.has(identity)) continue;
+    seenSurface.add(match.item.word);
+    seenCanonical.add(identity);
+    vocabulary.push(match.item);
+  }
+  return vocabulary;
 }
 
 /**
  * Deterministic story vocabulary indexing. Japanese text is segmented locally,
- * then candidate words are resolved through Jisho's JMdict-backed word API.
- * No model is called and no generated meaning is accepted into the library.
+ * then all candidate forms are resolved in one Supabase call against a local
+ * JMdict import. No model and no public dictionary HTTP API is used at runtime.
  */
 export async function enrichGeneratedStoryVocabulary(input: {
   admin: SupabaseClient;
@@ -425,7 +308,11 @@ export async function enrichGeneratedStoryVocabulary(input: {
 }> {
   const japanese = input.draft.lines.map((line) => line.japanese).join("\n");
   const englishContext = input.draft.lines.map((line) => line.english).join(" ");
-  const vocabulary = await lookupJapaneseDictionaryVocabulary({ japanese, englishContext });
+  const vocabulary = await lookupJapaneseDictionaryVocabulary({
+    japanese,
+    englishContext,
+    admin: input.admin,
+  });
   if (vocabulary.length < MIN_REUSABLE_VOCABULARY) {
     throw new Error(
       `Story vocabulary dictionary lookup produced only ${vocabulary.length} reusable entries; at least ${MIN_REUSABLE_VOCABULARY} are required.`,
