@@ -2,10 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { storeGeneratedVocabularyTerms } from "@/lib/gemini/generated-vocabulary-storage";
-import {
-  DICTIONARY_SOURCE_MODEL,
-  lookupJapaneseDictionaryVocabulary,
-} from "@/lib/gemini/simple-story-enrichment";
+import * as dictionaryVocabulary from "@/lib/gemini/simple-story-enrichment";
 import type {
   GenerationAuditEntry,
   InspectableTerm,
@@ -79,7 +76,7 @@ export async function generateSpeakingRegion(input: {
   const speakingText = speaking.value.sentences
     .map((item) => item.sentence)
     .join("\n");
-  const vocabulary = await lookupJapaneseDictionaryVocabulary({
+  const vocabulary = await dictionaryVocabulary.lookupJapaneseDictionaryVocabulary({
     japanese: speakingText,
   });
   const terms = await storeGeneratedVocabularyTerms({
@@ -87,7 +84,7 @@ export async function generateSpeakingRegion(input: {
     requestId: input.requestId,
     level: input.level,
     vocabulary,
-    model: DICTIONARY_SOURCE_MODEL,
+    model: dictionaryVocabulary.DICTIONARY_SOURCE_MODEL,
     library: input.library,
   });
 
@@ -128,7 +125,7 @@ export async function generateSpeakingRegion(input: {
     }),
     audit: {
       stage: "communication_activities",
-      model: `${speaking.model}, ${DICTIONARY_SOURCE_MODEL}`,
+      model: `${speaking.model}, ${dictionaryVocabulary.DICTIONARY_SOURCE_MODEL}`,
       repaired: speaking.repaired,
     },
   };
