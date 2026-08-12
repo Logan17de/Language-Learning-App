@@ -102,6 +102,36 @@ function questionArrayIssues(
   return issues;
 }
 
+function teachingArrayIssues(
+  value: unknown,
+  expected: number,
+  label: string,
+  fields: string[],
+  validLibraryIds: ReadonlySet<string>,
+): string[] {
+  const items = array(value);
+  const issues = items.length === expected
+    ? []
+    : [`${label} must contain exactly ${expected} entries.`];
+  const ids = new Set<string>();
+  items.forEach((entry, index) => {
+    const item = record(entry);
+    const itemLabel = `${label} ${index + 1}`;
+    if (!item) {
+      issues.push(`${itemLabel} must be an object.`);
+      return;
+    }
+    issues.push(...requiredTextIssues(item, ["libraryId", ...fields], itemLabel));
+    const id = text(item.libraryId);
+    if (id) {
+      if (!validLibraryIds.has(id)) issues.push(`${itemLabel} references invalid library ID ${id}.`);
+      if (ids.has(id)) issues.push(`${itemLabel} repeats library ID ${id}.`);
+      ids.add(id);
+    }
+  });
+  return issues;
+}
+
 export function activityGroupCheckpointIssues(
   group: ActivityGroupName,
   value: unknown,
@@ -112,15 +142,30 @@ export function activityGroupCheckpointIssues(
   const issues: string[] = [];
 
   if (group === "vocabulary_and_kanji") {
-    return questionArrayIssues(
+    issues.push(...teachingArrayIssues(
+      payload.kanjiTeaching,
+      5,
+      "Kanji teaching",
+      ["character", "reading", "meaning"],
+      validLibraryIds,
+    ));
+    issues.push(...questionArrayIssues(
       payload.vocabularyQuestions,
       13,
       "Vocabulary question",
       validLibraryIds,
-    );
+    ));
+    return issues;
   }
 
   if (group === "grammar_and_reading") {
+    issues.push(...teachingArrayIssues(
+      payload.grammarTeaching,
+      3,
+      "Grammar teaching",
+      ["pattern", "meaning", "formation", "usage", "example", "translation"],
+      validLibraryIds,
+    ));
     issues.push(...questionArrayIssues(
       payload.grammarQuestions,
       10,
@@ -324,11 +369,7 @@ export function groupForPackageIssue(issue: string): ActivityGroupName | null {
   const normalized = issue.toLocaleLowerCase();
   if (normalized.includes("review")) return "final_review";
   if (normalized.includes("listening") || normalized.includes("speaking")) return "listening_and_speaking";
-  if (normalized.includes("grammarquestion") || normalized.includes("grammar question") || normalized.includes("reading")) {
-    return "grammar_and_reading";
-  }
-  if (normalized.includes("vocabularyquestion") || normalized.includes("vocabulary question")) {
-    return "vocabulary_and_kanji";
-  }
+  if (normalized.includes("grammar") || normalized.includes("reading")) return "grammar_and_reading";
+  if (normalized.includes("kanji") || normalized.includes("vocabulary")) return "vocabulary_and_kanji";
   return null;
 }
