@@ -15,10 +15,6 @@ const simpleEnrichment = readFileSync(
   "lib/gemini/simple-story-enrichment.ts",
   "utf8",
 );
-const simpleEnrichmentContract = readFileSync(
-  "lib/gemini/simple-story-enrichment-contract.ts",
-  "utf8",
-);
 const existingLibrary = readFileSync(
   "lib/gemini/story-library-existing-only.ts",
   "utf8",
@@ -103,8 +99,8 @@ const migration = readFileSync(
   "supabase/migrations/20260730070000_story_pipeline_and_kanji_exposure.sql",
   "utf8",
 );
-const enrichmentMigration = readFileSync(
-  "supabase/migrations/20260804090000_simple_story_vocabulary_enrichment.sql",
+const dictionaryMigration = readFileSync(
+  "supabase/migrations/20260812112000_dictionary_story_vocabulary.sql",
   "utf8",
 );
 const readingMigration = readFileSync(
@@ -162,7 +158,7 @@ describe("custom lesson story pipeline v3", () => {
     }]);
   });
 
-  it("enriches every raw story word before resolving library-backed taps", () => {
+  it("segments Japanese and resolves JMdict vocabulary without an enrichment model", () => {
     expect(existingLibrary).toContain("resolveStoryFromExistingLibrary");
     expect(existingLibrary).toContain("buildFormIndex");
     expect(existingLibrary).toContain("composeEntryForm");
@@ -170,25 +166,26 @@ describe("custom lesson story pipeline v3", () => {
     expect(existingLibrary).toContain('model: "existing-library-only"');
     expect(existingLibrary).not.toContain("generateStructured");
     expect(existingLibrary).not.toContain("OPENAI_API_KEY");
-    expect(simpleEnrichment).toContain('name: "story_vocabulary"');
-    expect(simpleEnrichment).toContain("strictSchema: true");
-    expect(simpleEnrichment).toContain("exactSchemaName: true");
-    expect(simpleEnrichment).toContain("storyEnrichmentPrompt(japaneseStory)");
+    expect(simpleEnrichment).toContain("Intl as unknown");
+    expect(simpleEnrichment).toContain('granularity: "word"');
+    expect(simpleEnrichment).toContain("https://jisho.org/api/v1/search/words");
+    expect(simpleEnrichment).toContain("lookupJapaneseDictionaryVocabulary");
+    expect(simpleEnrichment).toContain('DICTIONARY_SOURCE_MODEL = "jisho-jmdict"');
     expect(simpleEnrichment).toContain('rpc("store_story_vocabulary_enrichment"');
-    expect(simpleEnrichmentContract).toContain("List every unique vocabulary word exactly as it appears");
-    expect(simpleEnrichmentContract).toContain('required: ["word", "reading", "meaning"]');
+    expect(simpleEnrichment).not.toContain("generateStructured");
+    expect(simpleEnrichment).not.toContain("OPENAI_API_KEY");
     expect(runner).toContain("resolveStoryFromExistingLibrary");
     expect(runner).toContain("enrichGeneratedStoryVocabulary");
     expect(runner.indexOf("processVocabularyEnrichment")).toBeLessThan(
       runner.indexOf("processLibraryResolution"),
     );
     expect(runner).toContain('finishStage(admin, job, "library_resolution"');
-    expect(enrichmentMigration).toContain("create table if not exists public.story_vocabulary_enrichments");
-    expect(enrichmentMigration).toContain("word text not null");
-    expect(enrichmentMigration).toContain("reading text not null");
-    expect(enrichmentMigration).toContain("meaning text not null");
-    expect(enrichmentMigration).not.toContain("v_dictionary_form :=");
-    expect(enrichmentMigration).toMatch(/v_word,\s+v_word,\s+v_reading/u);
+    expect(dictionaryMigration).toContain("v_item->>'dictionaryForm'");
+    expect(dictionaryMigration).toContain("record.dictionary_form = v_dictionary_form");
+    expect(dictionaryMigration).toContain("coalesce(v_aliases, '{}')");
+    expect(dictionaryMigration).toContain("select v_word");
+    expect(dictionaryMigration).toContain("'imported'");
+    expect(dictionaryMigration).toContain("'source', 'JMdict'");
     expect(runner).not.toContain("resolveStoryLibraryV4");
   });
 
@@ -306,43 +303,46 @@ describe("custom lesson story pipeline v3", () => {
     expect(grammarContract).toMatch(/required:\s*\[\s*"format_id"/u);
   });
 
-  it("generates, enriches, and questions a separate reading passage in order", () => {
+  it("generates, dictionary-indexes, and questions a separate reading passage in order", () => {
     expect(readingContract).toContain("Generate a Japanese language-learning story for reading.");
     expect(readingContract).toContain("Create reading-comprehension questions from the following Japanese story.");
     expect(readingContract).toContain("Write essay-style questions in Japanese.");
     expect(readingContract).toContain("Medium questions must combine information from two or more story sentences.");
     expect(readingContract).toContain('required: ["difficulty", "question", "answer"]');
     expect(readingGeneration.indexOf("prompt: readingPassagePrompt")).toBeLessThan(
-      readingGeneration.indexOf("prompt: storyEnrichmentPrompt(passage.value.japanese_story)"),
+      readingGeneration.indexOf("lookupJapaneseDictionaryVocabulary"),
     );
-    expect(readingGeneration.indexOf("prompt: storyEnrichmentPrompt(passage.value.japanese_story)")).toBeLessThan(
+    expect(readingGeneration.indexOf("lookupJapaneseDictionaryVocabulary")).toBeLessThan(
       readingGeneration.indexOf("prompt: readingQuestionsPrompt"),
     );
     expect(readingGeneration).toContain('name: "reading_lesson"');
-    expect(readingGeneration).toContain('name: "reading_vocabulary"');
+    expect(readingGeneration).not.toContain('name: "reading_vocabulary"');
     expect(readingGeneration).toContain('name: "reading_questions"');
+    expect(readingGeneration).toContain("DICTIONARY_SOURCE_MODEL");
     expect(generatedVocabularyStorage).toContain('rpc("store_story_vocabulary_enrichment"');
     expect(readingMigration).toContain("create table public.lesson_reading_questions");
     expect(readingMigration).toContain("jsonb_array_length(p_package->'readingQuestions')");
   });
 
-  it("creates five enriched listening conversations from the exact sample contract", () => {
+  it("creates five dictionary-indexed listening conversations from the exact sample contract", () => {
     expect(listeningContract).toContain("Create exactly 5 listening-comprehension questions");
     expect(listeningContract).toContain("natural Japanese conversation of 5–10 lines");
     expect(listeningContract).toMatch(/required:\s*\[\s*"difficulty"/u);
     expect(listeningGeneration).toContain('name: "listening_questions"');
     expect(listeningGeneration).toContain("strictSchema: true");
     expect(listeningGeneration).toContain("exactSchemaName: true");
-    expect(listeningGeneration).toContain('name: "listening_vocabulary"');
+    expect(listeningGeneration).not.toContain('name: "listening_vocabulary"');
+    expect(listeningGeneration).toContain("lookupJapaneseDictionaryVocabulary");
+    expect(listeningGeneration).toContain("DICTIONARY_SOURCE_MODEL");
     expect(listeningGeneration.indexOf("prompt: listeningQuestionsPrompt")).toBeLessThan(
-      listeningGeneration.indexOf("prompt: storyEnrichmentPrompt(listeningText)"),
+      listeningGeneration.indexOf("lookupJapaneseDictionaryVocabulary"),
     );
     expect(activityGroups).toContain("generateListeningRegion");
     expect(listeningMigration).toContain("add column conversation_lines text[]");
     expect(listeningMigration).toContain("jsonb_array_length(p_package->'listeningExercises') <> 5");
   });
 
-  it("creates five story-grounded read-aloud sentences with the fixed difficulty mix", () => {
+  it("creates five story-grounded read-aloud sentences with dictionary indexing", () => {
     expect(speakingContract).toContain("Create exactly 5 Japanese sentences for read-aloud speaking practice");
     expect(speakingContract).toContain("2 easy, 2 medium, and 1 hard");
     expect(speakingContract).toContain("Do not ask the learner a question");
@@ -350,9 +350,11 @@ describe("custom lesson story pipeline v3", () => {
     expect(speakingGeneration).toContain('name: "speaking_read_aloud"');
     expect(speakingGeneration).toContain("strictSchema: true");
     expect(speakingGeneration).toContain("exactSchemaName: true");
-    expect(speakingGeneration).toContain('name: "speaking_vocabulary"');
+    expect(speakingGeneration).not.toContain('name: "speaking_vocabulary"');
+    expect(speakingGeneration).toContain("lookupJapaneseDictionaryVocabulary");
+    expect(speakingGeneration).toContain("DICTIONARY_SOURCE_MODEL");
     expect(speakingGeneration.indexOf("prompt: speakingReadAloudPrompt")).toBeLessThan(
-      speakingGeneration.indexOf("prompt: storyEnrichmentPrompt(speakingText)"),
+      speakingGeneration.indexOf("lookupJapaneseDictionaryVocabulary"),
     );
     expect(activityGroups).toContain("generateSpeakingRegion");
     expect(speakingMigration).toContain("v_easy <> 2 or v_medium <> 2 or v_hard <> 1");
