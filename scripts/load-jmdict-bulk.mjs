@@ -39,6 +39,26 @@ function copyPathLiteral(value) {
 }
 
 const sqlPath = join(CACHE_DIR, "load-jmdict.sql");
+const copyColumns = [
+  "entry_key",
+  "entry_seq",
+  "dictionary_form",
+  "reading",
+  "meaning",
+  "meanings",
+  "part_of_speech",
+  "conjugation_type",
+  "aliases",
+  "common",
+  "priority",
+  "source_version",
+  "imported_at",
+].join(", ");
+
+// psql backslash commands terminate at the newline. Keep the entire \copy
+// command on one physical line; SQL statements below may remain multiline.
+const copyCommand = `\\copy public.jmdict_entries (${copyColumns}) from ${copyPathLiteral(csvPath)} with (format csv, header true, encoding 'UTF8');`;
+
 const sql = String.raw`\set ON_ERROR_STOP on
 \echo 'Starting compact JMdict bulk load...'
 set statement_timeout = 0;
@@ -54,21 +74,7 @@ drop index if exists public.jmdict_entries_dictionary_form_idx;
 drop index if exists public.jmdict_entries_reading_idx;
 drop index if exists public.jmdict_entries_aliases_idx;
 
-\copy public.jmdict_entries (
-  entry_key,
-  entry_seq,
-  dictionary_form,
-  reading,
-  meaning,
-  meanings,
-  part_of_speech,
-  conjugation_type,
-  aliases,
-  common,
-  priority,
-  source_version,
-  imported_at
-) from ${copyPathLiteral(csvPath)} with (format csv, header true, encoding 'UTF8');
+${copyCommand}
 
 create index jmdict_entries_entry_seq_idx
   on public.jmdict_entries (entry_seq);
