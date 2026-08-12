@@ -130,7 +130,7 @@ describe("custom lesson engine contract", () => {
     expect(groups).toContain("strictSchema: true");
     expect(groups).toContain("exactSchemaName: true");
     expect(groups).toContain("Do not use or output database IDs");
-    expect(checkpoints).toContain('group === "final_review"');
+    expect(checkpoints).toContain("Final review must contain exactly 5 questions.");
     expect(checkpoints).not.toContain("requires at least one targetItemId");
   });
 
