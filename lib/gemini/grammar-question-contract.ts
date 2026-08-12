@@ -11,6 +11,15 @@ export interface GrammarQuestionFormat {
   sentence?: string;
 }
 
+export interface RawGrammarTeaching {
+  requestIndex: number;
+  meaning: string;
+  formation: string;
+  usage: string;
+  example: string;
+  translation: string;
+}
+
 export interface RawGrammarQuestion {
   format_id: number;
   difficulty: RawGrammarQuestionDifficulty;
@@ -21,6 +30,7 @@ export interface RawGrammarQuestion {
 }
 
 export interface RawGrammarQuestions {
+  grammarTeaching: RawGrammarTeaching[];
   questions: RawGrammarQuestion[];
 }
 
@@ -40,6 +50,24 @@ export const grammarQuestionFormats: GrammarQuestionFormat[] = [
 export const grammarQuestionsSchema: JsonSchema = {
   type: "object",
   properties: {
+    grammarTeaching: {
+      type: "array",
+      minItems: 3,
+      maxItems: 3,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["requestIndex", "meaning", "formation", "usage", "example", "translation"],
+        properties: {
+          requestIndex: { type: "integer", minimum: 0, maximum: 2 },
+          meaning: { type: "string" },
+          formation: { type: "string" },
+          usage: { type: "string" },
+          example: { type: "string" },
+          translation: { type: "string" },
+        },
+      },
+    },
     questions: {
       type: "array",
       minItems: 10,
@@ -74,7 +102,7 @@ export const grammarQuestionsSchema: JsonSchema = {
       },
     },
   },
-  required: ["questions"],
+  required: ["grammarTeaching", "questions"],
   additionalProperties: false,
 };
 
@@ -92,29 +120,31 @@ function pythonJson(value: unknown): string {
   throw new Error("Unsupported grammar question format value.");
 }
 
-function pythonStringList(values: string[]): string {
-  return `[${values.map((value) => `'${value.replace(/\\/gu, "\\\\").replace(/'/gu, "\\'")}'`).join(", ")}]`;
-}
-
 export function grammarQuestionsPrompt(input: {
   japaneseStory: string;
   targetGrammarPatterns: string[];
   questionFormats?: GrammarQuestionFormat[];
 }): string {
+  const indexedPatterns = input.targetGrammarPatterns.map((pattern, requestIndex) => ({
+    requestIndex,
+    pattern,
+  }));
   return `
-Create grammar questions from this Japanese story.
+Create AIko's grammar lesson from this fixed Japanese story.
 
 Story:
 ${input.japaneseStory}
 
-Grammar patterns:
-${pythonStringList(input.targetGrammarPatterns)}
+Three target grammar patterns:
+${pythonJson(indexedPatterns)}
 
 Question formats:
 ${pythonJson(input.questionFormats ?? grammarQuestionFormats)}
 
 Requirements:
-- Use only the provided question formats.
+- Do not rewrite the story.
+- grammarTeaching must contain exactly one entry for requestIndex 0 through 2.
+- For each grammarTeaching entry, explain the fixed pattern's meaning, formation, usage, one natural Japanese example, and the English translation of that example. Do not output or replace the pattern itself.
 - Use only the provided grammar patterns that appear in the story.
 - Create story-related questions in the most appropriate format for each pattern and difficulty.
 - Create exactly 10 questions: 3 easy, 4 medium, and 3 hard.
