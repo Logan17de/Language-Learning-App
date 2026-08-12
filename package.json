@@ -16,7 +16,8 @@
     "db:seed": "supabase db reset --local",
     "db:types": "supabase gen types --lang typescript --local > types/database.ts",
     "db:validate": "node scripts/validate-supabase.mjs",
-    "seed:validate": "node scripts/validate-seed.mjs"
+    "seed:validate": "node scripts/validate-seed.mjs",
+    "jmdict:import": "node scripts/import-jmdict.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.3",
