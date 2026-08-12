@@ -12,6 +12,22 @@ const reading = readFileSync(
   "lib/gemini/reading-region-generation.ts",
   "utf8",
 );
+const listening = readFileSync(
+  "lib/gemini/listening-region-generation.ts",
+  "utf8",
+);
+const speaking = readFileSync(
+  "lib/gemini/speaking-region-generation.ts",
+  "utf8",
+);
+const vocabularyContract = readFileSync(
+  "lib/gemini/vocabulary-question-contract.ts",
+  "utf8",
+);
+const grammarContract = readFileSync(
+  "lib/gemini/grammar-question-contract.ts",
+  "utf8",
+);
 const flexiblePackageMigration = readFileSync(
   "supabase/migrations/20260805090000_flexible_generated_lesson_validation.sql",
   "utf8",
@@ -26,7 +42,7 @@ const vocabularyMigration = readFileSync(
 );
 
 describe("generated lesson validation", () => {
-  it("keeps enrichment flexible while fixing and validating learner activity banks", () => {
+  it("keeps the original story enrichment flexible while fixing learner activity banks", () => {
     expect(
       listeningQuestionIssues({
         questions: Array.from({ length: 5 }, () => ({})),
@@ -61,13 +77,24 @@ describe("generated lesson validation", () => {
     expect(activities).toContain(
       "Review response must contain exactly 5 questions.",
     );
-    expect(activities).toContain("activityGroupCheckpointIssues(");
-    expect(activities).toContain('"final_review",');
     expect(activities).toContain("strictSchema: true");
     expect(activities).toContain("exactSchemaName: true");
     expect(activities).toContain(
-      "const targets = storyTargets.length > 0 ? storyTargets : input.library.grammar",
+      "const targets = storyTargets.length === 3 ? storyTargets : targetGrammarRecords(input.library)",
     );
+    expect(vocabularyContract).toContain("kanjiTeaching");
+    expect(grammarContract).toContain("grammarTeaching");
+  });
+
+  it("keeps JMdict limited to the original story", () => {
+    for (const source of [reading, listening, speaking]) {
+      expect(source).not.toContain("lookupJapaneseDictionaryVocabulary");
+      expect(source).not.toContain("storeGeneratedVocabularyTerms");
+      expect(source).not.toContain("DICTIONARY_SOURCE_MODEL");
+    }
+    expect(reading).toContain("inspectableTerms: []");
+    expect(listening).toContain("inspectableTerms: []");
+    expect(speaking).toContain("inspectableTerms: []");
   });
 
   it("rejects incomplete fixed activity regions before storage", () => {
@@ -75,8 +102,6 @@ describe("generated lesson validation", () => {
     expect(speakingReadAloudIssues({ sentences: [{}] })).not.toEqual([]);
     expect(storyEnrichmentOutputIssues({ vocabulary: [] })).not.toEqual([]);
 
-    // Preserve the historical reason PR #32 existed: target/story library
-    // regions can remain variable. Plan 1 only restores exact learner banks.
     expect(flexiblePackageMigration).toContain(
       "Accepts variable generated lesson counts",
     );
