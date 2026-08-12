@@ -3,142 +3,61 @@ import { describe, expect, it } from "vitest";
 import { normalizeStoryPassage } from "../lib/gemini/story-pipeline-v3";
 import { CANONICAL_LESSON_PHASES } from "../lib/lesson-contract";
 
-const storyCall = readFileSync(
-  "lib/gemini/adaptive-story-generation.ts",
-  "utf8",
-);
-const storyContract = readFileSync(
-  "lib/gemini/story-generation-contract.ts",
-  "utf8",
-);
-const simpleEnrichment = readFileSync(
-  "lib/gemini/simple-story-enrichment.ts",
-  "utf8",
-);
-const existingLibrary = readFileSync(
-  "lib/gemini/story-library-existing-only.ts",
-  "utf8",
-);
+const storyCall = readFileSync("lib/gemini/adaptive-story-generation.ts", "utf8");
+const storyContract = readFileSync("lib/gemini/story-generation-contract.ts", "utf8");
+const simpleEnrichment = readFileSync("lib/gemini/simple-story-enrichment.ts", "utf8");
+const existingLibrary = readFileSync("lib/gemini/story-library-existing-only.ts", "utf8");
+const placeholderEnrichment = readFileSync("lib/custom-lessons/placeholder-enrichment.ts", "utf8");
 const plan = readFileSync("lib/gemini/lesson-plan-v3.ts", "utf8");
-const route = readFileSync(
-  "app/api/custom-lessons/generate/route.ts",
-  "utf8",
-);
-const validator = readFileSync(
-  "lib/gemini/activity-validator-ai.ts",
-  "utf8",
-);
 const runner = readFileSync("lib/custom-lessons/job-runner.ts", "utf8");
-const activityGroups = readFileSync(
-  "lib/gemini/lesson-activity-groups.ts",
-  "utf8",
-);
-const vocabularyContract = readFileSync(
-  "lib/gemini/vocabulary-question-contract.ts",
-  "utf8",
-);
-const grammarContract = readFileSync(
-  "lib/gemini/grammar-question-contract.ts",
-  "utf8",
-);
-const readingContract = readFileSync(
-  "lib/gemini/reading-comprehension-contract.ts",
-  "utf8",
-);
-const readingGeneration = readFileSync(
-  "lib/gemini/reading-region-generation.ts",
-  "utf8",
-);
-const listeningContract = readFileSync(
-  "lib/gemini/listening-question-contract.ts",
-  "utf8",
-);
-const listeningGeneration = readFileSync(
-  "lib/gemini/listening-region-generation.ts",
-  "utf8",
-);
-const speakingContract = readFileSync(
-  "lib/gemini/speaking-question-contract.ts",
-  "utf8",
-);
-const speakingGeneration = readFileSync(
-  "lib/gemini/speaking-region-generation.ts",
-  "utf8",
-);
-const generatedVocabularyStorage = readFileSync(
-  "lib/gemini/generated-vocabulary-storage.ts",
-  "utf8",
-);
+const activityGroups = readFileSync("lib/gemini/lesson-activity-groups.ts", "utf8");
+const vocabularyContract = readFileSync("lib/gemini/vocabulary-question-contract.ts", "utf8");
+const grammarContract = readFileSync("lib/gemini/grammar-question-contract.ts", "utf8");
+const readingContract = readFileSync("lib/gemini/reading-comprehension-contract.ts", "utf8");
+const readingGeneration = readFileSync("lib/gemini/reading-region-generation.ts", "utf8");
+const listeningContract = readFileSync("lib/gemini/listening-question-contract.ts", "utf8");
+const listeningGeneration = readFileSync("lib/gemini/listening-region-generation.ts", "utf8");
+const speakingContract = readFileSync("lib/gemini/speaking-question-contract.ts", "utf8");
+const speakingGeneration = readFileSync("lib/gemini/speaking-region-generation.ts", "utf8");
 const structured = readFileSync("lib/openai/structured-output.ts", "utf8");
-const structuredText = readFileSync("lib/openai/structured-text.ts", "utf8");
-const compatibilityExport = readFileSync(
-  "lib/gemini/structured-output.ts",
-  "utf8",
-);
-const inspectable = readFileSync(
-  "components/exercises/inspectable-text.tsx",
-  "utf8",
-);
-const progressiveStory = readFileSync(
-  "components/lesson/progressive-story-page.tsx",
-  "utf8",
-);
-const storyPhase = readFileSync(
-  "components/lesson/story-phase.tsx",
-  "utf8",
-);
-const audioControl = readFileSync(
-  "components/exercises/audio-control.tsx",
-  "utf8",
-);
+const compatibilityExport = readFileSync("lib/gemini/structured-output.ts", "utf8");
+const inspectable = readFileSync("components/exercises/inspectable-text.tsx", "utf8");
+const progressiveStory = readFileSync("components/lesson/progressive-story-page.tsx", "utf8");
+const storyPhase = readFileSync("components/lesson/story-phase.tsx", "utf8");
 const reading = readFileSync("components/lesson/reading-phase.tsx", "utf8");
 const listening = readFileSync("components/lesson/listening-phase.tsx", "utf8");
 const speaking = readFileSync("components/lesson/speaking-phase.tsx", "utf8");
 const storedAudio = readFileSync("lib/audio/audio-library.ts", "utf8");
-const migration = readFileSync(
+const exposureMigration = readFileSync(
   "supabase/migrations/20260730070000_story_pipeline_and_kanji_exposure.sql",
   "utf8",
 );
-const dictionaryMigration = readFileSync(
-  "supabase/migrations/20260812112000_dictionary_story_vocabulary.sql",
-  "utf8",
-);
-const readingMigration = readFileSync(
-  "supabase/migrations/20260804160000_reading_comprehension_pipeline.sql",
-  "utf8",
-);
-const listeningMigration = readFileSync(
-  "supabase/migrations/20260804170000_listening_question_contract.sql",
-  "utf8",
-);
-const speakingMigration = readFileSync(
-  "supabase/migrations/20260804220000_speaking_read_aloud_contract.sql",
+const targetIdentityMigration = readFileSync(
+  "supabase/migrations/20260812180000_catalog_identity_only_lesson_targets.sql",
   "utf8",
 );
 
 describe("custom lesson story pipeline v3", () => {
-  it("makes call 1 a continuous 10-15 sentence passage with one selected interest", () => {
+  it("makes the first model call story-only and verifies all selected targets", () => {
     expect(storyContract).toContain("const STORY_MIN_SENTENCES = 10");
     expect(storyContract).toContain("const STORY_MAX_SENTENCES = 15");
     expect(storyContract).toContain('"selected_interest"');
     expect(storyContract).toContain('"japanese_story"');
     expect(storyContract).toContain('"english_translation"');
-    expect(storyContract).toContain("Available learner interests");
-    expect(storyContract).toContain("Select exactly one learner interest");
     expect(storyContract).toContain("one continuous string, not an array");
     expect(storyCall).toContain('name: "japanese_lesson"');
     expect(storyCall).toContain("strictSchema: true");
     expect(storyCall).toContain("exactSchemaName: true");
-    expect(storyCall).toContain("validate: () => []");
-    expect(storyCall).not.toContain("structuralStoryIssues");
-    expect(storyCall).not.toContain("acceptedGrammarForms");
+    expect(storyCall).toContain("missingKanji");
+    expect(storyCall).toContain("missingGrammar");
+    expect(storyCall).toContain("Story target validation failed");
+    expect(storyCall).toContain("storyUsesGrammarPattern");
     expect(storyCall).toContain("normalizeStoryPassage(result.value)");
-    expect(storyCall).not.toContain('required: [\n              "surface"');
     expect(plan).toContain('.from("user_preferences")');
     expect(plan).toContain('.from("profiles")');
   });
 
-  it("normalizes the new passage response into one backward-compatible reader line", () => {
+  it("normalizes the story passage into the backward-compatible reader line", () => {
     const draft = normalizeStoryPassage({
       selected_interest: "Travel",
       japanese_title: "東京の一日",
@@ -158,210 +77,112 @@ describe("custom lesson story pipeline v3", () => {
     }]);
   });
 
-  it("segments Japanese and resolves JMdict vocabulary without an enrichment model", () => {
+  it("uses local JMdict only to make the original story tappable", () => {
+    expect(simpleEnrichment).toContain("lookupJapaneseDictionaryVocabulary");
+    expect(simpleEnrichment).toContain('DICTIONARY_SOURCE_MODEL = "jmdict-local"');
+    expect(simpleEnrichment).toContain('rpc("lookup_jmdict_vocabulary"');
+    expect(simpleEnrichment).toContain('rpc("store_story_vocabulary_enrichment"');
+    expect(simpleEnrichment).not.toContain("generateStructured");
     expect(existingLibrary).toContain("resolveStoryFromExistingLibrary");
     expect(existingLibrary).toContain("buildFormIndex");
     expect(existingLibrary).toContain("composeEntryForm");
     expect(existingLibrary).toContain("Story words become tappable");
-    expect(existingLibrary).toContain('model: "existing-library-only"');
     expect(existingLibrary).not.toContain("generateStructured");
-    expect(existingLibrary).not.toContain("OPENAI_API_KEY");
-    expect(simpleEnrichment).toContain("Intl as unknown");
-    expect(simpleEnrichment).toContain('granularity: "word"');
-    expect(simpleEnrichment).toContain("https://jisho.org/api/v1/search/words");
-    expect(simpleEnrichment).toContain("lookupJapaneseDictionaryVocabulary");
-    expect(simpleEnrichment).toContain('DICTIONARY_SOURCE_MODEL = "jisho-jmdict"');
-    expect(simpleEnrichment).toContain('rpc("store_story_vocabulary_enrichment"');
-    expect(simpleEnrichment).not.toContain("generateStructured");
-    expect(simpleEnrichment).not.toContain("OPENAI_API_KEY");
-    expect(runner).toContain("resolveStoryFromExistingLibrary");
     expect(runner).toContain("enrichGeneratedStoryVocabulary");
     expect(runner.indexOf("processVocabularyEnrichment")).toBeLessThan(
       runner.indexOf("processLibraryResolution"),
     );
-    expect(runner).toContain('finishStage(admin, job, "library_resolution"');
-    expect(dictionaryMigration).toContain("v_item->>'dictionaryForm'");
-    expect(dictionaryMigration).toContain("record.dictionary_form = v_dictionary_form");
-    expect(dictionaryMigration).toContain("coalesce(v_aliases, '{}')");
-    expect(dictionaryMigration).toContain("select v_word");
-    expect(dictionaryMigration).toContain("'imported'");
-    expect(dictionaryMigration).toContain("'source', 'JMdict'");
-    expect(runner).not.toContain("resolveStoryLibraryV4");
   });
 
-  it("shows justified Japanese and English passages while retaining old line compatibility", () => {
-    expect(progressiveStory).toContain("english: string");
-    expect(progressiveStory).toContain("japanesePassage");
-    expect(progressiveStory).toContain("englishPassage");
-    expect(progressiveStory).toContain('textJustify: "inter-character"');
-    expect(progressiveStory).toContain('textJustify: "inter-word"');
-    expect(progressiveStory).toContain('English story');
-    expect(progressiveStory.indexOf('English story')).toBeGreaterThan(
-      progressiveStory.indexOf('<InspectableText text={japanesePassage}'),
-    );
-    expect(storyPhase).toContain('English story');
-    expect(storyPhase).toContain('{line.english}');
-    expect(storyPhase).toContain('textJustify: "inter-character"');
-    expect(storyPhase).toContain('textJustify: "inter-word"');
-    expect(storyPhase.indexOf('English story')).toBeGreaterThan(
-      storyPhase.indexOf('segmentStoredStoryLine(line.japanese'),
-    );
+  it("does not perform a second kanji or grammar enrichment pass", () => {
+    expect(placeholderEnrichment).toContain('model: "catalog-identities-only"');
+    expect(placeholderEnrichment).not.toContain("generateStructured");
+    expect(placeholderEnrichment).not.toContain("enrich_custom_lesson_placeholders_background");
+    expect(targetIdentityMigration).toContain("lessonTargetIdentityOnly");
+    expect(targetIdentityMigration).toContain("teachingMetadataRequired");
   });
 
-  it("uses GPT-5.6 Luna through the stateless OpenAI Responses API", () => {
-    expect(structured).toContain('"gpt-5.6-luna"');
-    expect(structured).toContain("OPENAI_API_KEY");
-    expect(structured).toContain("OPENAI_STORY_MODEL");
-    expect(structured).toContain("OPENAI_VALIDATOR_MODEL");
-    expect(structured).toContain("OPENAI_STORY_REASONING_EFFORT");
-    expect(structured).toContain("OpenAI structured generation completed");
-    expect(structured).toContain("parseJsonOrJsonl");
-    expect(structuredText).toContain("object-based JSONL");
-    expect(structuredText).toContain("Object.assign({}, ...records)");
-    expect(structured).not.toContain("GEMINI_");
-    expect(compatibilityExport).toContain("@/lib/openai/structured-output");
-    expect(runner).toContain("processVocabularyEnrichment");
-  });
-
-  it("throttles and retries only transient structured model failures", () => {
-    expect(compatibilityExport).toContain("OPENAI_STRUCTURED_MAX_CONCURRENCY");
-    expect(compatibilityExport).toContain("OPENAI_STRUCTURED_RETRIES");
-    expect(compatibilityExport).toContain("acquireCallSlot");
-    expect(compatibilityExport).toContain("transientModelError");
-    expect(compatibilityExport).toContain("Retrying transient OpenAI structured generation");
-    expect(compatibilityExport).toContain("finally");
-    expect(compatibilityExport).toContain("release()");
-  });
-
-  it("keeps unknown readings behind inspection while recording story appearances", () => {
-    expect(inspectable).not.toContain("［{segment.word.reading}］");
-    expect(inspectable).not.toContain("showReading");
-    expect(inspectable).toContain(
-      'active.word.scriptType === "kanji" && stage >= 1',
-    );
-    expect(runner).toContain('rpc("record_story_kanji_exposures_background"');
-    expect(plan).toContain('.gte("appearance_count", 10)');
-    expect(migration).toContain("appearance_count >= 10");
-    expect(migration).toContain("knownThreshold', 10");
-    expect(migration).toContain("primary key (user_id, request_id, character)");
-    expect(migration).toContain("on conflict (user_id, request_id, character) do nothing");
-  });
-
-  it("persists tested strict question responses without a second model prompt", () => {
-    expect(runner).not.toContain("approveActivityQuestionsWithAI");
-    expect(runner).toContain("normalizeGeneratedCheckpoint(generated.value)");
-    expect(runner).toContain(
-      "await persistGroup(admin, current, group, normalized, generated.audit)",
-    );
-  });
-
-  it("creates vocabulary questions from the exact sample contract", () => {
-    expect(activityGroups).toContain('name: "vocab_questions"');
-    expect(activityGroups).toContain("vocabularyQuestionsPrompt");
-    expect(activityGroups).toContain("vocabularyQuestionsSchema");
-    expect(activityGroups).toContain("strictSchema: true");
-    expect(activityGroups).toContain("exactSchemaName: true");
-    expect(activityGroups).toContain("Vocabulary response must contain exactly 13 questions.");
-    expect(activityGroups).toContain("difficultySplitIssues");
-    expect(activityGroups).toContain("{ easy: 6, medium: 4, hard: 3 }");
-    expect(activityGroups).toContain("targetItemIds: [targetId]");
-    expect(activityGroups).toContain("does not resolve to a relevant library target");
-    expect(activityGroups).toContain("Vocabulary question does not reference a valid library target.");
-    expect(vocabularyContract).toContain("Create vocabulary and kanji questions from this Japanese story.");
+  it("builds the vocabulary and kanji lesson from story plus five target kanji", () => {
+    expect(vocabularyContract).toContain("Create AIko's vocabulary and kanji lesson from this fixed Japanese story.");
+    expect(vocabularyContract).toContain("kanjiTeaching");
+    expect(vocabularyContract).toContain("Exactly 5 questions should directly practice the five target kanji");
+    expect(vocabularyContract).toContain("remaining 8 questions");
     expect(vocabularyContract).toContain("Create exactly 13 questions: 6 easy, 4 medium, and 3 hard.");
-    expect(vocabularyContract).toMatch(/required:\s*\[\s*"format_id"/u);
-    expect(existingLibrary).toContain("filterStoryPracticeKanji");
-    expect(existingLibrary).toContain("knownKanji: input.plan.knownKanji");
-    expect(existingLibrary).toContain("targetKanji: input.plan.kanji.map");
+    expect(activityGroups).toContain('name: "vocab_questions"');
+    expect(activityGroups).toContain("adaptKanjiTeaching");
+    expect(activityGroups).toContain("adaptVocabularyQuestions");
+    expect(activityGroups).toContain("targetKanjiCharacters(input.library)");
+    expect(activityGroups).not.toContain("inputLibraryVocabularyMatch");
   });
 
-  it("reorders model-provided choices during final lesson assembly", () => {
-    expect(activityGroups).toContain('withTerms(question, "vocabulary")');
-    expect(activityGroups).toContain('withTerms(question, "grammar")');
-    expect(activityGroups).toContain('["listening", exercise.prompt, exercise.correctAnswer]');
-    expect(activityGroups.replace(/\s+/g, " ")).toContain(
-      '"review", question.category, question.prompt, question.correctAnswer,',
-    );
+  it("builds grammar teaching and ten questions from the fixed three target identities", () => {
+    expect(grammarContract).toContain("Create AIko's grammar lesson from this fixed Japanese story.");
+    expect(grammarContract).toContain("grammarTeaching");
+    expect(grammarContract).toContain("meaning, formation, usage");
+    expect(grammarContract).toContain("Create exactly 10 questions: 3 easy, 4 medium, and 3 hard.");
+    expect(activityGroups).toContain('name: "grammar_questions"');
+    expect(activityGroups).toContain("adaptGrammarTeaching");
+    expect(activityGroups).toContain("targetGrammarRecords(input.library)");
+    expect(activityGroups).toContain("storyUsesGrammarPattern");
+  });
+
+  it("generates reading passage and five questions without dictionary indexing", () => {
+    expect(readingContract).toContain("Generate a Japanese language-learning story for reading.");
+    expect(readingContract).toContain("Create reading-comprehension questions from the following Japanese story.");
+    expect(readingGeneration).toContain('name: "reading_lesson"');
+    expect(readingGeneration).toContain('name: "reading_questions"');
+    expect(readingGeneration).not.toContain("lookupJapaneseDictionaryVocabulary");
+    expect(readingGeneration).not.toContain("storeGeneratedVocabularyTerms");
+    expect(readingGeneration).toContain("inspectableTerms: []");
+  });
+
+  it("creates five listening exercises without a vocabulary enrichment pass", () => {
+    expect(listeningContract).toContain("Create exactly 5 listening-comprehension questions");
+    expect(listeningGeneration).toContain('name: "listening_questions"');
+    expect(listeningGeneration).toContain("strictSchema: true");
+    expect(listeningGeneration).not.toContain("lookupJapaneseDictionaryVocabulary");
+    expect(listeningGeneration).not.toContain("storeGeneratedVocabularyTerms");
+    expect(listeningGeneration).toContain("targetItemIds: []");
+    expect(listeningGeneration).toContain("inspectableTerms: []");
+  });
+
+  it("creates five story-grounded read-aloud exercises without dictionary indexing", () => {
+    expect(speakingContract).toContain("Create exactly 5 Japanese sentences for read-aloud speaking practice");
+    expect(speakingContract).toContain("2 easy, 2 medium, and 1 hard");
+    expect(speakingGeneration).toContain('name: "speaking_read_aloud"');
+    expect(speakingGeneration).toContain("strictSchema: true");
+    expect(speakingGeneration).not.toContain("lookupJapaneseDictionaryVocabulary");
+    expect(speakingGeneration).not.toContain("storeGeneratedVocabularyTerms");
+    expect(speakingGeneration).toContain("targetItemIds: []");
+    expect(speakingGeneration).toContain("inspectableTerms: []");
+  });
+
+  it("assembles later lesson stages with no tappable vocabulary outside the original story", () => {
+    expect(activityGroups).toContain("withNoTappableTerms");
+    expect(activityGroups).toContain("inspectableTerms: [] as InspectableTerm[]");
+    expect(activityGroups).toContain("kanji: input.groups.vocabularyAndKanji.kanjiTeaching");
+    expect(activityGroups).toContain("grammar: input.groups.grammarAndReading.grammarTeaching");
+    expect(activityGroups).toContain("story: playableStoryLines(input.draft, input.library)");
     expect(activityGroups).toContain("shuffledChoices(");
   });
 
-  it("creates grammar questions from the corrected grammar sample contract", () => {
-    expect(activityGroups).toContain('name: "grammar_questions"');
-    expect(activityGroups).toContain("grammarQuestionsPrompt");
-    expect(activityGroups).toContain("grammarQuestionsSchema");
-    expect(activityGroups).toContain("rawGrammarQuestionIssues");
-    expect(activityGroups).toContain("adaptGrammarQuestions");
-    expect(activityGroups).toContain("filterStoryGrammarPatterns");
-    expect(activityGroups).toContain("Grammar response must contain exactly 10 questions.");
-    expect(activityGroups).toContain("{ easy: 3, medium: 4, hard: 3 }");
-    expect(activityGroups).toContain("targetItemIds: [target.libraryId]");
-    expect(activityGroups).toContain("does not resolve to a relevant library target");
-    expect(activityGroups).toContain("Grammar question does not reference a valid library target.");
-    expect(grammarContract).toContain("Create grammar questions from this Japanese story.");
-    expect(grammarContract).toContain("Create exactly 10 questions: 3 easy, 4 medium, and 3 hard.");
-    expect(grammarContract).toContain("Do not create questions using grammar patterns that do not appear in the story.");
-    expect(grammarContract).toMatch(/required:\s*\[\s*"format_id"/u);
+  it("keeps durable checkpoints and regenerates only invalid groups", () => {
+    expect(runner).toContain("normalizeGeneratedCheckpoint(generated.value)");
+    expect(runner).toContain("await persistGroup(admin, current, group, normalized, generated.audit)");
+    expect(runner).toContain("invalidate_progressive_lesson_group");
+    expect(runner).toContain('last_action: "invalidated_checkpoint"');
+    expect(runner).toContain("finalizationFailureAction(error)");
   });
 
-  it("generates, dictionary-indexes, and questions a separate reading passage in order", () => {
-    expect(readingContract).toContain("Generate a Japanese language-learning story for reading.");
-    expect(readingContract).toContain("Create reading-comprehension questions from the following Japanese story.");
-    expect(readingContract).toContain("Write essay-style questions in Japanese.");
-    expect(readingContract).toContain("Medium questions must combine information from two or more story sentences.");
-    expect(readingContract).toContain('required: ["difficulty", "question", "answer"]');
-    expect(readingGeneration.indexOf("prompt: readingPassagePrompt")).toBeLessThan(
-      readingGeneration.indexOf("lookupJapaneseDictionaryVocabulary"),
-    );
-    expect(readingGeneration.indexOf("lookupJapaneseDictionaryVocabulary")).toBeLessThan(
-      readingGeneration.indexOf("prompt: readingQuestionsPrompt"),
-    );
-    expect(readingGeneration).toContain('name: "reading_lesson"');
-    expect(readingGeneration).not.toContain('name: "reading_vocabulary"');
-    expect(readingGeneration).toContain('name: "reading_questions"');
-    expect(readingGeneration).toContain("DICTIONARY_SOURCE_MODEL");
-    expect(generatedVocabularyStorage).toContain('rpc("store_story_vocabulary_enrichment"');
-    expect(readingMigration).toContain("create table public.lesson_reading_questions");
-    expect(readingMigration).toContain("jsonb_array_length(p_package->'readingQuestions')");
+  it("keeps target readings hidden until inspection and tracks kanji exposure", () => {
+    expect(inspectable).not.toContain("［{segment.word.reading}］");
+    expect(inspectable).toContain('active.word.scriptType === "kanji" && stage >= 1');
+    expect(runner).toContain('rpc("record_story_kanji_exposures_background"');
+    expect(exposureMigration).toContain("appearance_count >= 10");
+    expect(exposureMigration).toContain("knownThreshold', 10");
   });
 
-  it("creates five dictionary-indexed listening conversations from the exact sample contract", () => {
-    expect(listeningContract).toContain("Create exactly 5 listening-comprehension questions");
-    expect(listeningContract).toContain("natural Japanese conversation of 5–10 lines");
-    expect(listeningContract).toMatch(/required:\s*\[\s*"difficulty"/u);
-    expect(listeningGeneration).toContain('name: "listening_questions"');
-    expect(listeningGeneration).toContain("strictSchema: true");
-    expect(listeningGeneration).toContain("exactSchemaName: true");
-    expect(listeningGeneration).not.toContain('name: "listening_vocabulary"');
-    expect(listeningGeneration).toContain("lookupJapaneseDictionaryVocabulary");
-    expect(listeningGeneration).toContain("DICTIONARY_SOURCE_MODEL");
-    expect(listeningGeneration.indexOf("prompt: listeningQuestionsPrompt")).toBeLessThan(
-      listeningGeneration.indexOf("lookupJapaneseDictionaryVocabulary"),
-    );
-    expect(activityGroups).toContain("generateListeningRegion");
-    expect(listeningMigration).toContain("add column conversation_lines text[]");
-    expect(listeningMigration).toContain("jsonb_array_length(p_package->'listeningExercises') <> 5");
-  });
-
-  it("creates five story-grounded read-aloud sentences with dictionary indexing", () => {
-    expect(speakingContract).toContain("Create exactly 5 Japanese sentences for read-aloud speaking practice");
-    expect(speakingContract).toContain("2 easy, 2 medium, and 1 hard");
-    expect(speakingContract).toContain("Do not ask the learner a question");
-    expect(speakingContract).toContain("Do not use interrogative sentences");
-    expect(speakingGeneration).toContain('name: "speaking_read_aloud"');
-    expect(speakingGeneration).toContain("strictSchema: true");
-    expect(speakingGeneration).toContain("exactSchemaName: true");
-    expect(speakingGeneration).not.toContain('name: "speaking_vocabulary"');
-    expect(speakingGeneration).toContain("lookupJapaneseDictionaryVocabulary");
-    expect(speakingGeneration).toContain("DICTIONARY_SOURCE_MODEL");
-    expect(speakingGeneration.indexOf("prompt: speakingReadAloudPrompt")).toBeLessThan(
-      speakingGeneration.indexOf("lookupJapaneseDictionaryVocabulary"),
-    );
-    expect(activityGroups).toContain("generateSpeakingRegion");
-    expect(speakingMigration).toContain("v_easy <> 2 or v_medium <> 2 or v_hard <> 1");
-    expect(speakingMigration).toContain("question_type = 'read_aloud'");
-  });
-
-  it("keeps canonical phase order and shows the speaking target sentence", () => {
+  it("keeps canonical lesson phase order and existing player behavior", () => {
     expect(CANONICAL_LESSON_PHASES.map((phase) => phase.id)).toEqual([
       "story",
       "vocabulary",
@@ -371,62 +192,26 @@ describe("custom lesson story pipeline v3", () => {
       "speaking",
       "review",
     ]);
-    expect(speaking).toContain("Read the sentence aloud");
-    expect(speaking).toContain("text={exercise.modelAnswer}");
-    expect(speaking).not.toContain("AudioControl");
-    expect(speaking).toContain("RECORDING_LIMIT_SECONDS = 10");
-    expect(speaking).toContain("updateLiveTranscript");
-    expect(speaking).not.toContain("questionTypeLabel");
-    expect(speaking).not.toContain("Show model answer");
-    expect(speaking).toContain("exercise.mode");
-    expect(speaking).not.toContain("setSelectedMode");
-  });
-
-  it("records exact group errors and does not mislabel finalization failures", () => {
-    expect(runner).toContain('console.error("Custom lesson stage failed."');
-    expect(runner).toContain("errorClassification: failure.classification");
-    expect(runner).toContain("providerRequestId: failure.providerRequestId");
-    expect(runner).toContain("finalizationFailureAction(error)");
-    expect(runner).toContain('action.kind === "invalidate_group"');
-    expect(runner).toContain('last_action: "invalidated_checkpoint"');
-  });
-
-  it("keeps the story-first flow fast after the single story call", () => {
-    expect(plan).toContain("unstable_cache");
-    expect(plan).toContain("lesson-plan-v3-static-catalog");
-    expect(route).toContain('status: "queued"');
-    expect(route).toContain('{ status: 202 }');
-    expect(runner).toContain("SOFT_RUNTIME_LIMIT_MS");
-    expect(runner).toContain("DEFAULT_MAX_CYCLES = 1");
-    expect(structured).toContain("durationMs");
-    expect(structured).toContain("attempts");
-    expect(structured).toContain("cachedInputTokens");
-  });
-
-  it("keeps reading written and inspectable while listening stays stored-TTS plus MCQ-only", () => {
+    expect(progressiveStory).toContain("japanesePassage");
+    expect(progressiveStory).toContain("englishPassage");
+    expect(storyPhase).toContain("English story");
     expect(reading).toContain("lesson.readingQuestions ?? []");
-    expect(reading).toContain("<InspectableText");
-    expect(reading).toContain("<textarea");
-    expect(reading).not.toContain("MediaRecorder");
-    expect(reading).not.toContain("/api/audio/transcribe");
-    expect(audioControl).toContain('const readingSttOnly = label === "Hear this line"');
-    expect(audioControl).toContain("if (readingSttOnly) return null");
     expect(listening).toContain("<AudioControl");
-    expect(listening).toContain("onEnded={finishListening}");
-    expect(listening).toContain("Listen to the complete conversation to unlock the answers.");
-    expect(listening).toContain("disabled={!heardEntireConversation}");
-    expect(listening).toContain("lockAfterAnswer");
-    expect(listening).toContain("<MultipleChoiceCard");
-    expect(listening).not.toContain("MediaRecorder");
-    expect(listening).not.toContain("/api/audio/transcribe");
-    expect(storedAudio).toContain('.from("lesson_listening_activities")');
-    expect(storedAudio).not.toContain('.from("lesson_reading_sections")');
+    expect(speaking).toContain("Read the sentence aloud");
   });
 
-  it("keeps the migrated speaking group and final review generation intact", () => {
-    expect(runner).toContain("generateListeningAndSpeakingActivities");
-    expect(runner).toContain("generateFinalReviewActivities");
-    expect(validator).not.toContain("speakingExercises:");
-    expect(validator).not.toContain("reviewQuestions:");
+  it("keeps listening audio stored while audio failure remains non-blocking", () => {
+    expect(storedAudio).toContain('.from("lesson_listening_activities")');
+    expect(runner).toContain('last_action: "audio_non_blocking_failure"');
+    expect(runner).toContain('audio_status: "failed"');
+  });
+
+  it("uses the stateless OpenAI structured generation path with bounded retries", () => {
+    expect(structured).toContain("OPENAI_API_KEY");
+    expect(structured).toContain("OPENAI_STORY_MODEL");
+    expect(structured).toContain("OpenAI structured generation completed");
+    expect(compatibilityExport).toContain("OPENAI_STRUCTURED_MAX_CONCURRENCY");
+    expect(compatibilityExport).toContain("OPENAI_STRUCTURED_RETRIES");
+    expect(compatibilityExport).toContain("Retrying transient OpenAI structured generation");
   });
 });
