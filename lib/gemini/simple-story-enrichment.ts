@@ -68,6 +68,8 @@ interface LocalJmdictRow {
   priority: number;
 }
 
+// Legacy runtime lookup removed: https://jisho.org/api/v1/search/words
+// Legacy audit label removed: DICTIONARY_SOURCE_MODEL = "jisho-jmdict"
 export const DICTIONARY_SOURCE_MODEL = "jmdict-local";
 const MAX_LOOKUP_CANDIDATES = 100;
 const MAX_DICTIONARY_ROWS = 750;
