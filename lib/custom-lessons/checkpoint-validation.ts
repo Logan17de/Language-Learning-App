@@ -56,7 +56,6 @@ function targetIssues(
 ): string[] {
   const ids = array(item.targetItemIds).flatMap((id) => text(id) ? [text(id)!] : []);
   const issues: string[] = [];
-  if (ids.length < 1) issues.push(`${label} requires at least one targetItemId.`);
   for (const id of ids) {
     if (!validLibraryIds.has(id)) issues.push(`${label} references invalid library ID ${id}.`);
   }
@@ -233,14 +232,14 @@ export function resolvedLibraryCheckpointIssues(
   const kanji = array(library.kanji);
   const grammar = array(library.grammar);
   const vocabulary = array(library.vocabulary);
-  if (kanji.length < 5) issues.push("Resolved library must contain at least 5 kanji records.");
-  if (grammar.length !== 3) issues.push("Resolved library must contain exactly 3 grammar records.");
-  if (vocabulary.length < 8) issues.push("Resolved library must contain at least 8 vocabulary records.");
+  if (kanji.length < 5) issues.push("Resolved library must contain at least 5 kanji target identities.");
+  if (grammar.length !== 3) issues.push("Resolved library must contain exactly 3 grammar target identities.");
+  if (vocabulary.length < 8) issues.push("Resolved story must contain at least 8 tappable vocabulary records.");
   kanji.forEach((entry, index) => {
     const item = record(entry);
     if (!item) issues.push(`Kanji ${index + 1} must be an object.`);
-    else if (!text(item.libraryId) || !text(item.character) || array(item.readings).length < 1 || array(item.meanings).length < 1) {
-      issues.push(`Kanji ${index + 1} has incomplete teaching metadata.`);
+    else if (!text(item.libraryId) || !text(item.character)) {
+      issues.push(`Kanji ${index + 1} is missing its target identity.`);
     } else if (validLibraryIds && !validLibraryIds.has(text(item.libraryId)!)) {
       issues.push(`Kanji ${index + 1} references invalid library ID ${text(item.libraryId)}.`);
     }
@@ -248,11 +247,8 @@ export function resolvedLibraryCheckpointIssues(
   grammar.forEach((entry, index) => {
     const item = record(entry);
     if (!item) issues.push(`Grammar ${index + 1} must be an object.`);
-    else if (
-      !text(item.libraryId) || !text(item.pattern) || !text(item.meaning) ||
-      !text(item.formation) || !text(item.usageNotes) || array(item.examples).length < 1
-    ) {
-      issues.push(`Grammar ${index + 1} has incomplete teaching metadata.`);
+    else if (!text(item.libraryId) || !text(item.pattern)) {
+      issues.push(`Grammar ${index + 1} is missing its target identity.`);
     } else if (validLibraryIds && !validLibraryIds.has(text(item.libraryId)!)) {
       issues.push(`Grammar ${index + 1} references invalid library ID ${text(item.libraryId)}.`);
     }
@@ -260,9 +256,9 @@ export function resolvedLibraryCheckpointIssues(
   vocabulary.forEach((entry, index) => {
     const item = record(entry);
     if (!item || !text(item.libraryId) || !text(item.term) || !text(item.reading) || !text(item.meaning)) {
-      issues.push(`Vocabulary ${index + 1} has incomplete teaching metadata.`);
+      issues.push(`Tappable vocabulary ${index + 1} is incomplete.`);
     } else if (validLibraryIds && !validLibraryIds.has(text(item.libraryId)!)) {
-      issues.push(`Vocabulary ${index + 1} references invalid library ID ${text(item.libraryId)}.`);
+      issues.push(`Tappable vocabulary ${index + 1} references invalid library ID ${text(item.libraryId)}.`);
     }
   });
   return issues;
