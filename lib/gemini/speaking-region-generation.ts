@@ -2,18 +2,16 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { storeGeneratedVocabularyTerms } from "@/lib/gemini/generated-vocabulary-storage";
+import {
+  DICTIONARY_SOURCE_MODEL,
+  lookupJapaneseDictionaryVocabulary,
+} from "@/lib/gemini/simple-story-enrichment";
 import type {
   GenerationAuditEntry,
   InspectableTerm,
   ResolvedLessonLibrary,
   StoryDraft,
 } from "@/lib/gemini/lesson-engine-v2";
-import {
-  simpleStoryEnrichmentSchema,
-  storyEnrichmentOutputIssues,
-  storyEnrichmentPrompt,
-  type SimpleStoryEnrichment,
-} from "@/lib/gemini/simple-story-enrichment-contract";
 import {
   speakingReadAloudIssues,
   speakingReadAloudPrompt,
@@ -81,21 +79,15 @@ export async function generateSpeakingRegion(input: {
   const speakingText = speaking.value.sentences
     .map((item) => item.sentence)
     .join("\n");
-  const enrichment = await generateStructured<SimpleStoryEnrichment>({
-    name: "speaking_vocabulary",
-    prompt: storyEnrichmentPrompt(speakingText),
-    schema: simpleStoryEnrichmentSchema,
-    strictSchema: true,
-    exactSchemaName: true,
-    validate: storyEnrichmentOutputIssues,
-    trace: { requestId: input.requestId, stage: "speaking_enrichment" },
+  const vocabulary = await lookupJapaneseDictionaryVocabulary({
+    japanese: speakingText,
   });
   const terms = await storeGeneratedVocabularyTerms({
     admin: input.admin,
     requestId: input.requestId,
     level: input.level,
-    vocabulary: enrichment.value.vocabulary,
-    model: enrichment.model,
+    vocabulary,
+    model: DICTIONARY_SOURCE_MODEL,
     library: input.library,
   });
 
@@ -107,9 +99,7 @@ export async function generateSpeakingRegion(input: {
   return {
     exercises: speaking.value.sentences.map((item, index) => {
       const inspectableTerms = uniqueTerms(
-        terms.filter((term) =>
-          item.sentence.includes(term.surface),
-        ),
+        terms.filter((term) => item.sentence.includes(term.surface)),
       );
       const termIds = [...new Set(
         inspectableTerms.map((term) => term.libraryId),
@@ -138,10 +128,8 @@ export async function generateSpeakingRegion(input: {
     }),
     audit: {
       stage: "communication_activities",
-      model: speaking.model === enrichment.model
-        ? speaking.model
-        : `${speaking.model}, ${enrichment.model}`,
-      repaired: speaking.repaired || enrichment.repaired,
+      model: `${speaking.model}, ${DICTIONARY_SOURCE_MODEL}`,
+      repaired: speaking.repaired,
     },
   };
 }
