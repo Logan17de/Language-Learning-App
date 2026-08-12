@@ -10,6 +10,12 @@ export interface VocabularyQuestionFormat {
   sentence?: string;
 }
 
+export interface RawKanjiTeaching {
+  requestIndex: number;
+  reading: string;
+  meaning: string;
+}
+
 export interface RawVocabularyQuestion {
   format_id: number;
   difficulty: RawVocabularyQuestionDifficulty;
@@ -20,6 +26,7 @@ export interface RawVocabularyQuestion {
 }
 
 export interface RawVocabularyQuestions {
+  kanjiTeaching: RawKanjiTeaching[];
   questions: RawVocabularyQuestion[];
 }
 
@@ -45,6 +52,21 @@ export const vocabularyQuestionFormats: VocabularyQuestionFormat[] = [
 export const vocabularyQuestionsSchema: JsonSchema = {
   type: "object",
   properties: {
+    kanjiTeaching: {
+      type: "array",
+      minItems: 5,
+      maxItems: 5,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["requestIndex", "reading", "meaning"],
+        properties: {
+          requestIndex: { type: "integer", minimum: 0, maximum: 4 },
+          reading: { type: "string" },
+          meaning: { type: "string" },
+        },
+      },
+    },
     questions: {
       type: "array",
       minItems: 13,
@@ -79,7 +101,7 @@ export const vocabularyQuestionsSchema: JsonSchema = {
       },
     },
   },
-  required: ["questions"],
+  required: ["kanjiTeaching", "questions"],
   additionalProperties: false,
 };
 
@@ -103,26 +125,35 @@ function pythonStringList(values: string[]): string {
 
 export function vocabularyQuestionsPrompt(input: {
   japaneseStory: string;
-  knownKanji: string[];
+  targetKanji: string[];
   questionFormats?: VocabularyQuestionFormat[];
 }): string {
+  const indexedKanji = input.targetKanji.map((character, requestIndex) => ({
+    requestIndex,
+    character,
+  }));
   return `
-Create vocabulary and kanji questions from this Japanese story.
+Create AIko's vocabulary and kanji lesson from this fixed Japanese story.
 
 Story:
 ${input.japaneseStory}
 
-Kanji:
-${pythonStringList(input.knownKanji)}
+Five target kanji:
+${pythonJson(indexedKanji)}
 
 Question formats:
 ${pythonJson(input.questionFormats ?? vocabularyQuestionFormats)}
 
 Requirements:
-- Use only the provided question formats.
-- Use vocabulary and kanji from the story.
+- Do not rewrite the story.
+- kanjiTeaching must contain exactly one entry for requestIndex 0 through 4.
+- For kanjiTeaching, provide a natural kana reading and concise English meaning for the corresponding fixed target kanji. Do not output or replace the character itself.
 - Create exactly 13 questions: 6 easy, 4 medium, and 3 hard.
+- Exactly 5 questions should directly practice the five target kanji, one target per question.
+- The remaining 8 questions should practice useful vocabulary that appears in the fixed story.
+- Use only the provided question formats.
 - Every question must have four different choices and one correct answer.
+- Keep all content appropriate for the story and learner level.
 `;
 }
 
