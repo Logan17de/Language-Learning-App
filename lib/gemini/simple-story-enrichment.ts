@@ -60,9 +60,7 @@ interface JishoEntry {
   is_common?: boolean;
   japanese?: JishoJapanese[];
   senses?: JishoSense[];
-  attribution?: {
-    jmdict?: boolean;
-  };
+  attribution?: { jmdict?: boolean };
 }
 
 interface JishoResponse {
@@ -125,20 +123,22 @@ function lineCandidates(japanese: string): string[] {
     .filter((part) => part.isWordLike && JAPANESE.test(part.segment))
     .map((part) => normalize(part.segment))
     .filter(Boolean);
-  const output: string[] = [];
+  const ordinary: string[] = [];
+  const inflected: string[] = [];
+
   for (let index = 0; index < pieces.length; index += 1) {
     const base = pieces[index]!;
-    if (isUsefulSurface(base)) output.push(base);
+    if (isUsefulSurface(base)) ordinary.push(base);
 
     let combined = base;
     for (let end = index + 1; end < Math.min(pieces.length, index + 4); end += 1) {
       const tail = pieces[end]!;
       if (!INFLECTION_TAILS.has(tail)) break;
       combined += tail;
-      if (isUsefulSurface(combined)) output.unshift(combined);
+      if (isUsefulSurface(combined)) inflected.push(combined);
     }
   }
-  return output;
+  return [...inflected.reverse(), ...ordinary];
 }
 
 export function storyDictionaryCandidates(draft: StoryOnlyDraft): string[] {
@@ -165,11 +165,11 @@ function contextWords(draft: StoryOnlyDraft): Set<string> {
 }
 
 function definitionOverlap(definitions: string[], context: ReadonlySet<string>): number {
-  const definitionWords = definitions
+  const words = definitions
     .join(" ")
     .toLocaleLowerCase()
     .match(/[a-z][a-z'-]+/gu) ?? [];
-  return definitionWords.reduce(
+  return words.reduce(
     (score, word) => score + (word.length > 2 && context.has(word) ? 1 : 0),
     0,
   );
@@ -184,29 +184,43 @@ function isFunctionSense(parts: string[]): boolean {
     joined.includes("prefix");
 }
 
-function conjugationType(parts: string[], dictionaryForm: string): RawStoryVocabulary["conjugationType"] {
+function godanEnding(
+  joined: string,
+  ending: string,
+): boolean {
+  return joined.includes(`'${ending}' ending`) ||
+    joined.includes(`\"${ending}\" ending`) ||
+    joined.includes(`${ending} ending`);
+}
+
+export function jishoConjugationType(
+  parts: string[],
+  dictionaryForm: string,
+): RawStoryVocabulary["conjugationType"] {
   const joined = parts.join(" ").toLocaleLowerCase();
   if (dictionaryForm === "ある") return "aru";
   if (joined.includes("ichidan verb")) return "ichidan";
   if (joined.includes("suru verb") || joined.includes("verb taking the aux. verb suru")) return "suru";
   if (joined.includes("kuru verb")) return "kuru";
   if (!joined.includes("godan verb")) return null;
-  if (joined.includes("u ending")) return "godan-u";
-  if (joined.includes("ku ending")) return "godan-ku";
-  if (joined.includes("gu ending")) return "godan-gu";
-  if (joined.includes("su ending")) return "godan-su";
-  if (joined.includes("tsu ending")) return "godan-tsu";
-  if (joined.includes("nu ending")) return "godan-nu";
-  if (joined.includes("bu ending")) return "godan-bu";
-  if (joined.includes("mu ending")) return "godan-mu";
-  if (joined.includes("ru ending")) return "godan-ru";
+  if (godanEnding(joined, "u")) return "godan-u";
+  if (godanEnding(joined, "ku")) return "godan-ku";
+  if (godanEnding(joined, "gu")) return "godan-gu";
+  if (godanEnding(joined, "su")) return "godan-su";
+  if (godanEnding(joined, "tsu")) return "godan-tsu";
+  if (godanEnding(joined, "nu")) return "godan-nu";
+  if (godanEnding(joined, "bu")) return "godan-bu";
+  if (godanEnding(joined, "mu")) return "godan-mu";
+  if (godanEnding(joined, "ru")) return "godan-ru";
   return null;
 }
 
-function partOfSpeech(parts: string[], dictionaryForm: string): RawStoryVocabulary["partOfSpeech"] {
+export function jishoPartOfSpeech(
+  parts: string[],
+  dictionaryForm: string,
+): RawStoryVocabulary["partOfSpeech"] {
   const joined = parts.join(" ").toLocaleLowerCase();
-  const verbType = conjugationType(parts, dictionaryForm);
-  if (verbType) return "verb";
+  if (jishoConjugationType(parts, dictionaryForm)) return "verb";
   if (joined.includes("i-adjective")) return "i-adjective";
   if (joined.includes("na-adjective")) return "na-adjective";
   if (joined.includes("adverb")) return "adverb";
@@ -228,11 +242,10 @@ function commonPrefixLength(left: string, right: string): number {
 }
 
 function entryScore(entry: JishoEntry, surface: string): number {
-  const forms = entry.japanese ?? [];
   let score = entry.is_common ? 10 : 0;
   if (entry.attribution?.jmdict) score += 5;
   if (normalize(entry.slug ?? "") === surface) score += 100;
-  for (const form of forms) {
+  for (const form of entry.japanese ?? []) {
     if (normalize(form.word ?? "") === surface) score = Math.max(score, 120);
     if (normalize(form.reading ?? "") === surface) score = Math.max(score, 110);
     const canonical = normalize(form.word ?? form.reading ?? "");
@@ -261,10 +274,15 @@ function selectSense(entry: JishoEntry, context: ReadonlySet<string>): JishoSens
   )[0] ?? null;
 }
 
-function aliases(entry: JishoEntry, dictionaryForm: string): string[] {
-  return [...new Set((entry.japanese ?? [])
-    .flatMap((form) => form.word ? [normalize(form.word)] : [])
-    .filter((value) => value && value !== dictionaryForm))];
+function dictionaryAliases(
+  entry: JishoEntry,
+  dictionaryForm: string,
+  surface: string,
+): string[] {
+  return [...new Set([
+    ...(entry.japanese ?? []).flatMap((form) => form.word ? [normalize(form.word)] : []),
+    surface,
+  ].filter((value) => value && value !== dictionaryForm))];
 }
 
 async function fetchJisho(surface: string): Promise<JishoResponse> {
@@ -319,11 +337,10 @@ async function lookupSurface(
   if (!dictionaryForm || !reading) return null;
   const parts = sense.parts_of_speech ?? [];
   if (isFunctionSense(parts)) return null;
-  const mappedPart = partOfSpeech(parts, dictionaryForm);
-  const mappedConjugation = conjugationType(parts, dictionaryForm);
+  const mappedPart = jishoPartOfSpeech(parts, dictionaryForm);
+  const mappedConjugation = jishoConjugationType(parts, dictionaryForm);
   if (mappedPart === "verb" && !mappedConjugation) return null;
-  const definitions = sense.english_definitions ?? [];
-  const meaning = definitions.slice(0, 3).join("; ").trim();
+  const meaning = (sense.english_definitions ?? []).slice(0, 3).join("; ").trim();
   if (!meaning) return null;
 
   return {
@@ -333,7 +350,7 @@ async function lookupSurface(
     meaning,
     partOfSpeech: mappedPart,
     conjugationType: mappedConjugation,
-    aliases: aliases(entry, dictionaryForm),
+    aliases: dictionaryAliases(entry, dictionaryForm, surface),
     source: "JMdict",
     sourceEntry: normalize(entry.slug ?? dictionaryForm),
   };
