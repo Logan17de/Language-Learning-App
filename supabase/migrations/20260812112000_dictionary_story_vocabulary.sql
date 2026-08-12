@@ -91,11 +91,20 @@ begin
         using errcode = '22023';
     end if;
 
-    select coalesce(array_agg(distinct btrim(alias.value)), '{}')
+    -- Keep JMdict spelling variants plus the exact story surface. The latter
+    -- lets the existing local resolver load the canonical row before it builds
+    -- its conjugation index, so inflected story words remain tappable.
+    select coalesce(array_agg(distinct value), '{}')
     into v_aliases
-    from jsonb_array_elements_text(coalesce(v_item->'aliases', '[]'::jsonb)) alias(value)
-    where btrim(alias.value) <> ''
-      and btrim(alias.value) <> v_dictionary_form;
+    from (
+      select btrim(alias.value) as value
+      from jsonb_array_elements_text(coalesce(v_item->'aliases', '[]'::jsonb)) alias(value)
+      where btrim(alias.value) <> ''
+        and btrim(alias.value) <> v_dictionary_form
+      union
+      select v_word
+      where v_word <> v_dictionary_form
+    ) aliases;
 
     perform pg_advisory_xact_lock(
       hashtextextended(
