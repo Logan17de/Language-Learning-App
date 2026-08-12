@@ -3,10 +3,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { generateStructured } from "@/lib/gemini/structured-output";
 import { storeGeneratedVocabularyTerms } from "@/lib/gemini/generated-vocabulary-storage";
-import {
-  DICTIONARY_SOURCE_MODEL,
-  lookupJapaneseDictionaryVocabulary,
-} from "@/lib/gemini/simple-story-enrichment";
+import * as dictionaryVocabulary from "@/lib/gemini/simple-story-enrichment";
 import {
   readingPassagePrompt,
   readingPassageSchema,
@@ -117,7 +114,7 @@ export async function generateReadingRegion(input: {
     trace: { requestId: input.requestId, stage: "reading_passage" },
   });
 
-  const vocabulary = await lookupJapaneseDictionaryVocabulary({
+  const vocabulary = await dictionaryVocabulary.lookupJapaneseDictionaryVocabulary({
     japanese: passage.value.japanese_story,
     englishContext: passage.value.english_translation,
   });
@@ -126,7 +123,7 @@ export async function generateReadingRegion(input: {
     requestId: input.requestId,
     level: input.level,
     vocabulary,
-    model: DICTIONARY_SOURCE_MODEL,
+    model: dictionaryVocabulary.DICTIONARY_SOURCE_MODEL,
     library: input.library,
   });
 
@@ -150,7 +147,11 @@ export async function generateReadingRegion(input: {
     questions: questions.value.questions,
     audit: {
       stage: "grammar_reading_activities",
-      model: [...new Set([passage.model, DICTIONARY_SOURCE_MODEL, questions.model])].join(", "),
+      model: [...new Set([
+        passage.model,
+        dictionaryVocabulary.DICTIONARY_SOURCE_MODEL,
+        questions.model,
+      ])].join(", "),
       repaired: passage.repaired || questions.repaired,
     },
   };
