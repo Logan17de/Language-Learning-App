@@ -51,11 +51,6 @@ begin
       using errcode = '22023';
   end if;
 
-  -- A retry replaces the request-local links, while permanent canonical
-  -- vocabulary rows remain reusable by every later lesson.
-  delete from public.story_vocabulary_enrichments
-  where request_id = p_request_id;
-
   for v_item in select value from jsonb_array_elements(p_vocabulary)
   loop
     v_position := v_position + 1;
@@ -91,9 +86,9 @@ begin
         using errcode = '22023';
     end if;
 
-    -- Keep JMdict spelling variants plus the exact story surface. The latter
-    -- lets the existing local resolver load the canonical row before it builds
-    -- its conjugation index, so inflected story words remain tappable.
+    -- Keep JMdict spelling variants plus the exact story/activity surface. The
+    -- latter lets the local resolver load the canonical row before building its
+    -- conjugation index, so inflected Japanese remains tappable.
     select coalesce(array_agg(distinct value), '{}')
     into v_aliases
     from (
@@ -214,7 +209,11 @@ begin
       v_reading,
       v_meaning,
       left(coalesce(nullif(btrim(p_source_model), ''), 'jisho-jmdict'), 120)
-    );
+    )
+    on conflict (request_id, word, reading, meaning) do update
+      set vocabulary_id = excluded.vocabulary_id,
+          position = least(public.story_vocabulary_enrichments.position, excluded.position),
+          source_model = excluded.source_model;
 
     v_linked := v_linked + 1;
   end loop;
@@ -244,10 +243,10 @@ grant execute on function public.store_story_vocabulary_enrichment(
 ) to service_role;
 
 comment on table public.story_vocabulary_enrichments is
-  'Exact story surfaces linked to reusable canonical vocabulary resolved from JMdict-backed dictionary data.';
+  'Exact lesson surfaces linked to reusable canonical vocabulary resolved from JMdict-backed dictionary data.';
 
 comment on column public.story_vocabulary_enrichments.word is
-  'The exact Japanese surface extracted from the generated story before dictionary canonicalization.';
+  'The exact Japanese surface extracted from generated lesson text before dictionary canonicalization.';
 
 comment on function public.store_story_vocabulary_enrichment(
   uuid,
@@ -255,4 +254,4 @@ comment on function public.store_story_vocabulary_enrichment(
   jsonb,
   text
 ) is
-  'Stores JMdict-backed canonical vocabulary and links exact story surfaces without any model-authored enrichment.';
+  'Stores JMdict-backed canonical vocabulary and links exact lesson surfaces without any model-authored enrichment.';
