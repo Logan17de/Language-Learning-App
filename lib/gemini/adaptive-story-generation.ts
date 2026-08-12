@@ -3,6 +3,7 @@ import "server-only";
 import type { JLPTLevel } from "@/types/lesson";
 import { generateStructured } from "@/lib/gemini/structured-output";
 import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
+import { storyUsesGrammarPattern } from "@/lib/gemini/lesson-validation";
 import {
   storyGenerationPrompt,
   storyGenerationSchema,
@@ -39,9 +40,6 @@ export async function generateAdaptiveStoryDraft(input: {
     schema: storyGenerationSchema,
     strictSchema: true,
     exactSchemaName: true,
-    // This deliberately mirrors the tested story_test.py flow: the provider's
-    // strict JSON schema is the story gate. Do not add a second semantic repair
-    // pass that rejects natural grammar variants after valid generation.
     validate: () => [],
     trace: {
       requestId: input.requestId,
@@ -49,6 +47,22 @@ export async function generateAdaptiveStoryDraft(input: {
       level: input.level,
     },
   });
+
+  const japanese = result.value.japanese_story.normalize("NFKC");
+  const missingKanji = input.plan.kanji
+    .map((item) => item.character)
+    .filter((character) => !japanese.includes(character));
+  const missingGrammar = input.plan.grammar
+    .map((item) => item.pattern)
+    .filter((pattern) => !storyUsesGrammarPattern(japanese, pattern));
+  if (missingKanji.length > 0 || missingGrammar.length > 0) {
+    throw new Error(
+      `Story target validation failed: ${[
+        ...missingKanji.map((item) => `missing kanji ${item}`),
+        ...missingGrammar.map((item) => `missing grammar ${item}`),
+      ].join(", ")}.`,
+    );
+  }
 
   return {
     draft: normalizeStoryPassage(result.value),
