@@ -69,7 +69,7 @@ interface JishoResponse {
 }
 
 const JISHO_WORDS_ENDPOINT = "https://jisho.org/api/v1/search/words";
-const DICTIONARY_SOURCE_MODEL = "jisho-jmdict";
+export const DICTIONARY_SOURCE_MODEL = "jisho-jmdict";
 const LOOKUP_TIMEOUT_MS = 8_000;
 const LOOKUP_CONCURRENCY = 4;
 const MAX_LOOKUP_CANDIDATES = 100;
@@ -141,11 +141,23 @@ function lineCandidates(japanese: string): string[] {
   return [...inflected.reverse(), ...ordinary];
 }
 
+export function japaneseDictionaryCandidates(japanese: string): string[] {
+  const seen = new Set<string>();
+  const values: string[] = [];
+  for (const candidate of lineCandidates(japanese)) {
+    if (seen.has(candidate)) continue;
+    seen.add(candidate);
+    values.push(candidate);
+    if (values.length >= MAX_LOOKUP_CANDIDATES) break;
+  }
+  return values;
+}
+
 export function storyDictionaryCandidates(draft: StoryOnlyDraft): string[] {
   const seen = new Set<string>();
   const values: string[] = [];
   for (const line of draft.lines) {
-    for (const candidate of lineCandidates(line.japanese)) {
+    for (const candidate of japaneseDictionaryCandidates(line.japanese)) {
       if (seen.has(candidate)) continue;
       seen.add(candidate);
       values.push(candidate);
@@ -155,10 +167,8 @@ export function storyDictionaryCandidates(draft: StoryOnlyDraft): string[] {
   return values;
 }
 
-function contextWords(draft: StoryOnlyDraft): Set<string> {
-  const words = draft.lines
-    .map((line) => line.english)
-    .join(" ")
+function contextWords(value: string): Set<string> {
+  const words = value
     .toLocaleLowerCase()
     .match(/[a-z][a-z'-]+/gu) ?? [];
   return new Set(words.filter((word) => word.length > 2 && !ENGLISH_STOPWORDS.has(word)));
@@ -184,10 +194,7 @@ function isFunctionSense(parts: string[]): boolean {
     joined.includes("prefix");
 }
 
-function godanEnding(
-  joined: string,
-  ending: string,
-): boolean {
+function godanEnding(joined: string, ending: string): boolean {
   return joined.includes(`'${ending}' ending`) ||
     joined.includes(`\"${ending}\" ending`) ||
     joined.includes(`${ending} ending`);
@@ -381,6 +388,27 @@ function canonicalIdentity(item: RawStoryVocabulary): string {
   return `${item.dictionaryForm}\u001f${item.reading}\u001f${item.partOfSpeech}`;
 }
 
+export async function lookupJapaneseDictionaryVocabulary(input: {
+  japanese: string;
+  englishContext?: string;
+}): Promise<RawStoryVocabulary[]> {
+  const candidates = japaneseDictionaryCandidates(input.japanese);
+  const context = contextWords(input.englishContext ?? "");
+  const lookedUp = await mapWithConcurrency(
+    candidates,
+    LOOKUP_CONCURRENCY,
+    (surface) => lookupSurface(surface, context),
+  );
+  const seenCanonical = new Set<string>();
+  return lookedUp.flatMap((item) => {
+    if (!item) return [];
+    const identity = canonicalIdentity(item);
+    if (seenCanonical.has(identity)) return [];
+    seenCanonical.add(identity);
+    return [item];
+  });
+}
+
 /**
  * Deterministic story vocabulary indexing. Japanese text is segmented locally,
  * then candidate words are resolved through Jisho's JMdict-backed word API.
@@ -395,24 +423,9 @@ export async function enrichGeneratedStoryVocabulary(input: {
   vocabulary: RawStoryVocabulary[];
   audit: GenerationAuditEntry;
 }> {
-  const candidates = storyDictionaryCandidates(input.draft);
-  if (candidates.length < 1) {
-    throw new Error("Story vocabulary dictionary lookup found no Japanese word candidates.");
-  }
-  const context = contextWords(input.draft);
-  const lookedUp = await mapWithConcurrency(
-    candidates,
-    LOOKUP_CONCURRENCY,
-    (surface) => lookupSurface(surface, context),
-  );
-  const seenCanonical = new Set<string>();
-  const vocabulary = lookedUp.flatMap((item) => {
-    if (!item) return [];
-    const identity = canonicalIdentity(item);
-    if (seenCanonical.has(identity)) return [];
-    seenCanonical.add(identity);
-    return [item];
-  });
+  const japanese = input.draft.lines.map((line) => line.japanese).join("\n");
+  const englishContext = input.draft.lines.map((line) => line.english).join(" ");
+  const vocabulary = await lookupJapaneseDictionaryVocabulary({ japanese, englishContext });
   if (vocabulary.length < MIN_REUSABLE_VOCABULARY) {
     throw new Error(
       `Story vocabulary dictionary lookup produced only ${vocabulary.length} reusable entries; at least ${MIN_REUSABLE_VOCABULARY} are required.`,
