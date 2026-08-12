@@ -2,8 +2,6 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { generateStructured } from "@/lib/gemini/structured-output";
-import { storeGeneratedVocabularyTerms } from "@/lib/gemini/generated-vocabulary-storage";
-import * as dictionaryVocabulary from "@/lib/gemini/simple-story-enrichment";
 import {
   readingPassagePrompt,
   readingPassageSchema,
@@ -69,24 +67,18 @@ function readingQuestionIssues(value: unknown): string[] {
     : ["Reading response must contain 2 easy, 2 medium, and 1 hard question."];
 }
 
-function readingLines(
-  passage: RawReadingPassage,
-  terms: InspectableTerm[],
-): GeneratedReadingLine[] {
+function readingLines(passage: RawReadingPassage): GeneratedReadingLine[] {
   return partitionReadingPassage({
     japanese: passage.japanese_story,
     english: passage.english_translation,
     maximumLines: 6,
-  }).map(({ japanese, english }) => {
-    const lineTerms = terms.filter((term) => japanese.includes(term.surface));
-    return {
-      speaker: "Reading",
-      japanese,
-      english,
-      targetItemIds: [...new Set(lineTerms.map((term) => term.libraryId))].slice(0, 5),
-      inspectableTerms: lineTerms,
-    };
-  });
+  }).map(({ japanese, english }) => ({
+    speaker: "Reading",
+    japanese,
+    english,
+    targetItemIds: [],
+    inspectableTerms: [],
+  }));
 }
 
 export async function generateReadingRegion(input: {
@@ -114,19 +106,6 @@ export async function generateReadingRegion(input: {
     trace: { requestId: input.requestId, stage: "reading_passage" },
   });
 
-  const vocabulary = await dictionaryVocabulary.lookupJapaneseDictionaryVocabulary({
-    japanese: passage.value.japanese_story,
-    englishContext: passage.value.english_translation,
-  });
-  const terms = await storeGeneratedVocabularyTerms({
-    admin: input.admin,
-    requestId: input.requestId,
-    level: input.level,
-    vocabulary,
-    model: dictionaryVocabulary.DICTIONARY_SOURCE_MODEL,
-    library: input.library,
-  });
-
   const questions = await generateStructured<RawReadingQuestions>({
     name: "reading_questions",
     prompt: readingQuestionsPrompt({
@@ -143,15 +122,13 @@ export async function generateReadingRegion(input: {
   return {
     title: passage.value.english_title,
     japaneseTitle: passage.value.japanese_title,
-    lines: readingLines(passage.value, terms),
+    lines: readingLines(passage.value),
     questions: questions.value.questions,
     audit: {
       stage: "grammar_reading_activities",
-      model: [...new Set([
-        passage.model,
-        dictionaryVocabulary.DICTIONARY_SOURCE_MODEL,
-        questions.model,
-      ])].join(", "),
+      model: passage.model === questions.model
+        ? passage.model
+        : `${passage.model}, ${questions.model}`,
       repaired: passage.repaired || questions.repaired,
     },
   };
