@@ -4,6 +4,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { generateStructured } from "@/lib/gemini/structured-output";
 import { storeGeneratedVocabularyTerms } from "@/lib/gemini/generated-vocabulary-storage";
 import {
+  DICTIONARY_SOURCE_MODEL,
+  lookupJapaneseDictionaryVocabulary,
+} from "@/lib/gemini/simple-story-enrichment";
+import {
   readingPassagePrompt,
   readingPassageSchema,
   readingQuestionsPrompt,
@@ -12,12 +16,6 @@ import {
   type RawReadingQuestion,
   type RawReadingQuestions,
 } from "@/lib/gemini/reading-comprehension-contract";
-import {
-  simpleStoryEnrichmentSchema,
-  storyEnrichmentOutputIssues,
-  storyEnrichmentPrompt,
-  type SimpleStoryEnrichment,
-} from "@/lib/gemini/simple-story-enrichment-contract";
 import type {
   GenerationAuditEntry,
   InspectableTerm,
@@ -119,21 +117,16 @@ export async function generateReadingRegion(input: {
     trace: { requestId: input.requestId, stage: "reading_passage" },
   });
 
-  const enrichment = await generateStructured<SimpleStoryEnrichment>({
-    name: "reading_vocabulary",
-    prompt: storyEnrichmentPrompt(passage.value.japanese_story),
-    schema: simpleStoryEnrichmentSchema,
-    strictSchema: true,
-    exactSchemaName: true,
-    validate: storyEnrichmentOutputIssues,
-    trace: { requestId: input.requestId, stage: "reading_enrichment" },
+  const vocabulary = await lookupJapaneseDictionaryVocabulary({
+    japanese: passage.value.japanese_story,
+    englishContext: passage.value.english_translation,
   });
   const terms = await storeGeneratedVocabularyTerms({
     admin: input.admin,
     requestId: input.requestId,
     level: input.level,
-    vocabulary: enrichment.value.vocabulary,
-    model: enrichment.model,
+    vocabulary,
+    model: DICTIONARY_SOURCE_MODEL,
     library: input.library,
   });
 
@@ -157,8 +150,8 @@ export async function generateReadingRegion(input: {
     questions: questions.value.questions,
     audit: {
       stage: "grammar_reading_activities",
-      model: [...new Set([passage.model, enrichment.model, questions.model])].join(", "),
-      repaired: passage.repaired || enrichment.repaired || questions.repaired,
+      model: [...new Set([passage.model, DICTIONARY_SOURCE_MODEL, questions.model])].join(", "),
+      repaired: passage.repaired || questions.repaired,
     },
   };
 }
