@@ -5,7 +5,7 @@ import { createGunzip } from "node:zlib";
 import { createClient } from "@supabase/supabase-js";
 import conjugationRuntime from "../lib/japanese-lexicon/runtime/conjugation.js";
 
-const { generateEntryForms } = conjugationRuntime;
+const { buildVerbStems, generateEntryForms } = conjugationRuntime;
 
 if (existsSync(".env.local") && typeof process.loadEnvFile === "function") {
   process.loadEnvFile(".env.local");
@@ -118,17 +118,16 @@ function classifySense(posCodes, dictionaryForm) {
 }
 
 function senseGroups(entryXml) {
-  const groups = new Map();
+  const groups = [];
   let inheritedPos = [];
   for (const sense of tagBlocks(entryXml, "sense")) {
     const explicitPos = entityCodes(sense, "pos");
     if (explicitPos.length > 0) inheritedPos = explicitPos;
     const glosses = unique(tagTexts(sense, "gloss")).slice(0, 6);
     if (glosses.length < 1 || inheritedPos.length < 1) continue;
-    const key = inheritedPos.join("|");
-    if (!groups.has(key)) groups.set(key, { posCodes: [...inheritedPos], glosses });
+    groups.push({ posCodes: [...inheritedPos], glosses });
   }
-  return [...groups.values()];
+  return groups;
 }
 
 function kanjiElements(entryXml) {
@@ -151,32 +150,141 @@ function containsKanji(value) {
   return /\p{Script=Han}/u.test(value);
 }
 
+function replaceEnding(value, ending, replacement) {
+  return value.endsWith(ending)
+    ? value.slice(0, -ending.length) + replacement
+    : null;
+}
+
+function temporaryEntry(spelling, reading, partOfSpeech, conjugationType) {
+  return {
+    id: "jmdict-import",
+    kanji: containsKanji(spelling) ? spelling : "",
+    kana: reading,
+    meaning: "",
+    partOfSpeech,
+    ...(conjugationType ? { conjugationType } : {}),
+    aliases: [],
+    source: "migration",
+    createdAt: "1970-01-01T00:00:00.000Z",
+    updatedAt: "1970-01-01T00:00:00.000Z",
+  };
+}
+
+function addEntryForms(forms, entry) {
+  try {
+    for (const form of generateEntryForms(entry)) {
+      if (form?.surface) forms.add(form.surface);
+      if (form?.kana) forms.add(form.kana);
+    }
+  } catch {
+    // Keep the canonical form even when an irregular historical entry cannot
+    // be represented by AIko's supported conjugation engine.
+  }
+}
+
+function derivedVerbEntries(entry) {
+  if (entry.partOfSpeech !== "verb" || !entry.conjugationType) return [];
+  let stems;
+  try {
+    stems = buildVerbStems(entry);
+  } catch {
+    return [];
+  }
+  const result = [];
+  const type = entry.conjugationType;
+
+  if (type !== "aru") {
+    const potentialSurface = `${stems.potentialStemSurface}る`;
+    const potentialKana = `${stems.potentialStemKana}る`;
+    result.push(temporaryEntry(potentialSurface, potentialKana, "verb", "ichidan"));
+
+    let passiveSurface;
+    let passiveKana;
+    if (type === "ichidan" || type === "kuru") {
+      passiveSurface = potentialSurface;
+      passiveKana = potentialKana;
+    } else if (type === "suru") {
+      passiveSurface = replaceEnding(stems.dictionarySurface, "する", "される");
+      passiveKana = replaceEnding(stems.dictionaryKana, "する", "される");
+    } else {
+      passiveSurface = `${stems.negativeStemSurface}れる`;
+      passiveKana = `${stems.negativeStemKana}れる`;
+    }
+    if (passiveSurface && passiveKana) {
+      result.push(temporaryEntry(passiveSurface, passiveKana, "verb", "ichidan"));
+    }
+
+    let causativeSurface;
+    let causativeKana;
+    if (type === "ichidan") {
+      causativeSurface = replaceEnding(stems.dictionarySurface, "る", "させる");
+      causativeKana = replaceEnding(stems.dictionaryKana, "る", "させる");
+    } else if (type === "suru") {
+      causativeSurface = replaceEnding(stems.dictionarySurface, "する", "させる");
+      causativeKana = replaceEnding(stems.dictionaryKana, "する", "させる");
+    } else if (type === "kuru") {
+      causativeSurface = `${stems.negativeStemSurface}させる`;
+      causativeKana = `${stems.negativeStemKana}させる`;
+    } else {
+      causativeSurface = `${stems.negativeStemSurface}せる`;
+      causativeKana = `${stems.negativeStemKana}せる`;
+    }
+    if (causativeSurface && causativeKana) {
+      result.push(temporaryEntry(causativeSurface, causativeKana, "verb", "ichidan"));
+    }
+  }
+
+  result.push(temporaryEntry(
+    `${stems.politeStemSurface}たい`,
+    `${stems.politeStemKana}たい`,
+    "i-adjective",
+    null,
+  ));
+  result.push(temporaryEntry(
+    `${stems.teSurface}しまう`,
+    `${stems.teKana}しまう`,
+    "verb",
+    "godan-u",
+  ));
+  return result;
+}
+
 function searchFormsFor(spellings, reading, partOfSpeech, conjugationType) {
   const forms = new Set([reading, ...spellings]);
   for (const spelling of spellings) {
-    const entry = {
-      id: "jmdict-import",
-      kanji: containsKanji(spelling) ? spelling : "",
-      kana: reading,
-      meaning: "",
-      partOfSpeech,
-      ...(conjugationType ? { conjugationType } : {}),
-      aliases: [],
-      source: "migration",
-      createdAt: "1970-01-01T00:00:00.000Z",
-      updatedAt: "1970-01-01T00:00:00.000Z",
-    };
-    try {
-      for (const form of generateEntryForms(entry)) {
-        if (form?.surface) forms.add(form.surface);
-        if (form?.kana) forms.add(form.kana);
+    const entry = temporaryEntry(spelling, reading, partOfSpeech, conjugationType);
+    addEntryForms(forms, entry);
+    for (const derived of derivedVerbEntries(entry)) addEntryForms(forms, derived);
+
+    if (partOfSpeech === "verb" && conjugationType) {
+      try {
+        const stems = buildVerbStems(entry);
+        const conditional = conjugationType === "aru"
+          ? "なければ"
+          : `${stems.negativeStemSurface}なければ`;
+        forms.add(conditional);
+        forms.add(conditional.endsWith("なければ")
+          ? `${conditional.slice(0, -"なければ".length)}なきゃ`
+          : conditional);
+        const te = stems.teSurface;
+        if (te.endsWith("て")) {
+          const base = te.slice(0, -1);
+          forms.add(`${base}ちゃう`);
+          forms.add(`${base}ちゃった`);
+        } else if (te.endsWith("で")) {
+          const base = te.slice(0, -1);
+          forms.add(`${base}じゃう`);
+          forms.add(`${base}じゃった`);
+        }
+      } catch {
+        // Canonical/basic forms are still useful.
       }
-    } catch {
-      // JMdict contains a few historical/irregular classes outside AIko's
-      // supported conjugation contract. Their dictionary form remains usable.
     }
   }
-  return [...forms].map((value) => value.normalize("NFKC").trim()).filter(Boolean);
+  return [...forms]
+    .map((value) => value.normalize("NFKC").trim())
+    .filter(Boolean);
 }
 
 function entryRows(entryXml, sourceVersion) {
@@ -205,24 +313,34 @@ function entryRows(entryXml, sourceVersion) {
       0,
     );
 
+    const classified = new Map();
     for (const sense of senses) {
       const classification = classifySense(sense.posCodes, primary);
       if (!classification) continue;
       if (classification.partOfSpeech === "verb" && !classification.conjugationType) continue;
+      const classKey = `${classification.partOfSpeech}:${classification.conjugationType || ""}`;
+      const current = classified.get(classKey);
+      if (current) {
+        current.glosses = unique([...current.glosses, ...sense.glosses]).slice(0, 6);
+      } else {
+        classified.set(classKey, { ...classification, glosses: [...sense.glosses] });
+      }
+    }
 
+    for (const group of classified.values()) {
       const spellings = unique([primary, ...aliases]);
       const searchForms = searchFormsFor(
         spellings,
         reading.reading,
-        classification.partOfSpeech,
-        classification.conjugationType,
+        group.partOfSpeech,
+        group.conjugationType,
       );
       const identity = [
         entrySeq,
         primary,
         reading.reading,
-        classification.partOfSpeech,
-        classification.conjugationType || "",
+        group.partOfSpeech,
+        group.conjugationType || "",
       ].join("\u001f");
       const entryKey = `${entrySeq}:${createHash("sha1").update(identity).digest("hex").slice(0, 16)}`;
       rows.push({
@@ -230,10 +348,10 @@ function entryRows(entryXml, sourceVersion) {
         entry_seq: entrySeq,
         dictionary_form: primary,
         reading: reading.reading,
-        meaning: sense.glosses[0],
-        meanings: sense.glosses,
-        part_of_speech: classification.partOfSpeech,
-        conjugation_type: classification.conjugationType,
+        meaning: group.glosses[0],
+        meanings: group.glosses,
+        part_of_speech: group.partOfSpeech,
+        conjugation_type: group.conjugationType,
         aliases,
         search_forms: searchForms,
         common: spellingPriority > 0,
