@@ -6,12 +6,18 @@ import {
 } from "@/lib/custom-lessons/checkpoint-validation";
 
 describe("durable custom lesson pipeline integration model", () => {
-  it("covers request creation through saved lesson while preserving checkpoints", () => {
-    const id = "00000000-0000-4000-8000-000000000001";
-    const validIds = new Set([id]);
-    const mc = (category?: string) => ({
-      ...(category ? { category } : {}), prompt: "Question", choices: ["A", "B", "C", "D"],
-      correctAnswer: "A", explanation: "Because A.", targetItemIds: [id],
+  it("covers story tappability through independent teaching groups and saved lesson", () => {
+    const ids = Array.from({ length: 8 }, (_, index) =>
+      `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+    );
+    const validIds = new Set(ids);
+    const mc = (category?: string, targetItemIds: string[] = []) => ({
+      ...(category ? { category } : {}),
+      prompt: "Question",
+      choices: ["A", "B", "C", "D"],
+      correctAnswer: "A",
+      explanation: "Because A.",
+      targetItemIds,
     });
     const state: {
       requestId: string;
@@ -31,14 +37,37 @@ describe("durable custom lesson pipeline integration model", () => {
 
     state.status = "story_building";
     state.story = { lines: [{ japanese: "文です。", english: "A sentence." }] };
+    state.status = "vocabulary_enrichment";
+    state.status = "library_resolution";
     state.status = "activity_groups";
+
     state.checkpoints.vocabulary_and_kanji = {
-      vocabularyQuestions: Array.from({ length: 13 }, () => mc()),
+      kanjiTeaching: Array.from({ length: 5 }, (_, index) => ({
+        libraryId: ids[index],
+        character: ["日", "本", "人", "学", "食"][index],
+        reading: `reading-${index}`,
+        meaning: `meaning-${index}`,
+      })),
+      vocabularyQuestions: Array.from({ length: 13 }, (_, index) =>
+        mc(undefined, index < 5 ? [ids[index]] : []),
+      ),
     };
     state.checkpoints.grammar_and_reading = {
-      grammarQuestions: Array.from({ length: 10 }, () => mc()),
-      readingTitle: "Reading", readingJapaneseTitle: "読み物",
-      readingConversation: [{ japanese: "文です。", english: "Sentence.", targetItemIds: [id] }],
+      grammarTeaching: Array.from({ length: 3 }, (_, index) => ({
+        libraryId: ids[index + 5],
+        pattern: ["ている", "ことがある", "ながら"][index],
+        meaning: `meaning-${index}`,
+        formation: `formation-${index}`,
+        usage: `usage-${index}`,
+        example: `例文${index}。`,
+        translation: `Example ${index}.`,
+      })),
+      grammarQuestions: Array.from({ length: 10 }, (_, index) =>
+        mc(undefined, index < 3 ? [ids[index + 5]] : []),
+      ),
+      readingTitle: "Reading",
+      readingJapaneseTitle: "読み物",
+      readingConversation: [{ japanese: "文です。", english: "Sentence.", targetItemIds: [] }],
       readingQuestions: [{ question: "何ですか。", answer: "文です。" }],
     };
     state.checkpoints.listening_and_speaking = {
@@ -46,13 +75,18 @@ describe("durable custom lesson pipeline integration model", () => {
         ...mc(), transcript: "会話です。", conversationLines: ["会話です。"],
       })),
       speakingExercises: Array.from({ length: 5 }, () => ({
-        questionType: "read_aloud", prompt: "読みます。", expectedAnswer: "読みます。",
-        modelAnswer: "読みます。", expectedConcepts: ["読みます。"], semanticCriteria: ["Match"],
-        targetItemIds: [id],
+        questionType: "read_aloud",
+        prompt: "読みます。",
+        expectedAnswer: "読みます。",
+        modelAnswer: "読みます。",
+        expectedConcepts: ["読みます。"],
+        semanticCriteria: ["Match"],
+        targetItemIds: [],
       })),
     };
     state.checkpoints.final_review = {
-      reviewQuestions: ["kanji", "vocabulary", "grammar", "listening", "speaking"].map(mc),
+      reviewQuestions: ["kanji", "vocabulary", "grammar", "listening", "speaking"]
+        .map((category) => mc(category)),
     };
     expect(inspectPersistedActivityCheckpoints(state.checkpoints, validIds)).toMatchObject({
       valid: ACTIVITY_GROUPS,
@@ -62,7 +96,10 @@ describe("durable custom lesson pipeline integration model", () => {
 
     state.status = "final_validation";
     state.lessonPackage = {
-      schemaVersion: 2, title: "Lesson", japaneseTitle: "レッスン", summary: "Summary",
+      schemaVersion: 2,
+      title: "Lesson",
+      japaneseTitle: "レッスン",
+      summary: "Summary",
       story: Array.from({ length: 10 }, () => ({ japanese: "文です。", english: "Sentence." })),
       kanji: Array.from({ length: 5 }, () => ({})),
       vocabulary: Array.from({ length: 8 }, () => ({})),
