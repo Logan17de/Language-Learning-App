@@ -3,6 +3,10 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { storeGeneratedVocabularyTerms } from "@/lib/gemini/generated-vocabulary-storage";
 import {
+  DICTIONARY_SOURCE_MODEL,
+  lookupJapaneseDictionaryVocabulary,
+} from "@/lib/gemini/simple-story-enrichment";
+import {
   listeningQuestionIssues,
   listeningQuestionsPrompt,
   listeningQuestionsSchema,
@@ -14,12 +18,6 @@ import type {
   InspectableTerm,
   ResolvedLessonLibrary,
 } from "@/lib/gemini/lesson-engine-v2";
-import {
-  simpleStoryEnrichmentSchema,
-  storyEnrichmentOutputIssues,
-  storyEnrichmentPrompt,
-  type SimpleStoryEnrichment,
-} from "@/lib/gemini/simple-story-enrichment-contract";
 import { generateStructured } from "@/lib/gemini/structured-output";
 import type { JLPTLevel } from "@/types/lesson";
 
@@ -88,21 +86,15 @@ export async function generateListeningRegion(input: {
   });
 
   const listeningText = generatedText(listening.value);
-  const enrichment = await generateStructured<SimpleStoryEnrichment>({
-    name: "listening_vocabulary",
-    prompt: storyEnrichmentPrompt(listeningText),
-    schema: simpleStoryEnrichmentSchema,
-    strictSchema: true,
-    exactSchemaName: true,
-    validate: storyEnrichmentOutputIssues,
-    trace: { requestId: input.requestId, stage: "listening_enrichment" },
+  const vocabulary = await lookupJapaneseDictionaryVocabulary({
+    japanese: listeningText,
   });
   const terms = await storeGeneratedVocabularyTerms({
     admin: input.admin,
     requestId: input.requestId,
     level: input.level,
-    vocabulary: enrichment.value.vocabulary,
-    model: enrichment.model,
+    vocabulary,
+    model: DICTIONARY_SOURCE_MODEL,
     library: input.library,
   });
 
@@ -145,10 +137,8 @@ export async function generateListeningRegion(input: {
     }),
     audit: {
       stage: "communication_activities",
-      model: listening.model === enrichment.model
-        ? listening.model
-        : `${listening.model}, ${enrichment.model}`,
-      repaired: listening.repaired || enrichment.repaired,
+      model: `${listening.model}, ${DICTIONARY_SOURCE_MODEL}`,
+      repaired: listening.repaired,
     },
   };
 }
