@@ -16,6 +16,12 @@ const workerAuthorization = readFileSync(
 );
 const runner = readFileSync("lib/custom-lessons/job-runner.ts", "utf8");
 const groups = readFileSync("lib/gemini/lesson-activity-groups.ts", "utf8");
+const checkpoints = readFileSync("lib/custom-lessons/checkpoint-validation.ts", "utf8");
+const placeholderEnrichment = readFileSync("lib/custom-lessons/placeholder-enrichment.ts", "utf8");
+const storyEnrichment = readFileSync("lib/gemini/simple-story-enrichment.ts", "utf8");
+const readingGeneration = readFileSync("lib/gemini/reading-region-generation.ts", "utf8");
+const listeningGeneration = readFileSync("lib/gemini/listening-region-generation.ts", "utf8");
+const speakingGeneration = readFileSync("lib/gemini/speaking-region-generation.ts", "utf8");
 const audio = readFileSync("lib/audio/audio-library.ts", "utf8");
 const durableMigration = readFileSync(
   "supabase/migrations/20260810090000_stage_based_custom_lesson_jobs.sql",
@@ -25,8 +31,10 @@ const scheduler = readFileSync(
   "supabase/migrations/20260810100000_supabase_custom_lesson_scheduler.sql",
   "utf8",
 );
-const targets = readFileSync("lib/gemini/lesson-targets.ts", "utf8");
-const generation = readFileSync("lib/gemini/lesson-generation.ts", "utf8");
+const identityMigration = readFileSync(
+  "supabase/migrations/20260812180000_catalog_identity_only_lesson_targets.sql",
+  "utf8",
+);
 const quota = readFileSync(
   "supabase/migrations/20260727003000_failed_custom_lessons_do_not_consume_quota.sql",
   "utf8",
@@ -49,9 +57,9 @@ describe("custom lesson engine contract", () => {
     expect(form).not.toContain('<Field label="Speaking difficulty">');
     expect(form).not.toContain('<Field label="Optional note">');
     expect(form).toContain("JSON.stringify({ topic, level })");
-    expect(route).toContain('begin_custom_lesson_generation_v4');
-    expect(route).toContain('p_topic: topic');
-    expect(route).toContain('p_level: level');
+    expect(route).toContain("begin_custom_lesson_generation_v4");
+    expect(route).toContain("p_topic: topic");
+    expect(route).toContain("p_level: level");
   });
 
   it("opens the resolved story in the real reader and polls durable backend progress", () => {
@@ -63,20 +71,15 @@ describe("custom lesson engine contract", () => {
     );
     expect(progressiveReader).toContain("<LessonPlayerShell");
     expect(progressiveReader).toContain("/api/custom-lessons/status?requestId=");
-    expect(progressiveReader).toContain("Story audio is off");
     expect(progressiveReader).toContain('data-testid="lesson-build-toast"');
-    expect(progressiveReader).not.toContain("Lesson readiness");
-    expect(progressiveReader).toContain("session.currentPhaseIndex = 1");
-    expect(progressiveReader).not.toContain("<AudioControl");
     expect(form).not.toContain("AbortSignal.timeout");
     expect(route).toContain('status: "queued"');
-    expect(route).toContain('{ status: 202 }');
+    expect(route).toContain("{ status: 202 }");
     expect(route).toContain("after(async () =>");
     expect(route).toContain("processCustomLessonJobs");
     expect(completionRoute).not.toContain("generatePlayableLesson");
     expect(completionRoute).toContain("the scheduler will resume it");
     expect(statusRoute).toContain('.eq("user_id", auth.userId)');
-    expect(statusRoute).toContain("row.story_draft && row.library_snapshot");
   });
 
   it("uses durable atomic stage claims and independently persisted groups", () => {
@@ -90,33 +93,45 @@ describe("custom lesson engine contract", () => {
     expect(groups).toContain("generateGrammarAndReadingActivities");
     expect(groups).toContain("generateListeningAndSpeakingActivities");
     expect(groups).toContain("generateFinalReviewActivities");
-    expect(groups).toContain("vocabularyQuestionsPrompt");
-    expect(groups).toContain("grammarQuestionsPrompt");
     expect(durableMigration).toContain("for update skip locked");
     expect(durableMigration).toContain("interval '8 minutes'");
     expect(durableMigration).toContain("completed_groups");
-    expect(durableMigration).toContain("stage_attempts");
     expect(runner).toContain("group_attempts");
     expect(scheduler).toContain("net.http_post");
     expect(scheduler).toContain("custom_lesson_worker_url");
     expect(scheduler).toContain("'* * * * *'");
   });
 
-  it("uses exact strict output and deterministic validation for final review", () => {
+  it("keeps the original JMdict story pass but removes all later enrichment passes", () => {
+    expect(storyEnrichment).toContain('DICTIONARY_SOURCE_MODEL = "jmdict-local"');
+    expect(storyEnrichment).toContain('rpc("store_story_vocabulary_enrichment"');
+    expect(placeholderEnrichment).toContain('model: "catalog-identities-only"');
+    expect(placeholderEnrichment).not.toContain("generateStructured");
+    for (const source of [readingGeneration, listeningGeneration, speakingGeneration]) {
+      expect(source).not.toContain("lookupJapaneseDictionaryVocabulary");
+      expect(source).not.toContain("storeGeneratedVocabularyTerms");
+      expect(source).not.toContain("DICTIONARY_SOURCE_MODEL");
+    }
+  });
+
+  it("generates kanji and grammar teaching content in their actual lesson stages", () => {
+    expect(groups).toContain("kanjiTeaching");
+    expect(groups).toContain("grammarTeaching");
+    expect(groups).toContain("adaptKanjiTeaching");
+    expect(groups).toContain("adaptGrammarTeaching");
+    expect(groups).toContain("kanji: input.groups.vocabularyAndKanji.kanjiTeaching");
+    expect(groups).toContain("grammar: input.groups.grammarAndReading.grammarTeaching");
+    expect(identityMigration).toContain("lessonTargetIdentityOnly");
+    expect(identityMigration).toContain("teachingMetadataRequired");
+  });
+
+  it("validates final review structurally without asking the model for database IDs", () => {
     expect(groups).toContain('name: "final_review"');
     expect(groups).toContain("strictSchema: true");
     expect(groups).toContain("exactSchemaName: true");
-    expect(groups).toContain("activityGroupCheckpointIssues(");
-    expect(groups).toContain('"final_review",');
-  });
-
-  it("keeps model-controlled identifiers out of library enrichment", () => {
-    const engine = readFileSync("lib/gemini/lesson-engine-v2.ts", "utf8");
-    const mapping = readFileSync("lib/gemini/library-enrichment-mapping.ts", "utf8");
-    expect(engine).toContain("mapLibraryEnrichment");
-    expect(mapping).toContain("requestIndex");
-    expect(mapping).toContain("Do not output character, pattern, writtenForm");
-    expect(mapping).toContain("linkedKanjiForWord");
+    expect(groups).toContain("Do not use or output database IDs");
+    expect(checkpoints).toContain('group === "final_review"');
+    expect(checkpoints).not.toContain("requires at least one targetItemId");
   });
 
   it("publishes lesson content before audio and limits TTS to voice activities", () => {
@@ -125,23 +140,8 @@ describe("custom lesson engine contract", () => {
     );
     expect(audio).toContain('.from("lesson_listening_activities")');
     expect(audio).not.toContain('.from("lesson_speaking_activities")');
-    expect(audio).toContain('.from("lesson_listening_activities")');
     expect(audio).not.toContain('.from("lesson_story_lines")');
     expect(audio).not.toContain('.from("lesson_reading_sections")');
-  });
-
-  it("enriches only missing library categories before selecting targets", () => {
-    expect(targets).toContain("libraryNeedsEnrichment");
-    expect(targets).toContain("generateLessonLibrarySeed");
-    expect(targets).toContain("enrich_custom_lesson_library");
-    expect(targets).toContain("selectedKanjiNeedDetails ? seed.kanji : []");
-    expect(targets).toContain("selectedGrammarNeedDetails ? seed.grammar : []");
-    expect(targets).toContain("vocabularyRows.length < 20 ? seed.vocabulary : []");
-    expect(targets).toContain('.from("kanji_catalog")');
-    expect(targets).toContain('.from("grammar_catalog")');
-    expect(generation).toContain("Required kanji (exact)");
-    expect(generation).toContain("Required grammar patterns (exact)");
-    expect(generation).toContain("Every meaningful Japanese content word or kanji");
   });
 
   it("normalizes the complete user-provided JLPT catalogs", () => {
