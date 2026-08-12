@@ -18,6 +18,8 @@
     "db:validate": "node scripts/validate-supabase.mjs",
     "seed:validate": "node scripts/validate-seed.mjs",
     "jmdict:prepare": "node scripts/prepare-jmdict-bulk.mjs",
+    "jmdict:compact": "node scripts/compact-jmdict-csv.mjs",
+    "jmdict:load": "node scripts/load-jmdict-bulk.mjs",
     "jmdict:import": "node scripts/run-jmdict-import.mjs"
   },
   "dependencies": {
