@@ -2,8 +2,11 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
-import { defaultPreferences, mockUser } from "@/data/mock-user";
-import { mockProgress } from "@/data/mock-progress";
+import {
+  defaultPreferences,
+  defaultProgress,
+  defaultUser,
+} from "@/data/default-learner-state";
 import { customLessonRepository } from "@/lib/repositories/custom-lesson-repository";
 import { getBackendMode } from "@/lib/supabase/config";
 import { settingsRepository } from "@/lib/repositories/settings-repository";
@@ -24,13 +27,15 @@ import type {
   LearnerLevel,
   LearningGoal,
   OnboardingPreferences,
+  UserProfile,
 } from "@/types/learner";
 import type { LearnerProgress, RecentLesson } from "@/types/progress";
 
 interface AppState {
   hasHydrated: boolean;
+  backendSessionChecked: boolean;
   isAuthenticated: boolean;
-  user: typeof mockUser;
+  user: UserProfile;
   onboarding: OnboardingPreferences;
   progress: LearnerProgress;
   lessonSessions: Record<string, LessonSession>;
@@ -42,8 +47,14 @@ interface AppState {
   supportRequests: SupportRequest[];
   lessonReports: LessonReport[];
   setHasHydrated: (value: boolean) => void;
+  setBackendSessionChecked: (value: boolean) => void;
   signIn: (name?: string) => void;
-  syncBackendIdentity: (name: string, email: string) => void;
+  syncBackendIdentity: (
+    id: string,
+    name: string,
+    email: string,
+    onboardingComplete: boolean,
+  ) => void;
   hydrateBackendProgress: (snapshot: BackendProgressSnapshot) => void;
   signOut: () => void;
   setGoal: (goal: LearningGoal) => void;
@@ -75,7 +86,6 @@ interface AppState {
   completeLesson: (lesson: RecentLesson) => void;
   resetLessonSession: (lessonId: string) => void;
   resetProgress: () => void;
-  resetDemo: () => void;
 }
 
 const defaultSubscription: UserSubscription = {
@@ -106,9 +116,9 @@ const defaultSettings: UserSettings = {
 
 const initialState = {
   isAuthenticated: false,
-  user: mockUser,
+  user: defaultUser,
   onboarding: defaultPreferences,
-  progress: mockProgress,
+  progress: defaultProgress,
   lessonSessions: {},
   savedLessonIds: [],
   generatedLessons: [],
@@ -124,11 +134,7 @@ const safeStorage: StateStorage = {
   getItem: (name) => {
     try {
       if (typeof window === "undefined") return memoryFallback.get(name) ?? null;
-      const current = window.localStorage.getItem(name);
-      if (current) return current;
-      return name === "aiko-app-state"
-        ? window.localStorage.getItem("kizuna-app-state")
-        : null;
+      return window.localStorage.getItem(name);
     } catch {
       return memoryFallback.get(name) ?? null;
     }
@@ -261,27 +267,45 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       ...initialState,
       hasHydrated: false,
+      backendSessionChecked: false,
       setHasHydrated: (value) => set({ hasHydrated: value }),
+      setBackendSessionChecked: (value) => set({ backendSessionChecked: value }),
       signIn: (name) =>
         set((state) => ({
           isAuthenticated: true,
           user: { ...state.user, name: name?.trim() || state.user.name },
         })),
-      syncBackendIdentity: (name, email) =>
+      syncBackendIdentity: (id, name, email, onboardingComplete) =>
         set((state) => ({
           isAuthenticated: true,
           user: {
             ...state.user,
-            name: name.trim() || state.user.name,
+            id,
+            name: name.trim() || "Learner",
             email,
+          },
+          onboarding: {
+            ...state.onboarding,
+            completed: onboardingComplete,
           },
         })),
       hydrateBackendProgress: (snapshot) =>
         set((state) => ({
           user: {
             ...state.user,
+            level: snapshot.currentLevel,
+            dailyGoalMinutes: snapshot.dailyGoalMinutes,
+            minutesStudiedToday: snapshot.minutesStudiedToday,
+            joinDate: snapshot.joinDate,
             xp: snapshot.xp,
             streakDays: snapshot.streakDays,
+          },
+          onboarding: {
+            ...state.onboarding,
+            goal: snapshot.learningGoal,
+            level: snapshot.currentLevel,
+            dailyMinutes: snapshot.dailyGoalMinutes as DailyMinutes,
+            interests: snapshot.interests,
           },
           progress: {
             ...state.progress,
@@ -300,7 +324,11 @@ export const useAppStore = create<AppState>()(
             achievements: snapshot.achievements,
           },
         })),
-      signOut: () => set({ isAuthenticated: false }),
+      signOut: () =>
+        set({
+          ...initialState,
+          backendSessionChecked: true,
+        }),
       setGoal: (goal) =>
         set((state) => ({ onboarding: { ...state.onboarding, goal } })),
       setLevel: (level) =>
@@ -356,7 +384,6 @@ export const useAppStore = create<AppState>()(
             plan,
             billingPeriod: billingPeriod ?? state.subscription.billingPeriod,
             status: "active",
-            renewsAt: plan === "premium" ? "2026-08-24" : undefined,
           },
         })),
       cancelSubscription: () =>
@@ -477,7 +504,7 @@ export const useAppStore = create<AppState>()(
             user: {
               ...state.user,
               xp: state.user.xp + result.xpGained,
-              streakDays: Math.max(state.user.streakDays, 13),
+              streakDays: Math.max(state.user.streakDays, 1),
               minutesStudiedToday:
                 state.user.minutesStudiedToday + result.durationMinutes,
             },
@@ -581,24 +608,24 @@ export const useAppStore = create<AppState>()(
         }),
       resetProgress: () =>
         set({
-          progress: mockProgress,
+          progress: defaultProgress,
           lessonSessions: {},
         }),
-      resetDemo: () => set({ ...initialState }),
     }),
     {
       name: "aiko-app-state",
-      version: 4,
+      version: 5,
       storage: createJSONStorage(() => safeStorage),
       migrate: (persistedState) => persistedState as Partial<AppState>,
       merge: (persisted, current) => {
         const saved = persisted as Partial<AppState>;
         return {
           ...current,
-          ...saved,
-          user: { ...current.user, ...saved.user },
           onboarding: { ...current.onboarding, ...saved.onboarding },
-          progress: mergeProgress(current.progress, saved.progress),
+          progress: {
+            ...current.progress,
+            lessonProgress: saved.progress?.lessonProgress ?? {},
+          },
           lessonSessions: Object.fromEntries(
             Object.entries(saved.lessonSessions ?? {}).map(
               ([lessonId, session]) => [
@@ -610,11 +637,14 @@ export const useAppStore = create<AppState>()(
           savedLessonIds: saved.savedLessonIds ?? [],
           generatedLessons: saved.generatedLessons ?? [],
           customLessonRequests: saved.customLessonRequests ?? [],
-          subscription: { ...current.subscription, ...saved.subscription },
           settings: { ...current.settings, ...saved.settings },
-          supportRequests: saved.supportRequests ?? [],
-          lessonReports: saved.lessonReports ?? [],
           hasHydrated: false,
+          backendSessionChecked: false,
+          isAuthenticated: false,
+          user: current.user,
+          subscription: current.subscription,
+          supportRequests: [],
+          lessonReports: [],
         };
       },
       onRehydrateStorage: () => (state) => state?.setHasHydrated(true),
@@ -622,31 +652,12 @@ export const useAppStore = create<AppState>()(
   ),
 );
 
-function mergeProgress(
-  current: LearnerProgress,
-  saved?: LearnerProgress,
-): LearnerProgress {
-  if (!saved) return current;
-  return {
-    ...current,
-    ...saved,
-    weeklyActivity: saved.weeklyActivity ?? current.weeklyActivity,
-    weakKanji: saved.weakKanji ?? current.weakKanji,
-    weakVocabulary: saved.weakVocabulary ?? current.weakVocabulary,
-    grammarToReview: saved.grammarToReview ?? current.grammarToReview,
-    recentLessons: saved.recentLessons ?? current.recentLessons,
-    completedLessonIds:
-      saved.completedLessonIds ?? current.completedLessonIds,
-    lessonProgress: saved.lessonProgress ?? current.lessonProgress,
-    achievements: saved.achievements ?? current.achievements,
-  };
-}
-
 function addMinutesToToday(
   activity: LearnerProgress["weeklyActivity"],
   minutes: number,
 ): LearnerProgress["weeklyActivity"] {
-  const index = Math.min(4, activity.length - 1);
+  if (!activity.length) return activity;
+  const index = activity.length - 1;
   return activity.map((day, dayIndex) =>
     dayIndex === index ? { ...day, minutes: day.minutes + minutes } : day,
   );
@@ -656,18 +667,11 @@ function mergeWeakVocabulary(
   existing: LearnerProgress["weakVocabulary"],
   terms: string[],
 ): LearnerProgress["weakVocabulary"] {
-  const known: Record<string, { reading: string; meaning: string }> = {
-    "改札": { reading: "かいさつ", meaning: "ticket gate" },
-    "一緒に": { reading: "いっしょに", meaning: "together" },
-    "〜ながら": { reading: "ながら", meaning: "while doing" },
-    "Listening detail": { reading: "", meaning: "comprehension detail" },
-  };
   const additions = terms
     .filter((term) => !existing.some((item) => item.term === term))
     .map((term) => ({
       term,
-      reading: known[term]?.reading,
-      meaning: known[term]?.meaning ?? "lesson target",
+      meaning: "lesson target",
       mastery: 45,
     }));
   return [...existing, ...additions];
