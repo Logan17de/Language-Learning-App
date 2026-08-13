@@ -1,0 +1,416 @@
+﻿id,word,reading,english_meaning,study_level,kanji_components,component_levels
+N4_V001,言語,げんご,language,N4,言 語,N4 N5
+N4_V002,発言,はつげん,statement; remark,N4,発 言,N4 N4
+N4_V003,手話,しゅわ,sign language,N4,手 話,N4 N5
+N4_V004,手作り,てづくり,handmade; homemade,N4,手 作,N4 N4
+N4_V005,自動,じどう,automatic,N4,自 動,N4 N4
+N4_V006,自由,じゆう,freedom,N4,自 由,N4 N3
+N4_V007,作者,さくしゃ,author,N4,作 者,N4 N4
+N4_V008,医者,いしゃ,doctor,N4,医 者,N4 N4
+N4_V009,用事,ようじ,errand; business to attend to,N4,用 事,N4 N4
+N4_V010,事故,じこ,accident,N4,事 故,N4 N1
+N4_V011,思考,しこう,thought; thinking,N4,思 考,N4 N4
+N4_V012,意思,いし,intention; will,N4,意 思,N4 N4
+N4_V013,社会,しゃかい,society,N4,社 会,N4 N4
+N4_V014,会議,かいぎ,meeting; conference,N4,会 議,N4 N3
+N4_V015,会場,かいじょう,venue,N4,会 場,N4 N4
+N4_V016,家事,かじ,housework,N4,家 事,N4 N4
+N4_V017,家庭,かてい,home; household,N4,家 庭,N4 N3
+N4_V018,作家,さっか,writer; author,N4,作 家,N4 N4
+N4_V019,目的,もくてき,purpose; objective,N4,目 的,N4 N4
+N4_V020,基本的,きほんてき,basic; fundamental,N4,基 本 的,N1 N5 N4
+N4_V021,方法,ほうほう,method; way,N4,方 法,N4 N3
+N4_V022,方向,ほうこう,direction,N4,方 向,N4 N3
+N4_V023,夕方,ゆうがた,evening,N4,夕 方,N4 N4
+N4_V024,地図,ちず,map,N4,地 図,N4 N4
+N4_V025,地方,ちほう,region; local area,N4,地 方,N4 N4
+N4_V026,地下,ちか,underground; basement,N4,地 下,N4 N5
+N4_V027,注目,ちゅうもく,attention; notice,N4,注 目,N4 N4
+N4_V028,目標,もくひょう,goal; target,N4,目 標,N4 N1
+N4_V029,場所,ばしょ,place; location,N4,場 所,N4 N3
+N4_V030,工場,こうじょう,factory,N4,工 場,N4 N4
+N4_V031,時代,じだい,era; age,N4,時 代,N5 N4
+N4_V032,代金,だいきん,charge; price,N4,代 金,N4 N5
+N4_V033,代表,だいひょう,representative,N4,代 表,N4 N3
+N4_V034,私立,しりつ,private (institution),N4,私 立,N4 N4
+N4_V035,私用,しよう,private use; personal business,N4,私 用,N4 N4
+N4_V036,立場,たちば,standpoint; position,N4,立 場,N4 N4
+N4_V037,国立,こくりつ,national; state-run,N4,国 立,N5 N4
+N4_V038,動物,どうぶつ,animal,N4,動 物,N4 N4
+N4_V039,荷物,にもつ,luggage; baggage,N4,荷 物,N2 N4
+N4_V040,物語,ものがたり,story; tale,N4,物 語,N4 N5
+N4_V041,水田,すいでん,rice paddy,N4,水 田,N5 N4
+N4_V042,田舎,いなか,countryside; hometown,N4,田 舎,N4 N1
+N4_V043,体力,たいりょく,physical strength,N4,体 力,N4 N4
+N4_V044,体育,たいいく,physical education,N4,体 育,N4 N3
+N4_V045,全体,ぜんたい,whole; entirety,N4,全 体,N3 N4
+N4_V046,運動,うんどう,exercise; movement,N4,運 動,N4 N4
+N4_V047,神社,じんじゃ,Shinto shrine,N4,神 社,N3 N4
+N4_V048,本社,ほんしゃ,head office,N4,本 社,N5 N4
+N4_V049,知識,ちしき,knowledge,N4,知 識,N4 N3
+N4_V050,知人,ちじん,acquaintance,N4,知 人,N4 N5
+N4_V051,通知,つうち,notice; notification,N4,通 知,N4 N4
+N4_V052,理由,りゆう,reason,N4,理 由,N4 N3
+N4_V053,理解,りかい,understanding,N4,理 解,N4 N3
+N4_V054,同時,どうじ,same time; simultaneous,N4,同 時,N4 N5
+N4_V055,同意,どうい,agreement; consent,N4,同 意,N4 N4
+N4_V056,心配,しんぱい,worry; concern,N4,心 配,N4 N3
+N4_V057,中心,ちゅうしん,center; core,N4,中 心,N5 N4
+N4_V058,安心,あんしん,relief; peace of mind,N4,安 心,N4 N4
+N4_V059,発音,はつおん,pronunciation,N4,発 音,N4 N4
+N4_V060,出発,しゅっぱつ,departure,N4,出 発,N5 N4
+N4_V061,発表,はっぴょう,announcement; presentation,N4,発 表,N4 N3
+N4_V062,作品,さくひん,work; production,N4,作 品,N4 N4
+N4_V063,作文,さくぶん,composition; writing,N4,作 文,N4 N4
+N4_V064,新年,しんねん,New Year,N4,新 年,N4 N5
+N4_V065,新品,しんぴん,new product; brand-new item,N4,新 品,N4 N4
+N4_V066,世界,せかい,world,N4,世 界,N4 N4
+N4_V067,世話,せわ,care; assistance,N4,世 話,N4 N5
+N4_V068,世代,せだい,generation,N4,世 代,N4 N4
+N4_V069,今度,こんど,this time; next time,N4,今 度,N5 N4
+N4_V070,一度,いちど,once; one time,N4,一 度,N5 N4
+N4_V071,温度,おんど,temperature,N4,温 度,N2 N4
+N4_V072,説明,せつめい,explanation,N4,説 明,N3 N4
+N4_V073,発明,はつめい,invention,N4,発 明,N4 N4
+N4_V074,明確,めいかく,clear; definite,N4,明 確,N4 N3
+N4_V075,努力,どりょく,effort,N4,努 力,N3 N4
+N4_V076,協力,きょうりょく,cooperation,N4,協 力,N2 N4
+N4_V077,電力,でんりょく,electric power,N4,電 力,N5 N4
+N4_V078,意見,いけん,opinion,N4,意 見,N4 N5
+N4_V079,注意,ちゅうい,attention; caution,N4,注 意,N4 N4
+N4_V080,用意,ようい,preparation,N4,用 意,N4 N4
+N4_V081,利用,りよう,use; utilization,N4,利 用,N3 N4
+N4_V082,使用,しよう,use; usage,N4,使 用,N4 N4
+N4_V083,主人,しゅじん,husband; master; owner,N4,主 人,N4 N5
+N4_V084,主役,しゅやく,leading role,N4,主 役,N4 N3
+N4_V085,主要,しゅよう,main; principal,N4,主 要,N4 N3
+N4_V086,通学,つうがく,commuting to school,N4,通 学,N4 N5
+N4_V087,通勤,つうきん,commuting to work,N4,通 勤,N4 N3
+N4_V088,普通,ふつう,ordinary; normal,N4,普 通,N2 N4
+N4_V089,文化,ぶんか,culture,N4,文 化,N4 N3
+N4_V090,文法,ぶんぽう,grammar,N4,文 法,N4 N3
+N4_V091,部屋,へや,room,N4,部 屋,N3 N4
+N4_V092,屋上,おくじょう,rooftop,N4,屋 上,N4 N5
+N4_V093,屋外,おくがい,outdoors,N4,屋 外,N4 N5
+N4_V094,産業,さんぎょう,industry,N4,産 業,N3 N4
+N4_V095,工業,こうぎょう,manufacturing industry,N4,工 業,N4 N4
+N4_V096,営業,えいぎょう,business; sales operations,N4,営 業,N2 N4
+N4_V097,気持ち,きもち,feeling; mood,N4,気 持,N5 N4
+N4_V098,持参,じさん,bringing; taking along,N4,持 参,N4 N3
+N4_V099,持続,じぞく,continuation; persistence,N4,持 続,N4 N3
+N4_V100,道路,どうろ,road,N4,道 路,N4 N3
+N4_V101,水道,すいどう,water supply; tap water,N4,水 道,N5 N4
+N4_V102,歩道,ほどう,sidewalk,N4,歩 道,N4 N4
+N4_V103,身体,しんたい,body,N4,身 体,N4 N4
+N4_V104,出身,しゅっしん,origin; hometown; background,N4,出 身,N5 N4
+N4_V105,自身,じしん,oneself; self,N4,自 身,N4 N4
+N4_V106,不安,ふあん,anxiety; uneasiness,N4,不 安,N4 N4
+N4_V107,不便,ふべん,inconvenient,N4,不 便,N4 N3
+N4_V108,不足,ふそく,shortage; insufficiency,N4,不 足,N4 N4
+N4_V109,人口,じんこう,population,N4,人 口,N5 N4
+N4_V110,口語,こうご,spoken language,N4,口 語,N4 N5
+N4_V111,口座,こうざ,bank account,N4,口 座,N4 N3
+N4_V112,多分,たぶん,probably,N4,多 分,N4 N5
+N4_V113,多数,たすう,large number; many,N4,多 数,N4 N3
+N4_V114,多目的,たもくてき,multipurpose,N4,多 目 的,N4 N4 N4
+N4_V115,野球,やきゅう,baseball,N4,野 球,N4 N3
+N4_V116,野外,やがい,outdoors; open air,N4,野 外,N4 N5
+N4_V117,分野,ぶんや,field; area,N4,分 野,N5 N4
+N4_V118,考え方,かんがえかた,way of thinking,N4,考 方,N4 N4
+N4_V119,参考,さんこう,reference; consultation,N4,参 考,N3 N4
+N4_V120,開発,かいはつ,development,N4,開 発,N4 N4
+N4_V121,公開,こうかい,public release; open to the public,N4,公 開,N4 N4
+N4_V122,教会,きょうかい,church,N4,教 会,N4 N4
+N4_V123,教科,きょうか,school subject,N4,教 科,N4 N3
+N4_V124,教育,きょういく,education,N4,教 育,N4 N3
+N4_V125,最近,さいきん,recently; lately,N4,最 近,N3 N4
+N4_V126,近所,きんじょ,neighborhood,N4,近 所,N4 N3
+N4_V127,近代,きんだい,modern era,N4,近 代,N4 N4
+N4_V128,以上,いじょう,more than; at least,N4,以 上,N4 N5
+N4_V129,以下,いか,less than; at most; below,N4,以 下,N4 N5
+N4_V130,以内,いない,within; inside of,N4,以 内,N4 N3
+N4_V131,質問,しつもん,question,N4,質 問,N4 N4
+N4_V132,問答,もんどう,questions and answers; dialogue,N4,問 答,N4 N4
+N4_V133,訪問,ほうもん,visit,N4,訪 問,N3 N4
+N4_V134,正解,せいかい,correct answer,N4,正 解,N4 N3
+N4_V135,正式,せいしき,formal; official,N4,正 式,N4 N3
+N4_V136,正直,しょうじき,honest; honestly,N4,正 直,N4 N3
+N4_V137,真面目,まじめ,serious; diligent,N4,真 面 目,N4 N3 N4
+N4_V138,真実,しんじつ,truth; reality,N4,真 実,N4 N3
+N4_V139,興味,きょうみ,interest,N4,興 味,N1 N4
+N4_V140,味方,みかた,ally; supporter,N4,味 方,N4 N4
+N4_V141,業界,ぎょうかい,industry; business world,N4,業 界,N4 N4
+N4_V142,限界,げんかい,limit; boundary,N4,限 界,N3 N4
+N4_V143,無理,むり,impossible; unreasonable,N4,無 理,N4 N4
+N4_V144,無料,むりょう,free of charge,N4,無 料,N4 N4
+N4_V145,無事,ぶじ,safe; without incident,N4,無 事,N4 N4
+N4_V146,少年,しょうねん,boy; youth,N4,少 年,N4 N5
+N4_V147,少女,しょうじょ,girl; young woman,N4,少 女,N4 N5
+N4_V148,多少,たしょう,more or less; somewhat,N4,多 少,N4 N4
+N4_V149,海外,かいがい,overseas,N4,海 外,N4 N5
+N4_V150,海水,かいすい,seawater,N4,海 水,N4 N5
+N4_V151,海岸,かいがん,coast; seashore,N4,海 岸,N4 N2
+N4_V152,大切,たいせつ,important; precious,N4,大 切,N5 N4
+N4_V153,親切,しんせつ,kind; kindness,N4,親 切,N4 N4
+N4_V154,切手,きって,postage stamp,N4,切 手,N4 N4
+N4_V155,重要,じゅうよう,important; essential,N4,重 要,N4 N3
+N4_V156,体重,たいじゅう,body weight,N4,体 重,N4 N4
+N4_V157,二重,にじゅう,double; twofold,N4,二 重,N5 N4
+N4_V158,集合,しゅうごう,gathering; assembly,N4,集 合,N4 N3
+N4_V159,集中,しゅうちゅう,concentration,N4,集 中,N4 N5
+N4_V160,募集,ぼしゅう,recruitment; collection of applications,N4,募 集,N2 N4
+N4_V161,店員,てんいん,store clerk,N4,店 員,N4 N4
+N4_V162,駅員,えきいん,station employee,N4,駅 員,N4 N4
+N4_V163,全員,ぜんいん,everyone; all members,N4,全 員,N3 N4
+N4_V164,公共,こうきょう,public; community,N4,公 共,N4 N3
+N4_V165,公立,こうりつ,publicly run,N4,公 立,N4 N4
+N4_V166,計画,けいかく,plan; project,N4,計 画,N4 N4
+N4_V167,画面,がめん,screen; display,N4,画 面,N4 N3
+N4_V168,漫画,まんが,manga; comic,N4,漫 画,N1 N4
+N4_V169,死亡,しぼう,death,N4,死 亡,N4 N3
+N4_V170,死者,ししゃ,dead person; deceased,N4,死 者,N4 N4
+N4_V171,必死,ひっし,desperate; frantic,N4,必 死,N3 N4
+N4_V172,安全,あんぜん,safe; safety,N4,安 全,N4 N3
+N4_V173,安定,あんてい,stability; stable,N4,安 定,N4 N3
+N4_V174,親子,おやこ,parent and child,N4,親 子,N4 N5
+N4_V175,親友,しんゆう,close friend,N4,親 友,N4 N5
+N4_V176,強力,きょうりょく,powerful; strong,N4,強 力,N4 N4
+N4_V177,強風,きょうふう,strong wind,N4,強 風,N4 N4
+N4_V178,大使,たいし,ambassador,N4,大 使,N5 N4
+N4_V179,使い方,つかいかた,way of using; instructions,N4,使 方,N4 N4
+N4_V180,朝日,あさひ,morning sun,N4,朝 日,N4 N5
+N4_V181,朝方,あさがた,early morning,N4,朝 方,N4 N4
+N4_V182,話題,わだい,topic; subject of conversation,N4,話 題,N5 N4
+N4_V183,題名,だいめい,title,N4,題 名,N4 N5
+N4_V184,仕方,しかた,way; method,N4,仕 方,N4 N4
+N4_V185,仕組み,しくみ,structure; mechanism,N4,仕 組,N4 N3
+N4_V186,東京,とうきょう,Tokyo,N4,東 京,N5 N4
+N4_V187,京都,きょうと,Kyoto,N4,京 都,N4 N3
+N4_V188,上京,じょうきょう,going to Tokyo,N4,上 京,N5 N4
+N4_V189,足元,あしもと,at one's feet; footing,N4,足 元,N4 N4
+N4_V190,満足,まんぞく,satisfaction; satisfied,N4,満 足,N3 N4
+N4_V191,商品,しょうひん,product; merchandise,N4,商 品,N3 N4
+N4_V192,食品,しょくひん,food product,N4,食 品,N5 N4
+N4_V193,到着,とうちゃく,arrival,N4,到 着,N3 N4
+N4_V194,着物,きもの,kimono,N4,着 物,N4 N4
+N4_V195,下着,したぎ,underwear,N4,下 着,N5 N4
+N4_V196,特別,とくべつ,special,N4,特 別,N4 N4
+N4_V197,別人,べつじん,different person,N4,別 人,N4 N5
+N4_V198,録音,ろくおん,sound recording,N4,録 音,N2 N4
+N4_V199,音声,おんせい,voice; audio,N4,音 声,N4 N3
+N4_V200,元日,がんじつ,New Year's Day,N4,元 日,N4 N5
+N4_V201,地元,じもと,local area; hometown,N4,地 元,N4 N4
+N4_V202,特急,とっきゅう,limited express,N4,特 急,N4 N4
+N4_V203,特色,とくしょく,distinctive feature,N4,特 色,N4 N4
+N4_V204,風景,ふうけい,scenery,N4,風 景,N4 N3
+N4_V205,洋風,ようふう,Western style,N4,洋 風,N4 N4
+N4_V206,夜中,よなか,middle of the night,N4,夜 中,N4 N5
+N4_V207,今夜,こんや,tonight,N4,今 夜,N5 N4
+N4_V208,深夜,しんや,late at night,N4,深 夜,N3 N4
+N4_V209,空港,くうこう,airport,N4,空 港,N4 N3
+N4_V210,青空,あおぞら,blue sky,N4,青 空,N4 N4
+N4_V211,空間,くうかん,space; room,N4,空 間,N4 N5
+N4_V212,有料,ゆうりょう,paid; fee-charging,N4,有 料,N4 N4
+N4_V213,有効,ゆうこう,valid; effective,N4,有 効,N4 N2
+N4_V214,所有,しょゆう,ownership; possession,N4,所 有,N3 N4
+N4_V215,起床,きしょう,getting up; waking,N4,起 床,N4 N2
+N4_V216,起動,きどう,startup; activation,N4,起 動,N4 N4
+N4_V217,起点,きてん,starting point,N4,起 点,N4 N3
+N4_V218,運転,うんてん,driving; operation,N4,運 転,N4 N4
+N4_V219,運命,うんめい,fate; destiny,N4,運 命,N4 N3
+N4_V220,料金,りょうきん,fee; charge,N4,料 金,N4 N5
+N4_V221,材料,ざいりょう,material; ingredient,N4,材 料,N2 N4
+N4_V222,楽器,がっき,musical instrument,N4,楽 器,N4 N1
+N4_V223,楽園,らくえん,paradise,N4,楽 園,N4 N3
+N4_V224,景色,けしき,scenery,N4,景 色,N3 N4
+N4_V225,茶色,ちゃいろ,brown,N4,茶 色,N4 N4
+N4_V226,帰国,きこく,return to one's country,N4,帰 国,N4 N5
+N4_V227,帰宅,きたく,returning home,N4,帰 宅,N4 N3
+N4_V228,帰省,きせい,returning to one's hometown,N4,帰 省,N4 N2
+N4_V229,散歩,さんぽ,walk; stroll,N4,散 歩,N3 N4
+N4_V230,進歩,しんぽ,progress,N4,進 歩,N3 N4
+N4_V231,悪口,わるぐち,bad-mouthing; insult,N4,悪 口,N4 N4
+N4_V232,最悪,さいあく,worst,N4,最 悪,N3 N4
+N4_V233,悪意,あくい,ill will; malice,N4,悪 意,N4 N4
+N4_V234,広場,ひろば,plaza; open square,N4,広 場,N4 N4
+N4_V235,広告,こうこく,advertisement,N4,広 告,N4 N3
+N4_V236,広大,こうだい,vast; extensive,N4,広 大,N4 N5
+N4_V237,書店,しょてん,bookstore,N4,書 店,N5 N4
+N4_V238,本店,ほんてん,main store; head shop,N4,本 店,N5 N4
+N4_V239,町内,ちょうない,within the neighborhood,N4,町 内,N4 N3
+N4_V240,下町,したまち,old downtown area,N4,下 町,N5 N4
+N4_V241,市町村,しちょうそん,municipalities,N4,市 町 村,N3 N4 N2
+N4_V242,住民,じゅうみん,resident; inhabitants,N4,住 民,N4 N3
+N4_V243,住宅,じゅうたく,housing; residence,N4,住 宅,N4 N3
+N4_V244,売店,ばいてん,stand; kiosk,N4,売 店,N4 N4
+N4_V245,売買,ばいばい,buying and selling,N4,売 買,N4 N4
+N4_V246,商売,しょうばい,business; trade,N4,商 売,N3 N4
+N4_V247,期待,きたい,expectation; hope,N4,期 待,N3 N4
+N4_V248,招待,しょうたい,invitation,N4,招 待,N3 N4
+N4_V249,待合室,まちあいしつ,waiting room,N4,待 合 室,N4 N3 N4
+N4_V250,中古,ちゅうこ,used; secondhand,N4,中 古,N5 N4
+N4_V251,古代,こだい,ancient times,N4,古 代,N4 N4
+N4_V252,古本,ふるほん,used book,N4,古 本,N4 N5
+N4_V253,開始,かいし,start; beginning,N4,開 始,N4 N4
+N4_V254,年始,ねんし,beginning of the year,N4,年 始,N5 N4
+N4_V255,始発,しはつ,first train; first departure,N4,始 発,N4 N4
+N4_V256,最終,さいしゅう,final; last,N4,最 終,N3 N4
+N4_V257,終了,しゅうりょう,end; completion,N4,終 了,N4 N2
+N4_V258,終点,しゅうてん,terminal; last stop,N4,終 点,N4 N3
+N4_V259,合計,ごうけい,total; sum,N4,合 計,N3 N4
+N4_V260,会計,かいけい,accounting; bill,N4,会 計,N4 N4
+N4_V261,入院,にゅういん,hospitalization,N4,入 院,N5 N4
+N4_V262,退院,たいいん,leaving the hospital,N4,退 院,N3 N4
+N4_V263,大学院,だいがくいん,graduate school,N4,大 学 院,N5 N5 N4
+N4_V264,放送,ほうそう,broadcast,N4,放 送,N3 N4
+N4_V265,送料,そうりょう,shipping fee,N4,送 料,N4 N4
+N4_V266,送信,そうしん,transmission; sending,N4,送 信,N4 N3
+N4_V267,民族,みんぞく,ethnic group; people,N4,民 族,N3 N4
+N4_V268,水族館,すいぞくかん,aquarium,N4,水 族 館,N5 N4 N4
+N4_V269,上映,じょうえい,screening; showing a film,N4,上 映,N5 N4
+N4_V270,反映,はんえい,reflection; influence,N4,反 映,N3 N4
+N4_V271,購買,こうばい,purchase; buying,N4,購 買,N1 N4
+N4_V272,病気,びょうき,illness; sickness,N4,病 気,N4 N5
+N4_V273,病人,びょうにん,sick person,N4,病 人,N4 N5
+N4_V274,病室,びょうしつ,hospital room,N4,病 室,N4 N4
+N4_V275,早朝,そうちょう,early morning,N4,早 朝,N4 N4
+N4_V276,早口,はやくち,fast speech,N4,早 口,N4 N4
+N4_V277,早退,そうたい,leaving early,N4,早 退,N4 N3
+N4_V278,品質,ひんしつ,quality,N4,品 質,N4 N4
+N4_V279,性質,せいしつ,nature; property,N4,性 質,N3 N4
+N4_V280,台所,だいどころ,kitchen,N4,台 所,N4 N3
+N4_V281,舞台,ぶたい,stage,N4,舞 台,N3 N4
+N4_V282,会議室,かいぎしつ,meeting room,N4,会 議 室,N4 N3 N4
+N4_V283,可能,かのう,possible,N4,可 能,N4 N3
+N4_V284,許可,きょか,permission,N4,許 可,N3 N4
+N4_V285,可決,かけつ,approval; passage (of a motion),N4,可 決,N4 N3
+N4_V286,建物,たてもの,building,N4,建 物,N4 N4
+N4_V287,建設,けんせつ,construction,N4,建 設,N4 N2
+N4_V288,建築,けんちく,architecture; construction,N4,建 築,N4 N2
+N4_V289,転校,てんこう,changing schools,N4,転 校,N4 N5
+N4_V290,回転,かいてん,rotation; revolution,N4,回 転,N3 N4
+N4_V291,医学,いがく,medicine; medical science,N4,医 学,N4 N5
+N4_V292,医療,いりょう,medical care,N4,医 療,N4 N2
+N4_V293,中止,ちゅうし,cancellation; suspension,N4,中 止,N5 N4
+N4_V294,禁止,きんし,prohibition,N4,禁 止,N2 N4
+N4_V295,止血,しけつ,stopping bleeding; hemostasis,N4,止 血,N4 N2
+N4_V296,漢字,かんじ,kanji; Chinese character,N4,漢 字,N4 N4
+N4_V297,文字,もじ,letter; character,N4,文 字,N4 N4
+N4_V298,数字,すうじ,number; numeral,N4,数 字,N3 N4
+N4_V299,工事,こうじ,construction work,N4,工 事,N4 N4
+N4_V300,急行,きゅうこう,express train,N4,急 行,N4 N5
+N4_V301,救急,きゅうきゅう,emergency; first aid,N4,救 急,N1 N4
+N4_V302,図形,ずけい,figure; shape,N4,図 形,N4 N3
+N4_V303,図表,ずひょう,diagram; chart,N4,図 表,N4 N3
+N4_V304,黒板,こくばん,blackboard,N4,黒 板,N4 N2
+N4_V305,黒字,くろじ,profit; black figures,N4,黒 字,N4 N4
+N4_V306,花火,はなび,fireworks,N4,花 火,N4 N5
+N4_V307,花見,はなみ,cherry-blossom viewing,N4,花 見,N4 N5
+N4_V308,生花,せいか,fresh flowers,N4,生 花,N5 N4
+N4_V309,英文,えいぶん,English sentence; English text,N4,英 文,N4 N4
+N4_V310,英会話,えいかいわ,English conversation,N4,英 会 話,N4 N4 N5
+N4_V311,英国,えいこく,United Kingdom; Britain,N4,英 国,N4 N5
+N4_V312,競走,きょうそう,race,N4,競 走,N2 N4
+N4_V313,走行,そうこう,running; traveling (vehicle),N4,走 行,N4 N5
+N4_V314,逃走,とうそう,escape; flight,N4,逃 走,N3 N4
+N4_V315,青年,せいねん,young person; youth,N4,青 年,N4 N5
+N4_V316,青色,あおいろ,blue color,N4,青 色,N4 N4
+N4_V317,回答,かいとう,answer; response,N4,回 答,N3 N4
+N4_V318,解答,かいとう,answer; solution,N4,解 答,N3 N4
+N4_V319,答案,とうあん,answer sheet,N4,答 案,N4 N1
+N4_V320,用紙,ようし,form; sheet of paper,N4,用 紙,N4 N4
+N4_V321,新聞紙,しんぶんし,newspaper paper,N4,新 聞 紙,N4 N5 N4
+N4_V322,折り紙,おりがみ,origami; paper folding,N4,折 紙,N3 N4
+N4_V323,歌手,かしゅ,singer,N4,歌 手,N4 N4
+N4_V324,歌声,うたごえ,singing voice,N4,歌 声,N4 N3
+N4_V325,国歌,こっか,national anthem,N4,国 歌,N5 N4
+N4_V326,注文,ちゅうもん,order; request,N4,注 文,N4 N4
+N4_V327,赤字,あかじ,deficit; loss,N4,赤 字,N4 N4
+N4_V328,赤道,せきどう,equator,N4,赤 道,N4 N4
+N4_V329,赤色,あかいろ,red color,N4,赤 色,N4 N4
+N4_V330,青春,せいしゅん,youth; adolescence,N4,青 春,N4 N4
+N4_V331,春分,しゅんぶん,spring equinox,N4,春 分,N4 N5
+N4_V332,春休み,はるやすみ,spring vacation,N4,春 休,N4 N5
+N4_V333,会館,かいかん,hall; assembly building,N4,会 館,N4 N4
+N4_V334,体育館,たいいくかん,gymnasium,N4,体 育 館,N4 N3 N4
+N4_V335,旅館,りょかん,Japanese inn,N4,旅 館,N4 N4
+N4_V336,旅費,りょひ,travel expenses,N4,旅 費,N4 N3
+N4_V337,旅客,りょかく,traveler; passenger,N4,旅 客,N4 N3
+N4_V338,経験,けいけん,experience,N4,経 験,N3 N4
+N4_V339,試験,しけん,exam; test,N4,試 験,N4 N4
+N4_V340,実験,じっけん,experiment,N4,実 験,N3 N4
+N4_V341,写生,しゃせい,sketching from nature,N4,写 生,N4 N5
+N4_V342,複写,ふくしゃ,copy; duplication,N4,複 写,N2 N4
+N4_V343,過去,かこ,past,N4,過 去,N3 N4
+N4_V344,消去,しょうきょ,erasure; deletion,N4,消 去,N3 N4
+N4_V345,研究,けんきゅう,research,N4,研 究,N4 N4
+N4_V346,研修,けんしゅう,training; study program,N4,研 修,N4 N1
+N4_V347,研究者,けんきゅうしゃ,researcher,N4,研 究 者,N4 N4 N4
+N4_V348,飲食,いんしょく,eating and drinking,N4,飲 食,N4 N5
+N4_V349,飲酒,いんしゅ,drinking alcohol,N4,飲 酒,N4 N3
+N4_V350,飲料,いんりょう,beverage,N4,飲 料,N4 N4
+N4_V351,牛肉,ぎゅうにく,beef,N4,牛 肉,N4 N4
+N4_V352,豚肉,ぶたにく,pork,N4,豚 肉,N1 N4
+N4_V353,肉体,にくたい,body; flesh,N4,肉 体,N4 N4
+N4_V354,洋服,ようふく,Western-style clothes,N4,洋 服,N4 N4
+N4_V355,服装,ふくそう,clothing; attire,N4,服 装,N4 N2
+N4_V356,制服,せいふく,uniform,N4,制 服,N3 N4
+N4_V357,銀色,ぎんいろ,silver color,N4,銀 色,N4 N4
+N4_V358,銀河,ぎんが,galaxy; Milky Way,N4,銀 河,N4 N2
+N4_V359,紅茶,こうちゃ,black tea,N4,紅 茶,N2 N4
+N4_V360,茶道,さどう,tea ceremony,N4,茶 道,N4 N4
+N4_V361,追究,ついきゅう,investigation; pursuit,N4,追 究,N3 N4
+N4_V362,究明,きゅうめい,investigation; clarification,N4,究 明,N4 N4
+N4_V363,洋食,ようしょく,Western food,N4,洋 食,N4 N5
+N4_V364,西洋,せいよう,the West; Western countries,N4,西 洋,N5 N4
+N4_V365,長兄,ちょうけい,eldest brother,N4,長 兄,N5 N4
+N4_V366,秋分,しゅうぶん,autumn equinox,N4,秋 分,N4 N5
+N4_V367,秋風,あきかぜ,autumn breeze,N4,秋 風,N4 N4
+N4_V368,秋雨,あきさめ,autumn rain,N4,秋 雨,N4 N5
+N4_V369,講堂,こうどう,lecture hall; auditorium,N4,講 堂,N2 N4
+N4_V370,週末,しゅうまつ,weekend,N4,週 末,N4 N3
+N4_V371,週間,しゅうかん,week; weekly period,N4,週 間,N4 N5
+N4_V372,練習,れんしゅう,practice,N4,練 習,N2 N4
+N4_V373,習慣,しゅうかん,habit; custom,N4,習 慣,N4 N3
+N4_V374,学習,がくしゅう,study; learning,N4,学 習,N5 N4
+N4_V375,試合,しあい,match; game,N4,試 合,N4 N3
+N4_V376,試食,ししょく,food tasting,N4,試 食,N4 N5
+N4_V377,初夏,しょか,early summer,N4,初 夏,N3 N4
+N4_V378,夏休み,なつやすみ,summer vacation,N4,夏 休,N4 N5
+N4_V379,夏服,なつふく,summer clothes,N4,夏 服,N4 N4
+N4_V380,弟子,でし,pupil; apprentice,N4,弟 子,N4 N5
+N4_V381,野鳥,やちょう,wild bird,N4,野 鳥,N4 N4
+N4_V382,白鳥,はくちょう,swan,N4,白 鳥,N5 N4
+N4_V383,子犬,こいぬ,puppy,N4,子 犬,N5 N4
+N4_V384,番犬,ばんけん,watchdog,N4,番 犬,N3 N4
+N4_V385,野犬,やけん,stray dog; wild dog,N4,野 犬,N4 N4
+N4_V386,朝夕,あさゆう,morning and evening,N4,朝 夕,N4 N4
+N4_V387,夕日,ゆうひ,evening sun; sunset,N4,夕 日,N4 N5
+N4_V388,金魚,きんぎょ,goldfish,N4,金 魚,N5 N4
+N4_V389,魚屋,さかなや,fish shop; fishmonger,N4,魚 屋,N4 N4
+N4_V390,魚肉,ぎょにく,fish meat,N4,魚 肉,N4 N4
+N4_V391,借金,しゃっきん,debt,N4,借 金,N4 N5
+N4_V392,貸借,たいしゃく,lending and borrowing,N4,貸 借,N4 N4
+N4_V393,借家,しゃくや,rented house,N4,借 家,N4 N4
+N4_V394,朝飯,あさめし,breakfast,N4,朝 飯,N4 N4
+N4_V395,昼飯,ひるめし,lunch,N4,昼 飯,N4 N4
+N4_V396,夕飯,ゆうはん,evening meal; dinner,N4,夕 飯,N4 N4
+N4_V397,駅長,えきちょう,stationmaster,N4,駅 長,N4 N5
+N4_V398,昼間,ひるま,daytime,N4,昼 間,N4 N5
+N4_V399,昼休み,ひるやすみ,lunch break,N4,昼 休,N4 N5
+N4_V400,昼夜,ちゅうや,day and night,N4,昼 夜,N4 N4
+N4_V401,冬休み,ふゆやすみ,winter vacation,N4,冬 休,N4 N5
+N4_V402,冬季,とうき,winter season,N4,冬 季,N4 N2
+N4_V403,冬服,ふゆふく,winter clothes,N4,冬 服,N4 N4
+N4_V404,姉妹校,しまいこう,sister school,N4,姉 妹 校,N4 N4 N5
+N4_V405,曜日,ようび,day of the week,N4,曜 日,N4 N5
+N4_V406,月曜,げつよう,Monday (abbrev.),N4,月 曜,N5 N4
+N4_V407,漢語,かんご,Sino-Japanese word,N4,漢 語,N4 N5
+N4_V408,漢文,かんぶん,classical Chinese writing,N4,漢 文,N4 N4
+N4_V409,牛乳,ぎゅうにゅう,milk,N4,牛 乳,N4 N2
+N4_V410,牛丼,ぎゅうどん,beef bowl,N4,牛 丼,N4 N1
+N4_V411,義妹,ぎまい,younger sister-in-law,N4,義 妹,N1 N4
+N4_V412,貸出,かしだし,lending; checkout,N4,貸 出,N4 N5
+N4_V413,貸家,かしや,house for rent,N4,貸 家,N4 N4
+N4_V414,勉学,べんがく,study; learning,N4,勉 学,N4 N5
+N4_V415,勤勉,きんべん,diligence; industriousness,N4,勤 勉,N3 N4

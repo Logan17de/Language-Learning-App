@@ -1,0 +1,637 @@
+﻿id,word,reading,english_meaning,study_level,kanji_components,component_levels
+N2_V001,軍事,ぐんじ,military affairs,N2,軍 事,N2 N4
+N2_V002,兵力,へいりょく,military strength,N2,兵 力,N2 N4
+N2_V003,島国,しまぐに,island country,N2,島 国,N2 N5
+N2_V004,村人,むらびと,villager,N2,村 人,N2 N5
+N2_V005,正門,せいもん,main gate,N2,正 門,N4 N2
+N2_V006,雨戸,あまど,storm shutter,N2,雨 戸,N5 N2
+N2_V007,武力,ぶりょく,military force,N2,武 力,N2 N4
+N2_V008,城内,じょうない,inside a castle,N2,城 内,N2 N3
+N2_V009,総合,そうごう,overall; comprehensive,N2,総 合,N2 N3
+N2_V010,団体,だんたい,group; organization,N2,団 体,N2 N4
+N2_V011,路線,ろせん,route; railway line,N2,路 線,N3 N2
+N2_V012,設定,せってい,setting; establishment,N2,設 定,N2 N3
+N2_V013,勢力,せいりょく,influence; power,N2,勢 力,N2 N4
+N2_V014,政党,せいとう,political party,N2,政 党,N3 N2
+N2_V015,歴史,れきし,history,N2,歴 史,N2 N2
+N2_V016,政府,せいふ,government,N2,政 府,N3 N2
+N2_V017,巻物,まきもの,scroll,N2,巻 物,N2 N4
+N2_V018,紹介,しょうかい,introduction,N2,紹 介,N2 N2
+N2_V019,冷蔵,れいぞう,refrigeration; cold storage,N2,冷 蔵,N3 N2
+N2_V020,造船,ぞうせん,shipbuilding,N2,造 船,N2 N3
+N2_V021,根本,こんぽん,root; basis; fundamental,N2,根 本,N2 N5
+N2_V022,寺院,じいん,Buddhist temple; temple institution,N2,寺 院,N2 N4
+N2_V023,調査,ちょうさ,investigation; survey,N2,調 査,N3 N2
+N2_V024,将来,しょうらい,future,N2,将 来,N2 N5
+N2_V025,改正,かいせい,revision; amendment,N2,改 正,N2 N4
+N2_V026,県内,けんない,within the prefecture,N2,県 内,N2 N3
+N2_V027,温泉,おんせん,hot spring,N2,温 泉,N2 N2
+N2_V028,映像,えいぞう,image; video,N2,映 像,N4 N2
+N2_V029,細部,さいぶ,details; fine parts,N2,細 部,N2 N3
+N2_V030,谷間,たにま,valley; ravine,N2,谷 間,N2 N5
+N2_V031,奥地,おくち,interior; remote area,N2,奥 地,N2 N4
+N2_V032,再開,さいかい,reopening; resumption,N2,再 開,N2 N4
+N2_V033,出血,しゅっけつ,bleeding,N2,出 血,N5 N2
+N2_V034,計算,けいさん,calculation,N2,計 算,N4 N2
+N2_V035,対象,たいしょう,target; object; subject,N2,対 象,N3 N2
+N2_V036,清水,しみず,clear water,N2,清 水,N2 N5
+N2_V037,技術,ぎじゅつ,technology; skill,N2,技 術,N2 N3
+N2_V038,本州,ほんしゅう,Honshu,N2,本 州,N5 N2
+N2_V039,領土,りょうど,territory,N2,領 土,N2 N5
+N2_V040,鉄橋,てっきょう,iron bridge; railway bridge,N2,鉄 橋,N2 N2
+N2_V041,芸術,げいじゅつ,art; the arts,N2,芸 術,N2 N3
+N2_V042,大型,おおがた,large-sized,N2,大 型,N5 N2
+N2_V043,香水,こうすい,perfume,N2,香 水,N2 N5
+N2_V044,数量,すうりょう,quantity; amount,N2,数 量,N3 N2
+N2_V045,永久,えいきゅう,eternity; permanence,N2,永 久,N2 N2
+N2_V046,国境,こっきょう,national border,N2,国 境,N5 N2
+N2_V047,階段,かいだん,stairs; staircase,N2,階 段,N2 N3
+N2_V048,地区,ちく,district; area,N2,地 区,N4 N2
+N2_V049,電波,でんぱ,radio wave; signal,N2,電 波,N5 N2
+N2_V050,移動,いどう,movement; transfer,N2,移 動,N2 N4
+N2_V051,地域,ちいき,region; area,N2,地 域,N4 N2
+N2_V052,周辺,しゅうへん,surroundings; vicinity,N2,周 辺,N2 N2
+N2_V053,接続,せつぞく,connection,N2,接 続,N2 N3
+N2_V054,鉄道,てつどう,railway,N2,鉄 道,N2 N4
+N2_V055,近頃,ちかごろ,recently; nowadays,N2,近 頃,N4 N2
+N2_V056,教材,きょうざい,teaching material,N2,教 材,N4 N2
+N2_V057,個人,こじん,individual; private person,N2,個 人,N2 N5
+N2_V058,協定,きょうてい,agreement; pact,N2,協 定,N2 N3
+N2_V059,各国,かっこく,each country; various countries,N2,各 国,N2 N5
+N2_V060,地帯,ちたい,zone; area,N2,地 帯,N4 N2
+N2_V061,学歴,がくれき,educational background,N2,学 歴,N5 N2
+N2_V062,編集,へんしゅう,editing; compilation,N2,編 集,N2 N4
+N2_V063,裏面,りめん,reverse side; back,N2,裏 面,N2 N3
+N2_V064,対比,たいひ,contrast; comparison,N2,対 比,N3 N2
+N2_V065,坂道,さかみち,sloping road; hill road,N2,坂 道,N2 N4
+N2_V066,省略,しょうりゃく,omission; abbreviation,N2,省 略,N2 N2
+N2_V067,税金,ぜいきん,tax; taxes,N2,税 金,N2 N5
+N2_V068,競争,きょうそう,competition,N2,競 争,N2 N3
+N2_V069,周囲,しゅうい,surroundings; circumference,N2,周 囲,N2 N2
+N2_V070,海辺,うみべ,seaside; beach area,N2,海 辺,N4 N2
+N2_V071,河川,かせん,rivers,N2,河 川,N2 N5
+N2_V072,南極,なんきょく,South Pole; Antarctica,N2,南 極,N5 N2
+N2_V073,防止,ぼうし,prevention,N2,防 止,N2 N4
+N2_V074,低下,ていか,decline; fall,N2,低 下,N2 N5
+N2_V075,山林,さんりん,mountain forest,N2,山 林,N5 N2
+N2_V076,指導,しどう,guidance; instruction,N2,指 導,N3 N2
+N2_V077,森林,しんりん,forest; woods,N2,森 林,N2 N2
+N2_V078,丸太,まるた,log,N2,丸 太,N2 N3
+N2_V079,胸部,きょうぶ,chest; thorax,N2,胸 部,N2 N3
+N2_V080,大陸,たいりく,continent,N2,大 陸,N5 N2
+N2_V081,治療,ちりょう,medical treatment,N2,治 療,N3 N2
+N2_V082,諸国,しょこく,various countries,N2,諸 国,N2 N5
+N2_V083,管理,かんり,management; control,N2,管 理,N2 N4
+N2_V084,仲間,なかま,companion; colleague; group,N2,仲 間,N2 N5
+N2_V085,改革,かいかく,reform,N2,改 革,N2 N2
+N2_V086,担当,たんとう,being in charge; responsibility,N2,担 当,N2 N3
+N2_V087,効果,こうか,effect; effectiveness,N2,効 果,N2 N3
+N2_V088,賞金,しょうきん,prize money,N2,賞 金,N2 N5
+N2_V089,星座,せいざ,constellation,N2,星 座,N2 N3
+N2_V090,復習,ふくしゅう,review; revision,N2,復 習,N2 N4
+N2_V091,片方,かたほう,one side; one of a pair,N2,片 方,N2 N4
+N2_V092,並列,へいれつ,parallel; arrangement side by side,N2,並 列,N2 N3
+N2_V093,海底,かいてい,seabed; ocean floor,N2,海 底,N4 N2
+N2_V094,軽量,けいりょう,lightweight,N2,軽 量,N2 N2
+N2_V095,記録,きろく,record; documentation,N2,記 録,N3 N2
+N2_V096,腰痛,ようつう,lower back pain,N2,腰 痛,N2 N3
+N2_V097,著者,ちょしゃ,author,N2,著 者,N2 N4
+N2_V098,混乱,こんらん,confusion; disorder,N2,混 乱,N2 N2
+N2_V099,神殿,しんでん,temple; sanctuary,N2,神 殿,N3 N2
+N2_V100,毛布,もうふ,blanket,N2,毛 布,N2 N2
+N2_V101,角度,かくど,angle,N2,角 度,N2 N4
+N2_V102,仏教,ぶっきょう,Buddhism,N2,仏 教,N2 N4
+N2_V103,永遠,えいえん,eternity; forever,N2,永 遠,N2 N3
+N2_V104,雑誌,ざっし,magazine,N2,雑 誌,N3 N2
+N2_V105,減少,げんしょう,decrease; reduction,N2,減 少,N2 N4
+N2_V106,略語,りゃくご,abbreviation,N2,略 語,N2 N5
+N2_V107,準備,じゅんび,preparation,N2,準 備,N2 N3
+N2_V108,委員,いいん,committee member,N2,委 員,N2 N4
+N2_V109,命令,めいれい,order; command,N2,命 令,N3 N2
+N2_V110,週刊,しゅうかん,weekly publication,N2,週 刊,N4 N2
+N2_V111,焼肉,やきにく,grilled meat,N2,焼 肉,N2 N4
+N2_V112,里帰り,さとがえり,returning to one's hometown,N2,里 帰,N2 N4
+N2_V113,圧力,あつりょく,pressure,N2,圧 力,N2 N4
+N2_V114,金額,きんがく,amount of money,N2,金 額,N5 N2
+N2_V115,印象,いんしょう,impression,N2,印 象,N2 N2
+N2_V116,電池,でんち,battery,N2,電 池,N5 N2
+N2_V117,大臣,だいじん,cabinet minister,N2,大 臣,N5 N2
+N2_V118,車庫,しゃこ,garage,N2,車 庫,N5 N2
+N2_V119,農業,のうぎょう,agriculture,N2,農 業,N2 N4
+N2_V120,恋愛,れんあい,romantic love,N2,恋 愛,N2 N3
+N2_V121,羽毛,うもう,feathers; down,N2,羽 毛,N2 N2
+N2_V122,専門,せんもん,specialty; field of expertise,N2,専 門,N2 N2
+N2_V123,逆転,ぎゃくてん,reversal; turnaround,N2,逆 転,N2 N4
+N2_V124,腕力,わんりょく,physical strength,N2,腕 力,N2 N4
+N2_V125,短期,たんき,short term,N2,短 期,N2 N3
+N2_V126,岩石,がんせき,rock; stone,N2,岩 石,N2 N3
+N2_V127,竹林,ちくりん,bamboo grove,N2,竹 林,N2 N2
+N2_V128,児童,じどう,child; schoolchild,N2,児 童,N2 N2
+N2_V129,毛皮,けがわ,fur; pelt,N2,毛 皮,N2 N2
+N2_V130,出版,しゅっぱん,publication; publishing,N2,出 版,N5 N2
+N2_V131,宇内,うだい,the whole world; the universe,N2,宇 内,N2 N3
+N2_V132,状況,じょうきょう,situation; circumstances,N2,状 況,N3 N2
+N2_V133,被害,ひがい,damage; harm,N2,被 害,N2 N3
+N2_V134,超過,ちょうか,excess; exceeding,N2,超 過,N2 N3
+N2_V135,豊富,ほうふ,abundant; plentiful,N2,豊 富,N2 N3
+N2_V136,含有,がんゆう,containment; containing,N2,含 有,N2 N4
+N2_V137,植物,しょくぶつ,plant; vegetation,N2,植 物,N2 N4
+N2_V138,補助,ほじょ,assistance; supplement,N2,補 助,N2 N3
+N2_V139,暴力,ぼうりょく,violence,N2,暴 力,N2 N4
+N2_V140,課題,かだい,task; issue; assignment,N2,課 題,N2 N4
+N2_V141,足跡,あしあと,footprint; trace,N2,足 跡,N4 N2
+N2_V142,接触,せっしょく,contact; touch,N2,接 触,N2 N2
+N2_V143,目玉,めだま,eyeball; featured attraction,N2,目 玉,N4 N2
+N2_V144,地震,じしん,earthquake,N2,地 震,N4 N2
+N2_V145,一億,いちおく,one hundred million,N2,一 億,N5 N2
+N2_V146,肩書,かたがき,title; position,N2,肩 書,N2 N5
+N2_V147,演劇,えんげき,drama; theater,N2,演 劇,N3 N2
+N2_V148,名刺,めいし,business card,N2,名 刺,N5 N2
+N2_V149,記述,きじゅつ,description; written account,N2,記 述,N3 N2
+N2_V150,車輪,しゃりん,wheel,N2,車 輪,N5 N2
+N2_V151,浅黒い,あさぐろい,dark-complexioned; swarthy,N2,浅 黒,N2 N4
+N2_V152,単純,たんじゅん,simple; straightforward,N2,単 純,N3 N2
+N2_V153,薄暗い,うすぐらい,dim; gloomy,N2,薄 暗,N2 N3
+N2_V154,大阪,おおさか,Osaka,N2,大 阪,N5 N2
+N2_V155,韓国,かんこく,South Korea,N2,韓 国,N2 N5
+N2_V156,固定,こてい,fixing; fixed,N2,固 定,N2 N3
+N2_V157,巨大,きょだい,huge; gigantic,N2,巨 大,N2 N5
+N2_V158,講演,こうえん,lecture; speech,N2,講 演,N2 N3
+N2_V159,一般,いっぱん,general; ordinary,N2,一 般,N5 N2
+N2_V160,熱湯,ねっとう,boiling water,N2,熱 湯,N3 N2
+N2_V161,取捨,しゅしゃ,selection; choice,N2,取 捨,N3 N2
+N2_V162,衣服,いふく,clothes; clothing,N2,衣 服,N2 N4
+N2_V163,交替,こうたい,alternation; changeover,N2,交 替,N3 N2
+N2_V164,中央,ちゅうおう,center; central,N2,中 央,N5 N2
+N2_V165,骨折,こっせつ,bone fracture,N2,骨 折,N2 N3
+N2_V166,年齢,ねんれい,age,N2,年 齢,N5 N2
+N2_V167,照明,しょうめい,lighting; illumination,N2,照 明,N2 N4
+N2_V168,階層,かいそう,class; hierarchy; layer,N2,階 層,N2 N2
+N2_V169,弱点,じゃくてん,weak point,N2,弱 点,N2 N3
+N2_V170,頭脳,ずのう,brain; intellect,N2,頭 脳,N3 N2
+N2_V171,航海,こうかい,voyage; navigation,N2,航 海,N2 N4
+N2_V172,快速,かいそく,rapid; rapid train,N2,快 速,N2 N3
+N2_V173,翌日,よくじつ,the following day,N2,翌 日,N2 N5
+N2_V174,旧式,きゅうしき,old style; obsolete type,N2,旧 式,N2 N3
+N2_V175,筆者,ひっしゃ,writer; author,N2,筆 者,N2 N4
+N2_V176,交換,こうかん,exchange,N2,交 換,N3 N2
+N2_V177,群島,ぐんとう,archipelago,N2,群 島,N2 N2
+N2_V178,爆発,ばくはつ,explosion,N2,爆 発,N2 N4
+N2_V179,捜査,そうさ,investigation; search,N2,捜 査,N2 N2
+N2_V180,石油,せきゆ,petroleum; oil,N2,石 油,N3 N2
+N2_V181,絶叫,ぜっきょう,scream; shriek,N2,絶 叫,N3 N2
+N2_V182,追伸,ついしん,postscript,N2,追 伸,N3 N2
+N2_V183,承認,しょうにん,approval; recognition,N2,承 認,N2 N3
+N2_V184,雨雲,あまぐも,rain cloud,N2,雨 雲,N5 N2
+N2_V185,紹介者,しょうかいしゃ,introducer,N2,紹 介 者,N2 N2 N4
+N2_V186,包装,ほうそう,wrapping; packaging,N2,包 装,N2 N2
+N2_V187,官庁,かんちょう,government office,N2,官 庁,N3 N2
+N2_V188,測定,そくてい,measurement,N2,測 定,N2 N3
+N2_V189,占有,せんゆう,exclusive possession; occupancy,N2,占 有,N2 N4
+N2_V190,混雑,こんざつ,congestion; crowding,N2,混 雑,N2 N3
+N2_V191,倍数,ばいすう,multiple (in mathematics),N2,倍 数,N2 N3
+N2_V192,荒野,こうや,wilderness,N2,荒 野,N2 N4
+N2_V193,缶詰,かんづめ,canned food,N2,缶 詰,N2 N2
+N2_V194,栄光,えいこう,glory,N2,栄 光,N2 N3
+N2_V195,病床,びょうしょう,sickbed; hospital bed,N2,病 床,N4 N2
+N2_V196,規則,きそく,rule; regulation,N2,規 則,N3 N2
+N2_V197,手順,てじゅん,procedure; steps,N2,手 順,N4 N2
+N2_V198,枚数,まいすう,number of sheets/items,N2,枚 数,N2 N3
+N2_V199,厚紙,あつがみ,cardboard; thick paper,N2,厚 紙,N2 N4
+N2_V200,皮肉,ひにく,irony; sarcasm,N2,皮 肉,N2 N4
+N2_V201,輸送,ゆそう,transportation,N2,輸 送,N2 N4
+N2_V202,濃度,のうど,concentration; density,N2,濃 度,N2 N4
+N2_V203,簡単,かんたん,simple; easy,N2,簡 単,N2 N3
+N2_V204,子孫,しそん,descendants; posterity,N2,子 孫,N5 N2
+N2_V205,丈夫,じょうぶ,strong; durable; healthy,N2,丈 夫,N2 N3
+N2_V206,黄色,きいろ,yellow,N2,黄 色,N2 N4
+N2_V207,届出,とどけで,notification; report; filing,N2,届 出,N2 N5
+N2_V208,連絡,れんらく,contact; communication,N2,連 絡,N3 N2
+N2_V209,採用,さいよう,adoption; hiring,N2,採 用,N2 N4
+N2_V210,傾向,けいこう,tendency; trend,N2,傾 向,N2 N3
+N2_V211,鼻血,はなぢ,nosebleed,N2,鼻 血,N2 N2
+N2_V212,宝石,ほうせき,jewel; gemstone,N2,宝 石,N2 N3
+N2_V213,患者,かんじゃ,patient,N2,患 者,N2 N4
+N2_V214,延長,えんちょう,extension; prolongation,N2,延 長,N2 N5
+N2_V215,法律,ほうりつ,law,N2,法 律,N3 N2
+N2_V216,希望,きぼう,hope; wish,N2,希 望,N2 N3
+N2_V217,甘味,あまみ,sweetness; sweet taste,N2,甘 味,N2 N4
+N2_V218,港湾,こうわん,harbor; port,N2,港 湾,N3 N2
+N2_V219,沈下,ちんか,sinking; subsidence,N2,沈 下,N2 N5
+N2_V220,販売,はんばい,sales; selling,N2,販 売,N2 N4
+N2_V221,欧米,おうべい,Europe and America; the West,N2,欧 米,N2 N3
+N2_V222,砂場,すなば,sandbox; sandy area,N2,砂 場,N2 N4
+N2_V223,尊敬,そんけい,respect,N2,尊 敬,N2 N2
+N2_V224,複数,ふくすう,plural; multiple,N2,複 数,N2 N3
+N2_V225,宿泊,しゅくはく,lodging; stay overnight,N2,宿 泊,N3 N2
+N2_V226,枝葉,えだは,branches and leaves; details,N2,枝 葉,N2 N3
+N2_V227,依頼,いらい,request; commission,N2,依 頼,N2 N3
+N2_V228,幼児,ようじ,young child; infant,N2,幼 児,N2 N2
+N2_V229,斬新,ざんしん,novel; original,N2,斬 新,N2 N4
+N2_V230,勇気,ゆうき,courage,N2,勇 気,N2 N5
+N2_V231,上昇,じょうしょう,rise; increase,N2,上 昇,N5 N2
+N2_V232,長寿,ちょうじゅ,longevity,N2,長 寿,N5 N2
+N2_V233,四季,しき,four seasons,N2,四 季,N5 N2
+N2_V234,液体,えきたい,liquid,N2,液 体,N2 N4
+N2_V235,食券,しょっけん,meal ticket,N2,食 券,N5 N2
+N2_V236,祭日,さいじつ,holiday; festival day,N2,祭 日,N2 N5
+N2_V237,手袋,てぶくろ,gloves,N2,手 袋,N4 N2
+N2_V238,燃料,ねんりょう,fuel,N2,燃 料,N2 N4
+N2_V239,毒物,どくぶつ,poisonous substance,N2,毒 物,N2 N4
+N2_V240,改札,かいさつ,ticket gate; ticket inspection,N2,改 札,N2 N2
+N2_V241,狙い所,ねらいどころ,point to aim at; target point,N2,狙 所,N2 N3
+N2_V242,脇道,わきみち,side road; byway,N2,脇 道,N2 N4
+N2_V243,副業,ふくぎょう,side job,N2,副 業,N2 N4
+N2_V244,敬語,けいご,honorific language,N2,敬 語,N2 N5
+N2_V245,方針,ほうしん,policy; course of action,N2,方 針,N4 N2
+N2_V246,拝見,はいけん,seeing; looking (humble),N2,拝 見,N2 N5
+N2_V247,入浴,にゅうよく,bathing,N2,入 浴,N5 N2
+N2_V248,苦悩,くのう,anguish; distress,N2,苦 悩,N3 N2
+N2_V249,汚水,おすい,wastewater; dirty water,N2,汚 水,N2 N5
+N2_V250,電灯,でんとう,electric light,N2,電 灯,N5 N2
+N2_V251,寝坊,ねぼう,oversleeping; late riser,N2,寝 坊,N3 N2
+N2_V252,目尻,めじり,outer corner of the eye,N2,目 尻,N4 N2
+N2_V253,涙声,なみだごえ,tearful voice,N2,涙 声,N2 N3
+N2_V254,停止,ていし,stop; suspension,N2,停 止,N2 N4
+N2_V255,完了,かんりょう,completion,N2,完 了,N3 N2
+N2_V256,発汗,はっかん,perspiration; sweating,N2,発 汗,N4 N2
+N2_V257,郵便,ゆうびん,mail; postal service,N2,郵 便,N2 N3
+N2_V258,幅広い,はばひろい,wide; broad-ranging,N2,幅 広,N2 N4
+N2_V259,童話,どうわ,children's story; fairy tale,N2,童 話,N2 N5
+N2_V260,害虫,がいちゅう,harmful insect; pest,N2,害 虫,N3 N2
+N2_V261,埋立地,うめたてち,reclaimed land,N2,埋 立 地,N2 N4 N4
+N2_V262,小舟,こぶね,small boat,N2,小 舟,N5 N2
+N2_V263,暗闇,くらやみ,darkness,N2,暗 闇,N3 N2
+N2_V264,鉄棒,てつぼう,iron bar; horizontal bar,N2,鉄 棒,N2 N2
+N2_V265,貨物,かもつ,freight; cargo,N2,貨 物,N2 N4
+N2_V266,肌色,はだいろ,skin color; flesh color,N2,肌 色,N2 N4
+N2_V267,内臓,ないぞう,internal organs,N2,内 臓,N3 N2
+N2_V268,食塩,しょくえん,table salt,N2,食 塩,N5 N2
+N2_V269,平均,へいきん,average,N2,平 均,N3 N2
+N2_V270,湖水,こすい,lake water; lake,N2,湖 水,N2 N5
+N2_V271,損失,そんしつ,loss,N2,損 失,N2 N3
+N2_V272,膝頭,ひざがしら,kneecap; knee,N2,膝 頭,N2 N3
+N2_V273,辛口,からくち,dry; spicy; harsh,N2,辛 口,N2 N4
+N2_V274,双方,そうほう,both sides; both parties,N2,双 方,N2 N4
+N2_V275,軒先,のきさき,edge of the eaves; storefront,N2,軒 先,N2 N5
+N2_V276,成績,せいせき,results; grades; performance,N2,成 績,N3 N2
+N2_V277,干物,ひもの,dried food; dried fish,N2,干 物,N2 N4
+N2_V278,姓名,せいめい,full name; surname and given name,N2,姓 名,N2 N5
+N2_V279,発掘,はっくつ,excavation; discovery,N2,発 掘,N4 N2
+N2_V280,珍味,ちんみ,delicacy,N2,珍 味,N2 N4
+N2_V281,訓練,くんれん,training; drill,N2,訓 練,N2 N2
+N2_V282,預金,よきん,bank deposit; savings,N2,預 金,N2 N5
+N2_V283,署名,しょめい,signature,N2,署 名,N2 N5
+N2_V284,漁業,ぎょぎょう,fishing industry,N2,漁 業,N2 N4
+N2_V285,緑色,みどりいろ,green color,N2,緑 色,N2 N4
+N2_V286,畳表,たたみおもて,tatami surface matting,N2,畳 表,N2 N3
+N2_V287,咲き方,さきかた,way of blooming,N2,咲 方,N2 N4
+N2_V288,貿易,ぼうえき,trade; commerce,N2,貿 易,N2 N3
+N2_V289,舞踊,ぶよう,dance,N2,舞 踊,N3 N2
+N2_V290,開封,かいふう,opening a sealed item,N2,開 封,N4 N2
+N2_V291,前兆,ぜんちょう,sign; omen; precursor,N2,前 兆,N5 N2
+N2_V292,電柱,でんちゅう,utility pole,N2,電 柱,N5 N2
+N2_V293,駐車,ちゅうしゃ,parking,N2,駐 車,N2 N5
+N2_V294,祝日,しゅくじつ,public holiday,N2,祝 日,N2 N5
+N2_V295,石炭,せきたん,coal,N2,石 炭,N3 N2
+N2_V296,柔道,じゅうどう,judo,N2,柔 道,N2 N4
+N2_V297,雇用,こよう,employment,N2,雇 用,N2 N4
+N2_V298,乾杯,かんぱい,toast; cheers,N2,乾 杯,N2 N3
+N2_V299,鋭角,えいかく,acute angle,N2,鋭 角,N2 N2
+N2_V300,氷山,ひょうざん,iceberg,N2,氷 山,N2 N5
+N2_V301,片隅,かたすみ,corner; nook,N2,片 隅,N2 N2
+N2_V302,一冊,いっさつ,one book; one volume,N2,一 冊,N5 N2
+N2_V303,毛糸,けいと,woolen yarn,N2,毛 糸,N2 N2
+N2_V304,硬貨,こうか,coin,N2,硬 貨,N2 N2
+N2_V305,塗料,とりょう,paint; coating material,N2,塗 料,N2 N4
+N2_V306,愛憎,あいぞう,love and hate,N2,愛 憎,N3 N2
+N2_V307,泥水,どろみず,muddy water,N2,泥 水,N2 N5
+N2_V308,油脂,ゆし,oils and fats,N2,油 脂,N2 N2
+N2_V309,花粉,かふん,pollen,N2,花 粉,N4 N2
+N2_V310,名詞,めいし,noun,N2,名 詞,N5 N2
+N2_V311,水筒,すいとう,water bottle; flask,N2,水 筒,N5 N2
+N2_V312,清掃,せいそう,cleaning,N2,清 掃,N2 N2
+N2_V313,鉄塔,てっとう,steel tower,N2,鉄 塔,N2 N2
+N2_V314,賢者,けんじゃ,wise person; sage,N2,賢 者,N2 N4
+N2_V315,拾得,しゅうとく,finding; picking up,N2,拾 得,N2 N3
+N2_V316,小麦,こむぎ,wheat,N2,小 麦,N5 N2
+N2_V317,印刷,いんさつ,printing,N2,印 刷,N2 N2
+N2_V318,卵白,らんぱく,egg white,N2,卵 白,N2 N5
+N2_V319,機械,きかい,machine; machinery,N2,機 械,N3 N2
+N2_V320,灰皿,はいざら,ashtray,N2,灰 皿,N2 N2
+N2_V321,祈願,きがん,prayer; petition,N2,祈 願,N2 N3
+N2_V322,灰色,はいいろ,gray,N2,灰 色,N2 N4
+N2_V323,召集,しょうしゅう,summoning; convocation,N2,召 集,N2 N4
+N2_V324,溶液,ようえき,solution; liquid solution,N2,溶 液,N2 N2
+N2_V325,研磨,けんま,polishing; grinding,N2,研 磨,N4 N2
+N2_V326,粒子,りゅうし,particle,N2,粒 子,N2 N5
+N2_V327,喫茶,きっさ,tea drinking; cafe,N2,喫 茶,N2 N4
+N2_V328,机上,きじょう,on a desk; theoretical,N2,机 上,N2 N5
+N2_V329,貯金,ちょきん,savings,N2,貯 金,N2 N5
+N2_V330,一匹,いっぴき,one small animal,N2,一 匹,N5 N2
+N2_V331,木綿,もめん,cotton,N2,木 綿,N5 N2
+N2_V332,贈答,ぞうとう,exchange of gifts; gift-giving,N2,贈 答,N2 N4
+N2_V333,冷凍,れいとう,freezing; frozen,N2,冷 凍,N3 N2
+N2_V334,花瓶,かびん,flower vase,N2,花 瓶,N4 N2
+N2_V335,帽子,ぼうし,hat; cap,N2,帽 子,N2 N5
+N2_V336,清涼,せいりょう,cool; refreshing,N2,清 涼,N2 N2
+N2_V337,秒数,びょうすう,number of seconds,N2,秒 数,N2 N3
+N2_V338,湿度,しつど,humidity,N2,湿 度,N2 N4
+N2_V339,蒸気,じょうき,steam; vapor,N2,蒸 気,N2 N5
+N2_V340,菓子,かし,sweets; confectionery,N2,菓 子,N2 N5
+N2_V341,耕地,こうち,cultivated land,N2,耕 地,N2 N4
+N2_V342,鉱物,こうぶつ,mineral,N2,鉱 物,N2 N4
+N2_V343,皮膚,ひふ,skin,N2,皮 膚,N2 N2
+N2_V344,胃液,いえき,gastric juice,N2,胃 液,N2 N2
+N2_V345,板挟み,いたばさみ,caught between two sides; dilemma,N2,板 挟,N2 N2
+N2_V346,郊外,こうがい,suburbs; outskirts,N2,郊 外,N2 N5
+N2_V347,銅像,どうぞう,bronze statue,N2,銅 像,N2 N2
+N2_V348,鈍感,どんかん,insensitive; dull,N2,鈍 感,N2 N3
+N2_V349,貝類,かいるい,shellfish,N2,貝 類,N2 N3
+N2_V350,空缶,あきかん,empty can,N2,空 缶,N4 N2
+N2_V351,枯葉,かれは,dead leaves,N2,枯 葉,N2 N3
+N2_V352,水滴,すいてき,water droplet,N2,水 滴,N5 N2
+N2_V353,符号,ふごう,sign; symbol; code,N2,符 号,N2 N3
+N2_V354,家畜,かちく,livestock,N2,家 畜,N4 N2
+N2_V355,軟弱,なんじゃく,weak; soft; feeble,N2,軟 弱,N2 N2
+N2_V356,洗濯,せんたく,laundry; washing,N2,洗 濯,N3 N2
+N2_V357,一隻,いっせき,one ship; one vessel,N2,一 隻,N5 N2
+N2_V358,伺い書,うかがいしょ,written inquiry; approval request,N2,伺 書,N2 N5
+N2_V359,沸点,ふってん,boiling point,N2,沸 点,N2 N3
+N2_V360,曇天,どんてん,cloudy sky; overcast weather,N2,曇 天,N2 N5
+N2_V361,肯定,こうてい,affirmation; positive,N2,肯 定,N2 N3
+N2_V362,乾燥,かんそう,dryness; drying,N2,乾 燥,N2 N2
+N2_V363,零点,れいてん,zero point; zero score,N2,零 点,N2 N3
+N2_V364,軍人,ぐんじん,soldier; military person,N2,軍 人,N2 N5
+N2_V365,歩兵,ほへい,infantry soldier,N2,歩 兵,N4 N2
+N2_V366,半島,はんとう,peninsula,N2,半 島,N5 N2
+N2_V367,農村,のうそん,farming village; rural village,N2,農 村,N2 N2
+N2_V368,専門家,せんもんか,specialist; expert,N2,専 門 家,N2 N2 N4
+N2_V369,武道,ぶどう,martial arts,N2,武 道,N2 N4
+N2_V370,城下,じょうか,area below a castle; castle town,N2,城 下,N2 N5
+N2_V371,総数,そうすう,total number,N2,総 数,N2 N3
+N2_V372,集団,しゅうだん,group; collective,N2,集 団,N4 N2
+N2_V373,電線,でんせん,electric wire,N2,電 線,N5 N2
+N2_V374,情勢,じょうせい,situation; state of affairs,N2,情 勢,N3 N2
+N2_V375,与党,よとう,ruling party,N2,与 党,N3 N2
+N2_V376,日本史,にほんし,Japanese history,N2,日 本 史,N5 N5 N2
+N2_V377,運営,うんえい,management; operation,N2,運 営,N4 N2
+N2_V378,府内,ふない,within an urban prefecture,N2,府 内,N2 N3
+N2_V379,一巻,いっかん,one volume,N2,一 巻,N5 N2
+N2_V380,介入,かいにゅう,intervention,N2,介 入,N2 N5
+N2_V381,蔵書,ぞうしょ,collection of books,N2,蔵 書,N2 N5
+N2_V382,改造,かいぞう,remodeling; modification,N2,改 造,N2 N2
+N2_V383,屋根,やね,roof,N2,屋 根,N4 N2
+N2_V384,山寺,やまでら,mountain temple,N2,山 寺,N5 N2
+N2_V385,将校,しょうこう,military officer,N2,将 校,N2 N5
+N2_V386,改良,かいりょう,improvement,N2,改 良,N2 N3
+N2_V387,県外,けんがい,outside the prefecture,N2,県 外,N2 N5
+N2_V388,画像,がぞう,image; picture,N2,画 像,N4 N2
+N2_V389,再会,さいかい,reunion,N2,再 会,N2 N4
+N2_V390,血液,けつえき,blood,N2,血 液,N2 N2
+N2_V391,予算,よさん,budget,N2,予 算,N3 N2
+N2_V392,清掃員,せいそういん,cleaner; sanitation worker,N2,清 掃 員,N2 N2 N4
+N2_V393,技能,ぎのう,skill; technical ability,N2,技 能,N2 N3
+N2_V394,九州,きゅうしゅう,Kyushu,N2,九 州,N5 N2
+N2_V395,領域,りょういき,domain; area,N2,領 域,N2 N2
+N2_V396,文芸,ぶんげい,literature and arts,N2,文 芸,N4 N2
+N2_V397,小型,こがた,small-sized; compact,N2,小 型,N5 N2
+N2_V398,香料,こうりょう,fragrance; flavoring,N2,香 料,N2 N4
+N2_V399,量産,りょうさん,mass production,N2,量 産,N2 N3
+N2_V400,境界,きょうかい,boundary; border,N2,境 界,N2 N4
+N2_V401,二階,にかい,second floor,N2,二 階,N5 N2
+N2_V402,区別,くべつ,distinction; classification,N2,区 別,N2 N4
+N2_V403,波長,はちょう,wavelength,N2,波 長,N2 N5
+N2_V404,移民,いみん,immigrant; migration,N2,移 民,N2 N3
+N2_V405,各地,かくち,various places,N2,各 地,N2 N4
+N2_V406,長編,ちょうへん,full-length work,N2,長 編,N5 N2
+N2_V407,裏口,うらぐち,back entrance,N2,裏 口,N2 N4
+N2_V408,比例,ひれい,proportion,N2,比 例,N2 N3
+N2_V409,包装紙,ほうそうし,wrapping paper,N2,包 装 紙,N2 N2 N4
+N2_V410,反省,はんせい,reflection; self-examination,N2,反 省,N3 N2
+N2_V411,消費税,しょうひぜい,consumption tax,N2,消 費 税,N3 N3 N2
+N2_V412,競技,きょうぎ,competition; sporting event,N2,競 技,N2 N2
+N2_V413,運河,うんが,canal,N2,運 河,N4 N2
+N2_V414,北極,ほっきょく,North Pole; Arctic,N2,北 極,N5 N2
+N2_V415,予防,よぼう,prevention,N2,予 防,N3 N2
+N2_V416,最低,さいてい,lowest; minimum,N2,最 低,N3 N2
+N2_V417,導入,どうにゅう,introduction; implementation,N2,導 入,N2 N5
+N2_V418,胸囲,きょうい,chest measurement,N2,胸 囲,N2 N2
+N2_V419,陸上,りくじょう,land; track and field,N2,陸 上,N2 N5
+N2_V420,諸問題,しょもんだい,various problems,N2,諸 問 題,N2 N4 N4
+N2_V421,革命,かくめい,revolution,N2,革 命,N2 N3
+N2_V422,負担,ふたん,burden; responsibility,N2,負 担,N3 N2
+N2_V423,受賞,じゅしょう,receiving a prize,N2,受 賞,N3 N2
+N2_V424,火星,かせい,Mars,N2,火 星,N5 N2
+N2_V425,回復,かいふく,recovery,N2,回 復,N3 N2
+N2_V426,片道,かたみち,one-way trip,N2,片 道,N2 N4
+N2_V427,並行,へいこう,parallel; going alongside,N2,並 行,N2 N5
+N2_V428,気温,きおん,air temperature,N2,気 温,N5 N2
+N2_V429,軽食,けいしょく,light meal,N2,軽 食,N2 N5
+N2_V430,著作,ちょさく,literary work; writing,N2,著 作,N2 N4
+N2_V431,乱用,らんよう,abuse; misuse,N2,乱 用,N2 N4
+N2_V432,一章,いっしょう,one chapter,N2,一 章,N5 N2
+N2_V433,分布,ぶんぷ,distribution,N2,分 布,N5 N2
+N2_V434,三角,さんかく,triangle,N2,三 角,N5 N2
+N2_V435,仏像,ぶつぞう,Buddhist statue,N2,仏 像,N2 N2
+N2_V436,日誌,にっし,daily log; journal,N2,日 誌,N5 N2
+N2_V437,加減,かげん,degree; adjustment,N2,加 減,N3 N2
+N2_V438,水準,すいじゅん,level; standard,N2,水 準,N5 N2
+N2_V439,委員会,いいんかい,committee,N2,委 員 会,N2 N4 N4
+N2_V440,法令,ほうれい,law; ordinance,N2,法 令,N3 N2
+N2_V441,発刊,はっかん,publication; launching a periodical,N2,発 刊,N4 N2
+N2_V442,全焼,ぜんしょう,burned down completely,N2,全 焼,N3 N2
+N2_V443,血圧,けつあつ,blood pressure,N2,血 圧,N2 N2
+N2_V444,額面,がくめん,face value; nominal amount,N2,額 面,N2 N3
+N2_V445,目印,めじるし,mark; landmark,N2,目 印,N4 N2
+N2_V446,貯水池,ちょすいち,reservoir,N2,貯 水 池,N2 N5 N2
+N2_V447,臣下,しんか,retainer; subject,N2,臣 下,N2 N5
+N2_V448,金庫,きんこ,safe; vault,N2,金 庫,N5 N2
+N2_V449,板前,いたまえ,Japanese chef,N2,板 前,N2 N5
+N2_V450,失恋,しつれん,broken heart; disappointed love,N2,失 恋,N3 N2
+N2_V451,羽根,はね,feather; wing,N2,羽 根,N2 N2
+N2_V452,専用,せんよう,exclusive use,N2,専 用,N2 N4
+N2_V453,逆効果,ぎゃくこうか,opposite effect; backfire,N2,逆 効 果,N2 N2 N3
+N2_V454,腕前,うでまえ,skill; ability,N2,腕 前,N2 N5
+N2_V455,短所,たんしょ,weak point; shortcoming,N2,短 所,N2 N3
+N2_V456,普段,ふだん,usual; everyday,N2,普 段,N2 N3
+N2_V457,岩山,いわやま,rocky mountain,N2,岩 山,N2 N5
+N2_V458,竹馬,たけうま,stilts,N2,竹 馬,N2 N3
+N2_V459,育児,いくじ,childcare,N2,育 児,N3 N2
+N2_V460,版画,はんが,print; woodblock print,N2,版 画,N2 N4
+N2_V461,被告,ひこく,defendant,N2,被 告,N2 N3
+N2_V462,岸辺,きしべ,shore; bank,N2,岸 辺,N2 N2
+N2_V463,超音波,ちょうおんぱ,ultrasound; ultrasonic wave,N2,超 音 波,N2 N4 N2
+N2_V464,豊作,ほうさく,good harvest,N2,豊 作,N2 N4
+N2_V465,包含,ほうがん,inclusion; containing,N2,包 含,N2 N2
+N2_V466,植林,しょくりん,afforestation; tree planting,N2,植 林,N2 N2
+N2_V467,候補,こうほ,candidate,N2,候 補,N3 N2
+N2_V468,暴走,ぼうそう,reckless running; runaway,N2,暴 走,N2 N4
+N2_V469,日課,にっか,daily routine,N2,日 課,N5 N2
+N2_V470,跡地,あとち,site; former site,N2,跡 地,N2 N4
+N2_V471,触感,しょっかん,touch sensation; texture,N2,触 感,N2 N3
+N2_V472,水玉,みずたま,water drop; polka dot,N2,水 玉,N5 N2
+N2_V473,億万,おくまん,millions; vast wealth,N2,億 万,N2 N5
+N2_V474,劇場,げきじょう,theater,N2,劇 場,N2 N4
+N2_V475,刺身,さしみ,sashimi,N2,刺 身,N2 N4
+N2_V476,口述,こうじゅつ,oral statement; dictation,N2,口 述,N4 N2
+N2_V477,指輪,ゆびわ,ring,N2,指 輪,N3 N2
+N2_V478,純真,じゅんしん,pure; innocent,N2,純 真,N2 N4
+N2_V479,薄着,うすぎ,light clothing,N2,薄 着,N2 N4
+N2_V480,固体,こたい,solid (state),N2,固 体,N2 N4
+N2_V481,巨額,きょがく,huge amount of money,N2,巨 額,N2 N2
+N2_V482,講師,こうし,lecturer; instructor,N2,講 師,N2 N3
+N2_V483,湯気,ゆげ,steam; vapor,N2,湯 気,N2 N5
+N2_V484,両替,りょうがえ,currency exchange; change-making,N2,両 替,N3 N2
+N2_V485,骨組,ほねぐみ,framework; skeleton,N2,骨 組,N2 N3
+N2_V486,高齢,こうれい,advanced age,N2,高 齢,N5 N2
+N2_V487,対照,たいしょう,contrast; comparison,N2,対 照,N3 N2
+N2_V488,高層,こうそう,high-rise; upper layer,N2,高 層,N5 N2
+N2_V489,強弱,きょうじゃく,strength and weakness,N2,強 弱,N4 N2
+N2_V490,構築,こうちく,construction; building up,N2,構 築,N3 N2
+N2_V491,脳内,のうない,within the brain,N2,脳 内,N2 N3
+N2_V492,航空,こうくう,aviation; air travel,N2,航 空,N2 N4
+N2_V493,快感,かいかん,pleasant sensation,N2,快 感,N2 N3
+N2_V494,翌年,よくねん,the following year,N2,翌 年,N2 N5
+N2_V495,新旧,しんきゅう,new and old,N2,新 旧,N4 N2
+N2_V496,筆記,ひっき,writing; written test,N2,筆 記,N2 N3
+N2_V497,変換,へんかん,conversion; transformation,N2,変 換,N3 N2
+N2_V498,群集,ぐんしゅう,crowd; gathering,N2,群 集,N2 N4
+N2_V499,爆音,ばくおん,explosive roar; loud noise,N2,爆 音,N2 N4
+N2_V500,油田,ゆでん,oil field,N2,油 田,N2 N4
+N2_V501,伸長,しんちょう,extension; growth,N2,伸 長,N2 N5
+N2_V502,承知,しょうち,knowledge; consent,N2,承 知,N2 N4
+N2_V503,青雲,せいうん,blue sky; high ambition,N2,青 雲,N4 N2
+N2_V504,訓練所,くんれんじょ,training center,N2,訓 練 所,N2 N2 N3
+N2_V505,包囲,ほうい,surrounding; encirclement,N2,包 囲,N2 N2
+N2_V506,県庁,けんちょう,prefectural government office,N2,県 庁,N2 N2
+N2_V507,予測,よそく,prediction; forecast,N2,予 測,N3 N2
+N2_V508,二倍,にばい,double; twice,N2,二 倍,N5 N2
+N2_V509,乳児,にゅうじ,infant,N2,乳 児,N2 N2
+N2_V510,荒天,こうてん,stormy weather,N2,荒 天,N2 N5
+N2_V511,箱詰,はこづめ,packing in boxes,N2,箱 詰,N3 N2
+N2_V512,法則,ほうそく,law; rule,N2,法 則,N3 N2
+N2_V513,禁煙,きんえん,no smoking; smoking ban,N2,禁 煙,N2 N3
+N2_V514,順番,じゅんばん,order; turn,N2,順 番,N2 N3
+N2_V515,一枚,いちまい,one flat item,N2,一 枚,N5 N2
+N2_V516,濃厚,のうこう,rich; dense; strong,N2,濃 厚,N2 N2
+N2_V517,簡易,かんい,simple; simplified,N2,簡 易,N2 N3
+N2_V518,孫娘,まごむすめ,granddaughter,N2,孫 娘,N2 N3
+N2_V519,身丈,みたけ,body height; garment length,N2,身 丈,N4 N2
+N2_V520,黄金,おうごん,gold; golden,N2,黄 金,N2 N5
+N2_V521,採点,さいてん,scoring; marking,N2,採 点,N2 N3
+N2_V522,宝物,たからもの,treasure; prized possession,N2,宝 物,N2 N4
+N2_V523,患部,かんぶ,affected area,N2,患 部,N2 N3
+N2_V524,延期,えんき,postponement,N2,延 期,N2 N3
+N2_V525,規律,きりつ,discipline; rules,N2,規 律,N3 N2
+N2_V526,希少,きしょう,scarce; rare,N2,希 少,N2 N4
+N2_V527,甘口,あまくち,sweet; mild,N2,甘 口,N2 N4
+N2_V528,西欧,せいおう,Western Europe,N2,西 欧,N5 N2
+N2_V529,砂地,すなじ,sandy ground,N2,砂 地,N2 N4
+N2_V530,尊重,そんちょう,respect; regard,N2,尊 重,N2 N4
+N2_V531,口紅,くちべに,lipstick,N2,口 紅,N4 N2
+N2_V532,複雑,ふくざつ,complex; complicated,N2,複 雑,N2 N3
+N2_V533,一泊,いっぱく,one-night stay,N2,一 泊,N5 N2
+N2_V534,入荷,にゅうか,arrival of goods,N2,入 荷,N5 N2
+N2_V535,小枝,こえだ,twig; small branch,N2,小 枝,N5 N2
+N2_V536,依存,いぞん,dependence,N2,依 存,N2 N3
+N2_V537,幼少,ようしょう,early childhood,N2,幼 少,N2 N4
+N2_V538,勇者,ゆうしゃ,brave person; hero,N2,勇 者,N2 N4
+N2_V539,昇進,しょうしん,promotion,N2,昇 進,N2 N3
+N2_V540,寿命,じゅみょう,lifespan,N2,寿 命,N2 N3
+N2_V541,菜食,さいしょく,vegetarian diet,N2,菜 食,N2 N5
+N2_V542,季語,きご,seasonal word (haiku),N2,季 語,N2 N5
+N2_V543,乗車券,じょうしゃけん,train/bus ticket,N2,乗 車 券,N3 N5 N2
+N2_V544,文化祭,ぶんかさい,school cultural festival,N2,文 化 祭,N4 N3 N2
+N2_V545,紙袋,かみぶくろ,paper bag,N2,紙 袋,N4 N2
+N2_V546,燃焼,ねんしょう,combustion; burning,N2,燃 焼,N2 N2
+N2_V547,中毒,ちゅうどく,poisoning; addiction,N2,中 毒,N5 N2
+N2_V548,札束,さつたば,bundle of banknotes,N2,札 束,N2 N3
+N2_V549,脇役,わきやく,supporting role,N2,脇 役,N2 N3
+N2_V550,高卒,こうそつ,high-school graduate,N2,高 卒,N5 N2
+N2_V551,副作用,ふくさよう,side effect,N2,副 作 用,N2 N4 N4
+N2_V552,針金,はりがね,wire,N2,針 金,N2 N5
+N2_V553,拝読,はいどく,reading (humble),N2,拝 読,N2 N5
+N2_V554,海水浴,かいすいよく,sea bathing,N2,海 水 浴,N4 N5 N2
+N2_V555,悩み事,なやみごと,worry; concern,N2,悩 事,N2 N4
+N2_V556,汚物,おぶつ,filth; waste,N2,汚 物,N2 N4
+N2_V557,灯火,とうか,lamplight; light,N2,灯 火,N2 N5
+N2_V558,坊主,ぼうず,Buddhist priest; shaved head,N2,坊 主,N2 N4
+N2_V559,涙目,なみだめ,tearful eyes,N2,涙 目,N2 N4
+N2_V560,停電,ていでん,power outage,N2,停 電,N2 N5
+N2_V561,了解,りょうかい,understanding; acknowledgement,N2,了 解,N2 N3
+N2_V562,冷汗,ひやあせ,cold sweat,N2,冷 汗,N3 N2
+N2_V563,郵送,ゆうそう,mailing; sending by post,N2,郵 送,N2 N4
+N2_V564,毛虫,けむし,caterpillar,N2,毛 虫,N2 N2
+N2_V565,闇夜,やみよ,dark night,N2,闇 夜,N2 N4
+N2_V566,通貨,つうか,currency,N2,通 貨,N4 N2
+N2_V567,心臓,しんぞう,heart,N2,心 臓,N4 N2
+N2_V568,塩水,しおみず,salt water,N2,塩 水,N2 N5
+N2_V569,均等,きんとう,equal; even,N2,均 等,N2 N3
+N2_V570,湖面,こめん,lake surface,N2,湖 面,N2 N3
+N2_V571,損害,そんがい,damage; loss,N2,損 害,N2 N3
+N2_V572,辛苦,しんく,hardship,N2,辛 苦,N2 N3
+N2_V573,双子,ふたご,twins,N2,双 子,N2 N5
+N2_V574,一軒,いっけん,one house; one establishment,N2,一 軒,N5 N2
+N2_V575,実績,じっせき,achievement; record,N2,実 績,N3 N2
+N2_V576,同姓,どうせい,same surname,N2,同 姓,N4 N2
+N2_V577,書籍,しょせき,books; publications,N2,書 籍,N5 N2
+N2_V578,珍品,ちんぴん,rare item; curiosity,N2,珍 品,N2 N4
+N2_V579,教訓,きょうくん,lesson; moral,N2,教 訓,N4 N2
+N2_V580,漁船,ぎょせん,fishing boat,N2,漁 船,N2 N3
+N2_V581,緑茶,りょくちゃ,green tea,N2,緑 茶,N2 N4
+N2_V582,踊り場,おどりば,stair landing; dance floor,N2,踊 場,N2 N4
+N2_V583,封書,ふうしょ,sealed letter,N2,封 書,N2 N5
+N2_V584,兆候,ちょうこう,sign; indication,N2,兆 候,N2 N3
+N2_V585,支柱,しちゅう,supporting pillar,N2,支 柱,N3 N2
+N2_V586,祝福,しゅくふく,blessing; congratulations,N2,祝 福,N2 N3
+N2_V587,炭火,すみび,charcoal fire,N2,炭 火,N2 N5
+N2_V588,柔和,にゅうわ,gentle; mild,N2,柔 和,N2 N3
+N2_V589,解雇,かいこ,dismissal; firing,N2,解 雇,N3 N2
+N2_V590,鋭利,えいり,sharp; keen,N2,鋭 利,N2 N3
+N2_V591,氷点,ひょうてん,freezing point,N2,氷 点,N2 N3
+N2_V592,四隅,よすみ,four corners,N2,四 隅,N5 N2
+N2_V593,冊数,さっすう,number of books/volumes,N2,冊 数,N2 N3
+N2_V594,糸口,いとぐち,clue; beginning,N2,糸 口,N2 N4
+N2_V595,公募,こうぼ,public recruitment,N2,公 募,N4 N2
+N2_V596,硬化,こうか,hardening,N2,硬 化,N2 N3
+N2_V597,塗装,とそう,painting; coating,N2,塗 装,N2 N2
+N2_V598,憎悪,ぞうお,hatred,N2,憎 悪,N2 N4
+N2_V599,泥棒,どろぼう,thief,N2,泥 棒,N2 N2
+N2_V600,粉末,ふんまつ,powder,N2,粉 末,N2 N3
+N2_V601,動詞,どうし,verb,N2,動 詞,N4 N2
+N2_V602,円筒,えんとう,cylinder,N2,円 筒,N5 N2
+N2_V603,掃除,そうじ,cleaning,N2,掃 除,N2 N3
+N2_V604,五重塔,ごじゅうのとう,five-story pagoda,N2,五 重 塔,N5 N4 N2
+N2_V605,賢人,けんじん,wise person,N2,賢 人,N2 N5
+N2_V606,拾い物,ひろいもの,found object; lucky find,N2,拾 物,N2 N4
+N2_V607,麦茶,むぎちゃ,barley tea,N2,麦 茶,N2 N4
+N2_V608,増刷,ぞうさつ,additional printing,N2,増 刷,N3 N2
+N2_V609,卵黄,らんおう,egg yolk,N2,卵 黄,N2 N2
+N2_V610,小皿,こざら,small plate,N2,小 皿,N5 N2
+N2_V611,祈念,きねん,prayer; commemoration,N2,祈 念,N2 N3
+N2_V612,召使い,めしつかい,servant,N2,召 使,N2 N4
+N2_V613,溶岩,ようがん,lava,N2,溶 岩,N2 N2
+N2_V614,歯磨き,はみがき,toothbrushing; toothpaste,N2,歯 磨,N3 N2
+N2_V615,一粒,ひとつぶ,one grain; one drop,N2,一 粒,N5 N2
+N2_V616,喫煙,きつえん,smoking,N2,喫 煙,N2 N3
+N2_V617,貯水,ちょすい,water storage,N2,貯 水,N2 N5
+N2_V618,綿毛,わたげ,fluff; down,N2,綿 毛,N2 N2
+N2_V619,贈与,ぞうよ,gift; donation,N2,贈 与,N2 N3
+N2_V620,空瓶,あきびん,empty bottle,N2,空 瓶,N4 N2
+N2_V621,涼風,りょうふう,cool breeze,N2,涼 風,N2 N4
+N2_V622,一秒,いちびょう,one second,N2,一 秒,N5 N2
+N2_V623,多湿,たしつ,high humidity,N2,多 湿,N4 N2
+N2_V624,蒸発,じょうはつ,evaporation,N2,蒸 発,N2 N4
+N2_V625,和菓子,わがし,Japanese sweets,N2,和 菓 子,N3 N2 N5
+N2_V626,農耕,のうこう,farming; cultivation,N2,農 耕,N2 N2
+N2_V627,鉱山,こうざん,mine,N2,鉱 山,N2 N5
+N2_V628,胃病,いびょう,stomach illness,N2,胃 病,N2 N4
+N2_V629,近郊,きんこう,suburbs; outskirts,N2,近 郊,N4 N2
+N2_V630,銅板,どうばん,copper plate,N2,銅 板,N2 N2
+N2_V631,鈍角,どんかく,obtuse angle,N2,鈍 角,N2 N2
+N2_V632,枯れ木,かれき,dead tree,N2,枯 木,N2 N5
+N2_V633,一滴,いってき,one drop,N2,一 滴,N5 N2
+N2_V634,音符,おんぷ,musical note,N2,音 符,N4 N2
+N2_V635,軟化,なんか,softening,N2,軟 化,N2 N3
+N2_V636,零度,れいど,zero degrees,N2,零 度,N2 N4

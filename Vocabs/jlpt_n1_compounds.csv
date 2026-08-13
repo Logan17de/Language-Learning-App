@@ -1,0 +1,1090 @@
+﻿id,word,reading,english_meaning,study_level,kanji_components,component_levels
+N1_V0001,新郎,しんろう,bridegroom,N1,新 郎,N4 N1
+N1_V0002,結論,けつろん,conclusion,N1,結 論,N1 N3
+N1_V0003,氏名,しめい,full name,N1,氏 名,N1 N5
+N1_V0004,衛生,えいせい,hygiene; sanitation,N1,衛 生,N1 N5
+N1_V0005,第一,だいいち,first; number one,N1,第 一,N1 N5
+N1_V0006,保護,ほご,protection,N1,保 護,N1 N1
+N1_V0007,義務,ぎむ,duty; obligation,N1,義 務,N1 N3
+N1_V0008,吉日,きちじつ,lucky day,N1,吉 日,N1 N5
+N1_V0009,弁護士,べんごし,lawyer,N1,弁 護 士,N1 N1 N1
+N1_V0010,藤色,ふじいろ,wisteria purple,N1,藤 色,N1 N4
+N1_V0011,井戸,いど,water well,N1,井 戸,N1 N2
+N1_V0012,江戸,えど,Edo,N1,江 戸,N1 N2
+N1_V0013,主張,しゅちょう,claim; assertion,N1,主 張,N4 N1
+N1_V0014,松葉,まつば,pine needle,N1,松 葉,N1 N3
+N1_V0015,対応,たいおう,response; handling,N1,対 応,N3 N1
+N1_V0016,視点,してん,viewpoint,N1,視 点,N1 N3
+N1_V0017,態度,たいど,attitude,N1,態 度,N1 N4
+N1_V0018,姿勢,しせい,posture; attitude,N1,姿 勢,N1 N2
+N1_V0019,天皇,てんのう,Emperor of Japan,N1,天 皇,N5 N1
+N1_V0020,神宮,じんぐう,Shinto shrine of high status,N1,神 宮,N3 N1
+N1_V0021,離婚,りこん,divorce,N1,離 婚,N1 N3
+N1_V0022,基本,きほん,basis; fundamentals,N1,基 本,N1 N5
+N1_V0023,部隊,ぶたい,unit; troops,N1,部 隊,N3 N1
+N1_V0024,要素,ようそ,element; factor,N1,要 素,N3 N1
+N1_V0025,価格,かかく,price,N1,価 格,N1 N3
+N1_V0026,攻撃,こうげき,attack,N1,攻 撃,N1 N1
+N1_V0027,振動,しんどう,vibration,N1,振 動,N1 N4
+N1_V0028,証明,しょうめい,proof; certification,N1,証 明,N1 N4
+N1_V0029,派遣,はけん,dispatch,N1,派 遣,N1 N1
+N1_V0030,僕達,ぼくたち,we; us,N1,僕 達,N1 N3
+N1_V0031,補佐,ほさ,assistance; aide,N1,補 佐,N2 N1
+N1_V0032,紀元,きげん,era; epoch,N1,紀 元,N1 N4
+N1_V0033,統一,とういつ,unification,N1,統 一,N1 N5
+N1_V0034,容器,ようき,container; vessel,N1,容 器,N3 N1
+N1_V0035,異常,いじょう,abnormality,N1,異 常,N1 N3
+N1_V0036,条件,じょうけん,condition; requirement,N1,条 件,N1 N3
+N1_V0037,独立,どくりつ,independence,N1,独 立,N1 N4
+N1_V0038,資源,しげん,resources,N1,資 源,N3 N1
+N1_V0039,影響,えいきょう,influence; effect,N1,影 響,N1 N1
+N1_V0040,眼鏡,めがね,eyeglasses,N1,眼 鏡,N1 N1
+N1_V0041,企業,きぎょう,company; enterprise,N1,企 業,N1 N4
+N1_V0042,津波,つなみ,tsunami,N1,津 波,N1 N2
+N1_V0043,提案,ていあん,proposal,N1,提 案,N1 N1
+N1_V0044,政策,せいさく,policy,N1,政 策,N3 N1
+N1_V0045,宗教,しゅうきょう,religion,N1,宗 教,N1 N4
+N1_V0046,提出,ていしゅつ,submission,N1,提 出,N1 N5
+N1_V0047,昭和,しょうわ,Showa era,N1,昭 和,N1 N3
+N1_V0048,秘密,ひみつ,secret,N1,秘 密,N1 N1
+N1_V0049,司会,しかい,master of ceremonies,N1,司 会,N1 N4
+N1_V0050,検査,けんさ,inspection; test,N1,検 査,N1 N2
+N1_V0051,健康,けんこう,health,N1,健 康,N1 N1
+N1_V0052,沢山,たくさん,many; much,N1,沢 山,N1 N5
+N1_V0053,優秀,ゆうしゅう,excellent,N1,優 秀,N3 N1
+N1_V0054,興奮,こうふん,excitement,N1,興 奮,N1 N1
+N1_V0055,効率,こうりつ,efficiency,N1,効 率,N2 N1
+N1_V0056,評価,ひょうか,evaluation,N1,評 価,N1 N1
+N1_V0057,監督,かんとく,supervision; director,N1,監 督,N1 N1
+N1_V0058,川崎,かわさき,Kawasaki,N1,川 崎,N5 N1
+N1_V0059,新鮮,しんせん,fresh,N1,新 鮮,N4 N1
+N1_V0060,激動,げきどう,turbulence; upheaval,N1,激 動,N1 N4
+N1_V0061,道徳,どうとく,morality,N1,道 徳,N4 N1
+N1_V0062,選挙,せんきょ,election,N1,選 挙,N3 N1
+N1_V0063,志望,しぼう,wish; aspiration,N1,志 望,N1 N3
+N1_V0064,敷地,しきち,site; lot,N1,敷 地,N1 N4
+N1_V0065,体系,たいけい,system; framework,N1,体 系,N4 N1
+N1_V0066,組織,そしき,organization,N1,組 織,N3 N1
+N1_V0067,製品,せいひん,manufactured product,N1,製 品,N1 N4
+N1_V0068,先端,せんたん,tip; leading edge,N1,先 端,N5 N1
+N1_V0069,遺産,いさん,inheritance; legacy,N1,遺 産,N1 N3
+N1_V0070,暖房,だんぼう,heating,N1,暖 房,N1 N1
+N1_V0071,街道,かいどう,highway; road,N1,街 道,N1 N4
+N1_V0072,尾根,おね,mountain ridge,N1,尾 根,N1 N2
+N1_V0073,株式,かぶしき,stock; shares,N1,株 式,N1 N3
+N1_V0074,従業,じゅうぎょう,employment; work,N1,従 業,N1 N4
+N1_V0075,敵対,てきたい,hostility; opposition,N1,敵 対,N1 N3
+N1_V0076,発展,はってん,development,N1,発 展,N4 N1
+N1_V0077,描写,びょうしゃ,description; depiction,N1,描 写,N1 N4
+N1_V0078,修理,しゅうり,repair,N1,修 理,N1 N4
+N1_V0079,我慢,がまん,patience; endurance,N1,我 慢,N1 N1
+N1_V0080,掲載,けいさい,publication; posting,N1,掲 載,N1 N1
+N1_V0081,裁判,さいばん,trial; judgment,N1,裁 判,N1 N3
+N1_V0082,隠居,いんきょ,retirement from active life,N1,隠 居,N1 N3
+N1_V0083,環境,かんきょう,environment,N1,環 境,N1 N2
+N1_V0084,援助,えんじょ,assistance,N1,援 助,N1 N3
+N1_V0085,故障,こしょう,breakdown; malfunction,N1,故 障,N1 N1
+N1_V0086,幕府,ばくふ,shogunate,N1,幕 府,N1 N2
+N1_V0087,倉庫,そうこ,warehouse,N1,倉 庫,N1 N2
+N1_V0088,実施,じっし,implementation,N1,実 施,N3 N1
+N1_V0089,嫌悪,けんお,disgust; aversion,N1,嫌 悪,N1 N4
+N1_V0090,継続,けいぞく,continuation,N1,継 続,N1 N3
+N1_V0091,障害,しょうがい,obstacle; disability,N1,障 害,N1 N3
+N1_V0092,貴重,きちょう,precious; valuable,N1,貴 重,N1 N4
+N1_V0093,整理,せいり,organization; sorting,N1,整 理,N1 N4
+N1_V0094,公衆,こうしゅう,public,N1,公 衆,N4 N1
+N1_V0095,普及,ふきゅう,diffusion; spread,N1,普 及,N2 N1
+N1_V0096,盛大,せいだい,grand;盛大,N1,盛 大,N1 N5
+N1_V0097,玄関,げんかん,entrance hall,N1,玄 関,N1 N3
+N1_V0098,恩恵,おんけい,benefit; blessing,N1,恩 恵,N1 N1
+N1_V0099,授業,じゅぎょう,class; lesson,N1,授 業,N1 N4
+N1_V0100,弾丸,だんがん,bullet,N1,弾 丸,N1 N2
+N1_V0101,栄養,えいよう,nutrition,N1,栄 養,N2 N1
+N1_V0102,驚異,きょうい,wonder; marvel,N1,驚 異,N1 N1
+N1_V0103,奈良,なら,Nara,N1,奈 良,N1 N3
+N1_V0104,推薦,すいせん,recommendation,N1,推 薦,N1 N1
+N1_V0105,樹木,じゅもく,trees; woody plants,N1,樹 木,N1 N5
+N1_V0106,行為,こうい,act; conduct,N1,行 為,N5 N1
+N1_V0107,英雄,えいゆう,hero,N1,英 雄,N4 N1
+N1_V0108,日本刀,にほんとう,Japanese sword,N1,日 本 刀,N5 N5 N1
+N1_V0109,弁当,べんとう,boxed lunch,N1,弁 当,N1 N3
+N1_V0110,微妙,びみょう,subtle; delicate,N1,微 妙,N1 N1
+N1_V0111,模様,もよう,pattern; design,N1,模 様,N1 N3
+N1_V0112,抵抗,ていこう,resistance,N1,抵 抗,N1 N1
+N1_V0113,上級,じょうきゅう,advanced level,N1,上 級,N5 N1
+N1_V0114,瞬間,しゅんかん,instant; moment,N1,瞬 間,N1 N5
+N1_V0115,名称,めいしょう,name; designation,N1,名 称,N5 N1
+N1_V0116,豪華,ごうか,luxurious; gorgeous,N1,豪 華,N1 N1
+N1_V0117,負傷,ふしょう,injury,N1,負 傷,N3 N1
+N1_V0118,戦闘,せんとう,combat,N1,戦 闘,N3 N1
+N1_V0119,筋肉,きんにく,muscle,N1,筋 肉,N1 N4
+N1_V0120,翻訳,ほんやく,translation,N1,翻 訳,N1 N1
+N1_V0121,放射,ほうしゃ,radiation; emission,N1,放 射,N3 N1
+N1_V0122,改善,かいぜん,improvement,N1,改 善,N2 N1
+N1_V0123,沈黙,ちんもく,silence,N1,沈 黙,N2 N1
+N1_V0124,人柄,ひとがら,personality; character,N1,人 柄,N5 N1
+N1_V0125,刑事,けいじ,criminal investigation; detective,N1,刑 事,N1 N4
+N1_V0126,季節,きせつ,season,N1,季 節,N2 N1
+N1_V0127,脱出,だっしゅつ,escape,N1,脱 出,N1 N5
+N1_V0128,厳重,げんじゅう,strict; secure,N1,厳 重,N1 N4
+N1_V0129,博士,はかせ,doctor; PhD,N1,博 士,N1 N1
+N1_V0130,陣地,じんち,position; encampment,N1,陣 地,N1 N4
+N1_V0131,奇跡,きせき,miracle,N1,奇 跡,N1 N2
+N1_V0132,忠実,ちゅうじつ,faithful; loyal,N1,忠 実,N1 N3
+N1_V0133,感染,かんせん,infection,N1,感 染,N3 N1
+N1_V0134,標準,ひょうじゅん,standard,N1,標 準,N1 N2
+N1_V0135,縁側,えんがわ,veranda,N1,縁 側,N1 N3
+N1_V0136,壁画,へきが,mural,N1,壁 画,N1 N4
+N1_V0137,駆動,くどう,drive; actuation,N1,駆 動,N1 N4
+N1_V0138,麻酔,ますい,anesthesia,N1,麻 酔,N1 N1
+N1_V0139,甲板,かんぱん,ship deck,N1,甲 板,N1 N2
+N1_V0140,藩主,はんしゅ,feudal lord,N1,藩 主,N1 N4
+N1_V0141,迫力,はくりょく,impact; force,N1,迫 力,N1 N4
+N1_V0142,踏切,ふみきり,railway crossing,N1,踏 切,N1 N4
+N1_V0143,討論,とうろん,debate,N1,討 論,N1 N3
+N1_V0144,聖書,せいしょ,Bible,N1,聖 書,N1 N5
+N1_V0145,辞典,じてん,dictionary,N1,辞 典,N3 N1
+N1_V0146,剣道,けんどう,kendo,N1,剣 道,N1 N4
+N1_V0147,症状,しょうじょう,symptom,N1,症 状,N1 N3
+N1_V0148,納税,のうぜい,tax payment,N1,納 税,N1 N2
+N1_V0149,弥生,やよい,Yayoi; March (old name),N1,弥 生,N1 N5
+N1_V0150,金融,きんゆう,finance,N1,金 融,N5 N1
+N1_V0151,砂浜,すなはま,sandy beach,N1,砂 浜,N2 N1
+N1_V0152,故郷,こきょう,hometown,N1,故 郷,N1 N1
+N1_V0153,迷惑,めいわく,trouble; nuisance,N1,迷 惑,N3 N1
+N1_V0154,柳川,やながわ,Yanagawa,N1,柳 川,N1 N5
+N1_V0155,根拠,こんきょ,basis; grounds,N1,根 拠,N2 N1
+N1_V0156,奉仕,ほうし,service; volunteering,N1,奉 仕,N1 N4
+N1_V0157,崩壊,ほうかい,collapse,N1,崩 壊,N1 N1
+N1_V0158,利益,りえき,profit; benefit,N1,利 益,N3 N1
+N1_V0159,文句,もんく,complaint; phrase,N1,文 句,N4 N1
+N1_V0160,所属,しょぞく,affiliation,N1,所 属,N3 N1
+N1_V0161,成功,せいこう,success,N1,成 功,N3 N1
+N1_V0162,皇帝,こうてい,emperor,N1,皇 帝,N1 N1
+N1_V0163,年賀,ねんが,New Year greeting,N1,年 賀,N5 N1
+N1_V0164,外堀,そとぼり,outer moat,N1,外 堀,N5 N1
+N1_V0165,創造,そうぞう,creation,N1,創 造,N1 N2
+N1_V0166,号泣,ごうきゅう,wailing; sobbing,N1,号 泣,N3 N1
+N1_V0167,記憶,きおく,memory,N1,記 憶,N3 N1
+N1_V0168,幹部,かんぶ,executive; leadership,N1,幹 部,N1 N3
+N1_V0169,露出,ろしゅつ,exposure,N1,露 出,N1 N5
+N1_V0170,矢印,やじるし,arrow mark,N1,矢 印,N1 N2
+N1_V0171,握手,あくしゅ,handshake,N1,握 手,N1 N4
+N1_V0172,儀式,ぎしき,ceremony,N1,儀 式,N1 N3
+N1_V0173,聴覚,ちょうかく,hearing sense,N1,聴 覚,N1 N3
+N1_V0174,襲撃,しゅうげき,attack; raid,N1,襲 撃,N1 N1
+N1_V0175,特徴,とくちょう,feature; characteristic,N1,特 徴,N4 N1
+N1_V0176,丁寧,ていねい,polite; careful,N1,丁 寧,N1 N1
+N1_V0177,憲法,けんぽう,constitution,N1,憲 法,N1 N3
+N1_V0178,内閣,ないかく,cabinet,N1,内 閣,N3 N1
+N1_V0179,救助,きゅうじょ,rescue,N1,救 助,N1 N3
+N1_V0180,陰気,いんき,gloomy; melancholy,N1,陰 気,N1 N5
+N1_V0181,繰越,くりこし,carryover,N1,繰 越,N1 N3
+N1_V0182,刹那,せつな,instant; moment,N1,刹 那,N1 N1
+N1_V0183,操作,そうさ,operation; manipulation,N1,操 作,N1 N4
+N1_V0184,騒音,そうおん,noise,N1,騒 音,N1 N4
+N1_V0185,自己,じこ,self; oneself,N1,自 己,N4 N1
+N1_V0186,魔法,まほう,magic,N1,魔 法,N1 N3
+N1_V0187,撮影,さつえい,photography; filming,N1,撮 影,N1 N1
+N1_V0188,携帯,けいたい,portable; mobile phone,N1,携 帯,N1 N2
+N1_V0189,隣人,りんじん,neighbor,N1,隣 人,N1 N5
+N1_V0190,宣言,せんげん,declaration,N1,宣 言,N1 N4
+N1_V0191,訴訟,そしょう,lawsuit,N1,訴 訟,N1 N1
+N1_V0192,繁茂,はんも,luxuriant growth,N1,繁 茂,N1 N1
+N1_V0193,釣銭,つりせん,change (money returned),N1,釣 銭,N1 N1
+N1_V0194,批判,ひはん,criticism,N1,批 判,N1 N3
+N1_V0195,誘導,ゆうどう,guidance; induction,N1,誘 導,N1 N2
+N1_V0196,核兵器,かくへいき,nuclear weapon,N1,核 兵 器,N1 N2 N1
+N1_V0197,哲学,てつがく,philosophy,N1,哲 学,N1 N5
+N1_V0198,締結,ていけつ,conclusion of an agreement,N1,締 結,N1 N1
+N1_V0199,鹿肉,しかにく,venison,N1,鹿 肉,N1 N4
+N1_V0200,就職,しゅうしょく,getting a job,N1,就 職,N1 N3
+N1_V0201,全滅,ぜんめつ,annihilation,N1,全 滅,N3 N1
+N1_V0202,仰天,ぎょうてん,astonishment,N1,仰 天,N1 N5
+N1_V0203,浅瀬,あさせ,shallows,N1,浅 瀬,N2 N1
+N1_V0204,一致,いっち,agreement;一致,N1,一 致,N5 N1
+N1_V0205,潜伏,せんぷく,concealment; incubation,N1,潜 伏,N1 N1
+N1_V0206,杉林,すぎばやし,cedar grove,N1,杉 林,N1 N2
+N1_V0207,審査,しんさ,examination; screening,N1,審 査,N1 N2
+N1_V0208,回避,かいひ,avoidance,N1,回 避,N3 N1
+N1_V0209,動揺,どうよう,agitation; shaking,N1,動 揺,N4 N1
+N1_V0210,浦島,うらしま,Urashima,N1,浦 島,N1 N2
+N1_V0211,至急,しきゅう,urgent,N1,至 急,N1 N4
+N1_V0212,裕福,ゆうふく,wealthy,N1,裕 福,N1 N3
+N1_V0213,同盟,どうめい,alliance,N1,同 盟,N4 N1
+N1_V0214,執行,しっこう,execution; enforcement,N1,執 行,N1 N5
+N1_V0215,鬼門,きもん,unlucky direction; weak point,N1,鬼 門,N1 N2
+N1_V0216,酸素,さんそ,oxygen,N1,酸 素,N1 N1
+N1_V0217,拡大,かくだい,expansion,N1,拡 大,N1 N5
+N1_V0218,銃弾,じゅうだん,bullet,N1,銃 弾,N1 N1
+N1_V0219,維持,いじ,maintenance,N1,維 持,N1 N4
+N1_V0220,縄文,じょうもん,Jomon,N1,縄 文,N1 N4
+N1_V0221,詩人,しじん,poet,N1,詩 人,N1 N5
+N1_V0222,廃止,はいし,abolition,N1,廃 止,N1 N4
+N1_V0223,充実,じゅうじつ,fulfillment; enrichment,N1,充 実,N1 N3
+N1_V0224,望遠鏡,ぼうえんきょう,telescope,N1,望 遠 鏡,N3 N3 N1
+N1_V0225,仮定,かてい,assumption,N1,仮 定,N1 N3
+N1_V0226,吐息,といき,sigh,N1,吐 息,N1 N3
+N1_V0227,申請,しんせい,application,N1,申 請,N3 N1
+N1_V0228,眺望,ちょうぼう,view; prospect,N1,眺 望,N1 N3
+N1_V0229,沖縄,おきなわ,Okinawa,N1,沖 縄,N1 N1
+N1_V0230,活躍,かつやく,active role; success,N1,活 躍,N3 N1
+N1_V0231,威力,いりょく,power; might,N1,威 力,N1 N4
+N1_V0232,屈折,くっせつ,refraction; bending,N1,屈 折,N1 N3
+N1_V0233,勘定,かんじょう,calculation; bill,N1,勘 定,N1 N3
+N1_V0234,徹底,てってい,thoroughness,N1,徹 底,N1 N2
+N1_V0235,書斎,しょさい,study room,N1,書 斎,N5 N1
+N1_V0236,感謝,かんしゃ,gratitude,N1,感 謝,N3 N1
+N1_V0237,軍艦,ぐんかん,warship,N1,軍 艦,N2 N1
+N1_V0238,開催,かいさい,holding an event,N1,開 催,N4 N1
+N1_V0239,校舎,こうしゃ,school building,N1,校 舎,N5 N1
+N1_V0240,仁愛,じんあい,benevolence; charity,N1,仁 愛,N1 N3
+N1_V0241,衝突,しょうとつ,collision,N1,衝 突,N1 N3
+N1_V0242,脚本,きゃくほん,script,N1,脚 本,N1 N5
+N1_V0243,虎口,ここ,dangerous place,N1,虎 口,N1 N4
+N1_V0244,潮流,ちょうりゅう,current; trend,N1,潮 流,N1 N3
+N1_V0245,洞穴,どうくつ,cave,N1,洞 穴,N1 N1
+N1_V0246,怪物,かいぶつ,monster,N1,怪 物,N1 N4
+N1_V0247,仙人,せんにん,hermit; immortal sage,N1,仙 人,N1 N5
+N1_V0248,光輝,こうき,brilliance,N1,光 輝,N3 N1
+N1_V0249,緊急,きんきゅう,emergency,N1,緊 急,N1 N4
+N1_V0250,口唇,こうしん,lips,N1,口 唇,N4 N1
+N1_V0251,忍耐,にんたい,patience,N1,忍 耐,N1 N1
+N1_V0252,狂気,きょうき,madness,N1,狂 気,N1 N5
+N1_V0253,略奪,りゃくだつ,plunder,N1,略 奪,N2 N1
+N1_V0254,診断,しんだん,diagnosis,N1,診 断,N1 N3
+N1_V0255,恐竜,きょうりゅう,dinosaur,N1,恐 竜,N3 N1
+N1_V0256,負債,ふさい,liabilities; debt,N1,負 債,N3 N1
+N1_V0257,鈴木,すずき,Suzuki,N1,鈴 木,N1 N5
+N1_V0258,僧侶,そうりょ,Buddhist monk,N1,僧 侶,N1 N1
+N1_V0259,掲示,けいじ,notice; posting,N1,掲 示,N1 N3
+N1_V0260,伯爵,はくしゃく,count; earl,N1,伯 爵,N1 N1
+N1_V0261,熊手,くまで,rake; bear paw,N1,熊 手,N1 N4
+N1_V0262,浪人,ろうにん,masterless samurai; gap-year student,N1,浪 人,N1 N5
+N1_V0263,梅雨,つゆ,rainy season,N1,梅 雨,N1 N5
+N1_V0264,看護,かんご,nursing,N1,看 護,N1 N1
+N1_V0265,俊才,しゅんさい,talent; gifted person,N1,俊 才,N1 N3
+N1_V0266,指摘,してき,pointing out,N1,指 摘,N3 N1
+N1_V0267,項目,こうもく,item; entry,N1,項 目,N1 N4
+N1_V0268,霊感,れいかん,inspiration; spiritual sense,N1,霊 感,N1 N3
+N1_V0269,石垣,いしがき,stone wall,N1,石 垣,N3 N1
+N1_V0270,慢性,まんせい,chronic condition,N1,慢 性,N1 N3
+N1_V0271,取扱,とりあつかい,handling,N1,取 扱,N3 N1
+N1_V0272,交渉,こうしょう,negotiation,N1,交 渉,N3 N1
+N1_V0273,如実,にょじつ,vivid; true to life,N1,如 実,N1 N3
+N1_V0274,短縮,たんしゅく,shortening,N1,短 縮,N2 N1
+N1_V0275,詳細,しょうさい,details,N1,詳 細,N1 N2
+N1_V0276,元旦,がんたん,New Year's Day,N1,元 旦,N4 N1
+N1_V0277,考慮,こうりょ,consideration,N1,考 慮,N4 N1
+N1_V0278,優雅,ゆうが,elegant,N1,優 雅,N3 N1
+N1_V0279,鉄砲,てっぽう,gun,N1,鉄 砲,N2 N1
+N1_V0280,陰謀,いんぼう,conspiracy,N1,陰 謀,N1 N1
+N1_V0281,懐中,かいちゅう,pocket; bosom,N1,懐 中,N1 N5
+N1_V0282,愚痴,ぐち,complaint; grumbling,N1,愚 痴,N1 N1
+N1_V0283,毒舌,どくぜつ,sharp tongue,N1,毒 舌,N2 N1
+N1_V0284,駄作,ださく,poor work,N1,駄 作,N1 N4
+N1_V0285,奴隷,どれい,slave,N1,奴 隷,N1 N1
+N1_V0286,大豆,だいず,soybean,N1,大 豆,N5 N1
+N1_V0287,又聞き,またぎき,hearsay,N1,又 聞,N1 N5
+N1_V0288,金銭,きんせん,money,N1,金 銭,N5 N1
+N1_V0289,抑制,よくせい,restraint,N1,抑 制,N1 N3
+N1_V0290,侍従,じじゅう,chamberlain,N1,侍 従,N1 N1
+N1_V0291,宇宙,うちゅう,universe,N1,宇 宙,N2 N1
+N1_V0292,範囲,はんい,range; scope,N1,範 囲,N1 N2
+N1_V0293,潜水,せんすい,diving,N1,潜 水,N1 N5
+N1_V0294,泥酔,でいすい,dead drunk,N1,泥 酔,N2 N1
+N1_V0295,風呂,ふろ,bath,N1,風 呂,N4 N1
+N1_V0296,返還,へんかん,return; restoration,N1,返 還,N3 N1
+N1_V0297,丹念,たんねん,careful; painstaking,N1,丹 念,N1 N3
+N1_V0298,亜熱帯,あねったい,subtropics,N1,亜 熱 帯,N1 N3 N2
+N1_V0299,亀裂,きれつ,crack; fissure,N1,亀 裂,N1 N1
+N1_V0300,沼地,ぬまち,marshland,N1,沼 地,N1 N4
+N1_V0301,巡回,じゅんかい,patrol; circuit,N1,巡 回,N1 N3
+N1_V0302,悪臭,あくしゅう,bad smell,N1,悪 臭,N4 N1
+N1_V0303,慶応,けいおう,Keio era/name,N1,慶 応,N1 N1
+N1_V0304,距離,きょり,distance,N1,距 離,N1 N1
+N1_V0305,解釈,かいしゃく,interpretation,N1,解 釈,N3 N1
+N1_V0306,侵入,しんにゅう,intrusion,N1,侵 入,N1 N5
+N1_V0307,同僚,どうりょう,colleague,N1,同 僚,N4 N1
+N1_V0308,覚悟,かくご,readiness; resolution,N1,覚 悟,N3 N1
+N1_V0309,隆盛,りゅうせい,prosperity,N1,隆 盛,N1 N1
+N1_V0310,破裂,はれつ,burst; rupture,N1,破 裂,N3 N1
+N1_V0311,尋問,じんもん,interrogation,N1,尋 問,N1 N4
+N1_V0312,国旗,こっき,national flag,N1,国 旗,N5 N1
+N1_V0313,羅列,られつ,enumeration,N1,羅 列,N1 N3
+N1_V0314,指揮,しき,command; direction,N1,指 揮,N3 N1
+N1_V0315,票数,ひょうすう,number of votes,N1,票 数,N1 N3
+N1_V0316,稲作,いなさく,rice cultivation,N1,稲 作,N1 N4
+N1_V0317,細胞,さいぼう,cell,N1,細 胞,N2 N1
+N1_V0318,懸命,けんめい,earnest; strenuous,N1,懸 命,N1 N3
+N1_V0319,原稿,げんこう,manuscript,N1,原 稿,N3 N1
+N1_V0320,貝塚,かいづか,shell mound,N1,貝 塚,N2 N1
+N1_V0321,基盤,きばん,foundation; infrastructure,N1,基 盤,N1 N1
+N1_V0322,災害,さいがい,disaster,N1,災 害,N1 N3
+N1_V0323,軍曹,ぐんそう,sergeant,N1,軍 曹,N2 N1
+N1_V0324,尽力,じんりょく,effort; assistance,N1,尽 力,N1 N4
+N1_V0325,花嫁,はなよめ,bride,N1,花 嫁,N4 N1
+N1_V0326,繁栄,はんえい,prosperity,N1,繁 栄,N1 N2
+N1_V0327,即座,そくざ,immediate; on the spot,N1,即 座,N1 N3
+N1_V0328,手帳,てちょう,pocket notebook,N1,手 帳,N4 N1
+N1_V0329,装飾,そうしょく,decoration,N1,装 飾,N2 N1
+N1_V0330,沿岸,えんがん,coast,N1,沿 岸,N1 N2
+N1_V0331,獲得,かくとく,acquisition,N1,獲 得,N1 N3
+N1_V0332,同伴,どうはん,accompaniment,N1,同 伴,N4 N1
+N1_V0333,唐辛子,とうがらし,chili pepper,N1,唐 辛 子,N1 N2 N5
+N1_V0334,狭間,はざま,gap; interval,N1,狭 間,N1 N5
+N1_V0335,添加,てんか,addition; additive,N1,添 加,N1 N3
+N1_V0336,薬剤,やくざい,medicine; chemical agent,N1,薬 剤,N3 N1
+N1_V0337,魅力,みりょく,charm; attraction,N1,魅 力,N1 N4
+N1_V0338,契約,けいやく,contract,N1,契 約,N1 N3
+N1_V0339,邪魔,じゃま,hindrance,N1,邪 魔,N1 N1
+N1_V0340,挑戦,ちょうせん,challenge,N1,挑 戦,N1 N3
+N1_V0341,免許,めんきょ,license,N1,免 許,N1 N3
+N1_V0342,爵位,しゃくい,peerage rank,N1,爵 位,N1 N3
+N1_V0343,選択,せんたく,choice,N1,選 択,N3 N1
+N1_V0344,廊下,ろうか,corridor,N1,廊 下,N1 N5
+N1_V0345,分析,ぶんせき,analysis,N1,分 析,N5 N1
+N1_V0346,先輩,せんぱい,senior,N1,先 輩,N5 N1
+N1_V0347,敏感,びんかん,sensitive,N1,敏 感,N1 N3
+N1_V0348,千羽鶴,せんばづる,one thousand paper cranes,N1,千 羽 鶴,N5 N2 N1
+N1_V0349,虚偽,きょぎ,falsehood,N1,虚 偽,N1 N1
+N1_V0350,往復,おうふく,round trip,N1,往 復,N1 N2
+N1_V0351,趣味,しゅみ,hobby; taste,N1,趣 味,N1 N4
+N1_V0352,猛烈,もうれつ,fierce; intense,N1,猛 烈,N1 N1
+N1_V0353,検索,けんさく,search,N1,検 索,N1 N1
+N1_V0354,匂い袋,においぶくろ,scented sachet,N1,匂 袋,N1 N2
+N1_V0355,摩擦,まさつ,friction,N1,摩 擦,N1 N1
+N1_V0356,菊花,きっか,chrysanthemum flower,N1,菊 花,N1 N4
+N1_V0357,滑走,かっそう,gliding; taxiing,N1,滑 走,N1 N4
+N1_V0358,沙漠,さばく,desert,N1,沙 漠,N1 N1
+N1_V0359,裸足,はだし,barefoot,N1,裸 足,N1 N4
+N1_V0360,孝行,こうこう,filial devotion,N1,孝 行,N1 N5
+N1_V0361,大綱,たいこう,outline; principles,N1,大 綱,N5 N1
+N1_V0362,官邸,かんてい,official residence,N1,官 邸,N3 N1
+N1_V0363,邦人,ほうじん,Japanese national,N1,邦 人,N1 N5
+N1_V0364,掲揚,けいよう,hoisting,N1,掲 揚,N1 N1
+N1_V0365,卓越,たくえつ,excellence,N1,卓 越,N1 N3
+N1_V0366,騎士,きし,knight,N1,騎 士,N1 N1
+N1_V0367,墓地,ぼち,cemetery,N1,墓 地,N1 N4
+N1_V0368,歌姫,うたひめ,female singer; diva,N1,歌 姫,N4 N1
+N1_V0369,孔子,こうし,Confucius,N1,孔 子,N1 N5
+N1_V0370,耐久,たいきゅう,durability,N1,耐 久,N1 N2
+N1_V0371,必須,ひっす,essential; required,N1,必 須,N3 N1
+N1_V0372,臨時,りんじ,temporary; extraordinary,N1,臨 時,N1 N5
+N1_V0373,貢献,こうけん,contribution,N1,貢 献,N1 N1
+N1_V0374,人脈,じんみゃく,personal connections,N1,人 脈,N5 N1
+N1_V0375,芝生,しばふ,lawn,N1,芝 生,N1 N5
+N1_V0376,合唱,がっしょう,chorus,N1,合 唱,N3 N1
+N1_V0377,料亭,りょうてい,traditional Japanese restaurant,N1,料 亭,N4 N1
+N1_V0378,誕生,たんじょう,birth,N1,誕 生,N1 N5
+N1_V0379,一貫,いっかん,consistency,N1,一 貫,N5 N1
+N1_V0380,偽造,ぎぞう,forgery,N1,偽 造,N1 N2
+N1_V0381,桜花,おうか,cherry blossom,N1,桜 花,N1 N4
+N1_V0382,成熟,せいじゅく,maturity,N1,成 熟,N3 N1
+N1_V0383,排除,はいじょ,exclusion,N1,排 除,N1 N3
+N1_V0384,透明,とうめい,transparent,N1,透 明,N1 N4
+N1_V0385,放棄,ほうき,abandonment,N1,放 棄,N3 N1
+N1_V0386,削除,さくじょ,deletion,N1,削 除,N1 N3
+N1_V0387,演奏,えんそう,musical performance,N1,演 奏,N3 N1
+N1_V0388,幻想,げんそう,fantasy; illusion,N1,幻 想,N1 N3
+N1_V0389,華麗,かれい,splendid; gorgeous,N1,華 麗,N1 N1
+N1_V0390,逮捕,たいほ,arrest,N1,逮 捕,N1 N3
+N1_V0391,誠実,せいじつ,sincere; honest,N1,誠 実,N1 N3
+N1_V0392,炎症,えんしょう,inflammation,N1,炎 症,N1 N1
+N1_V0393,椅子,いす,chair,N1,椅 子,N1 N5
+N1_V0394,寛大,かんだい,generous; tolerant,N1,寛 大,N1 N5
+N1_V0395,一斉,いっせい,all at once,N1,一 斉,N5 N1
+N1_V0396,稲穂,いなほ,ear of rice,N1,稲 穂,N1 N1
+N1_V0397,兼業,けんぎょう,side business; concurrent occupation,N1,兼 業,N1 N4
+N1_V0398,飼育,しいく,rearing; breeding,N1,飼 育,N1 N3
+N1_V0399,促進,そくしん,promotion; acceleration,N1,促 進,N1 N3
+N1_V0400,尚更,なおさら,all the more,N1,尚 更,N1 N3
+N1_V0401,色彩,しきさい,color; coloring,N1,色 彩,N4 N1
+N1_V0402,温暖,おんだん,warm; mild climate,N1,温 暖,N2 N1
+N1_V0403,風俗,ふうぞく,customs; manners,N1,風 俗,N4 N1
+N1_V0404,比較,ひかく,comparison,N1,比 較,N2 N1
+N1_V0405,傍観,ぼうかん,looking on; bystanding,N1,傍 観,N1 N3
+N1_V0406,肝臓,かんぞう,liver,N1,肝 臓,N1 N2
+N1_V0407,田畑,たはた,fields; farmland,N1,田 畑,N4 N1
+N1_V0408,山峰,さんぽう,mountain peak,N1,山 峰,N5 N1
+N1_V0409,誇張,こちょう,exaggeration,N1,誇 張,N1 N1
+N1_V0410,通信網,つうしんもう,communications network,N1,通 信 網,N4 N3 N1
+N1_V0411,渋滞,じゅうたい,traffic congestion,N1,渋 滞,N1 N1
+N1_V0412,魂胆,こんたん,intention; scheme,N1,魂 胆,N1 N1
+N1_V0413,牧場,ぼくじょう,farm; ranch,N1,牧 場,N1 N4
+N1_V0414,控除,こうじょ,deduction,N1,控 除,N1 N3
+N1_V0415,紛争,ふんそう,dispute; conflict,N1,紛 争,N1 N3
+N1_V0416,戒律,かいりつ,religious precepts,N1,戒 律,N1 N2
+N1_V0417,没収,ぼっしゅう,confiscation,N1,没 収,N1 N3
+N1_V0418,既存,きそん,existing,N1,既 存,N1 N3
+N1_V0419,股関節,こかんせつ,hip joint,N1,股 関 節,N1 N3 N1
+N1_V0420,脅迫,きょうはく,threat; intimidation,N1,脅 迫,N1 N1
+N1_V0421,遠征,えんせい,expedition,N1,遠 征,N3 N1
+N1_V0422,覆面,ふくめん,mask; disguise,N1,覆 面,N1 N3
+N1_V0423,郡部,ぐんぶ,rural districts,N1,郡 部,N1 N3
+N1_V0424,丘陵,きゅうりょう,hills,N1,丘 陵,N1 N1
+N1_V0425,佳作,かさく,commendable work,N1,佳 作,N1 N4
+N1_V0426,叔父,おじ,uncle,N1,叔 父,N1 N5
+N1_V0427,委託,いたく,consignment; delegation,N1,委 託,N2 N1
+N1_V0428,哀悼,あいとう,mourning; condolences,N1,哀 悼,N1 N1
+N1_V0429,肥料,ひりょう,fertilizer,N1,肥 料,N1 N4
+N1_V0430,朗読,ろうどく,reading aloud,N1,朗 読,N1 N5
+N1_V0431,慎重,しんちょう,careful; prudent,N1,慎 重,N1 N4
+N1_V0432,悠久,ゆうきゅう,eternity; permanence,N1,悠 久,N1 N2
+N1_V0433,眉毛,まゆげ,eyebrow,N1,眉 毛,N1 N2
+N1_V0434,拒否,きょひ,refusal,N1,拒 否,N1 N3
+N1_V0435,概要,がいよう,overview,N1,概 要,N1 N3
+N1_V0436,顧客,こきゃく,customer,N1,顧 客,N1 N3
+N1_V0437,腐敗,ふはい,decay; corruption,N1,腐 敗,N1 N3
+N1_V0438,挨拶,あいさつ,greeting,N1,挨 拶,N1 N1
+N1_V0439,孤独,こどく,loneliness,N1,孤 独,N1 N1
+N1_V0440,返却,へんきゃく,returning an item,N1,返 却,N3 N1
+N1_V0441,海賊,かいぞく,pirate,N1,海 賊,N4 N1
+N1_V0442,別荘,べっそう,vacation home,N1,別 荘,N4 N1
+N1_V0443,巨匠,きょしょう,master; great artist,N1,巨 匠,N2 N1
+N1_V0444,後悔,こうかい,regret,N1,後 悔,N5 N1
+N1_V0445,監獄,かんごく,prison,N1,監 獄,N1 N1
+N1_V0446,滞在,たいざい,stay; sojourn,N1,滞 在,N1 N3
+N1_V0447,待遇,たいぐう,treatment;待遇,N1,待 遇,N4 N1
+N1_V0448,淡水,たんすい,fresh water,N1,淡 水,N1 N5
+N1_V0449,購入,こうにゅう,purchase,N1,購 入,N1 N5
+N1_V0450,合併,がっぺい,merger,N1,合 併,N3 N1
+N1_V0451,崇拝,すうはい,worship,N1,崇 拝,N1 N2
+N1_V0452,唯一,ゆいいつ,only; sole,N1,唯 一,N1 N5
+N1_V0453,垂直,すいちょく,vertical,N1,垂 直,N1 N3
+N1_V0454,分岐,ぶんき,branching,N1,分 岐,N5 N1
+N1_V0455,俳優,はいゆう,actor,N1,俳 優,N1 N3
+N1_V0456,斜面,しゃめん,slope,N1,斜 面,N1 N3
+N1_V0457,令嬢,れいじょう,daughter; young lady,N1,令 嬢,N2 N1
+N1_V0458,陥没,かんぼつ,cave-in; subsidence,N1,陥 没,N1 N1
+N1_V0459,賠償,ばいしょう,compensation,N1,賠 償,N1 N1
+N1_V0460,鑑定,かんてい,appraisal,N1,鑑 定,N1 N3
+N1_V0461,勧誘,かんゆう,solicitation; invitation,N1,勧 誘,N1 N1
+N1_V0462,葬式,そうしき,funeral,N1,葬 式,N1 N3
+N1_V0463,焦点,しょうてん,focus,N1,焦 点,N1 N3
+N1_V0464,剛性,ごうせい,rigidity,N1,剛 性,N1 N3
+N1_V0465,膨張,ぼうちょう,expansion,N1,膨 張,N1 N1
+N1_V0466,法廷,ほうてい,courtroom,N1,法 廷,N3 N1
+N1_V0467,紫外線,しがいせん,ultraviolet rays,N1,紫 外 線,N1 N5 N2
+N1_V0468,銘柄,めいがら,brand; make,N1,銘 柄,N1 N1
+N1_V0469,鎌倉,かまくら,Kamakura,N1,鎌 倉,N1 N1
+N1_V0470,細菌,さいきん,bacteria,N1,細 菌,N2 N1
+N1_V0471,稼働,かどう,operation; running,N1,稼 働,N1 N3
+N1_V0472,譲渡,じょうと,transfer; assignment,N1,譲 渡,N1 N3
+N1_V0473,随時,ずいじ,at any time; as needed,N1,随 時,N1 N5
+N1_V0474,遂行,すいこう,accomplishment; execution,N1,遂 行,N1 N5
+N1_V0475,冒険,ぼうけん,adventure,N1,冒 険,N1 N3
+N1_V0476,安泰,あんたい,security; peace,N1,安 泰,N4 N1
+N1_V0477,右翼,うよく,right wing,N1,右 翼,N5 N1
+N1_V0478,凄惨,せいさん,ghastly; gruesome,N1,凄 惨,N1 N1
+N1_V0479,序列,じょれつ,ranking; order,N1,序 列,N1 N3
+N1_V0480,門扉,もんぴ,gate door,N1,門 扉,N2 N1
+N1_V0481,是非,ぜひ,by all means; right or wrong,N1,是 非,N1 N3
+N1_V0482,寸法,すんぽう,dimensions,N1,寸 法,N1 N3
+N1_V0483,家賃,やちん,rent,N1,家 賃,N4 N1
+N1_V0484,探偵,たんてい,detective,N1,探 偵,N3 N1
+N1_V0485,清澄,せいちょう,clear; pure,N1,清 澄,N2 N1
+N1_V0486,特殊,とくしゅ,special,N1,特 殊,N4 N1
+N1_V0487,緩和,かんわ,relaxation; easing,N1,緩 和,N1 N3
+N1_V0488,頑固,がんこ,stubborn,N1,頑 固,N1 N2
+N1_V0489,指紋,しもん,fingerprint,N1,指 紋,N3 N1
+N1_V0490,砂糖,さとう,sugar,N1,砂 糖,N2 N1
+N1_V0491,煮物,にもの,simmered dish,N1,煮 物,N1 N4
+N1_V0492,芳香,ほうこう,fragrance,N1,芳 香,N1 N2
+N1_V0493,悲惨,ひさん,miserable; tragic,N1,悲 惨,N3 N1
+N1_V0494,歓迎,かんげい,welcome,N1,歓 迎,N1 N3
+N1_V0495,虐待,ぎゃくたい,abuse,N1,虐 待,N1 N4
+N1_V0496,咽喉,いんこう,throat,N1,咽 喉,N1 N1
+N1_V0497,趣旨,しゅし,purpose; gist,N1,趣 旨,N1 N1
+N1_V0498,凝縮,ぎょうしゅく,condensation; compression,N1,凝 縮,N1 N1
+N1_V0499,首都圏,しゅとけん,Tokyo metropolitan area,N1,首 都 圏,N3 N3 N1
+N1_V0500,乾拭き,からぶき,dry wiping,N1,乾 拭,N2 N1
+N1_V0501,生涯,しょうがい,lifetime,N1,生 涯,N5 N1
+N1_V0502,貞操,ていそう,chastity,N1,貞 操,N1 N1
+N1_V0503,堅実,けんじつ,steady; reliable,N1,堅 実,N1 N3
+N1_V0504,倫理,りんり,ethics,N1,倫 理,N1 N4
+N1_V0505,演壇,えんだん,platform; rostrum,N1,演 壇,N3 N1
+N1_V0506,呉服,ごふく,kimono fabric,N1,呉 服,N1 N4
+N1_V0507,休暇,きゅうか,holiday; leave,N1,休 暇,N5 N1
+N1_V0508,容貌,ようぼう,appearance; looks,N1,容 貌,N3 N1
+N1_V0509,閉塞,へいそく,blockage,N1,閉 塞,N3 N1
+N1_V0510,噴火,ふんか,volcanic eruption,N1,噴 火,N1 N5
+N1_V0511,老婆,ろうば,old woman,N1,老 婆,N3 N1
+N1_V0512,山岳,さんがく,mountains,N1,山 岳,N5 N1
+N1_V0513,蹴球,しゅうきゅう,soccer; football,N1,蹴 球,N1 N3
+N1_V0514,合鍵,あいかぎ,spare key,N1,合 鍵,N3 N1
+N1_V0515,配膳,はいぜん,serving meals,N1,配 膳,N3 N1
+N1_V0516,尺度,しゃくど,scale; measure,N1,尺 度,N1 N4
+N1_V0517,処罰,しょばつ,punishment,N1,処 罰,N3 N1
+N1_V0518,漏電,ろうでん,electrical leakage,N1,漏 電,N1 N5
+N1_V0519,朱色,しゅいろ,vermilion color,N1,朱 色,N1 N4
+N1_V0520,一覧,いちらん,list; overview,N1,一 覧,N5 N1
+N1_V0521,漂流,ひょうりゅう,drifting,N1,漂 流,N1 N3
+N1_V0522,果汁,かじゅう,fruit juice,N1,果 汁,N3 N1
+N1_V0523,静寂,せいじゃく,silence; stillness,N1,静 寂,N3 N1
+N1_V0524,感嘆,かんたん,admiration; exclamation,N1,感 嘆,N3 N1
+N1_V0525,座禅,ざぜん,Zen meditation,N1,座 禅,N3 N1
+N1_V0526,浄化,じょうか,purification,N1,浄 化,N1 N3
+N1_V0527,残酷,ざんこく,cruel,N1,残 酷,N3 N1
+N1_V0528,刃物,はもの,cutlery; edged tool,N1,刃 物,N1 N4
+N1_V0529,漫談,まんだん,comic monologue; humorous talk,N1,漫 談,N1 N3
+N1_V0530,濃霧,のうむ,dense fog,N1,濃 霧,N2 N1
+N1_V0531,猛暑,もうしょ,extreme heat,N1,猛 暑,N1 N1
+N1_V0532,本棚,ほんだな,bookshelf,N1,本 棚,N5 N1
+N1_V0533,半袖,はんそで,short sleeves,N1,半 袖,N5 N1
+N1_V0534,壮大,そうだい,magnificent,N1,壮 大,N1 N5
+N1_V0535,旬刊,じゅんかん,published every ten days,N1,旬 刊,N1 N2
+N1_V0536,彫刻,ちょうこく,sculpture,N1,彫 刻,N1 N3
+N1_V0537,需要,じゅよう,demand,N1,需 要,N1 N3
+N1_V0538,鎖国,さこく,national isolation,N1,鎖 国,N1 N5
+N1_V0539,潰瘍,かいよう,ulcer,N1,潰 瘍,N1 N1
+N1_V0540,縦横,じゅうおう,length and breadth; freely,N1,縦 横,N1 N3
+N1_V0541,化粧,けしょう,makeup,N1,化 粧,N3 N1
+N1_V0542,恐慌,きょうこう,panic; crisis,N1,恐 慌,N3 N1
+N1_V0543,穏健,おんけん,moderate; calm,N1,穏 健,N1 N1
+N1_V0544,枠組,わくぐみ,framework,N1,枠 組,N1 N3
+N1_V0545,謎解き,なぞとき,puzzle solving,N1,謎 解,N1 N3
+N1_V0546,名誉,めいよ,honor,N1,名 誉,N5 N1
+N1_V0547,逸脱,いつだつ,deviation,N1,逸 脱,N1 N1
+N1_V0548,持駒,もちごま,piece in hand (shogi),N1,持 駒,N4 N1
+N1_V0549,惜別,せきべつ,regretful farewell,N1,惜 別,N1 N4
+N1_V0550,措置,そち,measure; action,N1,措 置,N1 N3
+N1_V0551,水晶,すいしょう,quartz; crystal,N1,水 晶,N5 N1
+N1_V0552,琴線,きんせん,heartstrings,N1,琴 線,N1 N2
+N1_V0553,摂取,せっしゅ,intake,N1,摂 取,N1 N3
+N1_V0554,拍手,はくしゅ,applause,N1,拍 手,N1 N4
+N1_V0555,稽古,けいこ,practice; training,N1,稽 古,N1 N4
+N1_V0556,基礎,きそ,foundation; basics,N1,基 礎,N1 N1
+N1_V0557,遭難,そうなん,distress; accident,N1,遭 難,N1 N3
+N1_V0558,車掌,しゃしょう,train conductor,N1,車 掌,N5 N1
+N1_V0559,土鍋,どなべ,earthenware pot,N1,土 鍋,N5 N1
+N1_V0560,弓道,きゅうどう,Japanese archery,N1,弓 道,N1 N4
+N1_V0561,克服,こくふく,overcoming,N1,克 服,N1 N4
+N1_V0562,据置,すえおき,leaving as is; deferment,N1,据 置,N1 N3
+N1_V0563,大胆,だいたん,bold,N1,大 胆,N5 N1
+N1_V0564,跳躍,ちょうやく,jump; leap,N1,跳 躍,N1 N1
+N1_V0565,束縛,そくばく,restraint,N1,束 縛,N3 N1
+N1_V0566,鎮静,ちんせい,calming; sedation,N1,鎮 静,N1 N3
+N1_V0567,落雷,らくらい,lightning strike,N1,落 雷,N3 N1
+N1_V0568,怨恨,えんこん,grudge; resentment,N1,怨 恨,N1 N1
+N1_V0569,顕著,けんちょ,remarkable; conspicuous,N1,顕 著,N1 N2
+N1_V0570,繁殖,はんしょく,breeding; propagation,N1,繁 殖,N1 N1
+N1_V0571,湧水,ゆうすい,spring water,N1,湧 水,N1 N5
+N1_V0572,将棋,しょうぎ,shogi,N1,将 棋,N2 N1
+N1_V0573,技巧,ぎこう,technique; craftsmanship,N1,技 巧,N2 N1
+N1_V0574,浸水,しんすい,flooding; water immersion,N1,浸 水,N1 N5
+N1_V0575,白桃,はくとう,white peach,N1,白 桃,N5 N1
+N1_V0576,間隔,かんかく,interval,N1,間 隔,N5 N1
+N1_V0577,班長,はんちょう,group leader,N1,班 長,N1 N5
+N1_V0578,甚大,じんだい,enormous; serious,N1,甚 大,N1 N5
+N1_V0579,妊娠,にんしん,pregnancy,N1,妊 娠,N1 N1
+N1_V0580,福祉,ふくし,welfare,N1,福 祉,N3 N1
+N1_V0581,野獣,やじゅう,wild beast,N1,野 獣,N4 N1
+N1_V0582,疾患,しっかん,disease; disorder,N1,疾 患,N1 N2
+N1_V0583,学習塾,がくしゅうじゅく,cram school,N1,学 習 塾,N5 N4 N1
+N1_V0584,干潟,ひがた,tidal flat,N1,干 潟,N2 N1
+N1_V0585,打撲,だぼく,bruise; blow,N1,打 撲,N3 N1
+N1_V0586,金塊,きんかい,gold bullion,N1,金 塊,N5 N1
+N1_V0587,絞殺,こうさつ,strangulation,N1,絞 殺,N1 N3
+N1_V0588,履歴,りれき,personal history,N1,履 歴,N1 N2
+N1_V0589,苗木,なえぎ,sapling,N1,苗 木,N1 N5
+N1_V0590,里芋,さといも,taro,N1,里 芋,N2 N1
+N1_V0591,冗談,じょうだん,joke,N1,冗 談,N1 N3
+N1_V0592,陶器,とうき,pottery,N1,陶 器,N1 N1
+N1_V0593,激励,げきれい,encouragement,N1,激 励,N1 N1
+N1_V0594,陳述,ちんじゅつ,statement,N1,陳 述,N1 N2
+N1_V0595,野猿,やえん,wild monkey,N1,野 猿,N4 N1
+N1_V0596,葛粉,くずこ,kudzu starch,N1,葛 粉,N1 N2
+N1_V0597,日傘,ひがさ,parasol,N1,日 傘,N5 N1
+N1_V0598,啓発,けいはつ,enlightenment; awareness,N1,啓 発,N1 N4
+N1_V0599,劣化,れっか,deterioration,N1,劣 化,N1 N3
+N1_V0600,撤回,てっかい,withdrawal; retraction,N1,撤 回,N1 N3
+N1_V0601,殴打,おうだ,beating,N1,殴 打,N1 N3
+N1_V0602,矛盾,むじゅん,contradiction,N1,矛 盾,N1 N1
+N1_V0603,衰退,すいたい,decline,N1,衰 退,N1 N3
+N1_V0604,滝川,たきがわ,waterfall river; Takikawa,N1,滝 川,N1 N5
+N1_V0605,慰謝,いしゃ,consolation; compensation,N1,慰 謝,N1 N1
+N1_V0606,毒蛇,どくじゃ,venomous snake,N1,毒 蛇,N2 N1
+N1_V0607,洋梨,ようなし,pear,N1,洋 梨,N4 N1
+N1_V0608,悪癖,あくへき,bad habit,N1,悪 癖,N4 N1
+N1_V0609,潤沢,じゅんたく,abundant; plentiful,N1,潤 沢,N1 N1
+N1_V0610,植木鉢,うえきばち,flowerpot,N1,植 木 鉢,N2 N5 N1
+N1_V0611,戯曲,ぎきょく,drama; play,N1,戯 曲,N1 N3
+N1_V0612,大腸,だいちょう,large intestine,N1,大 腸,N5 N1
+N1_V0613,偏見,へんけん,prejudice,N1,偏 見,N1 N5
+N1_V0614,巣箱,すばこ,nest box,N1,巣 箱,N1 N3
+N1_V0615,宴会,えんかい,banquet; party,N1,宴 会,N1 N4
+N1_V0616,暖炉,だんろ,fireplace,N1,暖 炉,N1 N1
+N1_V0617,病棟,びょうとう,hospital ward,N1,病 棟,N4 N1
+N1_V0618,洞窟,どうくつ,cave,N1,洞 窟,N1 N1
+N1_V0619,狩猟,しゅりょう,hunting,N1,狩 猟,N1 N1
+N1_V0620,陛下,へいか,His/Her Majesty,N1,陛 下,N1 N5
+N1_V0621,磁石,じしゃく,magnet,N1,磁 石,N1 N3
+N1_V0622,清潔,せいけつ,cleanliness,N1,清 潔,N2 N1
+N1_V0623,粘膜,ねんまく,mucous membrane,N1,粘 膜,N1 N1
+N1_V0624,貧乏,びんぼう,poverty; poor,N1,貧 乏,N3 N1
+N1_V0625,吉祥,きっしょう,auspiciousness,N1,吉 祥,N1 N1
+N1_V0626,未曽有,みぞう,unprecedented,N1,未 曽 有,N3 N1 N4
+N1_V0627,店舗,てんぽ,store; shop,N1,店 舗,N4 N1
+N1_V0628,抽選,ちゅうせん,lottery; drawing,N1,抽 選,N1 N3
+N1_V0629,睡眠,すいみん,sleep,N1,睡 眠,N1 N3
+N1_V0630,賭博,とばく,gambling,N1,賭 博,N1 N1
+N1_V0631,総括,そうかつ,summary; overall control,N1,総 括,N2 N1
+N1_V0632,犠牲,ぎせい,sacrifice,N1,犠 牲,N1 N1
+N1_V0633,粗末,そまつ,poor; crude,N1,粗 末,N1 N3
+N1_V0634,卑劣,ひれつ,mean;卑劣,N1,卑 劣,N1 N1
+N1_V0635,貼付,ちょうふ,pasting; attachment,N1,貼 付,N1 N3
+N1_V0636,拉致,らち,abduction,N1,拉 致,N1 N1
+N1_V0637,帆船,はんせん,sailing ship,N1,帆 船,N1 N3
+N1_V0638,挿入,そうにゅう,insertion,N1,挿 入,N1 N5
+N1_V0639,羊毛,ようもう,wool,N1,羊 毛,N1 N2
+N1_V0640,枕元,まくらもと,beside one's pillow,N1,枕 元,N1 N4
+N1_V0641,錯覚,さっかく,illusion,N1,錯 覚,N1 N3
+N1_V0642,謙虚,けんきょ,humble; modest,N1,謙 虚,N1 N1
+N1_V0643,真珠,しんじゅ,pearl,N1,真 珠,N4 N1
+N1_V0644,貯蓄,ちょちく,savings,N1,貯 蓄,N2 N1
+N1_V0645,開拓,かいたく,development; pioneering,N1,開 拓,N4 N1
+N1_V0646,鼓舞,こぶ,inspiration; encouragement,N1,鼓 舞,N1 N3
+N1_V0647,純粋,じゅんすい,pure,N1,純 粋,N2 N1
+N1_V0648,大尉,たいい,captain,N1,大 尉,N5 N1
+N1_V0649,皇后,こうごう,empress,N1,皇 后,N1 N1
+N1_V0650,粘土,ねんど,clay,N1,粘 土,N1 N5
+N1_V0651,披露,ひろう,announcement; presentation,N1,披 露,N1 N1
+N1_V0652,徐行,じょこう,slow driving,N1,徐 行,N1 N5
+N1_V0653,喜悦,きえつ,joy; delight,N1,喜 悦,N3 N1
+N1_V0654,堪忍,かんにん,patience; pardon,N1,堪 忍,N1 N1
+N1_V0655,王冠,おうかん,crown,N1,王 冠,N3 N1
+N1_V0656,愉快,ゆかい,pleasant; cheerful,N1,愉 快,N1 N2
+N1_V0657,尿検査,にょうけんさ,urine test,N1,尿 検 査,N1 N1 N2
+N1_V0658,下顎,かがく,lower jaw,N1,下 顎,N5 N1
+N1_V0659,誓約,せいやく,pledge; oath,N1,誓 約,N1 N3
+N1_V0660,憂鬱,ゆううつ,depression; gloom,N1,憂 鬱,N1 N1
+N1_V0661,名簿,めいぼ,roster,N1,名 簿,N5 N1
+N1_V0662,食糧,しょくりょう,food provisions,N1,食 糧,N5 N1
+N1_V0663,架橋,かきょう,bridge construction,N1,架 橋,N1 N2
+N1_V0664,発芽,はつが,germination,N1,発 芽,N4 N1
+N1_V0665,中軸,ちゅうじく,central axis,N1,中 軸,N5 N1
+N1_V0666,苛酷,かこく,harsh; severe,N1,苛 酷,N1 N1
+N1_V0667,頭蓋,ずがい,skull,N1,頭 蓋,N3 N1
+N1_V0668,盆地,ぼんち,basin,N1,盆 地,N1 N4
+N1_V0669,凶器,きょうき,weapon used in a crime,N1,凶 器,N1 N1
+N1_V0670,王妃,おうひ,queen consort,N1,王 妃,N3 N1
+N1_V0671,庶民,しょみん,common people,N1,庶 民,N1 N3
+N1_V0672,秩序,ちつじょ,order,N1,秩 序,N1 N1
+N1_V0673,裾野,すその,foot of a mountain,N1,裾 野,N1 N4
+N1_V0674,幽霊,ゆうれい,ghost,N1,幽 霊,N1 N1
+N1_V0675,平凡,へいぼん,ordinary,N1,平 凡,N3 N1
+N1_V0676,砂漠,さばく,desert,N1,砂 漠,N2 N1
+N1_V0677,拙速,せっそく,hasty; rough-and-ready,N1,拙 速,N1 N3
+N1_V0678,恒例,こうれい,customary practice,N1,恒 例,N1 N3
+N1_V0679,西暦,せいれき,Common Era calendar,N1,西 暦,N5 N1
+N1_V0680,腫瘍,しゅよう,tumor,N1,腫 瘍,N1 N1
+N1_V0681,峠道,とうげみち,mountain-pass road,N1,峠 道,N1 N4
+N1_V0682,宰相,さいしょう,prime minister; chancellor,N1,宰 相,N1 N3
+N1_V0683,野蛮,やばん,barbarous; savage,N1,野 蛮,N4 N1
+N1_V0684,窮地,きゅうち,difficult situation,N1,窮 地,N1 N4
+N1_V0685,爪痕,つめあと,claw mark; scar,N1,爪 痕,N1 N1
+N1_V0686,幼稚,ようち,childish;幼稚,N1,幼 稚,N2 N1
+N1_V0687,屈辱,くつじょく,humiliation,N1,屈 辱,N1 N1
+N1_V0688,砂嵐,すなあらし,sandstorm,N1,砂 嵐,N2 N1
+N1_V0689,憤慨,ふんがい,indignation,N1,憤 慨,N1 N1
+N1_V0690,治癒,ちゆ,healing,N1,治 癒,N3 N1
+N1_V0691,疎外,そがい,alienation,N1,疎 外,N1 N5
+N1_V0692,雰囲気,ふんいき,atmosphere,N1,雰 囲 気,N1 N2 N5
+N1_V0693,表彰,ひょうしょう,commendation,N1,表 彰,N3 N1
+N1_V0694,肺炎,はいえん,pneumonia,N1,肺 炎,N1 N1
+N1_V0695,傑作,けっさく,masterpiece,N1,傑 作,N1 N4
+N1_V0696,拘束,こうそく,restraint,N1,拘 束,N1 N3
+N1_V0697,頻度,ひんど,frequency,N1,頻 度,N1 N4
+N1_V0698,緯度,いど,latitude,N1,緯 度,N1 N4
+N1_V0699,妖怪,ようかい,supernatural creature,N1,妖 怪,N1 N1
+N1_V0700,養豚,ようとん,pig farming,N1,養 豚,N1 N1
+N1_V0701,藍色,あいいろ,indigo blue,N1,藍 色,N1 N4
+N1_V0702,鍛錬,たんれん,discipline; training,N1,鍛 錬,N1 N1
+N1_V0703,繊維,せんい,fiber,N1,繊 維,N1 N1
+N1_V0704,裁縫,さいほう,sewing,N1,裁 縫,N1 N1
+N1_V0705,把握,はあく,grasp; understanding,N1,把 握,N1 N1
+N1_V0706,高楼,こうろう,tall building; tower,N1,高 楼,N5 N1
+N1_V0707,捕捉,ほそく,capture; grasp,N1,捕 捉,N3 N1
+N1_V0708,漬物,つけもの,pickles,N1,漬 物,N1 N4
+N1_V0709,紳士,しんし,gentleman,N1,紳 士,N1 N1
+N1_V0710,飽和,ほうわ,saturation,N1,飽 和,N1 N3
+N1_V0711,宛名,あてな,addressee name,N1,宛 名,N1 N5
+N1_V0712,財閥,ざいばつ,business conglomerate,N1,財 閥,N3 N1
+N1_V0713,旋回,せんかい,turning; circling,N1,旋 回,N1 N3
+N1_V0714,坪数,つぼすう,floor area in tsubo,N1,坪 数,N1 N3
+N1_V0715,断崖,だんがい,cliff,N1,断 崖,N3 N1
+N1_V0716,叱責,しっせき,reprimand,N1,叱 責,N1 N3
+N1_V0717,鶏肉,とりにく,chicken meat,N1,鶏 肉,N1 N4
+N1_V0718,海峡,かいきょう,strait,N1,海 峡,N4 N1
+N1_V0719,海溝,かいこう,ocean trench,N1,海 溝,N4 N1
+N1_V0720,素朴,そぼく,simple; rustic,N1,素 朴,N1 N1
+N1_V0721,軌道,きどう,orbit; track,N1,軌 道,N1 N4
+N1_V0722,瓦屋根,かわらやね,tiled roof,N1,瓦 屋 根,N1 N4 N2
+N1_V0723,喪失,そうしつ,loss,N1,喪 失,N1 N3
+N1_V0724,墨汁,ぼくじゅう,India ink,N1,墨 汁,N1 N1
+N1_V0725,疫病,えきびょう,epidemic disease,N1,疫 病,N1 N4
+N1_V0726,普遍,ふへん,universal,N1,普 遍,N2 N1
+N1_V0727,濁音,だくおん,voiced sound,N1,濁 音,N1 N4
+N1_V0728,扇風機,せんぷうき,electric fan,N1,扇 風 機,N1 N4 N3
+N1_V0729,拳銃,けんじゅう,handgun,N1,拳 銃,N1 N1
+N1_V0730,乙女,おとめ,maiden,N1,乙 女,N1 N5
+N1_V0731,発酵,はっこう,fermentation,N1,発 酵,N4 N1
+N1_V0732,堤防,ていぼう,embankment,N1,堤 防,N1 N2
+N1_V0733,阻止,そし,prevention; obstruction,N1,阻 止,N1 N4
+N1_V0734,桑畑,くわばたけ,mulberry field,N1,桑 畑,N1 N1
+N1_V0735,捕虜,ほりょ,prisoner of war,N1,捕 虜,N3 N1
+N1_V0736,乞食,こじき,beggar,N1,乞 食,N1 N5
+N1_V0737,恭順,きょうじゅん,obedience; submission,N1,恭 順,N1 N2
+N1_V0738,警鐘,けいしょう,alarm bell; warning,N1,警 鐘,N3 N1
+N1_V0739,余剰,よじょう,surplus,N1,余 剰,N3 N1
+N1_V0740,慈善,じぜん,charity,N1,慈 善,N1 N1
+N1_V0741,半径,はんけい,radius,N1,半 径,N5 N1
+N1_V0742,栽培,さいばい,cultivation,N1,栽 培,N1 N1
+N1_V0743,擁護,ようご,advocacy; protection,N1,擁 護,N1 N1
+N1_V0744,輪郭,りんかく,outline; contour,N1,輪 郭,N2 N1
+N1_V0745,呪文,じゅもん,spell; incantation,N1,呪 文,N1 N4
+N1_V0746,粉砕,ふんさい,pulverization,N1,粉 砕,N2 N1
+N1_V0747,沙汰,さた,affair; news; disposition,N1,沙 汰,N1 N1
+N1_V0748,勃発,ぼっぱつ,outbreak,N1,勃 発,N1 N4
+N1_V0749,老翁,ろうおう,old man,N1,老 翁,N3 N1
+N1_V0750,絹糸,きぬいと,silk thread,N1,絹 糸,N1 N2
+N1_V0751,楽譜,がくふ,musical score,N1,楽 譜,N4 N1
+N1_V0752,痴漢,ちかん,molester,N1,痴 漢,N1 N4
+N1_V0753,汽笛,きてき,steam whistle,N1,汽 笛,N1 N1
+N1_V0754,曖昧,あいまい,ambiguous,N1,曖 昧,N1 N1
+N1_V0755,唾液,だえき,saliva,N1,唾 液,N1 N2
+N1_V0756,脂肪,しぼう,fat,N1,脂 肪,N2 N1
+N1_V0757,土塀,どべい,earth wall,N1,土 塀,N5 N1
+N1_V0758,囲碁,いご,Go,N1,囲 碁,N2 N1
+N1_V0759,勇敢,ゆうかん,brave,N1,勇 敢,N2 N1
+N1_V0760,本塁,ほんるい,home base,N1,本 塁,N5 N1
+N1_V0761,早暁,そうぎょう,early dawn,N1,早 暁,N4 N1
+N1_V0762,胴体,どうたい,torso,N1,胴 体,N1 N4
+N1_V0763,民謡,みんよう,folk song,N1,民 謡,N3 N1
+N1_V0764,飢餓,きが,starvation,N1,飢 餓,N1 N1
+N1_V0765,空欄,くうらん,blank field,N1,空 欄,N4 N1
+N1_V0766,艶色,えんしょく,glossy color; charm,N1,艶 色,N1 N4
+N1_V0767,傷痕,きずあと,scar,N1,傷 痕,N1 N1
+N1_V0768,怠慢,たいまん,negligence,N1,怠 慢,N1 N1
+N1_V0769,詐欺,さぎ,fraud,N1,詐 欺,N1 N1
+N1_V0770,弦楽,げんがく,string music,N1,弦 楽,N1 N4
+N1_V0771,水泡,すいほう,bubble,N1,水 泡,N5 N1
+N1_V0772,諦観,ていかん,resignation; detached view,N1,諦 観,N1 N3
+N1_V0773,伐採,ばっさい,logging; felling,N1,伐 採,N1 N2
+N1_V0774,餅米,もちごめ,glutinous rice,N1,餅 米,N1 N3
+N1_V0775,学生寮,がくせいりょう,student dormitory,N1,学 生 寮,N5 N5 N1
+N1_V0776,厄年,やくどし,unlucky age,N1,厄 年,N1 N5
+N1_V0777,奔放,ほんぽう,free-spirited; uninhibited,N1,奔 放,N1 N3
+N1_V0778,瞳孔,どうこう,pupil,N1,瞳 孔,N1 N1
+N1_V0779,昆虫,こんちゅう,insect,N1,昆 虫,N1 N2
+N1_V0780,脊椎,せきつい,spine; vertebra,N1,脊 椎,N1 N1
+N1_V0781,懇談,こんだん,informal talk,N1,懇 談,N1 N3
+N1_V0782,小唄,こうた,short Japanese song,N1,小 唄,N5 N1
+N1_V0783,渦巻,うずまき,whirlpool; spiral,N1,渦 巻,N1 N2
+N1_V0784,襟元,えりもと,collar area,N1,襟 元,N1 N4
+N1_V0785,吟味,ぎんみ,careful examination,N1,吟 味,N1 N4
+N1_V0786,覇権,はけん,hegemony,N1,覇 権,N1 N3
+N1_V0787,均衡,きんこう,balance; equilibrium,N1,均 衡,N2 N1
+N1_V0788,贈呈,ぞうてい,presentation; gift,N1,贈 呈,N2 N1
+N1_V0789,隙間,すきま,gap; opening,N1,隙 間,N1 N5
+N1_V0790,淫乱,いんらん,lewdness,N1,淫 乱,N1 N2
+N1_V0791,循環,じゅんかん,circulation,N1,循 環,N1 N1
+N1_V0792,懲戒,ちょうかい,disciplinary punishment,N1,懲 戒,N1 N1
+N1_V0793,錦織,にしきおり,brocade weaving,N1,錦 織,N1 N1
+N1_V0794,貨幣,かへい,currency,N1,貨 幣,N2 N1
+N1_V0795,附属,ふぞく,affiliated; attached,N1,附 属,N1 N1
+N1_V0796,箇所,かしょ,place; point,N1,箇 所,N1 N3
+N1_V0797,醜態,しゅうたい,disgraceful behavior,N1,醜 態,N1 N1
+N1_V0798,割箸,わりばし,disposable chopsticks,N1,割 箸,N3 N1
+N1_V0799,親戚,しんせき,relative,N1,親 戚,N4 N1
+N1_V0800,召喚,しょうかん,summoning,N1,召 喚,N2 N1
+N1_V0801,紺色,こんいろ,navy blue,N1,紺 色,N1 N4
+N1_V0802,某国,ぼうこく,a certain country,N1,某 国,N1 N5
+N1_V0803,鋼鉄,こうてつ,steel,N1,鋼 鉄,N1 N2
+N1_V0804,褒賞,ほうしょう,reward; commendation,N1,褒 賞,N1 N2
+N1_V0805,赴任,ふにん,赴任; taking up a post,N1,赴 任,N1 N3
+N1_V0806,媒体,ばいたい,medium; media,N1,媒 体,N1 N4
+N1_V0807,嫉妬,しっと,jealousy,N1,嫉 妬,N1 N1
+N1_V0808,遮断,しゃだん,cutoff; blocking,N1,遮 断,N1 N3
+N1_V0809,窯業,ようぎょう,ceramics industry,N1,窯 業,N1 N4
+N1_V0810,諸侯,しょこう,feudal lords,N1,諸 侯,N2 N1
+N1_V0811,釜飯,かまめし,rice cooked in an iron pot,N1,釜 飯,N1 N4
+N1_V0812,地下茎,ちかけい,underground stem,N1,地 下 茎,N4 N5 N1
+N1_V0813,軽蔑,けいべつ,contempt,N1,軽 蔑,N2 N1
+N1_V0814,嗅覚,きゅうかく,sense of smell,N1,嗅 覚,N1 N3
+N1_V0815,土壌,どじょう,soil,N1,土 壌,N5 N1
+N1_V0816,蜂蜜,はちみつ,honey,N1,蜂 蜜,N1 N1
+N1_V0817,尼僧,にそう,nun,N1,尼 僧,N1 N1
+N1_V0818,四肢,しし,limbs,N1,四 肢,N5 N1
+N1_V0819,恩赦,おんしゃ,amnesty; pardon,N1,恩 赦,N1 N1
+N1_V0820,報酬,ほうしゅう,compensation; reward,N1,報 酬,N3 N1
+N1_V0821,頂戴,ちょうだい,receiving; please give me,N1,頂 戴,N3 N1
+N1_V0822,詠唱,えいしょう,chanting; recitation,N1,詠 唱,N1 N1
+N1_V0823,北斗,ほくと,Big Dipper,N1,北 斗,N5 N1
+N1_V0824,便宜,べんぎ,convenience,N1,便 宜,N3 N1
+N1_V0825,貝殻,かいがら,seashell,N1,貝 殻,N2 N1
+N1_V0826,古墳,こふん,ancient burial mound,N1,古 墳,N4 N1
+N1_V0827,炊飯,すいはん,cooking rice,N1,炊 飯,N1 N4
+N1_V0828,記念碑,きねんひ,monument,N1,記 念 碑,N3 N3 N1
+N1_V0829,痩身,そうしん,slimming,N1,痩 身,N1 N4
+N1_V0830,但書,ただしがき,proviso; note,N1,但 書,N1 N5
+N1_V0831,奨学,しょうがく,encouragement of study,N1,奨 学,N1 N5
+N1_V0832,実践,じっせん,practice; implementation,N1,実 践,N3 N1
+N1_V0833,滋養,じよう,nourishment,N1,滋 養,N1 N1
+N1_V0834,儒教,じゅきょう,Confucianism,N1,儒 教,N1 N4
+N1_V0835,草刈,くさかり,grass cutting,N1,草 刈,N3 N1
+N1_V0836,閑静,かんせい,quiet; peaceful,N1,閑 静,N1 N3
+N1_V0837,錠剤,じょうざい,tablet; pill,N1,錠 剤,N1 N1
+N1_V0838,扶養,ふよう,support; maintenance,N1,扶 養,N1 N1
+N1_V0839,妥協,だきょう,compromise,N1,妥 協,N1 N2
+N1_V0840,妨害,ぼうがい,obstruction,N1,妨 害,N1 N3
+N1_V0841,覚醒,かくせい,awakening,N1,覚 醒,N3 N1
+N1_V0842,参詣,さんけい,shrine/temple visit,N1,参 詣,N3 N1
+N1_V0843,胎児,たいじ,fetus,N1,胎 児,N1 N2
+N1_V0844,雑巾,ぞうきん,cleaning cloth,N1,雑 巾,N3 N1
+N1_V0845,忌引,きびき,bereavement leave,N1,忌 引,N1 N3
+N1_V0846,骸骨,がいこつ,skeleton,N1,骸 骨,N1 N2
+N1_V0847,翻弄,ほんろう,manipulation; being tossed about,N1,翻 弄,N1 N1
+N1_V0848,粛清,しゅくせい,purge,N1,粛 清,N1 N2
+N1_V0849,罵声,ばせい,abusive shout,N1,罵 声,N1 N3
+N1_V0850,囚人,しゅうじん,prisoner,N1,囚 人,N1 N5
+N1_V0851,鉛筆,えんぴつ,pencil,N1,鉛 筆,N1 N2
+N1_V0852,搭載,とうさい,installation; loading aboard,N1,搭 載,N1 N1
+N1_V0853,教諭,きょうゆ,school teacher,N1,教 諭,N4 N1
+N1_V0854,完璧,かんぺき,perfect,N1,完 璧,N3 N1
+N1_V0855,岐阜,ぎふ,Gifu,N1,岐 阜,N1 N1
+N1_V0856,喝采,かっさい,applause; acclaim,N1,喝 采,N1 N1
+N1_V0857,享受,きょうじゅ,enjoyment; receiving benefits,N1,享 受,N1 N3
+N1_V0858,高騰,こうとう,sharp rise,N1,高 騰,N5 N1
+N1_V0859,継嗣,けいし,successor; heir,N1,継 嗣,N1 N1
+N1_V0860,勅令,ちょくれい,imperial decree,N1,勅 令,N1 N2
+N1_V0861,危篤,きとく,critical condition,N1,危 篤,N3 N1
+N1_V0862,勲章,くんしょう,medal; decoration,N1,勲 章,N1 N2
+N1_V0863,埼玉,さいたま,Saitama,N1,埼 玉,N1 N2
+N1_V0864,歌舞伎,かぶき,kabuki,N1,歌 舞 伎,N4 N3 N1
+N1_V0865,餌食,えじき,prey; victim,N1,餌 食,N1 N5
+N1_V0866,岬町,みさきちょう,cape town; Misaki town,N1,岬 町,N1 N4
+N1_V0867,暫定,ざんてい,provisional,N1,暫 定,N1 N3
+N1_V0868,爽快,そうかい,refreshing,N1,爽 快,N1 N2
+N1_V0869,肖像,しょうぞう,portrait,N1,肖 像,N1 N2
+N1_V0870,詮索,せんさく,prying; inquiry,N1,詮 索,N1 N1
+N1_V0871,承諾,しょうだく,consent,N1,承 諾,N2 N1
+N1_V0872,干柿,ほしがき,dried persimmon,N1,干 柿,N2 N1
+N1_V0873,鉛筆芯,えんぴつしん,pencil lead,N1,鉛 筆 芯,N1 N2 N1
+N1_V0874,破綻,はたん,collapse; failure,N1,破 綻,N3 N1
+N1_V0875,訂正,ていせい,correction,N1,訂 正,N1 N4
+N1_V0876,汽車,きしゃ,steam train,N1,汽 車,N1 N5
+N1_V0877,薫風,くんぷう,fragrant early-summer breeze,N1,薫 風,N1 N4
+N1_V0878,土俵,どひょう,sumo ring,N1,土 俵,N5 N1
+N1_V0879,遷移,せんい,transition,N1,遷 移,N1 N2
+N1_V0880,中枢,ちゅうすう,center; core,N1,中 枢,N5 N1
+N1_V0881,肘掛,ひじかけ,armrest,N1,肘 掛,N1 N3
+N1_V0882,山麓,さんろく,foot of a mountain,N1,山 麓,N5 N1
+N1_V0883,憧憬,しょうけい,longing; admiration,N1,憧 憬,N1 N1
+N1_V0884,元帥,げんすい,marshal,N1,元 帥,N4 N1
+N1_V0885,漆器,しっき,lacquerware,N1,漆 器,N1 N1
+N1_V0886,晩酌,ばんしゃく,evening drink,N1,晩 酌,N3 N1
+N1_V0887,頓挫,とんざ,setback; interruption,N1,頓 挫,N1 N1
+N1_V0888,枯渇,こかつ,depletion,N1,枯 渇,N2 N1
+N1_V0889,慕情,ぼじょう,longing; affection,N1,慕 情,N1 N3
+N1_V0890,花婿,はなむこ,bridegroom,N1,花 婿,N4 N1
+N1_V0891,妄想,もうそう,delusion,N1,妄 想,N1 N3
+N1_V0892,感慨,かんがい,deep emotion,N1,感 慨,N3 N1
+N1_V0893,匿名,とくめい,anonymity,N1,匿 名,N1 N5
+N1_V0894,渓谷,けいこく,valley; gorge,N1,渓 谷,N1 N2
+N1_V0895,侮辱,ぶじょく,insult,N1,侮 辱,N1 N1
+N1_V0896,骨髄,こつずい,bone marrow,N1,骨 髄,N2 N1
+N1_V0897,穀物,こくもつ,grain; cereal,N1,穀 物,N1 N4
+N1_V0898,薪炭,しんたん,fuelwood and charcoal,N1,薪 炭,N1 N2
+N1_V0899,管轄,かんかつ,jurisdiction,N1,管 轄,N2 N1
+N1_V0900,洪水,こうずい,flood,N1,洪 水,N1 N5
+N1_V0901,象牙,ぞうげ,ivory,N1,象 牙,N2 N1
+N1_V0902,咽頭,いんとう,pharynx,N1,咽 頭,N1 N3
+N1_V0903,迅速,じんそく,rapid; prompt,N1,迅 速,N1 N3
+N1_V0904,該当,がいとう,applicable; corresponding,N1,該 当,N1 N3
+N1_V0905,逐次,ちくじ,sequentially,N1,逐 次,N1 N3
+N1_V0906,嘲笑,ちょうしょう,ridicule,N1,嘲 笑,N1 N3
+N1_V0907,墜落,ついらく,crash; fall,N1,墜 落,N1 N3
+N1_V0908,臆測,おくそく,conjecture,N1,臆 測,N1 N2
+N1_V0909,挫折,ざせつ,setback; frustration,N1,挫 折,N1 N3
+N1_V0910,桟橋,さんばし,pier,N1,桟 橋,N1 N2
+N1_V0911,溺死,できし,drowning death,N1,溺 死,N1 N4
+N1_V0912,賄賂,わいろ,bribe,N1,賄 賂,N1 N1
+N1_V0913,盲点,もうてん,blind spot,N1,盲 点,N1 N3
+N1_V0914,捕鯨,ほげい,whaling,N1,捕 鯨,N3 N1
+N1_V0915,艦艇,かんてい,warships; naval vessels,N1,艦 艇,N1 N1
+N1_V0916,天丼,てんどん,tempura rice bowl,N1,天 丼,N5 N1
+N1_V0917,堕落,だらく,depravity; degeneration,N1,堕 落,N1 N3
+N1_V0918,水槽,すいそう,water tank; aquarium,N1,水 槽,N5 N1
+N1_V0919,休憩,きゅうけい,break; rest,N1,休 憩,N5 N1
+N1_V0920,僅少,きんしょう,very small; scant,N1,僅 少,N1 N4
+N1_V0921,閲覧,えつらん,browsing;閲覧,N1,閲 覧,N1 N1
+N1_V0922,鉄柵,てっさく,iron fence,N1,鉄 柵,N2 N1
+N1_V0923,湖畔,こはん,lakeside,N1,湖 畔,N2 N1
+N1_V0924,親睦,しんぼく,friendship; fellowship,N1,親 睦,N4 N1
+N1_V0925,教唆,きょうさ,instigation,N1,教 唆,N4 N1
+N1_V0926,官吏,かんり,government official,N1,官 吏,N3 N1
+N1_V0927,収穫,しゅうかく,harvest,N1,収 穫,N3 N1
+N1_V0928,酢酸,さくさん,acetic acid,N1,酢 酸,N1 N1
+N1_V0929,下賜,かし,imperial grant,N1,下 賜,N5 N1
+N1_V0930,腎臓,じんぞう,kidney,N1,腎 臓,N1 N2
+N1_V0931,脳梗塞,のうこうそく,cerebral infarction,N1,脳 梗 塞,N2 N1 N1
+N1_V0932,瑠璃,るり,lapis lazuli,N1,瑠 璃,N1 N1
+N1_V0933,羨望,せんぼう,envy; admiration,N1,羨 望,N1 N3
+N1_V0934,運搬,うんぱん,transport,N1,運 搬,N4 N1
+N1_V0935,解剖,かいぼう,dissection; anatomy,N1,解 剖,N3 N1
+N1_V0936,焼酎,しょうちゅう,shochu,N1,焼 酎,N2 N1
+N1_V0937,近畿,きんき,Kinki region,N1,近 畿,N4 N1
+N1_V0938,今宵,こよい,this evening,N1,今 宵,N5 N1
+N1_V0939,誘拐,ゆうかい,kidnapping,N1,誘 拐,N1 N1
+N1_V0940,醸造,じょうぞう,brewing,N1,醸 造,N1 N2
+N1_V0941,猶予,ゆうよ,postponement; grace period,N1,猶 予,N1 N3
+N1_V0942,諮問,しもん,consultation; inquiry,N1,諮 問,N1 N4
+N1_V0943,畏敬,いけい,reverence,N1,畏 敬,N1 N2
+N1_V0944,分泌,ぶんぴつ,secretion,N1,分 泌,N5 N1
+N1_V0945,哀愁,あいしゅう,melancholy,N1,哀 愁,N1 N1
+N1_V0946,逝去,せいきょ,death; passing,N1,逝 去,N1 N4
+N1_V0947,老朽,ろうきゅう,deterioration with age,N1,老 朽,N3 N1
+N1_V0948,硫黄,いおう,sulfur,N1,硫 黄,N1 N2
+N1_V0949,明瞭,めいりょう,clear; distinct,N1,明 瞭,N4 N1
+N1_V0950,模擬,もぎ,simulation; mock,N1,模 擬,N1 N1
+N1_V0951,叙述,じょじゅつ,description; narration,N1,叙 述,N1 N2
+N1_V0952,弊害,へいがい,harmful effect,N1,弊 害,N1 N3
+N1_V0953,累計,るいけい,cumulative total,N1,累 計,N1 N4
+N1_V0954,煩雑,はんざつ,complicated; troublesome,N1,煩 雑,N1 N3
+N1_V0955,失踪,しっそう,disappearance,N1,失 踪,N3 N1
+N1_V0956,海藻,かいそう,seaweed,N1,海 藻,N4 N1
+N1_V0957,蚊取,かとり,mosquito repellent,N1,蚊 取,N1 N3
+N1_V0958,栃木,とちぎ,Tochigi,N1,栃 木,N1 N5
+N1_V0959,且又,かつまた,and also,N1,且 又,N1 N1
+N1_V0960,鋳造,ちゅうぞう,metal casting,N1,鋳 造,N1 N2
+N1_V0961,隠蔽,いんぺい,concealment,N1,隠 蔽,N1 N1
+N1_V0962,茨城,いばらき,Ibaraki,N1,茨 城,N1 N2
+N1_V0963,石棺,せっかん,stone coffin,N1,石 棺,N3 N1
+N1_V0964,戦慄,せんりつ,shudder; terror,N1,戦 慄,N3 N1
+N1_V0965,傲慢,ごうまん,arrogance,N1,傲 慢,N1 N1
+N1_V0966,硝酸,しょうさん,nitric acid,N1,硝 酸,N1 N1
+N1_V0967,船舶,せんぱく,ships; vessels,N1,船 舶,N3 N1
+N1_V0968,租税,そぜい,taxation,N1,租 税,N1 N2
+N1_V0969,模倣,もほう,imitation,N1,模 倣,N1 N1
+N1_V0970,謹慎,きんしん,self-restraint; suspension,N1,謹 慎,N1 N1
+N1_V0971,抹消,まっしょう,deletion; erasure,N1,抹 消,N1 N3
+N1_V0972,虹彩,こうさい,iris,N1,虹 彩,N1 N1
+N1_V0973,捻挫,ねんざ,sprain,N1,捻 挫,N1 N1
+N1_V0974,娯楽,ごらく,entertainment,N1,娯 楽,N1 N4
+N1_V0975,臼歯,きゅうし,molar tooth,N1,臼 歯,N1 N3
+N1_V0976,比喩,ひゆ,metaphor,N1,比 喩,N2 N1
+N1_V0977,萎縮,いしゅく,atrophy; shrinkage,N1,萎 縮,N1 N1
+N1_V0978,蛍光,けいこう,fluorescence,N1,蛍 光,N1 N3
+N1_V0979,窒素,ちっそ,nitrogen,N1,窒 素,N1 N1
+N1_V0980,乳腺,にゅうせん,mammary gland,N1,乳 腺,N2 N1
+N1_V0981,桁数,けたすう,number of digits,N1,桁 数,N1 N3
+N1_V0982,玩具,がんぐ,toy,N1,玩 具,N1 N3
+N1_V0983,冶金,やきん,metallurgy,N1,冶 金,N1 N5
+N1_V0984,羞恥,しゅうち,shame,N1,羞 恥,N1 N3
+N1_V0985,血栓,けっせん,blood clot,N1,血 栓,N2 N1
+N1_V0986,危惧,きぐ,apprehension,N1,危 惧,N3 N1
+N1_V0987,寡黙,かもく,reticent; quiet,N1,寡 黙,N1 N1
+N1_V0988,畝間,うねま,space between crop rows,N1,畝 間,N1 N5
+N1_V0989,淑女,しゅくじょ,lady,N1,淑 女,N1 N5
+N1_V0990,嫡男,ちゃくなん,legitimate eldest son,N1,嫡 男,N1 N5
+N1_V0991,駐屯,ちゅうとん,stationing; garrison,N1,駐 屯,N2 N1
+N1_V0992,糾弾,きゅうだん,denunciation,N1,糾 弾,N1 N1
+N1_V0993,遡及,そきゅう,retroactive application,N1,遡 及,N1 N1
+N1_V0994,陪審,ばいしん,jury,N1,陪 審,N1 N1
+N1_V0995,雌雄,しゆう,male and female,N1,雌 雄,N1 N1
+N1_V0996,舷側,げんそく,ship's side,N1,舷 側,N1 N3
+N1_V0997,霜害,そうがい,frost damage,N1,霜 害,N1 N3
+N1_V0998,殉職,じゅんしょく,dying in the line of duty,N1,殉 職,N1 N3
+N1_V0999,紡績,ぼうせき,spinning; textile manufacture,N1,紡 績,N1 N2
+N1_V1000,貪欲,どんよく,greedy; avid,N1,貪 欲,N1 N3
+N1_V1001,凡庸,ぼんよう,mediocre,N1,凡 庸,N1 N1
+N1_V1002,韻律,いんりつ,meter; rhythm,N1,韻 律,N1 N2
+N1_V1003,修繕,しゅうぜん,repair,N1,修 繕,N1 N1
+N1_V1004,搾取,さくしゅ,exploitation,N1,搾 取,N1 N3
+N1_V1005,堆積,たいせき,accumulation; sedimentation,N1,堆 積,N1 N3
+N1_V1006,災禍,さいか,disaster; calamity,N1,災 禍,N1 N1
+N1_V1007,煎茶,せんちゃ,green tea,N1,煎 茶,N1 N4
+N1_V1008,婚姻,こんいん,marriage,N1,婚 姻,N3 N1
+N1_V1009,斑点,はんてん,spot; speck,N1,斑 点,N1 N3
+N1_V1010,冥福,めいふく,peace after death,N1,冥 福,N1 N3
+N1_V1011,抄録,しょうろく,abstract; excerpt,N1,抄 録,N1 N2
+N1_V1012,拷問,ごうもん,torture,N1,拷 問,N1 N4
+N1_V1013,謙遜,けんそん,humility,N1,謙 遜,N1 N1
+N1_V1014,旺盛,おうせい,vigorous;旺盛,N1,旺 盛,N1 N1
+N1_V1015,批准,ひじゅん,ratification,N1,批 准,N1 N1
+N1_V1016,勾配,こうばい,slope; gradient,N1,勾 配,N1 N3
+N1_V1017,廉価,れんか,low price,N1,廉 価,N1 N1
+N1_V1018,岩礁,がんしょう,reef,N1,岩 礁,N2 N1
+N1_V1019,壱万円,いちまんえん,"10,000 yen (formal numeral)",N1,壱 万 円,N1 N5 N5
+N1_V1020,麺類,めんるい,noodles,N1,麺 類,N1 N3
+N1_V1021,一升,いっしょう,one sho measure,N1,一 升,N5 N1
+N1_V1022,卸売,おろしうり,wholesale,N1,卸 売,N1 N4
+N1_V1023,消耗,しょうもう,consumption; wear,N1,消 耗,N3 N1
+N1_V1024,謁見,えっけん,audience with a dignitary,N1,謁 見,N1 N5
+N1_V1025,炭坑,たんこう,coal mine,N1,炭 坑,N2 N1
+N1_V1026,串焼,くしやき,skewered grilled food,N1,串 焼,N1 N2
+N1_V1027,弔問,ちょうもん,condolence visit,N1,弔 問,N1 N4
+N1_V1028,来賓,らいひん,honored guest,N1,来 賓,N5 N1
+N1_V1029,充塡,じゅうてん,filling; loading,N1,充 塡,N1 N1
+N1_V1030,下痢,げり,diarrhea,N1,下 痢,N5 N1
+N1_V1031,威嚇,いかく,intimidation,N1,威 嚇,N1 N1
+N1_V1032,氾濫,はんらん,flooding; overflow,N1,氾 濫,N1 N1
+N1_V1033,俸給,ほうきゅう,salary,N1,俸 給,N1 N3
+N1_V1034,便箋,びんせん,letter paper,N1,便 箋,N3 N1
+N1_V1035,凸凹,でこぼこ,unevenness,N1,凸 凹,N1 N1
+N1_V1036,脊髄,せきずい,spinal cord,N1,脊 髄,N1 N1
+N1_V1037,詔書,しょうしょ,imperial rescript,N1,詔 書,N1 N5
+N1_V1038,精緻,せいち,minute; elaborate,N1,精 緻,N3 N1
+N1_V1039,凹凸,おうとつ,unevenness;凹凸,N1,凹 凸,N1 N1
+N1_V1040,罷免,ひめん,dismissal,N1,罷 免,N1 N1
+N1_V1041,漸進,ぜんしん,gradual progress,N1,漸 進,N1 N3
+N1_V1042,賦課,ふか,imposition; assessment,N1,賦 課,N1 N2
+N1_V1043,円弧,えんこ,arc,N1,円 弧,N5 N1
+N1_V1044,褐色,かっしょく,brown,N1,褐 色,N1 N4
+N1_V1045,辛辣,しんらつ,biting; severe,N1,辛 辣,N2 N1
+N1_V1046,真摯,しんし,sincere; earnest,N1,真 摯,N4 N1
+N1_V1047,汎用,はんよう,general-purpose,N1,汎 用,N1 N4
+N1_V1048,排斥,はいせき,rejection; exclusion,N1,排 斥,N1 N1
+N1_V1049,一厘,いちりん,one rin; tiny amount,N1,一 厘,N5 N1
+N1_V1050,矯正,きょうせい,correction; orthodontics,N1,矯 正,N1 N4
+N1_V1051,毀損,きそん,damage; defamation,N1,毀 損,N1 N2
+N1_V1052,窃盗,せっとう,theft,N1,窃 盗,N1 N3
+N1_V1053,遵守,じゅんしゅ,compliance,N1,遵 守,N1 N3
+N1_V1054,怠惰,たいだ,laziness,N1,怠 惰,N1 N1
+N1_V1055,養蚕,ようさん,sericulture,N1,養 蚕,N1 N1
+N1_V1056,俳諧,はいかい,haikai poetry,N1,俳 諧,N1 N1
+N1_V1057,倹約,けんやく,thrift; economy,N1,倹 約,N1 N3
+N1_V1058,定款,ていかん,articles of incorporation,N1,定 款,N3 N1
+N1_V1059,才媛,さいえん,talented woman,N1,才 媛,N3 N1
+N1_V1060,遺憾,いかん,regrettable; regret,N1,遺 憾,N1 N1
+N1_V1061,哺乳,ほにゅう,nursing; suckling,N1,哺 乳,N1 N2
+N1_V1062,折衷,せっちゅう,compromise; eclecticism,N1,折 衷,N3 N1
+N1_V1063,語彙,ごい,vocabulary,N1,語 彙,N5 N1
+N1_V1064,更迭,こうてつ,replacement; reshuffle,N1,更 迭,N3 N1
+N1_V1065,委嘱,いしょく,commission; entrustment,N1,委 嘱,N2 N1
+N1_V1066,恣意,しい,arbitrariness,N1,恣 意,N1 N4
+N1_V1067,開墾,かいこん,land reclamation,N1,開 墾,N4 N1
+N1_V1068,逓減,ていげん,gradual decrease,N1,逓 減,N1 N2
+N1_V1069,弾劾,だんがい,impeachment,N1,弾 劾,N1 N1
+N1_V1070,酪農,らくのう,dairy farming,N1,酪 農,N1 N2
+N1_V1071,肥沃,ひよく,fertile,N1,肥 沃,N1 N1
+N1_V1072,塑像,そぞう,clay/plaster statue,N1,塑 像,N1 N2
+N1_V1073,水痘,すいとう,chickenpox,N1,水 痘,N5 N1
+N1_V1074,朕意,ちんい,the emperor's will,N1,朕 意,N1 N4
+N1_V1075,危虞,きぐ,fear; concern,N1,危 虞,N3 N1
+N1_V1076,丙種,へいしゅ,third class/category,N1,丙 種,N1 N3
+N1_V1077,斤量,きんりょう,weight,N1,斤 量,N1 N2
+N1_V1078,進捗,しんちょく,progress,N1,進 捗,N3 N1
+N1_V1079,弐千円,にせんえん,"2,000 yen (formal numeral)",N1,弐 千 円,N1 N5 N5
+N1_V1080,訃報,ふほう,obituary notice,N1,訃 報,N1 N3
+N1_V1081,謄本,とうほん,certified copy,N1,謄 本,N1 N5
+N1_V1082,繭糸,けんし,silk thread from cocoons,N1,繭 糸,N1 N2
+N1_V1083,国璽,こくじ,Great Seal of State,N1,国 璽,N5 N1
+N1_V1084,頒布,はんぷ,distribution,N1,頒 布,N1 N2
+N1_V1085,楷書,かいしょ,block-style calligraphy,N1,楷 書,N1 N5
+N1_V1086,剥離,はくり,peeling; separation,N1,剥 離,N1 N1
+N1_V1087,籠城,ろうじょう,holding a castle; barricading oneself,N1,籠 城,N1 N2
+N1_V1088,禁錮,きんこ,imprisonment without labor,N1,禁 錮,N2 N1
+N1_V1089,頰骨,ほおぼね,cheekbone,N1,頰 骨,N1 N2

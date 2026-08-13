@@ -1,0 +1,371 @@
+﻿id,kanji,english_meaning,introduced_level,compound_count,compound_refs
+N3_K001,合,fit; join; combine,N3,6,N3_V001 N3_V130 N3_V211 N3_V360 N3_V388 N3_V507
+N3_K002,部,part; section; department,N3,2,N3_V002 N3_V365
+N3_K003,彼,he; him; that,N3,2,N3_V003 N3_V163
+N3_K004,内,inside; within,N3,3,N3_V004 N3_V366 N3_V384
+N3_K005,実,truth; reality; fruit,N3,3,N3_V005 N3_V355 N3_V404
+N3_K006,当,hit; correspond; appropriate,N3,3,N3_V006 N3_V316 N3_V395
+N3_K007,戦,war; battle; fight,N3,2,N3_V007 N3_V293
+N3_K008,性,nature; sex; characteristic,N3,2,N3_V008 N3_V367
+N3_K009,対,opposite; versus; pair,N3,4,N3_V009 N3_V200 N3_V374 N3_V436
+N3_K010,関,relation; barrier; concern,N3,2,N3_V010 N3_V368
+N3_K011,感,feeling; sensation,N3,4,N3_V011 N3_V109 N3_V139 N3_V534
+N3_K012,定,decide; fixed; determine,N3,12,N3_V012 N3_V058 N3_V132 N3_V147 N3_V155 N3_V229 N3_V230 N3_V320 N3_V385 N3_V412 N3_V424 N3_V505
+N3_K013,政,government; politics,N3,3,N3_V013 N3_V369 N3_V531
+N3_K014,取,take; get,N3,3,N3_V014 N3_V370 N3_V493
+N3_K015,所,place; point,N3,2,N3_V015 N3_V121
+N3_K016,現,present; appear; actual,N3,2,N3_V005 N3_V016
+N3_K017,最,most; extreme,N3,3,N3_V063 N3_V371 N3_V567
+N3_K018,化,change; transform; -ization,N3,3,N3_V017 N3_V372 N3_V443
+N3_K019,民,people; nation,N3,3,N3_V018 N3_V052 N3_V110
+N3_K020,相,mutual; aspect; minister,N3,5,N3_V019 N3_V216 N3_V407 N3_V532 N3_V578
+N3_K021,法,law; method,N3,2,N3_V020 N3_V373
+N3_K022,全,whole; all,N3,2,N3_V021 N3_V281
+N3_K023,情,feeling; condition; information,N3,4,N3_V011 N3_V022 N3_V102 N3_V244
+N3_K024,向,direction; face toward,N3,2,N3_V023 N3_V374
+N3_K025,平,flat; peaceful; equal,N3,2,N3_V024 N3_V222
+N3_K026,成,become; accomplish,N3,6,N3_V025 N3_V145 N3_V146 N3_V346 N3_V420 N3_V541
+N3_K027,経,pass through; manage; experience,N3,2,N3_V026 N3_V375
+N3_K028,信,believe; trust; message,N3,5,N3_V027 N3_V169 N3_V182 N3_V383 N3_V418
+N3_K029,面,face; surface; aspect,N3,3,N3_V028 N3_V037 N3_V326
+N3_K030,連,connect; take along,N3,3,N3_V029 N3_V368 N3_V376
+N3_K031,原,field; origin; original,N3,2,N3_V030 N3_V377
+N3_K032,顔,face,N3,4,N3_V031 N3_V263 N3_V341 N3_V470
+N3_K033,機,machine; opportunity; function,N3,4,N3_V032 N3_V378 N3_V437 N3_V528
+N3_K034,次,next; order,N3,2,N3_V033 N3_V379
+N3_K035,数,number; count,N3,6,N3_V034 N3_V036 N3_V080 N3_V201 N3_V400 N3_V597
+N3_K036,美,beauty; beautiful,N3,2,N3_V035 N3_V380
+N3_K037,回,turn; occurrence; revolve,N3,2,N3_V033 N3_V036
+N3_K038,表,surface; table; express,N3,2,N3_V037 N3_V168
+N3_K039,声,voice,N3,4,N3_V038 N3_V066 N3_V545 N3_V547
+N3_K040,報,report; information; reward,N3,3,N3_V022 N3_V039 N3_V445
+N3_K041,要,need; important; main point,N3,4,N3_V040 N3_V207 N3_V215 N3_V297
+N3_K042,変,change; strange,N3,3,N3_V017 N3_V041 N3_V329
+N3_K043,神,god; spirit,N3,2,N3_V042 N3_V231
+N3_K044,記,write down; record,N3,3,N3_V043 N3_V179 N3_V270
+N3_K045,和,harmony; Japanese style; sum,N3,2,N3_V024 N3_V044
+N3_K046,引,pull; draw; subtract,N3,4,N3_V014 N3_V045 N3_V226 N3_V491
+N3_K047,治,govern; cure,N3,2,N3_V013 N3_V046
+N3_K048,決,decide; settle,N3,2,N3_V012 N3_V047
+N3_K049,太,thick; fat,N3,2,N3_V048 N3_V381
+N3_K050,込,crowded; go into; included,N3,2,N3_V049 N3_V382
+N3_K051,受,receive; accept,N3,2,N3_V050 N3_V383
+N3_K052,解,untie; solve; understand,N3,4,N3_V051 N3_V285 N3_V344 N3_V557
+N3_K053,市,city; market,N3,2,N3_V052 N3_V384
+N3_K054,期,period; term; expect,N3,3,N3_V053 N3_V385 N3_V492
+N3_K055,様,manner; appearance; honorific,N3,5,N3_V042 N3_V054 N3_V171 N3_V189 N3_V338
+N3_K056,活,lively; activity,N3,2,N3_V055 N3_V386
+N3_K057,頭,head,N3,2,N3_V056 N3_V387
+N3_K058,組,group; assemble,N3,2,N3_V057 N3_V388
+N3_K059,指,finger; point; indicate,N3,2,N3_V058 N3_V389
+N3_K060,説,explain; theory,N3,4,N3_V051 N3_V059 N3_V192 N3_V398
+N3_K061,能,ability; function,N3,3,N3_V060 N3_V328 N3_V378
+N3_K062,葉,leaf; word,N3,2,N3_V352 N3_V390
+N3_K063,流,flow; style; current,N3,2,N3_V061 N3_V111
+N3_K064,然,so; natural,N3,3,N3_V062 N3_V143 N3_V347
+N3_K065,初,first; beginning,N3,2,N3_V063 N3_V391
+N3_K066,在,exist; be located,N3,3,N3_V016 N3_V064 N3_V137
+N3_K067,調,investigate; tune; condition,N3,2,N3_V065 N3_V392
+N3_K068,笑,laugh; smile,N3,2,N3_V031 N3_V066
+N3_K069,議,deliberation; discussion,N3,2,N3_V067 N3_V393
+N3_K070,直,straight; direct; fix,N3,2,N3_V068 N3_V394
+N3_K071,夫,husband; man,N3,2,N3_V069 N3_V218
+N3_K072,選,choose; select,N3,2,N3_V070 N3_V395
+N3_K073,権,right; authority,N3,2,N3_V071 N3_V396
+N3_K074,利,profit; advantage; benefit,N3,3,N3_V072 N3_V315 N3_V396
+N3_K075,制,system; control,N3,2,N3_V073 N3_V212
+N3_K076,続,continue,N3,3,N3_V029 N3_V074 N3_V434
+N3_K077,石,stone,N3,3,N3_V075 N3_V372 N3_V397
+N3_K078,進,advance; progress,N3,2,N3_V076 N3_V446
+N3_K079,伝,transmit; tradition,N3,2,N3_V077 N3_V398
+N3_K080,加,add; join,N3,4,N3_V078 N3_V160 N3_V184 N3_V498
+N3_K081,助,help; assist,N3,2,N3_V079 N3_V399
+N3_K082,点,point; dot; score,N3,3,N3_V080 N3_V138 N3_V324
+N3_K083,産,produce; birth; property,N3,4,N3_V081 N3_V254 N3_V265 N3_V519
+N3_K084,務,duty; work,N3,4,N3_V082 N3_V302 N3_V313 N3_V444
+N3_K085,件,matter; case; item,N3,2,N3_V083 N3_V400
+N3_K086,命,life; order; fate,N3,3,N3_V084 N3_V362 N3_V518
+N3_K087,番,number; turn; watch,N3,3,N3_V057 N3_V401 N3_V572
+N3_K088,落,fall; drop,N3,2,N3_V085 N3_V352
+N3_K089,付,attach; add,N3,3,N3_V050 N3_V086 N3_V180
+N3_K090,得,gain; obtain,N3,3,N3_V015 N3_V087 N3_V370
+N3_K091,好,like; favorable,N3,4,N3_V088 N3_V129 N3_V167 N3_V410
+N3_K092,違,differ; violate,N3,2,N3_V089 N3_V402
+N3_K093,殺,kill,N3,3,N3_V090 N3_V403 N3_V598
+N3_K094,置,put; place,N3,2,N3_V091 N3_V354
+N3_K095,返,return; repay,N3,2,N3_V092 N3_V127
+N3_K096,論,argument; theory,N3,3,N3_V067 N3_V093 N3_V096
+N3_K097,際,occasion; edge,N3,2,N3_V094 N3_V404
+N3_K098,歳,year of age,N3,2,N3_V095 N3_V405
+N3_K099,反,opposite; anti-; reverse,N3,4,N3_V009 N3_V089 N3_V096 N3_V436
+N3_K100,形,shape; form,N3,3,N3_V097 N3_V144 N3_V431
+N3_K101,光,light; shine,N3,2,N3_V098 N3_V406
+N3_K102,首,neck; head; chief,N3,2,N3_V099 N3_V407
+N3_K103,勝,win; victory,N3,4,N3_V072 N3_V100 N3_V174 N3_V408
+N3_K104,必,certain; inevitable,N3,2,N3_V040 N3_V408
+N3_K105,係,relation; person in charge,N3,2,N3_V010 N3_V101
+N3_K106,由,reason; means,N3,3,N3_V353 N3_V375 N3_V409
+N3_K107,愛,love,N3,2,N3_V102 N3_V410
+N3_K108,都,capital; metropolis,N3,2,N3_V099 N3_V103
+N3_K109,放,release; let go; broadcast,N3,3,N3_V354 N3_V411 N3_V450
+N3_K110,確,certain; confirm,N3,2,N3_V104 N3_V412
+N3_K111,過,pass; exceed; past,N3,2,N3_V105 N3_V413
+N3_K112,約,promise; approximately,N3,2,N3_V106 N3_V208
+N3_K113,馬,horse,N3,2,N3_V107 N3_V414
+N3_K114,状,condition; form; letter,N3,2,N3_V108 N3_V415
+N3_K115,想,thought; idea,N3,3,N3_V109 N3_V416 N3_V440
+N3_K116,官,government official,N3,2,N3_V110 N3_V417
+N3_K117,交,mix; associate; exchange,N3,2,N3_V111 N3_V327
+N3_K118,米,rice; America,N3,2,N3_V112 N3_V190
+N3_K119,配,distribute; worry,N3,2,N3_V113 N3_V418
+N3_K120,若,young; if,N3,2,N3_V114 N3_V419
+N3_K121,資,resources; capital,N3,2,N3_V115 N3_V175
+N3_K122,常,usual; normal,N3,4,N3_V116 N3_V236 N3_V459 N3_V509
+N3_K123,果,fruit; result,N3,2,N3_V355 N3_V420
+N3_K124,呼,call; breathe,N3,2,N3_V117 N3_V421
+N3_K125,共,together; both,N3,3,N3_V118 N3_V422 N3_V480
+N3_K126,残,remain; leftover,N3,2,N3_V119 N3_V423
+N3_K127,判,judge; stamp,N3,2,N3_V120 N3_V424
+N3_K128,役,role; duty,N3,2,N3_V121 N3_V425
+N3_K129,他,other,N3,2,N3_V122 N3_V426
+N3_K130,術,skill; technique,N3,2,N3_V035 N3_V123
+N3_K131,支,support; branch,N3,2,N3_V124 N3_V291
+N3_K132,両,both; two,N3,1,N3_V125
+N3_K133,乗,ride; multiply,N3,2,N3_V126 N3_V427
+N3_K134,済,finish; settle,N3,2,N3_V026 N3_V127
+N3_K135,供,offer; accompany; child,N3,2,N3_V128 N3_V428
+N3_K136,格,status; standard,N3,3,N3_V001 N3_V008 N3_V129
+N3_K137,打,hit; strike,N3,3,N3_V130 N3_V429 N3_V522
+N3_K138,御,honorable; imperial,N3,2,N3_V131 N3_V430
+N3_K139,断,cut off; decide; refuse,N3,3,N3_V120 N3_V132 N3_V183
+N3_K140,式,style; ceremony; formula,N3,2,N3_V133 N3_V431
+N3_K141,師,teacher; master; expert,N3,2,N3_V134 N3_V432
+N3_K142,告,tell; announce,N3,4,N3_V039 N3_V135 N3_V194 N3_V460
+N3_K143,深,deep,N3,2,N3_V136 N3_V433
+N3_K144,存,exist; know,N3,2,N3_V137 N3_V434
+N3_K145,争,dispute; contend,N3,2,N3_V007 N3_V138
+N3_K146,覚,remember; wake; sense,N3,2,N3_V139 N3_V435
+N3_K147,側,side,N3,2,N3_V140 N3_V436
+N3_K148,飛,fly; jump,N3,3,N3_V141 N3_V382 N3_V437
+N3_K149,参,participate; visit,N3,3,N3_V078 N3_V142 N3_V476
+N3_K150,突,thrust; sudden,N3,2,N3_V143 N3_V438
+N3_K151,容,contain; appearance,N3,4,N3_V004 N3_V144 N3_V310 N3_V361
+N3_K152,育,raise; grow,N3,2,N3_V145 N3_V439
+N3_K153,構,construct; mind,N3,2,N3_V146 N3_V440
+N3_K154,認,recognize; admit,N3,2,N3_V104 N3_V147
+N3_K155,位,rank; position,N3,2,N3_V091 N3_V148
+N3_K156,達,reach; plural suffix,N3,6,N3_V113 N3_V149 N3_V335 N3_V474 N3_V488 N3_V516
+N3_K157,守,protect; obey,N3,2,N3_V150 N3_V441
+N3_K158,満,full; satisfy,N3,3,N3_V151 N3_V442 N3_V504
+N3_K159,消,erase; extinguish,N3,2,N3_V152 N3_V443
+N3_K160,任,duty; entrust,N3,3,N3_V153 N3_V444 N3_V570
+N3_K161,居,reside; be,N3,2,N3_V154 N3_V309
+N3_K162,予,in advance; beforehand,N3,3,N3_V155 N3_V416 N3_V445
+N3_K163,路,road; route,N3,3,N3_V156 N3_V446 N3_V576
+N3_K164,座,seat; sit,N3,2,N3_V157 N3_V447
+N3_K165,客,guest; customer,N3,3,N3_V158 N3_V427 N3_V448
+N3_K166,船,ship; boat,N3,3,N3_V159 N3_V449 N3_V566
+N3_K167,追,chase; follow,N3,2,N3_V160 N3_V450
+N3_K168,背,back; height; disobey,N3,2,N3_V161 N3_V451
+N3_K169,観,view; observe,N3,6,N3_V098 N3_V142 N3_V158 N3_V162 N3_V197 N3_V300
+N3_K170,誰,who,N3,2,N3_V163 N3_V452
+N3_K171,息,breath; son,N3,2,N3_V164 N3_V453
+N3_K172,失,lose; error,N3,2,N3_V105 N3_V165
+N3_K173,老,old; age,N3,2,N3_V166 N3_V454
+N3_K174,良,good,N3,2,N3_V167 N3_V455
+N3_K175,示,show; indicate,N3,3,N3_V168 N3_V389 N3_V456
+N3_K176,号,number; designation; signal,N3,3,N3_V169 N3_V457 N3_V535
+N3_K177,職,job; occupation,N3,2,N3_V170 N3_V357
+N3_K178,王,king,N3,2,N3_V171 N3_V458
+N3_K179,識,knowledge; discern,N3,2,N3_V172 N3_V459
+N3_K180,警,warn; police,N3,3,N3_V173 N3_V417 N3_V460
+N3_K181,優,excellent; gentle,N3,2,N3_V038 N3_V174
+N3_K182,投,throw; invest,N3,2,N3_V175 N3_V461
+N3_K183,局,bureau; office; situation,N3,2,N3_V176 N3_V462
+N3_K184,難,difficult; disaster,N3,3,N3_V177 N3_V463 N3_V582
+N3_K185,種,kind; seed,N3,2,N3_V178 N3_V464
+N3_K186,念,thought; concern,N3,3,N3_V179 N3_V423 N3_V465
+N3_K187,寄,approach; contribute,N3,2,N3_V180 N3_V466
+N3_K188,商,commerce; merchant,N3,2,N3_V356 N3_V467
+N3_K189,害,harm; damage,N3,2,N3_V181 N3_V468
+N3_K190,頼,rely; request,N3,2,N3_V182 N3_V469
+N3_K191,横,sideways; horizontal,N3,2,N3_V183 N3_V470
+N3_K192,増,increase,N3,2,N3_V184 N3_V471
+N3_K193,差,difference,N3,2,N3_V185 N3_V472
+N3_K194,苦,suffering; bitter,N3,2,N3_V186 N3_V273
+N3_K195,収,receive; collect,N3,2,N3_V187 N3_V306
+N3_K196,段,step; grade,N3,3,N3_V188 N3_V397 N3_V473
+N3_K197,俺,I; me (male informal),N3,2,N3_V189 N3_V474
+N3_K198,渡,cross; hand over,N3,2,N3_V190 N3_V475
+N3_K199,与,give; grant,N3,2,N3_V191 N3_V476
+N3_K200,演,perform; act; present,N3,3,N3_V192 N3_V477 N3_V517
+N3_K201,備,prepare; equip,N3,3,N3_V193 N3_V441 N3_V478
+N3_K202,申,say; apply,N3,2,N3_V049 N3_V194
+N3_K203,例,example,N3,4,N3_V195 N3_V456 N3_V479 N3_V583
+N3_K204,働,work,N3,2,N3_V196 N3_V480
+N3_K205,景,scene; view,N3,3,N3_V197 N3_V451 N3_V481
+N3_K206,抜,pull out; omit,N3,2,N3_V198 N3_V482
+N3_K207,遠,far,N3,3,N3_V199 N3_V483 N3_V599
+N3_K208,絶,cut off; cease; absolute,N3,2,N3_V200 N3_V484
+N3_K209,負,lose; bear; negative,N3,3,N3_V100 N3_V201 N3_V232
+N3_K210,福,fortune; blessing,N3,3,N3_V202 N3_V485 N3_V497
+N3_K211,球,ball; sphere,N3,2,N3_V203 N3_V486
+N3_K212,酒,alcohol; sake,N3,2,N3_V204 N3_V487
+N3_K213,君,you; lord,N3,2,N3_V205 N3_V488
+N3_K214,察,guess; inspect,N3,3,N3_V162 N3_V173 N3_V206
+N3_K215,望,hope; desire; view,N3,3,N3_V207 N3_V282 N3_V484
+N3_K216,婚,marriage,N3,2,N3_V208 N3_V489
+N3_K217,単,single; simple,N3,2,N3_V148 N3_V209
+N3_K218,押,push; press,N3,2,N3_V210 N3_V490
+N3_K219,割,divide; rate,N3,2,N3_V211 N3_V491
+N3_K220,限,limit,N3,2,N3_V212 N3_V492
+N3_K221,戻,return; go back,N3,3,N3_V213 N3_V493 N3_V550
+N3_K222,科,department; subject,N3,2,N3_V214 N3_V494
+N3_K223,求,seek; request,N3,3,N3_V215 N3_V239 N3_V277
+N3_K224,談,talk; discuss,N3,3,N3_V216 N3_V356 N3_V533
+N3_K225,降,descend; fall,N3,2,N3_V217 N3_V495
+N3_K226,妻,wife,N3,2,N3_V218 N3_V496
+N3_K227,岡,hill,N3,2,N3_V219 N3_V497
+N3_K228,熱,heat; fever; passion,N3,2,N3_V220 N3_V498
+N3_K229,浮,float,N3,2,N3_V221 N3_V499
+N3_K230,等,equal; class; etc.,N3,2,N3_V222 N3_V500
+N3_K231,末,end; tip,N3,3,N3_V223 N3_V405 N3_V501
+N3_K232,幸,happiness; fortune,N3,2,N3_V202 N3_V224
+N3_K233,草,grass,N3,2,N3_V225 N3_V322
+N3_K234,越,cross over; exceed,N3,2,N3_V226 N3_V502
+N3_K235,登,climb; register,N3,2,N3_V227 N3_V503
+N3_K236,類,kind; class,N3,3,N3_V178 N3_V228 N3_V530
+N3_K237,未,not yet,N3,2,N3_V229 N3_V504
+N3_K238,規,rule; standard,N3,2,N3_V230 N3_V505
+N3_K239,精,spirit; refined; vitality,N3,2,N3_V231 N3_V506
+N3_K240,抱,embrace; hold,N3,2,N3_V232 N3_V507
+N3_K241,労,labor; effort,N3,4,N3_V186 N3_V196 N3_V233 N3_V574
+N3_K242,処,deal with; place,N3,2,N3_V234 N3_V508
+N3_K243,退,retreat; resign,N3,2,N3_V357 N3_V363
+N3_K244,費,expense; consume,N3,2,N3_V152 N3_V235
+N3_K245,非,wrong; non-,N3,2,N3_V236 N3_V509
+N3_K246,喜,rejoice,N3,2,N3_V237 N3_V510
+N3_K247,娘,daughter; girl,N3,2,N3_V238 N3_V511
+N3_K248,逃,escape,N3,2,N3_V358 N3_V512
+N3_K249,探,search,N3,2,N3_V239 N3_V513
+N3_K250,犯,crime; offender,N3,2,N3_V240 N3_V283
+N3_K251,薬,medicine,N3,2,N3_V176 N3_V241
+N3_K252,園,garden; park,N3,2,N3_V242 N3_V266
+N3_K253,疑,doubt; suspect,N3,2,N3_V243 N3_V514
+N3_K254,緒,cord; beginning; emotion,N3,2,N3_V244 N3_V409
+N3_K255,静,quiet,N3,2,N3_V245 N3_V259
+N3_K256,具,tool; ingredient,N3,2,N3_V246 N3_V515
+N3_K257,席,seat; occasion,N3,3,N3_V157 N3_V247 N3_V575
+N3_K258,速,fast; speed,N3,2,N3_V248 N3_V516
+N3_K259,舞,dance,N3,2,N3_V359 N3_V517
+N3_K260,宿,lodging; inn; dwell,N3,2,N3_V360 N3_V518
+N3_K261,程,extent; degree,N3,2,N3_V249 N3_V413
+N3_K262,倒,fall; collapse,N3,2,N3_V250 N3_V519
+N3_K263,寝,sleep; lie down,N3,2,N3_V251 N3_V520
+N3_K264,宅,home; residence,N3,2,N3_V252 N3_V521
+N3_K265,絵,picture,N3,2,N3_V253 N3_V263
+N3_K266,破,tear; break,N3,2,N3_V254 N3_V522
+N3_K267,庭,garden; yard,N3,2,N3_V255 N3_V334
+N3_K268,婦,woman; wife,N3,2,N3_V069 N3_V256
+N3_K269,余,remainder; surplus,N3,2,N3_V257 N3_V523
+N3_K270,訪,visit,N3,2,N3_V258 N3_V524
+N3_K271,冷,cold; cool,N3,2,N3_V259 N3_V525
+N3_K272,暮,live; evening,N3,2,N3_V260 N3_V526
+N3_K273,腹,belly; abdomen,N3,2,N3_V261 N3_V527
+N3_K274,危,dangerous,N3,2,N3_V262 N3_V528
+N3_K275,許,permit; forgive,N3,2,N3_V361 N3_V529
+N3_K276,似,resemble,N3,3,N3_V263 N3_V514 N3_V530
+N3_K277,険,steep; dangerous,N3,2,N3_V262 N3_V264
+N3_K278,財,wealth; property,N3,2,N3_V265 N3_V531
+N3_K279,遊,play; travel,N3,2,N3_V266 N3_V532
+N3_K280,雑,miscellaneous; rough,N3,2,N3_V267 N3_V533
+N3_K281,恐,fear,N3,2,N3_V268 N3_V534
+N3_K282,値,value; price,N3,2,N3_V188 N3_V269
+N3_K283,暗,dark; memorize,N3,2,N3_V270 N3_V535
+N3_K284,積,pile; accumulate,N3,2,N3_V028 N3_V271
+N3_K285,夢,dream,N3,2,N3_V272 N3_V536
+N3_K286,痛,pain; hurt,N3,3,N3_V056 N3_V273 N3_V527
+N3_K287,富,wealth; rich,N3,2,N3_V274 N3_V342
+N3_K288,刻,engrave; moment,N3,3,N3_V136 N3_V275 N3_V321
+N3_K289,鳴,cry; sound,N3,3,N3_V276 N3_V288 N3_V540
+N3_K290,欲,desire; want,N3,2,N3_V277 N3_V537
+N3_K291,途,way; route,N3,2,N3_V278 N3_V538
+N3_K292,曲,bend; tune,N3,2,N3_V279 N3_V539
+N3_K293,耳,ear,N3,2,N3_V280 N3_V540
+N3_K294,完,complete,N3,2,N3_V281 N3_V541
+N3_K295,願,wish; request,N3,3,N3_V282 N3_V465 N3_V542
+N3_K296,罪,crime; guilt,N3,2,N3_V283 N3_V543
+N3_K297,陽,sun; positive,N3,2,N3_V048 N3_V284
+N3_K298,亡,die; flee,N3,2,N3_V358 N3_V362
+N3_K299,散,scatter,N3,2,N3_V285 N3_V544
+N3_K300,掛,hang; multiply; concern,N3,2,N3_V286 N3_V545
+N3_K301,昨,yesterday; previous,N3,2,N3_V287 N3_V546
+N3_K302,怒,anger,N3,3,N3_V288 N3_V510 N3_V547
+N3_K303,留,stop; stay; retain,N3,2,N3_V150 N3_V548
+N3_K304,礼,courtesy; thanks,N3,2,N3_V131 N3_V289
+N3_K305,列,row; line,N3,2,N3_V290 N3_V549
+N3_K306,雪,snow,N3,2,N3_V271 N3_V317
+N3_K307,払,pay; sweep,N3,2,N3_V291 N3_V550
+N3_K308,給,supply; salary,N3,3,N3_V128 N3_V191 N3_V292
+N3_K309,敗,defeat; fail,N3,2,N3_V165 N3_V293
+N3_K310,捕,catch; capture,N3,2,N3_V294 N3_V551
+N3_K311,忘,forget,N3,2,N3_V295 N3_V552
+N3_K312,晴,clear weather,N3,2,N3_V296 N3_V553
+N3_K313,因,cause; factor,N3,2,N3_V030 N3_V297
+N3_K314,折,fold; break,N3,2,N3_V298 N3_V554
+N3_K315,迎,welcome; meet,N3,2,N3_V299 N3_V555
+N3_K316,悲,sad,N3,2,N3_V276 N3_V300
+N3_K317,港,harbor,N3,2,N3_V301 N3_V556
+N3_K318,責,responsibility; blame,N3,2,N3_V153 N3_V302
+N3_K319,除,remove; exclude,N3,2,N3_V303 N3_V557
+N3_K320,困,trouble; difficulty,N3,2,N3_V177 N3_V304
+N3_K321,閉,close,N3,2,N3_V305 N3_V558
+N3_K322,吸,inhale; suck,N3,2,N3_V117 N3_V306
+N3_K323,髪,hair,N3,2,N3_V307 N3_V559
+N3_K324,束,bundle; bind; tie,N3,2,N3_V106 N3_V308
+N3_K325,眠,sleep,N3,2,N3_V309 N3_V560
+N3_K326,易,easy; exchange,N3,2,N3_V310 N3_V561
+N3_K327,窓,window,N3,2,N3_V311 N3_V562
+N3_K328,祖,ancestor,N3,2,N3_V312 N3_V563
+N3_K329,勤,work; diligence,N3,2,N3_V313 N3_V564
+N3_K330,昔,long ago,N3,2,N3_V314 N3_V565
+N3_K331,便,convenience; mail,N3,2,N3_V315 N3_V566
+N3_K332,適,suitable; appropriate,N3,2,N3_V316 N3_V567
+N3_K333,吹,blow,N3,2,N3_V317 N3_V568
+N3_K334,候,season; candidate,N3,2,N3_V318 N3_V569
+N3_K335,怖,scary; fear,N3,3,N3_V268 N3_V319 N3_V534
+N3_K336,辞,resign; word; diction,N3,2,N3_V363 N3_V570
+N3_K337,否,no; deny; negate,N3,3,N3_V320 N3_V571 N3_V596
+N3_K338,遅,late; slow,N3,2,N3_V321 N3_V572
+N3_K339,煙,smoke,N3,2,N3_V322 N3_V573
+N3_K340,徒,follower; on foot; futile,N3,2,N3_V323 N3_V574
+N3_K341,欠,lack; absence,N3,2,N3_V324 N3_V575
+N3_K342,迷,get lost; hesitate,N3,2,N3_V325 N3_V576
+N3_K343,洗,wash,N3,2,N3_V326 N3_V577
+N3_K344,互,mutual,N3,2,N3_V327 N3_V578
+N3_K345,才,talent; years old,N3,2,N3_V328 N3_V579
+N3_K346,更,again; renew,N3,2,N3_V329 N3_V580
+N3_K347,歯,tooth,N3,2,N3_V330 N3_V581
+N3_K348,盗,steal,N3,2,N3_V331 N3_V582
+N3_K349,慣,become accustomed,N3,2,N3_V332 N3_V583
+N3_K350,晩,evening; late,N3,1,N3_V333
+N3_K351,箱,box,N3,2,N3_V334 N3_V584
+N3_K352,到,arrive; reach,N3,2,N3_V335 N3_V585
+N3_K353,頂,summit; receive,N3,2,N3_V336 N3_V586
+N3_K354,杯,cup; counter for cups,N3,2,N3_V337 N3_V587
+N3_K355,皆,all; everyone,N3,2,N3_V338 N3_V588
+N3_K356,招,invite; beckon,N3,2,N3_V108 N3_V589
+N3_K357,寒,cold,N3,2,N3_V339 N3_V590
+N3_K358,恥,shame,N3,2,N3_V340 N3_V591
+N3_K359,疲,tired; fatigue,N3,2,N3_V233 N3_V341
+N3_K360,貧,poor; poverty,N3,2,N3_V304 N3_V342
+N3_K361,猫,cat,N3,2,N3_V343 N3_V592
+N3_K362,誤,mistake,N3,2,N3_V344 N3_V593
+N3_K363,努,endeavor,N3,2,N3_V364 N3_V594
+N3_K364,幾,how many; several,N3,2,N3_V345 N3_V595
+N3_K365,賛,approve; praise,N3,2,N3_V346 N3_V596
+N3_K366,偶,even; chance,N3,2,N3_V347 N3_V597
+N3_K367,忙,busy,N3,2,N3_V348 N3_V598
+N3_K368,泳,swim,N3,2,N3_V349 N3_V599
+N3_K369,靴,shoes,N3,2,N3_V350 N3_V600
+N3_K370,偉,great; admirable,N3,2,N3_V351 N3_V601
