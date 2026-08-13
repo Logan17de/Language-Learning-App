@@ -9,7 +9,6 @@ export interface CheckpointInspection {
   missing: ActivityGroupName[];
 }
 
-/** Final review is intentionally not a generation checkpoint anymore. */
 export const ACTIVITY_GROUPS: ActivityGroupName[] = [
   "vocabulary_and_kanji",
   "grammar_and_reading",
@@ -54,15 +53,8 @@ function requiredTextIssues(
   );
 }
 
-/**
- * Question validation is intentionally structural only. Selected target IDs are
- * generation guidance and optional mastery metadata; they are not an acceptance
- * gate for otherwise playable questions.
- */
-function multipleChoiceIssues(
-  value: unknown,
-  label: string,
-): string[] {
+/** Structural MCQ validation only. It never judges what the question teaches. */
+function multipleChoiceIssues(value: unknown, label: string): string[] {
   const item = record(value);
   if (!item) return [`${label} must be an object.`];
   const issues = requiredTextIssues(
@@ -87,20 +79,13 @@ function multipleChoiceIssues(
   return issues;
 }
 
-function questionArrayIssues(
-  value: unknown,
-  expected: number,
-  label: string,
-): string[] {
+function questionArrayIssues(value: unknown, expected: number, label: string): string[] {
   const questions = array(value);
   const issues = questions.length === expected
     ? []
     : [`${label} must contain exactly ${expected} questions.`];
   questions.forEach((question, index) => {
-    issues.push(...multipleChoiceIssues(
-      question,
-      `${label} ${index + 1}`,
-    ));
+    issues.push(...multipleChoiceIssues(question, `${label} ${index + 1}`));
   });
   return issues;
 }
@@ -112,13 +97,10 @@ function difficultyDistributionIssues(
   label: string,
   description: string,
 ): string[] {
-  const items = array(value);
   const counts = new Map<string, number>();
-  for (const item of items) {
+  for (const item of array(value)) {
     const raw = record(item)?.[field];
-    if (typeof raw === "string") {
-      counts.set(raw, (counts.get(raw) ?? 0) + 1);
-    }
+    if (typeof raw === "string") counts.set(raw, (counts.get(raw) ?? 0) + 1);
   }
   const matches = Object.entries(expected).every(
     ([key, count]) => (counts.get(key) ?? 0) === count,
@@ -171,14 +153,11 @@ function teachingArrayIssues(
   expected: number,
   label: string,
   fields: string[],
-  validLibraryIds: ReadonlySet<string>,
 ): string[] {
   const items = array(value);
   const issues = items.length === expected
     ? []
     : [`${label} must contain exactly ${expected} entries.`];
-  const ids = new Set<string>();
-
   items.forEach((entry, index) => {
     const item = record(entry);
     const itemLabel = `${label} ${index + 1}`;
@@ -187,14 +166,6 @@ function teachingArrayIssues(
       return;
     }
     issues.push(...requiredTextIssues(item, ["libraryId", ...fields], itemLabel));
-    const id = text(item.libraryId);
-    if (id) {
-      if (!validLibraryIds.has(id)) {
-        issues.push(`${itemLabel} references invalid library ID ${id}.`);
-      }
-      if (ids.has(id)) issues.push(`${itemLabel} repeats library ID ${id}.`);
-      ids.add(id);
-    }
   });
   return issues;
 }
@@ -202,7 +173,7 @@ function teachingArrayIssues(
 export function activityGroupCheckpointIssues(
   group: ActivityGroupName,
   value: unknown,
-  validLibraryIds: ReadonlySet<string>,
+  _validLibraryIds: ReadonlySet<string>,
 ): string[] {
   const payload = record(value);
   if (!payload) return [`${group} checkpoint must be an object.`];
@@ -214,13 +185,8 @@ export function activityGroupCheckpointIssues(
       5,
       "Kanji teaching",
       ["character", "reading", "meaning"],
-      validLibraryIds,
     ));
-    issues.push(...questionArrayIssues(
-      payload.vocabularyQuestions,
-      7,
-      "Vocabulary question",
-    ));
+    issues.push(...questionArrayIssues(payload.vocabularyQuestions, 7, "Vocabulary question"));
     issues.push(...difficultyDistributionIssues(
       payload.vocabularyQuestions,
       "difficulty",
@@ -237,13 +203,8 @@ export function activityGroupCheckpointIssues(
       3,
       "Grammar teaching",
       ["pattern", "meaning", "formation", "usage", "example", "translation"],
-      validLibraryIds,
     ));
-    issues.push(...questionArrayIssues(
-      payload.grammarQuestions,
-      7,
-      "Grammar question",
-    ));
+    issues.push(...questionArrayIssues(payload.grammarQuestions, 7, "Grammar question"));
     issues.push(...difficultyDistributionIssues(
       payload.grammarQuestions,
       "difficulty",
@@ -264,11 +225,8 @@ export function activityGroupCheckpointIssues(
     lines.forEach((line, index) => {
       const item = record(line);
       const label = `Reading line ${index + 1}`;
-      if (!item) {
-        issues.push(`${label} must be an object.`);
-        return;
-      }
-      issues.push(...requiredTextIssues(item, ["japanese", "english"], label));
+      if (!item) issues.push(`${label} must be an object.`);
+      else issues.push(...requiredTextIssues(item, ["japanese", "english"], label));
     });
     issues.push(...readingQuestionArrayIssues(payload.readingQuestions));
     return issues;
@@ -276,12 +234,8 @@ export function activityGroupCheckpointIssues(
 
   const listening = array(payload.listeningExercises);
   const speaking = array(payload.speakingExercises);
-  if (listening.length !== 5) {
-    issues.push("Listening region must contain exactly 5 exercises.");
-  }
-  if (speaking.length !== 5) {
-    issues.push("Speaking region must contain exactly 5 exercises.");
-  }
+  if (listening.length !== 5) issues.push("Listening region must contain exactly 5 exercises.");
+  if (speaking.length !== 5) issues.push("Speaking region must contain exactly 5 exercises.");
   issues.push(...difficultyDistributionIssues(
     listening,
     "difficulty",
@@ -319,11 +273,7 @@ export function activityGroupCheckpointIssues(
       issues.push(`${label} must be an object.`);
       return;
     }
-    issues.push(...requiredTextIssues(
-      item,
-      ["prompt", "expectedAnswer", "modelAnswer"],
-      label,
-    ));
+    issues.push(...requiredTextIssues(item, ["prompt", "expectedAnswer", "modelAnswer"], label));
     if (item.questionType !== "read_aloud") {
       issues.push(`${label} must be a playable read_aloud activity.`);
     }
@@ -363,38 +313,26 @@ export function resolvedLibraryCheckpointIssues(
   const grammar = array(library.grammar);
   const vocabulary = array(library.vocabulary);
 
-  if (kanji.length < 5) {
-    issues.push("Resolved library must contain at least 5 kanji target identities.");
-  }
-  if (grammar.length !== 3) {
-    issues.push("Resolved library must contain exactly 3 grammar target identities.");
-  }
-  if (vocabulary.length < 8) {
-    issues.push("Resolved story must contain at least 8 tappable vocabulary records.");
-  }
+  if (kanji.length < 5) issues.push("Resolved library must contain at least 5 kanji target identities.");
+  if (grammar.length !== 3) issues.push("Resolved library must contain exactly 3 grammar target identities.");
 
   kanji.forEach((entry, index) => {
     const item = record(entry);
     const id = item ? text(item.libraryId) : null;
     if (!item) issues.push(`Kanji ${index + 1} must be an object.`);
-    else if (!id || !text(item.character)) {
-      issues.push(`Kanji ${index + 1} is missing its target identity.`);
-    } else if (validLibraryIds && !validLibraryIds.has(id)) {
-      issues.push(`Kanji ${index + 1} references invalid library ID ${id}.`);
-    }
+    else if (!id || !text(item.character)) issues.push(`Kanji ${index + 1} is missing its target identity.`);
+    else if (validLibraryIds && !validLibraryIds.has(id)) issues.push(`Kanji ${index + 1} references invalid library ID ${id}.`);
   });
 
   grammar.forEach((entry, index) => {
     const item = record(entry);
     const id = item ? text(item.libraryId) : null;
     if (!item) issues.push(`Grammar ${index + 1} must be an object.`);
-    else if (!id || !text(item.pattern)) {
-      issues.push(`Grammar ${index + 1} is missing its target identity.`);
-    } else if (validLibraryIds && !validLibraryIds.has(id)) {
-      issues.push(`Grammar ${index + 1} references invalid library ID ${id}.`);
-    }
+    else if (!id || !text(item.pattern)) issues.push(`Grammar ${index + 1} is missing its target identity.`);
+    else if (validLibraryIds && !validLibraryIds.has(id)) issues.push(`Grammar ${index + 1} references invalid library ID ${id}.`);
   });
 
+  // Story tappability is optional. Validate curated rows only when they exist.
   vocabulary.forEach((entry, index) => {
     const item = record(entry);
     const id = item ? text(item.libraryId) : null;
@@ -420,11 +358,7 @@ export function storyCheckpointIssues(value: unknown): string[] {
   lines.forEach((line, index) => {
     const item = record(line);
     if (!item) issues.push(`Story line ${index + 1} must be an object.`);
-    else issues.push(...requiredTextIssues(
-      item,
-      ["japanese", "english"],
-      `Story line ${index + 1}`,
-    ));
+    else issues.push(...requiredTextIssues(item, ["japanese", "english"], `Story line ${index + 1}`));
   });
   const japanese = lines.flatMap((line) => {
     const item = record(line);
@@ -442,17 +376,13 @@ export function storyCheckpointIssues(value: unknown): string[] {
 export function playableLessonPackageIssues(value: unknown): string[] {
   const lesson = record(value);
   if (!lesson) return ["Playable lesson package must be an object."];
-  const issues = requiredTextIssues(
-    lesson,
-    ["title", "japaneseTitle", "summary"],
-    "Lesson",
-  );
+  const issues = requiredTextIssues(lesson, ["title", "japaneseTitle", "summary"], "Lesson");
   if (lesson.schemaVersion !== 2) issues.push("Lesson schemaVersion must be 2.");
 
   const counts: Array<[string, number, number]> = [
     ["story", 1, 20],
     ["kanji", 5, 5],
-    ["vocabulary", 8, 200],
+    ["vocabulary", 0, 200],
     ["grammar", 3, 3],
     ["vocabularyQuestions", 7, 7],
     ["grammarQuestions", 7, 7],
@@ -475,20 +405,16 @@ export function playableLessonPackageIssues(value: unknown): string[] {
       issues.push(`Story line ${index + 1} is not playable.`);
     }
   }
+  issues.push(...questionArrayIssues(lesson.vocabularyQuestions, 7, "Vocabulary question"));
+  issues.push(...questionArrayIssues(lesson.grammarQuestions, 7, "Grammar question"));
   issues.push(...readingQuestionArrayIssues(lesson.readingQuestions));
   return issues;
 }
 
 export function groupForPackageIssue(issue: string): ActivityGroupName | null {
   const normalized = issue.toLocaleLowerCase();
-  if (normalized.includes("listening") || normalized.includes("speaking")) {
-    return "listening_and_speaking";
-  }
-  if (normalized.includes("grammar") || normalized.includes("reading")) {
-    return "grammar_and_reading";
-  }
-  if (normalized.includes("kanji") || normalized.includes("vocabulary")) {
-    return "vocabulary_and_kanji";
-  }
+  if (normalized.includes("listening") || normalized.includes("speaking")) return "listening_and_speaking";
+  if (normalized.includes("grammar") || normalized.includes("reading")) return "grammar_and_reading";
+  if (normalized.includes("kanji") || normalized.includes("vocabulary")) return "vocabulary_and_kanji";
   return null;
 }

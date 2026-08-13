@@ -33,7 +33,6 @@ export const CANONICAL_LESSON_PHASES = [
   },
 ] as const satisfies readonly LessonPhase[];
 
-/** The only activity shape produced by the current custom-lesson generator. */
 export const CANONICAL_LESSON_ACTIVITY_COUNTS = {
   vocabulary: 7,
   grammar: 7,
@@ -44,16 +43,11 @@ export const CANONICAL_LESSON_ACTIVITY_COUNTS = {
 } as const;
 
 const canonicalPhaseIds = CANONICAL_LESSON_PHASES.map((phase) => phase.id);
-const oldSeedPhaseIds = [...canonicalPhaseIds, "review"] as const;
 
 export function canonicalLessonPhases(): LessonPhase[] {
   return CANONICAL_LESSON_PHASES.map((phase) => ({ ...phase }));
 }
 
-/**
- * Final review is no longer part of the learner flow. Any stored phase metadata
- * is normalized to the six current phases when a lesson is loaded.
- */
 export function normalizeLessonPhases(value: unknown): LessonPhase[] {
   if (!Array.isArray(value)) return canonicalLessonPhases();
 
@@ -63,12 +57,7 @@ export function normalizeLessonPhases(value: unknown): LessonPhase[] {
     const source = item as Record<string, unknown>;
     const id = source.id;
     if (!canonicalPhaseIds.includes(id as (typeof canonicalPhaseIds)[number])) continue;
-    if (
-      typeof source.label !== "string" ||
-      typeof source.description !== "string"
-    ) {
-      continue;
-    }
+    if (typeof source.label !== "string" || typeof source.description !== "string") continue;
     byId.set(id as LessonPhase["id"], {
       id: id as LessonPhase["id"],
       label: source.label,
@@ -82,17 +71,10 @@ export function normalizeLessonPhases(value: unknown): LessonPhase[] {
   }));
 }
 
-function splitMatches(
-  values: string[],
-  expected: Record<string, number>,
-): boolean {
+function splitMatches(values: string[], expected: Record<string, number>): boolean {
   const counts = new Map<string, number>();
-  for (const value of values) {
-    counts.set(value, (counts.get(value) ?? 0) + 1);
-  }
-  return Object.entries(expected).every(
-    ([key, count]) => (counts.get(key) ?? 0) === count,
-  );
+  for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1);
+  return Object.entries(expected).every(([key, count]) => (counts.get(key) ?? 0) === count);
 }
 
 function exactCountIssue(label: string, actual: number, expected: number): string[] {
@@ -101,93 +83,75 @@ function exactCountIssue(label: string, actual: number, expected: number): strin
     : [`${label} must contain exactly ${expected} activities; found ${actual}.`];
 }
 
-function isOldCuratedSeed(lesson: LessonPackage): boolean {
-  return lesson.source === "curated_seed";
-}
-
 export function lessonContractIssues(lesson: LessonPackage): string[] {
   const issues: string[] = [];
   const phaseIds = lesson.phases.map((phase) => phase.id);
   const currentPhases =
     phaseIds.length === canonicalPhaseIds.length &&
     phaseIds.every((id, index) => id === canonicalPhaseIds[index]);
-  const oldSeedPhases =
-    isOldCuratedSeed(lesson) &&
-    phaseIds.length === oldSeedPhaseIds.length &&
-    phaseIds.every((id, index) => id === oldSeedPhaseIds[index]);
-
-  if (!currentPhases && !oldSeedPhases) {
-    issues.push(`Lesson phases must be ${canonicalPhaseIds.join(" → ")}.`);
-  }
+  if (!currentPhases) issues.push(`Lesson phases must be ${canonicalPhaseIds.join(" → ")}.`);
 
   if (!lesson.story.length) issues.push("Story must not be empty.");
-  if (!lesson.vocabulary.length) issues.push("Vocabulary must not be empty.");
   if (!lesson.grammar.length) issues.push("Grammar must not be empty.");
   if (!lesson.readingConversation.length) issues.push("Reading passage must not be empty.");
 
-  if (!isOldCuratedSeed(lesson)) {
-    issues.push(...exactCountIssue(
-      "Vocabulary practice",
-      lesson.vocabularyQuestions.length,
-      CANONICAL_LESSON_ACTIVITY_COUNTS.vocabulary,
-    ));
-    issues.push(...exactCountIssue(
-      "Grammar practice",
-      lesson.grammarQuestions.length,
-      CANONICAL_LESSON_ACTIVITY_COUNTS.grammar,
-    ));
-    issues.push(...exactCountIssue(
-      "Reading questions",
-      lesson.readingQuestions?.length ?? 0,
-      CANONICAL_LESSON_ACTIVITY_COUNTS.reading,
-    ));
-    issues.push(...exactCountIssue(
-      "Listening practice",
-      lesson.listeningExercises.length,
-      CANONICAL_LESSON_ACTIVITY_COUNTS.listening,
-    ));
-    issues.push(...exactCountIssue(
-      "Speaking practice",
-      lesson.speakingExercises.length,
-      CANONICAL_LESSON_ACTIVITY_COUNTS.speaking,
-    ));
-    issues.push(...exactCountIssue(
-      "Final review",
-      lesson.reviewQuestions.length,
-      CANONICAL_LESSON_ACTIVITY_COUNTS.review,
-    ));
+  issues.push(...exactCountIssue(
+    "Vocabulary practice",
+    lesson.vocabularyQuestions.length,
+    CANONICAL_LESSON_ACTIVITY_COUNTS.vocabulary,
+  ));
+  issues.push(...exactCountIssue(
+    "Grammar practice",
+    lesson.grammarQuestions.length,
+    CANONICAL_LESSON_ACTIVITY_COUNTS.grammar,
+  ));
+  issues.push(...exactCountIssue(
+    "Reading questions",
+    lesson.readingQuestions?.length ?? 0,
+    CANONICAL_LESSON_ACTIVITY_COUNTS.reading,
+  ));
+  issues.push(...exactCountIssue(
+    "Listening practice",
+    lesson.listeningExercises.length,
+    CANONICAL_LESSON_ACTIVITY_COUNTS.listening,
+  ));
+  issues.push(...exactCountIssue(
+    "Speaking practice",
+    lesson.speakingExercises.length,
+    CANONICAL_LESSON_ACTIVITY_COUNTS.speaking,
+  ));
+  issues.push(...exactCountIssue(
+    "Final review",
+    lesson.reviewQuestions.length,
+    CANONICAL_LESSON_ACTIVITY_COUNTS.review,
+  ));
 
-    if (!splitMatches(
-      lesson.vocabularyQuestions.map((question) => question.difficulty),
-      { Easy: 3, Medium: 2, Hard: 2 },
-    )) {
-      issues.push("Vocabulary practice must contain 3 Easy, 2 Medium, and 2 Hard questions.");
-    }
-    if (!splitMatches(
-      lesson.grammarQuestions.map((question) => question.difficulty),
-      { Easy: 3, Medium: 2, Hard: 2 },
-    )) {
-      issues.push("Grammar practice must contain 3 Easy, 2 Medium, and 2 Hard questions.");
-    }
-    if (!splitMatches(
-      (lesson.readingQuestions ?? []).map((question) => question.difficulty),
-      { easy: 2, medium: 2, hard: 1 },
-    )) {
-      issues.push("Reading practice must contain 2 easy, 2 medium, and 1 hard question.");
-    }
-    if (!splitMatches(
-      lesson.speakingExercises.map((exercise) => exercise.mode),
-      { easy: 2, medium: 2, hard: 1 },
-    )) {
-      issues.push("Speaking practice must contain 2 easy, 2 medium, and 1 hard sentence.");
-    }
+  if (!splitMatches(
+    lesson.vocabularyQuestions.map((question) => question.difficulty),
+    { Easy: 3, Medium: 2, Hard: 2 },
+  )) {
+    issues.push("Vocabulary practice must contain 3 Easy, 2 Medium, and 2 Hard questions.");
+  }
+  if (!splitMatches(
+    lesson.grammarQuestions.map((question) => question.difficulty),
+    { Easy: 3, Medium: 2, Hard: 2 },
+  )) {
+    issues.push("Grammar practice must contain 3 Easy, 2 Medium, and 2 Hard questions.");
+  }
+  if (!splitMatches(
+    (lesson.readingQuestions ?? []).map((question) => question.difficulty),
+    { easy: 2, medium: 2, hard: 1 },
+  )) {
+    issues.push("Reading practice must contain 2 easy, 2 medium, and 1 hard question.");
+  }
+  if (!splitMatches(
+    lesson.speakingExercises.map((exercise) => exercise.mode),
+    { easy: 2, medium: 2, hard: 1 },
+  )) {
+    issues.push("Speaking practice must contain 2 easy, 2 medium, and 1 hard sentence.");
   }
 
-  if (
-    lesson.speakingExercises.some(
-      (exercise) => exercise.questionType !== "read_aloud",
-    )
-  ) {
+  if (lesson.speakingExercises.some((exercise) => exercise.questionType !== "read_aloud")) {
     issues.push("Every speaking activity must use read_aloud mode.");
   }
 
@@ -197,14 +161,9 @@ export function lessonContractIssues(lesson: LessonPackage): string[] {
     ...(lesson.readingQuestions ?? []).map((item) => item.id),
     ...lesson.listeningExercises.map((item) => item.id),
     ...lesson.speakingExercises.map((item) => item.id),
-    ...lesson.reviewQuestions.map((item) => item.id),
   ];
-  if (ids.some((id) => !id.trim())) {
-    issues.push("Every lesson activity must have a non-empty id.");
-  }
-  if (new Set(ids).size !== ids.length) {
-    issues.push("Lesson activity ids must be unique across all phases.");
-  }
+  if (ids.some((id) => !id.trim())) issues.push("Every lesson activity must have a non-empty id.");
+  if (new Set(ids).size !== ids.length) issues.push("Lesson activity ids must be unique across all phases.");
 
   return [...new Set(issues)];
 }
