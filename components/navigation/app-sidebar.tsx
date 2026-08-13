@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  BookOpen,
   ChartNoAxesColumnIncreasing,
   CircleHelp,
   Crown,
@@ -19,7 +18,6 @@ import { cn } from "@/lib/utils";
 const primary = [
   { label: "Home", href: "/home", icon: House },
   { label: "Learn", href: "/learn", icon: LibraryBig },
-  { label: "Review", href: "/review", icon: BookOpen },
   { label: "Progress", href: "/progress", icon: ChartNoAxesColumnIncreasing },
   { label: "Profile", href: "/profile", icon: UserRound },
 ];
