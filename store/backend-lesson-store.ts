@@ -78,12 +78,9 @@ export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
   loadOne: async (id) => {
     const existing = get().lessons.find((lesson) => lesson.id === id);
     if (existing) return existing;
-    const result = await lessonRepository.assignNext();
-    if (!result.ok || !result.data) return undefined;
-    const lesson = mapCanonicalLesson(result.data.lesson);
-    if (lesson.id !== id && result.data.assignment.lessonId !== id) {
-      return undefined;
-    }
+    const result = await lessonRepository.getPlayable(id);
+    if (!result.ok) return undefined;
+    const lesson = mapCanonicalLesson(result.data);
     set((state) => ({
       lessons: [
         ...state.lessons.filter((item) => item.id !== lesson.id),
