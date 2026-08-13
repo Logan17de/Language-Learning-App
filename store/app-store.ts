@@ -4,8 +4,6 @@ import { create } from "zustand";
 import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
 import { defaultPreferences, mockUser } from "@/data/mock-user";
 import { mockProgress } from "@/data/mock-progress";
-import { createReviewSession } from "@/lib/review-utils";
-import { rescheduleReviewItem } from "@/lib/review-scheduling";
 import { customLessonRepository } from "@/lib/repositories/custom-lesson-repository";
 import { getBackendMode } from "@/lib/supabase/config";
 import { settingsRepository } from "@/lib/repositories/settings-repository";
@@ -21,9 +19,13 @@ import type {
 } from "@/types/app-preferences";
 import type { LessonPackage } from "@/types/lesson";
 import type { LessonCompletionResult, LessonSession } from "@/types/lesson-session";
-import type { DailyMinutes, LearnerLevel, LearningGoal, OnboardingPreferences } from "@/types/learner";
-import type { LearnerProgress, RecentLesson, ReviewQueueItem } from "@/types/progress";
-import type { QuickReviewResult, ReviewSession } from "@/types/review-session";
+import type {
+  DailyMinutes,
+  LearnerLevel,
+  LearningGoal,
+  OnboardingPreferences,
+} from "@/types/learner";
+import type { LearnerProgress, RecentLesson } from "@/types/progress";
 
 interface AppState {
   hasHydrated: boolean;
@@ -35,8 +37,6 @@ interface AppState {
   savedLessonIds: string[];
   generatedLessons: LessonPackage[];
   customLessonRequests: CustomLessonRequest[];
-  activeReviewSession: ReviewSession | null;
-  reviewHistory: QuickReviewResult[];
   subscription: UserSubscription;
   settings: UserSettings;
   supportRequests: SupportRequest[];
@@ -54,7 +54,10 @@ interface AppState {
   completeOnboarding: () => void;
   updateProfile: (edits: ProfileEdits) => void;
   updateSettings: (settings: Partial<UserSettings>) => void;
-  setSubscription: (plan: SubscriptionPlan, billingPeriod?: UserSubscription["billingPeriod"]) => void;
+  setSubscription: (
+    plan: SubscriptionPlan,
+    billingPeriod?: UserSubscription["billingPeriod"],
+  ) => void;
   cancelSubscription: () => void;
   toggleSavedLesson: (lessonId: string) => void;
   addGeneratedLesson: (lesson: LessonPackage) => void;
@@ -65,13 +68,12 @@ interface AppState {
   saveLessonProgress: (lessonId: string, percent: number) => void;
   startOrResumeLesson: (lessonId: string) => LessonSession;
   saveLessonSession: (session: LessonSession) => void;
-  rewardLessonCompletion: (lesson: LessonPackage, result: LessonCompletionResult) => boolean;
+  rewardLessonCompletion: (
+    lesson: LessonPackage,
+    result: LessonCompletionResult,
+  ) => boolean;
   completeLesson: (lesson: RecentLesson) => void;
   resetLessonSession: (lessonId: string) => void;
-  startOrResumeReview: () => ReviewSession;
-  saveReviewSession: (session: ReviewSession) => void;
-  rewardReviewCompletion: (result: QuickReviewResult) => boolean;
-  startNewReview: () => ReviewSession;
   resetProgress: () => void;
   resetDemo: () => void;
 }
@@ -111,8 +113,6 @@ const initialState = {
   savedLessonIds: [],
   generatedLessons: [],
   customLessonRequests: [],
-  activeReviewSession: null,
-  reviewHistory: [],
   subscription: defaultSubscription,
   settings: defaultSettings,
   supportRequests: [],
@@ -126,7 +126,9 @@ const safeStorage: StateStorage = {
       if (typeof window === "undefined") return memoryFallback.get(name) ?? null;
       const current = window.localStorage.getItem(name);
       if (current) return current;
-      return name === "aiko-app-state" ? window.localStorage.getItem("kizuna-app-state") : null;
+      return name === "aiko-app-state"
+        ? window.localStorage.getItem("kizuna-app-state")
+        : null;
     } catch {
       return memoryFallback.get(name) ?? null;
     }
@@ -268,7 +270,11 @@ export const useAppStore = create<AppState>()(
       syncBackendIdentity: (name, email) =>
         set((state) => ({
           isAuthenticated: true,
-          user: { ...state.user, name: name.trim() || state.user.name, email },
+          user: {
+            ...state.user,
+            name: name.trim() || state.user.name,
+            email,
+          },
         })),
       hydrateBackendProgress: (snapshot) =>
         set((state) => ({
@@ -289,29 +295,40 @@ export const useAppStore = create<AppState>()(
             grammarToReview: snapshot.grammarToReview,
             recentLessons: snapshot.recentLessons,
             completedLessonIds: snapshot.completedLessonIds,
-            reviewQueue: snapshot.reviewQueue,
             longestStreak: snapshot.longestStreak,
             totalStudyMinutes: snapshot.totalStudyMinutes,
             achievements: snapshot.achievements,
           },
         })),
       signOut: () => set({ isAuthenticated: false }),
-      setGoal: (goal) => set((state) => ({ onboarding: { ...state.onboarding, goal } })),
+      setGoal: (goal) =>
+        set((state) => ({ onboarding: { ...state.onboarding, goal } })),
       setLevel: (level) =>
         set((state) => ({
           onboarding: { ...state.onboarding, level },
-          user: { ...state.user, level: level === "Not sure" || level === "Beginner" ? "N5" : level },
+          user: {
+            ...state.user,
+            level: level === "Not sure" || level === "Beginner" ? "N5" : level,
+          },
         })),
       setDailyMinutes: (dailyMinutes) =>
         set((state) => ({
           onboarding: { ...state.onboarding, dailyMinutes },
           user: { ...state.user, dailyGoalMinutes: dailyMinutes },
         })),
-      setInterests: (interests) => set((state) => ({ onboarding: { ...state.onboarding, interests } })),
+      setInterests: (interests) =>
+        set((state) => ({ onboarding: { ...state.onboarding, interests } })),
       acknowledgeReading: () =>
-        set((state) => ({ onboarding: { ...state.onboarding, readingPermissionUnderstood: true } })),
+        set((state) => ({
+          onboarding: {
+            ...state.onboarding,
+            readingPermissionUnderstood: true,
+          },
+        })),
       completeOnboarding: () =>
-        set((state) => ({ onboarding: { ...state.onboarding, completed: true } })),
+        set((state) => ({
+          onboarding: { ...state.onboarding, completed: true },
+        })),
       updateProfile: (edits) =>
         set((state) => ({
           user: {
@@ -344,7 +361,12 @@ export const useAppStore = create<AppState>()(
         })),
       cancelSubscription: () =>
         set((state) => ({
-          subscription: { ...state.subscription, plan: "free", status: "cancelled", renewsAt: undefined },
+          subscription: {
+            ...state.subscription,
+            plan: "free",
+            status: "cancelled",
+            renewsAt: undefined,
+          },
         })),
       toggleSavedLesson: (lessonId) =>
         set((state) => ({
@@ -361,21 +383,32 @@ export const useAppStore = create<AppState>()(
         })),
       removeGeneratedLesson: (lessonId) =>
         set((state) => ({
-          generatedLessons: state.generatedLessons.filter((lesson) => lesson.id !== lessonId),
+          generatedLessons: state.generatedLessons.filter(
+            (lesson) => lesson.id !== lessonId,
+          ),
         })),
       addCustomLessonRequest: (request) => {
-        set((state) => ({ customLessonRequests: [request, ...state.customLessonRequests] }));
-        if (getBackendMode() === "supabase") void customLessonRepository.create(request);
+        set((state) => ({
+          customLessonRequests: [request, ...state.customLessonRequests],
+        }));
+        if (getBackendMode() === "supabase") {
+          void customLessonRepository.create(request);
+        }
       },
       addSupportRequest: (request) =>
-        set((state) => ({ supportRequests: [request, ...state.supportRequests] })),
+        set((state) => ({
+          supportRequests: [request, ...state.supportRequests],
+        })),
       addLessonReport: (report) =>
         set((state) => ({ lessonReports: [report, ...state.lessonReports] })),
       saveLessonProgress: (lessonId, percent) =>
         set((state) => ({
           progress: {
             ...state.progress,
-            lessonProgress: { ...state.progress.lessonProgress, [lessonId]: percent },
+            lessonProgress: {
+              ...state.progress.lessonProgress,
+              [lessonId]: percent,
+            },
           },
         })),
       startOrResumeLesson: (lessonId) => {
@@ -395,7 +428,10 @@ export const useAppStore = create<AppState>()(
           lessonSessions: { ...state.lessonSessions, [lessonId]: session },
           progress: {
             ...state.progress,
-            lessonProgress: { ...state.progress.lessonProgress, [lessonId]: 1 },
+            lessonProgress: {
+              ...state.progress.lessonProgress,
+              [lessonId]: 1,
+            },
           },
         }));
         return session;
@@ -437,40 +473,70 @@ export const useAppStore = create<AppState>()(
             score: result.score,
             durationMinutes: result.durationMinutes,
           };
-          const reviewItems: ReviewQueueItem[] = result.wordsNeedingReview.map((term, index) => ({
-            id: `${lesson.id}_${term}_${index}`,
-            type: term.includes("〜") ? "grammar" : "vocabulary",
-            term,
-            dueLabel: "Tomorrow",
-            confidence: Math.max(35, result.score - 25),
-            reason: "Lesson retrieval mistake",
-            lastReviewed: "Just now",
-          }));
           return {
             user: {
               ...state.user,
               xp: state.user.xp + result.xpGained,
               streakDays: Math.max(state.user.streakDays, 13),
-              minutesStudiedToday: state.user.minutesStudiedToday + result.durationMinutes,
+              minutesStudiedToday:
+                state.user.minutesStudiedToday + result.durationMinutes,
             },
             progress: {
               ...state.progress,
-              completedLessonIds: [...new Set([...state.progress.completedLessonIds, lesson.id])],
-              recentLessons: [recentLesson, ...state.progress.recentLessons.filter((item) => item.lessonId !== lesson.id)],
-              lessonProgress: { ...state.progress.lessonProgress, [lesson.id]: 100 },
-              weeklyActivity: addMinutesToToday(state.progress.weeklyActivity, result.durationMinutes),
-              totalStudyMinutes: state.progress.totalStudyMinutes + result.durationMinutes,
-              weakVocabulary: mergeWeakVocabulary(state.progress.weakVocabulary, result.wordsNeedingReview),
-              kanjiRecognition: Math.min(100, state.progress.kanjiRecognition + result.recognitionChange),
-              pronunciation: Math.min(100, state.progress.pronunciation + result.pronunciationChange),
-              grammarUnderstanding: Math.min(100, state.progress.grammarUnderstanding + result.grammarUnderstandingChange),
-              grammarProduction: Math.min(100, state.progress.grammarProduction + result.grammarProductionChange),
-              speakingConfidence: Math.min(100, state.progress.speakingConfidence + result.pronunciationChange),
-              reviewQueue: mergeReviewQueue(state.progress.reviewQueue, reviewItems),
+              completedLessonIds: [
+                ...new Set([...state.progress.completedLessonIds, lesson.id]),
+              ],
+              recentLessons: [
+                recentLesson,
+                ...state.progress.recentLessons.filter(
+                  (item) => item.lessonId !== lesson.id,
+                ),
+              ],
+              lessonProgress: {
+                ...state.progress.lessonProgress,
+                [lesson.id]: 100,
+              },
+              weeklyActivity: addMinutesToToday(
+                state.progress.weeklyActivity,
+                result.durationMinutes,
+              ),
+              totalStudyMinutes:
+                state.progress.totalStudyMinutes + result.durationMinutes,
+              weakVocabulary: mergeWeakVocabulary(
+                state.progress.weakVocabulary,
+                result.wordsNeedingReview,
+              ),
+              kanjiRecognition: Math.min(
+                100,
+                state.progress.kanjiRecognition + result.recognitionChange,
+              ),
+              pronunciation: Math.min(
+                100,
+                state.progress.pronunciation + result.pronunciationChange,
+              ),
+              grammarUnderstanding: Math.min(
+                100,
+                state.progress.grammarUnderstanding +
+                  result.grammarUnderstandingChange,
+              ),
+              grammarProduction: Math.min(
+                100,
+                state.progress.grammarProduction + result.grammarProductionChange,
+              ),
+              speakingConfidence: Math.min(
+                100,
+                state.progress.speakingConfidence + result.pronunciationChange,
+              ),
             },
             lessonSessions: {
               ...state.lessonSessions,
-              [lesson.id]: { ...currentSession, completed: true, rewarded: true, completionResult: result, updatedAt: new Date().toISOString() },
+              [lesson.id]: {
+                ...currentSession,
+                completed: true,
+                rewarded: true,
+                completionResult: result,
+                updatedAt: new Date().toISOString(),
+              },
             },
           };
         });
@@ -480,9 +546,22 @@ export const useAppStore = create<AppState>()(
         set((state) => ({
           progress: {
             ...state.progress,
-            completedLessonIds: [...new Set([...state.progress.completedLessonIds, lesson.lessonId])],
-            recentLessons: [lesson, ...state.progress.recentLessons.filter((item) => item.lessonId !== lesson.lessonId)],
-            lessonProgress: { ...state.progress.lessonProgress, [lesson.lessonId]: 100 },
+            completedLessonIds: [
+              ...new Set([
+                ...state.progress.completedLessonIds,
+                lesson.lessonId,
+              ]),
+            ],
+            recentLessons: [
+              lesson,
+              ...state.progress.recentLessons.filter(
+                (item) => item.lessonId !== lesson.lessonId,
+              ),
+            ],
+            lessonProgress: {
+              ...state.progress.lessonProgress,
+              [lesson.lessonId]: 100,
+            },
           },
         })),
       resetLessonSession: (lessonId) =>
@@ -493,66 +572,23 @@ export const useAppStore = create<AppState>()(
             lessonSessions,
             progress: {
               ...state.progress,
-              lessonProgress: { ...state.progress.lessonProgress, [lessonId]: 0 },
+              lessonProgress: {
+                ...state.progress.lessonProgress,
+                [lessonId]: 0,
+              },
             },
           };
         }),
-      startOrResumeReview: () => {
-        const existing = get().activeReviewSession;
-        if (existing && !existing.completed) return existing;
-        const session = createReviewSession(get().progress.reviewQueue, get().reviewHistory.length + 1);
-        set({ activeReviewSession: session });
-        return session;
-      },
-      saveReviewSession: (session) => set({ activeReviewSession: session }),
-      rewardReviewCompletion: (result) => {
-        const session = get().activeReviewSession;
-        if (!session || session.rewarded) return false;
-        set((state) => {
-          const active = state.activeReviewSession;
-          if (!active || active.rewarded) return state;
-          const improved = new Set(result.improvedItemIds);
-          const weak = new Set(result.weakItemIds);
-          const reviewQueue = state.progress.reviewQueue
-            .map((item) => {
-              if (weak.has(item.id)) return rescheduleReviewItem(item, false);
-              if (!improved.has(item.id)) return item;
-              return rescheduleReviewItem(item, true);
-            })
-            .filter((item) => !(improved.has(item.id) && item.confidence >= 72));
-          return {
-            user: { ...state.user, xp: state.user.xp + result.xpEarned },
-            progress: {
-              ...state.progress,
-              reviewQueue,
-              reviewScores: [...state.progress.reviewScores, result.score].slice(-8),
-              totalStudyMinutes: state.progress.totalStudyMinutes + 5,
-              weeklyActivity: addMinutesToToday(state.progress.weeklyActivity, 5),
-              kanjiRecognition: Math.min(100, state.progress.kanjiRecognition + Math.round(result.correctCount / 2)),
-            },
-            reviewHistory: [result, ...state.reviewHistory],
-            activeReviewSession: { ...active, result, completed: true, rewarded: true },
-          };
-        });
-        return true;
-      },
-      startNewReview: () => {
-        const session = createReviewSession(get().progress.reviewQueue, get().reviewHistory.length + 1);
-        set({ activeReviewSession: session });
-        return session;
-      },
       resetProgress: () =>
         set({
           progress: mockProgress,
           lessonSessions: {},
-          activeReviewSession: null,
-          reviewHistory: [],
         }),
       resetDemo: () => set({ ...initialState }),
     }),
     {
       name: "aiko-app-state",
-      version: 3,
+      version: 4,
       storage: createJSONStorage(() => safeStorage),
       migrate: (persistedState) => persistedState as Partial<AppState>,
       merge: (persisted, current) => {
@@ -574,8 +610,6 @@ export const useAppStore = create<AppState>()(
           savedLessonIds: saved.savedLessonIds ?? [],
           generatedLessons: saved.generatedLessons ?? [],
           customLessonRequests: saved.customLessonRequests ?? [],
-          activeReviewSession: saved.activeReviewSession ?? null,
-          reviewHistory: saved.reviewHistory ?? [],
           subscription: { ...current.subscription, ...saved.subscription },
           settings: { ...current.settings, ...saved.settings },
           supportRequests: saved.supportRequests ?? [],
@@ -588,7 +622,10 @@ export const useAppStore = create<AppState>()(
   ),
 );
 
-function mergeProgress(current: LearnerProgress, saved?: LearnerProgress): LearnerProgress {
+function mergeProgress(
+  current: LearnerProgress,
+  saved?: LearnerProgress,
+): LearnerProgress {
   if (!saved) return current;
   return {
     ...current,
@@ -598,17 +635,21 @@ function mergeProgress(current: LearnerProgress, saved?: LearnerProgress): Learn
     weakVocabulary: saved.weakVocabulary ?? current.weakVocabulary,
     grammarToReview: saved.grammarToReview ?? current.grammarToReview,
     recentLessons: saved.recentLessons ?? current.recentLessons,
-    completedLessonIds: saved.completedLessonIds ?? current.completedLessonIds,
+    completedLessonIds:
+      saved.completedLessonIds ?? current.completedLessonIds,
     lessonProgress: saved.lessonProgress ?? current.lessonProgress,
-    reviewQueue: saved.reviewQueue ?? current.reviewQueue,
-    reviewScores: saved.reviewScores ?? current.reviewScores,
     achievements: saved.achievements ?? current.achievements,
   };
 }
 
-function addMinutesToToday(activity: LearnerProgress["weeklyActivity"], minutes: number): LearnerProgress["weeklyActivity"] {
+function addMinutesToToday(
+  activity: LearnerProgress["weeklyActivity"],
+  minutes: number,
+): LearnerProgress["weeklyActivity"] {
   const index = Math.min(4, activity.length - 1);
-  return activity.map((day, dayIndex) => dayIndex === index ? { ...day, minutes: day.minutes + minutes } : day);
+  return activity.map((day, dayIndex) =>
+    dayIndex === index ? { ...day, minutes: day.minutes + minutes } : day,
+  );
 }
 
 function mergeWeakVocabulary(
@@ -626,13 +667,8 @@ function mergeWeakVocabulary(
     .map((term) => ({
       term,
       reading: known[term]?.reading,
-      meaning: known[term]?.meaning ?? "lesson review item",
+      meaning: known[term]?.meaning ?? "lesson target",
       mastery: 45,
     }));
   return [...existing, ...additions];
-}
-
-function mergeReviewQueue(existing: ReviewQueueItem[], additions: ReviewQueueItem[]): ReviewQueueItem[] {
-  const terms = new Set(additions.map((item) => item.term));
-  return [...additions, ...existing.filter((item) => !terms.has(item.term))];
 }
