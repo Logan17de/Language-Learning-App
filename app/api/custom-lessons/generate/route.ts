@@ -1,7 +1,7 @@
 import { after, NextResponse, type NextRequest } from "next/server";
 import { authorize } from "@/lib/auth/server-authorization";
+import { processCustomLessonFastPath } from "@/lib/custom-lessons/fast-path";
 import { withGenerationTraceContext } from "@/lib/custom-lessons/generation-trace";
-import { processCustomLessonJobs } from "@/lib/custom-lessons/job-runner";
 import { getCustomLessonSchedulerDiagnostics } from "@/lib/custom-lessons/scheduler-diagnostics";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/types/database";
@@ -118,12 +118,13 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  // This is only a low-latency kick. The persisted claim and scheduled worker
-  // are the durability boundary if this invocation is interrupted.
+  // The first invocation now keeps consuming ready persisted checkpoints while
+  // there is safe Vercel runtime left. Supabase cron remains the recovery path
+  // if the invocation is interrupted or deliberately stops before audio.
   after(async () => {
     try {
       await withGenerationTraceContext({ requestId: generation.requestId }, () =>
-        processCustomLessonJobs({ requestId: generation.requestId, maxCycles: 1 }),
+        processCustomLessonFastPath({ requestId: generation.requestId, deferAudio: true }),
       );
     } catch (error) {
       console.error("Custom lesson kickoff stopped; the durable worker will resume it.", {
