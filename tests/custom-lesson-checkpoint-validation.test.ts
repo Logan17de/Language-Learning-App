@@ -143,7 +143,7 @@ describe("custom lesson checkpoint validation", () => {
     expect(storyCheckpointIssues(story).join(" ")).toContain("10 to 15 Japanese sentences");
   });
 
-  it("allows questions outside selected targets but still rejects invalid IDs when supplied", () => {
+  it("validates question structure without enforcing target-library content", () => {
     const group = validCheckpoints().vocabulary_and_kanji;
     group.vocabularyQuestions[0].choices = ["A", " A ", "C", "D"];
     group.vocabularyQuestions[1].correctAnswer = "Z";
@@ -152,8 +152,8 @@ describe("custom lesson checkpoint validation", () => {
     const issues = activityGroupCheckpointIssues("vocabulary_and_kanji", group, ids);
     expect(issues.join(" ")).toContain("choices must be distinct");
     expect(issues.join(" ")).toContain("correctAnswer must occur in choices");
-    expect(issues.join(" ")).not.toContain("at least one targetItemId");
-    expect(issues.join(" ")).toContain("references invalid library ID");
+    expect(issues.join(" ")).not.toContain("targetItemId");
+    expect(issues.join(" ")).not.toContain("references invalid library ID");
   });
 
   it("requires lesson-specific kanji and grammar teaching outputs", () => {
