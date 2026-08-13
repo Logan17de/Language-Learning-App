@@ -138,7 +138,7 @@ describe("custom lesson generation prompt contracts", () => {
       targetGrammar: ["～たい"],
       targetKanji: ["学"],
     });
-    expect(passagePrompt).toContain("Generate a Japanese language-learning story for reading.");
+    expect(passagePrompt).toContain("Generate a Japanese language-learning story.");
     expect(passagePrompt).toContain("Write one coherent story containing 10–15 natural Japanese sentences.");
     expect(readingPassageSchema).toBe(storyGenerationSchema);
 
