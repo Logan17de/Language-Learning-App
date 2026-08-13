@@ -2,13 +2,17 @@
 
 import type { LessonPackage } from "@/types/lesson";
 import type { LessonPhaseId, LessonSession } from "@/types/lesson-session";
-import type { ReviewSession } from "@/types/review-session";
 import type { Json } from "@/types/database";
 import { getBackendMode } from "@/lib/supabase/config";
 import { lessonRepository } from "@/lib/repositories/lesson-repository";
 import { lessonSessionRepository } from "@/lib/repositories/lesson-session-repository";
-import { reviewRepository } from "@/lib/repositories/review-repository";
-import { enqueueSync, markSyncAttempt, readSyncQueue, removeSyncOperation, type SyncOperation } from "@/lib/sync/offline-queue";
+import {
+  enqueueSync,
+  markSyncAttempt,
+  readSyncQueue,
+  removeSyncOperation,
+  type SyncOperation,
+} from "@/lib/sync/offline-queue";
 
 function json(value: unknown): Json {
   return JSON.parse(JSON.stringify(value)) as Json;
@@ -104,8 +108,12 @@ export function buildMasteryEvidence(
     ...lesson.readingConversation.flatMap(
       (item) => item.inspectableTerms ?? [],
     ),
-    ...lesson.listeningExercises.flatMap((item) => item.inspectableTerms ?? []),
-    ...lesson.speakingExercises.flatMap((item) => item.inspectableTerms ?? []),
+    ...lesson.listeningExercises.flatMap(
+      (item) => item.inspectableTerms ?? [],
+    ),
+    ...lesson.speakingExercises.flatMap(
+      (item) => item.inspectableTerms ?? [],
+    ),
     ...lesson.reviewQuestions.flatMap((item) => item.inspectableTerms ?? []),
   ];
 
@@ -191,7 +199,8 @@ export function buildMasteryEvidence(
     }
   };
 
-  for (const answer of phaseId === "vocabulary" ? session.vocabularyAnswers : []) {
+  for (const answer of
+    phaseId === "vocabulary" ? session.vocabularyAnswers : []) {
     const question = lesson.vocabularyQuestions.find(
       (item) => item.id === answer.questionId,
     );
@@ -230,7 +239,12 @@ export function buildMasteryEvidence(
     }
     addUnassistedKanji(
       question.id,
-      [question.prompt, question.cue, question.hintFront, ...question.choices].join("\n"),
+      [
+        question.prompt,
+        question.cue,
+        question.hintFront,
+        ...question.choices,
+      ].join("\n"),
       { answeredCorrectly: answer.correct, source: "grammar" },
     );
   }
@@ -245,7 +259,8 @@ export function buildMasteryEvidence(
     });
   }
 
-  for (const event of phaseId === "listening" ? session.listeningEvents : []) {
+  for (const event of
+    phaseId === "listening" ? session.listeningEvents : []) {
     if (event.type !== "answer" || !event.questionId) continue;
     const exercise = lesson.listeningExercises.find(
       (item) => item.id === event.questionId,
@@ -288,6 +303,8 @@ export function buildMasteryEvidence(
     });
   }
 
+  // This is the lesson's final review stage, not the retired standalone
+  // Quick Review feature.
   for (const answer of phaseId === "review" ? session.reviewAnswers : []) {
     const question = lesson.reviewQuestions.find(
       (item) => item.id === answer.questionId,
@@ -300,7 +317,10 @@ export function buildMasteryEvidence(
         dimension:
           answer.category === "speaking" ? "pronunciation" : "meaning",
         signal: answer.correct ? "correct" : "incorrect",
-        data: { selectedAnswer: answer.selectedAnswer, category: answer.category },
+        data: {
+          selectedAnswer: answer.selectedAnswer,
+          category: answer.category,
+        },
       });
     }
     addUnassistedKanji(
@@ -321,7 +341,10 @@ async function persistLesson(
 ): Promise<boolean> {
   const canonical = await lessonRepository.getPlayable(lesson.id);
   if (!canonical.ok) return false;
-  const backendSession = await lessonSessionRepository.startOrResume(canonical.data.lesson.id, canonical.data.version.id);
+  const backendSession = await lessonSessionRepository.startOrResume(
+    canonical.data.lesson.id,
+    canonical.data.version.id,
+  );
   if (!backendSession.ok) return false;
   const answers = [
     ...session.vocabularyAnswers.map((answer) => ({
@@ -396,13 +419,16 @@ async function persistLesson(
   ]);
   if (!answersResult.ok || !eventsResult.ok || !masteryResult.ok) return false;
   const phase = lesson.phases[session.currentPhaseIndex]?.id ?? "story";
-  const checkpoint = await lessonSessionRepository.saveCheckpoint(backendSession.data.id, {
-    current_phase: phase,
-    current_phase_index: session.currentPhaseIndex,
-    activity_index: session.activityIndex,
-    elapsed_seconds: session.elapsedSeconds,
-    checkpoint: json({ session }),
-  });
+  const checkpoint = await lessonSessionRepository.saveCheckpoint(
+    backendSession.data.id,
+    {
+      current_phase: phase,
+      current_phase_index: session.currentPhaseIndex,
+      activity_index: session.activityIndex,
+      elapsed_seconds: session.elapsedSeconds,
+      checkpoint: json({ session }),
+    },
+  );
   if (!checkpoint.ok) return false;
   if (complete && session.completionResult) {
     const result = await lessonSessionRepository.complete({
@@ -413,9 +439,13 @@ async function persistLesson(
       completionData: json({
         result: session.completionResult,
         metrics: {
-          vocabulary_correct: session.vocabularyAnswers.filter((answer) => answer.correct).length,
+          vocabulary_correct: session.vocabularyAnswers.filter(
+            (answer) => answer.correct,
+          ).length,
           vocabulary_total: session.vocabularyAnswers.length,
-          grammar_correct: session.grammarAnswers.filter((answer) => answer.correct).length,
+          grammar_correct: session.grammarAnswers.filter(
+            (answer) => answer.correct,
+          ).length,
           grammar_total: session.grammarAnswers.length,
           review_correct: session.reviewResult?.correctCount ?? 0,
           review_total: session.reviewResult?.totalCount ?? 0,
@@ -425,25 +455,6 @@ async function persistLesson(
     return result.ok;
   }
   return true;
-}
-
-async function persistReview(session: ReviewSession, complete: boolean): Promise<boolean> {
-  const backendSession = await reviewRepository.start();
-  if (!backendSession.ok) return false;
-  const answers = await reviewRepository.saveAnswers(backendSession.data.id, session.answers);
-  if (!answers.ok) return false;
-  if (!complete) return true;
-  if (!session.result) return false;
-  const result = await reviewRepository.complete({
-    sessionId: backendSession.data.id,
-    score: session.result.score,
-    correctCount: session.result.correctCount,
-    totalCount: session.result.totalCount,
-    improvedItemIds: session.result.improvedItemIds,
-    weakItemIds: session.result.weakItemIds,
-    xp: session.result.xpEarned,
-  });
-  return result.ok;
 }
 
 export async function syncLessonProgress(
@@ -459,7 +470,12 @@ export async function syncLessonProgress(
     enqueueSync(kind, key, json({ lesson, session, masteryPhase }), "Offline");
     return false;
   }
-  const synced = await persistLesson(lesson, session, complete, masteryPhase);
+  const synced = await persistLesson(
+    lesson,
+    session,
+    complete,
+    masteryPhase,
+  );
   if (!synced) {
     enqueueSync(
       kind,
@@ -471,46 +487,55 @@ export async function syncLessonProgress(
   return synced;
 }
 
-export async function syncReviewCompletion(session: ReviewSession): Promise<void> {
-  if (getBackendMode() !== "supabase" || !session.result) return;
-  if (!navigator.onLine || !(await persistReview(session, true))) {
-    enqueueSync("review_completion", `review_completion:${session.id}`, json({ session }), navigator.onLine ? "Database request failed." : "Offline");
-  }
-}
-
-export async function syncReviewProgress(session: ReviewSession): Promise<void> {
-  if (getBackendMode() !== "supabase" || session.completed) return;
-  if (!navigator.onLine || !(await persistReview(session, false))) {
-    enqueueSync("review_checkpoint", `review_checkpoint:${session.id}`, json({ session }), navigator.onLine ? "Database request failed." : "Offline");
-  }
-}
-
-export async function restoreLessonProgress(lesson: LessonPackage, fallback: LessonSession): Promise<LessonSession> {
+export async function restoreLessonProgress(
+  lesson: LessonPackage,
+  fallback: LessonSession,
+): Promise<LessonSession> {
   if (getBackendMode() !== "supabase") return fallback;
   const canonical = await lessonRepository.getPlayable(lesson.id);
   if (!canonical.ok) return fallback;
-  const backendSession = await lessonSessionRepository.startOrResume(canonical.data.lesson.id, canonical.data.version.id);
+  const backendSession = await lessonSessionRepository.startOrResume(
+    canonical.data.lesson.id,
+    canonical.data.version.id,
+  );
   if (!backendSession.ok) return fallback;
   const checkpoint = backendSession.data.checkpoint;
-  if (typeof checkpoint !== "object" || checkpoint === null || Array.isArray(checkpoint) || !("session" in checkpoint)) return fallback;
+  if (
+    typeof checkpoint !== "object" ||
+    checkpoint === null ||
+    Array.isArray(checkpoint) ||
+    !("session" in checkpoint)
+  ) {
+    return fallback;
+  }
   const restored = checkpoint.session;
-  if (typeof restored !== "object" || restored === null || Array.isArray(restored)
-    || restored.lessonId !== lesson.id || typeof restored.currentPhaseIndex !== "number"
-    || typeof restored.elapsedSeconds !== "number" || !Array.isArray(restored.completedPhaseIds)) return fallback;
+  if (
+    typeof restored !== "object" ||
+    restored === null ||
+    Array.isArray(restored) ||
+    restored.lessonId !== lesson.id ||
+    typeof restored.currentPhaseIndex !== "number" ||
+    typeof restored.elapsedSeconds !== "number" ||
+    !Array.isArray(restored.completedPhaseIds)
+  ) {
+    return fallback;
+  }
   return restored as unknown as LessonSession;
 }
 
 function operationPayload(operation: SyncOperation): {
   lesson?: LessonPackage;
-  session?: LessonSession | ReviewSession;
+  session?: LessonSession;
   masteryPhase?: LessonPhaseId;
 } {
-  return typeof operation.payload === "object" && operation.payload !== null && !Array.isArray(operation.payload)
-    ? operation.payload as unknown as {
+  return typeof operation.payload === "object" &&
+    operation.payload !== null &&
+    !Array.isArray(operation.payload)
+    ? (operation.payload as unknown as {
         lesson?: LessonPackage;
-        session?: LessonSession | ReviewSession;
+        session?: LessonSession;
         masteryPhase?: LessonPhaseId;
-      }
+      })
     : {};
 }
 
@@ -518,17 +543,19 @@ export async function retryPendingSync(): Promise<void> {
   if (getBackendMode() !== "supabase" || !navigator.onLine) return;
   for (const operation of readSyncQueue()) {
     const payload = operationPayload(operation);
-    let synced = false;
-    if ((operation.kind === "lesson_checkpoint" || operation.kind === "lesson_completion") && payload.lesson && payload.session) {
-      synced = await persistLesson(
-        payload.lesson,
-        payload.session as LessonSession,
-        operation.kind === "lesson_completion",
-        payload.masteryPhase,
-      );
-    } else if ((operation.kind === "review_checkpoint" || operation.kind === "review_completion") && payload.session) {
-      synced = await persistReview(payload.session as ReviewSession, operation.kind === "review_completion");
+    const supported =
+      operation.kind === "lesson_checkpoint" ||
+      operation.kind === "lesson_completion";
+    if (!supported || !payload.lesson || !payload.session) {
+      removeSyncOperation(operation.id);
+      continue;
     }
+    const synced = await persistLesson(
+      payload.lesson,
+      payload.session,
+      operation.kind === "lesson_completion",
+      payload.masteryPhase,
+    );
     if (synced) removeSyncOperation(operation.id);
     else markSyncAttempt(operation.id, "Retry failed.");
   }
