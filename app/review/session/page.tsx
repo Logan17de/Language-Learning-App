@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import { ReviewPlayer } from "@/components/review/review-player";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Quick Review" };
-export default function ReviewSessionPage() { return <ReviewPlayer />; }
+export default function ReviewSessionPage() {
+  redirect("/progress");
+}
