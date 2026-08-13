@@ -6,19 +6,19 @@ const sessionTypes = readFileSync("types/lesson-session.ts", "utf8");
 const lessonTypes = readFileSync("types/lesson.ts", "utf8");
 
 describe("reading comprehension contract", () => {
-  it("uses a written Japanese question flow without speaking controls", () => {
+  it("uses MCQ controls for new reading questions and keeps the legacy written fallback", () => {
     expect(reading).toContain("lesson.readingQuestions ?? []");
-    expect(reading).toContain("日本語で答えてください");
+    expect(reading).toContain("question?.choices");
+    expect(reading).toContain('role="radiogroup"');
     expect(reading).toContain("<textarea");
     expect(reading).toContain("Save answer");
     expect(reading).not.toContain("MediaRecorder");
     expect(reading).not.toContain("/api/audio/transcribe");
   });
 
-  it("locks submitted answers and shows a reference without exact-match scoring", () => {
+  it("locks submitted choices and shows the correct answer without pronunciation scoring", () => {
     expect(reading).toContain("disabled={Boolean(submitted)}");
-    expect(reading).toContain("Reference answer");
-    expect(reading).toContain("Your wording may be different");
+    expect(reading).toContain("Correct answer");
     expect(reading).not.toContain("response === question.answer");
     expect(reading).not.toContain("pronunciation");
   });
@@ -27,6 +27,7 @@ describe("reading comprehension contract", () => {
     expect(sessionTypes).toContain("interface ReadingComprehensionAnswer");
     expect(sessionTypes).toContain("readingAnswers: ReadingComprehensionAnswer[]");
     expect(lessonTypes).toContain("interface ReadingComprehensionQuestion");
+    expect(lessonTypes).toContain("choices?: string[];");
     expect(reading).toContain("readingAnswers: nextAnswers");
     expect(reading).toContain("readingComplete: nextAnswers.length >= questions.length");
   });

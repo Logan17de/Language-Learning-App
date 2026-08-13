@@ -74,17 +74,26 @@ describe("canonical lesson contract", () => {
     ]);
   });
 
-  it("keeps every demo lesson on the same playable contract", () => {
+  it("keeps every existing demo lesson playable during the seven-question transition", () => {
     for (const lesson of mockLessons) {
       expect(lessonContractIssues(lesson), lesson.id).toEqual([]);
       expect(isCanonicalPlayableLesson(lesson), lesson.id).toBe(true);
     }
   });
 
-  it("requires all 13 vocabulary answers before the learner can continue", () => {
-    expect(commuteLesson.vocabularyQuestions).toHaveLength(
-      CANONICAL_LESSON_ACTIVITY_COUNTS.vocabulary,
-    );
+  it("uses seven activities for every newly generated learner phase except the five-item final review", () => {
+    expect(CANONICAL_LESSON_ACTIVITY_COUNTS).toEqual({
+      vocabulary: 7,
+      grammar: 7,
+      reading: 7,
+      listening: 7,
+      speaking: 7,
+      review: 5,
+    });
+  });
+
+  it("still completes a legacy vocabulary phase only after all of its stored questions are answered", () => {
+    expect(commuteLesson.vocabularyQuestions).toHaveLength(13);
     const session = sessionFor(commuteLesson);
     session.vocabularyAnswers = commuteLesson.vocabularyQuestions
       .slice(0, 10)
@@ -110,14 +119,14 @@ describe("canonical lesson contract", () => {
     expect(phaseIsComplete(session, "vocabulary", commuteLesson)).toBe(true);
   });
 
-  it("fails closed when a required canonical activity bank is incomplete", () => {
+  it("fails closed when an activity bank matches neither current nor legacy counts", () => {
     const malformed: LessonPackage = {
       ...commuteLesson,
       vocabularyQuestions: commuteLesson.vocabularyQuestions.slice(0, 10),
     };
     expect(isCanonicalPlayableLesson(malformed)).toBe(false);
-    expect(lessonContractIssues(malformed)).toContain(
-      "Vocabulary practice must contain exactly 13 activities; found 10.",
+    expect(lessonContractIssues(malformed).join(" ")).toContain(
+      "Vocabulary practice must contain 7 current-format or 13 legacy activities; found 10.",
     );
   });
 
@@ -130,7 +139,7 @@ describe("canonical lesson contract", () => {
     expect(mapper).toContain("normalizeLessonPhases");
   });
 
-  it("locks generated schemas and storage to the same activity counts", () => {
+  it("locks new generated schemas to seven activities while storage remains backward compatible", () => {
     const vocabulary = readFileSync(
       "lib/gemini/vocabulary-question-contract.ts",
       "utf8",
@@ -143,32 +152,23 @@ describe("canonical lesson contract", () => {
       "lib/gemini/reading-comprehension-contract.ts",
       "utf8",
     );
-    const migration = readFileSync(
-      "supabase/migrations/20260808120000_canonical_lesson_contract.sql",
+    const flexibleStorage = readFileSync(
+      "supabase/migrations/20260805090000_flexible_generated_lesson_validation.sql",
+      "utf8",
+    );
+    const readingMcq = readFileSync(
+      "supabase/migrations/20260813070000_reading_mcq_choices.sql",
       "utf8",
     );
 
-    expect(vocabulary).toContain("minItems: 13");
-    expect(vocabulary).toContain("maxItems: 13");
-    expect(grammar).toContain("minItems: 10");
-    expect(grammar).toContain("maxItems: 10");
-    expect(reading).toContain("minItems: 5");
-    expect(reading).toContain("maxItems: 5");
-
-    expect(migration).toContain(
-      "jsonb_array_length(p_package->'vocabularyQuestions') <> 13",
-    );
-    expect(migration).toContain(
-      "jsonb_array_length(p_package->'grammarQuestions') <> 10",
-    );
-    expect(migration).toContain(
-      "jsonb_array_length(p_package->'readingQuestions') <> 5",
-    );
-    expect(migration).toContain(
-      '"id":"reading","label":"Reading"',
-    );
-    expect(migration.indexOf('"id":"reading"')).toBeLessThan(
-      migration.indexOf('"id":"speaking"'),
-    );
+    expect(vocabulary).toContain("minItems: 7");
+    expect(vocabulary).toContain("maxItems: 7");
+    expect(grammar).toContain("minItems: 7");
+    expect(grammar).toContain("maxItems: 7");
+    expect(reading).toContain("minItems: 7");
+    expect(reading).toContain("maxItems: 7");
+    expect(flexibleStorage).toContain("Accepts variable generated lesson counts");
+    expect(readingMcq).toContain("add column if not exists choices text[]");
+    expect(readingMcq).toContain("Reading MCQ at position % requires exactly four choices");
   });
 });

@@ -11,8 +11,11 @@ describe("durable custom lesson pipeline integration model", () => {
       `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
     );
     const validIds = new Set(ids);
-    const mc = (category?: string, targetItemIds: string[] = []) => ({
+    const difficulty = (index: number) =>
+      index < 3 ? "Easy" as const : index < 5 ? "Medium" as const : "Hard" as const;
+    const mc = (index: number, category?: string, targetItemIds: string[] = []) => ({
       ...(category ? { category } : {}),
+      difficulty: difficulty(index),
       prompt: "Question",
       choices: ["A", "B", "C", "D"],
       correctAnswer: "A",
@@ -48,8 +51,8 @@ describe("durable custom lesson pipeline integration model", () => {
         reading: `reading-${index}`,
         meaning: `meaning-${index}`,
       })),
-      vocabularyQuestions: Array.from({ length: 13 }, (_, index) =>
-        mc(undefined, index < 5 ? [ids[index]] : []),
+      vocabularyQuestions: Array.from({ length: 7 }, (_, index) =>
+        mc(index, undefined, index < 5 ? [ids[index]] : []),
       ),
     };
     state.checkpoints.grammar_and_reading = {
@@ -62,19 +65,26 @@ describe("durable custom lesson pipeline integration model", () => {
         example: `例文${index}。`,
         translation: `Example ${index}.`,
       })),
-      grammarQuestions: Array.from({ length: 10 }, (_, index) =>
-        mc(undefined, index < 3 ? [ids[index + 5]] : []),
+      grammarQuestions: Array.from({ length: 7 }, (_, index) =>
+        mc(index, undefined, index < 3 ? [ids[index + 5]] : []),
       ),
       readingTitle: "Reading",
       readingJapaneseTitle: "読み物",
       readingConversation: [{ japanese: "文です。", english: "Sentence.", targetItemIds: [] }],
-      readingQuestions: [{ question: "何ですか。", answer: "文です。" }],
+      readingQuestions: Array.from({ length: 7 }, (_, index) => ({
+        q_no: index + 1,
+        difficulty: index < 3 ? "easy" : index < 5 ? "medium" : "hard",
+        question: `何ですか ${index + 1}。`,
+        choices: ["文です。", "本です。", "学校です。", "友達です。"],
+        answer: "文です。",
+      })),
     };
     state.checkpoints.listening_and_speaking = {
-      listeningExercises: Array.from({ length: 5 }, () => ({
-        ...mc(), transcript: "会話です。", conversationLines: ["会話です。"],
+      listeningExercises: Array.from({ length: 7 }, (_, index) => ({
+        ...mc(index), transcript: "会話です。", conversationLines: ["会話です。"],
       })),
-      speakingExercises: Array.from({ length: 5 }, () => ({
+      speakingExercises: Array.from({ length: 7 }, (_, index) => ({
+        mode: index < 3 ? "easy" : index < 5 ? "medium" : "hard",
         questionType: "read_aloud",
         prompt: "読みます。",
         expectedAnswer: "読みます。",
@@ -86,7 +96,7 @@ describe("durable custom lesson pipeline integration model", () => {
     };
     state.checkpoints.final_review = {
       reviewQuestions: ["kanji", "vocabulary", "grammar", "listening", "speaking"]
-        .map((category) => mc(category)),
+        .map((category, index) => mc(index, category)),
     };
     expect(inspectPersistedActivityCheckpoints(state.checkpoints, validIds)).toMatchObject({
       valid: ACTIVITY_GROUPS,
@@ -107,6 +117,7 @@ describe("durable custom lesson pipeline integration model", () => {
       vocabularyQuestions: (state.checkpoints.vocabulary_and_kanji as Record<string, unknown>).vocabularyQuestions,
       grammarQuestions: (state.checkpoints.grammar_and_reading as Record<string, unknown>).grammarQuestions,
       readingConversation: (state.checkpoints.grammar_and_reading as Record<string, unknown>).readingConversation,
+      readingQuestions: (state.checkpoints.grammar_and_reading as Record<string, unknown>).readingQuestions,
       listeningExercises: (state.checkpoints.listening_and_speaking as Record<string, unknown>).listeningExercises,
       speakingExercises: (state.checkpoints.listening_and_speaking as Record<string, unknown>).speakingExercises,
       reviewQuestions: (state.checkpoints.final_review as Record<string, unknown>).reviewQuestions,

@@ -19,7 +19,7 @@ export const CANONICAL_LESSON_PHASES = [
   {
     id: "reading",
     label: "Reading",
-    description: "Read closely and answer in Japanese.",
+    description: "Read closely and answer comprehension questions.",
   },
   {
     id: "listening",
@@ -38,7 +38,22 @@ export const CANONICAL_LESSON_PHASES = [
   },
 ] as const satisfies readonly LessonPhase[];
 
+/** Current activity-bank sizes for newly generated lessons. */
 export const CANONICAL_LESSON_ACTIVITY_COUNTS = {
+  vocabulary: 7,
+  grammar: 7,
+  reading: 7,
+  listening: 7,
+  speaking: 7,
+  review: 5,
+} as const;
+
+/**
+ * Existing curated/generated lessons were published with the older bank sizes.
+ * They stay playable during the transition; new generation uses the current
+ * seven-question contract above.
+ */
+const LEGACY_LESSON_ACTIVITY_COUNTS = {
   vocabulary: 13,
   grammar: 10,
   reading: 5,
@@ -106,6 +121,22 @@ function splitMatches(
   );
 }
 
+function currentOrLegacyCount(
+  actual: number,
+  current: number,
+  legacy: number,
+): boolean {
+  return actual === current || actual === legacy;
+}
+
+function currentOrLegacySplit(
+  values: string[],
+  current: Record<string, number>,
+  legacy: Record<string, number>,
+): boolean {
+  return splitMatches(values, current) || splitMatches(values, legacy);
+}
+
 export function lessonContractIssues(lesson: LessonPackage): string[] {
   const issues: string[] = [];
   const phaseIds = lesson.phases.map((phase) => phase.id);
@@ -121,77 +152,89 @@ export function lessonContractIssues(lesson: LessonPackage): string[] {
   if (!lesson.vocabulary.length) issues.push("Vocabulary must not be empty.");
   if (!lesson.grammar.length) issues.push("Grammar must not be empty.");
 
-  const exactBanks: Array<[string, number, number]> = [
+  const exactBanks: Array<[string, number, number, number]> = [
     [
       "Vocabulary practice",
       lesson.vocabularyQuestions.length,
       CANONICAL_LESSON_ACTIVITY_COUNTS.vocabulary,
+      LEGACY_LESSON_ACTIVITY_COUNTS.vocabulary,
     ],
     [
       "Grammar practice",
       lesson.grammarQuestions.length,
       CANONICAL_LESSON_ACTIVITY_COUNTS.grammar,
+      LEGACY_LESSON_ACTIVITY_COUNTS.grammar,
     ],
     [
       "Reading questions",
       lesson.readingQuestions?.length ?? 0,
       CANONICAL_LESSON_ACTIVITY_COUNTS.reading,
+      LEGACY_LESSON_ACTIVITY_COUNTS.reading,
     ],
     [
       "Listening practice",
       lesson.listeningExercises.length,
       CANONICAL_LESSON_ACTIVITY_COUNTS.listening,
+      LEGACY_LESSON_ACTIVITY_COUNTS.listening,
     ],
     [
       "Speaking practice",
       lesson.speakingExercises.length,
       CANONICAL_LESSON_ACTIVITY_COUNTS.speaking,
+      LEGACY_LESSON_ACTIVITY_COUNTS.speaking,
     ],
     [
       "Final review",
       lesson.reviewQuestions.length,
       CANONICAL_LESSON_ACTIVITY_COUNTS.review,
+      LEGACY_LESSON_ACTIVITY_COUNTS.review,
     ],
   ];
-  for (const [label, actual, expected] of exactBanks) {
-    if (actual !== expected) {
+  for (const [label, actual, current, legacy] of exactBanks) {
+    if (!currentOrLegacyCount(actual, current, legacy)) {
       issues.push(
-        `${label} must contain exactly ${expected} activities; found ${actual}.`,
+        current === legacy
+          ? `${label} must contain exactly ${current} activities; found ${actual}.`
+          : `${label} must contain ${current} current-format or ${legacy} legacy activities; found ${actual}.`,
       );
     }
   }
 
   if (
-    !splitMatches(
+    !currentOrLegacySplit(
       lesson.vocabularyQuestions.map((question) => question.difficulty),
+      { Easy: 3, Medium: 2, Hard: 2 },
       { Easy: 6, Medium: 4, Hard: 3 },
     )
   ) {
-    issues.push("Vocabulary practice must contain 6 Easy, 4 Medium, and 3 Hard questions.");
+    issues.push("Vocabulary practice must use the current 3 Easy / 2 Medium / 2 Hard split or the legacy 6 / 4 / 3 split.");
   }
   if (
-    !splitMatches(
+    !currentOrLegacySplit(
       lesson.grammarQuestions.map((question) => question.difficulty),
+      { Easy: 3, Medium: 2, Hard: 2 },
       { Easy: 3, Medium: 4, Hard: 3 },
     )
   ) {
-    issues.push("Grammar practice must contain 3 Easy, 4 Medium, and 3 Hard questions.");
+    issues.push("Grammar practice must use the current 3 Easy / 2 Medium / 2 Hard split or the legacy 3 / 4 / 3 split.");
   }
   if (
-    !splitMatches(
+    !currentOrLegacySplit(
       (lesson.readingQuestions ?? []).map((question) => question.difficulty),
+      { easy: 3, medium: 2, hard: 2 },
       { easy: 2, medium: 2, hard: 1 },
     )
   ) {
-    issues.push("Reading practice must contain 2 easy, 2 medium, and 1 hard question.");
+    issues.push("Reading practice must use the current 3 easy / 2 medium / 2 hard split or the legacy 2 / 2 / 1 split.");
   }
   if (
-    !splitMatches(
+    !currentOrLegacySplit(
       lesson.speakingExercises.map((exercise) => exercise.mode),
+      { easy: 3, medium: 2, hard: 2 },
       { easy: 2, medium: 2, hard: 1 },
     )
   ) {
-    issues.push("Speaking practice must contain 2 easy, 2 medium, and 1 hard sentence.");
+    issues.push("Speaking practice must use the current 3 easy / 2 medium / 2 hard split or the legacy 2 / 2 / 1 split.");
   }
 
   if (!lesson.readingConversation.length) {

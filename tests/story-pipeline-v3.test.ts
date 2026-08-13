@@ -102,42 +102,46 @@ describe("custom lesson story pipeline v3", () => {
     expect(targetIdentityMigration).toContain("teachingMetadataRequired");
   });
 
-  it("builds the vocabulary and kanji lesson from story plus five target kanji", () => {
+  it("builds seven vocabulary and kanji questions from story plus five target teaching identities", () => {
     expect(vocabularyContract).toContain("Create AIko's vocabulary and kanji lesson from this fixed Japanese story.");
     expect(vocabularyContract).toContain("kanjiTeaching");
-    expect(vocabularyContract).toContain("Exactly 5 questions should directly practice the five target kanji");
-    expect(vocabularyContract).toContain("remaining 8 questions");
-    expect(vocabularyContract).toContain("Create exactly 13 questions: 6 easy, 4 medium, and 3 hard.");
+    expect(vocabularyContract).toContain("not a question whitelist");
+    expect(vocabularyContract).toContain("Create exactly 7 questions: 3 easy, 2 medium, and 2 hard.");
     expect(activityGroups).toContain('name: "vocab_questions"');
     expect(activityGroups).toContain("adaptKanjiTeaching");
     expect(activityGroups).toContain("adaptVocabularyQuestions");
     expect(activityGroups).toContain("targetKanjiCharacters(input.library)");
+    expect(activityGroups).not.toContain("does not practice target kanji");
     expect(activityGroups).not.toContain("inputLibraryVocabularyMatch");
   });
 
-  it("builds grammar teaching and ten questions from the fixed three target identities", () => {
+  it("builds grammar teaching plus seven questions without target-whitelist rejection", () => {
     expect(grammarContract).toContain("Create AIko's grammar lesson from this fixed Japanese story.");
     expect(grammarContract).toContain("grammarTeaching");
     expect(grammarContract).toContain("meaning, formation, usage");
-    expect(grammarContract).toContain("Create exactly 10 questions: 3 easy, 4 medium, and 3 hard.");
+    expect(grammarContract).toContain("Create exactly 7 questions: 3 easy, 2 medium, and 2 hard.");
+    expect(grammarContract).toContain("guidance rather than a whitelist");
     expect(activityGroups).toContain('name: "grammar_questions"');
     expect(activityGroups).toContain("adaptGrammarTeaching");
     expect(activityGroups).toContain("targetGrammarRecords(input.library)");
-    expect(activityGroups).toContain("storyUsesGrammarPattern");
+    expect(activityGroups).not.toContain("does not practice one of the selected grammar patterns");
   });
 
-  it("generates reading passage and five questions without dictionary indexing", () => {
-    expect(readingContract).toContain("Generate a Japanese language-learning story for reading.");
-    expect(readingContract).toContain("Create reading-comprehension questions from the following Japanese story.");
+  it("generates reading passage and seven MCQs without dictionary indexing", () => {
+    expect(readingContract).toContain("Create reading-comprehension multiple-choice questions");
+    expect(readingContract).toContain("Create exactly 7 questions: 3 easy, 2 medium, and 2 hard.");
+    expect(readingContract).toContain("exactly four distinct choices");
     expect(readingGeneration).toContain('name: "reading_lesson"');
     expect(readingGeneration).toContain('name: "reading_questions"');
     expect(readingGeneration).not.toContain("lookupJapaneseDictionaryVocabulary");
     expect(readingGeneration).not.toContain("storeGeneratedVocabularyTerms");
     expect(readingGeneration).toContain("inspectableTerms: []");
+    expect(reading).toContain("question?.choices");
   });
 
-  it("creates five listening exercises without a vocabulary enrichment pass", () => {
-    expect(listeningContract).toContain("Create exactly 5 listening-comprehension questions");
+  it("creates seven listening exercises without a vocabulary enrichment pass", () => {
+    expect(listeningContract).toContain("Create exactly 7 listening-comprehension questions");
+    expect(listeningContract).toContain("3 easy, 2 medium, and 2 hard");
     expect(listeningGeneration).toContain('name: "listening_questions"');
     expect(listeningGeneration).toContain("strictSchema: true");
     expect(listeningGeneration).not.toContain("lookupJapaneseDictionaryVocabulary");
@@ -146,9 +150,9 @@ describe("custom lesson story pipeline v3", () => {
     expect(listeningGeneration).toContain("inspectableTerms: []");
   });
 
-  it("creates five story-grounded read-aloud exercises without dictionary indexing", () => {
-    expect(speakingContract).toContain("Create exactly 5 Japanese sentences for read-aloud speaking practice");
-    expect(speakingContract).toContain("2 easy, 2 medium, and 1 hard");
+  it("creates seven story-grounded read-aloud exercises without dictionary indexing", () => {
+    expect(speakingContract).toContain("Create exactly 7 Japanese sentences for read-aloud speaking practice");
+    expect(speakingContract).toContain("3 easy, 2 medium, and 2 hard");
     expect(speakingGeneration).toContain('name: "speaking_read_aloud"');
     expect(speakingGeneration).toContain("strictSchema: true");
     expect(speakingGeneration).not.toContain("lookupJapaneseDictionaryVocabulary");

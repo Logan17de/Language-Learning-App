@@ -120,7 +120,7 @@ describe("learning engine V2 contracts", () => {
     ).toBe("Translate the ending: The flower was beautiful (plain).");
   });
 
-  it("stores adaptive candidate banks without changing older ten-question lessons", () => {
+  it("stores adaptive candidate banks while new custom lessons use seven-question banks", () => {
     const migration = readFileSync(
       resolve(
         process.cwd(),
@@ -151,8 +151,8 @@ describe("learning engine V2 contracts", () => {
     expect(migration).toContain(
       "jsonb_array_length(p_package->'grammarQuestions') not between 10 and 13",
     );
-    expect(vocabularyContract).toContain("6 easy, 4 medium, and 3 hard");
-    expect(grammarContract).toContain("3 easy, 4 medium, and 3 hard");
+    expect(vocabularyContract).toContain("3 easy, 2 medium, and 2 hard");
+    expect(grammarContract).toContain("3 easy, 2 medium, and 2 hard");
     expect(activityGroups).toContain('name: "vocab_questions"');
     expect(activityGroups).toContain('name: "grammar_questions"');
     expect(engine).toContain("generateVocabularyAndKanjiActivities");
