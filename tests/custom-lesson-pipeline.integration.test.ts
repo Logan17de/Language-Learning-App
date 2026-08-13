@@ -6,16 +6,17 @@ import {
 } from "@/lib/custom-lessons/checkpoint-validation";
 
 describe("durable custom lesson pipeline integration model", () => {
-  it("covers story tappability through independent teaching groups and saved lesson", () => {
+  it("covers story tappability through the three teaching groups and saved lesson", () => {
     const ids = Array.from({ length: 8 }, (_, index) =>
       `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
     );
     const validIds = new Set(ids);
-    const difficulty = (index: number) =>
+    const sevenDifficulty = (index: number) =>
       index < 3 ? "Easy" as const : index < 5 ? "Medium" as const : "Hard" as const;
-    const mc = (index: number, category?: string, targetItemIds: string[] = []) => ({
-      ...(category ? { category } : {}),
-      difficulty: difficulty(index),
+    const fiveDifficulty = (index: number) =>
+      index < 2 ? "Easy" as const : index < 4 ? "Medium" as const : "Hard" as const;
+    const mc = (index: number, targetItemIds: string[] = []) => ({
+      difficulty: sevenDifficulty(index),
       prompt: "Question",
       choices: ["A", "B", "C", "D"],
       correctAnswer: "A",
@@ -52,7 +53,7 @@ describe("durable custom lesson pipeline integration model", () => {
         meaning: `meaning-${index}`,
       })),
       vocabularyQuestions: Array.from({ length: 7 }, (_, index) =>
-        mc(index, undefined, index < 5 ? [ids[index]] : []),
+        mc(index, index < 5 ? [ids[index]] : []),
       ),
     };
     state.checkpoints.grammar_and_reading = {
@@ -66,25 +67,28 @@ describe("durable custom lesson pipeline integration model", () => {
         translation: `Example ${index}.`,
       })),
       grammarQuestions: Array.from({ length: 7 }, (_, index) =>
-        mc(index, undefined, index < 3 ? [ids[index + 5]] : []),
+        mc(index, index < 3 ? [ids[index + 5]] : []),
       ),
       readingTitle: "Reading",
       readingJapaneseTitle: "読み物",
       readingConversation: [{ japanese: "文です。", english: "Sentence.", targetItemIds: [] }],
-      readingQuestions: Array.from({ length: 7 }, (_, index) => ({
+      readingQuestions: Array.from({ length: 5 }, (_, index) => ({
         q_no: index + 1,
-        difficulty: index < 3 ? "easy" : index < 5 ? "medium" : "hard",
+        difficulty: index < 2 ? "easy" : index < 4 ? "medium" : "hard",
         question: `何ですか ${index + 1}。`,
         choices: ["文です。", "本です。", "学校です。", "友達です。"],
         answer: "文です。",
       })),
     };
     state.checkpoints.listening_and_speaking = {
-      listeningExercises: Array.from({ length: 7 }, (_, index) => ({
-        ...mc(index), transcript: "会話です。", conversationLines: ["会話です。"],
+      listeningExercises: Array.from({ length: 5 }, (_, index) => ({
+        ...mc(index),
+        difficulty: fiveDifficulty(index),
+        transcript: "会話です。",
+        conversationLines: ["会話です。"],
       })),
-      speakingExercises: Array.from({ length: 7 }, (_, index) => ({
-        mode: index < 3 ? "easy" : index < 5 ? "medium" : "hard",
+      speakingExercises: Array.from({ length: 5 }, (_, index) => ({
+        mode: index < 2 ? "easy" : index < 4 ? "medium" : "hard",
         questionType: "read_aloud",
         prompt: "読みます。",
         expectedAnswer: "読みます。",
@@ -94,10 +98,7 @@ describe("durable custom lesson pipeline integration model", () => {
         targetItemIds: [],
       })),
     };
-    state.checkpoints.final_review = {
-      reviewQuestions: ["kanji", "vocabulary", "grammar", "listening", "speaking"]
-        .map((category, index) => mc(index, category)),
-    };
+
     expect(inspectPersistedActivityCheckpoints(state.checkpoints, validIds)).toMatchObject({
       valid: ACTIVITY_GROUPS,
       invalid: [],
@@ -120,7 +121,7 @@ describe("durable custom lesson pipeline integration model", () => {
       readingQuestions: (state.checkpoints.grammar_and_reading as Record<string, unknown>).readingQuestions,
       listeningExercises: (state.checkpoints.listening_and_speaking as Record<string, unknown>).listeningExercises,
       speakingExercises: (state.checkpoints.listening_and_speaking as Record<string, unknown>).speakingExercises,
-      reviewQuestions: (state.checkpoints.final_review as Record<string, unknown>).reviewQuestions,
+      reviewQuestions: [],
     };
     expect(playableLessonPackageIssues(state.lessonPackage)).toEqual([]);
     state.status = "lesson_saving";
