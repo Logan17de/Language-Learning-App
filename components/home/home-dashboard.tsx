@@ -3,49 +3,38 @@
 import { ArrowRight, Clock3, Flame, Gem, Target } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
-import { mockLessons } from "@/data/mock-lessons";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { useAppStore } from "@/store/app-store";
-import { getBackendMode } from "@/lib/supabase/config";
 import { useBackendLessonStore } from "@/store/backend-lesson-store";
 
 export function HomeDashboard() {
   const user = useAppStore((state) => state.user);
   const progress = useAppStore((state) => state.progress);
   const sessions = useAppStore((state) => state.lessonSessions);
-  const generatedLessons = useAppStore((state) => state.generatedLessons);
-  const backendMode = getBackendMode();
   const backendLessons = useBackendLessonStore((state) => state.lessons);
   const backendLoading = useBackendLessonStore((state) => state.loading);
-  const backendLoaded = useBackendLessonStore((state) => state.loaded);
   const backendError = useBackendLessonStore((state) => state.error);
   const loadBackendLessons = useBackendLessonStore((state) => state.load);
 
   useEffect(() => {
-    if (backendMode === "supabase") void loadBackendLessons();
-  }, [backendMode, loadBackendLessons]);
+    void loadBackendLessons();
+  }, [loadBackendLessons]);
 
-  const demoLessons = [
-    ...generatedLessons,
-    ...mockLessons.filter(
-      (lesson) => !generatedLessons.some((item) => item.id === lesson.id),
-    ),
-  ];
-  const allLessons = backendMode === "supabase" ? backendLessons : demoLessons;
   const activeSession = Object.values(sessions).find(
     (session) =>
       !session.completed &&
-      allLessons.some((lesson) => lesson.id === session.lessonId),
+      backendLessons.some((lesson) => lesson.id === session.lessonId),
   );
   const activeLesson = activeSession
-    ? allLessons.find((lesson) => lesson.id === activeSession.lessonId)
+    ? backendLessons.find((lesson) => lesson.id === activeSession.lessonId)
     : undefined;
   const nextLesson =
-    allLessons.find((lesson) => !progress.completedLessonIds.includes(lesson.id)) ??
-    allLessons[0];
+    backendLessons.find(
+      (lesson) => !progress.completedLessonIds.includes(lesson.id),
+    ) ?? backendLessons[0];
   const selectedLesson = activeLesson ?? nextLesson;
   const selectedLessonId = activeSession?.lessonId ?? selectedLesson?.id;
   const lessonPercent = selectedLessonId
@@ -55,29 +44,6 @@ export function HomeDashboard() {
     activeSession && activeLesson
       ? activeLesson.phases[activeSession.currentPhaseIndex]?.label
       : undefined;
-
-  const completedLessons = allLessons.filter((lesson) =>
-    progress.completedLessonIds.includes(lesson.id),
-  );
-  const learnedVocabulary = new Set(
-    completedLessons.flatMap((lesson) => lesson.vocabulary.map((item) => item.term)),
-  ).size;
-  const learnedKanji = new Set(
-    completedLessons.flatMap((lesson) => lesson.kanji.map((item) => item.character)),
-  ).size;
-  const learnedGrammar = new Set(
-    completedLessons.flatMap((lesson) => lesson.grammar.map((item) => item.pattern)),
-  ).size;
-
-  const levelLessons = allLessons.filter((lesson) => lesson.level === user.level);
-  const levelProgress = levelLessons.length
-    ? Math.round(
-        levelLessons.reduce((total, lesson) => {
-          if (progress.completedLessonIds.includes(lesson.id)) return total + 100;
-          return total + (progress.lessonProgress[lesson.id] ?? 0);
-        }, 0) / levelLessons.length,
-      )
-    : 0;
   const dailyPercent = user.dailyGoalMinutes
     ? Math.min(
         100,
@@ -126,11 +92,13 @@ export function HomeDashboard() {
             </div>
 
             <h2 className="mt-7 max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">
-              {activeSession ? "Resume where you stopped." : "Your next lesson is ready."}
+              {activeSession
+                ? "Resume where you stopped."
+                : "Your next lesson is ready."}
             </h2>
             <p className="mt-3 max-w-xl text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
-              {backendMode === "supabase" && !selectedLesson
-                ? backendLoading || !backendLoaded
+              {!selectedLesson
+                ? backendLoading
                   ? "Selecting a level-matched lesson for you."
                   : backendError ||
                     "No published lesson is available for your current level yet."
@@ -153,14 +121,22 @@ export function HomeDashboard() {
               </div>
             ) : (
               <div className="mt-7 flex flex-wrap gap-2 text-xs font-medium text-white/65">
-                <span className="rounded-full bg-white/[0.07] px-3 py-2">Story first</span>
-                <span className="rounded-full bg-white/[0.07] px-3 py-2">Speaking included</span>
-                <span className="rounded-full bg-white/[0.07] px-3 py-2">Mastery tracked</span>
+                <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                  Story first
+                </span>
+                <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                  Speaking included
+                </span>
+                <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                  Mastery tracked
+                </span>
               </div>
             )}
 
             <ButtonLink
-              href={selectedLessonId ? `/lesson/${selectedLessonId}/play` : "/learn"}
+              href={
+                selectedLessonId ? `/lesson/${selectedLessonId}/play` : "/learn"
+              }
               className="mt-8 !bg-persimmon-500 px-7 hover:!bg-persimmon-600"
             >
               {backendLoading
@@ -208,7 +184,9 @@ export function HomeDashboard() {
               <span className="grid size-10 place-items-center rounded-2xl bg-persimmon-50 text-persimmon-500">
                 <Flame className="size-5" aria-hidden="true" />
               </span>
-              <p className="mt-5 text-2xl font-semibold tabular-nums">{user.streakDays}</p>
+              <p className="mt-5 text-2xl font-semibold tabular-nums">
+                {user.streakDays}
+              </p>
               <p className="mt-1 text-xs font-medium text-muted">day streak</p>
             </Card>
             <Card className="p-5">
@@ -231,20 +209,27 @@ export function HomeDashboard() {
               <Target className="size-5" aria-hidden="true" />
             </span>
             <span className="text-sm font-semibold tabular-nums text-moss-700">
-              {user.level} · {levelProgress}%
+              {user.level} · {progress.levelCompletion}%
             </span>
           </div>
           <h2 className="mt-6 text-xl font-semibold">Level progress</h2>
           <p className="mt-2 text-sm leading-6 text-muted">
             See how much useful language you have accumulated at this level.
           </p>
-          <ProgressBar value={levelProgress} className="mt-5" />
+          <ProgressBar value={progress.levelCompletion} className="mt-5" />
           <div className="mt-5 grid grid-cols-3 gap-2 text-center">
-            <MiniStat value={learnedVocabulary} label="vocabulary" />
-            <MiniStat value={learnedKanji} label="kanji" />
-            <MiniStat value={learnedGrammar} label="grammar" />
+            <MiniStat
+              value={progress.learnedVocabularyCount}
+              label="vocabulary"
+            />
+            <MiniStat value={progress.learnedKanjiCount} label="kanji" />
+            <MiniStat value={progress.learnedGrammarCount} label="grammar" />
           </div>
-          <ButtonLink href="/progress" variant="secondary" className="mt-5 w-full sm:w-auto">
+          <ButtonLink
+            href="/progress"
+            variant="secondary"
+            className="mt-5 w-full sm:w-auto"
+          >
             View progress
           </ButtonLink>
         </Card>
