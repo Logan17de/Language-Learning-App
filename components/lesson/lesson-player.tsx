@@ -165,6 +165,9 @@ export function LessonPlayer({
     () => (session ? phaseIsComplete(session, phase.id, lesson) : false),
     [lesson, phase.id, session],
   );
+  const isLastPhase = session
+    ? session.currentPhaseIndex === lesson.phases.length - 1
+    : false;
   const progress = session
     ? Math.round(
         ((session.currentPhaseIndex + (canContinue ? 1 : 0.35)) /
@@ -217,7 +220,7 @@ export function LessonPlayer({
   function continueLesson() {
     if (!session || !canContinue) return;
     const currentPhase = lesson.phases[session.currentPhaseIndex];
-    if (currentPhase.id === "review") {
+    if (session.currentPhaseIndex === lesson.phases.length - 1) {
       const timedSession = {
         ...session,
         elapsedSeconds,
@@ -281,9 +284,7 @@ export function LessonPlayer({
         totalPhases={lesson.phases.length}
         progress={progress}
         canContinue={canContinue}
-        continueLabel={
-          phase.id === "review" ? "See results" : nextLabel(phase.id)
-        }
+        continueLabel={isLastPhase ? "See results" : nextLabel(phase.id)}
         onBack={back}
         onContinue={continueLesson}
         onExit={() => setShowExit(true)}
