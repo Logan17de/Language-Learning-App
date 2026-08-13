@@ -27,6 +27,10 @@ const durableMigration = readFileSync(
   "supabase/migrations/20260810090000_stage_based_custom_lesson_jobs.sql",
   "utf8",
 );
+const currentContractMigration = readFileSync(
+  "supabase/migrations/20260813070000_reading_mcq_choices.sql",
+  "utf8",
+);
 const scheduler = readFileSync(
   "supabase/migrations/20260810100000_supabase_custom_lesson_scheduler.sql",
   "utf8",
@@ -82,7 +86,7 @@ describe("custom lesson engine contract", () => {
     expect(statusRoute).toContain('.eq("user_id", auth.userId)');
   });
 
-  it("uses durable atomic stage claims and independently persisted groups", () => {
+  it("uses durable atomic stage claims and only three persisted activity groups", () => {
     expect(workerRoute).toContain("customLessonWorkerAuthorized");
     expect(workerAuthorization).toContain("CUSTOM_LESSON_WORKER_SECRET");
     expect(workerAuthorization).toContain("CRON_SECRET");
@@ -92,7 +96,10 @@ describe("custom lesson engine contract", () => {
     expect(groups).toContain("generateVocabularyAndKanjiActivities");
     expect(groups).toContain("generateGrammarAndReadingActivities");
     expect(groups).toContain("generateListeningAndSpeakingActivities");
-    expect(groups).toContain("generateFinalReviewActivities");
+    expect(checkpoints).toContain('"vocabulary_and_kanji"');
+    expect(checkpoints).toContain('"grammar_and_reading"');
+    expect(checkpoints).toContain('"listening_and_speaking"');
+    expect(checkpoints).not.toContain('| "final_review"');
     expect(durableMigration).toContain("for update skip locked");
     expect(durableMigration).toContain("interval '8 minutes'");
     expect(durableMigration).toContain("completed_groups");
@@ -125,13 +132,14 @@ describe("custom lesson engine contract", () => {
     expect(identityMigration).toContain("teachingMetadataRequired");
   });
 
-  it("validates final review structurally without asking the model for database IDs", () => {
-    expect(groups).toContain('name: "final_review"');
-    expect(groups).toContain("strictSchema: true");
-    expect(groups).toContain("exactSchemaName: true");
-    expect(groups).toContain("Do not use or output database IDs");
-    expect(checkpoints).toContain("Final review must contain exactly 5 questions.");
-    expect(checkpoints).not.toContain("requires at least one targetItemId");
+  it("uses the current 7-7-5-5-5 package and removes final review from the learner flow", () => {
+    expect(currentContractMigration).toContain("vocabularyQuestions must contain exactly 7 items");
+    expect(currentContractMigration).toContain("grammarQuestions must contain exactly 7 items");
+    expect(currentContractMigration).toContain("readingQuestions must contain exactly 5 items");
+    expect(currentContractMigration).toContain("listeningExercises must contain exactly 5 items");
+    expect(currentContractMigration).toContain("speakingExercises must contain exactly 5 items");
+    expect(currentContractMigration).toContain("reviewQuestions must be empty");
+    expect(currentContractMigration).toContain("Final review is intentionally removed");
   });
 
   it("publishes lesson content before audio and limits TTS to voice activities", () => {
