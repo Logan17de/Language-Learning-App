@@ -1,6 +1,7 @@
 import { after, NextResponse, type NextRequest } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
+import { processCustomLessonFastPath } from "@/lib/custom-lessons/fast-path";
 import { processCustomLessonJobs } from "@/lib/custom-lessons/job-runner";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -64,7 +65,11 @@ export async function POST(request: NextRequest) {
   after(async () => {
     const startedAt = Date.now();
     try {
-      await processCustomLessonJobs({ requestId, maxCycles: 1 });
+      if (action === "audio") {
+        await processCustomLessonJobs({ requestId, maxCycles: 1 });
+      } else {
+        await processCustomLessonFastPath({ requestId, deferAudio: true });
+      }
     } catch (error) {
       console.error("Custom lesson retry nudge stopped; the scheduler will resume it.", {
         requestId,
