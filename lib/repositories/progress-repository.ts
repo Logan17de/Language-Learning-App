@@ -5,7 +5,11 @@ import {
   success,
   type RepositoryResult,
 } from "@/lib/repositories/result";
-import type { LearnerLevel } from "@/types/learner";
+import type {
+  DailyMinutes,
+  LearnerLevel,
+  LearningGoal,
+} from "@/types/learner";
 import type {
   Achievement,
   MasteryItem,
@@ -15,7 +19,9 @@ import type {
 
 export interface BackendProgressSnapshot {
   currentLevel: LearnerLevel;
-  dailyGoalMinutes: number;
+  learningGoal: LearningGoal | null;
+  interests: string[];
+  dailyGoalMinutes: DailyMinutes;
   minutesStudiedToday: number;
   joinDate: string;
   levelCompletion: number;
@@ -61,6 +67,10 @@ function dateInTimeZone(timeZone: string): string {
   }
 }
 
+function dailyMinutes(value: number): DailyMinutes {
+  return value === 15 || value === 45 || value === 60 ? value : 30;
+}
+
 export const progressRepository = {
   async loadCurrent(): Promise<RepositoryResult<BackendProgressSnapshot>> {
     const client = createClient();
@@ -83,7 +93,7 @@ export const progressRepository = {
       client
         .from("profiles")
         .select(
-          "xp,streak_days,longest_streak,total_study_minutes,daily_study_minutes,current_jlpt_level,created_at,timezone",
+          "xp,streak_days,longest_streak,total_study_minutes,daily_study_minutes,current_jlpt_level,learning_goal,interests,created_at,timezone",
         )
         .eq("id", userId)
         .single(),
@@ -208,10 +218,13 @@ export const progressRepository = {
     const today = dateInTimeZone(profile.data.timezone);
     const minutesStudiedToday =
       (weekly.data ?? []).find((item) => item.activity_date === today)?.minutes ?? 0;
+    const goalMinutes = dailyMinutes(profile.data.daily_study_minutes);
 
     return success({
       currentLevel: profile.data.current_jlpt_level as LearnerLevel,
-      dailyGoalMinutes: profile.data.daily_study_minutes,
+      learningGoal: profile.data.learning_goal as LearningGoal | null,
+      interests: profile.data.interests ?? [],
+      dailyGoalMinutes: goalMinutes,
       minutesStudiedToday,
       joinDate: profile.data.created_at.slice(0, 10),
       levelCompletion: summaryNumber(summary.data, "level_completion"),
@@ -234,7 +247,7 @@ export const progressRepository = {
             { weekday: "short" },
           ),
           minutes: item.minutes,
-          goal: profile.data.daily_study_minutes,
+          goal: goalMinutes,
         })),
       weakKanji: masteryFor("kanji"),
       weakVocabulary: masteryFor("vocabulary"),
@@ -251,8 +264,7 @@ export const progressRepository = {
       }),
       completedLessonIds: (completions.data ?? []).map(
         (completion) =>
-          lessonMap.get(completion.lesson_id)?.legacy_id ??
-          completion.lesson_id,
+          lessonMap.get(completion.lesson_id)?.legacy_id ?? completion.lesson_id,
       ),
       achievements: (definitions.data ?? []).map((definition) => {
         const item = earnedMap.get(definition.id);
