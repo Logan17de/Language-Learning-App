@@ -20,7 +20,7 @@ import {
   AdminStatCard,
   AdminStatus,
 } from "@/components/admin/admin-primitives";
-import { Button, ButtonLink } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   adminDashboardRepository,
   type AdminDashboardData,
@@ -81,93 +81,39 @@ export function AdminDashboard() {
     : "0.0";
   const metricCards = metrics
     ? ([
-        [
-          "Total users",
-          metrics.totalUsers.toLocaleString(),
-          "Registered learner profiles",
-          "teal",
-        ],
-        [
-          "Daily active users",
-          metrics.dailyActiveUsers.toLocaleString(),
-          "Users with activity today",
-          "blue",
-        ],
-        [
-          "Premium users",
-          metrics.premiumUsers.toLocaleString(),
-          `${conversion}% of registered users`,
-          "orange",
-        ],
-        [
-          "Published lessons",
-          metrics.lessonsPublished.toLocaleString(),
-          "Learner-visible canonical lessons",
-          "teal",
-        ],
-        [
-          "Pending validation",
-          metrics.generatedAwaitingValidation.toLocaleString(),
-          "Generated content requiring attention",
-          "orange",
-        ],
-        [
-          "Open reports",
-          metrics.reportsAwaitingReview.toLocaleString(),
-          "Lesson reports not closed",
-          "red",
-        ],
-        [
-          "Open support",
-          metrics.openSupportRequests.toLocaleString(),
-          "Support tickets not resolved",
-          "orange",
-        ],
-        [
-          "Completed today",
-          metrics.lessonsCompletedToday.toLocaleString(),
-          "Lesson completions since UTC midnight",
-          "blue",
-        ],
-        [
-          "Average score today",
-          `${metrics.averageLessonScore}%`,
-          "Completed lessons today",
-          "teal",
-        ],
-        [
-          "Recorded cost this month",
-          `$${metrics.recordedAiCost.toFixed(2)}`,
-          "From cost records",
-          "orange",
-        ],
-        [
-          "Stored media assets",
-          metrics.storageAssets.toLocaleString(),
-          `${live?.imageCount ?? 0} images · ${live?.audioCount ?? 0} audio`,
-          "blue",
-        ],
-        [
-          "Recent failed generations",
-          metrics.failedGenerationCount.toLocaleString(),
-          "Among the latest generation jobs",
-          "red",
-        ],
+        ["Total users", metrics.totalUsers.toLocaleString(), "Registered learner profiles", "teal"],
+        ["Daily active users", metrics.dailyActiveUsers.toLocaleString(), "Users with activity today", "blue"],
+        ["Premium users", metrics.premiumUsers.toLocaleString(), `${conversion}% of registered users`, "orange"],
+        ["Published lessons", metrics.lessonsPublished.toLocaleString(), "Learner-visible canonical lessons", "teal"],
+        ["Pending validation", metrics.generatedAwaitingValidation.toLocaleString(), "Generated content requiring attention", "orange"],
+        ["Open reports", metrics.reportsAwaitingReview.toLocaleString(), "Lesson reports not closed", "red"],
+        ["Open support", metrics.openSupportRequests.toLocaleString(), "Support tickets not resolved", "orange"],
+        ["Completed today", metrics.lessonsCompletedToday.toLocaleString(), "Lesson completions since UTC midnight", "blue"],
+        ["Average score today", `${metrics.averageLessonScore}%`, "Completed lessons today", "teal"],
+        ["Recorded cost this month", `$${metrics.recordedAiCost.toFixed(2)}`, "From cost records", "orange"],
+        ["Stored media assets", metrics.storageAssets.toLocaleString(), `${live?.imageCount ?? 0} images · ${live?.audioCount ?? 0} audio`, "blue"],
+        ["Recent failed generations", metrics.failedGenerationCount.toLocaleString(), "Among the latest generation jobs", "red"],
       ] as const)
     : [];
 
   function exportAnalytics() {
     if (!live || !metrics) return;
-    const payload = {
-      exportedAt: new Date().toISOString(),
-      source: "supabase",
-      metrics,
-      services: live.services,
-      jobs: live.recentJobs,
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {
-      type: "application/json",
-    });
+    const blob = new Blob(
+      [
+        JSON.stringify(
+          {
+            exportedAt: new Date().toISOString(),
+            source: "supabase",
+            metrics,
+            services: live.services,
+            jobs: live.recentJobs,
+          },
+          null,
+          2,
+        ),
+      ],
+      { type: "application/json" },
+    );
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
@@ -192,26 +138,16 @@ export function AdminDashboard() {
         title="Admin dashboard"
         description="Live learner, content, generation, support, cost, and service-health signals from Supabase."
         actions={
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              className="rounded-xl"
-              disabled={loading}
-              onClick={() => void refresh()}
-            >
-              <RefreshCw
-                className={`size-4 ${loading ? "animate-spin" : ""}`}
-              />
-              Refresh
-            </Button>
-            <ButtonLink
-              href="/admin/lessons/new/edit"
-              className="rounded-xl bg-slate-950 hover:bg-slate-800"
-            >
-              Create lesson
-            </ButtonLink>
-          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            className="rounded-xl"
+            disabled={loading}
+            onClick={() => void refresh()}
+          >
+            <RefreshCw className={`size-4 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
         }
       />
 
@@ -245,10 +181,7 @@ export function AdminDashboard() {
       )}
 
       <div className="mt-7 grid gap-6 xl:grid-cols-[1.15fr_.85fr]">
-        <AdminSection
-          title="Recent activity"
-          description="Latest persisted audit events."
-        >
+        <AdminSection title="Recent activity" description="Latest persisted audit events.">
           <div className="space-y-1">
             {(live?.recentAudit ?? []).map((item) => (
               <div
@@ -279,14 +212,11 @@ export function AdminDashboard() {
           </div>
         </AdminSection>
 
-        <AdminSection
-          title="Quick actions"
-          description="Common content and operations tasks."
-        >
+        <AdminSection title="Quick actions" description="Production-backed content and operations tasks.">
           <div className="grid gap-3 sm:grid-cols-2">
             {[
-              ["Create lesson", "/admin/lessons/new/edit"],
               ["Import lesson", "/admin/lessons/import"],
+              ["Batch generate", "/admin/lessons/batch-generate"],
               ["Review generations", "/admin/generated"],
               ["Manage users", "/admin/users"],
               ["View reports", "/admin/reports"],
@@ -340,11 +270,7 @@ export function AdminDashboard() {
             {failedJobs.map((job) => (
               <Link
                 key={job.id}
-                href={
-                  job.lesson_id
-                    ? `/admin/generated/${job.lesson_id}`
-                    : "/admin/generated"
-                }
+                href={job.lesson_id ? `/admin/generated/${job.lesson_id}` : "/admin/generated"}
                 className="flex items-center gap-3 rounded-xl border border-red-100 bg-red-50/50 p-4 hover:bg-red-50"
               >
                 <AlertTriangle className="size-5 shrink-0 text-red-700" />
@@ -367,19 +293,12 @@ export function AdminDashboard() {
           </div>
         </AdminSection>
 
-        <AdminSection
-          title="Generation pipeline"
-          description="Latest persisted custom-lesson generation jobs."
-        >
+        <AdminSection title="Generation pipeline" description="Latest persisted custom-lesson generation jobs.">
           <div className="space-y-3">
             {(live?.recentJobs ?? []).slice(0, 6).map((job) => (
               <Link
                 key={job.id}
-                href={
-                  job.lesson_id
-                    ? `/admin/generated/${job.lesson_id}`
-                    : "/admin/generated"
-                }
+                href={job.lesson_id ? `/admin/generated/${job.lesson_id}` : "/admin/generated"}
                 className="flex items-center gap-3 rounded-xl border border-slate-100 p-4 hover:bg-slate-50"
               >
                 <span className="grid size-10 place-items-center rounded-xl bg-violet-50 text-violet-700">
@@ -387,15 +306,11 @@ export function AdminDashboard() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-bold">
-                    {job.lesson_id
-                      ? `Lesson ${job.lesson_id.slice(0, 8)}`
-                      : "Generation job"}
+                    {job.lesson_id ? `Lesson ${job.lesson_id.slice(0, 8)}` : "Generation job"}
                   </p>
                   <p className="text-xs text-slate-500">
                     {new Date(job.created_at).toLocaleString()} ·{" "}
-                    {job.generation_seconds
-                      ? `${job.generation_seconds.toFixed(1)}s`
-                      : "in progress"}
+                    {job.generation_seconds ? `${job.generation_seconds.toFixed(1)}s` : "in progress"}
                   </p>
                 </div>
                 <AdminStatus>{job.status}</AdminStatus>
@@ -417,19 +332,20 @@ export function AdminDashboard() {
         >
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {(live?.services ?? []).map((service) => {
-              const healthy = [
-                "ok",
-                "healthy",
-                "operational",
-                "available",
-              ].includes(service.status.toLowerCase());
+              const healthy = ["ok", "healthy", "operational", "available"].includes(
+                service.status.toLowerCase(),
+              );
               return (
                 <div
                   key={service.id}
                   className="flex items-start gap-3 rounded-xl border border-slate-100 p-4"
                 >
                   <span
-                    className={`grid size-9 shrink-0 place-items-center rounded-xl ${healthy ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}
+                    className={`grid size-9 shrink-0 place-items-center rounded-xl ${
+                      healthy
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-amber-50 text-amber-700"
+                    }`}
                   >
                     <ServerCog className="size-4" />
                   </span>
