@@ -45,6 +45,7 @@ export interface AdminStoreState {
   settings: AdminSettings;
   indexRebuiltAt?: string;
   setHasHydrated: (value: boolean) => void;
+  login: (email: string, password: string) => boolean;
   establishBackendSession: (email: string, displayName: string, role: string) => void;
   logout: () => void;
   saveLesson: (lesson: LessonPackage, action?: string) => void;
