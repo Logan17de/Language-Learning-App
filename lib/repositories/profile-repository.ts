@@ -139,20 +139,4 @@ export const profileRepository = {
       ? failure(preferences.error, "Your onboarding status could not be saved.")
       : success(null);
   },
-
-  async markLegacyImported(): Promise<RepositoryResult<string>> {
-    const client = createClient();
-    if (!client) return notConfigured();
-    const { data: auth } = await client.auth.getUser();
-    if (!auth.user)
-      return failure({ code: "AUTH" }, "Your session has expired.");
-    const importedAt = new Date().toISOString();
-    const { error } = await client
-      .from("profiles")
-      .update({ legacy_imported_at: importedAt })
-      .eq("id", auth.user.id);
-    return error
-      ? failure(error, "The import marker could not be saved.")
-      : success(importedAt);
-  },
 };
