@@ -19,20 +19,6 @@ export interface RecentLesson {
   durationMinutes?: number;
 }
 
-export interface ReviewQueueItem {
-  id: string;
-  type: "kanji" | "vocabulary" | "grammar" | "listening" | "speaking";
-  term: string;
-  dueLabel: string;
-  confidence: number;
-  reading?: string;
-  meaning?: string;
-  pronunciation?: number;
-  lastReviewed?: string;
-  reason?: string;
-  overdue?: boolean;
-}
-
 export interface Achievement {
   id: string;
   title: string;
@@ -59,11 +45,9 @@ export interface LearnerProgress {
   pronunciation: number;
   grammarUnderstanding: number;
   grammarProduction: number;
-  reviewQueue: ReviewQueueItem[];
   longestStreak: number;
   totalStudyMinutes: number;
   listeningConfidence: number;
   speakingConfidence: number;
-  reviewScores: number[];
   achievements: Achievement[];
 }
