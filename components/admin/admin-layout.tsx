@@ -22,9 +22,9 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   );
   const setHasHydrated = useAdminStore((state) => state.setHasHydrated);
   const [drawer, setDrawer] = useState(false);
-  const demoMode = getBackendMode() === "demo";
-  const [identityChecked, setIdentityChecked] = useState(demoMode);
+  const [identityChecked, setIdentityChecked] = useState(false);
   const loginRoute = pathname === "/admin/login";
+  const backendReady = getBackendMode() === "supabase";
 
   useEffect(() => {
     if (hydrated) return;
@@ -44,8 +44,11 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   }, [hydrated, setHasHydrated]);
 
   useEffect(() => {
-    if (!hydrated || loginRoute) return;
-    if (authenticated || demoMode) return;
+    if (!hydrated || loginRoute || authenticated) return;
+    if (!backendReady) {
+      setIdentityChecked(true);
+      return;
+    }
 
     let active = true;
     let timeout: ReturnType<typeof setTimeout> | undefined;
@@ -74,28 +77,39 @@ export function AdminLayout({ children }: { children: ReactNode }) {
       active = false;
       if (timeout) clearTimeout(timeout);
     };
-  }, [authenticated, demoMode, establishBackendSession, hydrated, loginRoute]);
+  }, [authenticated, backendReady, establishBackendSession, hydrated, loginRoute]);
 
   useEffect(() => {
     if (hydrated && identityChecked && !authenticated && !loginRoute) {
+      const reason = backendReady ? "" : "&error=backend-not-configured";
       router.replace(
-        `/admin/login?next=${encodeURIComponent(pathname ?? "/admin")}`,
+        `/admin/login?next=${encodeURIComponent(pathname ?? "/admin")}${reason}`,
       );
     }
-  }, [authenticated, hydrated, identityChecked, loginRoute, pathname, router]);
+  }, [authenticated, backendReady, hydrated, identityChecked, loginRoute, pathname, router]);
 
   if (loginRoute) return <>{children}</>;
   if (!hydrated || (!authenticated && !identityChecked)) {
-    return <AdminLoading message={hydrated ? "Verifying admin access…" : "Loading admin workspace…"} />;
+    return (
+      <AdminLoading
+        message={
+          hydrated ? "Verifying admin access…" : "Loading admin workspace…"
+        }
+      />
+    );
   }
-  if (!authenticated) return <AdminLoading message="Redirecting to admin login…" />;
+  if (!authenticated) {
+    return <AdminLoading message="Redirecting to admin login…" />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800">
       <AdminSidebar open={drawer} onClose={() => setDrawer(false)} />
       <div className="lg:pl-72">
         <AdminHeader onMenu={() => setDrawer(true)} />
-        <main className="mx-auto max-w-[1600px] px-4 py-7 sm:px-6 lg:px-8">{children}</main>
+        <main className="mx-auto max-w-[1600px] px-4 py-7 sm:px-6 lg:px-8">
+          {children}
+        </main>
       </div>
     </div>
   );
