@@ -76,7 +76,7 @@ describe("custom lesson engine contract", () => {
     expect(route).toContain('status: "queued"');
     expect(route).toContain("{ status: 202 }");
     expect(route).toContain("after(async () =>");
-    expect(route).toContain("processCustomLessonJobs");
+    expect(route).toContain("processCustomLessonFastPath");
     expect(completionRoute).not.toContain("generatePlayableLesson");
     expect(completionRoute).toContain("the scheduler will resume it");
     expect(statusRoute).toContain('.eq("user_id", auth.userId)');
