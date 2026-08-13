@@ -10,6 +10,7 @@ const existingLibrary = readFileSync("lib/gemini/story-library-existing-only.ts"
 const placeholderEnrichment = readFileSync("lib/custom-lessons/placeholder-enrichment.ts", "utf8");
 const plan = readFileSync("lib/gemini/lesson-plan-v3.ts", "utf8");
 const runner = readFileSync("lib/custom-lessons/job-runner.ts", "utf8");
+const checkpoints = readFileSync("lib/custom-lessons/checkpoint-validation.ts", "utf8");
 const activityGroups = readFileSync("lib/gemini/lesson-activity-groups.ts", "utf8");
 const vocabularyContract = readFileSync("lib/gemini/vocabulary-question-contract.ts", "utf8");
 const grammarContract = readFileSync("lib/gemini/grammar-question-contract.ts", "utf8");
@@ -127,9 +128,9 @@ describe("custom lesson story pipeline v3", () => {
     expect(activityGroups).not.toContain("does not practice one of the selected grammar patterns");
   });
 
-  it("generates reading passage and seven MCQs without dictionary indexing", () => {
+  it("generates reading passage and five MCQs without dictionary indexing", () => {
     expect(readingContract).toContain("Create reading-comprehension multiple-choice questions");
-    expect(readingContract).toContain("Create exactly 7 questions: 3 easy, 2 medium, and 2 hard.");
+    expect(readingContract).toContain("Create exactly 5 questions: 2 easy, 2 medium, and 1 hard.");
     expect(readingContract).toContain("exactly four distinct choices");
     expect(readingGeneration).toContain('name: "reading_lesson"');
     expect(readingGeneration).toContain('name: "reading_questions"');
@@ -139,9 +140,9 @@ describe("custom lesson story pipeline v3", () => {
     expect(reading).toContain("question?.choices");
   });
 
-  it("creates seven listening exercises without a vocabulary enrichment pass", () => {
-    expect(listeningContract).toContain("Create exactly 7 listening-comprehension questions");
-    expect(listeningContract).toContain("3 easy, 2 medium, and 2 hard");
+  it("creates five listening exercises without a vocabulary enrichment pass", () => {
+    expect(listeningContract).toContain("Create exactly 5 listening-comprehension questions");
+    expect(listeningContract).toContain("2 easy, 2 medium, and 1 hard");
     expect(listeningGeneration).toContain('name: "listening_questions"');
     expect(listeningGeneration).toContain("strictSchema: true");
     expect(listeningGeneration).not.toContain("lookupJapaneseDictionaryVocabulary");
@@ -150,9 +151,9 @@ describe("custom lesson story pipeline v3", () => {
     expect(listeningGeneration).toContain("inspectableTerms: []");
   });
 
-  it("creates seven story-grounded read-aloud exercises without dictionary indexing", () => {
-    expect(speakingContract).toContain("Create exactly 7 Japanese sentences for read-aloud speaking practice");
-    expect(speakingContract).toContain("3 easy, 2 medium, and 2 hard");
+  it("creates five story-grounded read-aloud exercises without dictionary indexing", () => {
+    expect(speakingContract).toContain("Create exactly 5 Japanese sentences for read-aloud speaking practice");
+    expect(speakingContract).toContain("2 easy, 2 medium, and 1 hard");
     expect(speakingGeneration).toContain('name: "speaking_read_aloud"');
     expect(speakingGeneration).toContain("strictSchema: true");
     expect(speakingGeneration).not.toContain("lookupJapaneseDictionaryVocabulary");
@@ -170,7 +171,11 @@ describe("custom lesson story pipeline v3", () => {
     expect(activityGroups).toContain("shuffledChoices(");
   });
 
-  it("keeps durable checkpoints and regenerates only invalid groups", () => {
+  it("keeps durable checkpoints, drops final review, and regenerates only invalid groups", () => {
+    expect(checkpoints).toContain('"vocabulary_and_kanji"');
+    expect(checkpoints).toContain('"grammar_and_reading"');
+    expect(checkpoints).toContain('"listening_and_speaking"');
+    expect(checkpoints).not.toContain('| "final_review"');
     expect(runner).toContain("normalizeGeneratedCheckpoint(generated.value)");
     expect(runner).toContain("await persistGroup(admin, current, group, normalized, generated.audit)");
     expect(runner).toContain("invalidate_progressive_lesson_group");
@@ -186,7 +191,7 @@ describe("custom lesson story pipeline v3", () => {
     expect(exposureMigration).toContain("knownThreshold', 10");
   });
 
-  it("keeps canonical lesson phase order and existing player behavior", () => {
+  it("uses the six-phase learner order with no final review", () => {
     expect(CANONICAL_LESSON_PHASES.map((phase) => phase.id)).toEqual([
       "story",
       "vocabulary",
@@ -194,7 +199,6 @@ describe("custom lesson story pipeline v3", () => {
       "reading",
       "listening",
       "speaking",
-      "review",
     ]);
     expect(progressiveStory).toContain("japanesePassage");
     expect(progressiveStory).toContain("englishPassage");
