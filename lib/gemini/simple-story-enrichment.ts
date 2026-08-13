@@ -6,10 +6,8 @@ import {
   matchCuratedStoryVocabulary,
   type CuratedVocabularyMatch,
 } from "@/lib/curated-vocabulary-catalog";
-import type {
-  GenerationAuditEntry,
-  StoryDraft,
-} from "@/lib/gemini/lesson-engine-v2";
+import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
+import type { StoryOnlyDraft } from "@/lib/gemini/story-pipeline-v3";
 import type { JLPTLevel } from "@/types/lesson";
 
 export const CURATED_VOCABULARY_SOURCE_MODEL = "jlpt-curated-csv";
@@ -29,7 +27,7 @@ export interface RawStoryVocabulary {
   sourceFile: string;
 }
 
-function storyJapanese(draft: StoryDraft): string {
+function storyJapanese(draft: StoryOnlyDraft): string {
   return draft.lines.map((line) => line.japanese).join("\n").normalize("NFKC");
 }
 
@@ -54,14 +52,14 @@ function asStoryVocabulary(match: CuratedVocabularyMatch): RawStoryVocabulary {
  * catalogs committed under Vocabs/. No external dictionary or local JMdict
  * cache participates in lesson generation.
  */
-export function lookupCuratedStoryVocabulary(draft: StoryDraft): RawStoryVocabulary[] {
+export function lookupCuratedStoryVocabulary(draft: StoryOnlyDraft): RawStoryVocabulary[] {
   return matchCuratedStoryVocabulary(storyJapanese(draft)).map(asStoryVocabulary);
 }
 
 export async function enrichGeneratedStoryVocabulary(input: {
   requestId: string;
   level: JLPTLevel;
-  draft: StoryDraft;
+  draft: StoryOnlyDraft;
   admin?: SupabaseClient;
 }): Promise<{ vocabulary: RawStoryVocabulary[]; audit: GenerationAuditEntry }> {
   const vocabulary = lookupCuratedStoryVocabulary(input.draft);
