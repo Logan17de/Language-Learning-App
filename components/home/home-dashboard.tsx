@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  ArrowRight,
-  Clock3,
-  Flame,
-  Gem,
-  RotateCcw,
-  Target,
-} from "lucide-react";
+import { ArrowRight, Clock3, Flame, Gem, Target } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { mockLessons } from "@/data/mock-lessons";
@@ -85,13 +78,6 @@ export function HomeDashboard() {
         }, 0) / levelLessons.length,
       )
     : 0;
-
-  const weakItems = progress.reviewQueue.filter(
-    (item) => item.confidence < 70 || item.overdue,
-  );
-  const weakKanji = weakItems.filter((item) => item.type === "kanji").length;
-  const weakGrammar = weakItems.filter((item) => item.type === "grammar").length;
-  const weakOther = Math.max(0, weakItems.length - weakKanji - weakGrammar);
   const dailyPercent = user.dailyGoalMinutes
     ? Math.min(
         100,
@@ -111,7 +97,7 @@ export function HomeDashboard() {
             おはよう, {user.name}.
           </h1>
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted sm:text-base">
-            Continue your lesson, then spend a few minutes on whatever needs reinforcement.
+            Continue your lesson and keep building useful Japanese at your current level.
           </p>
         </div>
         <Link
@@ -145,7 +131,7 @@ export function HomeDashboard() {
             <p className="mt-3 max-w-xl text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
               {backendMode === "supabase" && !selectedLesson
                 ? backendLoading || !backendLoaded
-                  ? "AIko is selecting a level-matched lesson for you."
+                  ? "Selecting a level-matched lesson for you."
                   : backendError ||
                     "No published lesson is available for your current level yet."
                 : activeSession
@@ -169,7 +155,7 @@ export function HomeDashboard() {
               <div className="mt-7 flex flex-wrap gap-2 text-xs font-medium text-white/65">
                 <span className="rounded-full bg-white/[0.07] px-3 py-2">Story first</span>
                 <span className="rounded-full bg-white/[0.07] px-3 py-2">Speaking included</span>
-                <span className="rounded-full bg-white/[0.07] px-3 py-2">Adaptive review</span>
+                <span className="rounded-full bg-white/[0.07] px-3 py-2">Mastery tracked</span>
               </div>
             )}
 
@@ -222,9 +208,7 @@ export function HomeDashboard() {
               <span className="grid size-10 place-items-center rounded-2xl bg-persimmon-50 text-persimmon-500">
                 <Flame className="size-5" aria-hidden="true" />
               </span>
-              <p className="mt-5 text-2xl font-semibold tabular-nums">
-                {user.streakDays}
-              </p>
+              <p className="mt-5 text-2xl font-semibold tabular-nums">{user.streakDays}</p>
               <p className="mt-1 text-xs font-medium text-muted">day streak</p>
             </Card>
             <Card className="p-5">
@@ -240,30 +224,7 @@ export function HomeDashboard() {
         </div>
       </section>
 
-      <section className="mt-5 grid gap-5 lg:grid-cols-2">
-        <Card className="p-6 sm:p-7">
-          <div className="flex items-start justify-between gap-4">
-            <span className="grid size-11 place-items-center rounded-2xl bg-moss-100 text-moss-700">
-              <RotateCcw className="size-5" aria-hidden="true" />
-            </span>
-            <Badge tone={weakItems.length ? "orange" : "moss"}>
-              {weakItems.length} weak
-            </Badge>
-          </div>
-          <h2 className="mt-6 text-xl font-semibold">Review what needs work</h2>
-          <p className="mt-2 text-sm leading-6 text-muted">
-            Only language that needs another pass appears here.
-          </p>
-          <div className="mt-5 grid grid-cols-3 gap-2 text-center">
-            <MiniStat value={weakKanji} label="kanji" />
-            <MiniStat value={weakGrammar} label="grammar" />
-            <MiniStat value={weakOther} label="other" />
-          </div>
-          <ButtonLink href="/review" variant="secondary" className="mt-5 w-full">
-            Open review
-          </ButtonLink>
-        </Card>
-
+      <section className="mt-5">
         <Card className="p-6 sm:p-7">
           <div className="flex items-start justify-between gap-4">
             <span className="grid size-11 place-items-center rounded-2xl bg-persimmon-50 text-persimmon-500">
@@ -283,7 +244,7 @@ export function HomeDashboard() {
             <MiniStat value={learnedKanji} label="kanji" />
             <MiniStat value={learnedGrammar} label="grammar" />
           </div>
-          <ButtonLink href="/progress" variant="secondary" className="mt-5 w-full">
+          <ButtonLink href="/progress" variant="secondary" className="mt-5 w-full sm:w-auto">
             View progress
           </ButtonLink>
         </Card>
