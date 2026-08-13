@@ -5,7 +5,14 @@ export type LearningGoal =
   | "Daily life in Japan"
   | "Travel";
 
-export type LearnerLevel = "Beginner" | "N5" | "N4" | "N3" | "N2" | "Not sure";
+export type LearnerLevel =
+  | "Beginner"
+  | "N5"
+  | "N4"
+  | "N3"
+  | "N2"
+  | "N1"
+  | "Not sure";
 export type DailyMinutes = 15 | 30 | 45 | 60;
 
 export interface OnboardingPreferences {
