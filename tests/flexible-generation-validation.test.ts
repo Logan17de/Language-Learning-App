@@ -4,18 +4,15 @@ import { listeningQuestionIssues } from "../lib/gemini/listening-question-contra
 import { speakingReadAloudIssues } from "../lib/gemini/speaking-question-contract";
 
 const activities = readFileSync("lib/gemini/lesson-activity-groups.ts", "utf8");
+const checkpoints = readFileSync("lib/custom-lessons/checkpoint-validation.ts", "utf8");
 const storyEnrichment = readFileSync("lib/gemini/simple-story-enrichment.ts", "utf8");
 const reading = readFileSync("lib/gemini/reading-region-generation.ts", "utf8");
 const listening = readFileSync("lib/gemini/listening-region-generation.ts", "utf8");
 const speaking = readFileSync("lib/gemini/speaking-region-generation.ts", "utf8");
 const vocabularyContract = readFileSync("lib/gemini/vocabulary-question-contract.ts", "utf8");
 const grammarContract = readFileSync("lib/gemini/grammar-question-contract.ts", "utf8");
-const flexiblePackageMigration = readFileSync(
-  "supabase/migrations/20260805090000_flexible_generated_lesson_validation.sql",
-  "utf8",
-);
-const canonicalMigration = readFileSync(
-  "supabase/migrations/20260808120000_canonical_lesson_contract.sql",
+const currentPackageMigration = readFileSync(
+  "supabase/migrations/20260813070000_reading_mcq_choices.sql",
   "utf8",
 );
 const vocabularyMigration = readFileSync(
@@ -29,10 +26,8 @@ describe("generated lesson validation", () => {
       questions: [
         { difficulty: "easy" },
         { difficulty: "easy" },
-        { difficulty: "easy" },
         { difficulty: "medium" },
         { difficulty: "medium" },
-        { difficulty: "hard" },
         { difficulty: "hard" },
       ],
     })).toEqual([]);
@@ -40,10 +35,8 @@ describe("generated lesson validation", () => {
       sentences: [
         { difficulty: "easy" },
         { difficulty: "easy" },
-        { difficulty: "easy" },
         { difficulty: "medium" },
         { difficulty: "medium" },
-        { difficulty: "hard" },
         { difficulty: "hard" },
       ],
     })).toEqual([]);
@@ -51,12 +44,12 @@ describe("generated lesson validation", () => {
     expect(storyEnrichment).toContain("lookupJapaneseDictionaryVocabulary");
     expect(storyEnrichment).not.toContain("generateStructured");
 
-    expect(reading).toContain("Reading response must contain exactly 7 questions.");
+    expect(reading).toContain("Reading response must contain exactly 5 questions.");
     expect(activities).toContain("Vocabulary response must contain exactly 7 questions.");
     expect(activities).toContain("Grammar response must contain exactly 7 questions.");
     expect(activities).not.toContain("does not practice one of the selected grammar patterns");
     expect(activities).not.toContain("does not practice target kanji");
-    expect(activities).toContain("Review response must contain exactly 5 questions.");
+    expect(checkpoints).not.toContain('| "final_review"');
     expect(activities).toContain("strictSchema: true");
     expect(activities).toContain("exactSchemaName: true");
     expect(activities).toContain(
@@ -83,16 +76,22 @@ describe("generated lesson validation", () => {
     expect(listeningQuestionIssues({ questions: [{}] })).not.toEqual([]);
     expect(speakingReadAloudIssues({ sentences: [{}] })).not.toEqual([]);
 
-    expect(flexiblePackageMigration).toContain("Accepts variable generated lesson counts");
-    expect(canonicalMigration).toContain(
-      "jsonb_array_length(p_package->'vocabularyQuestions') <> 13",
+    expect(currentPackageMigration).toContain(
+      "vocabularyQuestions must contain exactly 7 items",
     );
-    expect(canonicalMigration).toContain(
-      "jsonb_array_length(p_package->'grammarQuestions') <> 10",
+    expect(currentPackageMigration).toContain(
+      "grammarQuestions must contain exactly 7 items",
     );
-    expect(canonicalMigration).toContain(
-      "jsonb_array_length(p_package->'readingQuestions') <> 5",
+    expect(currentPackageMigration).toContain(
+      "readingQuestions must contain exactly 5 items",
     );
+    expect(currentPackageMigration).toContain(
+      "listeningExercises must contain exactly 5 items",
+    );
+    expect(currentPackageMigration).toContain(
+      "speakingExercises must contain exactly 5 items",
+    );
+    expect(currentPackageMigration).toContain("reviewQuestions must be empty");
   });
 
   it("reuses an existing raw word and inserts only when it is absent", () => {
