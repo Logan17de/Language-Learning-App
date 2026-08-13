@@ -1,0 +1,602 @@
+﻿id,word,reading,english_meaning,study_level,kanji_components,component_levels
+N3_V001,合格,ごうかく,passing; qualification; success,N3,合 格,N3 N3
+N3_V002,部分,ぶぶん,part; section,N3,部 分,N3 N5
+N3_V003,彼女,かのじょ,she; girlfriend,N3,彼 女,N3 N5
+N3_V004,内容,ないよう,content; details,N3,内 容,N3 N3
+N3_V005,現実,げんじつ,reality,N3,現 実,N3 N3
+N3_V006,当日,とうじつ,the day; that day,N3,当 日,N3 N5
+N3_V007,戦争,せんそう,war,N3,戦 争,N3 N3
+N3_V008,性格,せいかく,personality; character,N3,性 格,N3 N3
+N3_V009,反対,はんたい,opposition; opposite,N3,反 対,N3 N3
+N3_V010,関係,かんけい,relationship; connection,N3,関 係,N3 N3
+N3_V011,感情,かんじょう,emotion; feeling,N3,感 情,N3 N3
+N3_V012,決定,けってい,decision; determination,N3,決 定,N3 N3
+N3_V013,政治,せいじ,politics; government,N3,政 治,N3 N3
+N3_V014,取引,とりひき,transaction; dealings,N3,取 引,N3 N3
+N3_V015,所得,しょとく,income; earnings,N3,所 得,N3 N3
+N3_V016,現在,げんざい,present; current time,N3,現 在,N3 N3
+N3_V017,変化,へんか,change; transformation,N3,変 化,N3 N3
+N3_V018,国民,こくみん,citizen; people of a country,N3,国 民,N5 N3
+N3_V019,相手,あいて,partner; opponent; other party,N3,相 手,N3 N4
+N3_V020,法学,ほうがく,law; legal studies,N3,法 学,N3 N5
+N3_V021,全国,ぜんこく,the whole country; nationwide,N3,全 国,N3 N5
+N3_V022,情報,じょうほう,information,N3,情 報,N3 N3
+N3_V023,向上,こうじょう,improvement; advancement,N3,向 上,N3 N5
+N3_V024,平和,へいわ,peace,N3,平 和,N3 N3
+N3_V025,成長,せいちょう,growth; development,N3,成 長,N3 N5
+N3_V026,経済,けいざい,economy; economics,N3,経 済,N3 N3
+N3_V027,信用,しんよう,trust; credit,N3,信 用,N3 N4
+N3_V028,面積,めんせき,area; surface area,N3,面 積,N3 N3
+N3_V029,連続,れんぞく,continuation; consecutive,N3,連 続,N3 N3
+N3_V030,原因,げんいん,cause; origin,N3,原 因,N3 N3
+N3_V031,笑顔,えがお,smiling face; smile,N3,笑 顔,N3 N3
+N3_V032,機会,きかい,opportunity; chance,N3,機 会,N3 N4
+N3_V033,次回,じかい,next time,N3,次 回,N3 N3
+N3_V034,数学,すうがく,mathematics,N3,数 学,N3 N5
+N3_V035,美術,びじゅつ,art; fine arts,N3,美 術,N3 N3
+N3_V036,回数,かいすう,number of times; frequency,N3,回 数,N3 N3
+N3_V037,表面,ひょうめん,surface; exterior,N3,表 面,N3 N3
+N3_V038,声優,せいゆう,voice actor,N3,声 優,N3 N3
+N3_V039,報告,ほうこく,report; notification,N3,報 告,N3 N3
+N3_V040,必要,ひつよう,necessary; need,N3,必 要,N3 N3
+N3_V041,大変,たいへん,serious; difficult; very,N3,大 変,N5 N3
+N3_V042,神様,かみさま,god; deity,N3,神 様,N3 N3
+N3_V043,記事,きじ,article; news story,N3,記 事,N3 N4
+N3_V044,和食,わしょく,Japanese food,N3,和 食,N3 N5
+N3_V045,引力,いんりょく,gravity; attraction,N3,引 力,N3 N4
+N3_V046,治安,ちあん,public safety; security,N3,治 安,N3 N4
+N3_V047,決心,けっしん,determination; resolve,N3,決 心,N3 N4
+N3_V048,太陽,たいよう,sun,N3,太 陽,N3 N3
+N3_V049,申込,もうしこみ,application; registration,N3,申 込,N3 N3
+N3_V050,受付,うけつけ,reception; acceptance desk,N3,受 付,N3 N3
+N3_V051,解説,かいせつ,explanation; commentary,N3,解 説,N3 N3
+N3_V052,市民,しみん,citizen; city resident,N3,市 民,N3 N3
+N3_V053,期間,きかん,period; term,N3,期 間,N3 N5
+N3_V054,様子,ようす,state; appearance; situation,N3,様 子,N3 N5
+N3_V055,生活,せいかつ,life; living,N3,生 活,N5 N3
+N3_V056,頭痛,ずつう,headache,N3,頭 痛,N3 N3
+N3_V057,番組,ばんぐみ,program; show,N3,番 組,N3 N3
+N3_V058,指定,してい,designation; specification,N3,指 定,N3 N3
+N3_V059,小説,しょうせつ,novel; fiction,N3,小 説,N5 N3
+N3_V060,能力,のうりょく,ability; capacity,N3,能 力,N3 N4
+N3_V061,流行,りゅうこう,trend; fashion; prevalence,N3,流 行,N3 N5
+N3_V062,自然,しぜん,nature; natural,N3,自 然,N4 N3
+N3_V063,最初,さいしょ,first; beginning,N3,最 初,N3 N3
+N3_V064,在学,ざいがく,being enrolled in school,N3,在 学,N3 N5
+N3_V065,体調,たいちょう,physical condition,N3,体 調,N4 N3
+N3_V066,笑い声,わらいごえ,laughter; laughing voice,N3,笑 声,N3 N3
+N3_V067,議論,ぎろん,discussion; argument,N3,議 論,N3 N3
+N3_V068,直後,ちょくご,immediately after,N3,直 後,N3 N5
+N3_V069,夫婦,ふうふ,married couple; husband and wife,N3,夫 婦,N3 N3
+N3_V070,選手,せんしゅ,player; athlete,N3,選 手,N3 N4
+N3_V071,人権,じんけん,human rights,N3,人 権,N5 N3
+N3_V072,勝利,しょうり,victory,N3,勝 利,N3 N3
+N3_V073,制度,せいど,system; institution,N3,制 度,N3 N4
+N3_V074,続行,ぞっこう,continuation; carrying on,N3,続 行,N3 N5
+N3_V075,大理石,だいりせき,marble,N3,大 理 石,N5 N4 N3
+N3_V076,進学,しんがく,advancing to higher education,N3,進 学,N3 N5
+N3_V077,伝言,でんごん,message; verbal message,N3,伝 言,N3 N4
+N3_V078,参加,さんか,participation,N3,参 加,N3 N3
+N3_V079,助手,じょしゅ,assistant,N3,助 手,N3 N4
+N3_V080,点数,てんすう,score; points,N3,点 数,N3 N3
+N3_V081,生産,せいさん,production,N3,生 産,N5 N3
+N3_V082,事務,じむ,office work; clerical work,N3,事 務,N4 N3
+N3_V083,事件,じけん,incident; case,N3,事 件,N4 N3
+N3_V084,生命,せいめい,life; living being,N3,生 命,N5 N3
+N3_V085,落書き,らくがき,graffiti; scribble,N3,落 書,N3 N5
+N3_V086,付近,ふきん,vicinity; nearby area,N3,付 近,N3 N4
+N3_V087,得意,とくい,strong point; good at,N3,得 意,N3 N4
+N3_V088,好意,こうい,goodwill; favor,N3,好 意,N3 N4
+N3_V089,違反,いはん,violation; infringement,N3,違 反,N3 N3
+N3_V090,殺人,さつじん,murder; homicide,N3,殺 人,N3 N5
+N3_V091,位置,いち,position; location,N3,位 置,N3 N3
+N3_V092,返事,へんじ,reply; response,N3,返 事,N3 N4
+N3_V093,理論,りろん,theory,N3,理 論,N4 N3
+N3_V094,国際,こくさい,international,N3,国 際,N5 N3
+N3_V095,何歳,なんさい,how old; what age,N3,何 歳,N5 N3
+N3_V096,反論,はんろん,counterargument; objection,N3,反 論,N3 N3
+N3_V097,人形,にんぎょう,doll; figure,N3,人 形,N5 N3
+N3_V098,観光,かんこう,sightseeing; tourism,N3,観 光,N3 N3
+N3_V099,首都,しゅと,capital city,N3,首 都,N3 N3
+N3_V100,勝負,しょうぶ,match; contest; outcome,N3,勝 負,N3 N3
+N3_V101,係員,かかりいん,attendant; staff member,N3,係 員,N3 N4
+N3_V102,愛情,あいじょう,love; affection,N3,愛 情,N3 N3
+N3_V103,都会,とかい,city; urban area,N3,都 会,N3 N4
+N3_V104,確認,かくにん,confirmation; checking,N3,確 認,N3 N3
+N3_V105,過失,かしつ,error; negligence,N3,過 失,N3 N3
+N3_V106,約束,やくそく,promise; appointment,N3,約 束,N3 N3
+N3_V107,馬車,ばしゃ,horse-drawn carriage,N3,馬 車,N3 N5
+N3_V108,招待状,しょうたいじょう,invitation card; invitation letter,N3,招 待 状,N3 N4 N3
+N3_V109,感想,かんそう,impression; thoughts,N3,感 想,N3 N3
+N3_V110,官民,かんみん,government and private sector,N3,官 民,N3 N3
+N3_V111,交流,こうりゅう,exchange; interaction,N3,交 流,N3 N3
+N3_V112,米国,べいこく,United States,N3,米 国,N3 N5
+N3_V113,配達,はいたつ,delivery,N3,配 達,N3 N3
+N3_V114,若者,わかもの,young person; youth,N3,若 者,N3 N4
+N3_V115,資料,しりょう,materials; data; documents,N3,資 料,N3 N4
+N3_V116,日常,にちじょう,daily life; everyday,N3,日 常,N5 N3
+N3_V117,呼吸,こきゅう,breathing; respiration,N3,呼 吸,N3 N3
+N3_V118,共同,きょうどう,cooperation; joint,N3,共 同,N3 N4
+N3_V119,残業,ざんぎょう,overtime work,N3,残 業,N3 N4
+N3_V120,判断,はんだん,judgment; decision,N3,判 断,N3 N3
+N3_V121,役所,やくしょ,government office,N3,役 所,N3 N3
+N3_V122,他人,たにん,other person; stranger,N3,他 人,N3 N5
+N3_V123,手術,しゅじゅつ,surgery; operation,N3,手 術,N4 N3
+N3_V124,支持,しじ,support; backing,N3,支 持,N3 N4
+N3_V125,両方,りょうほう,both; both sides,N3,両 方,N3 N4
+N3_V126,乗車,じょうしゃ,boarding; riding a vehicle,N3,乗 車,N3 N5
+N3_V127,返済,へんさい,repayment,N3,返 済,N3 N3
+N3_V128,供給,きょうきゅう,supply; provision,N3,供 給,N3 N3
+N3_V129,格好,かっこう,appearance; shape; form,N3,格 好,N3 N3
+N3_V130,打合せ,うちあわせ,meeting; arrangement,N3,打 合,N3 N3
+N3_V131,御礼,おれい,thanks; gratitude,N3,御 礼,N3 N3
+N3_V132,断定,だんてい,definite conclusion; assertion,N3,断 定,N3 N3
+N3_V133,方式,ほうしき,method; system; formula,N3,方 式,N4 N3
+N3_V134,医師,いし,physician; doctor,N3,医 師,N4 N3
+N3_V135,告白,こくはく,confession; declaration,N3,告 白,N3 N5
+N3_V136,深刻,しんこく,serious; grave,N3,深 刻,N3 N3
+N3_V137,存在,そんざい,existence; being,N3,存 在,N3 N3
+N3_V138,争点,そうてん,point at issue,N3,争 点,N3 N3
+N3_V139,感覚,かんかく,sense; sensation,N3,感 覚,N3 N3
+N3_V140,外側,そとがわ,outside; outer side,N3,外 側,N5 N3
+N3_V141,飛行,ひこう,flight; aviation,N3,飛 行,N3 N5
+N3_V142,参観,さんかん,visit for observation; school visitation,N3,参 観,N3 N3
+N3_V143,突然,とつぜん,suddenly; abrupt,N3,突 然,N3 N3
+N3_V144,形容,けいよう,description; representation,N3,形 容,N3 N3
+N3_V145,育成,いくせい,training; development; fostering,N3,育 成,N3 N3
+N3_V146,構成,こうせい,composition; structure,N3,構 成,N3 N3
+N3_V147,認定,にんてい,certification; recognition,N3,認 定,N3 N3
+N3_V148,単位,たんい,unit; credit,N3,単 位,N3 N3
+N3_V149,達人,たつじん,master; expert,N3,達 人,N3 N5
+N3_V150,留守,るす,absence; being away from home,N3,留 守,N3 N3
+N3_V151,不満,ふまん,dissatisfaction,N3,不 満,N4 N3
+N3_V152,消費,しょうひ,consumption; spending,N3,消 費,N3 N3
+N3_V153,責任,せきにん,responsibility,N3,責 任,N3 N3
+N3_V154,居住,きょじゅう,residence; living,N3,居 住,N3 N4
+N3_V155,予定,よてい,plan; schedule,N3,予 定,N3 N3
+N3_V156,路地,ろじ,alley; lane,N3,路 地,N3 N4
+N3_V157,座席,ざせき,seat,N3,座 席,N3 N3
+N3_V158,観客,かんきゃく,audience; spectator,N3,観 客,N3 N3
+N3_V159,船長,せんちょう,ship captain,N3,船 長,N3 N5
+N3_V160,追加,ついか,addition; supplement,N3,追 加,N3 N3
+N3_V161,背中,せなか,back (of the body),N3,背 中,N3 N5
+N3_V162,観察,かんさつ,observation,N3,観 察,N3 N3
+N3_V163,誰彼,だれかれ,anyone and everyone; people in general,N3,誰 彼,N3 N3
+N3_V164,息子,むすこ,son,N3,息 子,N3 N5
+N3_V165,失敗,しっぱい,failure; mistake,N3,失 敗,N3 N3
+N3_V166,老人,ろうじん,elderly person,N3,老 人,N3 N5
+N3_V167,良好,りょうこう,good; favorable,N3,良 好,N3 N3
+N3_V168,表示,ひょうじ,display; indication,N3,表 示,N3 N3
+N3_V169,信号,しんごう,signal; traffic light,N3,信 号,N3 N3
+N3_V170,職員,しょくいん,staff member; employee,N3,職 員,N3 N4
+N3_V171,王様,おうさま,king,N3,王 様,N3 N3
+N3_V172,意識,いしき,consciousness; awareness,N3,意 識,N4 N3
+N3_V173,警察,けいさつ,police,N3,警 察,N3 N3
+N3_V174,優勝,ゆうしょう,championship; victory,N3,優 勝,N3 N3
+N3_V175,投資,とうし,investment,N3,投 資,N3 N3
+N3_V176,薬局,やっきょく,pharmacy,N3,薬 局,N3 N3
+N3_V177,困難,こんなん,difficulty; hardship,N3,困 難,N3 N3
+N3_V178,種類,しゅるい,kind; type; variety,N3,種 類,N3 N3
+N3_V179,記念,きねん,commemoration; memory,N3,記 念,N3 N3
+N3_V180,寄付,きふ,donation; contribution,N3,寄 付,N3 N3
+N3_V181,公害,こうがい,pollution; public nuisance,N3,公 害,N4 N3
+N3_V182,信頼,しんらい,trust; reliance,N3,信 頼,N3 N3
+N3_V183,横断,おうだん,crossing; traversing,N3,横 断,N3 N3
+N3_V184,増加,ぞうか,increase; growth,N3,増 加,N3 N3
+N3_V185,差別,さべつ,discrimination; distinction,N3,差 別,N3 N4
+N3_V186,苦労,くろう,hardship; trouble,N3,苦 労,N3 N3
+N3_V187,収入,しゅうにゅう,income; revenue,N3,収 入,N3 N5
+N3_V188,値段,ねだん,price,N3,値 段,N3 N3
+N3_V189,俺様,おれさま,I; me (arrogant/self-important expression),N3,俺 様,N3 N3
+N3_V190,渡米,とべい,going to the United States,N3,渡 米,N3 N3
+N3_V191,給与,きゅうよ,salary; pay,N3,給 与,N3 N3
+N3_V192,演説,えんぜつ,speech; address,N3,演 説,N3 N3
+N3_V193,備考,びこう,note; remarks,N3,備 考,N3 N4
+N3_V194,申告,しんこく,declaration; report,N3,申 告,N3 N3
+N3_V195,例外,れいがい,exception,N3,例 外,N3 N5
+N3_V196,労働,ろうどう,labor; work,N3,労 働,N3 N3
+N3_V197,景観,けいかん,scenery; landscape,N3,景 観,N3 N3
+N3_V198,抜け出す,ぬけだす,to escape; to slip out,N3,抜 出,N3 N5
+N3_V199,遠足,えんそく,excursion; school trip,N3,遠 足,N3 N4
+N3_V200,絶対,ぜったい,absolute; definitely,N3,絶 対,N3 N3
+N3_V201,負数,ふすう,negative number,N3,負 数,N3 N3
+N3_V202,幸福,こうふく,happiness; well-being,N3,幸 福,N3 N3
+N3_V203,地球,ちきゅう,Earth; globe,N3,地 球,N4 N3
+N3_V204,日本酒,にほんしゅ,Japanese sake,N3,日 本 酒,N5 N5 N3
+N3_V205,君主,くんしゅ,monarch; sovereign,N3,君 主,N3 N4
+N3_V206,察知,さっち,detection; sensing,N3,察 知,N3 N4
+N3_V207,要望,ようぼう,request; demand,N3,要 望,N3 N3
+N3_V208,婚約,こんやく,engagement; betrothal,N3,婚 約,N3 N3
+N3_V209,単語,たんご,word; vocabulary item,N3,単 語,N3 N5
+N3_V210,押入れ,おしいれ,Japanese-style closet,N3,押 入,N3 N5
+N3_V211,割合,わりあい,rate; ratio; proportion,N3,割 合,N3 N3
+N3_V212,制限,せいげん,restriction; limit,N3,制 限,N3 N3
+N3_V213,戻り道,もどりみち,way back; return route,N3,戻 道,N3 N4
+N3_V214,外科,げか,surgery; surgical department,N3,外 科,N5 N3
+N3_V215,要求,ようきゅう,demand; request,N3,要 求,N3 N3
+N3_V216,相談,そうだん,consultation; discussion,N3,相 談,N3 N3
+N3_V217,下降,かこう,descent; decline,N3,下 降,N5 N3
+N3_V218,夫妻,ふさい,husband and wife; married couple,N3,夫 妻,N3 N3
+N3_V219,岡山,おかやま,Okayama,N3,岡 山,N3 N5
+N3_V220,熱心,ねっしん,enthusiastic; earnest,N3,熱 心,N3 N4
+N3_V221,浮上,ふじょう,surfacing; emerging,N3,浮 上,N3 N5
+N3_V222,平等,びょうどう,equality; equal,N3,平 等,N3 N3
+N3_V223,年末,ねんまつ,year-end,N3,年 末,N5 N3
+N3_V224,幸運,こううん,good luck; fortune,N3,幸 運,N3 N4
+N3_V225,草花,くさばな,flowers and grasses,N3,草 花,N3 N4
+N3_V226,引越し,ひっこし,moving house,N3,引 越,N3 N3
+N3_V227,登場,とうじょう,appearance; entrance,N3,登 場,N3 N4
+N3_V228,分類,ぶんるい,classification,N3,分 類,N5 N3
+N3_V229,未定,みてい,undecided; not yet fixed,N3,未 定,N3 N3
+N3_V230,定規,じょうぎ,ruler; measuring rule,N3,定 規,N3 N3
+N3_V231,精神,せいしん,mind; spirit,N3,精 神,N3 N3
+N3_V232,抱負,ほうふ,aspiration; ambition,N3,抱 負,N3 N3
+N3_V233,疲労,ひろう,fatigue; exhaustion,N3,疲 労,N3 N3
+N3_V234,処理,しょり,processing; handling,N3,処 理,N3 N4
+N3_V235,費用,ひよう,cost; expense,N3,費 用,N3 N4
+N3_V236,非常,ひじょう,emergency; extraordinary,N3,非 常,N3 N3
+N3_V237,大喜び,おおよろこび,great joy; delight,N3,大 喜,N5 N3
+N3_V238,母娘,ははむすめ,mother and daughter,N3,母 娘,N5 N3
+N3_V239,探求,たんきゅう,pursuit; quest,N3,探 求,N3 N3
+N3_V240,犯人,はんにん,criminal; culprit,N3,犯 人,N3 N5
+N3_V241,薬品,やくひん,medicine; chemical product,N3,薬 品,N3 N4
+N3_V242,学園,がくえん,educational institution; academy,N3,学 園,N5 N3
+N3_V243,疑問,ぎもん,doubt; question,N3,疑 問,N3 N4
+N3_V244,情緒,じょうちょ,emotion; atmosphere,N3,情 緒,N3 N3
+N3_V245,静止,せいし,standing still; stop,N3,静 止,N3 N4
+N3_V246,具体,ぐたい,concrete; specific form,N3,具 体,N3 N4
+N3_V247,出席,しゅっせき,attendance,N3,出 席,N5 N3
+N3_V248,速度,そくど,speed; velocity,N3,速 度,N3 N4
+N3_V249,程度,ていど,degree; extent,N3,程 度,N3 N4
+N3_V250,転倒,てんとう,falling over; overturning,N3,転 倒,N4 N3
+N3_V251,寝室,しんしつ,bedroom,N3,寝 室,N3 N4
+N3_V252,自宅,じたく,one's home,N3,自 宅,N4 N3
+N3_V253,絵本,えほん,picture book,N3,絵 本,N3 N5
+N3_V254,破産,はさん,bankruptcy,N3,破 産,N3 N3
+N3_V255,中庭,なかにわ,courtyard,N3,中 庭,N5 N3
+N3_V256,婦人,ふじん,woman; lady,N3,婦 人,N3 N5
+N3_V257,余分,よぶん,extra; surplus,N3,余 分,N3 N5
+N3_V258,訪日,ほうにち,visit to Japan,N3,訪 日,N3 N5
+N3_V259,冷静,れいせい,calm; composed,N3,冷 静,N3 N3
+N3_V260,夕暮れ,ゆうぐれ,evening; dusk,N3,夕 暮,N4 N3
+N3_V261,空腹,くうふく,hunger; empty stomach,N3,空 腹,N4 N3
+N3_V262,危険,きけん,danger; dangerous,N3,危 険,N3 N3
+N3_V263,似顔絵,にがおえ,portrait; caricature,N3,似 顔 絵,N3 N3 N3
+N3_V264,険悪,けんあく,dangerous; hostile; tense,N3,険 悪,N3 N4
+N3_V265,財産,ざいさん,property; assets,N3,財 産,N3 N3
+N3_V266,遊園地,ゆうえんち,amusement park,N3,遊 園 地,N3 N3 N4
+N3_V267,雑音,ざつおん,noise; static,N3,雑 音,N3 N4
+N3_V268,恐怖,きょうふ,fear; terror,N3,恐 怖,N3 N3
+N3_V269,値上げ,ねあげ,price increase,N3,値 上,N3 N5
+N3_V270,暗記,あんき,memorization,N3,暗 記,N3 N3
+N3_V271,積雪,せきせつ,snow accumulation,N3,積 雪,N3 N3
+N3_V272,夢中,むちゅう,absorbed; engrossed,N3,夢 中,N3 N5
+N3_V273,苦痛,くつう,pain; suffering,N3,苦 痛,N3 N3
+N3_V274,富山,とやま,Toyama,N3,富 山,N3 N5
+N3_V275,時刻,じこく,time; hour,N3,時 刻,N5 N3
+N3_V276,悲鳴,ひめい,scream; shriek,N3,悲 鳴,N3 N3
+N3_V277,欲求,よっきゅう,desire; demand,N3,欲 求,N3 N3
+N3_V278,途中,とちゅう,on the way; midway,N3,途 中,N3 N5
+N3_V279,作曲,さっきょく,composition (music),N3,作 曲,N4 N3
+N3_V280,耳元,みみもと,near the ear,N3,耳 元,N3 N4
+N3_V281,完全,かんぜん,complete; perfect,N3,完 全,N3 N3
+N3_V282,願望,がんぼう,desire; wish,N3,願 望,N3 N3
+N3_V283,犯罪,はんざい,crime,N3,犯 罪,N3 N3
+N3_V284,陽気,ようき,cheerful; weather; season,N3,陽 気,N3 N5
+N3_V285,解散,かいさん,dissolution; breakup,N3,解 散,N3 N3
+N3_V286,見掛け,みかけ,appearance; outward look,N3,見 掛,N5 N3
+N3_V287,昨年,さくねん,last year,N3,昨 年,N3 N5
+N3_V288,怒鳴る,どなる,to shout; to yell,N3,怒 鳴,N3 N3
+N3_V289,礼金,れいきん,key money; gratuity,N3,礼 金,N3 N5
+N3_V290,行列,ぎょうれつ,line; queue; procession,N3,行 列,N5 N3
+N3_V291,支払,しはらい,payment,N3,支 払,N3 N3
+N3_V292,給料,きゅうりょう,salary; wages,N3,給 料,N3 N4
+N3_V293,敗戦,はいせん,defeat in war,N3,敗 戦,N3 N3
+N3_V294,捕手,ほしゅ,catcher (baseball),N3,捕 手,N3 N4
+N3_V295,忘年会,ぼうねんかい,year-end party,N3,忘 年 会,N3 N5 N4
+N3_V296,晴天,せいてん,clear weather,N3,晴 天,N3 N5
+N3_V297,要因,よういん,factor; cause,N3,要 因,N3 N3
+N3_V298,折半,せっぱん,splitting equally; half each,N3,折 半,N3 N5
+N3_V299,送迎,そうげい,pickup and drop-off; seeing off and meeting,N3,送 迎,N4 N3
+N3_V300,悲観,ひかん,pessimism,N3,悲 観,N3 N3
+N3_V301,港町,みなとまち,port town,N3,港 町,N3 N4
+N3_V302,責務,せきむ,duty; obligation,N3,責 務,N3 N3
+N3_V303,除外,じょがい,exclusion,N3,除 外,N3 N5
+N3_V304,貧困,ひんこん,poverty,N3,貧 困,N3 N3
+N3_V305,閉店,へいてん,shop closing; closing a store,N3,閉 店,N3 N4
+N3_V306,吸収,きゅうしゅう,absorption; assimilation,N3,吸 収,N3 N3
+N3_V307,白髪,しらが,gray hair; white hair,N3,白 髪,N5 N3
+N3_V308,花束,はなたば,bouquet,N3,花 束,N4 N3
+N3_V309,居眠り,いねむり,dozing; nodding off,N3,居 眠,N3 N3
+N3_V310,容易,ようい,easy; simple,N3,容 易,N3 N3
+N3_V311,窓口,まどぐち,service window; counter,N3,窓 口,N3 N4
+N3_V312,祖父,そふ,grandfather,N3,祖 父,N3 N5
+N3_V313,勤務,きんむ,work; service; duty,N3,勤 務,N3 N3
+N3_V314,昔話,むかしばなし,old tale; folktale,N3,昔 話,N3 N5
+N3_V315,便利,べんり,convenient; useful,N3,便 利,N3 N3
+N3_V316,適当,てきとう,appropriate; suitable; casual,N3,適 当,N3 N3
+N3_V317,吹雪,ふぶき,snowstorm; blizzard,N3,吹 雪,N3 N3
+N3_V318,気候,きこう,climate,N3,気 候,N5 N3
+N3_V319,怖気,おじけ,fear; timidity,N3,怖 気,N3 N5
+N3_V320,否定,ひてい,denial; negation,N3,否 定,N3 N3
+N3_V321,遅刻,ちこく,lateness; being late,N3,遅 刻,N3 N3
+N3_V322,煙草,たばこ,tobacco; cigarette,N3,煙 草,N3 N3
+N3_V323,徒歩,とほ,walking; on foot,N3,徒 歩,N3 N4
+N3_V324,欠点,けってん,fault; weak point,N3,欠 点,N3 N3
+N3_V325,迷子,まいご,lost child; lost person,N3,迷 子,N3 N5
+N3_V326,洗面,せんめん,washing one's face,N3,洗 面,N3 N3
+N3_V327,交互,こうご,alternately; mutually,N3,交 互,N3 N3
+N3_V328,才能,さいのう,talent; ability,N3,才 能,N3 N3
+N3_V329,変更,へんこう,change; modification,N3,変 更,N3 N3
+N3_V330,歯医者,はいしゃ,dentist,N3,歯 医 者,N3 N4 N4
+N3_V331,強盗,ごうとう,robbery; robber,N3,強 盗,N4 N3
+N3_V332,慣用,かんよう,customary usage; idiomatic use,N3,慣 用,N3 N4
+N3_V333,晩年,ばんねん,later years; final years,N3,晩 年,N3 N5
+N3_V334,箱庭,はこにわ,miniature garden,N3,箱 庭,N3 N3
+N3_V335,到達,とうたつ,arrival; reaching,N3,到 達,N3 N3
+N3_V336,頂上,ちょうじょう,summit; top,N3,頂 上,N3 N5
+N3_V337,一杯,いっぱい,one cup; full; a lot,N3,一 杯,N5 N3
+N3_V338,皆様,みなさま,everyone (polite),N3,皆 様,N3 N3
+N3_V339,寒気,さむけ,chill; shivering,N3,寒 気,N3 N5
+N3_V340,恥知らず,はじしらず,shameless; shameless person,N3,恥 知,N3 N4
+N3_V341,疲れ顔,つかれがお,tired-looking face,N3,疲 顔,N3 N3
+N3_V342,貧富,ひんぷ,rich and poor; wealth disparity,N3,貧 富,N3 N3
+N3_V343,子猫,こねこ,kitten,N3,子 猫,N5 N3
+N3_V344,誤解,ごかい,misunderstanding,N3,誤 解,N3 N3
+N3_V345,幾何学,きかがく,geometry,N3,幾 何 学,N3 N5 N5
+N3_V346,賛成,さんせい,agreement; approval,N3,賛 成,N3 N3
+N3_V347,偶然,ぐうぜん,chance; coincidence,N3,偶 然,N3 N3
+N3_V348,多忙,たぼう,very busy,N3,多 忙,N4 N3
+N3_V349,水泳,すいえい,swimming,N3,水 泳,N5 N3
+N3_V350,靴下,くつした,socks,N3,靴 下,N3 N5
+N3_V351,偉人,いじん,great person; notable figure,N3,偉 人,N3 N5
+N3_V352,落葉,らくよう,fallen leaves; leaf fall,N3,落 葉,N3 N3
+N3_V353,由来,ゆらい,origin; derivation,N3,由 来,N3 N5
+N3_V354,放置,ほうち,leaving as is; neglect,N3,放 置,N3 N3
+N3_V355,果実,かじつ,fruit,N3,果 実,N3 N3
+N3_V356,商談,しょうだん,business negotiation,N3,商 談,N3 N3
+N3_V357,退職,たいしょく,retirement; leaving a job,N3,退 職,N3 N3
+N3_V358,逃亡,とうぼう,escape; flight,N3,逃 亡,N3 N3
+N3_V359,歌舞,かぶ,song and dance,N3,歌 舞,N4 N3
+N3_V360,合宿,がっしゅく,training camp; group lodging,N3,合 宿,N3 N3
+N3_V361,許容,きょよう,permission; tolerance,N3,許 容,N3 N3
+N3_V362,亡命,ぼうめい,exile; seeking asylum,N3,亡 命,N3 N3
+N3_V363,辞退,じたい,declining; refusal,N3,辞 退,N3 N3
+N3_V364,努力家,どりょくか,hard worker; diligent person,N3,努 力 家,N3 N4 N4
+N3_V365,部長,ぶちょう,department manager; section chief,N3,部 長,N3 N5
+N3_V366,国内,こくない,domestic; within the country,N3,国 内,N5 N3
+N3_V367,女性,じょせい,woman; female,N3,女 性,N5 N3
+N3_V368,関連,かんれん,relation; connection,N3,関 連,N3 N3
+N3_V369,政界,せいかい,political world,N3,政 界,N3 N4
+N3_V370,取得,しゅとく,acquisition; obtaining,N3,取 得,N3 N3
+N3_V371,最後,さいご,last; final,N3,最 後,N3 N5
+N3_V372,化石,かせき,fossil,N3,化 石,N3 N3
+N3_V373,法人,ほうじん,corporation; legal person,N3,法 人,N3 N5
+N3_V374,対向,たいこう,facing; opposite direction,N3,対 向,N3 N3
+N3_V375,経由,けいゆ,via; by way of,N3,経 由,N3 N3
+N3_V376,連日,れんじつ,day after day; consecutive days,N3,連 日,N3 N5
+N3_V377,原料,げんりょう,raw material,N3,原 料,N3 N4
+N3_V378,機能,きのう,function; capability,N3,機 能,N3 N3
+N3_V379,次男,じなん,second son,N3,次 男,N3 N5
+N3_V380,美人,びじん,beautiful woman,N3,美 人,N3 N5
+N3_V381,太字,ふとじ,bold type; boldface,N3,太 字,N3 N4
+N3_V382,飛び込む,とびこむ,to jump into; to rush into,N3,飛 込,N3 N3
+N3_V383,受信,じゅしん,reception; receiving a signal,N3,受 信,N3 N3
+N3_V384,市内,しない,within a city,N3,市 内,N3 N3
+N3_V385,定期,ていき,fixed term; regular; season ticket,N3,定 期,N3 N3
+N3_V386,活用,かつよう,practical use; utilization,N3,活 用,N3 N4
+N3_V387,先頭,せんとう,head; front; lead,N3,先 頭,N5 N3
+N3_V388,組合,くみあい,association; union,N3,組 合,N3 N3
+N3_V389,指示,しじ,instruction; indication,N3,指 示,N3 N3
+N3_V390,葉書,はがき,postcard,N3,葉 書,N3 N5
+N3_V391,初心,しょしん,beginner's mind; original intention,N3,初 心,N3 N4
+N3_V392,調子,ちょうし,condition; tone; manner,N3,調 子,N3 N5
+N3_V393,議員,ぎいん,legislator; assembly member,N3,議 員,N3 N4
+N3_V394,直前,ちょくぜん,immediately before,N3,直 前,N3 N5
+N3_V395,当選,とうせん,being elected; winning a prize,N3,当 選,N3 N3
+N3_V396,権利,けんり,right; privilege,N3,権 利,N3 N3
+N3_V397,石段,いしだん,stone steps,N3,石 段,N3 N3
+N3_V398,伝説,でんせつ,legend; tradition,N3,伝 説,N3 N3
+N3_V399,助言,じょげん,advice,N3,助 言,N3 N4
+N3_V400,件数,けんすう,number of cases; number of items,N3,件 数,N3 N3
+N3_V401,番地,ばんち,lot number; street number,N3,番 地,N3 N4
+N3_V402,間違い,まちがい,mistake; error,N3,間 違,N5 N3
+N3_V403,自殺,じさつ,suicide,N3,自 殺,N4 N3
+N3_V404,実際,じっさい,actually; reality,N3,実 際,N3 N3
+N3_V405,歳末,さいまつ,year-end,N3,歳 末,N3 N3
+N3_V406,日光,にっこう,sunlight; sunshine,N3,日 光,N5 N3
+N3_V407,首相,しゅしょう,prime minister,N3,首 相,N3 N3
+N3_V408,必勝,ひっしょう,certain victory; determination to win,N3,必 勝,N3 N3
+N3_V409,由緒,ゆいしょ,history; pedigree; origin,N3,由 緒,N3 N3
+N3_V410,愛好,あいこう,love; fondness,N3,愛 好,N3 N3
+N3_V411,放火,ほうか,arson; setting fire,N3,放 火,N3 N5
+N3_V412,確定,かくてい,confirmation; finalization,N3,確 定,N3 N3
+N3_V413,過程,かてい,process; course,N3,過 程,N3 N3
+N3_V414,馬力,ばりき,horsepower,N3,馬 力,N3 N4
+N3_V415,白状,はくじょう,confession; admitting the truth,N3,白 状,N5 N3
+N3_V416,予想,よそう,prediction; expectation,N3,予 想,N3 N3
+N3_V417,警官,けいかん,police officer,N3,警 官,N3 N3
+N3_V418,配信,はいしん,distribution; streaming,N3,配 信,N3 N3
+N3_V419,若手,わかて,young person; young talent,N3,若 手,N3 N4
+N3_V420,成果,せいか,result; achievement,N3,成 果,N3 N3
+N3_V421,呼出し,よびだし,call; summons; paging,N3,呼 出,N3 N5
+N3_V422,共通,きょうつう,common; shared,N3,共 通,N3 N4
+N3_V423,残念,ざんねん,regret; unfortunate,N3,残 念,N3 N3
+N3_V424,判定,はんてい,judgment; decision,N3,判 定,N3 N3
+N3_V425,役員,やくいん,officer; executive; board member,N3,役 員,N3 N4
+N3_V426,他国,たこく,another country; foreign country,N3,他 国,N3 N5
+N3_V427,乗客,じょうきゃく,passenger,N3,乗 客,N3 N3
+N3_V428,供物,くもつ,offering,N3,供 物,N3 N4
+N3_V429,打者,だしゃ,batter; hitter,N3,打 者,N3 N4
+N3_V430,御中,おんちゅう,attention to an organization; envelope honorific,N3,御 中,N3 N5
+N3_V431,形式,けいしき,form; format; style,N3,形 式,N3 N3
+N3_V432,教師,きょうし,teacher; instructor,N3,教 師,N4 N3
+N3_V433,深度,しんど,depth,N3,深 度,N3 N4
+N3_V434,存続,そんぞく,continuation; survival,N3,存 続,N3 N3
+N3_V435,自覚,じかく,self-awareness,N3,自 覚,N4 N3
+N3_V436,反対側,はんたいがわ,opposite side,N3,反 対 側,N3 N3 N3
+N3_V437,飛行機,ひこうき,airplane,N3,飛 行 機,N3 N5 N3
+N3_V438,突入,とつにゅう,rushing into; entering suddenly,N3,突 入,N3 N5
+N3_V439,子育て,こそだて,child-rearing,N3,子 育,N5 N3
+N3_V440,構想,こうそう,concept; plan,N3,構 想,N3 N3
+N3_V441,守備,しゅび,defense; fielding,N3,守 備,N3 N3
+N3_V442,満員,まんいん,full capacity; crowded,N3,満 員,N3 N4
+N3_V443,消化,しょうか,digestion; consumption,N3,消 化,N3 N3
+N3_V444,任務,にんむ,duty; mission,N3,任 務,N3 N3
+N3_V445,予報,よほう,forecast,N3,予 報,N3 N3
+N3_V446,進路,しんろ,course; route; future path,N3,進 路,N3 N3
+N3_V447,正座,せいざ,formal kneeling posture,N3,正 座,N4 N3
+N3_V448,客室,きゃくしつ,guest room; passenger cabin,N3,客 室,N3 N4
+N3_V449,船員,せんいん,sailor; crew member,N3,船 員,N3 N4
+N3_V450,追放,ついほう,banishment; expulsion,N3,追 放,N3 N3
+N3_V451,背景,はいけい,background,N3,背 景,N3 N3
+N3_V452,誰何,すいか,challenging someone's identity; who goes there,N3,誰 何,N3 N5
+N3_V453,休息,きゅうそく,rest; repose,N3,休 息,N5 N3
+N3_V454,老後,ろうご,old age; later life,N3,老 後,N3 N5
+N3_V455,良心,りょうしん,conscience,N3,良 心,N3 N4
+N3_V456,例示,れいじ,illustration; example,N3,例 示,N3 N3
+N3_V457,号外,ごうがい,newspaper extra; special edition,N3,号 外,N3 N5
+N3_V458,王国,おうこく,kingdom,N3,王 国,N3 N5
+N3_V459,常識,じょうしき,common sense,N3,常 識,N3 N3
+N3_V460,警告,けいこく,warning,N3,警 告,N3 N3
+N3_V461,投手,とうしゅ,pitcher,N3,投 手,N3 N4
+N3_V462,局長,きょくちょう,bureau chief; department director,N3,局 長,N3 N5
+N3_V463,難問,なんもん,difficult question; hard problem,N3,難 問,N3 N4
+N3_V464,人種,じんしゅ,race; ethnic group,N3,人 種,N5 N3
+N3_V465,念願,ねんがん,long-held wish,N3,念 願,N3 N3
+N3_V466,寄生,きせい,parasitism; living on another,N3,寄 生,N3 N5
+N3_V467,商店,しょうてん,shop; store,N3,商 店,N3 N4
+N3_V468,害悪,がいあく,harm; evil influence,N3,害 悪,N3 N4
+N3_V469,頼み事,たのみごと,request; favor,N3,頼 事,N3 N4
+N3_V470,横顔,よこがお,profile; side of the face,N3,横 顔,N3 N3
+N3_V471,増大,ぞうだい,increase; enlargement,N3,増 大,N3 N5
+N3_V472,時差,じさ,time difference,N3,時 差,N5 N3
+N3_V473,一段,いちだん,one step; a level; more,N3,一 段,N5 N3
+N3_V474,俺達,おれたち,we; us (masculine informal),N3,俺 達,N3 N3
+N3_V475,手渡し,てわたし,hand delivery; handing directly,N3,手 渡,N4 N3
+N3_V476,参与,さんよ,participation; participant,N3,参 与,N3 N3
+N3_V477,演習,えんしゅう,practice; exercise; drill,N3,演 習,N3 N4
+N3_V478,備品,びひん,equipment; fixtures,N3,備 品,N3 N4
+N3_V479,例年,れいねん,usual year; every year,N3,例 年,N3 N5
+N3_V480,共働き,ともばたらき,both partners working; dual-income household,N3,共 働,N3 N3
+N3_V481,夜景,やけい,night view; night scenery,N3,夜 景,N4 N3
+N3_V482,抜き書き,ぬきがき,excerpt; extract,N3,抜 書,N3 N5
+N3_V483,遠方,えんぽう,faraway place; distance,N3,遠 方,N3 N4
+N3_V484,絶望,ぜつぼう,despair; hopelessness,N3,絶 望,N3 N3
+N3_V485,福音,ふくいん,good news; gospel,N3,福 音,N3 N4
+N3_V486,球場,きゅうじょう,ballpark; stadium,N3,球 場,N3 N4
+N3_V487,酒屋,さかや,liquor store,N3,酒 屋,N3 N4
+N3_V488,君達,きみたち,you all,N3,君 達,N3 N3
+N3_V489,新婚,しんこん,newly married,N3,新 婚,N4 N3
+N3_V490,押売り,おしうり,high-pressure selling; forced sale,N3,押 売,N3 N4
+N3_V491,割引,わりびき,discount,N3,割 引,N3 N3
+N3_V492,期限,きげん,deadline; time limit,N3,期 限,N3 N3
+N3_V493,取り戻す,とりもどす,to take back; to recover,N3,取 戻,N3 N3
+N3_V494,学科,がっか,academic department; course of study,N3,学 科,N5 N3
+N3_V495,降水,こうすい,precipitation; rainfall,N3,降 水,N3 N5
+N3_V496,妻子,さいし,wife and children,N3,妻 子,N3 N5
+N3_V497,福岡,ふくおか,Fukuoka,N3,福 岡,N3 N3
+N3_V498,加熱,かねつ,heating,N3,加 熱,N3 N3
+N3_V499,浮気,うわき,infidelity; fickleness,N3,浮 気,N3 N5
+N3_V500,等分,とうぶん,equal division,N3,等 分,N3 N5
+N3_V501,月末,げつまつ,end of the month,N3,月 末,N5 N3
+N3_V502,年越し,としこし,passing into the New Year,N3,年 越,N5 N3
+N3_V503,登山,とざん,mountain climbing,N3,登 山,N3 N5
+N3_V504,未満,みまん,less than; under,N3,未 満,N3 N3
+N3_V505,規定,きてい,rule; regulation; provision,N3,規 定,N3 N3
+N3_V506,精力,せいりょく,energy; vitality,N3,精 力,N3 N4
+N3_V507,抱き合う,だきあう,to embrace each other,N3,抱 合,N3 N3
+N3_V508,処分,しょぶん,disposal; punishment; handling,N3,処 分,N3 N5
+N3_V509,非常口,ひじょうぐち,emergency exit,N3,非 常 口,N3 N3 N4
+N3_V510,喜怒,きど,joy and anger; emotions,N3,喜 怒,N3 N3
+N3_V511,一人娘,ひとりむすめ,only daughter,N3,一 人 娘,N5 N5 N3
+N3_V512,逃げ道,にげみち,escape route; way out,N3,逃 道,N3 N4
+N3_V513,探し物,さがしもの,lost item; thing being searched for,N3,探 物,N3 N4
+N3_V514,疑似,ぎじ,pseudo-; simulated,N3,疑 似,N3 N3
+N3_V515,文具,ぶんぐ,stationery,N3,文 具,N4 N3
+N3_V516,速達,そくたつ,express delivery; express mail,N3,速 達,N3 N3
+N3_V517,演舞,えんぶ,performance; demonstration dance,N3,演 舞,N3 N3
+N3_V518,宿命,しゅくめい,fate; destiny,N3,宿 命,N3 N3
+N3_V519,倒産,とうさん,bankruptcy; business failure,N3,倒 産,N3 N3
+N3_V520,寝台,しんだい,bed; berth,N3,寝 台,N3 N4
+N3_V521,宅地,たくち,residential land,N3,宅 地,N3 N4
+N3_V522,打破,だは,breakthrough; overcoming,N3,打 破,N3 N3
+N3_V523,余計,よけい,extra; unnecessary,N3,余 計,N3 N4
+N3_V524,来訪,らいほう,visit; arrival,N3,来 訪,N5 N3
+N3_V525,冷水,れいすい,cold water,N3,冷 水,N3 N5
+N3_V526,日暮れ,ひぐれ,sunset; dusk,N3,日 暮,N5 N3
+N3_V527,腹痛,ふくつう,stomachache; abdominal pain,N3,腹 痛,N3 N3
+N3_V528,危機,きき,crisis; danger,N3,危 機,N3 N3
+N3_V529,特許,とっきょ,patent; special permission,N3,特 許,N4 N3
+N3_V530,類似,るいじ,similarity; resemblance,N3,類 似,N3 N3
+N3_V531,財政,ざいせい,public finance; finances,N3,財 政,N3 N3
+N3_V532,遊び相手,あそびあいて,playmate; companion for play,N3,遊 相 手,N3 N3 N4
+N3_V533,雑談,ざつだん,casual conversation; chat,N3,雑 談,N3 N3
+N3_V534,恐怖感,きょうふかん,sense of fear,N3,恐 怖 感,N3 N3 N3
+N3_V535,暗号,あんごう,code; cipher,N3,暗 号,N3 N3
+N3_V536,悪夢,あくむ,nightmare,N3,悪 夢,N4 N3
+N3_V537,食欲,しょくよく,appetite,N3,食 欲,N5 N3
+N3_V538,用途,ようと,use; purpose,N3,用 途,N4 N3
+N3_V539,曲名,きょくめい,song title; piece title,N3,曲 名,N3 N5
+N3_V540,耳鳴り,みみなり,ringing in the ears; tinnitus,N3,耳 鳴,N3 N3
+N3_V541,完成,かんせい,completion; finished state,N3,完 成,N3 N3
+N3_V542,出願,しゅつがん,application; filing an application,N3,出 願,N5 N3
+N3_V543,有罪,ゆうざい,guilty; conviction,N3,有 罪,N4 N3
+N3_V544,散会,さんかい,adjournment; dispersal,N3,散 会,N3 N4
+N3_V545,掛け声,かけごえ,shout; chant; call,N3,掛 声,N3 N3
+N3_V546,昨夜,さくや,last night,N3,昨 夜,N3 N4
+N3_V547,怒声,どせい,angry shout,N3,怒 声,N3 N3
+N3_V548,留年,りゅうねん,repeating a school year,N3,留 年,N3 N5
+N3_V549,列車,れっしゃ,train,N3,列 車,N3 N5
+N3_V550,払い戻し,はらいもどし,refund; reimbursement,N3,払 戻,N3 N3
+N3_V551,捕食,ほしょく,predation; feeding on prey,N3,捕 食,N3 N5
+N3_V552,忘れ物,わすれもの,forgotten item; lost property,N3,忘 物,N3 N4
+N3_V553,晴れ間,はれま,break in the clouds; spell of clear weather,N3,晴 間,N3 N5
+N3_V554,右折,うせつ,right turn,N3,右 折,N5 N3
+N3_V555,迎え入れる,むかえいれる,to welcome in; to receive,N3,迎 入,N3 N5
+N3_V556,入港,にゅうこう,entering port,N3,入 港,N5 N3
+N3_V557,解除,かいじょ,cancellation; release,N3,解 除,N3 N3
+N3_V558,閉会,へいかい,closing of a meeting; adjournment,N3,閉 会,N3 N4
+N3_V559,長髪,ちょうはつ,long hair,N3,長 髪,N5 N3
+N3_V560,眠気,ねむけ,sleepiness; drowsiness,N3,眠 気,N3 N5
+N3_V561,安易,あんい,easy; simple; careless,N3,安 易,N4 N3
+N3_V562,車窓,しゃそう,train or car window,N3,車 窓,N5 N3
+N3_V563,祖母,そぼ,grandmother,N3,祖 母,N3 N5
+N3_V564,夜勤,やきん,night shift,N3,夜 勤,N4 N3
+N3_V565,大昔,おおむかし,long ago; ancient times,N3,大 昔,N5 N3
+N3_V566,船便,ふなびん,surface mail by ship,N3,船 便,N3 N3
+N3_V567,最適,さいてき,optimal; most suitable,N3,最 適,N3 N3
+N3_V568,吹き出す,ふきだす,to blow out; to burst out laughing,N3,吹 出,N3 N5
+N3_V569,天候,てんこう,weather,N3,天 候,N5 N3
+N3_V570,辞任,じにん,resignation,N3,辞 任,N3 N3
+N3_V571,可否,かひ,yes or no; propriety,N3,可 否,N4 N3
+N3_V572,遅番,おそばん,late shift,N3,遅 番,N3 N3
+N3_V573,黒煙,こくえん,black smoke,N3,黒 煙,N4 N3
+N3_V574,徒労,とろう,fruitless effort,N3,徒 労,N3 N3
+N3_V575,欠席,けっせき,absence; nonattendance,N3,欠 席,N3 N3
+N3_V576,迷路,めいろ,maze; labyrinth,N3,迷 路,N3 N3
+N3_V577,水洗,すいせん,washing with water; flush system,N3,水 洗,N5 N3
+N3_V578,相互,そうご,mutual; reciprocal,N3,相 互,N3 N3
+N3_V579,天才,てんさい,genius,N3,天 才,N5 N3
+N3_V580,更新,こうしん,renewal; update,N3,更 新,N3 N4
+N3_V581,入れ歯,いれば,dentures,N3,入 歯,N5 N3
+N3_V582,盗難,とうなん,theft,N3,盗 難,N3 N3
+N3_V583,慣例,かんれい,custom; convention,N3,慣 例,N3 N3
+N3_V584,本箱,ほんばこ,bookcase; bookshelf,N3,本 箱,N5 N3
+N3_V585,到来,とうらい,arrival; coming,N3,到 来,N3 N5
+N3_V586,山頂,さんちょう,mountain summit,N3,山 頂,N5 N3
+N3_V587,金杯,きんぱい,gold cup; gold trophy,N3,金 杯,N5 N3
+N3_V588,皆無,かいむ,none; nonexistent,N3,皆 無,N3 N4
+N3_V589,招集,しょうしゅう,calling together; convocation,N3,招 集,N3 N4
+N3_V590,寒空,さむぞら,cold sky; cold weather,N3,寒 空,N3 N4
+N3_V591,赤恥,あかはじ,shame; humiliation,N3,赤 恥,N4 N3
+N3_V592,黒猫,くろねこ,black cat,N3,黒 猫,N4 N3
+N3_V593,誤字,ごじ,typographical error; wrong character,N3,誤 字,N3 N4
+N3_V594,努力不足,どりょくぶそく,lack of effort,N3,努 力 不 足,N3 N4 N4 N4
+N3_V595,幾分,いくぶん,somewhat; to some extent,N3,幾 分,N3 N5
+N3_V596,賛否,さんぴ,approval and disapproval; pros and cons,N3,賛 否,N3 N3
+N3_V597,偶数,ぐうすう,even number,N3,偶 数,N3 N3
+N3_V598,忙殺,ぼうさつ,being extremely busy,N3,忙 殺,N3 N3
+N3_V599,遠泳,えんえい,long-distance swimming,N3,遠 泳,N3 N3
+N3_V600,長靴,ながぐつ,boots; rubber boots,N3,長 靴,N5 N3
+N3_V601,偉業,いぎょう,great achievement,N3,偉 業,N3 N4

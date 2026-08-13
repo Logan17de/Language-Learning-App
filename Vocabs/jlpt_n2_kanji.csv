@@ -1,0 +1,381 @@
+﻿id,kanji,english_meaning,introduced_level,compound_count,compound_refs
+N2_K001,軍,army; military,N2,2,N2_V001 N2_V364
+N2_K002,兵,soldier; troops,N2,2,N2_V002 N2_V365
+N2_K003,島,island,N2,3,N2_V003 N2_V177 N2_V366
+N2_K004,村,village,N2,2,N2_V004 N2_V367
+N2_K005,門,gate; branch; field,N2,3,N2_V005 N2_V122 N2_V368
+N2_K006,戸,door; household,N2,1,N2_V006
+N2_K007,武,military; warrior,N2,2,N2_V007 N2_V369
+N2_K008,城,castle,N2,2,N2_V008 N2_V370
+N2_K009,総,whole; general; total,N2,2,N2_V009 N2_V371
+N2_K010,団,group; association,N2,2,N2_V010 N2_V372
+N2_K011,線,line; track; wire,N2,2,N2_V011 N2_V373
+N2_K012,設,establish; set up,N2,1,N2_V012
+N2_K013,勢,force; power; condition,N2,2,N2_V013 N2_V374
+N2_K014,党,party; faction,N2,2,N2_V014 N2_V375
+N2_K015,史,history,N2,2,N2_V015 N2_V376
+N2_K016,営,manage; operate; camp,N2,1,N2_V377
+N2_K017,府,urban prefecture; government office,N2,2,N2_V016 N2_V378
+N2_K018,巻,roll; volume; wind,N2,2,N2_V017 N2_V379
+N2_K019,介,mediate; assist; introduce,N2,3,N2_V018 N2_V185 N2_V380
+N2_K020,蔵,storehouse; store; possess,N2,2,N2_V019 N2_V381
+N2_K021,造,make; build; create,N2,2,N2_V020 N2_V382
+N2_K022,根,root; basis,N2,3,N2_V021 N2_V383 N2_V451
+N2_K023,寺,Buddhist temple,N2,2,N2_V022 N2_V384
+N2_K024,査,investigate; inspect,N2,2,N2_V023 N2_V179
+N2_K025,将,commander; future; about to,N2,2,N2_V024 N2_V385
+N2_K026,改,reform; revise; change,N2,5,N2_V025 N2_V085 N2_V240 N2_V382 N2_V386
+N2_K027,県,prefecture,N2,3,N2_V026 N2_V387 N2_V506
+N2_K028,泉,spring; fountain,N2,1,N2_V027
+N2_K029,像,image; statue,N2,4,N2_V028 N2_V347 N2_V388 N2_V435
+N2_K030,細,thin; fine; detailed,N2,1,N2_V029
+N2_K031,谷,valley,N2,1,N2_V030
+N2_K032,奥,interior; inner part,N2,1,N2_V031
+N2_K033,再,again; re-,N2,2,N2_V032 N2_V389
+N2_K034,血,blood,N2,4,N2_V033 N2_V211 N2_V390 N2_V443
+N2_K035,算,calculate; count,N2,2,N2_V034 N2_V391
+N2_K036,象,elephant; image; phenomenon,N2,2,N2_V035 N2_V115
+N2_K037,清,pure; clean,N2,4,N2_V036 N2_V312 N2_V336 N2_V392
+N2_K038,技,skill; technique,N2,3,N2_V037 N2_V393 N2_V412
+N2_K039,州,state; province; sandbank,N2,2,N2_V038 N2_V394
+N2_K040,領,territory; domain; receive,N2,2,N2_V039 N2_V395
+N2_K041,橋,bridge,N2,1,N2_V040
+N2_K042,芸,art; performance,N2,2,N2_V041 N2_V396
+N2_K043,型,type; model; mold,N2,2,N2_V042 N2_V397
+N2_K044,香,fragrance; incense,N2,2,N2_V043 N2_V398
+N2_K045,量,quantity; measure,N2,3,N2_V044 N2_V094 N2_V399
+N2_K046,久,long time,N2,1,N2_V045
+N2_K047,境,boundary; border; situation,N2,2,N2_V046 N2_V400
+N2_K048,階,floor; level; rank,N2,3,N2_V047 N2_V168 N2_V401
+N2_K049,区,district; ward; divide,N2,2,N2_V048 N2_V402
+N2_K050,波,wave,N2,3,N2_V049 N2_V403 N2_V463
+N2_K051,移,move; transfer,N2,2,N2_V050 N2_V404
+N2_K052,域,area; region,N2,2,N2_V051 N2_V395
+N2_K053,周,circumference; around,N2,2,N2_V052 N2_V069
+N2_K054,接,contact; connect,N2,2,N2_V053 N2_V142
+N2_K055,鉄,iron; railway,N2,4,N2_V040 N2_V054 N2_V264 N2_V313
+N2_K056,頃,around; about; time,N2,1,N2_V055
+N2_K057,材,material; timber; talent,N2,1,N2_V056
+N2_K058,個,individual; counter for items,N2,1,N2_V057
+N2_K059,協,cooperate; cooperation,N2,1,N2_V058
+N2_K060,各,each; every,N2,2,N2_V059 N2_V405
+N2_K061,帯,belt; zone; carry,N2,1,N2_V060
+N2_K062,歴,history; career,N2,2,N2_V015 N2_V061
+N2_K063,編,compile; edit; knit,N2,2,N2_V062 N2_V406
+N2_K064,裏,back; reverse; inside,N2,2,N2_V063 N2_V407
+N2_K065,比,compare; ratio,N2,2,N2_V064 N2_V408
+N2_K066,坂,slope; hill,N2,1,N2_V065
+N2_K067,装,dress; equip; attire,N2,3,N2_V186 N2_V409 N2_V597
+N2_K068,省,ministry; omit; reflect,N2,2,N2_V066 N2_V410
+N2_K069,税,tax,N2,2,N2_V067 N2_V411
+N2_K070,競,compete,N2,2,N2_V068 N2_V412
+N2_K071,囲,surround; enclose,N2,3,N2_V069 N2_V418 N2_V505
+N2_K072,辺,area; vicinity; side,N2,3,N2_V052 N2_V070 N2_V462
+N2_K073,河,river,N2,2,N2_V071 N2_V413
+N2_K074,極,extreme; pole,N2,2,N2_V072 N2_V414
+N2_K075,防,prevent; defend,N2,2,N2_V073 N2_V415
+N2_K076,低,low,N2,2,N2_V074 N2_V416
+N2_K077,林,woods; grove,N2,4,N2_V075 N2_V077 N2_V127 N2_V466
+N2_K078,導,guide; lead,N2,2,N2_V076 N2_V417
+N2_K079,森,forest,N2,1,N2_V077
+N2_K080,丸,circle; round; whole,N2,1,N2_V078
+N2_K081,胸,chest; heart,N2,2,N2_V079 N2_V418
+N2_K082,陸,land,N2,2,N2_V080 N2_V419
+N2_K083,療,heal; treatment,N2,1,N2_V081
+N2_K084,諸,various; many,N2,2,N2_V082 N2_V420
+N2_K085,管,pipe; manage; control,N2,1,N2_V083
+N2_K086,仲,relationship; intermediary,N2,1,N2_V084
+N2_K087,革,leather; reform,N2,2,N2_V085 N2_V421
+N2_K088,担,carry; bear; take charge,N2,2,N2_V086 N2_V422
+N2_K089,効,effect; efficiency,N2,2,N2_V087 N2_V453
+N2_K090,賞,prize; reward; praise,N2,2,N2_V088 N2_V423
+N2_K091,星,star,N2,2,N2_V089 N2_V424
+N2_K092,復,return; restore; repeat,N2,2,N2_V090 N2_V425
+N2_K093,片,one side; fragment,N2,3,N2_V091 N2_V301 N2_V426
+N2_K094,並,line up; ordinary,N2,2,N2_V092 N2_V427
+N2_K095,底,bottom,N2,1,N2_V093
+N2_K096,温,warm; temperature,N2,2,N2_V027 N2_V428
+N2_K097,軽,light; slight,N2,2,N2_V094 N2_V429
+N2_K098,録,record,N2,1,N2_V095
+N2_K099,腰,waist; lower back,N2,1,N2_V096
+N2_K100,著,write; notable; remarkable,N2,2,N2_V097 N2_V430
+N2_K101,乱,disorder; disturb,N2,2,N2_V098 N2_V431
+N2_K102,章,chapter; badge,N2,1,N2_V432
+N2_K103,殿,palace; lord; hall,N2,1,N2_V099
+N2_K104,布,cloth; spread,N2,2,N2_V100 N2_V433
+N2_K105,角,angle; corner; horn,N2,4,N2_V101 N2_V299 N2_V434 N2_V631
+N2_K106,仏,Buddha; France,N2,2,N2_V102 N2_V435
+N2_K107,永,eternal; long,N2,2,N2_V045 N2_V103
+N2_K108,誌,magazine; record,N2,2,N2_V104 N2_V436
+N2_K109,減,decrease; reduce,N2,2,N2_V105 N2_V437
+N2_K110,略,abbreviate; omit; strategy,N2,2,N2_V066 N2_V106
+N2_K111,準,standard; semi-; prepare,N2,2,N2_V107 N2_V438
+N2_K112,委,committee; entrust,N2,2,N2_V108 N2_V439
+N2_K113,令,order; command,N2,2,N2_V109 N2_V440
+N2_K114,刊,publish; edition,N2,2,N2_V110 N2_V441
+N2_K115,焼,burn; bake,N2,3,N2_V111 N2_V442 N2_V546
+N2_K116,里,village; hometown; ri,N2,1,N2_V112
+N2_K117,圧,pressure; press,N2,2,N2_V113 N2_V443
+N2_K118,額,amount; forehead; frame,N2,3,N2_V114 N2_V444 N2_V481
+N2_K119,印,mark; seal; print,N2,3,N2_V115 N2_V317 N2_V445
+N2_K120,池,pond,N2,2,N2_V116 N2_V446
+N2_K121,臣,retainer; minister,N2,2,N2_V117 N2_V447
+N2_K122,庫,warehouse; storage,N2,2,N2_V118 N2_V448
+N2_K123,農,agriculture; farming,N2,3,N2_V119 N2_V367 N2_V626
+N2_K124,板,board; plank; plate,N2,3,N2_V345 N2_V449 N2_V630
+N2_K125,恋,romance; love,N2,2,N2_V120 N2_V450
+N2_K126,羽,feather; wing; counter for birds,N2,2,N2_V121 N2_V451
+N2_K127,専,specialty; exclusive,N2,3,N2_V122 N2_V368 N2_V452
+N2_K128,逆,reverse; opposite,N2,2,N2_V123 N2_V453
+N2_K129,腕,arm; ability,N2,2,N2_V124 N2_V454
+N2_K130,短,short; defect,N2,2,N2_V125 N2_V455
+N2_K131,普,universal; general,N2,1,N2_V456
+N2_K132,岩,rock; boulder,N2,3,N2_V126 N2_V457 N2_V613
+N2_K133,竹,bamboo,N2,2,N2_V127 N2_V458
+N2_K134,児,child,N2,4,N2_V128 N2_V228 N2_V459 N2_V509
+N2_K135,毛,hair; fur,N2,6,N2_V100 N2_V121 N2_V129 N2_V303 N2_V564 N2_V618
+N2_K136,版,printing plate; edition,N2,2,N2_V130 N2_V460
+N2_K137,宇,eaves; universe; space,N2,1,N2_V131
+N2_K138,況,condition; situation,N2,1,N2_V132
+N2_K139,被,suffer; be subjected to; cover,N2,2,N2_V133 N2_V461
+N2_K140,岸,shore; coast,N2,1,N2_V462
+N2_K141,超,exceed; super-,N2,2,N2_V134 N2_V463
+N2_K142,豊,abundant; rich,N2,2,N2_V135 N2_V464
+N2_K143,含,include; contain,N2,2,N2_V136 N2_V465
+N2_K144,植,plant,N2,2,N2_V137 N2_V466
+N2_K145,補,supplement; compensate; candidate,N2,2,N2_V138 N2_V467
+N2_K146,暴,violent; expose,N2,2,N2_V139 N2_V468
+N2_K147,課,section; lesson; task,N2,2,N2_V140 N2_V469
+N2_K148,跡,trace; remains; track,N2,2,N2_V141 N2_V470
+N2_K149,触,touch; contact,N2,2,N2_V142 N2_V471
+N2_K150,玉,jewel; ball,N2,2,N2_V143 N2_V472
+N2_K151,震,quake; shake,N2,1,N2_V144
+N2_K152,億,hundred million,N2,2,N2_V145 N2_V473
+N2_K153,肩,shoulder,N2,1,N2_V146
+N2_K154,劇,drama; intense,N2,2,N2_V147 N2_V474
+N2_K155,刺,stab; thorn; calling card,N2,2,N2_V148 N2_V475
+N2_K156,述,state; mention,N2,2,N2_V149 N2_V476
+N2_K157,輪,wheel; ring,N2,2,N2_V150 N2_V477
+N2_K158,浅,shallow,N2,1,N2_V151
+N2_K159,純,pure; genuine,N2,2,N2_V152 N2_V478
+N2_K160,薄,thin; weak; pale,N2,2,N2_V153 N2_V479
+N2_K161,阪,slope; Osaka,N2,1,N2_V154
+N2_K162,韓,Korea,N2,1,N2_V155
+N2_K163,固,hard; firm; solid,N2,2,N2_V156 N2_V480
+N2_K164,巨,gigantic; huge,N2,2,N2_V157 N2_V481
+N2_K165,講,lecture; explain,N2,2,N2_V158 N2_V482
+N2_K166,般,general; sort,N2,1,N2_V159
+N2_K167,湯,hot water; bath,N2,2,N2_V160 N2_V483
+N2_K168,捨,discard; throw away,N2,1,N2_V161
+N2_K169,衣,clothing; garment,N2,1,N2_V162
+N2_K170,替,replace; exchange,N2,2,N2_V163 N2_V484
+N2_K171,央,center; middle,N2,1,N2_V164
+N2_K172,骨,bone,N2,2,N2_V165 N2_V485
+N2_K173,齢,age,N2,2,N2_V166 N2_V486
+N2_K174,照,shine; illuminate; compare,N2,2,N2_V167 N2_V487
+N2_K175,層,layer; stratum,N2,2,N2_V168 N2_V488
+N2_K176,弱,weak,N2,3,N2_V169 N2_V355 N2_V489
+N2_K177,築,build; construct,N2,1,N2_V490
+N2_K178,脳,brain,N2,2,N2_V170 N2_V491
+N2_K179,航,navigate; voyage,N2,2,N2_V171 N2_V492
+N2_K180,快,pleasant; cheerful; rapid,N2,2,N2_V172 N2_V493
+N2_K181,翌,next; following,N2,2,N2_V173 N2_V494
+N2_K182,旧,old; former,N2,2,N2_V174 N2_V495
+N2_K183,筆,writing brush; writing,N2,2,N2_V175 N2_V496
+N2_K184,換,exchange; replace,N2,2,N2_V176 N2_V497
+N2_K185,群,group; flock,N2,2,N2_V177 N2_V498
+N2_K186,爆,explode; bomb,N2,2,N2_V178 N2_V499
+N2_K187,捜,search; investigate,N2,1,N2_V179
+N2_K188,油,oil,N2,3,N2_V180 N2_V308 N2_V500
+N2_K189,叫,shout; cry out,N2,1,N2_V181
+N2_K190,伸,stretch; extend,N2,2,N2_V182 N2_V501
+N2_K191,承,consent; receive; acknowledge,N2,2,N2_V183 N2_V502
+N2_K192,雲,cloud,N2,2,N2_V184 N2_V503
+N2_K193,練,practice; train; refine,N2,2,N2_V281 N2_V504
+N2_K194,紹,introduce,N2,2,N2_V018 N2_V185
+N2_K195,包,wrap; enclose; include,N2,4,N2_V186 N2_V409 N2_V465 N2_V505
+N2_K196,庁,government office; agency,N2,2,N2_V187 N2_V506
+N2_K197,測,measure; estimate,N2,2,N2_V188 N2_V507
+N2_K198,占,occupy; hold; fortune-tell,N2,1,N2_V189
+N2_K199,混,mix; blend; crowded,N2,2,N2_V098 N2_V190
+N2_K200,倍,double; times,N2,2,N2_V191 N2_V508
+N2_K201,乳,milk; breast,N2,1,N2_V509
+N2_K202,荒,rough; wild; desolate,N2,2,N2_V192 N2_V510
+N2_K203,詰,pack; fill; question closely,N2,2,N2_V193 N2_V511
+N2_K204,栄,prosper; glory,N2,1,N2_V194
+N2_K205,床,floor; bed,N2,1,N2_V195
+N2_K206,則,rule; principle,N2,2,N2_V196 N2_V512
+N2_K207,禁,prohibit; ban,N2,1,N2_V513
+N2_K208,順,order; obey,N2,2,N2_V197 N2_V514
+N2_K209,枚,counter for flat objects,N2,2,N2_V198 N2_V515
+N2_K210,厚,thick; kind,N2,2,N2_V199 N2_V516
+N2_K211,皮,skin; hide,N2,3,N2_V129 N2_V200 N2_V343
+N2_K212,輸,transport; import/export,N2,1,N2_V201
+N2_K213,濃,thick; concentrated,N2,2,N2_V202 N2_V516
+N2_K214,簡,simple; brief,N2,2,N2_V203 N2_V517
+N2_K215,孫,grandchild; descendant,N2,2,N2_V204 N2_V518
+N2_K216,丈,length; sturdy,N2,2,N2_V205 N2_V519
+N2_K217,黄,yellow,N2,3,N2_V206 N2_V520 N2_V609
+N2_K218,届,deliver; reach; report,N2,1,N2_V207
+N2_K219,絡,entangle; contact,N2,1,N2_V208
+N2_K220,採,gather; adopt,N2,2,N2_V209 N2_V521
+N2_K221,傾,incline; lean; tendency,N2,1,N2_V210
+N2_K222,鼻,nose,N2,1,N2_V211
+N2_K223,宝,treasure,N2,2,N2_V212 N2_V522
+N2_K224,患,suffer; patient,N2,2,N2_V213 N2_V523
+N2_K225,延,extend; postpone,N2,2,N2_V214 N2_V524
+N2_K226,律,law; rhythm,N2,2,N2_V215 N2_V525
+N2_K227,希,hope; rare,N2,2,N2_V216 N2_V526
+N2_K228,甘,sweet; indulgent; lenient,N2,2,N2_V217 N2_V527
+N2_K229,湾,bay; gulf,N2,1,N2_V218
+N2_K230,沈,sink; submerge; be depressed,N2,1,N2_V219
+N2_K231,販,sell; marketing,N2,1,N2_V220
+N2_K232,欧,Europe,N2,2,N2_V221 N2_V528
+N2_K233,砂,sand,N2,2,N2_V222 N2_V529
+N2_K234,尊,respect; noble,N2,2,N2_V223 N2_V530
+N2_K235,紅,crimson; red,N2,1,N2_V531
+N2_K236,複,duplicate; compound,N2,2,N2_V224 N2_V532
+N2_K237,泊,stay overnight,N2,2,N2_V225 N2_V533
+N2_K238,荷,load; baggage,N2,1,N2_V534
+N2_K239,枝,branch; twig,N2,2,N2_V226 N2_V535
+N2_K240,依,depend; rely,N2,2,N2_V227 N2_V536
+N2_K241,幼,young; early childhood; immature,N2,2,N2_V228 N2_V537
+N2_K242,斬,cut; behead,N2,1,N2_V229
+N2_K243,勇,courage; brave,N2,2,N2_V230 N2_V538
+N2_K244,昇,rise; ascend,N2,2,N2_V231 N2_V539
+N2_K245,寿,longevity; congratulations,N2,2,N2_V232 N2_V540
+N2_K246,菜,vegetable; greens,N2,1,N2_V541
+N2_K247,季,season,N2,2,N2_V233 N2_V542
+N2_K248,液,liquid,N2,4,N2_V234 N2_V324 N2_V344 N2_V390
+N2_K249,券,ticket; certificate,N2,2,N2_V235 N2_V543
+N2_K250,祭,festival; worship,N2,2,N2_V236 N2_V544
+N2_K251,袋,bag; sack,N2,2,N2_V237 N2_V545
+N2_K252,燃,burn; combust; fuel,N2,2,N2_V238 N2_V546
+N2_K253,毒,poison,N2,2,N2_V239 N2_V547
+N2_K254,札,bill; tag; card,N2,2,N2_V240 N2_V548
+N2_K255,狙,aim at; target,N2,1,N2_V241
+N2_K256,脇,side; armpit,N2,2,N2_V242 N2_V549
+N2_K257,卒,graduate; soldier,N2,1,N2_V550
+N2_K258,副,vice-; secondary; copy,N2,2,N2_V243 N2_V551
+N2_K259,敬,respect,N2,2,N2_V223 N2_V244
+N2_K260,針,needle; pointer,N2,2,N2_V245 N2_V552
+N2_K261,拝,worship; humbly see,N2,2,N2_V246 N2_V553
+N2_K262,浴,bathe,N2,2,N2_V247 N2_V554
+N2_K263,悩,worry; trouble,N2,2,N2_V248 N2_V555
+N2_K264,汚,dirty; pollute,N2,2,N2_V249 N2_V556
+N2_K265,灯,lamp; light,N2,2,N2_V250 N2_V557
+N2_K266,坊,boy; Buddhist monk; priest,N2,2,N2_V251 N2_V558
+N2_K267,尻,buttocks; rear,N2,1,N2_V252
+N2_K268,涙,tear,N2,2,N2_V253 N2_V559
+N2_K269,停,stop; halt,N2,2,N2_V254 N2_V560
+N2_K270,了,finish; understand,N2,2,N2_V255 N2_V561
+N2_K271,汗,sweat,N2,2,N2_V256 N2_V562
+N2_K272,郵,mail; postal,N2,2,N2_V257 N2_V563
+N2_K273,幅,width; breadth; range,N2,1,N2_V258
+N2_K274,童,child,N2,2,N2_V128 N2_V259
+N2_K275,虫,insect,N2,2,N2_V260 N2_V564
+N2_K276,埋,bury; fill,N2,1,N2_V261
+N2_K277,舟,boat,N2,1,N2_V262
+N2_K278,闇,darkness,N2,2,N2_V263 N2_V565
+N2_K279,棒,stick; rod,N2,2,N2_V264 N2_V599
+N2_K280,貨,goods; money,N2,3,N2_V265 N2_V304 N2_V566
+N2_K281,肌,skin,N2,1,N2_V266
+N2_K282,臓,internal organ,N2,2,N2_V267 N2_V567
+N2_K283,塩,salt,N2,2,N2_V268 N2_V568
+N2_K284,均,equal; average,N2,2,N2_V269 N2_V569
+N2_K285,湖,lake,N2,2,N2_V270 N2_V570
+N2_K286,損,loss; damage,N2,2,N2_V271 N2_V571
+N2_K287,膝,knee,N2,1,N2_V272
+N2_K288,辛,spicy; bitter; painful,N2,2,N2_V273 N2_V572
+N2_K289,双,pair; twin,N2,2,N2_V274 N2_V573
+N2_K290,軒,eaves; counter for houses,N2,2,N2_V275 N2_V574
+N2_K291,績,achievement; result,N2,2,N2_V276 N2_V575
+N2_K292,干,dry; interfere,N2,1,N2_V277
+N2_K293,姓,surname,N2,2,N2_V278 N2_V576
+N2_K294,掘,dig,N2,1,N2_V279
+N2_K295,籍,register; membership; record,N2,1,N2_V577
+N2_K296,珍,rare; unusual,N2,2,N2_V280 N2_V578
+N2_K297,訓,instruction; reading; lesson,N2,3,N2_V281 N2_V504 N2_V579
+N2_K298,預,deposit; entrust,N2,1,N2_V282
+N2_K299,署,government office; signature,N2,1,N2_V283
+N2_K300,漁,fishing,N2,2,N2_V284 N2_V580
+N2_K301,緑,green,N2,2,N2_V285 N2_V581
+N2_K302,畳,tatami; fold,N2,1,N2_V286
+N2_K303,咲,bloom,N2,1,N2_V287
+N2_K304,貿,trade,N2,1,N2_V288
+N2_K305,踊,dance,N2,2,N2_V289 N2_V582
+N2_K306,封,seal; close,N2,2,N2_V290 N2_V583
+N2_K307,兆,sign; trillion,N2,2,N2_V291 N2_V584
+N2_K308,柱,pillar; column,N2,2,N2_V292 N2_V585
+N2_K309,駐,station; be stationed; reside,N2,1,N2_V293
+N2_K310,祝,celebrate,N2,2,N2_V294 N2_V586
+N2_K311,炭,charcoal; coal,N2,2,N2_V295 N2_V587
+N2_K312,柔,soft; gentle; flexible,N2,2,N2_V296 N2_V588
+N2_K313,雇,employ; hire,N2,2,N2_V297 N2_V589
+N2_K314,乾,dry; heaven,N2,2,N2_V298 N2_V362
+N2_K315,鋭,sharp; acute,N2,2,N2_V299 N2_V590
+N2_K316,氷,ice,N2,2,N2_V300 N2_V591
+N2_K317,隅,corner,N2,2,N2_V301 N2_V592
+N2_K318,冊,counter for books; volume,N2,2,N2_V302 N2_V593
+N2_K319,糸,thread,N2,2,N2_V303 N2_V594
+N2_K320,募,recruit; collect,N2,1,N2_V595
+N2_K321,硬,hard; stiff,N2,2,N2_V304 N2_V596
+N2_K322,塗,paint; coat,N2,2,N2_V305 N2_V597
+N2_K323,憎,hate,N2,2,N2_V306 N2_V598
+N2_K324,泥,mud,N2,2,N2_V307 N2_V599
+N2_K325,脂,fat; grease,N2,1,N2_V308
+N2_K326,粉,powder,N2,2,N2_V309 N2_V600
+N2_K327,詞,word; part of speech,N2,2,N2_V310 N2_V601
+N2_K328,筒,tube; cylinder,N2,2,N2_V311 N2_V602
+N2_K329,掃,sweep; clean,N2,3,N2_V312 N2_V392 N2_V603
+N2_K330,塔,tower; pagoda,N2,2,N2_V313 N2_V604
+N2_K331,賢,wise; clever,N2,2,N2_V314 N2_V605
+N2_K332,拾,pick up,N2,2,N2_V315 N2_V606
+N2_K333,麦,wheat; barley,N2,2,N2_V316 N2_V607
+N2_K334,刷,print,N2,2,N2_V317 N2_V608
+N2_K335,卵,egg,N2,2,N2_V318 N2_V609
+N2_K336,械,machine; mechanism,N2,1,N2_V319
+N2_K337,皿,plate; dish,N2,2,N2_V320 N2_V610
+N2_K338,祈,pray,N2,2,N2_V321 N2_V611
+N2_K339,灰,ash,N2,2,N2_V320 N2_V322
+N2_K340,召,summon; call,N2,2,N2_V323 N2_V612
+N2_K341,溶,melt; dissolve,N2,2,N2_V324 N2_V613
+N2_K342,磨,polish; grind,N2,2,N2_V325 N2_V614
+N2_K343,粒,grain; particle,N2,2,N2_V326 N2_V615
+N2_K344,喫,consume; drink; smoke,N2,2,N2_V327 N2_V616
+N2_K345,机,desk,N2,1,N2_V328
+N2_K346,貯,save; store,N2,3,N2_V329 N2_V446 N2_V617
+N2_K347,匹,counter for small animals,N2,1,N2_V330
+N2_K348,綿,cotton,N2,2,N2_V331 N2_V618
+N2_K349,贈,give; present,N2,2,N2_V332 N2_V619
+N2_K350,凍,freeze,N2,1,N2_V333
+N2_K351,瓶,bottle,N2,2,N2_V334 N2_V620
+N2_K352,帽,hat; cap,N2,1,N2_V335
+N2_K353,涼,cool; refreshing,N2,2,N2_V336 N2_V621
+N2_K354,秒,second,N2,2,N2_V337 N2_V622
+N2_K355,湿,damp; humid,N2,2,N2_V338 N2_V623
+N2_K356,蒸,steam; evaporate,N2,2,N2_V339 N2_V624
+N2_K357,菓,confectionery,N2,2,N2_V340 N2_V625
+N2_K358,耕,cultivate; plow,N2,2,N2_V341 N2_V626
+N2_K359,鉱,mineral; ore,N2,2,N2_V342 N2_V627
+N2_K360,膚,skin,N2,1,N2_V343
+N2_K361,胃,stomach,N2,2,N2_V344 N2_V628
+N2_K362,挟,insert; pinch; between,N2,1,N2_V345
+N2_K363,郊,suburb; outskirts,N2,2,N2_V346 N2_V629
+N2_K364,銅,copper,N2,2,N2_V347 N2_V630
+N2_K365,鈍,dull; blunt,N2,2,N2_V348 N2_V631
+N2_K366,貝,shellfish; shell,N2,1,N2_V349
+N2_K367,缶,can; tin,N2,2,N2_V193 N2_V350
+N2_K368,枯,wither; dry up,N2,2,N2_V351 N2_V632
+N2_K369,滴,drop; drip,N2,2,N2_V352 N2_V633
+N2_K370,符,sign; symbol,N2,2,N2_V353 N2_V634
+N2_K371,畜,livestock,N2,1,N2_V354
+N2_K372,軟,soft; flexible,N2,2,N2_V355 N2_V635
+N2_K373,濯,wash; rinse,N2,1,N2_V356
+N2_K374,隻,counter for ships; one of a pair,N2,1,N2_V357
+N2_K375,伺,ask; visit; inquire humbly,N2,1,N2_V358
+N2_K376,沸,boil,N2,1,N2_V359
+N2_K377,曇,cloudy,N2,1,N2_V360
+N2_K378,肯,agree; affirm,N2,1,N2_V361
+N2_K379,燥,dry; parched,N2,1,N2_V362
+N2_K380,零,zero; spill,N2,2,N2_V363 N2_V636

@@ -1,0 +1,214 @@
+﻿id,word,reading,english_meaning,study_level,kanji_components,component_levels
+N5_V001,日本,にほん,Japan,N5,日 本,N5 N5
+N5_V002,日本人,にほんじん,Japanese person,N5,日 本 人,N5 N5 N5
+N5_V003,日本語,にほんご,Japanese language,N5,日 本 語,N5 N5 N5
+N5_V004,外国,がいこく,foreign country,N5,外 国,N5 N5
+N5_V005,外国人,がいこくじん,foreigner,N5,外 国 人,N5 N5 N5
+N5_V006,外国語,がいこくご,foreign language,N5,外 国 語,N5 N5 N5
+N5_V007,中国,ちゅうごく,China,N5,中 国,N5 N5
+N5_V008,中国人,ちゅうごくじん,Chinese person,N5,中 国 人,N5 N5 N5
+N5_V009,中国語,ちゅうごくご,Chinese language,N5,中 国 語,N5 N5 N5
+N5_V010,大人,おとな,adult,N5,大 人,N5 N5
+N5_V011,大学,だいがく,university,N5,大 学,N5 N5
+N5_V012,大学生,だいがくせい,university student,N5,大 学 生,N5 N5 N5
+N5_V013,学生,がくせい,student,N5,学 生,N5 N5
+N5_V014,学校,がっこう,school,N5,学 校,N5 N5
+N5_V015,小学校,しょうがっこう,elementary school,N5,小 学 校,N5 N5 N5
+N5_V016,小学生,しょうがくせい,elementary school student,N5,小 学 生,N5 N5 N5
+N5_V017,中学校,ちゅうがっこう,junior high school,N5,中 学 校,N5 N5 N5
+N5_V018,中学生,ちゅうがくせい,junior high school student,N5,中 学 生,N5 N5 N5
+N5_V019,高校,こうこう,high school,N5,高 校,N5 N5
+N5_V020,高校生,こうこうせい,high school student,N5,高 校 生,N5 N5 N5
+N5_V021,先生,せんせい,teacher,N5,先 生,N5 N5
+N5_V022,校長,こうちょう,school principal,N5,校 長,N5 N5
+N5_V023,留学生,りゅうがくせい,international student,N5,留 学 生,N3 N5 N5
+N5_V024,入学,にゅうがく,school admission; entering school,N5,入 学,N5 N5
+N5_V025,卒業,そつぎょう,graduation,N5,卒 業,N2 N4
+N5_V026,勉強,べんきょう,study,N5,勉 強,N4 N4
+N5_V027,教室,きょうしつ,classroom,N5,教 室,N4 N4
+N5_V028,宿題,しゅくだい,homework,N5,宿 題,N3 N4
+N5_V029,図書館,としょかん,library,N5,図 書 館,N4 N5 N4
+N5_V030,読書,どくしょ,reading books,N5,読 書,N5 N5
+N5_V031,辞書,じしょ,dictionary,N5,辞 書,N3 N5
+N5_V032,名前,なまえ,name,N5,名 前,N5 N5
+N5_V033,言葉,ことば,word; language; expression,N5,言 葉,N4 N3
+N5_V034,英語,えいご,English language,N5,英 語,N4 N5
+N5_V035,会話,かいわ,conversation,N5,会 話,N4 N5
+N5_V036,電話,でんわ,telephone; phone call,N5,電 話,N5 N5
+N5_V037,電話番号,でんわばんごう,telephone number,N5,電 話 番 号,N5 N5 N3 N3
+N5_V038,新聞,しんぶん,newspaper,N5,新 聞,N4 N5
+N5_V039,手紙,てがみ,letter,N5,手 紙,N4 N4
+N5_V040,文章,ぶんしょう,sentence; text; writing,N5,文 章,N4 N2
+N5_V041,時間,じかん,time; hours,N5,時 間,N5 N5
+N5_V042,一時間,いちじかん,one hour,N5,一 時 間,N5 N5 N5
+N5_V043,二時間,にじかん,two hours,N5,二 時 間,N5 N5 N5
+N5_V044,半時間,はんじかん,half an hour,N5,半 時 間,N5 N5 N5
+N5_V045,午前,ごぜん,a.m.; morning,N5,午 前,N5 N5
+N5_V046,午後,ごご,p.m.; afternoon,N5,午 後,N5 N5
+N5_V047,正午,しょうご,noon,N5,正 午,N4 N5
+N5_V048,今日,きょう,today,N5,今 日,N5 N5
+N5_V049,明日,あした,tomorrow,N5,明 日,N4 N5
+N5_V050,昨日,きのう,yesterday,N5,昨 日,N3 N5
+N5_V051,今朝,けさ,this morning,N5,今 朝,N5 N4
+N5_V052,今晩,こんばん,this evening; tonight,N5,今 晩,N5 N3
+N5_V053,毎朝,まいあさ,every morning,N5,毎 朝,N5 N4
+N5_V054,毎晩,まいばん,every evening,N5,毎 晩,N5 N3
+N5_V055,毎日,まいにち,every day,N5,毎 日,N5 N5
+N5_V056,毎週,まいしゅう,every week,N5,毎 週,N5 N4
+N5_V057,毎月,まいつき,every month,N5,毎 月,N5 N5
+N5_V058,毎年,まいとし,every year,N5,毎 年,N5 N5
+N5_V059,今週,こんしゅう,this week,N5,今 週,N5 N4
+N5_V060,来週,らいしゅう,next week,N5,来 週,N5 N4
+N5_V061,先週,せんしゅう,last week,N5,先 週,N5 N4
+N5_V062,今月,こんげつ,this month,N5,今 月,N5 N5
+N5_V063,来月,らいげつ,next month,N5,来 月,N5 N5
+N5_V064,先月,せんげつ,last month,N5,先 月,N5 N5
+N5_V065,今年,ことし,this year,N5,今 年,N5 N5
+N5_V066,来年,らいねん,next year,N5,来 年,N5 N5
+N5_V067,去年,きょねん,last year,N5,去 年,N4 N5
+N5_V068,半年,はんとし,half a year,N5,半 年,N5 N5
+N5_V069,半月,はんつき,half a month,N5,半 月,N5 N5
+N5_V070,半日,はんにち,half a day,N5,半 日,N5 N5
+N5_V071,一日,いちにち,one day,N5,一 日,N5 N5
+N5_V072,二日,ふつか,two days; second day of the month,N5,二 日,N5 N5
+N5_V073,三日,みっか,three days; third day of the month,N5,三 日,N5 N5
+N5_V074,四日,よっか,four days; fourth day of the month,N5,四 日,N5 N5
+N5_V075,五日,いつか,five days; fifth day of the month,N5,五 日,N5 N5
+N5_V076,六日,むいか,six days; sixth day of the month,N5,六 日,N5 N5
+N5_V077,七日,なのか,seven days; seventh day of the month,N5,七 日,N5 N5
+N5_V078,八日,ようか,eight days; eighth day of the month,N5,八 日,N5 N5
+N5_V079,九日,ここのか,nine days; ninth day of the month,N5,九 日,N5 N5
+N5_V080,十日,とおか,ten days; tenth day of the month,N5,十 日,N5 N5
+N5_V081,何日,なんにち,what day; how many days,N5,何 日,N5 N5
+N5_V082,一月,いちがつ,January,N5,一 月,N5 N5
+N5_V083,二月,にがつ,February,N5,二 月,N5 N5
+N5_V084,三月,さんがつ,March,N5,三 月,N5 N5
+N5_V085,四月,しがつ,April,N5,四 月,N5 N5
+N5_V086,五月,ごがつ,May,N5,五 月,N5 N5
+N5_V087,六月,ろくがつ,June,N5,六 月,N5 N5
+N5_V088,七月,しちがつ,July,N5,七 月,N5 N5
+N5_V089,八月,はちがつ,August,N5,八 月,N5 N5
+N5_V090,九月,くがつ,September,N5,九 月,N5 N5
+N5_V091,十月,じゅうがつ,October,N5,十 月,N5 N5
+N5_V092,十一月,じゅういちがつ,November,N5,十 一 月,N5 N5 N5
+N5_V093,十二月,じゅうにがつ,December,N5,十 二 月,N5 N5 N5
+N5_V094,何月,なんがつ,what month,N5,何 月,N5 N5
+N5_V095,何年,なんねん,what year; how many years,N5,何 年,N5 N5
+N5_V096,何時,なんじ,what time,N5,何 時,N5 N5
+N5_V097,何分,なんぷん,what minute; how many minutes,N5,何 分,N5 N5
+N5_V098,一人,ひとり,one person,N5,一 人,N5 N5
+N5_V099,二人,ふたり,two people,N5,二 人,N5 N5
+N5_V100,三人,さんにん,three people,N5,三 人,N5 N5
+N5_V101,四人,よにん,four people,N5,四 人,N5 N5
+N5_V102,五人,ごにん,five people,N5,五 人,N5 N5
+N5_V103,六人,ろくにん,six people,N5,六 人,N5 N5
+N5_V104,七人,しちにん,seven people,N5,七 人,N5 N5
+N5_V105,八人,はちにん,eight people,N5,八 人,N5 N5
+N5_V106,九人,きゅうにん,nine people,N5,九 人,N5 N5
+N5_V107,十人,じゅうにん,ten people,N5,十 人,N5 N5
+N5_V108,何人,なんにん,how many people,N5,何 人,N5 N5
+N5_V109,女の子,おんなのこ,girl,N5,女 子,N5 N5
+N5_V110,男の子,おとこのこ,boy,N5,男 子,N5 N5
+N5_V111,女子,じょし,girl; female student,N5,女 子,N5 N5
+N5_V112,男子,だんし,boy; male student,N5,男 子,N5 N5
+N5_V113,男女,だんじょ,men and women; male and female,N5,男 女,N5 N5
+N5_V114,兄弟,きょうだい,siblings; brothers,N5,兄 弟,N4 N4
+N5_V115,姉妹,しまい,sisters,N5,姉 妹,N4 N4
+N5_V116,家族,かぞく,family,N5,家 族,N4 N4
+N5_V117,両親,りょうしん,parents,N5,両 親,N3 N4
+N5_V118,父母,ふぼ,father and mother; parents,N5,父 母,N5 N5
+N5_V119,友達,ともだち,friend,N5,友 達,N5 N3
+N5_V120,友人,ゆうじん,friend,N5,友 人,N5 N5
+N5_V121,年上,としうえ,older; senior in age,N5,年 上,N5 N5
+N5_V122,年下,としした,younger; junior in age,N5,年 下,N5 N5
+N5_V123,入口,いりぐち,entrance,N5,入 口,N5 N4
+N5_V124,出口,でぐち,exit,N5,出 口,N5 N4
+N5_V125,出入口,でいりぐち,entrance and exit,N5,出 入 口,N5 N5 N4
+N5_V126,駅前,えきまえ,in front of the station,N5,駅 前,N4 N5
+N5_V127,店内,てんない,inside a store,N5,店 内,N4 N3
+N5_V128,室内,しつない,indoors; inside a room,N5,室 内,N4 N3
+N5_V129,会社,かいしゃ,company,N5,会 社,N4 N4
+N5_V130,仕事,しごと,work; job,N5,仕 事,N4 N4
+N5_V131,会社員,かいしゃいん,company employee,N5,会 社 員,N4 N4 N4
+N5_V132,銀行,ぎんこう,bank,N5,銀 行,N4 N5
+N5_V133,郵便局,ゆうびんきょく,post office,N5,郵 便 局,N2 N3 N3
+N5_V134,病院,びょういん,hospital,N5,病 院,N4 N4
+N5_V135,映画,えいが,movie,N5,映 画,N4 N4
+N5_V136,映画館,えいがかん,movie theater,N5,映 画 館,N4 N4 N4
+N5_V137,写真,しゃしん,photograph,N5,写 真,N4 N4
+N5_V138,音楽,おんがく,music,N5,音 楽,N4 N4
+N5_V139,旅行,りょこう,travel; trip,N5,旅 行,N4 N5
+N5_V140,公園,こうえん,park,N5,公 園,N4 N3
+N5_V141,食事,しょくじ,meal,N5,食 事,N5 N4
+N5_V142,食堂,しょくどう,dining hall; cafeteria,N5,食 堂,N5 N4
+N5_V143,朝食,ちょうしょく,breakfast,N5,朝 食,N4 N5
+N5_V144,昼食,ちゅうしょく,lunch,N5,昼 食,N4 N5
+N5_V145,夕食,ゆうしょく,dinner,N5,夕 食,N4 N5
+N5_V146,食べ物,たべもの,food,N5,食 物,N5 N4
+N5_V147,飲み物,のみもの,drink; beverage,N5,飲 物,N4 N4
+N5_V148,買い物,かいもの,shopping,N5,買 物,N4 N4
+N5_V149,果物,くだもの,fruit,N5,果 物,N3 N4
+N5_V150,野菜,やさい,vegetables,N5,野 菜,N4 N2
+N5_V151,料理,りょうり,cooking; cuisine,N5,料 理,N4 N4
+N5_V152,電気,でんき,electricity; electric light,N5,電 気,N5 N5
+N5_V153,電車,でんしゃ,train,N5,電 車,N5 N5
+N5_V154,自転車,じてんしゃ,bicycle,N5,自 転 車,N4 N4 N5
+N5_V155,地下鉄,ちかてつ,subway,N5,地 下 鉄,N4 N5 N2
+N5_V156,天気,てんき,weather,N5,天 気,N5 N5
+N5_V157,元気,げんき,healthy; energetic; well,N5,元 気,N4 N5
+N5_V158,空気,くうき,air; atmosphere,N5,空 気,N4 N5
+N5_V159,大雨,おおあめ,heavy rain,N5,大 雨,N5 N5
+N5_V160,大雪,おおゆき,heavy snow,N5,大 雪,N5 N3
+N5_V161,台風,たいふう,typhoon,N5,台 風,N4 N4
+N5_V162,火曜日,かようび,Tuesday,N5,火 曜 日,N5 N4 N5
+N5_V163,水曜日,すいようび,Wednesday,N5,水 曜 日,N5 N4 N5
+N5_V164,木曜日,もくようび,Thursday,N5,木 曜 日,N5 N4 N5
+N5_V165,金曜日,きんようび,Friday,N5,金 曜 日,N5 N4 N5
+N5_V166,土曜日,どようび,Saturday,N5,土 曜 日,N5 N4 N5
+N5_V167,日曜日,にちようび,Sunday,N5,日 曜,N5 N4
+N5_V168,月曜日,げつようび,Monday,N5,月 曜 日,N5 N4 N5
+N5_V169,何曜日,なんようび,what day of the week,N5,何 曜 日,N5 N4 N5
+N5_V170,東口,ひがしぐち,east exit,N5,東 口,N5 N4
+N5_V171,西口,にしぐち,west exit,N5,西 口,N5 N4
+N5_V172,南口,みなみぐち,south exit,N5,南 口,N5 N4
+N5_V173,北口,きたぐち,north exit,N5,北 口,N5 N4
+N5_V174,東西,とうざい,east and west,N5,東 西,N5 N5
+N5_V175,南北,なんぼく,north and south,N5,南 北,N5 N5
+N5_V176,左右,さゆう,left and right,N5,左 右,N5 N5
+N5_V177,右手,みぎて,right hand; right side,N5,右 手,N5 N4
+N5_V178,左手,ひだりて,left hand; left side,N5,左 手,N5 N4
+N5_V179,百円,ひゃくえん,100 yen,N5,百 円,N5 N5
+N5_V180,千円,せんえん,"1,000 yen",N5,千 円,N5 N5
+N5_V181,一万円,いちまんえん,"10,000 yen",N5,一 万 円,N5 N5 N5
+N5_V182,百万円,ひゃくまんえん,one million yen,N5,百 万 円,N5 N5 N5
+N5_V183,半分,はんぶん,half,N5,半 分,N5 N5
+N5_V184,一番,いちばん,number one; best; first,N5,一 番,N5 N3
+N5_V185,全部,ぜんぶ,all; whole,N5,全 部,N3 N3
+N5_V186,自分,じぶん,oneself,N5,自 分,N4 N5
+N5_V187,大丈夫,だいじょうぶ,all right; okay,N5,大 丈 夫,N5 N2 N3
+N5_V188,問題,もんだい,problem; question,N5,問 題,N4 N4
+N5_V189,有名,ゆうめい,famous,N5,有 名,N4 N5
+N5_V190,意味,いみ,meaning,N5,意 味,N4 N4
+N5_V191,上手,じょうず,skillful; good at,N5,上 手,N5 N4
+N5_V192,下手,へた,unskillful; poor at,N5,下 手,N5 N4
+N5_V193,一緒,いっしょ,together,N5,一 緒,N5 N3
+N5_V194,本屋,ほんや,bookstore,N5,本 屋,N5 N4
+N5_V195,八百屋,やおや,greengrocer,N5,八 百 屋,N5 N5 N4
+N5_V196,喫茶店,きっさてん,coffee shop; café,N5,喫 茶 店,N2 N4 N4
+N5_V197,万年筆,まんねんひつ,fountain pen,N5,万 年 筆,N5 N5 N2
+N5_V198,誕生日,たんじょうび,birthday,N5,誕 生 日,N1 N5 N5
+N5_V199,番号,ばんごう,number,N5,番 号,N3 N3
+N5_V200,住所,じゅうしょ,address,N5,住 所,N4 N3
+N5_V201,国籍,こくせき,nationality,N5,国 籍,N5 N2
+N5_V202,留学,りゅうがく,study abroad,N5,留 学,N3 N5
+N5_V203,見学,けんがく,observation; study visit,N5,見 学,N5 N5
+N5_V204,火山,かざん,volcano,N5,火 山,N5 N5
+N5_V205,小川,おがわ,stream; small river,N5,小 川,N5 N5
+N5_V206,白黒,しろくろ,black and white,N5,白 黒,N5 N4
+N5_V207,休日,きゅうじつ,holiday; day off,N5,休 日,N5 N5
+N5_V208,一週間,いっしゅうかん,one week,N5,一 週 間,N5 N4 N5
+N5_V209,二週間,にしゅうかん,two weeks,N5,二 週 間,N5 N4 N5
+N5_V210,一ヶ月,いっかげつ,one month,N5,一 月,N5 N5
+N5_V211,二ヶ月,にかげつ,two months,N5,二 月,N5 N5
+N5_V212,一年前,いちねんまえ,one year ago,N5,一 年 前,N5 N5 N5
+N5_V213,一年後,いちねんご,one year later,N5,一 年 後,N5 N5 N5
