@@ -5,6 +5,7 @@ import {
   success,
   type RepositoryResult,
 } from "@/lib/repositories/result";
+import type { LearnerLevel } from "@/types/learner";
 import type {
   Achievement,
   MasteryItem,
@@ -13,6 +14,10 @@ import type {
 } from "@/types/progress";
 
 export interface BackendProgressSnapshot {
+  currentLevel: LearnerLevel;
+  dailyGoalMinutes: number;
+  minutesStudiedToday: number;
+  joinDate: string;
   levelCompletion: number;
   learnedVocabularyCount: number;
   learnedKanjiCount: number;
@@ -40,6 +45,22 @@ function summaryNumber(value: unknown, key: string): number {
     : 0;
 }
 
+function dateInTimeZone(timeZone: string): string {
+  try {
+    const parts = new Intl.DateTimeFormat("en", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(new Date());
+    const part = (type: Intl.DateTimeFormatPartTypes) =>
+      parts.find((item) => item.type === type)?.value ?? "";
+    return `${part("year")}-${part("month")}-${part("day")}`;
+  } catch {
+    return new Date().toISOString().slice(0, 10);
+  }
+}
+
 export const progressRepository = {
   async loadCurrent(): Promise<RepositoryResult<BackendProgressSnapshot>> {
     const client = createClient();
@@ -62,7 +83,7 @@ export const progressRepository = {
       client
         .from("profiles")
         .select(
-          "xp,streak_days,longest_streak,total_study_minutes,daily_study_minutes",
+          "xp,streak_days,longest_streak,total_study_minutes,daily_study_minutes,current_jlpt_level,created_at,timezone",
         )
         .eq("id", userId)
         .single(),
@@ -184,7 +205,15 @@ export const progressRepository = {
     const earnedMap = new Map(
       (earned.data ?? []).map((item) => [item.achievement_id, item]),
     );
+    const today = dateInTimeZone(profile.data.timezone);
+    const minutesStudiedToday =
+      (weekly.data ?? []).find((item) => item.activity_date === today)?.minutes ?? 0;
+
     return success({
+      currentLevel: profile.data.current_jlpt_level as LearnerLevel,
+      dailyGoalMinutes: profile.data.daily_study_minutes,
+      minutesStudiedToday,
+      joinDate: profile.data.created_at.slice(0, 10),
       levelCompletion: summaryNumber(summary.data, "level_completion"),
       learnedVocabularyCount: summaryNumber(
         summary.data,
