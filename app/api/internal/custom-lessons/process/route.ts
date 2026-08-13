@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { processCustomLessonJobs } from "@/lib/custom-lessons/job-runner";
+import { processCustomLessonFastPath } from "@/lib/custom-lessons/fast-path";
 import { getCustomLessonSchedulerDiagnostics } from "@/lib/custom-lessons/scheduler-diagnostics";
 import { customLessonWorkerAuthorized } from "@/lib/custom-lessons/worker-authorization";
 
@@ -19,9 +19,9 @@ async function run(request: NextRequest, requestId?: string) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
   try {
-    const result = await processCustomLessonJobs({
+    const result = await processCustomLessonFastPath({
       requestId: requestId && UUID.test(requestId) ? requestId : undefined,
-      maxCycles: 1,
+      deferAudio: true,
     });
     return NextResponse.json({
       ok: true,
