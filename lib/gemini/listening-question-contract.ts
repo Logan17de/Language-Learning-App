@@ -19,8 +19,8 @@ export const listeningQuestionsSchema: JsonSchema = {
   properties: {
     questions: {
       type: "array",
-      minItems: 7,
-      maxItems: 7,
+      minItems: 5,
+      maxItems: 5,
       items: {
         type: "object",
         properties: {
@@ -67,13 +67,13 @@ export function listeningQuestionsPrompt(input: {
   knownPatterns: string[];
 }): string {
   return `
-Create exactly 7 listening-comprehension questions for ${input.languageLevel} learners.
+Create exactly 5 listening-comprehension questions for ${input.languageLevel} learners.
 
 grammar patterns:
 ${pythonStringList(input.knownPatterns)}
 
 Requirements:
-- Create exactly 7 listening questions: 3 easy, 2 medium, and 2 hard.
+- Create exactly 5 listening questions: 2 easy, 2 medium, and 1 hard.
 - Each question must include a natural Japanese conversation of 5–10 lines.
 - The conversation should be between 2 or more speakers.
 - The learner should answer only after listening to the entire conversation.
@@ -90,8 +90,8 @@ export function listeningQuestionIssues(value: unknown): string[] {
     return ["Listening response must be an object."];
   }
   const questions = (value as Record<string, unknown>).questions;
-  if (!Array.isArray(questions) || questions.length !== 7) {
-    return ["Listening response must contain exactly 7 questions."];
+  if (!Array.isArray(questions) || questions.length !== 5) {
+    return ["Listening response must contain exactly 5 questions."];
   }
   const difficulties = questions.map((question) =>
     question && typeof question === "object" && !Array.isArray(question)
@@ -101,7 +101,7 @@ export function listeningQuestionIssues(value: unknown): string[] {
   const easy = difficulties.filter((item) => item === "easy").length;
   const medium = difficulties.filter((item) => item === "medium").length;
   const hard = difficulties.filter((item) => item === "hard").length;
-  return easy === 3 && medium === 2 && hard === 2
+  return easy === 2 && medium === 2 && hard === 1
     ? []
-    : ["Listening response must contain 3 easy, 2 medium, and 2 hard questions."];
+    : ["Listening response must contain 2 easy, 2 medium, and 1 hard question."];
 }
