@@ -72,7 +72,6 @@ export function readingPassagePrompt(input: {
     naturalInterests: input.naturalInterests,
     targetGrammar: input.targetGrammar,
     targetKanji: input.targetKanji,
-    purpose: "reading",
   });
 }
 
