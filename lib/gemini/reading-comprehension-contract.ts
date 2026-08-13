@@ -31,14 +31,14 @@ export const readingQuestionsSchema: JsonSchema = {
   properties: {
     questions: {
       type: "array",
-      minItems: 7,
-      maxItems: 7,
+      minItems: 5,
+      maxItems: 5,
       items: {
         type: "object",
         additionalProperties: false,
         required: ["q_no", "difficulty", "question", "choices", "answer"],
         properties: {
-          q_no: { type: "integer", minimum: 1, maximum: 7 },
+          q_no: { type: "integer", minimum: 1, maximum: 5 },
           difficulty: {
             type: "string",
             enum: ["easy", "medium", "hard"],
@@ -89,7 +89,7 @@ ${input.japaneseStory}
 
 Requirements:
 - Do not rewrite the passage.
-- Create exactly 7 questions: 3 easy, 2 medium, and 2 hard.
+- Create exactly 5 questions: 2 easy, 2 medium, and 1 hard.
 - Base every question only on the passage.
 - Every question must be multiple choice with exactly four distinct choices.
 - Exactly one choice must be correct, and answer must exactly match that choice.
