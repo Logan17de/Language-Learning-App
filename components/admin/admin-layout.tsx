@@ -7,45 +7,29 @@ import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { authService } from "@/lib/auth/auth-service";
 import { canAccessAdmin } from "@/lib/auth/permissions";
 import { getBackendMode } from "@/lib/supabase/config";
-import { useAdminStore } from "@/store/admin-store";
+import { useAdminSessionStore } from "@/store/admin-session-store";
 
 const ADMIN_SESSION_TIMEOUT_MS = 8_000;
-const ADMIN_HYDRATION_FALLBACK_MS = 1_500;
 
 export function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const hydrated = useAdminStore((state) => state.hasHydrated);
-  const authenticated = useAdminStore((state) => state.session.authenticated);
-  const establishBackendSession = useAdminStore(
+  const authenticated = useAdminSessionStore(
+    (state) => state.session.authenticated,
+  );
+  const establishBackendSession = useAdminSessionStore(
     (state) => state.establishBackendSession,
   );
-  const setHasHydrated = useAdminStore((state) => state.setHasHydrated);
+  const logout = useAdminSessionStore((state) => state.logout);
   const [drawer, setDrawer] = useState(false);
   const [identityChecked, setIdentityChecked] = useState(false);
   const loginRoute = pathname === "/admin/login";
   const backendReady = getBackendMode() === "supabase";
 
   useEffect(() => {
-    if (hydrated) return;
-
-    const finishHydration = () => setHasHydrated(true);
-    const unsubscribe = useAdminStore.persist.onFinishHydration(finishHydration);
-    if (useAdminStore.persist.hasHydrated()) finishHydration();
-    const fallback = window.setTimeout(
-      finishHydration,
-      ADMIN_HYDRATION_FALLBACK_MS,
-    );
-
-    return () => {
-      unsubscribe();
-      window.clearTimeout(fallback);
-    };
-  }, [hydrated, setHasHydrated]);
-
-  useEffect(() => {
-    if (!hydrated || loginRoute || authenticated) return;
+    if (loginRoute || identityChecked) return;
     if (!backendReady) {
+      logout();
       setIdentityChecked(true);
       return;
     }
@@ -65,6 +49,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           identity.data.displayName,
           identity.data.role.replace("_", " "),
         );
+      } else {
+        logout();
       }
       setIdentityChecked(true);
     }
@@ -77,26 +63,32 @@ export function AdminLayout({ children }: { children: ReactNode }) {
       active = false;
       if (timeout) clearTimeout(timeout);
     };
-  }, [authenticated, backendReady, establishBackendSession, hydrated, loginRoute]);
+  }, [
+    backendReady,
+    establishBackendSession,
+    identityChecked,
+    loginRoute,
+    logout,
+  ]);
 
   useEffect(() => {
-    if (hydrated && identityChecked && !authenticated && !loginRoute) {
-      const reason = backendReady ? "" : "&error=backend-not-configured";
-      router.replace(
-        `/admin/login?next=${encodeURIComponent(pathname ?? "/admin")}${reason}`,
-      );
-    }
-  }, [authenticated, backendReady, hydrated, identityChecked, loginRoute, pathname, router]);
+    if (!identityChecked || authenticated || loginRoute) return;
+    const reason = backendReady ? "" : "&error=backend-not-configured";
+    router.replace(
+      `/admin/login?next=${encodeURIComponent(pathname ?? "/admin")}${reason}`,
+    );
+  }, [
+    authenticated,
+    backendReady,
+    identityChecked,
+    loginRoute,
+    pathname,
+    router,
+  ]);
 
   if (loginRoute) return <>{children}</>;
-  if (!hydrated || (!authenticated && !identityChecked)) {
-    return (
-      <AdminLoading
-        message={
-          hydrated ? "Verifying admin access…" : "Loading admin workspace…"
-        }
-      />
-    );
+  if (!identityChecked) {
+    return <AdminLoading message="Verifying admin access…" />;
   }
   if (!authenticated) {
     return <AdminLoading message="Redirecting to admin login…" />;
