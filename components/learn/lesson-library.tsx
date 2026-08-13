@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
@@ -9,47 +9,21 @@ import {
   Play,
   RotateCcw,
 } from "lucide-react";
-import { mockLessons } from "@/data/mock-lessons";
-import {
-  learnerVisibleLessons,
-  mergeCanonicalLessons,
-} from "@/lib/canonical-lessons";
-import { selectNextLesson } from "@/lib/lesson-assignment";
 import { useAppStore } from "@/store/app-store";
-import { useAdminStore } from "@/store/admin-store";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getBackendMode } from "@/lib/supabase/config";
 import { useBackendLessonStore } from "@/store/backend-lesson-store";
-import type { JLPTLevel } from "@/types/lesson";
 
 export function LessonLibrary() {
   const router = useRouter();
-  const [demoLoading, setDemoLoading] = useState(true);
   const backendLessons = useBackendLessonStore((state) => state.lessons);
   const backendLoading = useBackendLessonStore((state) => state.loading);
   const backendAssigning = useBackendLessonStore((state) => state.assigning);
   const backendError = useBackendLessonStore((state) => state.error);
   const loadBackendLessons = useBackendLessonStore((state) => state.load);
   const assignNewBackendLesson = useBackendLessonStore((state) => state.assignNew);
-  const generated = useAppStore((state) => state.generatedLessons);
-  const overrides = useAdminStore((state) => state.lessonOverrides);
-  const deletedLessonIds = useAdminStore((state) => state.deletedLessonIds);
-  const completedIds = useAppStore((state) => state.progress.completedLessonIds);
   const sessions = useAppStore((state) => state.lessonSessions);
-  const onboarding = useAppStore((state) => state.onboarding);
-  const subscription = useAppStore((state) => state.subscription);
-  const user = useAppStore((state) => state.user);
-  const backendMode = getBackendMode();
-  const premium = subscription.plan === "premium";
 
-  const allDemoLessons = useMemo(
-    () =>
-      learnerVisibleLessons(
-        mergeCanonicalLessons(mockLessons, generated, overrides, deletedLessonIds),
-      ),
-    [deletedLessonIds, generated, overrides],
-  );
   const activeSession = useMemo(
     () =>
       Object.values(sessions)
@@ -59,68 +33,27 @@ export function LessonLibrary() {
   );
 
   const assignedLesson = useMemo(() => {
-    const availableLessons =
-      backendMode === "supabase" ? backendLessons : allDemoLessons;
     if (activeSession) {
-      const activeLesson = availableLessons.find(
+      const activeLesson = backendLessons.find(
         (lesson) => lesson.id === activeSession.lessonId,
       );
       if (activeLesson) return activeLesson;
     }
-    if (backendMode === "supabase") return backendLessons[0] ?? null;
-    return (
-      selectNextLesson({
-        lessons: allDemoLessons,
-        level: learnerLevel(onboarding.level ?? user.level),
-        interests: onboarding.interests,
-        premium,
-        excludedLessonIds: completedIds,
-        seed: [user.id, completedIds.length].join(":"),
-      })?.lesson ?? null
-    );
-  }, [
-    activeSession,
-    allDemoLessons,
-    backendLessons,
-    backendMode,
-    completedIds,
-    onboarding.interests,
-    onboarding.level,
-    premium,
-    user.id,
-    user.level,
-  ]);
+    return backendLessons[0] ?? null;
+  }, [activeSession, backendLessons]);
 
   const assignedSession = assignedLesson ? sessions[assignedLesson.id] : undefined;
   const isResuming = Boolean(assignedSession && !assignedSession.completed);
 
   useEffect(() => {
     void loadBackendLessons();
-    const timer = window.setTimeout(() => setDemoLoading(false), 320);
-    return () => window.clearTimeout(timer);
   }, [loadBackendLessons]);
 
   async function startNewLesson() {
     if (!assignedLesson) return;
-    if (backendMode === "supabase") {
-      const next = await assignNewBackendLesson(assignedLesson.id);
-      if (next) router.push(`/lesson/${next.id}/play`);
-      return;
-    }
-    const next = selectNextLesson({
-      lessons: allDemoLessons,
-      level: learnerLevel(onboarding.level ?? user.level),
-      interests: onboarding.interests,
-      premium,
-      excludedLessonIds: Array.from(
-        new Set([...completedIds, assignedLesson.id]),
-      ),
-      seed: [user.id, completedIds.length, assignedLesson.id, "new"].join(":"),
-    })?.lesson;
+    const next = await assignNewBackendLesson(assignedLesson.id);
     if (next) router.push(`/lesson/${next.id}/play`);
   }
-
-  const loading = backendLoading || (backendMode === "demo" && demoLoading);
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
@@ -137,7 +70,7 @@ export function LessonLibrary() {
       </header>
 
       <section className="mt-9" aria-label="Assigned lesson">
-        {loading ? (
+        {backendLoading ? (
           <Card
             className="grid min-h-80 place-items-center overflow-hidden !bg-moss-50"
             role="status"
@@ -171,7 +104,9 @@ export function LessonLibrary() {
                 {assignedLesson.level} lesson
               </p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-                {isResuming ? "Continue your learning loop." : "Start with a clean reveal."}
+                {isResuming
+                  ? "Continue your learning loop."
+                  : "Start with a clean reveal."}
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
                 {isResuming
@@ -180,9 +115,15 @@ export function LessonLibrary() {
               </p>
 
               <div className="mx-auto mt-7 flex max-w-lg flex-wrap justify-center gap-2 text-xs font-medium text-white/65">
-                <span className="rounded-full bg-white/[0.07] px-3 py-2">7 connected stages</span>
-                <span className="rounded-full bg-white/[0.07] px-3 py-2">Speaking practice</span>
-                <span className="rounded-full bg-white/[0.07] px-3 py-2">Review evidence</span>
+                <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                  7 connected stages
+                </span>
+                <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                  Speaking practice
+                </span>
+                <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                  Final review
+                </span>
               </div>
 
               <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
@@ -205,7 +146,10 @@ export function LessonLibrary() {
                     className="border-white/20 bg-white/10 px-8 text-white hover:border-white/30 hover:bg-white/15"
                   >
                     {backendAssigning ? (
-                      <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+                      <LoaderCircle
+                        className="size-4 animate-spin"
+                        aria-hidden="true"
+                      />
                     ) : (
                       <Play className="size-4" aria-hidden="true" />
                     )}
@@ -231,11 +175,11 @@ export function LessonLibrary() {
                 aria-hidden="true"
               />
               <h2 className="mt-5 text-xl font-semibold">
-                Every available lesson is complete.
+                No lesson is available right now.
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted">
                 {backendError ||
-                  "AIko will prepare another level-matched lesson when new content is available."}
+                  "AIko will show the next level-matched lesson when content is available."}
               </p>
             </div>
           </Card>
@@ -243,14 +187,4 @@ export function LessonLibrary() {
       </section>
     </div>
   );
-}
-
-function learnerLevel(level: string | null): JLPTLevel {
-  return level === "N5" ||
-    level === "N4" ||
-    level === "N3" ||
-    level === "N2" ||
-    level === "N1"
-    ? level
-    : "N5";
 }
