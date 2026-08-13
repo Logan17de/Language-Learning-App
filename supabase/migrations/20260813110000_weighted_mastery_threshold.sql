@@ -30,6 +30,11 @@ begin
     new.recognition_score,
     new.pronunciation_score
   );
+  new.next_review_at := case
+    when new.mastery < 60 then now()
+    when new.mastery < 80 then now() + interval '1 day'
+    else now() + interval '7 days'
+  end;
   return new;
 end
 $$;
@@ -105,6 +110,7 @@ begin
         when status = 'mastered' then 'scheduled'
         else status
       end,
+      due_at = new.next_review_at,
       updated_at = now()
   where user_id = new.user_id
     and item_type = new.item_type
@@ -126,10 +132,11 @@ for each row execute function public.sync_review_queue_from_mastery();
 update public.review_queue queue
 set status = case
       when mastery.mastery >= 80 then 'mastered'
-      when queue.status = 'mastered' and queue.due_at <= now() then 'due'
+      when queue.status = 'mastered' and mastery.next_review_at <= now() then 'due'
       when queue.status = 'mastered' then 'scheduled'
       else queue.status
     end,
+    due_at = coalesce(mastery.next_review_at, queue.due_at),
     updated_at = now()
 from public.learner_mastery mastery
 where mastery.user_id = queue.user_id
