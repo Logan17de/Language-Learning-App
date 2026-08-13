@@ -26,7 +26,7 @@ describe("review data stays internal", () => {
   it("keeps the review queue available for internal mastery logic", () => {
     const repository = source("lib/repositories/review-repository.ts");
 
-    expect(repository).toContain('Tables]["review_queue"]');
+    expect(repository).toContain('["Tables"]["review_queue"]');
     expect(repository).toContain('from("review_queue")');
   });
 });
