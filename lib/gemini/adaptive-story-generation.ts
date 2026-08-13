@@ -3,7 +3,6 @@ import "server-only";
 import type { JLPTLevel } from "@/types/lesson";
 import { generateStructured } from "@/lib/gemini/structured-output";
 import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
-import { storyUsesGrammarPattern } from "@/lib/gemini/lesson-validation";
 import {
   storyGenerationPrompt,
   storyGenerationSchema,
@@ -17,8 +16,8 @@ import { normalizeStoryPassage } from "@/lib/gemini/story-pipeline-v3";
 
 /**
  * API call 1. This call is intentionally limited to one passage-style story.
- * Existing library taps and all activities are resolved only after this
- * response has passed story validation.
+ * Target kanji and grammar are prompt guidance only. Acceptance is structural:
+ * a valid story is not rejected because the model used different content.
  */
 export async function generateAdaptiveStoryDraft(input: {
   requestId: string;
@@ -47,22 +46,6 @@ export async function generateAdaptiveStoryDraft(input: {
       level: input.level,
     },
   });
-
-  const japanese = result.value.japanese_story.normalize("NFKC");
-  const missingKanji = input.plan.kanji
-    .map((item) => item.character)
-    .filter((character) => !japanese.includes(character));
-  const missingGrammar = input.plan.grammar
-    .map((item) => item.pattern)
-    .filter((pattern) => !storyUsesGrammarPattern(japanese, pattern));
-  if (missingKanji.length > 0 || missingGrammar.length > 0) {
-    throw new Error(
-      `Story target validation failed: ${[
-        ...missingKanji.map((item) => `missing kanji ${item}`),
-        ...missingGrammar.map((item) => `missing grammar ${item}`),
-      ].join(", ")}.`,
-    );
-  }
 
   return {
     draft: normalizeStoryPassage(result.value),
