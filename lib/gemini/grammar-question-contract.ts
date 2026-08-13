@@ -70,8 +70,8 @@ export const grammarQuestionsSchema: JsonSchema = {
     },
     questions: {
       type: "array",
-      minItems: 10,
-      maxItems: 10,
+      minItems: 7,
+      maxItems: 7,
       items: {
         type: "object",
         properties: {
@@ -135,7 +135,7 @@ Create AIko's grammar lesson from this fixed Japanese story.
 Story:
 ${input.japaneseStory}
 
-Three target grammar patterns:
+Three target grammar patterns (priority teaching targets, not a question whitelist):
 ${pythonJson(indexedPatterns)}
 
 Question formats:
@@ -145,11 +145,11 @@ Requirements:
 - Do not rewrite the story.
 - grammarTeaching must contain exactly one entry for requestIndex 0 through 2.
 - For each grammarTeaching entry, explain the fixed pattern's meaning, formation, usage, one natural Japanese example, and the English translation of that example. Do not output or replace the pattern itself.
-- Use only the provided grammar patterns that appear in the story.
-- Create story-related questions in the most appropriate format for each pattern and difficulty.
-- Create exactly 10 questions: 3 easy, 4 medium, and 3 hard.
+- Create exactly 7 questions: 3 easy, 2 medium, and 2 hard.
+- Prefer the supplied target grammar patterns when they make natural, useful questions, but they are guidance rather than a whitelist.
+- Questions may also practice other natural grammar from the fixed story when appropriate for the learner level.
+- Create story-related questions in the most appropriate format and difficulty.
 - Every question must have four different choices and one correct answer.
-- Do not create questions using grammar patterns that do not appear in the story.
 - Follow the provided question formats exactly.
 - Return only the required JSON.
 `;

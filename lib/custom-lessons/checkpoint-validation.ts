@@ -102,6 +102,55 @@ function questionArrayIssues(
   return issues;
 }
 
+function difficultyDistributionIssues(
+  value: unknown,
+  field: string,
+  expected: Record<string, number>,
+  label: string,
+): string[] {
+  const items = array(value);
+  const counts = new Map<string, number>();
+  for (const item of items) {
+    const raw = record(item)?.[field];
+    if (typeof raw === "string") counts.set(raw, (counts.get(raw) ?? 0) + 1);
+  }
+  const matches = Object.entries(expected).every(([key, count]) => (counts.get(key) ?? 0) === count);
+  return matches
+    ? []
+    : [`${label} must contain 3 easy, 2 medium, and 2 hard items.`];
+}
+
+function readingQuestionArrayIssues(value: unknown): string[] {
+  const questions = array(value);
+  const issues = questions.length === 7
+    ? []
+    : ["Reading questions must contain exactly 7 questions."];
+  questions.forEach((question, index) => {
+    const item = record(question);
+    const label = `Reading question ${index + 1}`;
+    if (!item) {
+      issues.push(`${label} must be an object.`);
+      return;
+    }
+    issues.push(...requiredTextIssues(item, ["question", "answer"], label));
+    const choices = array(item.choices).flatMap((choice) => text(choice) ? [text(choice)!] : []);
+    if (choices.length !== 4) issues.push(`${label} must contain exactly four non-empty choices.`);
+    const normalized = choices.map(normalizedChoice);
+    if (new Set(normalized).size !== normalized.length) issues.push(`${label} choices must be distinct.`);
+    const answer = text(item.answer);
+    if (answer && !normalized.includes(normalizedChoice(answer))) {
+      issues.push(`${label} answer must occur in choices.`);
+    }
+  });
+  issues.push(...difficultyDistributionIssues(
+    questions,
+    "difficulty",
+    { easy: 3, medium: 2, hard: 2 },
+    "Reading questions",
+  ));
+  return issues;
+}
+
 function teachingArrayIssues(
   value: unknown,
   expected: number,
@@ -151,9 +200,15 @@ export function activityGroupCheckpointIssues(
     ));
     issues.push(...questionArrayIssues(
       payload.vocabularyQuestions,
-      13,
+      7,
       "Vocabulary question",
       validLibraryIds,
+    ));
+    issues.push(...difficultyDistributionIssues(
+      payload.vocabularyQuestions,
+      "difficulty",
+      { Easy: 3, Medium: 2, Hard: 2 },
+      "Vocabulary questions",
     ));
     return issues;
   }
@@ -168,9 +223,15 @@ export function activityGroupCheckpointIssues(
     ));
     issues.push(...questionArrayIssues(
       payload.grammarQuestions,
-      10,
+      7,
       "Grammar question",
       validLibraryIds,
+    ));
+    issues.push(...difficultyDistributionIssues(
+      payload.grammarQuestions,
+      "difficulty",
+      { Easy: 3, Medium: 2, Hard: 2 },
+      "Grammar questions",
     ));
     issues.push(...requiredTextIssues(payload, ["readingTitle", "readingJapaneseTitle"], "Reading region"));
     const lines = array(payload.readingConversation);
@@ -185,21 +246,27 @@ export function activityGroupCheckpointIssues(
       issues.push(...requiredTextIssues(item, ["japanese", "english"], label));
       issues.push(...targetIssues(item, label, validLibraryIds));
     });
-    const readingQuestions = array(payload.readingQuestions);
-    if (readingQuestions.length < 1) issues.push("Reading questions must not be empty.");
-    readingQuestions.forEach((question, index) => {
-      const item = record(question);
-      if (!item) issues.push(`Reading question ${index + 1} must be an object.`);
-      else issues.push(...requiredTextIssues(item, ["question", "answer"], `Reading question ${index + 1}`));
-    });
+    issues.push(...readingQuestionArrayIssues(payload.readingQuestions));
     return issues;
   }
 
   if (group === "listening_and_speaking") {
     const listening = array(payload.listeningExercises);
     const speaking = array(payload.speakingExercises);
-    if (listening.length !== 5) issues.push("Listening region must contain exactly 5 exercises.");
-    if (speaking.length !== 5) issues.push("Speaking region must contain exactly 5 exercises.");
+    if (listening.length !== 7) issues.push("Listening region must contain exactly 7 exercises.");
+    if (speaking.length !== 7) issues.push("Speaking region must contain exactly 7 exercises.");
+    issues.push(...difficultyDistributionIssues(
+      listening,
+      "difficulty",
+      { Easy: 3, Medium: 2, Hard: 2 },
+      "Listening exercises",
+    ));
+    issues.push(...difficultyDistributionIssues(
+      speaking,
+      "mode",
+      { easy: 3, medium: 2, hard: 2 },
+      "Speaking exercises",
+    ));
     listening.forEach((exercise, index) => {
       const item = record(exercise);
       const label = `Listening exercise ${index + 1}`;
@@ -343,11 +410,12 @@ export function playableLessonPackageIssues(value: unknown): string[] {
     ["kanji", 5, 5],
     ["vocabulary", 8, 200],
     ["grammar", 3, 3],
-    ["vocabularyQuestions", 13, 13],
-    ["grammarQuestions", 10, 10],
+    ["vocabularyQuestions", 7, 7],
+    ["grammarQuestions", 7, 7],
     ["readingConversation", 1, 6],
-    ["listeningExercises", 5, 5],
-    ["speakingExercises", 5, 5],
+    ["readingQuestions", 7, 7],
+    ["listeningExercises", 7, 7],
+    ["speakingExercises", 7, 7],
     ["reviewQuestions", 5, 5],
   ];
   for (const [key, minimum, maximum] of counts) {
@@ -362,6 +430,7 @@ export function playableLessonPackageIssues(value: unknown): string[] {
       issues.push(`Story line ${index + 1} is not playable.`);
     }
   }
+  issues.push(...readingQuestionArrayIssues(lesson.readingQuestions));
   return issues;
 }
 

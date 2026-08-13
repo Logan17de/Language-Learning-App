@@ -1,5 +1,8 @@
 import type { JsonSchema } from "@/lib/openai/structured-output";
-import { storyGenerationSchema } from "@/lib/gemini/story-generation-contract";
+import {
+  storyGenerationSchema,
+  storyGenerationPrompt,
+} from "@/lib/gemini/story-generation-contract";
 
 export interface RawReadingPassage {
   selected_interest: string;
@@ -10,8 +13,10 @@ export interface RawReadingPassage {
 }
 
 export interface RawReadingQuestion {
+  q_no: number;
   difficulty: "easy" | "medium" | "hard";
   question: string;
+  choices: string[];
   answer: string;
 }
 
@@ -26,20 +31,27 @@ export const readingQuestionsSchema: JsonSchema = {
   properties: {
     questions: {
       type: "array",
-      minItems: 5,
-      maxItems: 5,
+      minItems: 7,
+      maxItems: 7,
       items: {
         type: "object",
+        additionalProperties: false,
+        required: ["q_no", "difficulty", "question", "choices", "answer"],
         properties: {
+          q_no: { type: "integer", minimum: 1, maximum: 7 },
           difficulty: {
             type: "string",
             enum: ["easy", "medium", "hard"],
           },
           question: { type: "string" },
+          choices: {
+            type: "array",
+            minItems: 4,
+            maxItems: 4,
+            items: { type: "string" },
+          },
           answer: { type: "string" },
         },
-        required: ["difficulty", "question", "answer"],
-        additionalProperties: false,
       },
     },
   },
@@ -54,46 +66,14 @@ export function readingPassagePrompt(input: {
   targetGrammar: string[];
   targetKanji: string[];
 }): string {
-  const interestText = input.naturalInterests.length > 0
-    ? input.naturalInterests.join(", ")
-    : "No learner interests were provided.";
-  const grammarText = input.targetGrammar.length > 0
-    ? input.targetGrammar.join(", ")
-    : "No target grammar was provided.";
-  const kanjiText = input.targetKanji.length > 0
-    ? input.targetKanji.join(", ")
-    : "No target kanji was provided.";
-
-  return `
-Generate a Japanese language-learning story for reading.
-
-Learner requirements:
-- Language level: ${input.languageLevel}
-- Story topic: ${input.topic}
-- Available learner interests: ${interestText}
-- Target grammar: ${grammarText}
-- Target kanji: ${kanjiText}
-
-Story requirements:
-- The story must primarily focus on the given topic.
-- Write one coherent story containing 10–15 natural Japanese sentences.
-- Return the Japanese story as one continuous string, not an array.
-- Select exactly one learner interest that fits the story naturally.
-- When no provided interest fits naturally, choose a suitable interest
-  yourself.
-- When no learner interests are provided, choose a suitable interest
-  yourself.
-- Do not force an interest into the story.
-- Naturally use every provided target grammar pattern at least once.
-- Naturally use every provided target kanji at least once.
-- Keep all other vocabulary and grammar appropriate for ${input.languageLevel}.
-- Make the story engaging, educational, and easy to follow.
-- Keep romantic interactions respectful and age-appropriate.
-- Use Japanese quotation marks 「」 only for direct speech.
-- Do not place narration inside Japanese quotation marks.
-- Provide an accurate English translation of the complete story.
-- Return the English translation as one continuous string, not an array.
-`;
+  return storyGenerationPrompt({
+    languageLevel: input.languageLevel,
+    topic: input.topic,
+    naturalInterests: input.naturalInterests,
+    targetGrammar: input.targetGrammar,
+    targetKanji: input.targetKanji,
+    purpose: "reading",
+  });
 }
 
 export function readingQuestionsPrompt(input: {
@@ -101,25 +81,23 @@ export function readingQuestionsPrompt(input: {
   japaneseStory: string;
 }): string {
   return `
-Create reading-comprehension questions from the following Japanese story.
+Create reading-comprehension multiple-choice questions for this fixed Japanese passage.
 
 Language level: ${input.languageLevel}
 
-Story:
+Passage:
 ${input.japaneseStory}
 
 Requirements:
-- Create exactly 5 questions: 2 easy, 2 medium, and 1 hard.
-- Base every question only on the story.
-- Write essay-style questions in Japanese.
-- Require answers in short, complete Japanese sentences.
-- Include direct-detail, sequence, reason, and simple inference questions.
-- Keep the questions appropriate for ${input.languageLevel}.
-- Do not create questions that cannot be answered from the story.
-- Do not copy full sentences from the story as answers unless necessary.
-- Easy questions must have answers stated directly in the story.
-- Medium questions must combine information from two or more story sentences.
-- Hard questions must require a simple inference supported by the story.
+- Do not rewrite the passage.
+- Create exactly 7 questions: 3 easy, 2 medium, and 2 hard.
+- Base every question only on the passage.
+- Every question must be multiple choice with exactly four distinct choices.
+- Exactly one choice must be correct, and answer must exactly match that choice.
+- Easy questions should test direct information.
+- Medium questions may test sequence, reason, or speaker/character intention.
+- Hard questions may test inference or combine details from multiple parts of the passage.
+- Keep the Japanese appropriate for ${input.languageLevel}.
 - Return only the required JSON.
 `;
 }

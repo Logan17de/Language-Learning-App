@@ -26,14 +26,24 @@ const vocabularyMigration = readFileSync(
 describe("generated lesson validation", () => {
   it("keeps the original story dictionary pass while fixing learner activity banks", () => {
     expect(listeningQuestionIssues({
-      questions: Array.from({ length: 5 }, () => ({})),
+      questions: [
+        { difficulty: "easy" },
+        { difficulty: "easy" },
+        { difficulty: "easy" },
+        { difficulty: "medium" },
+        { difficulty: "medium" },
+        { difficulty: "hard" },
+        { difficulty: "hard" },
+      ],
     })).toEqual([]);
     expect(speakingReadAloudIssues({
       sentences: [
         { difficulty: "easy" },
         { difficulty: "easy" },
+        { difficulty: "easy" },
         { difficulty: "medium" },
         { difficulty: "medium" },
+        { difficulty: "hard" },
         { difficulty: "hard" },
       ],
     })).toEqual([]);
@@ -41,9 +51,11 @@ describe("generated lesson validation", () => {
     expect(storyEnrichment).toContain("lookupJapaneseDictionaryVocabulary");
     expect(storyEnrichment).not.toContain("generateStructured");
 
-    expect(reading).toContain("Reading response must contain exactly 5 questions.");
-    expect(activities).toContain("Vocabulary response must contain exactly 13 questions.");
-    expect(activities).toContain("Grammar response must contain exactly 10 questions.");
+    expect(reading).toContain("Reading response must contain exactly 7 questions.");
+    expect(activities).toContain("Vocabulary response must contain exactly 7 questions.");
+    expect(activities).toContain("Grammar response must contain exactly 7 questions.");
+    expect(activities).not.toContain("does not practice one of the selected grammar patterns");
+    expect(activities).not.toContain("does not practice target kanji");
     expect(activities).toContain("Review response must contain exactly 5 questions.");
     expect(activities).toContain("strictSchema: true");
     expect(activities).toContain("exactSchemaName: true");
@@ -51,7 +63,9 @@ describe("generated lesson validation", () => {
       "const targets = storyTargets.length === 3 ? storyTargets : targetGrammarRecords(input.library)",
     );
     expect(vocabularyContract).toContain("kanjiTeaching");
+    expect(vocabularyContract).toContain("not a question whitelist");
     expect(grammarContract).toContain("grammarTeaching");
+    expect(grammarContract).toContain("not a question whitelist");
   });
 
   it("keeps JMdict limited to the original story", () => {

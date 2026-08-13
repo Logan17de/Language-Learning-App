@@ -58,7 +58,7 @@ describe("custom lesson generation prompt contracts", () => {
     });
   });
 
-  it("creates the vocabulary and kanji lesson from fixed story plus five target kanji", () => {
+  it("creates seven vocabulary and kanji questions while keeping five target teaching cards", () => {
     const prompt = vocabularyQuestionsPrompt({
       japaneseStory: "学校へ行きました。友達と昼ご飯を食べました。",
       targetKanji: ["学", "校", "友", "食", "昼"],
@@ -71,9 +71,9 @@ describe("custom lesson generation prompt contracts", () => {
     });
     expect(prompt).toContain("Create AIko's vocabulary and kanji lesson from this fixed Japanese story.");
     expect(prompt).toContain("kanjiTeaching must contain exactly one entry for requestIndex 0 through 4");
-    expect(prompt).toContain("Exactly 5 questions should directly practice the five target kanji");
-    expect(prompt).toContain("remaining 8 questions");
-    expect(prompt).toContain("Create exactly 13 questions: 6 easy, 4 medium, and 3 hard.");
+    expect(prompt).toContain("not a question whitelist");
+    expect(prompt).toContain("Create exactly 7 questions: 3 easy, 2 medium, and 2 hard.");
+    expect(prompt).toContain("Questions may also practice other useful vocabulary or kanji");
     expect(vocabularyQuestionFormats).toHaveLength(16);
     expect(vocabularyQuestionsSchema).toMatchObject({
       type: "object",
@@ -81,7 +81,7 @@ describe("custom lesson generation prompt contracts", () => {
       additionalProperties: false,
       properties: {
         kanjiTeaching: { type: "array", minItems: 5, maxItems: 5 },
-        questions: { type: "array", minItems: 13, maxItems: 13 },
+        questions: { type: "array", minItems: 7, maxItems: 7 },
       },
     });
   });
@@ -94,7 +94,7 @@ describe("custom lesson generation prompt contracts", () => {
     })).toEqual(["学", "校", "友", "達", "本"]);
   });
 
-  it("creates grammar teaching and questions from exactly the selected patterns", () => {
+  it("creates grammar teaching from selected targets but allows broader story grammar questions", () => {
     const prompt = grammarQuestionsPrompt({
       japaneseStory: "音楽を聞きながら、学校へ行きます。",
       targetGrammarPatterns: ["～ながら", "～たい", "～てもいい"],
@@ -109,7 +109,8 @@ describe("custom lesson generation prompt contracts", () => {
     expect(prompt).toContain("Create AIko's grammar lesson from this fixed Japanese story.");
     expect(prompt).toContain("grammarTeaching must contain exactly one entry for requestIndex 0 through 2");
     expect(prompt).toContain("meaning, formation, usage");
-    expect(prompt).toContain("Create exactly 10 questions: 3 easy, 4 medium, and 3 hard.");
+    expect(prompt).toContain("Create exactly 7 questions: 3 easy, 2 medium, and 2 hard.");
+    expect(prompt).toContain("guidance rather than a whitelist");
     expect(grammarQuestionFormats).toHaveLength(10);
     expect(grammarQuestionsSchema).toMatchObject({
       type: "object",
@@ -117,19 +118,19 @@ describe("custom lesson generation prompt contracts", () => {
       additionalProperties: false,
       properties: {
         grammarTeaching: { type: "array", minItems: 3, maxItems: 3 },
-        questions: { type: "array", minItems: 10, maxItems: 10 },
+        questions: { type: "array", minItems: 7, maxItems: 7 },
       },
     });
   });
 
-  it("passes only target grammar patterns that occur in the story", () => {
+  it("passes only target grammar patterns that occur in the story for teaching identity selection", () => {
     expect(filterStoryGrammarPatterns({
       japaneseStory: "音楽を聞きながら、学校へ行きます。",
       targetGrammarPatterns: ["～ながら", "～てもいいですか", "～たい"],
     })).toEqual(["～ながら"]);
   });
 
-  it("keeps reading as passage generation followed by five comprehension questions", () => {
+  it("keeps reading as passage generation followed by seven MCQs", () => {
     const passagePrompt = readingPassagePrompt({
       languageLevel: "JLPT N5",
       topic: "A day at school",
@@ -145,50 +146,62 @@ describe("custom lesson generation prompt contracts", () => {
       languageLevel: "JLPT N5",
       japaneseStory: "太郎は学校へ行きました。",
     });
-    expect(questionsPrompt).toContain("Create exactly 5 questions: 2 easy, 2 medium, and 1 hard.");
-    expect(questionsPrompt).toContain("Base every question only on the story.");
+    expect(questionsPrompt).toContain("Create exactly 7 questions: 3 easy, 2 medium, and 2 hard.");
+    expect(questionsPrompt).toContain("multiple choice with exactly four distinct choices");
+    expect(questionsPrompt).toContain("Base every question only on the passage.");
     expect(readingQuestionsSchema).toMatchObject({
       type: "object",
       required: ["questions"],
-      properties: { questions: { minItems: 5, maxItems: 5 } },
+      properties: {
+        questions: {
+          minItems: 7,
+          maxItems: 7,
+          items: {
+            required: ["q_no", "difficulty", "question", "choices", "answer"],
+          },
+        },
+      },
     });
   });
 
-  it("keeps listening at exactly five comprehension exercises", () => {
+  it("keeps listening at seven comprehension exercises", () => {
     const prompt = listeningQuestionsPrompt({
       languageLevel: "JLPT N5",
       knownPatterns: ["～たい"],
     });
-    expect(prompt).toContain("Create exactly 5 listening-comprehension questions");
+    expect(prompt).toContain("Create exactly 7 listening-comprehension questions");
+    expect(prompt).toContain("3 easy, 2 medium, and 2 hard");
     expect(prompt).toContain("natural Japanese conversation of 5–10 lines");
     expect(listeningQuestionsSchema).toMatchObject({
       type: "object",
       required: ["questions"],
-      properties: { questions: { minItems: 5, maxItems: 5 } },
+      properties: { questions: { minItems: 7, maxItems: 7 } },
     });
   });
 
-  it("keeps speaking as five read-aloud sentences", () => {
+  it("keeps speaking as seven read-aloud sentences", () => {
     const prompt = speakingReadAloudPrompt({
       languageLevel: "JLPT N4",
       japaneseStory: "ゆきさんは駅へ行きました。それから友達に会いました。",
       grammarPatterns: ["〜てから"],
     });
-    expect(prompt).toContain("Create exactly 5 Japanese sentences for read-aloud speaking practice");
-    expect(prompt).toContain("2 easy, 2 medium, and 1 hard");
+    expect(prompt).toContain("Create exactly 7 Japanese sentences for read-aloud speaking practice");
+    expect(prompt).toContain("3 easy, 2 medium, and 2 hard");
     expect(prompt).toContain("Do not ask the learner a question");
     expect(speakingReadAloudSchema).toMatchObject({
       type: "object",
       required: ["sentences"],
-      properties: { sentences: { minItems: 5, maxItems: 5 } },
+      properties: { sentences: { minItems: 7, maxItems: 7 } },
     });
     expect(speakingReadAloudIssues({
       sentences: [
         { difficulty: "easy", sentence: "ゆきさんは駅へ行きました。" },
         { difficulty: "easy", sentence: "ゆきさんは友達に会いました。" },
+        { difficulty: "easy", sentence: "二人は話しました。" },
         { difficulty: "medium", sentence: "駅へ行ってから、友達に会いました。" },
         { difficulty: "medium", sentence: "二人は駅の近くで楽しく話しました。" },
         { difficulty: "hard", sentence: "友達に会うために駅へ行ったので、ゆきさんはうれしそうでした。" },
+        { difficulty: "hard", sentence: "話しながら歩いていると、二人は新しい店を見つけました。" },
       ],
     })).toEqual([]);
   });

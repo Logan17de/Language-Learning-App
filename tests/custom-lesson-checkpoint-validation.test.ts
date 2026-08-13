@@ -11,13 +11,18 @@ import {
 
 const ids = new Set(Array.from({ length: 20 }, (_, index) => `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`));
 const idList = [...ids];
-const targetId = idList[0];
+
+function difficulty(index: number) {
+  if (index < 3) return "Easy" as const;
+  if (index < 5) return "Medium" as const;
+  return "Hard" as const;
+}
 
 function mc(index: number, category?: string, targetItemIds: string[] = []) {
   return {
     ...(category ? { category } : {}),
     activityType: "multiple_choice",
-    difficulty: "Easy",
+    difficulty: difficulty(index),
     mode: "mixed",
     skill: "understanding",
     prompt: `Question ${index}`,
@@ -41,7 +46,7 @@ function validCheckpoints() {
         reading: ["にち", "ほん", "ひと", "がく", "しょく"][index],
         meaning: ["day", "book/origin", "person", "study", "eat/food"][index],
       })),
-      vocabularyQuestions: Array.from({ length: 13 }, (_, index) =>
+      vocabularyQuestions: Array.from({ length: 7 }, (_, index) =>
         mc(index, undefined, index < 5 ? [idList[index]] : []),
       ),
     },
@@ -55,7 +60,7 @@ function validCheckpoints() {
         example: `例文${index + 1}。`,
         translation: `Example ${index + 1}.`,
       })),
-      grammarQuestions: Array.from({ length: 10 }, (_, index) =>
+      grammarQuestions: Array.from({ length: 7 }, (_, index) =>
         mc(index, undefined, index < 3 ? [idList[index + 5]] : []),
       ),
       readingTitle: "Reading",
@@ -66,16 +71,22 @@ function validCheckpoints() {
         english: "This is Japanese.",
         targetItemIds: [],
       }],
-      readingQuestions: [{ difficulty: "easy", question: "何ですか。", answer: "日本語です。" }],
+      readingQuestions: Array.from({ length: 7 }, (_, index) => ({
+        q_no: index + 1,
+        difficulty: index < 3 ? "easy" : index < 5 ? "medium" : "hard",
+        question: `何ですか ${index + 1}。`,
+        choices: ["日本語です。", "英語です。", "本です。", "学校です。"],
+        answer: "日本語です。",
+      })),
     },
     listening_and_speaking: {
-      listeningExercises: Array.from({ length: 5 }, (_, index) => ({
+      listeningExercises: Array.from({ length: 7 }, (_, index) => ({
         ...mc(index),
         conversationLines: ["A: こんにちは。", "B: こんにちは。"],
         transcript: "A: こんにちは。\nB: こんにちは。",
       })),
-      speakingExercises: Array.from({ length: 5 }, (_, index) => ({
-        mode: index < 2 ? "easy" : index < 4 ? "medium" : "hard",
+      speakingExercises: Array.from({ length: 7 }, (_, index) => ({
+        mode: index < 3 ? "easy" : index < 5 ? "medium" : "hard",
         questionType: "read_aloud",
         prompt: "日本語を読みます。",
         easyPrompt: "日本語を読みます。",
@@ -90,7 +101,7 @@ function validCheckpoints() {
     },
     final_review: {
       reviewQuestions: ["kanji", "vocabulary", "grammar", "listening", "speaking"]
-        .map((category, index) => mc(index, category)),
+        .map((category, index) => ({ ...mc(index), category })),
     },
   };
 }
@@ -148,13 +159,13 @@ describe("custom lesson checkpoint validation", () => {
     ).join(" ")).toContain("requires non-empty formation");
   });
 
-  it("rejects empty reading Japanese and unplayable communication structures", () => {
+  it("requires reading MCQs and unplayable communication structures", () => {
     const checkpoints = validCheckpoints();
-    checkpoints.grammar_and_reading.readingConversation[0].japanese = "  ";
+    checkpoints.grammar_and_reading.readingQuestions[0].choices = ["日本語です。"];
     checkpoints.listening_and_speaking.listeningExercises[0].conversationLines = [];
     checkpoints.listening_and_speaking.speakingExercises[0].questionType = "question";
     expect(activityGroupCheckpointIssues("grammar_and_reading", checkpoints.grammar_and_reading, ids).join(" "))
-      .toContain("requires non-empty japanese");
+      .toContain("exactly four non-empty choices");
     const communication = activityGroupCheckpointIssues(
       "listening_and_speaking",
       checkpoints.listening_and_speaking,
@@ -220,6 +231,7 @@ describe("custom lesson checkpoint validation", () => {
       vocabularyQuestions: checkpoints.vocabulary_and_kanji.vocabularyQuestions,
       grammarQuestions: checkpoints.grammar_and_reading.grammarQuestions,
       readingConversation: checkpoints.grammar_and_reading.readingConversation,
+      readingQuestions: checkpoints.grammar_and_reading.readingQuestions,
       listeningExercises: checkpoints.listening_and_speaking.listeningExercises,
       speakingExercises: checkpoints.listening_and_speaking.speakingExercises,
       reviewQuestions: checkpoints.final_review.reviewQuestions,
@@ -233,9 +245,9 @@ describe("custom lesson checkpoint validation", () => {
 
   it("maps package validation issues to only the responsible checkpoint", () => {
     expect(groupForPackageIssue("reviewQuestions must contain 5 items.")).toBe("final_review");
-    expect(groupForPackageIssue("speakingExercises must contain 5 items.")).toBe("listening_and_speaking");
+    expect(groupForPackageIssue("speakingExercises must contain 7 items.")).toBe("listening_and_speaking");
     expect(groupForPackageIssue("readingConversation must not be empty.")).toBe("grammar_and_reading");
-    expect(groupForPackageIssue("vocabularyQuestions must contain 13 items.")).toBe("vocabulary_and_kanji");
+    expect(groupForPackageIssue("vocabularyQuestions must contain 7 items.")).toBe("vocabulary_and_kanji");
     expect(groupForPackageIssue("kanji lesson metadata is incomplete.")).toBe("vocabulary_and_kanji");
     expect(groupForPackageIssue("Story line 1 is not playable.")).toBeNull();
   });

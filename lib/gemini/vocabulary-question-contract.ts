@@ -69,8 +69,8 @@ export const vocabularyQuestionsSchema: JsonSchema = {
     },
     questions: {
       type: "array",
-      minItems: 13,
-      maxItems: 13,
+      minItems: 7,
+      maxItems: 7,
       items: {
         type: "object",
         properties: {
@@ -138,7 +138,7 @@ Create AIko's vocabulary and kanji lesson from this fixed Japanese story.
 Story:
 ${input.japaneseStory}
 
-Five target kanji:
+Five target kanji (priority teaching targets, not a question whitelist):
 ${pythonJson(indexedKanji)}
 
 Question formats:
@@ -148,9 +148,9 @@ Requirements:
 - Do not rewrite the story.
 - kanjiTeaching must contain exactly one entry for requestIndex 0 through 4.
 - For kanjiTeaching, provide a natural kana reading and concise English meaning for the corresponding fixed target kanji. Do not output or replace the character itself.
-- Create exactly 13 questions: 6 easy, 4 medium, and 3 hard.
-- Exactly 5 questions should directly practice the five target kanji, one target per question.
-- The remaining 8 questions should practice useful vocabulary that appears in the fixed story.
+- Create exactly 7 questions: 3 easy, 2 medium, and 2 hard.
+- Prefer the five target kanji when they make a natural, useful question, but they are guidance rather than a whitelist.
+- Questions may also practice other useful vocabulary or kanji from the fixed story when appropriate for the learner level.
 - Use only the provided question formats.
 - Every question must have four different choices and one correct answer.
 - Keep all content appropriate for the story and learner level.

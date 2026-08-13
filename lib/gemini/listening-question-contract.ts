@@ -19,8 +19,8 @@ export const listeningQuestionsSchema: JsonSchema = {
   properties: {
     questions: {
       type: "array",
-      minItems: 5,
-      maxItems: 5,
+      minItems: 7,
+      maxItems: 7,
       items: {
         type: "object",
         properties: {
@@ -67,23 +67,19 @@ export function listeningQuestionsPrompt(input: {
   knownPatterns: string[];
 }): string {
   return `
-Create exactly 5 listening-comprehension questions for ${input.languageLevel} learners.
+Create exactly 7 listening-comprehension questions for ${input.languageLevel} learners.
 
 grammar patterns:
 ${pythonStringList(input.knownPatterns)}
 
 Requirements:
-- Create exactly 5 listening questions.
+- Create exactly 7 listening questions: 3 easy, 2 medium, and 2 hard.
 - Each question must include a natural Japanese conversation of 5–10 lines.
 - The conversation should be between 2 or more speakers.
 - The learner should answer only after listening to the entire conversation.
 - The question should test understanding of the conversation, not memorization.
-- Include a mix of:
-  - Direct information
-  - Speaker intention
-  - Sequence of events
-  - Reason or purpose
-  - Simple inference
+- Include a mix of direct information, speaker intention, sequence of events, reason or purpose, and simple inference.
+- The supplied grammar patterns are useful context, not a whitelist.
 - Provide four unique answer choices with exactly one correct answer.
 - Keep everything appropriate for ${input.languageLevel}.
 `;
@@ -94,7 +90,18 @@ export function listeningQuestionIssues(value: unknown): string[] {
     return ["Listening response must be an object."];
   }
   const questions = (value as Record<string, unknown>).questions;
-  return Array.isArray(questions) && questions.length === 5
+  if (!Array.isArray(questions) || questions.length !== 7) {
+    return ["Listening response must contain exactly 7 questions."];
+  }
+  const difficulties = questions.map((question) =>
+    question && typeof question === "object" && !Array.isArray(question)
+      ? (question as Record<string, unknown>).difficulty
+      : null,
+  );
+  const easy = difficulties.filter((item) => item === "easy").length;
+  const medium = difficulties.filter((item) => item === "medium").length;
+  const hard = difficulties.filter((item) => item === "hard").length;
+  return easy === 3 && medium === 2 && hard === 2
     ? []
-    : ["Listening response must contain exactly 5 questions."];
+    : ["Listening response must contain 3 easy, 2 medium, and 2 hard questions."];
 }

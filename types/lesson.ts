@@ -76,6 +76,7 @@ export interface ReadingComprehensionQuestion {
   id: string;
   difficulty: "easy" | "medium" | "hard";
   question: string;
+  choices?: string[];
   answer: string;
 }
 

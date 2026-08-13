@@ -346,12 +346,9 @@ function questionText(question: RawVocabularyQuestion): string {
   ].join("\n").normalize("NFKC");
 }
 
-function rawVocabularyQuestionIssues(
-  value: unknown,
-  targetKanji: string[],
-): string[] {
+function rawVocabularyQuestionIssues(value: unknown): string[] {
   if (!isRecord(value) || !Array.isArray(value.questions)) {
-    return ["Vocabulary response must contain exactly 13 questions."];
+    return ["Vocabulary response must contain exactly 7 questions."];
   }
   const issues = indexedTeachingIssues(
     value.kanjiTeaching,
@@ -359,26 +356,17 @@ function rawVocabularyQuestionIssues(
     "Kanji teaching",
     ["reading", "meaning"],
   );
-  if (value.questions.length !== 13) {
-    issues.push("Vocabulary response must contain exactly 13 questions.");
+  if (value.questions.length !== 7) {
+    issues.push("Vocabulary response must contain exactly 7 questions.");
   }
   issues.push(...difficultySplitIssues(
     value.questions,
-    { easy: 6, medium: 4, hard: 3 },
+    { easy: 3, medium: 2, hard: 2 },
     "Vocabulary",
   ));
   value.questions.forEach((raw, index) => {
     issues.push(...multipleChoiceContentIssues(raw, `Vocabulary question ${index + 1}`));
   });
-  const evidence = value.questions
-    .filter(isRecord)
-    .map((raw) => [raw.question, raw.sentence, raw.answer, ...(Array.isArray(raw.choices) ? raw.choices : [])].join("\n"))
-    .join("\n");
-  for (const character of targetKanji) {
-    if (!evidence.includes(character)) {
-      issues.push(`Vocabulary and kanji lesson does not practice target kanji ${character}.`);
-    }
-  }
   return issues;
 }
 
@@ -473,12 +461,9 @@ function grammarTargetsForQuestion(
   return targets.filter((item) => storyUsesGrammarPattern(fallbackEvidence, item.pattern));
 }
 
-function rawGrammarQuestionIssues(
-  value: unknown,
-  targets: ResolvedLessonLibrary["grammar"],
-): string[] {
+function rawGrammarQuestionIssues(value: unknown): string[] {
   if (!isRecord(value) || !Array.isArray(value.questions)) {
-    return ["Grammar response must contain exactly 10 questions."];
+    return ["Grammar response must contain exactly 7 questions."];
   }
   const issues = indexedTeachingIssues(
     value.grammarTeaching,
@@ -486,17 +471,14 @@ function rawGrammarQuestionIssues(
     "Grammar teaching",
     ["meaning", "formation", "usage", "example", "translation"],
   );
-  if (value.questions.length !== 10) issues.push("Grammar response must contain exactly 10 questions.");
+  if (value.questions.length !== 7) issues.push("Grammar response must contain exactly 7 questions.");
   issues.push(...difficultySplitIssues(
     value.questions,
-    { easy: 3, medium: 4, hard: 3 },
+    { easy: 3, medium: 2, hard: 2 },
     "Grammar",
   ));
   value.questions.forEach((raw, index) => {
     issues.push(...multipleChoiceContentIssues(raw, `Grammar question ${index + 1}`));
-    if (isRecord(raw) && grammarTargetsForQuestion(raw as unknown as RawGrammarQuestion, targets).length < 1) {
-      issues.push(`Grammar question ${index + 1} does not practice one of the selected grammar patterns.`);
-    }
   });
   return issues;
 }
@@ -602,7 +584,7 @@ export async function generateVocabularyAndKanjiActivities(input: {
     schema: vocabularyQuestionsSchema,
     strictSchema: true,
     exactSchemaName: true,
-    validate: (value) => rawVocabularyQuestionIssues(value, targetKanji),
+    validate: rawVocabularyQuestionIssues,
     trace: { requestId: input.requestId, stage: "vocabulary_questions" },
   });
   return {
@@ -640,7 +622,7 @@ export async function generateGrammarAndReadingActivities(input: {
       schema: grammarQuestionsSchema,
       strictSchema: true,
       exactSchemaName: true,
-      validate: (value) => rawGrammarQuestionIssues(value, targets),
+      validate: rawGrammarQuestionIssues,
       trace: { requestId: input.requestId, stage: "grammar_questions" },
     }),
     generateReadingRegion({

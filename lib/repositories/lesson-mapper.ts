@@ -237,8 +237,6 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
     grammar,
     kanji,
     vocabulary,
-    // A missing practice region is malformed lesson data. Do not manufacture
-    // learner-facing questions or distractors in the mapper.
     vocabularyQuestions: practice.vocabulary,
     grammarQuestions: practice.grammar,
     reviewItems: value.version.review_items,
@@ -287,6 +285,10 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
       id: item.id,
       difficulty: item.difficulty,
       question: item.question,
+      choices:
+        "choices" in item && Array.isArray(item.choices)
+          ? item.choices.filter((choice): choice is string => typeof choice === "string")
+          : undefined,
       answer: item.answer,
     })),
     listeningExercises: value.listening.map((item, index) => {

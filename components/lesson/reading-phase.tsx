@@ -24,12 +24,15 @@ export function ReadingPhase({
   const questions = lesson.readingQuestions ?? [];
   const answers = session.readingAnswers ?? [];
   const [typedAnswer, setTypedAnswer] = useState("");
+  const [selectedChoice, setSelectedChoice] = useState("");
   const currentIndex = Math.min(session.activityIndex, Math.max(0, questions.length - 1));
   const question = questions[currentIndex];
   const submitted = question
     ? answers.find((item) => item.questionId === question.id)
     : undefined;
   const convertedAnswer = japaneseInputPreview(typedAnswer);
+  const choices = question?.choices?.filter((choice) => choice.trim().length > 0) ?? [];
+  const multipleChoice = choices.length === 4;
   const complete = questions.length > 0 && answers.length >= questions.length;
   const terms = useMemo(
     () => uniqueTerms(
@@ -63,8 +66,11 @@ export function ReadingPhase({
   }
 
   function submit() {
-    if (!question || submitted || !typedAnswer.trim()) return;
-    const response = convertedAnswer || typedAnswer.trim();
+    if (!question || submitted) return;
+    const response = multipleChoice
+      ? selectedChoice.trim()
+      : (convertedAnswer || typedAnswer.trim());
+    if (!response) return;
     const nextAnswers = [
       ...answers,
       { questionId: question.id, response },
@@ -79,6 +85,7 @@ export function ReadingPhase({
   function nextQuestion() {
     if (!submitted || currentIndex >= questions.length - 1) return;
     setTypedAnswer("");
+    setSelectedChoice("");
     onChange({ ...session, activityIndex: currentIndex + 1 });
   }
 
@@ -94,8 +101,7 @@ export function ReadingPhase({
           {lesson.readingJapaneseTitle || "Read for meaning."}
         </h2>
         <p className="mt-3 leading-7 text-stone-500">
-          Read the passage carefully. Touch a supported word when you need its
-          reading or meaning, then answer in a short Japanese sentence.
+          Read the passage carefully, then choose the best answer for each comprehension question.
         </p>
       </div>
 
@@ -148,40 +154,69 @@ export function ReadingPhase({
               />
             </p>
 
-            <label className="mt-7 block text-sm font-semibold text-stone-600" htmlFor="reading-answer">
-              日本語で答えてください
-            </label>
-            <textarea
-              id="reading-answer"
-              rows={3}
-              value={submitted?.response ?? typedAnswer}
-              disabled={Boolean(submitted)}
-              onChange={(event) => setTypedAnswer(event.target.value)}
-              placeholder="短い文で答えてください"
-              className="mt-2 w-full resize-none rounded-2xl border border-stone-200 bg-white px-4 py-3 font-serif text-lg leading-8 outline-none transition focus:border-moss-500 focus:ring-4 focus:ring-moss-100 disabled:bg-stone-50"
-            />
-
-            {!submitted && convertedAnswer && convertedAnswer !== typedAnswer && (
-              <div className="mt-3 rounded-2xl border border-moss-100 bg-moss-50 p-4" role="status">
-                <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-moss-600">
-                  <Languages className="size-4" /> Japanese input preview
-                </p>
-                <p className="mt-2 font-serif text-xl leading-8">{convertedAnswer}</p>
+            {multipleChoice ? (
+              <div className="mt-7 grid gap-3" role="radiogroup" aria-label="Reading answer choices">
+                {choices.map((choice) => {
+                  const selected = (submitted?.response ?? selectedChoice) === choice;
+                  return (
+                    <button
+                      key={choice}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      disabled={Boolean(submitted)}
+                      onClick={() => setSelectedChoice(choice)}
+                      className={`rounded-2xl border px-5 py-4 text-left font-serif text-lg transition ${
+                        selected
+                          ? "border-moss-500 bg-moss-50 ring-2 ring-moss-100"
+                          : "border-stone-200 bg-white hover:border-moss-300 hover:bg-moss-50/40"
+                      } disabled:cursor-default`}
+                    >
+                      {choice}
+                    </button>
+                  );
+                })}
               </div>
+            ) : (
+              <>
+                <label className="mt-7 block text-sm font-semibold text-stone-600" htmlFor="reading-answer">
+                  日本語で答えてください
+                </label>
+                <textarea
+                  id="reading-answer"
+                  rows={3}
+                  value={submitted?.response ?? typedAnswer}
+                  disabled={Boolean(submitted)}
+                  onChange={(event) => setTypedAnswer(event.target.value)}
+                  placeholder="短い文で答えてください"
+                  className="mt-2 w-full resize-none rounded-2xl border border-stone-200 bg-white px-4 py-3 font-serif text-lg leading-8 outline-none transition focus:border-moss-500 focus:ring-4 focus:ring-moss-100 disabled:bg-stone-50"
+                />
+
+                {!submitted && convertedAnswer && convertedAnswer !== typedAnswer && (
+                  <div className="mt-3 rounded-2xl border border-moss-100 bg-moss-50 p-4" role="status">
+                    <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-moss-600">
+                      <Languages className="size-4" /> Japanese input preview
+                    </p>
+                    <p className="mt-2 font-serif text-xl leading-8">{convertedAnswer}</p>
+                  </div>
+                )}
+              </>
             )}
 
             {submitted ? (
               <div className="mt-6 rounded-2xl bg-moss-50 p-5">
                 <p className="flex items-center gap-2 text-sm font-semibold text-moss-800">
-                  <CheckCircle2 className="size-5" /> Reference answer
+                  <CheckCircle2 className="size-5" /> Correct answer
                 </p>
                 <p className="mt-3 font-serif text-lg leading-8">{question.answer}</p>
-                <p className="mt-2 text-xs leading-5 text-stone-500">
-                  Your wording may be different when it communicates the same story-supported answer.
-                </p>
               </div>
             ) : (
-              <Button type="button" className="mt-5" disabled={!typedAnswer.trim()} onClick={submit}>
+              <Button
+                type="button"
+                className="mt-5"
+                disabled={multipleChoice ? !selectedChoice : !typedAnswer.trim()}
+                onClick={submit}
+              >
                 Save answer
               </Button>
             )}
