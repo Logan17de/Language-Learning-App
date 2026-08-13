@@ -9,7 +9,6 @@ import {
   Eye,
   FileCheck2,
   Pencil,
-  Plus,
   Search,
   Upload,
 } from "lucide-react";
@@ -141,18 +140,13 @@ export function LessonManagementTable() {
         title="Lesson library"
         description="Manage persisted lesson packages and expose only operations supported by the production lesson repository."
         actions={
-          <div className="flex flex-wrap gap-2">
-            <ButtonLink
-              href="/admin/lessons/import"
-              variant="secondary"
-              className="rounded-xl"
-            >
-              <Upload className="size-4" /> Import full lesson
-            </ButtonLink>
-            <ButtonLink href="/admin/lessons/new/edit" className="rounded-xl">
-              <Plus className="size-4" /> Create lesson
-            </ButtonLink>
-          </div>
+          <ButtonLink
+            href="/admin/lessons/import"
+            variant="secondary"
+            className="rounded-xl"
+          >
+            <Upload className="size-4" /> Import full lesson
+          </ButtonLink>
         }
       />
 
