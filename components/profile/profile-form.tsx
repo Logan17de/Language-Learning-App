@@ -6,7 +6,6 @@ import type { DailyMinutes, LearnerLevel, LearningGoal } from "@/types/learner";
 import { useAppStore } from "@/store/app-store";
 import { Button } from "@/components/ui/button";
 import { profileRepository } from "@/lib/repositories/profile-repository";
-import { getBackendMode } from "@/lib/supabase/config";
 
 const goals: LearningGoal[] = [
   "JLPT preparation",
@@ -15,7 +14,15 @@ const goals: LearningGoal[] = [
   "Daily life in Japan",
   "Travel",
 ];
-const levels: LearnerLevel[] = ["Beginner", "N5", "N4", "N3", "N2", "Not sure"];
+const levels: LearnerLevel[] = [
+  "Beginner",
+  "N5",
+  "N4",
+  "N3",
+  "N2",
+  "N1",
+  "Not sure",
+];
 
 export function ProfileForm() {
   const user = useAppStore((state) => state.user);
@@ -40,20 +47,19 @@ export function ProfileForm() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
-    if (getBackendMode() === "supabase") {
-      setLoading(true);
-      const result = await profileRepository.updateCurrent({
-        display_name: name,
-        current_jlpt_level:
-          level === "Beginner" || level === "Not sure" ? "N5" : level,
-        learning_goal: goal,
-        daily_study_minutes: minutes,
-        interests,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      });
-      setLoading(false);
-      if (!result.ok) return setError(result.error.message);
-    }
+    setLoading(true);
+    const result = await profileRepository.updateCurrent({
+      display_name: name,
+      current_jlpt_level:
+        level === "Beginner" || level === "Not sure" ? "N5" : level,
+      learning_goal: goal,
+      daily_study_minutes: minutes,
+      interests,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+    setLoading(false);
+    if (!result.ok) return setError(result.error.message);
+
     updateProfile({ name, level, goal, dailyMinutes: minutes, interests });
     completeOnboarding();
     setEditing(false);
@@ -107,10 +113,7 @@ export function ProfileForm() {
             className="mt-4 flex items-center gap-2 text-sm font-semibold text-moss-700"
             role="status"
           >
-            <Check className="size-4" />{" "}
-            {getBackendMode() === "supabase"
-              ? "Profile changes synced."
-              : "Profile changes saved locally."}
+            <Check className="size-4" /> Profile changes synced.
           </p>
         )}
       </div>
@@ -153,8 +156,8 @@ export function ProfileForm() {
         <p className="mb-2 text-sm font-semibold">Interests</p>
         {interests.length === 0 && (
           <p className="mb-3 text-sm leading-6 text-stone-500">
-            No interests added. Pro lessons remain random at your level until
-            you add at least one.
+            Add interests if you want lesson selection and custom generation to
+            reflect the topics you care about.
           </p>
         )}
         <div className="flex flex-wrap gap-2">
