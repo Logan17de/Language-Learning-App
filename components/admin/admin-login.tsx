@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LockKeyhole, ShieldCheck } from "lucide-react";
-import { useAdminStore } from "@/store/admin-store";
+import { useAdminSessionStore } from "@/store/admin-session-store";
 import { Button } from "@/components/ui/button";
 import { authService } from "@/lib/auth/auth-service";
 import { canAccessAdmin } from "@/lib/auth/permissions";
@@ -29,7 +29,7 @@ function adminOAuthError(code: string | null): string {
 export function AdminLogin() {
   const router = useRouter();
   const search = useSearchParams();
-  const establishBackendSession = useAdminStore(
+  const establishBackendSession = useAdminSessionStore(
     (state) => state.establishBackendSession,
   );
   const [email, setEmail] = useState("");
