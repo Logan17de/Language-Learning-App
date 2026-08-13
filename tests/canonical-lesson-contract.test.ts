@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { commuteLesson, mockLessons } from "@/data/mock-lessons";
+import { commuteLesson } from "@/data/mock-lessons";
 import {
   CANONICAL_LESSON_ACTIVITY_COUNTS,
   CANONICAL_LESSON_PHASES,
@@ -61,7 +61,6 @@ describe("canonical lesson contract", () => {
       { id: "listening", label: "Listening", description: "Listening" },
       { id: "review", label: "Review", description: "Review" },
     ];
-
     expect(normalizeLessonPhases(oldStoredOrder).map((phase) => phase.id)).toEqual([
       "story",
       "vocabulary",
@@ -72,11 +71,11 @@ describe("canonical lesson contract", () => {
     ]);
   });
 
-  it("keeps existing curated demo lessons playable without preserving old generation logic", () => {
-    for (const lesson of mockLessons) {
-      expect(lessonContractIssues(lesson), lesson.id).toEqual([]);
-      expect(isCanonicalPlayableLesson(lesson), lesson.id).toBe(true);
-    }
+  it("does not treat old 13-10-5 demo packages as the current generated format", () => {
+    const issues = lessonContractIssues(commuteLesson);
+    expect(issues).toContain("Vocabulary practice must contain exactly 7 activities; found 13.");
+    expect(issues).toContain("Grammar practice must contain exactly 7 activities; found 10.");
+    expect(isCanonicalPlayableLesson(commuteLesson)).toBe(false);
   });
 
   it("uses 7-7-5-5-5 for generated practice and no review bank", () => {
@@ -90,7 +89,7 @@ describe("canonical lesson contract", () => {
     });
   });
 
-  it("completes a stored vocabulary phase only after all of its questions are answered", () => {
+  it("completes a stored vocabulary phase only after all stored questions are answered", () => {
     const session = sessionFor(commuteLesson);
     session.vocabularyAnswers = commuteLesson.vocabularyQuestions
       .slice(0, commuteLesson.vocabularyQuestions.length - 1)
@@ -103,15 +102,13 @@ describe("canonical lesson contract", () => {
       }));
     expect(phaseIsComplete(session, "vocabulary", commuteLesson)).toBe(false);
 
-    session.vocabularyAnswers = commuteLesson.vocabularyQuestions.map(
-      (question) => ({
-        questionId: question.id,
-        mode: question.mode,
-        selectedAnswer: question.correctAnswer,
-        correct: true,
-        attempts: 1,
-      }),
-    );
+    session.vocabularyAnswers = commuteLesson.vocabularyQuestions.map((question) => ({
+      questionId: question.id,
+      mode: question.mode,
+      selectedAnswer: question.correctAnswer,
+      correct: true,
+      attempts: 1,
+    }));
     expect(phaseIsComplete(session, "vocabulary", commuteLesson)).toBe(true);
   });
 
@@ -124,29 +121,18 @@ describe("canonical lesson contract", () => {
     expect(mapper).toContain("normalizeLessonPhases");
   });
 
-  it("locks generation and the unpushed DB migration to the current shape", () => {
-    const vocabulary = readFileSync(
-      "lib/gemini/vocabulary-question-contract.ts",
-      "utf8",
-    );
-    const grammar = readFileSync(
-      "lib/gemini/grammar-question-contract.ts",
-      "utf8",
-    );
-    const reading = readFileSync(
-      "lib/gemini/reading-comprehension-contract.ts",
-      "utf8",
-    );
-    const listening = readFileSync(
-      "lib/gemini/listening-question-contract.ts",
-      "utf8",
-    );
-    const speaking = readFileSync(
-      "lib/gemini/speaking-question-contract.ts",
-      "utf8",
-    );
+  it("locks generation and DB validation to the current shape", () => {
+    const vocabulary = readFileSync("lib/gemini/vocabulary-question-contract.ts", "utf8");
+    const grammar = readFileSync("lib/gemini/grammar-question-contract.ts", "utf8");
+    const reading = readFileSync("lib/gemini/reading-comprehension-contract.ts", "utf8");
+    const listening = readFileSync("lib/gemini/listening-question-contract.ts", "utf8");
+    const speaking = readFileSync("lib/gemini/speaking-question-contract.ts", "utf8");
     const migration = readFileSync(
       "supabase/migrations/20260813070000_reading_mcq_choices.sql",
+      "utf8",
+    );
+    const curatedMigration = readFileSync(
+      "supabase/migrations/20260813080000_curated_jlpt_vocabulary.sql",
       "utf8",
     );
 
@@ -162,6 +148,6 @@ describe("canonical lesson contract", () => {
     expect(speaking).toContain("maxItems: 5");
     expect(migration).toContain("reviewQuestions must be empty");
     expect(migration).toContain("add column if not exists choices text[]");
-    expect(migration).toContain("Reading MCQ at position % requires exactly four choices");
+    expect(curatedMigration).toContain("vocabulary must be an array");
   });
 });

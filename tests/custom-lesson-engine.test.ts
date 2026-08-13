@@ -19,6 +19,7 @@ const groups = readFileSync("lib/gemini/lesson-activity-groups.ts", "utf8");
 const checkpoints = readFileSync("lib/custom-lessons/checkpoint-validation.ts", "utf8");
 const placeholderEnrichment = readFileSync("lib/custom-lessons/placeholder-enrichment.ts", "utf8");
 const storyEnrichment = readFileSync("lib/gemini/simple-story-enrichment.ts", "utf8");
+const curatedVocabulary = readFileSync("lib/curated-vocabulary-catalog.ts", "utf8");
 const readingGeneration = readFileSync("lib/gemini/reading-region-generation.ts", "utf8");
 const listeningGeneration = readFileSync("lib/gemini/listening-region-generation.ts", "utf8");
 const speakingGeneration = readFileSync("lib/gemini/speaking-region-generation.ts", "utf8");
@@ -29,6 +30,10 @@ const durableMigration = readFileSync(
 );
 const currentContractMigration = readFileSync(
   "supabase/migrations/20260813070000_reading_mcq_choices.sql",
+  "utf8",
+);
+const curatedVocabularyMigration = readFileSync(
+  "supabase/migrations/20260813080000_curated_jlpt_vocabulary.sql",
   "utf8",
 );
 const scheduler = readFileSync(
@@ -109,15 +114,21 @@ describe("custom lesson engine contract", () => {
     expect(scheduler).toContain("'* * * * *'");
   });
 
-  it("keeps the original JMdict story pass but removes all later enrichment passes", () => {
-    expect(storyEnrichment).toContain('DICTIONARY_SOURCE_MODEL = "jmdict-local"');
+  it("uses the curated JLPT CSVs only for original-story tappability", () => {
+    expect(storyEnrichment).toContain('CURATED_VOCABULARY_SOURCE_MODEL = "jlpt-curated-csv"');
+    expect(storyEnrichment).toContain("matchCuratedStoryVocabulary");
     expect(storyEnrichment).toContain('rpc("store_story_vocabulary_enrichment"');
+    expect(storyEnrichment).not.toContain("lookup_jmdict_vocabulary");
+    expect(curatedVocabulary).toContain("Vocabs/jlpt_n5_compounds.csv");
+    expect(curatedVocabulary).toContain("Vocabs/jlpt_n1_compounds.csv");
+    expect(curatedVocabulary).toContain("longest spelling");
+    expect(curatedVocabularyMigration).toContain("drop table if exists public.jmdict_entries cascade");
+    expect(curatedVocabularyMigration).toContain("jlpt-curated-csv");
     expect(placeholderEnrichment).toContain('model: "catalog-identities-only"');
     expect(placeholderEnrichment).not.toContain("generateStructured");
     for (const source of [readingGeneration, listeningGeneration, speakingGeneration]) {
       expect(source).not.toContain("lookupJapaneseDictionaryVocabulary");
       expect(source).not.toContain("storeGeneratedVocabularyTerms");
-      expect(source).not.toContain("DICTIONARY_SOURCE_MODEL");
     }
   });
 
