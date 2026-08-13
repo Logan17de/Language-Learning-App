@@ -55,8 +55,8 @@ function readingQuestionIssues(value: unknown): string[] {
     return ["Reading response must be an object."];
   }
   const questions = (value as Record<string, unknown>).questions;
-  if (!Array.isArray(questions) || questions.length !== 7) {
-    return ["Reading response must contain exactly 7 questions."];
+  if (!Array.isArray(questions) || questions.length !== 5) {
+    return ["Reading response must contain exactly 5 questions."];
   }
   const issues: string[] = [];
   const difficulties = questions.map((question) =>
@@ -67,8 +67,8 @@ function readingQuestionIssues(value: unknown): string[] {
   const easy = difficulties.filter((item) => item === "easy").length;
   const medium = difficulties.filter((item) => item === "medium").length;
   const hard = difficulties.filter((item) => item === "hard").length;
-  if (easy !== 3 || medium !== 2 || hard !== 2) {
-    issues.push("Reading response must contain 3 easy, 2 medium, and 2 hard questions.");
+  if (easy !== 2 || medium !== 2 || hard !== 1) {
+    issues.push("Reading response must contain 2 easy, 2 medium, and 1 hard question.");
   }
   questions.forEach((question, index) => {
     if (!question || typeof question !== "object" || Array.isArray(question)) {
