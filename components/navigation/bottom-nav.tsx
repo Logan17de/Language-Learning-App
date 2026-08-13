@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import {
-  BookOpen,
   ChartNoAxesColumnIncreasing,
   House,
   LibraryBig,
@@ -19,7 +18,6 @@ const items = [
     icon: LibraryBig,
     matches: ["/learn", "/lesson", "/custom-topic"],
   },
-  { label: "Review", href: "/review", icon: BookOpen, matches: ["/review"] },
   {
     label: "Progress",
     href: "/progress",
@@ -42,7 +40,7 @@ export function BottomNav() {
       className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface px-2 pb-[max(.5rem,env(safe-area-inset-bottom))] pt-2 shadow-nav lg:hidden"
       aria-label="App navigation"
     >
-      <ul className="mx-auto grid max-w-lg grid-cols-5 gap-1">
+      <ul className="mx-auto grid max-w-lg grid-cols-4 gap-1">
         {items.map((item) => {
           const active = item.matches.some(
             (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
