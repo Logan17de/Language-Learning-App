@@ -54,23 +54,14 @@ function requiredTextIssues(
   );
 }
 
-function targetIssues(
-  item: Record<string, unknown>,
-  label: string,
-  validLibraryIds: ReadonlySet<string>,
-): string[] {
-  const ids = array(item.targetItemIds).flatMap((id) =>
-    text(id) ? [text(id)!] : []
-  );
-  return ids.flatMap((id) =>
-    validLibraryIds.has(id) ? [] : [`${label} references invalid library ID ${id}.`]
-  );
-}
-
+/**
+ * Question validation is intentionally structural only. Selected target IDs are
+ * generation guidance and optional mastery metadata; they are not an acceptance
+ * gate for otherwise playable questions.
+ */
 function multipleChoiceIssues(
   value: unknown,
   label: string,
-  validLibraryIds: ReadonlySet<string>,
 ): string[] {
   const item = record(value);
   if (!item) return [`${label} must be an object.`];
@@ -93,7 +84,6 @@ function multipleChoiceIssues(
   if (answer && !normalized.includes(normalizedChoice(answer))) {
     issues.push(`${label} correctAnswer must occur in choices.`);
   }
-  issues.push(...targetIssues(item, label, validLibraryIds));
   return issues;
 }
 
@@ -101,7 +91,6 @@ function questionArrayIssues(
   value: unknown,
   expected: number,
   label: string,
-  validLibraryIds: ReadonlySet<string>,
 ): string[] {
   const questions = array(value);
   const issues = questions.length === expected
@@ -111,7 +100,6 @@ function questionArrayIssues(
     issues.push(...multipleChoiceIssues(
       question,
       `${label} ${index + 1}`,
-      validLibraryIds,
     ));
   });
   return issues;
@@ -232,7 +220,6 @@ export function activityGroupCheckpointIssues(
       payload.vocabularyQuestions,
       7,
       "Vocabulary question",
-      validLibraryIds,
     ));
     issues.push(...difficultyDistributionIssues(
       payload.vocabularyQuestions,
@@ -256,7 +243,6 @@ export function activityGroupCheckpointIssues(
       payload.grammarQuestions,
       7,
       "Grammar question",
-      validLibraryIds,
     ));
     issues.push(...difficultyDistributionIssues(
       payload.grammarQuestions,
@@ -283,7 +269,6 @@ export function activityGroupCheckpointIssues(
         return;
       }
       issues.push(...requiredTextIssues(item, ["japanese", "english"], label));
-      issues.push(...targetIssues(item, label, validLibraryIds));
     });
     issues.push(...readingQuestionArrayIssues(payload.readingQuestions));
     return issues;
@@ -319,7 +304,7 @@ export function activityGroupCheckpointIssues(
       issues.push(`${label} must be an object.`);
       return;
     }
-    issues.push(...multipleChoiceIssues(item, label, validLibraryIds));
+    issues.push(...multipleChoiceIssues(item, label));
     issues.push(...requiredTextIssues(item, ["transcript"], label));
     const lines = array(item.conversationLines);
     if (lines.length < 1 || lines.some((line) => !text(line))) {
@@ -345,7 +330,6 @@ export function activityGroupCheckpointIssues(
     if (array(item.expectedConcepts).length < 1 || array(item.semanticCriteria).length < 1) {
       issues.push(`${label} requires expectedConcepts and semanticCriteria.`);
     }
-    issues.push(...targetIssues(item, label, validLibraryIds));
   });
   return issues;
 }
