@@ -39,7 +39,7 @@ const targetIdentityMigration = readFileSync(
 );
 
 describe("custom lesson story pipeline v3", () => {
-  it("makes the first model call story-only and verifies all selected targets", () => {
+  it("makes the first model call story-only and treats selected targets as prompt guidance", () => {
     expect(storyContract).toContain("const STORY_MIN_SENTENCES = 10");
     expect(storyContract).toContain("const STORY_MAX_SENTENCES = 15");
     expect(storyContract).toContain('"selected_interest"');
@@ -49,10 +49,11 @@ describe("custom lesson story pipeline v3", () => {
     expect(storyCall).toContain('name: "japanese_lesson"');
     expect(storyCall).toContain("strictSchema: true");
     expect(storyCall).toContain("exactSchemaName: true");
-    expect(storyCall).toContain("missingKanji");
-    expect(storyCall).toContain("missingGrammar");
-    expect(storyCall).toContain("Story target validation failed");
-    expect(storyCall).toContain("storyUsesGrammarPattern");
+    expect(storyCall).toContain("validate: () => []");
+    expect(storyCall).not.toContain("missingKanji");
+    expect(storyCall).not.toContain("missingGrammar");
+    expect(storyCall).not.toContain("Story target validation failed");
+    expect(storyCall).not.toContain("storyUsesGrammarPattern");
     expect(storyCall).toContain("normalizeStoryPassage(result.value)");
     expect(plan).toContain('.from("user_preferences")');
     expect(plan).toContain('.from("profiles")');
