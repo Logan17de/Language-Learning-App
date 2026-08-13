@@ -56,7 +56,7 @@ export function LessonDetail({ lessonId }: { lessonId: string }) {
   async function changeStatus(nextStatus: LessonStatus) {
     setWorking(true);
     setMessage("");
-    const ok = await setLessonStatus(lesson, nextStatus);
+    const ok = await setLessonStatus(lesson!, nextStatus);
     setMessage(
       ok
         ? `Lesson changed to ${nextStatus}.`
