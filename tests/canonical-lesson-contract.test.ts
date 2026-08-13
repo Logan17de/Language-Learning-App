@@ -42,7 +42,7 @@ function sessionFor(lesson: LessonPackage): LessonSession {
 }
 
 describe("canonical lesson contract", () => {
-  it("uses one seven-phase learner order everywhere", () => {
+  it("uses the six-phase learner order with no final review", () => {
     expect(CANONICAL_LESSON_PHASES.map((phase) => phase.id)).toEqual([
       "story",
       "vocabulary",
@@ -50,7 +50,6 @@ describe("canonical lesson contract", () => {
       "reading",
       "listening",
       "speaking",
-      "review",
     ]);
 
     const oldStoredOrder = [
@@ -70,33 +69,31 @@ describe("canonical lesson contract", () => {
       "reading",
       "listening",
       "speaking",
-      "review",
     ]);
   });
 
-  it("keeps every existing demo lesson playable during the seven-question transition", () => {
+  it("keeps existing curated demo lessons playable without preserving old generation logic", () => {
     for (const lesson of mockLessons) {
       expect(lessonContractIssues(lesson), lesson.id).toEqual([]);
       expect(isCanonicalPlayableLesson(lesson), lesson.id).toBe(true);
     }
   });
 
-  it("uses seven activities for every newly generated learner phase except the five-item final review", () => {
+  it("uses 7-7-5-5-5 for generated practice and no review bank", () => {
     expect(CANONICAL_LESSON_ACTIVITY_COUNTS).toEqual({
       vocabulary: 7,
       grammar: 7,
-      reading: 7,
-      listening: 7,
-      speaking: 7,
-      review: 5,
+      reading: 5,
+      listening: 5,
+      speaking: 5,
+      review: 0,
     });
   });
 
-  it("still completes a legacy vocabulary phase only after all of its stored questions are answered", () => {
-    expect(commuteLesson.vocabularyQuestions).toHaveLength(13);
+  it("completes a stored vocabulary phase only after all of its questions are answered", () => {
     const session = sessionFor(commuteLesson);
     session.vocabularyAnswers = commuteLesson.vocabularyQuestions
-      .slice(0, 10)
+      .slice(0, commuteLesson.vocabularyQuestions.length - 1)
       .map((question) => ({
         questionId: question.id,
         mode: question.mode,
@@ -104,7 +101,6 @@ describe("canonical lesson contract", () => {
         correct: true,
         attempts: 1,
       }));
-
     expect(phaseIsComplete(session, "vocabulary", commuteLesson)).toBe(false);
 
     session.vocabularyAnswers = commuteLesson.vocabularyQuestions.map(
@@ -119,17 +115,6 @@ describe("canonical lesson contract", () => {
     expect(phaseIsComplete(session, "vocabulary", commuteLesson)).toBe(true);
   });
 
-  it("fails closed when an activity bank matches neither current nor legacy counts", () => {
-    const malformed: LessonPackage = {
-      ...commuteLesson,
-      vocabularyQuestions: commuteLesson.vocabularyQuestions.slice(0, 10),
-    };
-    expect(isCanonicalPlayableLesson(malformed)).toBe(false);
-    expect(lessonContractIssues(malformed).join(" ")).toContain(
-      "Vocabulary practice must contain 7 current-format or 13 legacy activities; found 10.",
-    );
-  });
-
   it("does not manufacture learner questions in the canonical mapper", () => {
     const mapper = readFileSync("lib/repositories/lesson-mapper.ts", "utf8");
     expect(mapper).not.toContain("Other answer");
@@ -139,7 +124,7 @@ describe("canonical lesson contract", () => {
     expect(mapper).toContain("normalizeLessonPhases");
   });
 
-  it("locks new generated schemas to seven activities while storage remains backward compatible", () => {
+  it("locks generation and the unpushed DB migration to the current shape", () => {
     const vocabulary = readFileSync(
       "lib/gemini/vocabulary-question-contract.ts",
       "utf8",
@@ -152,11 +137,15 @@ describe("canonical lesson contract", () => {
       "lib/gemini/reading-comprehension-contract.ts",
       "utf8",
     );
-    const flexibleStorage = readFileSync(
-      "supabase/migrations/20260805090000_flexible_generated_lesson_validation.sql",
+    const listening = readFileSync(
+      "lib/gemini/listening-question-contract.ts",
       "utf8",
     );
-    const readingMcq = readFileSync(
+    const speaking = readFileSync(
+      "lib/gemini/speaking-question-contract.ts",
+      "utf8",
+    );
+    const migration = readFileSync(
       "supabase/migrations/20260813070000_reading_mcq_choices.sql",
       "utf8",
     );
@@ -165,10 +154,14 @@ describe("canonical lesson contract", () => {
     expect(vocabulary).toContain("maxItems: 7");
     expect(grammar).toContain("minItems: 7");
     expect(grammar).toContain("maxItems: 7");
-    expect(reading).toContain("minItems: 7");
-    expect(reading).toContain("maxItems: 7");
-    expect(flexibleStorage).toContain("Accepts variable generated lesson counts");
-    expect(readingMcq).toContain("add column if not exists choices text[]");
-    expect(readingMcq).toContain("Reading MCQ at position % requires exactly four choices");
+    expect(reading).toContain("minItems: 5");
+    expect(reading).toContain("maxItems: 5");
+    expect(listening).toContain("minItems: 5");
+    expect(listening).toContain("maxItems: 5");
+    expect(speaking).toContain("minItems: 5");
+    expect(speaking).toContain("maxItems: 5");
+    expect(migration).toContain("reviewQuestions must be empty");
+    expect(migration).toContain("add column if not exists choices text[]");
+    expect(migration).toContain("Reading MCQ at position % requires exactly four choices");
   });
 });
