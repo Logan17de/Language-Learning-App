@@ -17,8 +17,8 @@ export const speakingReadAloudSchema: JsonSchema = {
   properties: {
     sentences: {
       type: "array",
-      minItems: 7,
-      maxItems: 7,
+      minItems: 5,
+      maxItems: 5,
       items: {
         type: "object",
         properties: {
@@ -47,7 +47,7 @@ export function speakingReadAloudPrompt(input: {
   grammarPatterns: string[];
 }): string {
   return `
-Create exactly 7 Japanese sentences for read-aloud speaking practice.
+Create exactly 5 Japanese sentences for read-aloud speaking practice.
 
 Language level: ${input.languageLevel}
 
@@ -59,7 +59,7 @@ ${pythonStringList(input.grammarPatterns)}
 
 Requirements:
 - The learner will only read the displayed sentence aloud. Do not ask the learner a question.
-- Create exactly 7 sentences: 3 easy, 2 medium, and 2 hard.
+- Create exactly 5 sentences: 2 easy, 2 medium, and 1 hard.
 - Every item must be one natural Japanese statement appropriate for ${input.languageLevel}.
 - Easy sentences should be short and use familiar story vocabulary.
 - Medium sentences should be longer and may naturally use one supplied grammar pattern.
@@ -77,8 +77,8 @@ export function speakingReadAloudIssues(value: unknown): string[] {
     return ["Speaking response must be an object."];
   }
   const sentences = (value as Record<string, unknown>).sentences;
-  if (!Array.isArray(sentences) || sentences.length !== 7) {
-    return ["Speaking response must contain exactly 7 read-aloud sentences."];
+  if (!Array.isArray(sentences) || sentences.length !== 5) {
+    return ["Speaking response must contain exactly 5 read-aloud sentences."];
   }
   const difficulties = sentences.map((sentence) =>
     sentence && typeof sentence === "object" && !Array.isArray(sentence)
@@ -88,7 +88,7 @@ export function speakingReadAloudIssues(value: unknown): string[] {
   const easy = difficulties.filter((value) => value === "easy").length;
   const medium = difficulties.filter((value) => value === "medium").length;
   const hard = difficulties.filter((value) => value === "hard").length;
-  return easy === 3 && medium === 2 && hard === 2
+  return easy === 2 && medium === 2 && hard === 1
     ? []
-    : ["Speaking response must contain 3 easy, 2 medium, and 2 hard sentences."];
+    : ["Speaking response must contain 2 easy, 2 medium, and 1 hard sentence."];
 }
