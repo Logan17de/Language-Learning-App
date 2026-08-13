@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import { ReviewDashboard } from "@/components/review/review-dashboard";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Review" };
-export default function ReviewPage() { return <ReviewDashboard />; }
+export default function ReviewPage() {
+  redirect("/progress");
+}
