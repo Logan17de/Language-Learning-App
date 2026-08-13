@@ -24,7 +24,8 @@ const buildingRoute = readFileSync(
 
 describe("progressive custom lesson reading", () => {
   it("leaves the custom-topic builder as soon as the story request is ready", () => {
-    expect(customTopic).toContain('searchParams.get("requestId")');
+    expect(customTopic).toContain("new URL(window.location.href).searchParams.get(");
+    expect(customTopic).toContain('"requestId"');
     expect(customTopic).toContain(
       "router.replace(`/lesson/building/${encodeURIComponent(activeRequest)}`)",
     );
