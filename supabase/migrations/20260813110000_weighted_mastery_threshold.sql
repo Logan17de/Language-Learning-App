@@ -101,7 +101,7 @@ returns trigger
 language plpgsql
 security definer
 set search_path = public
-as $$;
+as $$
 begin
   update public.review_queue
   set status = case
