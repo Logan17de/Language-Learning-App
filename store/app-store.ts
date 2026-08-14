@@ -7,6 +7,7 @@ import {
   defaultProgress,
   defaultUser,
 } from "@/data/default-learner-state";
+import { CANONICAL_LESSON_PHASES } from "@/lib/lesson-contract";
 import { customLessonRepository } from "@/lib/repositories/custom-lesson-repository";
 import { getBackendMode } from "@/lib/supabase/config";
 import { settingsRepository } from "@/lib/repositories/settings-repository";
@@ -21,7 +22,11 @@ import type {
   UserSubscription,
 } from "@/types/app-preferences";
 import type { LessonPackage } from "@/types/lesson";
-import type { LessonCompletionResult, LessonSession } from "@/types/lesson-session";
+import type {
+  LessonCompletionResult,
+  LessonPhaseId,
+  LessonSession,
+} from "@/types/lesson-session";
 import type {
   DailyMinutes,
   LearnerLevel,
@@ -129,6 +134,10 @@ const initialState = {
   lessonReports: [],
 };
 
+const canonicalPhaseIds = new Set<LessonPhaseId>(
+  CANONICAL_LESSON_PHASES.map((phase) => phase.id),
+);
+
 const memoryFallback = new Map<string, string>();
 const safeStorage: StateStorage = {
   getItem: (name) => {
@@ -179,8 +188,6 @@ export function createEmptyLessonSession(lessonId: string): LessonSession {
     listeningComplete: false,
     speakingEvents: [],
     speakingComplete: false,
-    reviewAnswers: [],
-    reviewResult: null,
     completionResult: null,
     completed: false,
     rewarded: false,
@@ -196,7 +203,9 @@ export function normalizeLessonSession(
     return empty;
   }
 
-  const session = value as Partial<LessonSession>;
+  const session = value as Partial<LessonSession> & {
+    completedPhaseIds?: unknown;
+  };
   const integer = (candidate: unknown, fallback: number) =>
     typeof candidate === "number" && Number.isInteger(candidate)
       ? candidate
@@ -205,6 +214,13 @@ export function normalizeLessonSession(
     typeof candidate === "string" && candidate.length > 0
       ? candidate
       : fallback;
+  const completedPhaseIds = Array.isArray(session.completedPhaseIds)
+    ? session.completedPhaseIds.filter(
+        (phaseId): phaseId is LessonPhaseId =>
+          typeof phaseId === "string" &&
+          canonicalPhaseIds.has(phaseId as LessonPhaseId),
+      )
+    : [];
 
   return {
     ...empty,
@@ -212,15 +228,16 @@ export function normalizeLessonSession(
     lessonId,
     currentPhaseIndex: Math.max(
       0,
-      Math.min(6, integer(session.currentPhaseIndex, 0)),
+      Math.min(
+        CANONICAL_LESSON_PHASES.length - 1,
+        integer(session.currentPhaseIndex, 0),
+      ),
     ),
     activityIndex: Math.max(0, integer(session.activityIndex, 0)),
     elapsedSeconds: Math.max(0, integer(session.elapsedSeconds, 0)),
     startedAt: timestamp(session.startedAt, empty.startedAt),
     updatedAt: timestamp(session.updatedAt, empty.updatedAt),
-    completedPhaseIds: Array.isArray(session.completedPhaseIds)
-      ? session.completedPhaseIds
-      : [],
+    completedPhaseIds,
     activities:
       typeof session.activities === "object" &&
       session.activities !== null &&
@@ -252,10 +269,6 @@ export function normalizeLessonSession(
       ? session.speakingEvents
       : [],
     speakingComplete: session.speakingComplete === true,
-    reviewAnswers: Array.isArray(session.reviewAnswers)
-      ? session.reviewAnswers
-      : [],
-    reviewResult: session.reviewResult ?? null,
     completionResult: session.completionResult ?? null,
     completed: session.completed === true,
     rewarded: session.rewarded === true,
@@ -481,7 +494,11 @@ export const useAppStore = create<AppState>()(
                 ? 100
                 : Math.max(
                     1,
-                    Math.round((session.currentPhaseIndex / 7) * 100),
+                    Math.round(
+                      (session.currentPhaseIndex /
+                        CANONICAL_LESSON_PHASES.length) *
+                        100,
+                    ),
                   ),
             },
           },
@@ -614,7 +631,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: "aiko-app-state",
-      version: 5,
+      version: 6,
       storage: createJSONStorage(() => safeStorage),
       migrate: (persistedState) => persistedState as Partial<AppState>,
       merge: (persisted, current) => {
