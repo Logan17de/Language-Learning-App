@@ -64,9 +64,6 @@ function activityPhase(
   if (lesson.speakingExercises.some((item) => item.id === activityId)) {
     return "speaking";
   }
-  if (lesson.reviewQuestions.some((item) => item.id === activityId)) {
-    return "review";
-  }
   return null;
 }
 
@@ -75,9 +72,7 @@ export function buildMasteryEvidence(
   session: LessonSession,
   phaseId: LessonPhaseId,
 ): Json[] {
-  const phaseComplete =
-    session.completedPhaseIds.includes(phaseId) ||
-    (phaseId === "review" && session.completed);
+  const phaseComplete = session.completedPhaseIds.includes(phaseId);
   if (!phaseComplete) return [];
 
   const result: Json[] = [];
@@ -114,7 +109,6 @@ export function buildMasteryEvidence(
     ...lesson.speakingExercises.flatMap(
       (item) => item.inspectableTerms ?? [],
     ),
-    ...lesson.reviewQuestions.flatMap((item) => item.inspectableTerms ?? []),
   ];
 
   for (const interaction of session.storyInteractions) {
@@ -303,33 +297,6 @@ export function buildMasteryEvidence(
     });
   }
 
-  // This is the lesson's final review stage, not the retired standalone
-  // Quick Review feature.
-  for (const answer of phaseId === "review" ? session.reviewAnswers : []) {
-    const question = lesson.reviewQuestions.find(
-      (item) => item.id === answer.questionId,
-    );
-    if (!question) continue;
-    for (const itemKey of question.targetItemIds ?? []) {
-      add({
-        clientEventId: `review:${answer.questionId}:${itemKey}`,
-        itemKey,
-        dimension:
-          answer.category === "speaking" ? "pronunciation" : "meaning",
-        signal: answer.correct ? "correct" : "incorrect",
-        data: {
-          selectedAnswer: answer.selectedAnswer,
-          category: answer.category,
-        },
-      });
-    }
-    addUnassistedKanji(
-      question.id,
-      [question.prompt, ...question.choices].join("\n"),
-      { answeredCorrectly: answer.correct, source: "review" },
-    );
-  }
-
   return result;
 }
 
@@ -364,15 +331,6 @@ async function persistLesson(
       correct: answer.correct,
       attempts: answer.attempts,
       answer_data: json({ type: answer.type, skill: answer.skill }),
-    })),
-    ...session.reviewAnswers.map((answer) => ({
-      lesson_session_id: backendSession.data.id,
-      phase: "review",
-      activity_id: answer.questionId,
-      selected_answer: answer.selectedAnswer,
-      correct: answer.correct,
-      attempts: 1,
-      answer_data: json({ category: answer.category }),
     })),
   ];
   const events = [
@@ -447,8 +405,6 @@ async function persistLesson(
             (answer) => answer.correct,
           ).length,
           grammar_total: session.grammarAnswers.length,
-          review_correct: session.reviewResult?.correctCount ?? 0,
-          review_total: session.reviewResult?.totalCount ?? 0,
         },
       }),
     });
