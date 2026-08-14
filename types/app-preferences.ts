@@ -19,18 +19,6 @@ export interface UserSettings {
   preferredFocus: LessonFocus;
   readingDifficulty: "guided" | "balanced" | "independent";
   speakingDifficulty: "easy" | "medium" | "hard";
-  audioVolume: number;
-  autoplay: boolean;
-  playbackSpeed: 0.75 | 1 | 1.25;
-  showTranscript: boolean;
-  microphonePermission: "not-asked" | "allowed" | "denied";
-  readingHighlights: boolean;
-  pronunciationFeedback: boolean;
-  dailyReminder: boolean;
-  reviewReminder: boolean;
-  streakReminder: boolean;
-  weeklyReport: boolean;
-  customLessonReady: boolean;
   theme: ThemePreference;
 }
 
