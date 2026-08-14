@@ -90,7 +90,7 @@ export function SettingsPage() {
             <Select
               label="Current level"
               value={String(user.level)}
-              options={["Beginner", "N5", "N4", "N3", "N2", "Not sure"]}
+              options={["Beginner", "N5", "N4", "N3", "N2", "N1", "Not sure"]}
               onChange={(value) => setLevel(value as LearnerLevel)}
             />
             <Select
