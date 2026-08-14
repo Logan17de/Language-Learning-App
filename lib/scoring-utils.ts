@@ -7,8 +7,6 @@ import type {
   GrammarAnswer,
   LessonCompletionResult,
   LessonSession,
-  ReviewAnswer,
-  ReviewResult,
   VocabularyAnswer,
 } from "@/types/lesson-session";
 
@@ -38,29 +36,53 @@ export function upsertGrammarAnswer(
   ];
 }
 
-export function calculateReviewResult(answers: ReviewAnswer[], totalCount = 5): ReviewResult {
-  const correctCount = answers.filter((answer) => answer.correct).length;
-  return {
-    answers,
-    correctCount,
-    totalCount,
-    score: Math.round((correctCount / totalCount) * 100),
-  };
-}
-
 export function calculateLessonCompletion(
   lesson: LessonPackage,
   session: LessonSession,
 ): LessonCompletionResult {
-  const reviewScore = session.reviewResult?.score ?? 0;
   const vocabularyAccuracy = ratio(
     session.vocabularyAnswers.filter((answer) => answer.correct).length,
-    Math.max(1, session.vocabularyAnswers.length),
+    Math.max(1, lesson.vocabularyQuestions.length),
   );
   const grammarAccuracy = ratio(
     session.grammarAnswers.filter((answer) => answer.correct).length,
-    Math.max(1, session.grammarAnswers.length),
+    Math.max(1, lesson.grammarQuestions.length),
   );
+  const readingQuestions = lesson.readingQuestions ?? [];
+  const readingCorrect = session.readingAnswers.filter((answer) => {
+    const question = readingQuestions.find(
+      (item) => item.id === answer.questionId,
+    );
+    return question ? evaluateAnswer(answer.response, question.answer) : false;
+  }).length;
+  const readingAccuracy = ratio(
+    readingCorrect,
+    Math.max(1, readingQuestions.length),
+  );
+  const listeningAnswers = session.listeningEvents.filter(
+    (event) => event.type === "answer",
+  );
+  const listeningAccuracy = ratio(
+    listeningAnswers.filter((event) => event.correct === true).length,
+    Math.max(1, lesson.listeningExercises.length),
+  );
+  const evaluatedSpeaking = session.speakingEvents.filter(
+    (event) => event.evaluationAvailable,
+  );
+  const speakingAccuracy = evaluatedSpeaking.length > 0
+    ? evaluatedSpeaking.reduce(
+        (total, event) =>
+          total +
+          ratio(
+            event.pronunciationConfidence + event.grammarAccuracy,
+            200,
+          ),
+        0,
+      ) / evaluatedSpeaking.length
+    : session.speakingComplete
+      ? 1
+      : 0;
+
   const storyWords = lesson.story.flatMap((line) =>
     line.words.map((word) => ({ lineId: line.id, word })),
   );
@@ -77,13 +99,22 @@ export function calculateLessonCompletion(
       ) /
       storyWords.length /
       100
-    : 1;
+    : session.storyComplete
+      ? 1
+      : 0;
+
+  // The lesson has six learner phases and no Final Review. Keep every active
+  // phase represented in the final score instead of reserving weight for the
+  // retired review stage.
   const score = Math.round(
-    reviewScore * 0.5 +
-      vocabularyAccuracy * 20 +
-      grammarAccuracy * 20 +
-      storyIndependence * 10,
+    storyIndependence * 15 +
+      vocabularyAccuracy * 25 +
+      grammarAccuracy * 25 +
+      readingAccuracy * 15 +
+      listeningAccuracy * 10 +
+      speakingAccuracy * 10,
   );
+
   const wordsNeedingReview = unique([
     ...storyWords
       .filter((item) => {
@@ -120,15 +151,19 @@ export function calculateLessonCompletion(
         ),
       ),
     ...session.readingEvents
-      .filter((event) => ["paused-before-word", "pronunciation-issue", "stopped-at-word"].includes(event.type))
+      .filter((event) =>
+        ["paused-before-word", "pronunciation-issue", "stopped-at-word"].includes(
+          event.type,
+        ),
+      )
       .map((event) => event.term),
-    ...session.reviewAnswers
-      .filter((answer) => !answer.correct)
-      .flatMap((answer) =>
+    ...listeningAnswers
+      .filter((event) => event.correct === false && event.questionId)
+      .flatMap((event) =>
         exerciseTerms(
           lesson,
-          lesson.reviewQuestions.find(
-            (question) => question.id === answer.questionId,
+          lesson.listeningExercises.find(
+            (exercise) => exercise.id === event.questionId,
           )?.targetItemIds,
         ),
       ),
