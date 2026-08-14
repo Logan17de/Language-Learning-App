@@ -14,10 +14,12 @@ import { settingsRepository } from "@/lib/repositories/settings-repository";
 import type { BackendProgressSnapshot } from "@/lib/repositories/progress-repository";
 import type {
   CustomLessonRequest,
+  LessonFocus,
   LessonReport,
   ProfileEdits,
   SubscriptionPlan,
   SupportRequest,
+  ThemePreference,
   UserSettings,
   UserSubscription,
 } from "@/types/app-preferences";
@@ -104,18 +106,6 @@ const defaultSettings: UserSettings = {
   preferredFocus: "balanced",
   readingDifficulty: "balanced",
   speakingDifficulty: "medium",
-  audioVolume: 75,
-  autoplay: false,
-  playbackSpeed: 1,
-  showTranscript: true,
-  microphonePermission: "not-asked",
-  readingHighlights: true,
-  pronunciationFeedback: true,
-  dailyReminder: true,
-  reviewReminder: true,
-  streakReminder: true,
-  weeklyReport: true,
-  customLessonReady: true,
   theme: "light",
 };
 
@@ -165,6 +155,63 @@ const safeStorage: StateStorage = {
     memoryFallback.delete(name);
   },
 };
+
+function normalizeUserSettings(value: unknown): UserSettings {
+  const source = value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+  const lessonLength = [15, 30, 45, 60].includes(Number(source.lessonLength))
+    ? Number(source.lessonLength) as UserSettings["lessonLength"]
+    : defaultSettings.lessonLength;
+  const focuses: LessonFocus[] = [
+    "balanced",
+    "conversation",
+    "vocabulary",
+    "grammar",
+    "reading",
+    "speaking",
+    "workplace Japanese",
+  ];
+  const preferredFocus = typeof source.preferredFocus === "string" &&
+    focuses.includes(source.preferredFocus as LessonFocus)
+    ? source.preferredFocus as LessonFocus
+    : defaultSettings.preferredFocus;
+  const readingDifficulties: UserSettings["readingDifficulty"][] = [
+    "guided",
+    "balanced",
+    "independent",
+  ];
+  const readingDifficulty = typeof source.readingDifficulty === "string" &&
+    readingDifficulties.includes(
+      source.readingDifficulty as UserSettings["readingDifficulty"],
+    )
+    ? source.readingDifficulty as UserSettings["readingDifficulty"]
+    : defaultSettings.readingDifficulty;
+  const speakingDifficulties: UserSettings["speakingDifficulty"][] = [
+    "easy",
+    "medium",
+    "hard",
+  ];
+  const speakingDifficulty = typeof source.speakingDifficulty === "string" &&
+    speakingDifficulties.includes(
+      source.speakingDifficulty as UserSettings["speakingDifficulty"],
+    )
+    ? source.speakingDifficulty as UserSettings["speakingDifficulty"]
+    : defaultSettings.speakingDifficulty;
+  const themes: ThemePreference[] = ["light", "dark", "system"];
+  const theme = typeof source.theme === "string" &&
+    themes.includes(source.theme as ThemePreference)
+    ? source.theme as ThemePreference
+    : defaultSettings.theme;
+
+  return {
+    lessonLength,
+    preferredFocus,
+    readingDifficulty,
+    speakingDifficulty,
+    theme,
+  };
+}
 
 export function createEmptyLessonSession(lessonId: string): LessonSession {
   const timestamp = new Date().toISOString();
@@ -387,7 +434,7 @@ export const useAppStore = create<AppState>()(
           },
         })),
       updateSettings: (next) => {
-        const settings = { ...get().settings, ...next };
+        const settings = normalizeUserSettings({ ...get().settings, ...next });
         set({ settings });
         if (getBackendMode() === "supabase") void settingsRepository.save(settings);
       },
@@ -631,7 +678,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: "aiko-app-state",
-      version: 6,
+      version: 7,
       storage: createJSONStorage(() => safeStorage),
       migrate: (persistedState) => persistedState as Partial<AppState>,
       merge: (persisted, current) => {
@@ -654,7 +701,7 @@ export const useAppStore = create<AppState>()(
           savedLessonIds: saved.savedLessonIds ?? [],
           generatedLessons: saved.generatedLessons ?? [],
           customLessonRequests: saved.customLessonRequests ?? [],
-          settings: { ...current.settings, ...saved.settings },
+          settings: normalizeUserSettings(saved.settings),
           hasHydrated: false,
           backendSessionChecked: false,
           isAuthenticated: false,
