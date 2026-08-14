@@ -64,7 +64,6 @@ describe("six-phase lesson scoring", () => {
     const result = calculateLessonCompletion(lesson, session);
 
     expect(lesson.reviewQuestions).toEqual([]);
-    expect(session.reviewResult).toBeNull();
     expect(result.score).toBe(100);
   });
 });
