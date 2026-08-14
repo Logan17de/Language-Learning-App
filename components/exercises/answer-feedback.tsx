@@ -18,8 +18,8 @@ export function AnswerFeedback({
     <div
       role="status"
       className={cn(
-        "rounded-2xl border p-4",
-        correct ? "border-moss-200 bg-moss-50 text-moss-900" : "border-persimmon-100 bg-persimmon-50 text-persimmon-600",
+        "rounded-2xl border p-4 transition duration-280",
+        correct ? "scale-[1.01] border-moss-300 bg-moss-50 text-moss-900 shadow-soft" : "border-persimmon-200 bg-persimmon-50 text-persimmon-700",
       )}
     >
       <div className="flex items-start gap-3">

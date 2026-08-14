@@ -125,14 +125,14 @@ export function LessonLibrary() {
   return (
     <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
       <header className="mx-auto max-w-3xl text-center">
-        <p className="section-kicker">Learn</p>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-          {isResuming ? "Your lesson is saved." : "Your next lesson is ready."}
+        <p className="section-kicker">Expedition board</p>
+        <h1 className="mt-4 font-serif text-5xl font-semibold tracking-tight sm:text-6xl">
+          {isResuming ? "Your campfire still burns." : "A new trail has appeared."}
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-muted">
           {isResuming
-            ? "Resume from your checkpoint, or choose a fresh lesson. Everything you already attempted stays saved."
-            : "AIko has selected one lesson for your level. The title and topic stay hidden until you begin."}
+            ? "Return to your checkpoint or chart a fresh path. Every discovery you made is safely recorded."
+            : "AIko has chosen a level-matched expedition. Its story stays sealed until you cross the threshold."}
         </p>
       </header>
 
@@ -155,10 +155,8 @@ export function LessonLibrary() {
           </Card>
         ) : assignedLesson ? (
           <Card className="relative overflow-hidden !border-moss-900 !bg-moss-900 p-8 text-center text-white shadow-float sm:p-12">
-            <div
-              className="pointer-events-none absolute -right-20 -top-24 size-64 rounded-full border-[42px] border-white/[0.04]"
-              aria-hidden="true"
-            />
+            <div className="pointer-events-none absolute inset-0 bg-[url('/images/aiko-world-map.png')] bg-cover bg-center opacity-35" aria-hidden="true" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-moss-900 via-moss-900/75 to-moss-900/35" aria-hidden="true" />
             <div className="relative">
               <span className="mx-auto grid size-14 place-items-center rounded-2xl border border-white/10 bg-white/[0.07] text-persimmon-300">
                 {isResuming ? (
@@ -170,8 +168,8 @@ export function LessonLibrary() {
               <p className="mt-7 text-xs font-bold uppercase tracking-[.18em] text-moss-200">
                 {assignedLesson.level} lesson
               </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-                {isResuming ? "Continue your learning loop." : "Start with a clean reveal."}
+              <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
+                {isResuming ? "Return to the last waypoint." : "Enter the Whispering Forest."}
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
                 {isResuming

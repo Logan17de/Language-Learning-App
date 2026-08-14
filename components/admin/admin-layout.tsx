@@ -91,7 +91,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   if (!authenticated) return <AdminLoading message="Redirecting to admin login…" />;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800">
+    <div className="min-h-screen bg-paper text-ink">
       <AdminSidebar open={drawer} onClose={() => setDrawer(false)} />
       <div className="lg:pl-72">
         <AdminHeader onMenu={() => setDrawer(true)} />
@@ -103,10 +103,11 @@ export function AdminLayout({ children }: { children: ReactNode }) {
 
 function AdminLoading({ message }: { message: string }) {
   return (
-    <main className="grid min-h-screen place-items-center bg-slate-950 text-white">
+    <main className="grid min-h-screen place-items-center bg-moss-900 text-white">
       <div className="text-center">
-        <span className="mx-auto block size-10 animate-spin rounded-full border-4 border-white/20 border-t-teal-400" />
-        <p className="mt-4 text-sm text-white/60">{message}</p>
+        <span className="mx-auto grid size-14 animate-pulse place-items-center rounded-2xl border border-persimmon-300/30 bg-white/5 font-serif text-2xl text-persimmon-300">愛</span>
+        <p className="mt-4 text-xs font-bold uppercase tracking-[.18em] text-white/60">Opening the guild archive</p>
+        <p className="mt-2 text-sm text-white/45">{message}</p>
       </div>
     </main>
   );

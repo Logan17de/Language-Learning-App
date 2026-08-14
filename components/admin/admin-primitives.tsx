@@ -23,7 +23,7 @@ export function AdminStatCard({
     blue: "bg-sky-50 text-sky-700",
   };
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <article className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
       <div className={cn("mb-4 h-1.5 w-10 rounded-full", tones[tone])} />
       <p className="text-xs font-bold uppercase tracking-wider text-slate-500">{label}</p>
       <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900">{value}</p>
@@ -46,10 +46,10 @@ export function AdminSection({
   className?: string;
 }) {
   return (
-    <section className={cn("rounded-2xl border border-slate-200 bg-white shadow-sm", className)}>
+    <section className={cn("rounded-2xl border border-border bg-surface shadow-sm", className)}>
       <header className="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="font-bold text-slate-900">{title}</h2>
+          <h2 className="font-serif text-lg font-semibold text-ink">{title}</h2>
           {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
         </div>
         {action}
@@ -143,7 +143,7 @@ export function AdminPageHeader({
 }) {
   return (
     <header className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <div><p className="text-xs font-bold uppercase tracking-[.2em] text-teal-700">{eyebrow}</p><h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">{title}</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{description}</p></div>
+      <div><p className="text-xs font-bold uppercase tracking-[.2em] text-teal-700">{eyebrow}</p><h1 className="mt-2 font-serif text-4xl font-semibold tracking-tight text-ink sm:text-5xl">{title}</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{description}</p></div>
       {actions}
     </header>
   );

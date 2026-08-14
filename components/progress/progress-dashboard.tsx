@@ -19,12 +19,12 @@ export function ProgressDashboard() {
   return (
     <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
       <header>
-        <p className="section-kicker">Progress</p>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-          Your {currentLevel} progress.
+        <p className="section-kicker">Traveler&apos;s atlas</p>
+        <h1 className="mt-4 text-5xl font-semibold tracking-tight sm:text-6xl">
+          Your {currentLevel} world is taking shape.
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-muted">
-          See level completion and the language you have actually accumulated through lessons.
+          Trace the ground you have covered and the language you now carry with you.
         </p>
       </header>
 

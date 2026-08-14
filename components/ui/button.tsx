@@ -6,9 +6,9 @@ type Variant = "primary" | "secondary" | "ghost" | "dark";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-moss-600 text-white shadow-soft hover:bg-moss-700 active:scale-[0.98]",
+    "border border-moss-500 bg-moss-600 text-white shadow-[inset_0_1px_rgba(255,255,255,.18),0_8px_20px_-12px_rgba(37,51,37,.9)] hover:-translate-y-0.5 hover:bg-moss-700 active:translate-y-0 active:scale-[0.98]",
   secondary:
-    "border border-border bg-surface text-moss-700 hover:border-moss-200 hover:bg-moss-50 active:scale-[0.98]",
+    "border border-border bg-surface text-moss-700 shadow-[inset_0_1px_rgba(255,255,255,.35)] hover:-translate-y-0.5 hover:border-moss-300 hover:bg-moss-50 active:translate-y-0 active:scale-[0.98]",
   ghost: "text-ink hover:bg-surface-muted active:scale-[0.98]",
   dark: "bg-moss-900 text-white shadow-soft hover:bg-moss-800 active:scale-[0.98]",
 };
@@ -20,7 +20,7 @@ interface SharedProps {
 }
 
 const baseClass =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition duration-180 focus:outline-none focus-visible:ring-4 focus-visible:ring-moss-200 focus-visible:ring-offset-2 focus-visible:ring-offset-paper disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100";
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold transition duration-180 focus:outline-none focus-visible:ring-4 focus-visible:ring-moss-200 focus-visible:ring-offset-2 focus-visible:ring-offset-paper disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100";
 
 export function Button({
   children,

@@ -52,9 +52,9 @@ export function AdminSidebar({ open, onClose }: { open: boolean; onClose: () => 
   return (
     <>
       {open && <button type="button" className="fixed inset-0 z-40 bg-slate-950/50 lg:hidden" aria-label="Close admin navigation" onClick={onClose} />}
-      <aside className={cn("fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-slate-950 text-white transition-transform lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
+      <aside className={cn("fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-white/10 bg-[#252325] text-white shadow-float transition-transform lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
         <div className="flex h-20 items-center justify-between border-b border-white/10 px-6">
-          <Link href="/admin" className="flex items-center gap-3" onClick={onClose}><span className="grid size-10 place-items-center rounded-xl bg-teal-400 text-lg font-black text-slate-950">愛</span><span><strong className="block tracking-wide">AIko Admin</strong><small className="text-white/45">Operations console</small></span></Link>
+          <Link href="/admin" className="flex items-center gap-3" onClick={onClose}><span className="grid size-10 rotate-3 place-items-center rounded-xl border border-persimmon-300/40 bg-moss-900 font-serif text-lg font-black text-persimmon-300">愛</span><span><strong className="block font-serif text-lg tracking-wide">AIko Guild</strong><small className="text-white/45">Operations archive</small></span></Link>
           <button type="button" className="grid size-10 place-items-center rounded-lg hover:bg-white/10 lg:hidden" onClick={onClose} aria-label="Close admin menu"><X className="size-5" /></button>
         </div>
         <nav className="flex-1 overflow-y-auto p-4" aria-label="Admin navigation">
@@ -65,7 +65,7 @@ export function AdminSidebar({ open, onClose }: { open: boolean; onClose: () => 
                 : href === "/admin/lessons"
                   ? pathname === href || (pathname?.startsWith(`${href}/`) && !pathname.startsWith("/admin/lessons/import") && !pathname.startsWith("/admin/lessons/batch-generate"))
                   : pathname?.startsWith(href);
-              return <li key={href}><Link href={href} onClick={onClose} className={cn("flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-teal-300", active ? "bg-teal-400 text-slate-950" : "text-white/65 hover:bg-white/10 hover:text-white")}><Icon className="size-4.5" />{label}</Link></li>;
+              return <li key={href}><Link href={href} onClick={onClose} className={cn("flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-teal-300", active ? "bg-persimmon-400 text-moss-900 shadow-soft" : "text-white/65 hover:bg-white/10 hover:text-white")}><Icon className="size-4.5" />{label}</Link></li>;
             })}
           </ul>
         </nav>

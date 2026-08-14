@@ -29,11 +29,11 @@ export function AdminHeader({ onMenu }: { onMenu: () => void }) {
     .join("") || "A";
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-border bg-surface/90 shadow-soft backdrop-blur-xl">
       <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
         <button type="button" className="grid size-10 place-items-center rounded-xl text-slate-600 hover:bg-slate-100 lg:hidden" onClick={onMenu} aria-label="Open admin menu"><Menu className="size-5" /></button>
         <div className="min-w-0 flex-1"><AdminBreadcrumbs /></div>
-        <form onSubmit={submit} role="search" className="hidden w-full max-w-xs md:block"><label className="relative block"><span className="sr-only">Search lessons</span><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" /><input value={query} onChange={(event) => setQuery(event.target.value)} className="min-h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100" placeholder="Search lessons…" /></label></form>
+        <form onSubmit={submit} role="search" className="hidden w-full max-w-xs md:block"><label className="relative block"><span className="sr-only">Search lessons</span><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" /><input value={query} onChange={(event) => setQuery(event.target.value)} className="min-h-10 w-full rounded-xl border border-border bg-paper pl-9 pr-3 text-sm text-ink outline-none focus:border-moss-500 focus:ring-4 focus:ring-moss-100" placeholder="Search lessons…" /></label></form>
         <Link href="/admin/reports" className="grid size-10 place-items-center rounded-xl text-slate-600 hover:bg-slate-100" aria-label="Open reports requiring attention" title="Reports"><Bell className="size-5" /></Link>
         <div className="relative">
           <button type="button" onClick={() => setProfileOpen((value) => !value)} className="flex min-h-10 items-center gap-2 rounded-xl px-2 text-left hover:bg-slate-100" aria-expanded={profileOpen}><span className="grid size-8 place-items-center rounded-lg bg-slate-900 text-xs font-bold text-white">{initials}</span><span className="hidden text-xs sm:block"><strong className="block text-slate-800">{session.displayName}</strong><span className="text-slate-500">{session.role}</span></span><ChevronDown className="size-3 text-slate-400" /></button>

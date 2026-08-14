@@ -36,7 +36,7 @@ export function LessonResult({ lesson, result }: { lesson: LessonPackage; result
   }, [lesson, result, rewardLessonCompletion]);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-paper px-5 py-10 sm:px-8 sm:py-16">
+    <main className="relative min-h-screen overflow-hidden bg-paper px-5 py-10 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-[34rem] before:bg-[linear-gradient(to_bottom,rgba(37,51,37,.35),rgb(var(--aiko-paper))),url('/images/aiko-world-map.png')] before:bg-cover before:bg-center sm:px-8 sm:py-16">
       <div className="pointer-events-none absolute inset-0 motion-reduce:hidden" aria-hidden="true">
         {["left-[12%] top-16", "left-[25%] top-32", "right-[18%] top-20", "right-[30%] top-44"].map((position, index) => (
           <span key={position} className={`absolute ${position} animate-float-slow ${index % 2 ? "text-moss-500" : "text-persimmon-400"}`}>
@@ -47,8 +47,8 @@ export function LessonResult({ lesson, result }: { lesson: LessonPackage; result
       <div className="relative mx-auto max-w-4xl">
         <div className="text-center">
           <span className="mx-auto grid size-24 place-items-center rounded-[2.25rem] bg-moss-900 text-white shadow-float"><PartyPopper className="size-10 text-persimmon-400" /></span>
-          <Badge tone="orange" className="mt-7">Lesson Complete</Badge>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">{lesson.title}</h1>
+          <Badge tone="orange" className="mt-7">Destination reached</Badge>
+          <h1 className="mt-4 font-serif text-5xl font-semibold tracking-tight sm:text-6xl">{lesson.title}</h1>
           <p className="mt-3 font-serif text-xl text-stone-500">{lesson.japaneseTitle}</p>
           <div className="mt-8 flex items-end justify-center gap-2">
             <span className="text-7xl font-semibold tracking-tight text-moss-700">{result.score}</span>

@@ -28,9 +28,9 @@ export function ReviewDashboard() {
       <div className="mx-auto max-w-6xl px-5 py-7 sm:px-8 sm:py-10">
         <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="section-kicker">Review</p>
-            <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-              Practice only what is weak.
+            <p className="section-kicker">Memory sanctuary</p>
+            <h1 className="mt-4 text-5xl font-semibold tracking-tight sm:text-6xl">
+              Rekindle what is fading.
             </h1>
             <p className="mt-3 max-w-2xl text-base leading-7 text-muted">
               Kanji, vocabulary, grammar, listening, and speaking appear here only when your lesson results show that they need another pass.

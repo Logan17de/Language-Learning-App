@@ -4,160 +4,111 @@
 
 :root {
   color-scheme: light;
-  --aiko-paper: 251 250 246;
-  --aiko-surface: 255 255 255;
-  --aiko-surface-muted: 245 248 246;
-  --aiko-ink: 36 53 47;
-  --aiko-muted: 92 107 100;
-  --aiko-border: 224 229 225;
-  --aiko-sand: 238 233 223;
-  --aiko-progress-track: 226 238 231;
-  --aiko-progress-fill: 79 128 104;
+  --aiko-paper: 244 240 228;
+  --aiko-surface: 252 249 240;
+  --aiko-surface-muted: 235 232 218;
+  --aiko-ink: 38 39 34;
+  --aiko-muted: 101 99 88;
+  --aiko-border: 205 196 174;
+  --aiko-sand: 224 216 194;
+  --aiko-progress-track: 215 215 194;
+  --aiko-progress-fill: 75 99 64;
+  --aiko-plum: 73 55 80;
+  --aiko-gold: 185 124 43;
 }
 
 .dark {
   color-scheme: dark;
-  --aiko-paper: 20 30 26;
-  --aiko-surface: 29 43 37;
-  --aiko-surface-muted: 34 51 43;
-  --aiko-ink: 237 244 239;
-  --aiko-muted: 174 190 181;
-  --aiko-border: 57 76 67;
-  --aiko-sand: 45 57 50;
-  --aiko-progress-track: 52 75 64;
-  --aiko-progress-fill: 117 170 142;
+  --aiko-paper: 20 21 24;
+  --aiko-surface: 29 29 32;
+  --aiko-surface-muted: 39 39 39;
+  --aiko-ink: 239 233 216;
+  --aiko-muted: 177 170 154;
+  --aiko-border: 72 68 59;
+  --aiko-sand: 52 50 44;
+  --aiko-progress-track: 54 59 50;
+  --aiko-progress-fill: 141 164 116;
+  --aiko-plum: 171 146 179;
+  --aiko-gold: 222 182 106;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-  background: rgb(var(--aiko-paper));
-}
-
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; background: rgb(var(--aiko-paper)); }
 body {
   min-height: 100dvh;
   margin: 0;
   background:
-    radial-gradient(circle at 8% 0%, rgb(79 128 104 / 0.055), transparent 28rem),
+    linear-gradient(rgb(var(--aiko-paper) / .94), rgb(var(--aiko-paper) / .98)),
+    url("/images/aiko-world-map.png") center top / 100% auto no-repeat,
     rgb(var(--aiko-paper));
   color: rgb(var(--aiko-ink));
-  font-family: Inter, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-aiko-sans), "Noto Sans JP", ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-::selection {
-  background: #c5ddcf;
-  color: #20382e;
-}
-
-button,
-a,
-input,
-textarea,
-select {
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-a,
-button:not(:disabled),
-[role="button"]:not([aria-disabled="true"]) {
-  cursor: pointer;
-}
-
-.dark .bg-white {
-  background-color: rgb(var(--aiko-surface));
-}
-
-.dark .bg-paper {
-  background-color: rgb(var(--aiko-paper));
-}
-
-.dark .bg-stone-100,
-.dark .bg-moss-50 {
-  background-color: rgb(var(--aiko-surface-muted));
-}
-
-.dark .bg-moss-100 {
-  background-color: rgb(79 128 104 / 0.22);
-}
-
-.dark .bg-persimmon-50,
-.dark .bg-persimmon-100 {
-  background-color: rgb(229 119 72 / 0.16);
-}
-
-.dark .text-ink {
-  color: rgb(var(--aiko-ink));
-}
-
-.dark .text-stone-400 {
-  color: rgb(143 160 151);
-}
-
-.dark .text-stone-500,
-.dark .text-stone-600 {
-  color: rgb(var(--aiko-muted));
-}
-
-.dark .text-moss-600,
-.dark .text-moss-700,
-.dark .text-moss-800 {
-  color: #c5ddcf;
-}
-
-.dark .text-persimmon-500,
-.dark .text-persimmon-600,
-.dark .text-persimmon-700 {
-  color: #f5a97e;
-}
-
-.dark .border-stone-200,
-.dark .border-black\/\[\.06\],
-.dark .border-black\/\[0\.06\],
-.dark .border-black\/\[0\.05\] {
-  border-color: rgb(var(--aiko-border));
-}
+h1, h2 { font-family: var(--font-aiko-display), ui-serif, Georgia, serif; text-wrap: balance; }
+h3 { text-wrap: balance; }
+::selection { background: rgb(var(--aiko-gold) / .3); color: rgb(var(--aiko-ink)); }
+button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+a, button:not(:disabled), [role="button"]:not([aria-disabled="true"]) { cursor: pointer; }
 
 .progress-ring {
-  background: conic-gradient(
-    rgb(var(--aiko-progress-fill)) var(--progress-angle),
-    rgb(var(--aiko-progress-track)) 0
-  );
+  background: conic-gradient(rgb(var(--aiko-progress-fill)) var(--progress-angle), rgb(var(--aiko-progress-track)) 0);
 }
 
 @layer components {
   .form-input {
-    @apply min-h-12 w-full rounded-2xl border border-border bg-surface px-4 text-base text-ink outline-none transition duration-180 placeholder:text-muted/60 focus-visible:border-moss-500 focus-visible:ring-4 focus-visible:ring-moss-100;
+    @apply min-h-12 w-full rounded-xl border border-border bg-surface px-4 text-base text-ink outline-none transition duration-180 placeholder:text-muted/60 focus-visible:border-moss-500 focus-visible:ring-4 focus-visible:ring-moss-100;
+    box-shadow: inset 0 1px rgb(255 255 255 / .25);
   }
-
   .section-kicker {
-    @apply inline-flex items-center rounded-full border border-moss-200/70 bg-moss-50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-moss-700;
+    @apply inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-persimmon-600;
   }
-
+  .section-kicker::before, .section-kicker::after {
+    content: "";
+    width: 1.25rem;
+    height: 1px;
+    background: currentColor;
+    opacity: .5;
+  }
   .admin-input {
-    @apply min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-500 focus:ring-4 focus:ring-teal-100;
+    @apply min-h-11 w-full rounded-xl border border-border bg-surface px-3 text-sm text-ink outline-none transition placeholder:text-muted focus:border-moss-500 focus:ring-4 focus:ring-moss-100;
   }
-
-  .field-label {
-    @apply mb-1.5 block text-xs font-bold text-slate-600;
+  .field-label { @apply mb-1.5 block text-xs font-bold text-muted; }
+  .fantasy-panel {
+    border: 1px solid rgb(var(--aiko-border) / .85);
+    background: rgb(var(--aiko-surface) / .92);
+    box-shadow: 0 22px 60px -44px rgb(25 28 23 / .72), inset 0 1px rgb(255 255 255 / .35);
+    backdrop-filter: blur(14px);
   }
+  .rune-divider {
+    @apply flex items-center gap-3 text-[10px] uppercase tracking-[.25em] text-muted;
+  }
+  .rune-divider::before, .rune-divider::after { content: ""; height: 1px; flex: 1; background: rgb(var(--aiko-border)); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+/* Bring legacy learner and admin utilities into the same five-color material system. */
+.dark .bg-white, .bg-white { background-color: rgb(var(--aiko-surface)); }
+.dark .bg-paper { background-color: rgb(var(--aiko-paper)); }
+.dark .bg-stone-100, .dark .bg-moss-50 { background-color: rgb(var(--aiko-surface-muted)); }
+.dark .bg-moss-100 { background-color: rgb(var(--aiko-progress-fill) / .18); }
+.dark .bg-persimmon-50, .dark .bg-persimmon-100 { background-color: rgb(var(--aiko-gold) / .14); }
+.dark .text-ink { color: rgb(var(--aiko-ink)); }
+.dark .text-stone-400, .dark .text-stone-500, .dark .text-stone-600 { color: rgb(var(--aiko-muted)); }
+.dark .text-moss-600, .dark .text-moss-700, .dark .text-moss-800 { color: rgb(var(--aiko-progress-fill)); }
+.dark .text-persimmon-500, .dark .text-persimmon-600, .dark .text-persimmon-700 { color: rgb(var(--aiko-gold)); }
+.dark .border-stone-200, .dark .border-black\/\[\.06\], .dark .border-black\/\[0\.06\], .dark .border-black\/\[0\.05\] { border-color: rgb(var(--aiko-border)); }
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+/* Admin color bridge: related world, quieter operations density. */
+[class*="bg-slate-50"] { background-color: rgb(var(--aiko-paper)); }
+[class*="bg-slate-950"] { background-color: #252325; }
+[class*="bg-slate-100"] { background-color: rgb(var(--aiko-surface-muted)); }
+[class*="border-slate-200"], [class*="border-slate-100"] { border-color: rgb(var(--aiko-border)); }
+[class*="text-slate-950"], [class*="text-slate-900"], [class*="text-slate-800"], [class*="text-slate-700"] { color: rgb(var(--aiko-ink)); }
+[class*="text-slate-600"], [class*="text-slate-500"], [class*="text-slate-400"] { color: rgb(var(--aiko-muted)); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }

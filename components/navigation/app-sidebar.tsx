@@ -35,7 +35,7 @@ export function AppSidebar() {
   const pathname = usePathname() ?? "";
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-border bg-surface px-5 py-7 lg:flex">
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-border/80 bg-surface/90 px-5 py-7 shadow-[12px_0_50px_-38px_rgba(37,51,37,.8)] backdrop-blur-xl lg:flex">
       <Brand />
       <nav className="mt-10 flex flex-1 flex-col" aria-label="App navigation">
         <div className="space-y-1.5">
@@ -53,12 +53,12 @@ export function AppSidebar() {
         </div>
       </nav>
 
-      <div className="rounded-3xl border border-border bg-surface-muted p-4">
-        <p className="text-[11px] font-bold uppercase tracking-[.16em] text-moss-700">
-          Daily focus
+      <div className="rounded-2xl border border-border bg-[linear-gradient(145deg,rgb(var(--aiko-surface-muted)),rgb(var(--aiko-surface)))] p-4 shadow-inner">
+        <p className="text-[10px] font-bold uppercase tracking-[.2em] text-persimmon-600">
+          Traveler&apos;s maxim
         </p>
-        <p className="mt-2 font-serif text-lg text-ink">一歩ずつ</p>
-        <p className="mt-1 text-xs leading-5 text-muted">One step at a time.</p>
+        <p className="mt-2 font-serif text-xl text-ink">一歩ずつ</p>
+        <p className="mt-1 text-xs leading-5 text-muted">The summit is reached one phrase at a time.</p>
       </div>
     </aside>
   );

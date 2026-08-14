@@ -1,5 +1,13 @@
 import type { Metadata, Viewport } from "next";
+import { Cormorant_Garamond, Geist } from "next/font/google";
 import "./globals.css";
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-aiko-sans" });
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-aiko-display",
+  weight: ["500", "600", "700"],
+});
 import { ThemeSync } from "@/components/layout/theme-sync";
 import { DemoModeBanner } from "@/components/backend/demo-mode-banner";
 import { SyncStatus } from "@/components/backend/sync-status";
@@ -29,8 +37,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
-      <body>
+    <html lang="en" className="bg-paper" data-scroll-behavior="smooth">
+      <body className={`${geist.variable} ${cormorant.variable} font-sans`}>
         <ThemeSync />
         <BackendSessionHydrator />
         <DemoModeBanner />

@@ -92,16 +92,16 @@ export function AdminLogin() {
   }
 
   return (
-    <main className="grid min-h-screen bg-slate-950 px-5 py-12 text-white lg:grid-cols-2 lg:items-center lg:gap-12 lg:px-16">
-      <section className="mx-auto max-w-xl">
-        <span className="grid size-14 place-items-center rounded-2xl bg-teal-400 text-slate-950">
+    <main className="relative grid min-h-screen overflow-hidden bg-[#252325] px-5 py-12 text-white before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(90deg,rgba(37,35,37,.9),rgba(37,35,37,.68)),url('/images/aiko-world-map.png')] before:bg-cover before:bg-center lg:grid-cols-2 lg:items-center lg:gap-12 lg:px-16">
+      <section className="relative mx-auto max-w-xl">
+        <span className="grid size-14 rotate-3 place-items-center rounded-2xl border border-persimmon-300/40 bg-moss-900 text-persimmon-300">
           <ShieldCheck className="size-7" />
         </span>
-        <p className="mt-8 text-xs font-bold uppercase tracking-[.22em] text-teal-300">
-          AIko operations
+        <p className="mt-8 text-xs font-bold uppercase tracking-[.22em] text-persimmon-300">
+          AIko guild operations
         </p>
-        <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-6xl">
-          Private owner workspace.
+        <h1 className="mt-4 text-5xl font-semibold tracking-tight sm:text-7xl">
+          The private archive.
         </h1>
         <p className="mt-6 max-w-lg leading-7 text-white/55">
           {demoMode
@@ -109,8 +109,8 @@ export function AdminLogin() {
             : "Production administration is restricted to AIko's single owner account and server-verified permissions."}
         </p>
       </section>
-      <section className="mx-auto mt-12 w-full max-w-md rounded-3xl bg-white p-7 text-slate-900 shadow-2xl sm:p-9 lg:mt-0">
-        <LockKeyhole className="size-6 text-teal-700" />
+      <section className="relative mx-auto mt-12 w-full max-w-md rounded-3xl border border-border bg-surface p-7 text-ink shadow-2xl sm:p-9 lg:mt-0">
+        <LockKeyhole className="size-6 text-persimmon-600" />
         <h2 className="mt-5 text-2xl font-bold">Owner sign in</h2>
         <p className="mt-2 text-sm text-slate-500">
           {demoMode

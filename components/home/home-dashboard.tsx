@@ -18,6 +18,7 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { useAppStore } from "@/store/app-store";
 import { getBackendMode } from "@/lib/supabase/config";
 import { useBackendLessonStore } from "@/store/backend-lesson-store";
+import { WorldJourney } from "@/components/home/world-journey";
 
 export function HomeDashboard() {
   const user = useAppStore((state) => state.user);
@@ -107,11 +108,11 @@ export function HomeDashboard() {
             <p className="section-kicker">Today</p>
             <span className="text-xs font-semibold text-muted">{user.level}</span>
           </div>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-            おはよう, {user.name}.
+          <h1 className="mt-3 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
+            Your path is waiting, {user.name}.
           </h1>
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted sm:text-base">
-            Continue your lesson, then spend a few minutes on whatever needs reinforcement.
+            Follow the lantern trail, strengthen what is fading, and carry today&apos;s Japanese into the next region.
           </p>
         </div>
         <Link
@@ -123,7 +124,11 @@ export function HomeDashboard() {
         </Link>
       </header>
 
-      <section className="mt-8 grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,.65fr)]">
+      <div className="mt-8 animate-fade-up">
+        <WorldJourney progress={levelProgress} />
+      </div>
+
+      <section className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,.65fr)]">
         <Card className="relative overflow-hidden !border-moss-900 !bg-moss-900 p-7 text-white shadow-float sm:p-9">
           <div
             className="pointer-events-none absolute -right-20 -top-24 size-64 rounded-full border-[42px] border-white/[0.04]"
