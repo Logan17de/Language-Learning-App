@@ -1,5 +1,5 @@
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 function source(path: string): string {
@@ -18,12 +18,9 @@ describe("standalone review stays retired", () => {
     expect(home).not.toContain("Open review");
   });
 
-  it("redirects old learner review routes to progress", () => {
-    const reviewPage = source("app/review/page.tsx");
-    const reviewSessionPage = source("app/review/session/page.tsx");
-
-    expect(reviewPage).toContain('redirect("/progress")');
-    expect(reviewSessionPage).toContain('redirect("/progress")');
+  it("does not keep retired learner review routes", () => {
+    expect(existsSync(resolve(process.cwd(), "app/review/page.tsx"))).toBe(false);
+    expect(existsSync(resolve(process.cwd(), "app/review/session/page.tsx"))).toBe(false);
   });
 
   it("keeps learner mastery available for internal targeting", () => {
