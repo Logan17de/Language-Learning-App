@@ -20,7 +20,6 @@ import { GrammarPhase } from "@/components/lesson/grammar-phase";
 import { ReadingPhase } from "@/components/lesson/reading-phase";
 import { ListeningPhase } from "@/components/lesson/listening-phase";
 import { SpeakingPhase } from "@/components/lesson/speaking-phase";
-import { FinalReviewPhase } from "@/components/lesson/final-review-phase";
 import { LessonReportDialog } from "@/components/support/lesson-report-dialog";
 import { preloadListeningAudio } from "@/components/exercises/audio-control";
 import {
@@ -340,13 +339,6 @@ export function LessonPlayer({
             onChange={updateSession}
           />
         )}
-        {phase.id === "review" && (
-          <FinalReviewPhase
-            lesson={lesson}
-            session={session}
-            onChange={updateSession}
-          />
-        )}
       </LessonPlayerShell>
 
       {showExit && (
@@ -404,8 +396,7 @@ function nextLabel(phaseId: LessonPhaseId): string {
     grammar: "Reading",
     reading: "Listening",
     listening: "Speaking",
-    speaking: "Final review",
-    review: "Results",
+    speaking: "Results",
   };
   return labels[phaseId];
 }
