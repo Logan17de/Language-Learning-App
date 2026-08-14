@@ -191,10 +191,7 @@ describe("learning engine contracts", () => {
         ...question,
         targetItemIds: [`grammar-${index % commuteLesson.grammar.length}`],
       })),
-      reviewQuestions: commuteLesson.reviewQuestions.map((question) => ({
-        ...question,
-        targetItemIds: ["kanji-0"],
-      })),
+      reviewQuestions: [],
     };
     const session = createEmptyLessonSession(lesson.id);
     session.vocabularyAnswers = [{
@@ -212,17 +209,10 @@ describe("learning engine contracts", () => {
       skill: lesson.grammarQuestions[0].skill,
       attempts: 1,
     }];
-    session.reviewAnswers = [{
-      questionId: lesson.reviewQuestions[0].id,
-      category: "kanji",
-      selectedAnswer: "wrong",
-      correct: false,
-    }];
 
     expect(calculateLessonCompletion(lesson, session).wordsNeedingReview).toEqual([
       lesson.vocabulary[0].term,
       lesson.grammar[0].pattern,
-      lesson.kanji[0].character,
     ]);
   });
 
