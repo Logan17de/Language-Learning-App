@@ -155,7 +155,7 @@ export interface SpeakingExercise {
 }
 
 export interface LessonPhase {
-  id: "story" | "vocabulary" | "grammar" | "reading" | "listening" | "speaking" | "review";
+  id: "story" | "vocabulary" | "grammar" | "reading" | "listening" | "speaking";
   label: string;
   description: string;
 }
