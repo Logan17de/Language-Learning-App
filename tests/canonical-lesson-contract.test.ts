@@ -33,8 +33,6 @@ function sessionFor(lesson: LessonPackage): LessonSession {
     listeningComplete: false,
     speakingEvents: [],
     speakingComplete: false,
-    reviewAnswers: [],
-    reviewResult: null,
     completionResult: null,
     completed: false,
     rewarded: false,
