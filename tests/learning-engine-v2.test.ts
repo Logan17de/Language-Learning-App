@@ -16,7 +16,7 @@ import { createEmptyLessonSession } from "@/store/app-store";
 import type { LessonPackage } from "@/types/lesson";
 import type { ExerciseDifficulty } from "@/types/lesson";
 
-describe("learning engine V2 contracts", () => {
+describe("learning engine contracts", () => {
   it("grows story length from 10–12 lines at N5 to 18–20 at N1", () => {
     expect(storyLengthRange("N5")).toEqual({ min: 10, max: 12 });
     expect(storyLengthRange("N3")).toEqual({ min: 14, max: 16 });
@@ -101,16 +101,12 @@ describe("learning engine V2 contracts", () => {
     ).toBe("Translate the ending: The flower was beautiful (plain).");
   });
 
-  it("stores adaptive candidate banks while new custom lessons use seven-question banks", () => {
+  it("keeps adaptive candidate banks historical while current custom lessons use seven-question banks", () => {
     const migration = readFileSync(
       resolve(
         process.cwd(),
         "supabase/migrations/20260727100000_adaptive_question_banks.sql",
       ),
-      "utf8",
-    );
-    const engine = readFileSync(
-      resolve(process.cwd(), "lib/gemini/lesson-engine-v2.ts"),
       "utf8",
     );
     const activityGroups = readFileSync(
@@ -136,7 +132,6 @@ describe("learning engine V2 contracts", () => {
     expect(grammarContract).toContain("3 easy, 2 medium, and 2 hard");
     expect(activityGroups).toContain('name: "vocab_questions"');
     expect(activityGroups).toContain('name: "grammar_questions"');
-    expect(engine).toContain("generateVocabularyAndKanjiActivities");
   });
 
   it("keeps level completion tied to finite JLPT catalogs", () => {
