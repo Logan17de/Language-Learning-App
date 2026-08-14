@@ -51,10 +51,5 @@ export function phaseIsComplete(
           ),
         )
       );
-    case "review":
-      return hasAnswerForEveryQuestion(
-        lesson.reviewQuestions.map((question) => question.id),
-        session.reviewAnswers.map((answer) => answer.questionId),
-      );
   }
 }
