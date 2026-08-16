@@ -13,6 +13,10 @@ const grammar = readFileSync(
   "components/lesson/grammar-phase.tsx",
   "utf8",
 );
+const reading = readFileSync(
+  "components/lesson/reading-phase.tsx",
+  "utf8",
+);
 const listening = readFileSync(
   "components/lesson/listening-phase.tsx",
   "utf8",
@@ -33,7 +37,13 @@ describe("answer feedback interaction", () => {
     expect(multipleChoice).toContain("sm:flex-row");
     expect(vocabulary).toContain("answerAction={");
     expect(grammar).toContain("answerAction={nextAction}");
+    expect(reading).toContain("answerAction={");
     expect(listening).toContain("answerAction={");
+  });
+
+  it("submits reading MCQs on the choice click", () => {
+    expect(reading).toContain("onSelect={(choice) => submit(choice)}");
+    expect(reading).not.toContain("setSelectedChoice");
   });
 
   it("keeps vocabulary copy aligned with the seven-question contract", () => {
