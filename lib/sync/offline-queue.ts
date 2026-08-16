@@ -73,6 +73,18 @@ export function removeSyncOperation(id: string): void {
   write(readSyncQueue().filter((item) => item.id !== id));
 }
 
+export function discardLessonSyncOperations(lessonId: string): void {
+  const checkpointPrefix = `lesson_checkpoint:${lessonId}:`;
+  const completionPrefix = `lesson_completion:${lessonId}:`;
+  write(
+    readSyncQueue().filter(
+      (item) =>
+        !item.dedupeKey.startsWith(checkpointPrefix) &&
+        !item.dedupeKey.startsWith(completionPrefix),
+    ),
+  );
+}
+
 export function markSyncAttempt(id: string, error: string): void {
   write(
     readSyncQueue().map((item) =>
