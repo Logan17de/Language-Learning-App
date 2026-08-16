@@ -92,6 +92,12 @@ export function GrammarPhase({
     });
   }
 
+  const nextAction = answer && !roundComplete ? (
+    <Button type="button" className="h-full min-h-14 px-5" onClick={nextQuestion}>
+      Next <ArrowRight className="size-4" />
+    </Button>
+  ) : null;
+
   if (showLesson) {
     return (
       <div>
@@ -162,6 +168,7 @@ export function GrammarPhase({
             inspectableTerms={inspectableTerms}
             onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
             onSelect={submitAnswer}
+            answerAction={nextAction}
           />
         ) : (
           <section aria-labelledby="grammar-question-prompt">
@@ -205,23 +212,24 @@ export function GrammarPhase({
               </Button>
             )}
             {answer && (
-              <div className="mt-5">
-                <AnswerFeedback correct={answer.correct} explanation={question.explanation} />
-                {!answer.correct && (
-                  <p className="mt-3 rounded-2xl bg-stone-50 p-4 text-sm text-stone-600">
-                    <span className="font-semibold text-ink">Model answer: </span>
-                    <span className="font-serif">{question.correctAnswer}</span>
-                  </p>
+              <div className="answer-result-row mt-5 flex flex-col gap-3 sm:flex-row sm:items-stretch" data-answer-result-row>
+                <div className="min-w-0 flex-1">
+                  <AnswerFeedback correct={answer.correct} explanation={question.explanation} />
+                  {!answer.correct && (
+                    <p className="mt-3 rounded-2xl bg-stone-50 p-4 text-sm text-stone-600">
+                      <span className="font-semibold text-ink">Model answer: </span>
+                      <span className="font-serif">{question.correctAnswer}</span>
+                    </p>
+                  )}
+                </div>
+                {nextAction && (
+                  <div className="flex shrink-0 items-stretch sm:min-w-40 [&>*]:w-full">
+                    {nextAction}
+                  </div>
                 )}
               </div>
             )}
           </section>
-        )}
-
-        {answer && !roundComplete && (
-          <Button type="button" className="mt-6" onClick={nextQuestion}>
-            Next question <ArrowRight className="size-4" />
-          </Button>
         )}
 
         {answer && roundComplete && (
