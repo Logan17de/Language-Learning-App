@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Bell, ChevronDown, LogOut, Menu, Search } from "lucide-react";
@@ -14,6 +14,26 @@ export function AdminHeader({ onMenu }: { onMenu: () => void }) {
   const logout = useAdminStore((state) => state.logout);
   const [query, setQuery] = useState("");
   const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!profileOpen) return;
+    function closeProfile(event: MouseEvent | KeyboardEvent) {
+      if (event instanceof KeyboardEvent && event.key === "Escape") {
+        setProfileOpen(false);
+        return;
+      }
+      if (event instanceof MouseEvent && !profileRef.current?.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", closeProfile);
+    document.addEventListener("keydown", closeProfile);
+    return () => {
+      document.removeEventListener("mousedown", closeProfile);
+      document.removeEventListener("keydown", closeProfile);
+    };
+  }, [profileOpen]);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,9 +55,9 @@ export function AdminHeader({ onMenu }: { onMenu: () => void }) {
         <div className="min-w-0 flex-1"><AdminBreadcrumbs /></div>
         <form onSubmit={submit} role="search" className="hidden w-full max-w-xs md:block"><label className="relative block"><span className="sr-only">Search lessons</span><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" /><input value={query} onChange={(event) => setQuery(event.target.value)} className="min-h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100" placeholder="Search lessons…" /></label></form>
         <Link href="/admin/reports" className="grid size-10 place-items-center rounded-xl text-slate-600 hover:bg-slate-100" aria-label="Open reports requiring attention" title="Reports"><Bell className="size-5" /></Link>
-        <div className="relative">
-          <button type="button" onClick={() => setProfileOpen((value) => !value)} className="flex min-h-10 items-center gap-2 rounded-xl px-2 text-left hover:bg-slate-100" aria-expanded={profileOpen}><span className="grid size-8 place-items-center rounded-lg bg-slate-900 text-xs font-bold text-white">{initials}</span><span className="hidden text-xs sm:block"><strong className="block text-slate-800">{session.displayName}</strong><span className="text-slate-500">{session.role}</span></span><ChevronDown className="size-3 text-slate-400" /></button>
-          {profileOpen && <div className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-xl"><p className="break-all px-3 py-2 text-xs text-slate-500">{session.email}</p><button type="button" onClick={async () => { await authService.signOut(); logout(); router.replace("/admin/login"); router.refresh(); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"><LogOut className="size-4" />Log out</button></div>}
+        <div ref={profileRef} className="relative">
+          <button type="button" onClick={() => setProfileOpen((value) => !value)} className="flex min-h-11 items-center gap-2 rounded-xl px-2 text-left hover:bg-slate-100" aria-expanded={profileOpen} aria-haspopup="menu" aria-controls="admin-profile-menu"><span className="grid size-8 place-items-center rounded-lg bg-slate-900 text-xs font-bold text-white">{initials}</span><span className="hidden text-xs sm:block"><strong className="block text-slate-800">{session.displayName}</strong><span className="text-slate-500">{session.role}</span></span><ChevronDown className={`size-3 text-slate-400 transition-transform ${profileOpen ? "rotate-180" : ""}`} aria-hidden="true" /></button>
+          {profileOpen && <div id="admin-profile-menu" role="menu" className="absolute right-0 mt-2 w-56 rounded-xl border border-slate-200 bg-white p-2 shadow-xl"><p className="break-all px-3 py-2 text-xs text-slate-500">{session.email}</p><button type="button" role="menuitem" onClick={async () => { await authService.signOut(); logout(); router.replace("/admin/login"); router.refresh(); }} className="flex min-h-11 w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"><LogOut className="size-4" aria-hidden="true" />Log out</button></div>}
         </div>
       </div>
     </header>

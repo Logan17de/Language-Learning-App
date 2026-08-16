@@ -38,7 +38,7 @@ export function LiveGrammarInspector() {
     if (result.ok) setRecords(result.data); else setError(result.error.message);
     setLoading(false);
   }
-  useEffect(() => { void load(); }, []);
+  useEffect(() => { const timer = window.setTimeout(() => void load(), 0); return () => window.clearTimeout(timer); }, []);
   const visible = useMemo(() => records.filter((item) => (level === "all" || item.jlpt_level === level) && (!query || `${item.pattern} ${item.meaning} ${item.formation} ${item.nuance}`.toLowerCase().includes(query.toLowerCase()))), [level, query, records]);
   const archived = records.filter((item) => item.archived_at).length;
   const needsReview = records.filter((item) => item.quality_status === "needs_review" || item.quality_status === "rejected").length;
@@ -67,7 +67,7 @@ export function LiveVocabularyInspector() {
     if (vocabularyResult.ok) setVocabulary(vocabularyResult.data); else setError((current) => current || vocabularyResult.error.message);
     setLoading(false);
   }
-  useEffect(() => { void load(); }, []);
+  useEffect(() => { const timer = window.setTimeout(() => void load(), 0); return () => window.clearTimeout(timer); }, []);
   const visibleKanji = useMemo(() => kanji.filter((item) => (level === "all" || item.jlpt_level === level) && (!query || `${item.character} ${item.meanings.join(" ")} ${item.readings.join(" ")}`.toLowerCase().includes(query.toLowerCase()))), [kanji, level, query]);
   const visibleVocabulary = useMemo(() => vocabulary.filter((item) => (level === "all" || item.jlpt_level === level) && (!query || `${item.written_form} ${item.reading} ${item.meaning} ${item.part_of_speech}`.toLowerCase().includes(query.toLowerCase()))), [level, query, vocabulary]);
   const current = tab === "kanji" ? kanji : vocabulary;
@@ -94,7 +94,7 @@ export function LiveCurriculumInspector() {
     if (result.ok) setData(result.data); else setError(result.error.message);
     setLoading(false);
   }
-  useEffect(() => { void load(); }, []);
+  useEffect(() => { const timer = window.setTimeout(() => void load(), 0); return () => window.clearTimeout(timer); }, []);
   const levelById = useMemo(() => new Map((data?.levels ?? []).map((item) => [item.id, item])), [data]);
   const visible = useMemo(() => (data?.items ?? []).filter((item) => (levelId === "all" || item.curriculum_level_id === levelId) && (!query || `${item.label} ${item.item_type}`.toLowerCase().includes(query.toLowerCase()))), [data, levelId, query]);
   const required = (data?.items ?? []).filter((item) => item.required).length;
@@ -116,7 +116,7 @@ export function LiveImageInspector() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   async function load() { setLoading(true); setError(""); const result = await adminOperationsRepository.listImages(); if (result.ok) setAssets(result.data); else setError(result.error.message); setLoading(false); }
-  useEffect(() => { void load(); }, []);
+  useEffect(() => { const timer = window.setTimeout(() => void load(), 0); return () => window.clearTimeout(timer); }, []);
   const visible = useMemo(() => assets.filter((item) => !query || `${item.description} ${item.topic_tags.join(" ")} ${item.vocabulary_tags.join(" ")} ${item.storage_path}`.toLowerCase().includes(query.toLowerCase())), [assets, query]);
   return <>
     <InspectorHeader title="Image library" description="Live image-asset metadata and storage paths. Browser-side mock metadata editing is disabled in production." loading={loading} onRefresh={load} />
@@ -133,7 +133,7 @@ export function LiveAudioInspector() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   async function load() { setLoading(true); setError(""); const result = await adminOperationsRepository.listAudio(); if (result.ok) setAssets(result.data); else setError(result.error.message); setLoading(false); }
-  useEffect(() => { void load(); }, []);
+  useEffect(() => { const timer = window.setTimeout(() => void load(), 0); return () => window.clearTimeout(timer); }, []);
   const visible = useMemo(() => assets.filter((item) => !query || `${item.japanese_text} ${item.voice} ${item.speaking_style} ${item.storage_path}`.toLowerCase().includes(query.toLowerCase())), [assets, query]);
   return <>
     <InspectorHeader title="Audio library" description="Live persisted lesson audio metadata. This screen does not fabricate playback quality or storage size metrics." loading={loading} onRefresh={load} />

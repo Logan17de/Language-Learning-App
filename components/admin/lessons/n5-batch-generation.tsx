@@ -128,8 +128,9 @@ export function JLPTBatchGenerationWorkspace() {
     }
   }, [loadBatches]);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => { const timer = window.setTimeout(() => void refresh(), 0); return () => window.clearTimeout(timer); }, [refresh]);
   useEffect(() => {
+    const timer = window.setTimeout(() => {
     if (!selectedBatchId) {
       setDetail(null);
       return;
@@ -137,6 +138,8 @@ export function JLPTBatchGenerationWorkspace() {
     void loadDetail(selectedBatchId).catch((loadError) => {
       setError(loadError instanceof Error ? loadError.message : "Batch detail could not be loaded.");
     });
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [loadDetail, selectedBatchId]);
 
   async function createBatch() {

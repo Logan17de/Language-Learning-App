@@ -68,6 +68,17 @@ export function ProfileForm() {
     setNewInterest("");
   }
 
+  function cancelEditing() {
+    setName(user.name);
+    setLevel(user.level);
+    setGoal(onboarding.goal ?? "Conversation");
+    setMinutes(onboarding.dailyMinutes ?? 30);
+    setInterests(onboarding.interests);
+    setNewInterest("");
+    setError("");
+    setEditing(false);
+  }
+
   if (!editing) {
     return (
       <div>
@@ -152,7 +163,7 @@ export function ProfileForm() {
       <div>
         <p className="mb-2 text-sm font-semibold">Interests</p>
         {interests.length === 0 && (
-          <p className="mb-3 text-sm leading-6 text-stone-500">
+          <p className="mb-3 text-sm leading-6 text-muted">
             No interests added. Pro lessons remain random at your level until
             you add at least one.
           </p>
@@ -165,17 +176,26 @@ export function ProfileForm() {
               onClick={() =>
                 setInterests(interests.filter((item) => item !== interest))
               }
+              aria-label={`Remove ${interest} from interests`}
               className="inline-flex min-h-10 items-center gap-2 rounded-full bg-moss-50 px-4 text-xs font-semibold text-moss-700"
             >
               {interest}
-              <X className="size-3" />
+              <X className="size-3" aria-hidden="true" />
             </button>
           ))}
         </div>
-        <div className="mt-3 flex gap-2">
+        <label htmlFor="profile-interest" className="sr-only">Add an interest</label>
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
           <input
+            id="profile-interest"
             value={newInterest}
             onChange={(event) => setNewInterest(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                addInterest();
+              }
+            }}
             className="form-input"
             placeholder="Add an interest"
           />
@@ -183,7 +203,7 @@ export function ProfileForm() {
             type="button"
             variant="secondary"
             onClick={addInterest}
-            className="shrink-0 px-4"
+            className="shrink-0 px-4 sm:w-auto"
           >
             <Plus className="size-4" /> Add
           </Button>
@@ -201,7 +221,7 @@ export function ProfileForm() {
         <Button
           type="button"
           variant="secondary"
-          onClick={() => setEditing(false)}
+          onClick={cancelEditing}
         >
           Cancel
         </Button>
@@ -216,7 +236,7 @@ export function ProfileForm() {
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-xs font-bold uppercase tracking-wide text-stone-400">
+      <dt className="text-xs font-bold uppercase tracking-wide text-muted">
         {label}
       </dt>
       <dd className="mt-2 font-semibold">{value}</dd>

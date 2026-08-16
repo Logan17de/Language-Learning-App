@@ -33,7 +33,8 @@ export function AnalyticsDashboard() {
   }
 
   useEffect(() => {
-    void refresh();
+    const timer = window.setTimeout(() => void refresh(), 0);
+    return () => window.clearTimeout(timer);
   }, [backendMode]);
 
   const live = useMemo(() => (data ? deriveAnalytics(data) : null), [data]);

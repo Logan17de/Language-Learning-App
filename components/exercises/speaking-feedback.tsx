@@ -9,11 +9,11 @@ export function SpeakingFeedback({ event }: { event: SpeakingEvent }) {
         <CheckCircle2 className="size-5 text-moss-700" />
         <div>
           <p className="font-semibold">Sentence checked</p>
-          <p className="text-xs text-stone-500">Attempt {event.attempt}</p>
+          <p className="text-xs text-muted">Attempt {event.attempt}</p>
         </div>
       </div>
       {event.transcript && (
-        <div className="rounded-2xl bg-white p-4">
+        <div className="rounded-2xl bg-surface p-4">
           <p className="text-xs font-semibold text-moss-700">AIko heard</p>
           <p className="mt-2 font-serif text-lg">{event.transcript}</p>
         </div>
@@ -23,7 +23,7 @@ export function SpeakingFeedback({ event }: { event: SpeakingEvent }) {
           <span className="font-semibold">Sentence match</span>
           <span>{event.pronunciationConfidence}%</span>
         </div>
-        <ProgressBar value={event.pronunciationConfidence} className="bg-white" />
+        <ProgressBar value={event.pronunciationConfidence} className="bg-surface" />
       </div>
     </div>
   );
