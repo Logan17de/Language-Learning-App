@@ -2,23 +2,33 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const reading = readFileSync("components/lesson/reading-phase.tsx", "utf8");
+const multipleChoice = readFileSync(
+  "components/exercises/multiple-choice-card.tsx",
+  "utf8",
+);
 const sessionTypes = readFileSync("types/lesson-session.ts", "utf8");
 const lessonTypes = readFileSync("types/lesson.ts", "utf8");
 
 describe("reading comprehension contract", () => {
-  it("uses MCQ controls for new reading questions and keeps the legacy written fallback", () => {
+  it("uses the shared MCQ control for new reading questions and keeps the legacy written fallback", () => {
     expect(reading).toContain("lesson.readingQuestions ?? []");
     expect(reading).toContain("question?.choices");
-    expect(reading).toContain('role="radiogroup"');
+    expect(reading).toContain("<MultipleChoiceCard");
+    expect(reading).toContain("onSelect={(choice) => submit(choice)}");
+    expect(multipleChoice).toContain('role="radiogroup"');
     expect(reading).toContain("<textarea");
     expect(reading).toContain("Save answer");
     expect(reading).not.toContain("MediaRecorder");
     expect(reading).not.toContain("/api/audio/transcribe");
   });
 
-  it("locks submitted choices and shows the correct answer without pronunciation scoring", () => {
-    expect(reading).toContain("disabled={Boolean(submitted)}");
-    expect(reading).toContain("Correct answer");
+  it("locks submitted MCQ choices and supplies the canonical answer without pronunciation scoring", () => {
+    expect(reading).toContain("correctAnswer={question.answer}");
+    expect(reading).toContain("answered={Boolean(submitted)}");
+    expect(reading).toContain("lockAfterAnswer");
+    expect(reading).toContain("answerCorrect={answerCorrect}");
+    expect(reading).toContain("answerAction={");
+    expect(multipleChoice).toContain("choice === correctAnswer");
     expect(reading).not.toContain("response === question.answer");
     expect(reading).not.toContain("pronunciation");
   });
