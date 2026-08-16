@@ -476,6 +476,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
           setError(
             result?.error || "AIko could not restore this lesson's progress.",
           );
+          timer = window.setTimeout(() => void poll(), 4_000);
           return;
         }
         applyResult(result);
