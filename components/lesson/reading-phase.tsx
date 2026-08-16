@@ -1,12 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowRight, BookOpenText, CheckCircle2, Languages } from "lucide-react";
+import { ArrowRight, BookOpenText, Languages } from "lucide-react";
 import type { LessonPackage, StoryWord } from "@/types/lesson";
 import type { LessonSession, ReadingEvent } from "@/types/lesson-session";
 import { appendInspectableInteraction } from "@/lib/lesson-support";
 import { japaneseInputPreview } from "@/lib/japanese-input";
 import { InspectableText } from "@/components/exercises/inspectable-text";
+import { MultipleChoiceCard } from "@/components/exercises/multiple-choice-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,7 +25,6 @@ export function ReadingPhase({
   const questions = lesson.readingQuestions ?? [];
   const answers = session.readingAnswers ?? [];
   const [typedAnswer, setTypedAnswer] = useState("");
-  const [selectedChoice, setSelectedChoice] = useState("");
   const currentIndex = Math.min(session.activityIndex, Math.max(0, questions.length - 1));
   const question = questions[currentIndex];
   const submitted = question
@@ -33,6 +33,9 @@ export function ReadingPhase({
   const convertedAnswer = japaneseInputPreview(typedAnswer);
   const choices = question?.choices?.filter((choice) => choice.trim().length > 0) ?? [];
   const multipleChoice = choices.length === 4;
+  const answerCorrect = Boolean(
+    submitted && question && normalizeAnswer(submitted.response) === normalizeAnswer(question.answer),
+  );
   const complete = questions.length > 0 && answers.length >= questions.length;
   const terms = useMemo(
     () => uniqueTerms(
@@ -65,11 +68,9 @@ export function ReadingPhase({
     });
   }
 
-  function submit() {
+  function submit(selectedResponse?: string) {
     if (!question || submitted) return;
-    const response = multipleChoice
-      ? selectedChoice.trim()
-      : (convertedAnswer || typedAnswer.trim());
+    const response = selectedResponse?.trim() || convertedAnswer || typedAnswer.trim();
     if (!response) return;
     const nextAnswers = [
       ...answers,
@@ -85,7 +86,6 @@ export function ReadingPhase({
   function nextQuestion() {
     if (!submitted || currentIndex >= questions.length - 1) return;
     setTypedAnswer("");
-    setSelectedChoice("");
     onChange({ ...session, activityIndex: currentIndex + 1 });
   }
 
@@ -144,41 +144,40 @@ export function ReadingPhase({
           <ProgressBar value={(answers.length / questions.length) * 100} className="mt-4" />
 
           <Card className="mt-6 p-6 sm:p-8">
-            <p className="font-serif text-xl leading-9">
-              <InspectableText
-                text={question.question}
-                terms={terms}
-                onReveal={(word, type) =>
-                  reveal(question.id, word, type)
+            {multipleChoice ? (
+              <MultipleChoiceCard
+                prompt="Choose the best answer."
+                cue={question.question}
+                choices={choices}
+                correctAnswer={question.answer}
+                explanation={`The correct answer is ${question.answer}.`}
+                selectedAnswer={submitted?.response}
+                answered={Boolean(submitted)}
+                answerCorrect={answerCorrect}
+                lockAfterAnswer
+                inspectChoices={false}
+                inspectableTerms={terms}
+                onInspect={(word, type) => reveal(question.id, word, type)}
+                onSelect={(choice) => submit(choice)}
+                answerAction={
+                  submitted && currentIndex < questions.length - 1 ? (
+                    <Button type="button" className="h-full min-h-14 px-5" onClick={nextQuestion}>
+                      Next <ArrowRight className="size-4" />
+                    </Button>
+                  ) : null
                 }
               />
-            </p>
-
-            {multipleChoice ? (
-              <div className="mt-7 grid gap-3" role="radiogroup" aria-label="Reading answer choices">
-                {choices.map((choice) => {
-                  const selected = (submitted?.response ?? selectedChoice) === choice;
-                  return (
-                    <button
-                      key={choice}
-                      type="button"
-                      role="radio"
-                      aria-checked={selected}
-                      disabled={Boolean(submitted)}
-                      onClick={() => setSelectedChoice(choice)}
-                      className={`rounded-2xl border px-5 py-4 text-left font-serif text-lg transition ${
-                        selected
-                          ? "border-moss-500 bg-moss-50 ring-2 ring-moss-100"
-                          : "border-stone-200 bg-white hover:border-moss-300 hover:bg-moss-50/40"
-                      } disabled:cursor-default`}
-                    >
-                      {choice}
-                    </button>
-                  );
-                })}
-              </div>
             ) : (
               <>
+                <p className="font-serif text-xl leading-9">
+                  <InspectableText
+                    text={question.question}
+                    terms={terms}
+                    onReveal={(word, type) =>
+                      reveal(question.id, word, type)
+                    }
+                  />
+                </p>
                 <label className="mt-7 block text-sm font-semibold text-stone-600" htmlFor="reading-answer">
                   日本語で答えてください
                 </label>
@@ -200,31 +199,24 @@ export function ReadingPhase({
                     <p className="mt-2 font-serif text-xl leading-8">{convertedAnswer}</p>
                   </div>
                 )}
+
+                {!submitted ? (
+                  <Button
+                    type="button"
+                    className="mt-5"
+                    disabled={!typedAnswer.trim()}
+                    onClick={() => submit()}
+                  >
+                    Save answer
+                  </Button>
+                ) : currentIndex < questions.length - 1 ? (
+                  <div className="mt-5 flex justify-end">
+                    <Button type="button" onClick={nextQuestion}>
+                      Next <ArrowRight className="size-4" />
+                    </Button>
+                  </div>
+                ) : null}
               </>
-            )}
-
-            {submitted ? (
-              <div className="mt-6 rounded-2xl bg-moss-50 p-5">
-                <p className="flex items-center gap-2 text-sm font-semibold text-moss-800">
-                  <CheckCircle2 className="size-5" /> Correct answer
-                </p>
-                <p className="mt-3 font-serif text-lg leading-8">{question.answer}</p>
-              </div>
-            ) : (
-              <Button
-                type="button"
-                className="mt-5"
-                disabled={multipleChoice ? !selectedChoice : !typedAnswer.trim()}
-                onClick={submit}
-              >
-                Save answer
-              </Button>
-            )}
-
-            {submitted && currentIndex < questions.length - 1 && (
-              <Button type="button" className="mt-5" onClick={nextQuestion}>
-                Next question <ArrowRight className="size-4" />
-              </Button>
             )}
           </Card>
         </section>
@@ -246,6 +238,10 @@ export function ReadingPhase({
       )}
     </div>
   );
+}
+
+function normalizeAnswer(value: string): string {
+  return value.normalize("NFKC").trim().toLocaleLowerCase();
 }
 
 function uniqueTerms(terms: StoryWord[]): StoryWord[] {
