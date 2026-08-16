@@ -55,6 +55,26 @@ export const lessonSessionRepository = {
     return error ? failure(error, "Your lesson checkpoint is waiting to sync.") : success(data);
   },
 
+  async abandonActive(lessonId: string): Promise<RepositoryResult<number>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { data: auth } = await client.auth.getUser();
+    if (!auth.user) return failure({ code: "AUTH" }, "Your session has expired.");
+    const { data, error } = await client
+      .from("lesson_sessions")
+      .update({
+        status: "abandoned",
+        last_saved_at: new Date().toISOString(),
+      })
+      .eq("user_id", auth.user.id)
+      .eq("lesson_id", lessonId)
+      .eq("status", "active")
+      .select("id");
+    return error
+      ? failure(error, "The lesson could not be ended. Please try again.")
+      : success(data?.length ?? 0);
+  },
+
   async saveAnswers(answers: LessonAnswer[]): Promise<RepositoryResult<number>> {
     const client = createClient();
     if (!client) return notConfigured();
