@@ -13,7 +13,6 @@ import { useBackendLessonStore } from "@/store/backend-lesson-store";
 export function HomeDashboard() {
   const user = useAppStore((state) => state.user);
   const progress = useAppStore((state) => state.progress);
-  const sessions = useAppStore((state) => state.lessonSessions);
   const backendLessons = useBackendLessonStore((state) => state.lessons);
   const backendLoading = useBackendLessonStore((state) => state.loading);
   const backendError = useBackendLessonStore((state) => state.error);
@@ -23,27 +22,10 @@ export function HomeDashboard() {
     void loadBackendLessons();
   }, [loadBackendLessons]);
 
-  const activeSession = Object.values(sessions).find(
-    (session) =>
-      !session.completed &&
-      backendLessons.some((lesson) => lesson.id === session.lessonId),
-  );
-  const activeLesson = activeSession
-    ? backendLessons.find((lesson) => lesson.id === activeSession.lessonId)
-    : undefined;
-  const nextLesson =
+  const selectedLesson =
     backendLessons.find(
       (lesson) => !progress.completedLessonIds.includes(lesson.id),
     ) ?? backendLessons[0];
-  const selectedLesson = activeLesson ?? nextLesson;
-  const selectedLessonId = activeSession?.lessonId ?? selectedLesson?.id;
-  const lessonPercent = selectedLessonId
-    ? progress.lessonProgress[selectedLessonId] ?? 0
-    : 0;
-  const phaseLabel =
-    activeSession && activeLesson
-      ? activeLesson.phases[activeSession.currentPhaseIndex]?.label
-      : undefined;
   const dailyPercent = user.dailyGoalMinutes
     ? Math.min(
         100,
@@ -63,7 +45,7 @@ export function HomeDashboard() {
             おはよう, {user.name}.
           </h1>
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted sm:text-base">
-            Continue your lesson and keep building useful Japanese at your current level.
+            Start your next lesson and complete the full learning loop in one session.
           </p>
         </div>
         <Link
@@ -86,15 +68,13 @@ export function HomeDashboard() {
               <Badge tone="orange">Next up</Badge>
               {selectedLesson && (
                 <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-semibold text-white/70">
-                  {selectedLesson.level} · 7 stages
+                  {selectedLesson.level} · 6 stages
                 </span>
               )}
             </div>
 
             <h2 className="mt-7 max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">
-              {activeSession
-                ? "Resume where you stopped."
-                : "Your next lesson is ready."}
+              Your next lesson is ready.
             </h2>
             <p className="mt-3 max-w-xl text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
               {!selectedLesson
@@ -102,48 +82,26 @@ export function HomeDashboard() {
                   ? "Selecting a level-matched lesson for you."
                   : backendError ||
                     "No published lesson is available for your current level yet."
-                : activeSession
-                  ? "Your checkpoint, activity progress, and learning evidence are already saved."
-                  : "The topic stays private until you begin, so the lesson starts without spoilers."}
+                : "Once you start, finish the lesson before leaving. AIko does not pause lessons for later."}
             </p>
 
-            {activeSession ? (
-              <div className="mt-7 max-w-lg rounded-2xl border border-white/10 bg-white/[0.06] p-4">
-                <div className="mb-2 flex justify-between gap-4 text-xs font-medium text-white/65">
-                  <span>{phaseLabel ?? "Lesson in progress"}</span>
-                  <span className="tabular-nums">{lessonPercent}%</span>
-                </div>
-                <ProgressBar
-                  value={lessonPercent}
-                  className="bg-white/10"
-                  barClassName="bg-persimmon-400"
-                />
-              </div>
-            ) : (
-              <div className="mt-7 flex flex-wrap gap-2 text-xs font-medium text-white/65">
-                <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                  Story first
-                </span>
-                <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                  Speaking included
-                </span>
-                <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                  Mastery tracked
-                </span>
-              </div>
-            )}
+            <div className="mt-7 flex flex-wrap gap-2 text-xs font-medium text-white/65">
+              <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                Story first
+              </span>
+              <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                Speaking included
+              </span>
+              <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                Mastery tracked
+              </span>
+            </div>
 
             <ButtonLink
-              href={
-                selectedLessonId ? `/lesson/${selectedLessonId}/play` : "/learn"
-              }
+              href={selectedLesson ? `/lesson/${selectedLesson.id}/play` : "/learn"}
               className="mt-8 !bg-persimmon-500 px-7 hover:!bg-persimmon-600"
             >
-              {backendLoading
-                ? "Preparing lesson"
-                : activeSession
-                  ? "Resume lesson"
-                  : "Start lesson"}
+              {backendLoading ? "Preparing lesson" : "Start lesson"}
               <ArrowRight
                 className="size-4 transition-transform duration-180 group-hover:translate-x-0.5"
                 aria-hidden="true"
@@ -218,10 +176,7 @@ export function HomeDashboard() {
           </p>
           <ProgressBar value={progress.levelCompletion} className="mt-5" />
           <div className="mt-5 grid grid-cols-3 gap-2 text-center">
-            <MiniStat
-              value={progress.learnedVocabularyCount}
-              label="vocabulary"
-            />
+            <MiniStat value={progress.learnedVocabularyCount} label="vocabulary" />
             <MiniStat value={progress.learnedKanjiCount} label="kanji" />
             <MiniStat value={progress.learnedGrammarCount} label="grammar" />
           </div>
