@@ -82,7 +82,7 @@ export function VocabularyPhase({
             <Badge tone="neutral">{question.modeLabel}</Badge>
           </div>
           <h2 className="mt-4 text-3xl font-semibold tracking-tight">Vocabulary & kanji</h2>
-          <p className="mt-2 text-sm leading-6 text-stone-500">Thirteen questions build from direct recognition to vocabulary in context.</p>
+          <p className="mt-2 text-sm leading-6 text-stone-500">Seven questions build from direct recognition to vocabulary in context.</p>
         </div>
         <p className="shrink-0 text-sm font-semibold text-stone-500">{Math.min(answeredCount + (answer ? 0 : 1), QUESTION_TARGET)} / {QUESTION_TARGET}</p>
       </div>
@@ -104,13 +104,14 @@ export function VocabularyPhase({
           inspectableTerms={question.inspectableTerms.length ? question.inspectableTerms : lesson.story.flatMap((line) => line.words)}
           onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
           onSelect={select}
+          answerAction={
+            answer && !roundComplete ? (
+              <Button type="button" className="h-full min-h-14 px-5" onClick={nextQuestion}>
+                Next <ArrowRight className="size-4" />
+              </Button>
+            ) : null
+          }
         />
-
-        {answer && !roundComplete && (
-          <Button type="button" className="mt-6" onClick={nextQuestion}>
-            Next question <ArrowRight className="size-4" />
-          </Button>
-        )}
 
         {answer && roundComplete && (
           <div className="mt-6 flex items-start gap-3 rounded-2xl bg-moss-50 p-4 text-sm text-moss-800">
