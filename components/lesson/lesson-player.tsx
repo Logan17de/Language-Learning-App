@@ -26,6 +26,8 @@ import {
   restoreLessonProgress,
   syncLessonProgress,
 } from "@/lib/sync/backend-sync";
+import { lessonSessionRepository } from "@/lib/repositories/lesson-session-repository";
+import { discardLessonSyncOperations } from "@/lib/sync/offline-queue";
 
 function preferAdvancedSession(
   local: LessonSession,
@@ -57,10 +59,12 @@ export function LessonPlayer({
   const router = useRouter();
   const hasHydrated = useAppStore((state) => state.hasHydrated);
   const saveLessonSession = useAppStore((state) => state.saveLessonSession);
+  const resetLessonSession = useAppStore((state) => state.resetLessonSession);
   const [session, setSession] = useState<LessonSession | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [showExit, setShowExit] = useState(false);
-  const [isSavingExit, setIsSavingExit] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const [exitError, setExitError] = useState("");
   const restoredLessonRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -90,9 +94,8 @@ export function LessonPlayer({
         )
       : canonicalSession;
 
-    // The local checkpoint is authoritative for navigation. Render it without
-    // waiting for Supabase so Story -> Vocabulary can never be held behind a
-    // slow or unavailable restore request.
+    // A checkpoint protects the learner from refreshes or browser suspension.
+    // It is not exposed as a pause/resume product feature.
     queueMicrotask(() => {
       if (!active) return;
       setSession(fallback);
@@ -127,7 +130,10 @@ export function LessonPlayer({
 
   useEffect(() => {
     if (!session) return;
-    const timer = window.setInterval(() => setElapsedSeconds((value) => value + 1), 1000);
+    const timer = window.setInterval(
+      () => setElapsedSeconds((value) => value + 1),
+      1000,
+    );
     return () => window.clearInterval(timer);
   }, [session]);
 
@@ -184,7 +190,7 @@ export function LessonPlayer({
         <div className="text-center">
           <span className="mx-auto block size-10 animate-spin rounded-full border-4 border-moss-100 border-t-moss-600" />
           <p className="mt-4 text-sm font-semibold text-stone-500">
-            Restoring your lesson…
+            Loading your lesson…
           </p>
         </div>
       </main>
@@ -194,6 +200,7 @@ export function LessonPlayer({
   function back() {
     if (!session) return;
     if (session.currentPhaseIndex === 0) {
+      setExitError("");
       setShowExit(true);
       return;
     }
@@ -261,17 +268,27 @@ export function LessonPlayer({
     );
   }
 
-  async function exit() {
-    if (!session || isSavingExit) return;
-    setIsSavingExit(true);
-    const checkpoint = { ...session, elapsedSeconds };
-    saveLessonSession(checkpoint);
-    try {
-      await syncLessonProgress(lesson, checkpoint);
-    } catch {
-      // The sync layer keeps a retryable offline checkpoint.
+  async function leaveLesson() {
+    if (!session || isLeaving) return;
+    setIsLeaving(true);
+    setExitError("");
+
+    const abandoned = await lessonSessionRepository.abandonActive(lesson.id);
+    if (!abandoned.ok) {
+      setExitError(abandoned.error.message);
+      setIsLeaving(false);
+      return;
     }
-    router.push("/learn?paused=1");
+
+    discardLessonSyncOperations(lesson.id);
+    if (routeLessonId !== lesson.id) {
+      discardLessonSyncOperations(routeLessonId);
+    }
+    resetLessonSession(lesson.id);
+    if (routeLessonId !== lesson.id) {
+      resetLessonSession(routeLessonId);
+    }
+    router.replace("/learn");
   }
 
   return (
@@ -286,7 +303,10 @@ export function LessonPlayer({
         continueLabel={isLastPhase ? "See results" : nextLabel(phase.id)}
         onBack={back}
         onContinue={continueLesson}
-        onExit={() => setShowExit(true)}
+        onExit={() => {
+          setExitError("");
+          setShowExit(true);
+        }}
       >
         <div className="mb-5 flex justify-end">
           <LessonReportDialog
@@ -353,33 +373,41 @@ export function LessonPlayer({
               <AlertTriangle className="size-5" />
             </span>
             <h2 id="exit-title" className="mt-6 text-2xl font-semibold">
-              Pause this lesson?
+              Leave this lesson?
             </h2>
             <p className="mt-3 leading-7 text-stone-500">
-              AIko will save this checkpoint and the kanji, vocabulary,
-              grammar, and speaking evidence from every activity you attempted.
-              You can resume from {phase.label} or start a new lesson later.
+              AIko doesn&apos;t pause lessons. If you leave now, this attempt
+              will end and you&apos;ll start from the beginning next time.
+              Mastery already recorded from completed activities stays saved.
             </p>
+            {exitError && (
+              <p
+                role="alert"
+                className="mt-4 rounded-2xl bg-persimmon-50 p-4 text-sm font-semibold text-persimmon-700"
+              >
+                {exitError}
+              </p>
+            )}
             <div className="mt-6 flex gap-3">
               <Button
                 type="button"
                 variant="secondary"
                 className="flex-1"
-                disabled={isSavingExit}
+                disabled={isLeaving}
                 onClick={() => setShowExit(false)}
               >
-                Keep learning
+                Stay in lesson
               </Button>
               <Button
                 type="button"
-                className="flex-1"
-                disabled={isSavingExit}
-                onClick={() => void exit()}
+                className="flex-1 bg-persimmon-500 hover:bg-persimmon-600"
+                disabled={isLeaving}
+                onClick={() => void leaveLesson()}
               >
-                {isSavingExit ? (
+                {isLeaving ? (
                   <LoaderCircle className="size-4 animate-spin" />
                 ) : null}
-                {isSavingExit ? "Saving…" : "Save and exit"}
+                {isLeaving ? "Ending…" : "Leave lesson"}
               </Button>
             </div>
           </div>
