@@ -125,27 +125,69 @@ EVALUATION RULES
 Return only the requested structured object.`;
 }
 
-export function translationQuestionOutputIssues(
-  value: RawTranslationQuestions,
-  expectedCount = 5,
-): string[] {
+function record(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+export function translationQuestionOutputIssues(value: unknown): string[] {
+  const container = record(value);
+  if (!container || !Array.isArray(container.questions)) {
+    return ["Translation generation must contain exactly 5 questions."];
+  }
+
+  const questions = container.questions;
+  if (questions.length !== 5) {
+    return ["Translation generation must contain exactly 5 questions."];
+  }
+
   const issues: string[] = [];
-  if (!Array.isArray(value.questions) || value.questions.length !== expectedCount) {
-    return [`Translation generation must contain exactly ${expectedCount} questions.`];
-  }
-  const indexes = value.questions.map((question) => question.requestIndex);
-  if (new Set(indexes).size !== expectedCount) {
-    issues.push("Translation generation must use every requestIndex exactly once.");
-  }
-  for (let index = 0; index < expectedCount; index += 1) {
-    if (!indexes.includes(index)) issues.push(`Translation question requestIndex ${index} is missing.`);
-  }
-  value.questions.forEach((question, index) => {
-    if (!question.english?.trim()) issues.push(`Translation question ${index + 1} needs English text.`);
-    if (!question.modelAnswer?.trim()) issues.push(`Translation question ${index + 1} needs a Japanese model answer.`);
-    if (/[぀-ヿ㐀-鿿]/u.test(question.english ?? "")) {
+  const indexes: number[] = [];
+  questions.forEach((rawQuestion, index) => {
+    const question = record(rawQuestion);
+    if (!question) {
+      issues.push(`Translation question ${index + 1} must be an object.`);
+      return;
+    }
+    if (typeof question.requestIndex !== "number" || !Number.isInteger(question.requestIndex)) {
+      issues.push(`Translation question ${index + 1} needs an integer requestIndex.`);
+    } else {
+      indexes.push(question.requestIndex);
+    }
+    if (typeof question.english !== "string" || !question.english.trim()) {
+      issues.push(`Translation question ${index + 1} needs English text.`);
+    } else if (/[぀-ヿ㐀-鿿]/u.test(question.english)) {
       issues.push(`Translation question ${index + 1} must be English-only.`);
     }
+    if (typeof question.modelAnswer !== "string" || !question.modelAnswer.trim()) {
+      issues.push(`Translation question ${index + 1} needs a Japanese model answer.`);
+    }
   });
+
+  if (new Set(indexes).size !== 5) {
+    issues.push("Translation generation must use every requestIndex exactly once.");
+  }
+  for (let index = 0; index < 5; index += 1) {
+    if (!indexes.includes(index)) {
+      issues.push(`Translation question requestIndex ${index} is missing.`);
+    }
+  }
+  return issues;
+}
+
+export function translationEvaluationOutputIssues(value: unknown): string[] {
+  const evaluation = record(value);
+  if (!evaluation) return ["Translation validation must return one result object."];
+
+  const issues: string[] = [];
+  if (typeof evaluation.correct !== "boolean") {
+    issues.push("Translation validation needs a boolean correct verdict.");
+  }
+  for (const field of ["feedback", "suggestion", "suggestedAnswer"] as const) {
+    if (typeof evaluation[field] !== "string" || !evaluation[field].trim()) {
+      issues.push(`Translation validation needs ${field}.`);
+    }
+  }
   return issues;
 }
