@@ -45,7 +45,7 @@ export function HomeDashboard() {
             おはよう, {user.name}.
           </h1>
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted sm:text-base">
-            Start your next lesson and complete the full learning loop in one session.
+            AIko chooses what to teach next, then uses your lesson activity to shape what comes after.
           </p>
         </div>
         <Link
@@ -65,43 +65,43 @@ export function HomeDashboard() {
           />
           <div className="relative">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <Badge tone="orange">Next up</Badge>
+              <Badge tone="orange">Chosen for you</Badge>
               {selectedLesson && (
                 <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-semibold text-white/70">
-                  {selectedLesson.level} · 6 stages
+                  {selectedLesson.level} · 6 phases
                 </span>
               )}
             </div>
 
-            <h2 className="mt-7 max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">
-              Your next lesson is ready.
+            <h2 className="mt-7 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
+              One story. Six ways to make the Japanese stick.
             </h2>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
               {!selectedLesson
                 ? backendLoading
-                  ? "Selecting a level-matched lesson for you."
+                  ? "Choosing the next lesson that fits your level."
                   : backendError ||
                     "No published lesson is available for your current level yet."
-                : "Once you start, finish the lesson before leaving. AIko does not pause lessons for later."}
+                : "Start with a story, then reuse its language through vocabulary + kanji, grammar, reading, listening, and speaking. What you do in the lesson updates your progress and future targeting."}
             </p>
 
             <div className="mt-7 flex flex-wrap gap-2 text-xs font-medium text-white/65">
               <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                Story first
+                Story → practice
               </span>
               <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                Speaking included
+                6 connected phases
               </span>
               <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                Mastery tracked
+                Future lessons adapt
               </span>
             </div>
 
             <ButtonLink
-              href={selectedLesson ? `/lesson/${selectedLesson.id}/play` : "/learn"}
+              href={selectedLesson ? `/lesson/${selectedLesson.id}/preview` : "/learn"}
               className="mt-8 !bg-persimmon-500 px-7 hover:!bg-persimmon-600"
             >
-              {backendLoading ? "Preparing lesson" : "Start lesson"}
+              {backendLoading ? "Choosing lesson" : "See my next lesson"}
               <ArrowRight
                 className="size-4 transition-transform duration-180 group-hover:translate-x-0.5"
                 aria-hidden="true"
@@ -114,9 +114,9 @@ export function HomeDashboard() {
           <Card className="p-5 sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold text-ink">Daily goal</p>
+                <p className="text-sm font-semibold text-ink">Daily study goal</p>
                 <p className="mt-1 text-xs leading-5 text-muted">
-                  A small target is easier to keep every day.
+                  This tracks study time across your day; it does not set lesson length.
                 </p>
               </div>
               <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-moss-100 text-moss-700">
@@ -170,9 +170,9 @@ export function HomeDashboard() {
               {user.level} · {progress.levelCompletion}%
             </span>
           </div>
-          <h2 className="mt-6 text-xl font-semibold">Level progress</h2>
+          <h2 className="mt-6 text-xl font-semibold">What’s becoming familiar</h2>
           <p className="mt-2 text-sm leading-6 text-muted">
-            See how much useful language you have accumulated at this level.
+            AIko records mastery automatically from lesson activities. You do not have to manage a separate review queue.
           </p>
           <ProgressBar value={progress.levelCompletion} className="mt-5" />
           <div className="mt-5 grid grid-cols-3 gap-2 text-center">
@@ -185,7 +185,7 @@ export function HomeDashboard() {
             variant="secondary"
             className="mt-5 w-full sm:w-auto"
           >
-            View progress
+            See what I’ve learned
           </ButtonLink>
         </Card>
       </section>
