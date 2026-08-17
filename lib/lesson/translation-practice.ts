@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { storyUsesGrammarPattern } from "@/lib/gemini/lesson-validation";
 import { generateStructured } from "@/lib/gemini/structured-output";
 import {
   translationEvaluationPrompt,
@@ -52,15 +53,27 @@ async function resolveLesson(
     .select("id,current_version_id,jlpt_level,topic")
     .eq("id", lessonReference)
     .maybeSingle();
-  if (byId.error) throw new Error(`Lesson could not be loaded: ${byId.error.message}`);
-  const result = byId.data
-    ? byId
-    : (await admin
+  if (byId.error) {
+    throw new Error(`Lesson could not be loaded: ${byId.error.message}`);
+  }
+
+  const byLegacy = byId.data
+    ? null
+    : await admin
         .from("lessons")
         .select("id,current_version_id,jlpt_level,topic")
         .eq("legacy_id", lessonReference)
-        .maybeSingle()).data;
-  if (!result || typeof result.id !== "string" || typeof result.current_version_id !== "string") {
+        .maybeSingle();
+  if (byLegacy?.error) {
+    throw new Error(`Lesson could not be loaded: ${byLegacy.error.message}`);
+  }
+
+  const result = byId.data ?? byLegacy?.data ?? null;
+  if (
+    !result ||
+    typeof result.id !== "string" ||
+    typeof result.current_version_id !== "string"
+  ) {
     throw new Error("This lesson is unavailable for translation practice.");
   }
   if (!isJlptLevel(result.jlpt_level)) {
@@ -88,7 +101,9 @@ async function activeVersionId(
     .order("started_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (active.error) throw new Error(`Active lesson could not be loaded: ${active.error.message}`);
+  if (active.error) {
+    throw new Error(`Active lesson could not be loaded: ${active.error.message}`);
+  }
   return typeof active.data?.lesson_version_id === "string"
     ? active.data.lesson_version_id
     : lesson.currentVersionId;
@@ -125,7 +140,9 @@ async function translationTargets(
   ]);
 
   const error = lessonGrammar.error ?? mastery.error ?? records.error;
-  if (error) throw new Error(`Translation targets could not be loaded: ${error.message}`);
+  if (error) {
+    throw new Error(`Translation targets could not be loaded: ${error.message}`);
+  }
   if ((lessonGrammar.data ?? []).length !== 3) {
     throw new Error("Translation practice requires the lesson's three grammar targets.");
   }
@@ -138,22 +155,30 @@ async function translationTargets(
     byKey.set(record.pattern, record);
   }
 
-  const lessonTargets: TranslationQuestionTarget[] = (lessonGrammar.data ?? []).map((row) => {
-    const grammarId = typeof row.grammar_id === "string" ? row.grammar_id : "";
-    const record = byKey.get(grammarId) ?? byKey.get(String(row.pattern ?? ""));
-    if (!record) throw new Error(`Grammar record is missing for ${String(row.pattern ?? "target pattern")}.`);
-    return {
-      libraryId: record.id,
-      pattern: record.pattern,
-      meaning: record.meaning,
-      role: "lesson_target" as const,
-    };
-  });
+  const lessonTargets: TranslationQuestionTarget[] = (lessonGrammar.data ?? []).map(
+    (row) => {
+      const grammarId = typeof row.grammar_id === "string" ? row.grammar_id : "";
+      const record = byKey.get(grammarId) ?? byKey.get(String(row.pattern ?? ""));
+      if (!record) {
+        throw new Error(
+          `Grammar record is missing for ${String(row.pattern ?? "target pattern")}.`,
+        );
+      }
+      return {
+        libraryId: record.id,
+        pattern: record.pattern,
+        meaning: record.meaning,
+        role: "lesson_target" as const,
+      };
+    },
+  );
 
   const excluded = new Set(lessonTargets.map((target) => target.libraryId));
   const masteryByRecord = new Map<string, number>();
   for (const row of mastery.data ?? []) {
-    if (typeof row.item_key !== "string" || typeof row.mastery !== "number") continue;
+    if (typeof row.item_key !== "string" || typeof row.mastery !== "number") {
+      continue;
+    }
     const record = byKey.get(row.item_key);
     if (!record || excluded.has(record.id)) continue;
     const previous = masteryByRecord.get(record.id);
@@ -162,38 +187,54 @@ async function translationTargets(
     }
   }
 
-  const ranked = [...masteryByRecord.entries()]
-    .flatMap(([id, score]) => {
-      const record = byKey.get(id);
-      return record ? [{ record, score }] : [];
-    });
+  const ranked = [...masteryByRecord.entries()].flatMap(([id, score]) => {
+    const record = byKey.get(id);
+    return record ? [{ record, score }] : [];
+  });
   const reinforcement = ranked
-    .filter(({ score }) => score >= REINFORCEMENT_MIN && score < LEARNED_THRESHOLD)
+    .filter(
+      ({ score }) =>
+        score >= REINFORCEMENT_MIN && score < LEARNED_THRESHOLD,
+    )
     .sort((left, right) => {
       const masteryDifference = left.score - right.score;
       if (masteryDifference !== 0) return masteryDifference;
-      const levelDifference = Number(right.record.jlpt_level === lesson.level) - Number(left.record.jlpt_level === lesson.level);
+      const levelDifference =
+        Number(right.record.jlpt_level === lesson.level) -
+        Number(left.record.jlpt_level === lesson.level);
       if (levelDifference !== 0) return levelDifference;
       return left.record.pattern.localeCompare(right.record.pattern, "ja");
     })
     .slice(0, 2)
     .map(({ record }) => record);
 
-  // New learners may not yet have two grammar rows in the 60-80 band. Fill
-  // only missing slots from their strongest sub-60 rows, then unseen records,
-  // so the translation section stays usable without pretending those rows were
-  // in the requested reinforcement band.
+  // A learner can reach this feature before two grammar rows occupy the 60-80
+  // reinforcement band. Fill only missing slots from the strongest sub-60 rows,
+  // then unseen rows, so the phase remains playable. As soon as two 60-80 rows
+  // exist, this fallback is not used.
   if (reinforcement.length < 2) {
-    const chosen = new Set([...excluded, ...reinforcement.map((record) => record.id)]);
+    const chosen = new Set([
+      ...excluded,
+      ...reinforcement.map((record) => record.id),
+    ]);
     const subSixty = ranked
-      .filter(({ record, score }) => !chosen.has(record.id) && score < REINFORCEMENT_MIN)
+      .filter(
+        ({ record, score }) =>
+          !chosen.has(record.id) && score < REINFORCEMENT_MIN,
+      )
       .sort((left, right) => right.score - left.score)
       .map(({ record }) => record);
     const unseen = grammarRecords
-      .filter((record) => !chosen.has(record.id) && !masteryByRecord.has(record.id))
+      .filter(
+        (record) => !chosen.has(record.id) && !masteryByRecord.has(record.id),
+      )
       .sort((left, right) => {
-        const levelDifference = Number(right.jlpt_level === lesson.level) - Number(left.jlpt_level === lesson.level);
-        return levelDifference || left.pattern.localeCompare(right.pattern, "ja");
+        const levelDifference =
+          Number(right.jlpt_level === lesson.level) -
+          Number(left.jlpt_level === lesson.level);
+        return (
+          levelDifference || left.pattern.localeCompare(right.pattern, "ja")
+        );
       });
     for (const record of [...subSixty, ...unseen]) {
       if (reinforcement.length >= 2) break;
@@ -204,7 +245,9 @@ async function translationTargets(
   }
 
   if (reinforcement.length !== 2) {
-    throw new Error("Two additional grammar patterns are required for translation practice.");
+    throw new Error(
+      "Two additional grammar patterns are required for translation practice.",
+    );
   }
 
   return {
@@ -225,7 +268,10 @@ export async function generateGrammarTranslationPractice(input: {
   userId: string;
   lessonId: string;
 }): Promise<GrammarTranslationQuestion[]> {
-  const { lesson, targets } = await translationTargets(input.userId, input.lessonId);
+  const { lesson, targets } = await translationTargets(
+    input.userId,
+    input.lessonId,
+  );
   const generated = await generateStructured<RawTranslationQuestions>({
     name: "grammar_translation_questions",
     prompt: translationQuestionPrompt({
@@ -239,10 +285,19 @@ export async function generateGrammarTranslationPractice(input: {
     validate: translationQuestionOutputIssues,
     trace: { stage: "grammar_translation_questions" },
   });
-  const byIndex = new Map(generated.value.questions.map((question) => [question.requestIndex, question]));
+  const byIndex = new Map(
+    generated.value.questions.map((question) => [question.requestIndex, question]),
+  );
   return targets.map((target, index) => {
     const question = byIndex.get(index);
-    if (!question) throw new Error(`Translation question ${index + 1} is missing.`);
+    if (!question) {
+      throw new Error(`Translation question ${index + 1} is missing.`);
+    }
+    if (!storyUsesGrammarPattern(question.modelAnswer, target.pattern)) {
+      throw new Error(
+        `Translation question ${index + 1} did not naturally realize its required grammar pattern.`,
+      );
+    }
     return {
       id: `translation:${index}:${target.libraryId}`,
       english: question.english.trim(),
@@ -267,7 +322,9 @@ export async function evaluateGrammarTranslation(input: {
     .is("archived_at", null)
     .neq("quality_status", "rejected")
     .maybeSingle();
-  if (grammar.error) throw new Error(`Grammar target could not be loaded: ${grammar.error.message}`);
+  if (grammar.error) {
+    throw new Error(`Grammar target could not be loaded: ${grammar.error.message}`);
+  }
   if (!grammar.data || typeof grammar.data.pattern !== "string") {
     throw new Error("This translation grammar target is unavailable.");
   }
@@ -276,7 +333,8 @@ export async function evaluateGrammarTranslation(input: {
     prompt: translationEvaluationPrompt({
       english: input.english,
       targetPattern: grammar.data.pattern,
-      targetMeaning: typeof grammar.data.meaning === "string" ? grammar.data.meaning : "",
+      targetMeaning:
+        typeof grammar.data.meaning === "string" ? grammar.data.meaning : "",
       learnerAnswer: input.learnerAnswer,
     }),
     schema: translationEvaluationSchema,
