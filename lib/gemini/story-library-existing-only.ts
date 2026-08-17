@@ -103,7 +103,10 @@ async function loadRecords(
     ...plan.kanji.map((item) => item.character),
     ...draft.lines.flatMap((line) => line.japanese.match(/\p{Script=Han}/gu) ?? []),
   ])];
-  const patterns = plan.grammar.map((item) => item.pattern);
+  const patterns = [...new Set([
+    ...plan.grammar.map((item) => item.pattern),
+    ...plan.reinforcementGrammar.map((item) => item.pattern),
+  ])];
   const surfaces = storySurfaces(draft);
 
   const vocabularyQueries = chunks(surfaces).flatMap((group) => [
@@ -299,7 +302,11 @@ export async function resolveStoryFromExistingLibrary(
     const row = records.kanji.find((item) => item.character === character);
     return row ? [canonicalKanji(row)] : [];
   });
-  const grammar = input.plan.grammar.flatMap((target) => {
+  const grammarPatterns = [
+    ...input.plan.grammar,
+    ...input.plan.reinforcementGrammar,
+  ];
+  const grammar = grammarPatterns.flatMap((target) => {
     const row = records.grammar.find((item) => item.pattern === target.pattern);
     return row ? [canonicalGrammar(row)] : [];
   });
