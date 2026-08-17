@@ -1,153 +1,246 @@
 "use client";
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { createJSONStorage } from "zustand/middleware";
-import { commuteLesson } from "@/data/mock-lessons";
-import { canonicalLessonPhases } from "@/lib/lesson-contract";
+import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
+import {
+  defaultPreferences,
+  defaultProgress,
+  defaultUser,
+} from "@/data/default-learner-state";
+import { CANONICAL_LESSON_PHASES } from "@/lib/lesson-contract";
+import { customLessonRepository } from "@/lib/repositories/custom-lesson-repository";
+import { getBackendMode } from "@/lib/supabase/config";
+import { settingsRepository } from "@/lib/repositories/settings-repository";
+import type { BackendProgressSnapshot } from "@/lib/repositories/progress-repository";
 import type {
-  AppNotification,
-  AppProgress,
-  AppSubscription,
-  AppUser,
-  PersistedAppState,
-  UserPreferences,
-} from "@/types/app";
+  CustomLessonRequest,
+  LessonFocus,
+  LessonReport,
+  ProfileEdits,
+  SubscriptionPlan,
+  SupportRequest,
+  ThemePreference,
+  UserSettings,
+  UserSubscription,
+} from "@/types/app-preferences";
 import type { LessonPackage } from "@/types/lesson";
 import type {
-  GrammarAnswer,
-  GrammarTranslationQuestion,
   LessonCompletionResult,
   LessonPhaseId,
   LessonSession,
-  ListeningEvent,
-  ReadingComprehensionAnswer,
-  ReadingEvent,
-  SpeakingEvent,
-  StoryInteraction,
-  VocabularyAnswer,
 } from "@/types/lesson-session";
+import type {
+  DailyMinutes,
+  LearnerLevel,
+  LearningGoal,
+  OnboardingPreferences,
+  UserProfile,
+} from "@/types/learner";
+import type { LearnerProgress, RecentLesson } from "@/types/progress";
 
-const APP_STORAGE_KEY = "aiko_app_state_v4";
-
-const DEFAULT_PREFERENCES: UserPreferences = {
-  dailyGoalMinutes: 15,
-  furigana: true,
-  romaji: false,
-  audioAutoPlay: false,
-  soundEffects: true,
-  emailReminders: false,
-  theme: "light",
-};
-
-const DEFAULT_USER: AppUser = {
-  id: "",
-  name: "Learner",
-  email: "",
-  level: "N5",
-  streakDays: 0,
-  xp: 0,
-  minutesStudiedToday: 0,
-  subscriptionTier: "free",
-  joinedAt: "",
-};
-
-const DEFAULT_PROGRESS: AppProgress = {
-  completedLessonIds: [],
-  recentLessons: [],
-  lessonProgress: {},
-  weeklyActivity: [],
-  totalStudyMinutes: 0,
-  weakVocabulary: [],
-  kanjiRecognition: 0,
-  pronunciation: 0,
-  grammarUnderstanding: 0,
-  grammarProduction: 0,
-  speakingConfidence: 0,
-};
-
-const DEFAULT_SUBSCRIPTION: AppSubscription = {
-  tier: "free",
-  status: "active",
-  startedAt: "",
-  renewsAt: "",
-};
-
-interface AppState extends PersistedAppState {
-  hydrated: boolean;
+interface AppState {
+  hasHydrated: boolean;
   backendSessionChecked: boolean;
-  loading: boolean;
-  error: string;
-  setHydrated: (hydrated: boolean) => void;
-  setBackendSessionChecked: (checked: boolean) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: string) => void;
-  signIn: (user: Partial<AppUser>) => void;
+  isAuthenticated: boolean;
+  user: UserProfile;
+  onboarding: OnboardingPreferences;
+  progress: LearnerProgress;
+  lessonSessions: Record<string, LessonSession>;
+  savedLessonIds: string[];
+  generatedLessons: LessonPackage[];
+  customLessonRequests: CustomLessonRequest[];
+  subscription: UserSubscription;
+  settings: UserSettings;
+  supportRequests: SupportRequest[];
+  lessonReports: LessonReport[];
+  setHasHydrated: (value: boolean) => void;
+  setBackendSessionChecked: (value: boolean) => void;
+  signIn: (name?: string) => void;
+  syncBackendIdentity: (
+    id: string,
+    name: string,
+    email: string,
+    onboardingComplete: boolean,
+  ) => void;
+  hydrateBackendProgress: (snapshot: BackendProgressSnapshot) => void;
   signOut: () => void;
-  setUser: (user: Partial<AppUser>) => void;
-  setPreferences: (preferences: Partial<UserPreferences>) => void;
-  setSubscription: (subscription: Partial<AppSubscription>) => void;
-  setProgress: (progress: Partial<AppProgress>) => void;
-  setNotifications: (notifications: AppNotification[]) => void;
-  markNotificationRead: (id: string) => void;
-  startLessonSession: (lesson: LessonPackage) => void;
-  resetLessonSession: (lessonId: string) => void;
-  setLessonPhase: (lessonId: string, phaseIndex: number) => void;
-  setLessonActivityIndex: (lessonId: string, activityIndex: number) => void;
-  addLessonElapsedSeconds: (lessonId: string, seconds: number) => void;
-  completeLessonPhase: (lessonId: string, phaseId: LessonPhaseId) => void;
-  setStoryComplete: (lessonId: string, complete: boolean) => void;
-  addStoryInteraction: (lessonId: string, interaction: StoryInteraction) => void;
-  setVocabularyAnswers: (lessonId: string, answers: VocabularyAnswer[]) => void;
-  setGrammarAnswers: (lessonId: string, answers: GrammarAnswer[]) => void;
-  setGrammarTranslationQuestions: (
-    lessonId: string,
-    questions: GrammarTranslationQuestion[],
+  setGoal: (goal: LearningGoal) => void;
+  setLevel: (level: LearnerLevel) => void;
+  setDailyMinutes: (minutes: DailyMinutes) => void;
+  acknowledgeReading: () => void;
+  completeOnboarding: () => void;
+  updateProfile: (edits: ProfileEdits) => void;
+  updateSettings: (settings: Partial<UserSettings>) => void;
+  setSubscription: (
+    plan: SubscriptionPlan,
+    billingPeriod?: UserSubscription["billingPeriod"],
   ) => void;
-  setReadingAnswers: (
-    lessonId: string,
-    answers: ReadingComprehensionAnswer[],
-  ) => void;
-  addReadingEvent: (lessonId: string, event: ReadingEvent) => void;
-  setReadingComplete: (lessonId: string, complete: boolean) => void;
-  addListeningEvent: (lessonId: string, event: ListeningEvent) => void;
-  setListeningComplete: (lessonId: string, complete: boolean) => void;
-  addSpeakingEvent: (lessonId: string, event: SpeakingEvent) => void;
-  setSpeakingComplete: (lessonId: string, complete: boolean) => void;
-  completeLesson: (lessonId: string, result: LessonCompletionResult) => void;
+  cancelSubscription: () => void;
+  toggleSavedLesson: (lessonId: string) => void;
+  addGeneratedLesson: (lesson: LessonPackage) => void;
+  removeGeneratedLesson: (lessonId: string) => void;
+  addCustomLessonRequest: (request: CustomLessonRequest) => void;
+  addSupportRequest: (request: SupportRequest) => void;
+  addLessonReport: (report: LessonReport) => void;
+  saveLessonProgress: (lessonId: string, percent: number) => void;
+  startOrResumeLesson: (lessonId: string) => LessonSession;
+  saveLessonSession: (session: LessonSession) => void;
   rewardLessonCompletion: (
     lesson: LessonPackage,
     result: LessonCompletionResult,
-  ) => void;
+  ) => boolean;
+  completeLesson: (lesson: RecentLesson) => void;
+  resetLessonSession: (lessonId: string) => void;
+  resetProgress: () => void;
 }
 
-function initialPersistedState(): PersistedAppState {
+const defaultSubscription: UserSubscription = {
+  plan: "free",
+  billingPeriod: "monthly",
+  status: "active",
+};
+
+const defaultSettings: UserSettings = {
+  lessonLength: 30,
+  preferredFocus: "balanced",
+  readingDifficulty: "balanced",
+  speakingDifficulty: "medium",
+  theme: "light",
+};
+
+const initialState = {
+  isAuthenticated: false,
+  user: defaultUser,
+  onboarding: defaultPreferences,
+  progress: defaultProgress,
+  lessonSessions: {},
+  savedLessonIds: [],
+  generatedLessons: [],
+  customLessonRequests: [],
+  subscription: defaultSubscription,
+  settings: defaultSettings,
+  supportRequests: [],
+  lessonReports: [],
+};
+
+const canonicalPhaseIds = new Set<LessonPhaseId>(
+  CANONICAL_LESSON_PHASES.map((phase) => phase.id),
+);
+
+const memoryFallback = new Map<string, string>();
+const safeStorage: StateStorage = {
+  getItem: (name) => {
+    try {
+      if (typeof window === "undefined") return memoryFallback.get(name) ?? null;
+      return window.localStorage.getItem(name);
+    } catch {
+      return memoryFallback.get(name) ?? null;
+    }
+  },
+  setItem: (name, value) => {
+    try {
+      if (typeof window !== "undefined") window.localStorage.setItem(name, value);
+      else memoryFallback.set(name, value);
+    } catch {
+      memoryFallback.set(name, value);
+    }
+  },
+  removeItem: (name) => {
+    try {
+      if (typeof window !== "undefined") window.localStorage.removeItem(name);
+    } catch {
+      // The in-memory copy is still cleared if browser storage is unavailable.
+    }
+    memoryFallback.delete(name);
+  },
+};
+
+function normalizeUserSettings(value: unknown): UserSettings {
+  const source = value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+  const lessonLength = [15, 30, 45, 60].includes(Number(source.lessonLength))
+    ? Number(source.lessonLength) as UserSettings["lessonLength"]
+    : defaultSettings.lessonLength;
+  const focuses: LessonFocus[] = [
+    "balanced",
+    "conversation",
+    "vocabulary",
+    "grammar",
+    "reading",
+    "speaking",
+    "workplace Japanese",
+  ];
+  const preferredFocus = typeof source.preferredFocus === "string" &&
+    focuses.includes(source.preferredFocus as LessonFocus)
+    ? source.preferredFocus as LessonFocus
+    : defaultSettings.preferredFocus;
+  const readingDifficulties: UserSettings["readingDifficulty"][] = [
+    "guided",
+    "balanced",
+    "independent",
+  ];
+  const readingDifficulty = typeof source.readingDifficulty === "string" &&
+    readingDifficulties.includes(
+      source.readingDifficulty as UserSettings["readingDifficulty"],
+    )
+    ? source.readingDifficulty as UserSettings["readingDifficulty"]
+    : defaultSettings.readingDifficulty;
+  const speakingDifficulties: UserSettings["speakingDifficulty"][] = [
+    "easy",
+    "medium",
+    "hard",
+  ];
+  const speakingDifficulty = typeof source.speakingDifficulty === "string" &&
+    speakingDifficulties.includes(
+      source.speakingDifficulty as UserSettings["speakingDifficulty"],
+    )
+    ? source.speakingDifficulty as UserSettings["speakingDifficulty"]
+    : defaultSettings.speakingDifficulty;
+  const themes: ThemePreference[] = ["light", "dark", "system"];
+  const theme = typeof source.theme === "string" &&
+    themes.includes(source.theme as ThemePreference)
+    ? source.theme as ThemePreference
+    : defaultSettings.theme;
+
   return {
-    user: { ...DEFAULT_USER },
-    preferences: { ...DEFAULT_PREFERENCES },
-    progress: { ...DEFAULT_PROGRESS },
-    subscription: { ...DEFAULT_SUBSCRIPTION },
-    notifications: [],
-    lessonSessions: {},
+    lessonLength,
+    preferredFocus,
+    readingDifficulty,
+    speakingDifficulty,
+    theme,
+  };
+}
+
+function normalizeOnboardingPreferences(
+  value: unknown,
+): Partial<OnboardingPreferences> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const source = value as Record<string, unknown>;
+  return {
+    goal: source.goal as OnboardingPreferences["goal"],
+    level: source.level as OnboardingPreferences["level"],
+    dailyMinutes: source.dailyMinutes as OnboardingPreferences["dailyMinutes"],
+    readingPermissionUnderstood: source.readingPermissionUnderstood === true,
+    completed: source.completed === true,
   };
 }
 
 export function createEmptyLessonSession(lessonId: string): LessonSession {
-  const now = new Date().toISOString();
+  const timestamp = new Date().toISOString();
   return {
     lessonId,
     currentPhaseIndex: 0,
     activityIndex: 0,
     elapsedSeconds: 0,
-    startedAt: now,
-    updatedAt: now,
+    startedAt: timestamp,
+    updatedAt: timestamp,
     completedPhaseIds: [],
     activities: {},
     storyInteractions: [],
     storyComplete: false,
     vocabularyAnswers: [],
     grammarAnswers: [],
-    grammarTranslationQuestions: [],
     readingAnswers: [],
     readingEvents: [],
     readingComplete: false,
@@ -161,306 +254,319 @@ export function createEmptyLessonSession(lessonId: string): LessonSession {
   };
 }
 
-function updateLessonSession(
-  sessions: Record<string, LessonSession>,
+export function normalizeLessonSession(
   lessonId: string,
-  updater: (session: LessonSession) => LessonSession,
-): Record<string, LessonSession> {
-  const current = sessions[lessonId] ?? createEmptyLessonSession(lessonId);
-  return {
-    ...sessions,
-    [lessonId]: updater(current),
+  value: unknown,
+): LessonSession {
+  const empty = createEmptyLessonSession(lessonId);
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return empty;
+  }
+
+  const session = value as Partial<LessonSession> & {
+    completedPhaseIds?: unknown;
   };
-}
+  const integer = (candidate: unknown, fallback: number) =>
+    typeof candidate === "number" && Number.isInteger(candidate)
+      ? candidate
+      : fallback;
+  const timestamp = (candidate: unknown, fallback: string) =>
+    typeof candidate === "string" && candidate.length > 0
+      ? candidate
+      : fallback;
+  const completedPhaseIds = Array.isArray(session.completedPhaseIds)
+    ? session.completedPhaseIds.filter(
+        (phaseId): phaseId is LessonPhaseId =>
+          typeof phaseId === "string" &&
+          canonicalPhaseIds.has(phaseId as LessonPhaseId),
+      )
+    : [];
 
-function markUpdated(session: LessonSession): LessonSession {
-  return { ...session, updatedAt: new Date().toISOString() };
-}
-
-function mergeWeakVocabulary(current: string[], additions: string[]): string[] {
-  return Array.from(new Set([...additions, ...current])).slice(0, 12);
-}
-
-function addMinutesToToday(
-  activity: AppProgress["weeklyActivity"],
-  minutes: number,
-): AppProgress["weeklyActivity"] {
-  const today = new Date().toISOString().slice(0, 10);
-  const existingIndex = activity.findIndex((item) => item.date === today);
-  if (existingIndex === -1) {
-    return [...activity, { date: today, minutes }].slice(-7);
-  }
-  return activity.map((item, index) =>
-    index === existingIndex ? { ...item, minutes: item.minutes + minutes } : item,
-  );
-}
-
-function normalizePersistedState(value: unknown): PersistedAppState {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return initialPersistedState();
-  }
-  const source = value as Partial<PersistedAppState>;
   return {
-    user: { ...DEFAULT_USER, ...(source.user ?? {}) },
-    preferences: { ...DEFAULT_PREFERENCES, ...(source.preferences ?? {}) },
-    progress: { ...DEFAULT_PROGRESS, ...(source.progress ?? {}) },
-    subscription: { ...DEFAULT_SUBSCRIPTION, ...(source.subscription ?? {}) },
-    notifications: Array.isArray(source.notifications) ? source.notifications : [],
-    lessonSessions:
-      source.lessonSessions && typeof source.lessonSessions === "object"
-        ? source.lessonSessions
+    ...empty,
+    ...session,
+    lessonId,
+    currentPhaseIndex: Math.max(
+      0,
+      Math.min(
+        CANONICAL_LESSON_PHASES.length - 1,
+        integer(session.currentPhaseIndex, 0),
+      ),
+    ),
+    activityIndex: Math.max(0, integer(session.activityIndex, 0)),
+    elapsedSeconds: Math.max(0, integer(session.elapsedSeconds, 0)),
+    startedAt: timestamp(session.startedAt, empty.startedAt),
+    updatedAt: timestamp(session.updatedAt, empty.updatedAt),
+    completedPhaseIds,
+    activities:
+      typeof session.activities === "object" &&
+      session.activities !== null &&
+      !Array.isArray(session.activities)
+        ? session.activities
         : {},
+    storyInteractions: Array.isArray(session.storyInteractions)
+      ? session.storyInteractions
+      : [],
+    storyComplete: session.storyComplete === true,
+    vocabularyAnswers: Array.isArray(session.vocabularyAnswers)
+      ? session.vocabularyAnswers
+      : [],
+    grammarAnswers: Array.isArray(session.grammarAnswers)
+      ? session.grammarAnswers
+      : [],
+    readingAnswers: Array.isArray(session.readingAnswers)
+      ? session.readingAnswers
+      : [],
+    readingEvents: Array.isArray(session.readingEvents)
+      ? session.readingEvents
+      : [],
+    readingComplete: session.readingComplete === true,
+    listeningEvents: Array.isArray(session.listeningEvents)
+      ? session.listeningEvents
+      : [],
+    listeningComplete: session.listeningComplete === true,
+    speakingEvents: Array.isArray(session.speakingEvents)
+      ? session.speakingEvents
+      : [],
+    speakingComplete: session.speakingComplete === true,
+    completionResult: session.completionResult ?? null,
+    completed: session.completed === true,
+    rewarded: session.rewarded === true,
   };
 }
 
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
-      ...initialPersistedState(),
-      hydrated: false,
+      ...initialState,
+      hasHydrated: false,
       backendSessionChecked: false,
-      loading: false,
-      error: "",
-      setHydrated: (hydrated) => set({ hydrated }),
-      setBackendSessionChecked: (backendSessionChecked) =>
-        set({ backendSessionChecked }),
-      setLoading: (loading) => set({ loading }),
-      setError: (error) => set({ error }),
-      signIn: (user) =>
+      setHasHydrated: (value) => set({ hasHydrated: value }),
+      setBackendSessionChecked: (value) => set({ backendSessionChecked: value }),
+      signIn: (name) =>
         set((state) => ({
-          user: { ...state.user, ...user },
+          isAuthenticated: true,
+          user: { ...state.user, name: name?.trim() || state.user.name },
+        })),
+      syncBackendIdentity: (id, name, email, onboardingComplete) =>
+        set((state) => ({
+          isAuthenticated: true,
+          user: {
+            ...state.user,
+            id,
+            name: name.trim() || "Learner",
+            email,
+          },
+          onboarding: {
+            ...state.onboarding,
+            completed: onboardingComplete,
+          },
+        })),
+      hydrateBackendProgress: (snapshot) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            level: snapshot.currentLevel,
+            dailyGoalMinutes: snapshot.dailyGoalMinutes,
+            minutesStudiedToday: snapshot.minutesStudiedToday,
+            joinDate: snapshot.joinDate,
+            xp: snapshot.xp,
+            streakDays: snapshot.streakDays,
+          },
+          onboarding: {
+            ...state.onboarding,
+            goal: snapshot.learningGoal,
+            level: snapshot.currentLevel,
+            dailyMinutes: snapshot.dailyGoalMinutes as DailyMinutes,
+          },
+          progress: {
+            ...state.progress,
+            levelCompletion: snapshot.levelCompletion,
+            learnedVocabularyCount: snapshot.learnedVocabularyCount,
+            learnedKanjiCount: snapshot.learnedKanjiCount,
+            learnedGrammarCount: snapshot.learnedGrammarCount,
+            weeklyActivity: snapshot.weeklyActivity,
+            weakKanji: snapshot.weakKanji,
+            weakVocabulary: snapshot.weakVocabulary,
+            grammarToReview: snapshot.grammarToReview,
+            recentLessons: snapshot.recentLessons,
+            completedLessonIds: snapshot.completedLessonIds,
+            longestStreak: snapshot.longestStreak,
+            totalStudyMinutes: snapshot.totalStudyMinutes,
+            achievements: snapshot.achievements,
+          },
         })),
       signOut: () =>
         set({
-          ...initialPersistedState(),
+          ...initialState,
           backendSessionChecked: true,
-          error: "",
         }),
-      setUser: (user) =>
-        set((state) => ({ user: { ...state.user, ...user } })),
-      setPreferences: (preferences) =>
+      setGoal: (goal) =>
+        set((state) => ({ onboarding: { ...state.onboarding, goal } })),
+      setLevel: (level) =>
         set((state) => ({
-          preferences: { ...state.preferences, ...preferences },
+          onboarding: { ...state.onboarding, level },
+          user: {
+            ...state.user,
+            level: level === "Not sure" || level === "Beginner" ? "N5" : level,
+          },
         })),
-      setSubscription: (subscription) =>
+      setDailyMinutes: (dailyMinutes) =>
         set((state) => ({
-          subscription: { ...state.subscription, ...subscription },
+          onboarding: { ...state.onboarding, dailyMinutes },
+          user: { ...state.user, dailyGoalMinutes: dailyMinutes },
         })),
-      setProgress: (progress) =>
-        set((state) => ({ progress: { ...state.progress, ...progress } })),
-      setNotifications: (notifications) => set({ notifications }),
-      markNotificationRead: (id) =>
+      acknowledgeReading: () =>
         set((state) => ({
-          notifications: state.notifications.map((notification) =>
-            notification.id === id
-              ? { ...notification, read: true }
-              : notification,
+          onboarding: {
+            ...state.onboarding,
+            readingPermissionUnderstood: true,
+          },
+        })),
+      completeOnboarding: () =>
+        set((state) => ({
+          onboarding: { ...state.onboarding, completed: true },
+        })),
+      updateProfile: (edits) =>
+        set((state) => ({
+          user: {
+            ...state.user,
+            name: edits.name.trim() || state.user.name,
+            level: edits.level,
+            dailyGoalMinutes: edits.dailyMinutes,
+          },
+          onboarding: {
+            ...state.onboarding,
+            goal: edits.goal,
+            level: edits.level,
+            dailyMinutes: edits.dailyMinutes,
+          },
+        })),
+      updateSettings: (next) => {
+        const settings = normalizeUserSettings({ ...get().settings, ...next });
+        set({ settings });
+        if (getBackendMode() === "supabase") void settingsRepository.save(settings);
+      },
+      setSubscription: (plan, billingPeriod) =>
+        set((state) => ({
+          subscription: {
+            plan,
+            billingPeriod: billingPeriod ?? state.subscription.billingPeriod,
+            status: "active",
+          },
+        })),
+      cancelSubscription: () =>
+        set((state) => ({
+          subscription: {
+            ...state.subscription,
+            plan: "free",
+            status: "cancelled",
+            renewsAt: undefined,
+          },
+        })),
+      toggleSavedLesson: (lessonId) =>
+        set((state) => ({
+          savedLessonIds: state.savedLessonIds.includes(lessonId)
+            ? state.savedLessonIds.filter((id) => id !== lessonId)
+            : [...state.savedLessonIds, lessonId],
+        })),
+      addGeneratedLesson: (lesson) =>
+        set((state) => ({
+          generatedLessons: [
+            lesson,
+            ...state.generatedLessons.filter((item) => item.id !== lesson.id),
+          ],
+        })),
+      removeGeneratedLesson: (lessonId) =>
+        set((state) => ({
+          generatedLessons: state.generatedLessons.filter(
+            (lesson) => lesson.id !== lessonId,
           ),
         })),
-      startLessonSession: (lesson) =>
-        set((state) => {
-          const existing = state.lessonSessions[lesson.id];
-          return {
-            lessonSessions: existing
-              ? state.lessonSessions
-              : {
-                  ...state.lessonSessions,
-                  [lesson.id]: createEmptyLessonSession(lesson.id),
-                },
-          };
-        }),
-      resetLessonSession: (lessonId) =>
+      addCustomLessonRequest: (request) => {
+        set((state) => ({
+          customLessonRequests: [request, ...state.customLessonRequests],
+        }));
+        if (getBackendMode() === "supabase") {
+          void customLessonRepository.create(request);
+        }
+      },
+      addSupportRequest: (request) =>
+        set((state) => ({
+          supportRequests: [request, ...state.supportRequests],
+        })),
+      addLessonReport: (report) =>
+        set((state) => ({ lessonReports: [report, ...state.lessonReports] })),
+      saveLessonProgress: (lessonId, percent) =>
+        set((state) => ({
+          progress: {
+            ...state.progress,
+            lessonProgress: {
+              ...state.progress.lessonProgress,
+              [lessonId]: percent,
+            },
+          },
+        })),
+      startOrResumeLesson: (lessonId) => {
+        const existing = get().lessonSessions[lessonId];
+        if (existing) {
+          const session = normalizeLessonSession(lessonId, existing);
+          set((state) => ({
+            lessonSessions: {
+              ...state.lessonSessions,
+              [lessonId]: session,
+            },
+          }));
+          return session;
+        }
+        const session = createEmptyLessonSession(lessonId);
+        set((state) => ({
+          lessonSessions: { ...state.lessonSessions, [lessonId]: session },
+          progress: {
+            ...state.progress,
+            lessonProgress: {
+              ...state.progress.lessonProgress,
+              [lessonId]: 1,
+            },
+          },
+        }));
+        return session;
+      },
+      saveLessonSession: (value) => {
+        const session = normalizeLessonSession(value.lessonId, value);
         set((state) => ({
           lessonSessions: {
             ...state.lessonSessions,
-            [lessonId]: createEmptyLessonSession(lessonId),
+            [session.lessonId]: {
+              ...session,
+              updatedAt: new Date().toISOString(),
+            },
           },
-        })),
-      setLessonPhase: (lessonId, phaseIndex) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) =>
-              markUpdated({
-                ...session,
-                currentPhaseIndex: Math.max(0, phaseIndex),
-                activityIndex: 0,
-              }),
-          ),
-        })),
-      setLessonActivityIndex: (lessonId, activityIndex) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) =>
-              markUpdated({
-                ...session,
-                activityIndex: Math.max(0, activityIndex),
-              }),
-          ),
-        })),
-      addLessonElapsedSeconds: (lessonId, seconds) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) =>
-              markUpdated({
-                ...session,
-                elapsedSeconds: session.elapsedSeconds + Math.max(0, seconds),
-              }),
-          ),
-        })),
-      completeLessonPhase: (lessonId, phaseId) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) =>
-              markUpdated({
-                ...session,
-                completedPhaseIds: [
-                  ...new Set([...session.completedPhaseIds, phaseId]),
-                ],
-              }),
-          ),
-        })),
-      setStoryComplete: (lessonId, complete) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) => markUpdated({ ...session, storyComplete: complete }),
-          ),
-        })),
-      addStoryInteraction: (lessonId, interaction) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) =>
-              markUpdated({
-                ...session,
-                storyInteractions: [...session.storyInteractions, interaction],
-              }),
-          ),
-        })),
-      setVocabularyAnswers: (lessonId, answers) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) => markUpdated({ ...session, vocabularyAnswers: answers }),
-          ),
-        })),
-      setGrammarAnswers: (lessonId, answers) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) => markUpdated({ ...session, grammarAnswers: answers }),
-          ),
-        })),
-      setGrammarTranslationQuestions: (lessonId, questions) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) =>
-              markUpdated({ ...session, grammarTranslationQuestions: questions }),
-          ),
-        })),
-      setReadingAnswers: (lessonId, answers) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) => markUpdated({ ...session, readingAnswers: answers }),
-          ),
-        })),
-      addReadingEvent: (lessonId, event) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) =>
-              markUpdated({
-                ...session,
-                readingEvents: [...session.readingEvents, event],
-              }),
-          ),
-        })),
-      setReadingComplete: (lessonId, complete) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) => markUpdated({ ...session, readingComplete: complete }),
-          ),
-        })),
-      addListeningEvent: (lessonId, event) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) =>
-              markUpdated({
-                ...session,
-                listeningEvents: [...session.listeningEvents, event],
-              }),
-          ),
-        })),
-      setListeningComplete: (lessonId, complete) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) => markUpdated({ ...session, listeningComplete: complete }),
-          ),
-        })),
-      addSpeakingEvent: (lessonId, event) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) =>
-              markUpdated({
-                ...session,
-                speakingEvents: [...session.speakingEvents, event],
-              }),
-          ),
-        })),
-      setSpeakingComplete: (lessonId, complete) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) => markUpdated({ ...session, speakingComplete: complete }),
-          ),
-        })),
-      completeLesson: (lessonId, result) =>
-        set((state) => ({
-          lessonSessions: updateLessonSession(
-            state.lessonSessions,
-            lessonId,
-            (session) =>
-              markUpdated({
-                ...session,
-                completionResult: result,
-                completed: true,
-              }),
-          ),
-        })),
+          progress: {
+            ...state.progress,
+            lessonProgress: {
+              ...state.progress.lessonProgress,
+              [session.lessonId]: session.completed
+                ? 100
+                : Math.max(
+                    1,
+                    Math.round(
+                      (session.currentPhaseIndex /
+                        CANONICAL_LESSON_PHASES.length) *
+                        100,
+                    ),
+                  ),
+            },
+          },
+        }));
+      },
       rewardLessonCompletion: (lesson, result) => {
         const session = get().lessonSessions[lesson.id];
-        if (session?.rewarded) return;
+        if (!session || session.rewarded) return false;
         set((state) => {
-          const currentSession =
-            state.lessonSessions[lesson.id] ?? createEmptyLessonSession(lesson.id);
-          if (currentSession.rewarded) return {};
-          const recentLesson = {
+          const currentSession = state.lessonSessions[lesson.id];
+          if (!currentSession || currentSession.rewarded) return state;
+          const recentLesson: RecentLesson = {
             lessonId: lesson.id,
             title: lesson.title,
             completedAt: "Just now",
@@ -498,7 +604,7 @@ export const useAppStore = create<AppState>()(
                 state.progress.totalStudyMinutes + result.durationMinutes,
               weakVocabulary: mergeWeakVocabulary(
                 state.progress.weakVocabulary,
-                result.weakItems,
+                result.wordsNeedingReview,
               ),
               kanjiRecognition: Math.min(
                 100,
@@ -524,42 +630,125 @@ export const useAppStore = create<AppState>()(
             },
             lessonSessions: {
               ...state.lessonSessions,
-              [lesson.id]: markUpdated({
+              [lesson.id]: {
                 ...currentSession,
-                completionResult: result,
                 completed: true,
                 rewarded: true,
-              }),
+                completionResult: result,
+                updatedAt: new Date().toISOString(),
+              },
             },
           };
         });
+        return true;
       },
+      completeLesson: (lesson) =>
+        set((state) => ({
+          progress: {
+            ...state.progress,
+            completedLessonIds: [
+              ...new Set([
+                ...state.progress.completedLessonIds,
+                lesson.lessonId,
+              ]),
+            ],
+            recentLessons: [
+              lesson,
+              ...state.progress.recentLessons.filter(
+                (item) => item.lessonId !== lesson.lessonId,
+              ),
+            ],
+            lessonProgress: {
+              ...state.progress.lessonProgress,
+              [lesson.lessonId]: 100,
+            },
+          },
+        })),
+      resetLessonSession: (lessonId) =>
+        set((state) => {
+          const lessonSessions = { ...state.lessonSessions };
+          delete lessonSessions[lessonId];
+          return {
+            lessonSessions,
+            progress: {
+              ...state.progress,
+              lessonProgress: {
+                ...state.progress.lessonProgress,
+                [lessonId]: 0,
+              },
+            },
+          };
+        }),
+      resetProgress: () =>
+        set({
+          progress: defaultProgress,
+          lessonSessions: {},
+        }),
     }),
     {
-      name: APP_STORAGE_KEY,
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        user: state.user,
-        preferences: state.preferences,
-        progress: state.progress,
-        subscription: state.subscription,
-        notifications: state.notifications,
-        lessonSessions: state.lessonSessions,
-      }),
-      merge: (persisted, current) => ({
-        ...current,
-        ...normalizePersistedState(persisted),
-      }),
-      onRehydrateStorage: () => (state) => {
-        state?.setHydrated(true);
+      name: "aiko-app-state",
+      version: 8,
+      storage: createJSONStorage(() => safeStorage),
+      migrate: (persistedState) => persistedState as Partial<AppState>,
+      merge: (persisted, current) => {
+        const saved = persisted as Partial<AppState>;
+        return {
+          ...current,
+          onboarding: {
+            ...current.onboarding,
+            ...normalizeOnboardingPreferences(saved.onboarding),
+          },
+          progress: {
+            ...current.progress,
+            lessonProgress: saved.progress?.lessonProgress ?? {},
+          },
+          lessonSessions: Object.fromEntries(
+            Object.entries(saved.lessonSessions ?? {}).map(
+              ([lessonId, session]) => [
+                lessonId,
+                normalizeLessonSession(lessonId, session),
+              ],
+            ),
+          ),
+          savedLessonIds: saved.savedLessonIds ?? [],
+          generatedLessons: saved.generatedLessons ?? [],
+          customLessonRequests: saved.customLessonRequests ?? [],
+          settings: normalizeUserSettings(saved.settings),
+          hasHydrated: false,
+          backendSessionChecked: false,
+          isAuthenticated: false,
+          user: current.user,
+          subscription: current.subscription,
+          supportRequests: [],
+          lessonReports: [],
+        };
       },
+      onRehydrateStorage: () => (state) => state?.setHasHydrated(true),
     },
   ),
 );
 
-export function getCurrentLesson(): LessonPackage {
-  return {
-    ...commuteLesson,
-    phases: canonicalLessonPhases(),
-  };
+function addMinutesToToday(
+  activity: LearnerProgress["weeklyActivity"],
+  minutes: number,
+): LearnerProgress["weeklyActivity"] {
+  if (!activity.length) return activity;
+  const index = activity.length - 1;
+  return activity.map((day, dayIndex) =>
+    dayIndex === index ? { ...day, minutes: day.minutes + minutes } : day,
+  );
+}
+
+function mergeWeakVocabulary(
+  existing: LearnerProgress["weakVocabulary"],
+  terms: string[],
+): LearnerProgress["weakVocabulary"] {
+  const additions = terms
+    .filter((term) => !existing.some((item) => item.term === term))
+    .map((term) => ({
+      term,
+      meaning: "lesson target",
+      mastery: 45,
+    }));
+  return [...existing, ...additions];
 }
