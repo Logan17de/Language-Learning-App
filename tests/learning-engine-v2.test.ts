@@ -191,7 +191,6 @@ describe("learning engine contracts", () => {
         ...question,
         targetItemIds: [`grammar-${index % commuteLesson.grammar.length}`],
       })),
-      reviewQuestions: [],
     };
     const session = createEmptyLessonSession(lesson.id);
     session.vocabularyAnswers = [{
