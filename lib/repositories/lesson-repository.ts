@@ -23,7 +23,6 @@ export interface CanonicalLesson {
   readingQuestions: Database["public"]["Tables"]["lesson_reading_questions"]["Row"][];
   listening: Database["public"]["Tables"]["lesson_listening_activities"]["Row"][];
   speaking: Database["public"]["Tables"]["lesson_speaking_activities"]["Row"][];
-  review: Database["public"]["Tables"]["lesson_review_activities"]["Row"][];
   /** Learner-specific kanji with at least ten recorded story appearances. */
   knownKanji: string[];
 }
@@ -75,7 +74,6 @@ async function loadContent(
     readingQuestions,
     listening,
     speaking,
-    review,
     knownKanji,
   ] = await Promise.all([
     client
@@ -125,11 +123,6 @@ async function loadContent(
       .select("*")
       .eq("lesson_version_id", versionId)
       .order("position"),
-    client
-      .from("lesson_review_activities")
-      .select("*")
-      .eq("lesson_version_id", versionId)
-      .order("position"),
     rawClient
       .from("learner_kanji_exposure_progress")
       .select("character,appearance_count")
@@ -151,7 +144,6 @@ async function loadContent(
     reading,
     listening,
     speaking,
-    review,
     knownKanji,
     ...(readingQuestionTableMissing ? [] : [readingQuestions]),
     ...(storyWordTableMissing ? [] : [storyWords]),
@@ -171,7 +163,6 @@ async function loadContent(
     readingQuestions: readingQuestionTableMissing ? [] : (readingQuestions.data ?? []),
     listening: listening.data ?? [],
     speaking: speaking.data ?? [],
-    review: review.data ?? [],
     knownKanji: (knownKanji.data ?? []).flatMap((row) =>
       typeof row.character === "string" ? [row.character] : [],
     ),
