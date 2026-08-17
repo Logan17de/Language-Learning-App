@@ -15,7 +15,6 @@ interface OnboardingUpdate {
   goal: LearningGoal | null;
   level: LearnerLevel | null;
   dailyMinutes: DailyMinutes | null;
-  interests: string[];
 }
 
 function toDatabaseLevel(
@@ -60,7 +59,6 @@ export const profileRepository = {
       current_jlpt_level: values.current_jlpt_level,
       learning_goal: values.learning_goal,
       daily_study_minutes: values.daily_study_minutes,
-      interests: values.interests,
       timezone: values.timezone,
     };
     const { data, error } = await client
@@ -76,7 +74,6 @@ export const profileRepository = {
       .update({
         learning_goal: values.learning_goal,
         daily_study_minutes: values.daily_study_minutes,
-        interests: values.interests,
         onboarding_complete: true,
       })
       .eq("user_id", auth.user.id);
@@ -102,7 +99,6 @@ export const profileRepository = {
 
     const profileValues: ProfileUpdate = {
       display_name: values.displayName.trim(),
-      interests: values.interests,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       ...(values.goal ? { learning_goal: values.goal } : {}),
       ...(values.level
@@ -124,7 +120,6 @@ export const profileRepository = {
 
     const preferenceValues: Database["public"]["Tables"]["user_preferences"]["Update"] =
       {
-        interests: values.interests,
         onboarding_complete: true,
         ...(values.goal ? { learning_goal: values.goal } : {}),
         ...(values.dailyMinutes
