@@ -9,13 +9,6 @@ const migration = readFileSync(
   ),
   "utf8",
 );
-const masteredMistakeMigration = readFileSync(
-  join(
-    process.cwd(),
-    "supabase/migrations/20260817150000_mastered_mistake_demotes_to_75.sql",
-  ),
-  "utf8",
-);
 const lessonTargets = readFileSync(
   join(process.cwd(), "lib/gemini/lesson-targets.ts"),
   "utf8",
@@ -67,35 +60,31 @@ describe("level-scoped learner mastery", () => {
       "mastery.mastery < LEARNED_MASTERY_THRESHOLD",
     );
     expect(lessonTargets).not.toContain("mastery.mastery < 75");
-    expect(lessonTargets).not.toContain("mastery.evidenceCount === 0 ||");
   });
 
-  it("treats assumed 100 lower-level kanji as known until evidence lowers them", () => {
+  it("does not mistake an assumed 100 score for an unknown item", () => {
+    expect(lessonTargets).not.toContain("mastery.evidenceCount === 0 ||");
+    expect(lessonTargets).toContain(
+      "weakKnown = Boolean(",
+    );
+    expect(lessonTargets).toContain(
+      "mastery.evidenceCount > 0",
+    );
+  });
+
+  it("treats assumed 100 lower-level kanji as known until mastery drops below 80", () => {
     expect(lessonTargets).toContain(
       "isKnown: Boolean(mastery && mastery.mastery >= LEARNED_MASTERY_THRESHOLD)",
     );
   });
 
-  it("demotes a mastered kanji or grammar item directly to 75 after one wrong answer", () => {
-    expect(masteredMistakeMigration).toContain("mastery >= 80");
-    expect(masteredMistakeMigration).toContain(
-      "v_item_type in (''kanji'', ''grammar'')",
-    );
-    expect(masteredMistakeMigration).toContain(
-      "v_signal in (''incorrect'', ''pronunciation_incorrect'')",
-    );
-    expect(
-      masteredMistakeMigration.match(/when v_demote_mastered then 75/g)?.length,
-    ).toBeGreaterThanOrEqual(6);
-    expect(masteredMistakeMigration).toContain(
-      "v_queue.item_type in (''kanji'', ''grammar'')",
-    );
-  });
-
-  it("keeps the normal -6 learning penalty for items already below mastery", () => {
+  it("keeps normal mistake decay so crossing below 80 makes an item targetable", () => {
     expect(masteryEvidence).toContain(
       "when v_item_type = 'grammar' and v_signal = 'incorrect' then -6",
     );
     expect(masteryEvidence).toContain("when v_signal = 'incorrect' then -6");
+    expect(lessonTargets).toContain(
+      "weakKnown ? 0 : belowMasteryThreshold ? 1 : 2",
+    );
   });
 });
