@@ -8,11 +8,9 @@ import {
   CirclePlay,
   Ear,
   Eye,
-  Headphones,
   Languages,
   Lightbulb,
   Mic,
-  RefreshCw,
   Sparkles,
   UserRound,
 } from "lucide-react";
@@ -20,16 +18,15 @@ import { PublicPrimaryAction } from "@/components/auth/public-auth-actions";
 import { PublicHeader } from "@/components/layout/public-header";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Brand } from "@/components/ui/brand";
 
 export const metadata: Metadata = {
   title: "AIko — Adaptive Language Learning",
   description:
-    "Learn through structured stories, vocabulary, grammar, reading, listening, speaking, and personalised review. AIko launches with Japanese and is designed for more languages.",
+    "Learn Japanese through one level-matched story lesson at a time: Story, Vocabulary + Kanji, Grammar, Reading, Listening, and Speaking. Mastery updates automatically from practice.",
   openGraph: {
     title: "AIko — Adaptive Language Learning",
     description:
-      "Structured language learning through connected lessons and personalised review. Launching first with Japanese.",
+      "Six connected Japanese lesson phases, adaptive grammar translation, and automatic mastery that helps shape what comes next.",
     type: "website",
   },
 };
@@ -42,39 +39,39 @@ const learningFlow: Array<{
 }> = [
   {
     number: "01",
-    title: "Learn through a story",
-    copy: "Meet useful language inside a situation that gives every new idea a reason to exist.",
-    icon: BookOpenText,
+    title: "AIko chooses one next lesson",
+    copy: "You receive one level-matched assignment instead of browsing a lesson catalog. Premium learners can also use their interests to rank suitable lessons.",
+    icon: BrainCircuit,
   },
   {
     number: "02",
-    title: "Understand the building blocks",
-    copy: "Explore vocabulary and grammar without losing the context that introduced them.",
-    icon: Lightbulb,
+    title: "Start with one connected story",
+    copy: "The story introduces the situation, vocabulary, kanji, and grammar that the rest of the lesson will keep reusing.",
+    icon: BookOpenText,
   },
   {
     number: "03",
-    title: "Read and listen",
-    copy: "Recognise the same language in text and audio, with support available when needed.",
-    icon: Headphones,
+    title: "Reuse the same language six ways",
+    copy: "Story, Vocabulary + Kanji, Grammar, Reading, Listening, and Speaking reinforce the same lesson context instead of behaving like separate exercises.",
+    icon: Languages,
   },
   {
     number: "04",
-    title: "Practise speaking",
-    copy: "Move from guided models toward your own response at a pace that feels manageable.",
-    icon: Mic,
+    title: "Produce Japanese in Grammar",
+    copy: "After grammar practice, adaptive English-to-Japanese translation asks you to actively use the lesson grammar plus reinforcement patterns when available.",
+    icon: Lightbulb,
   },
   {
     number: "05",
-    title: "Review what needs work",
-    copy: "Return to the words and patterns that were difficult instead of repeating everything.",
-    icon: RefreshCw,
+    title: "Mastery updates automatically",
+    copy: "Answers, reveals, translations, listening activity, and speaking attempts become learning evidence in the background. There is no separate Review stage to complete.",
+    icon: Check,
   },
   {
     number: "06",
-    title: "Let AIko choose what comes next",
-    copy: "Your level and learning evidence guide one new assignment at a time, without repeating an assigned lesson.",
-    icon: BrainCircuit,
+    title: "What you do shapes what comes next",
+    copy: "Your level and learning evidence guide future targeting. Once a lesson has been started, it does not return as your next assigned lesson.",
+    icon: Sparkles,
   },
 ];
 
@@ -84,35 +81,63 @@ const lessonStages: Array<{
   copy: string;
   icon: LucideIcon;
 }> = [
-  { number: "01", title: "Story", copy: "Meet the lesson in context.", icon: BookOpenText },
-  { number: "02", title: "Vocabulary", copy: "Understand useful words.", icon: Languages },
-  { number: "03", title: "Grammar", copy: "See how ideas connect.", icon: Lightbulb },
-  { number: "04", title: "Reading", copy: "Recognise language in text.", icon: Eye },
-  { number: "05", title: "Listening", copy: "Follow meaning in audio.", icon: Ear },
-  { number: "06", title: "Speaking", copy: "Turn input into expression.", icon: Mic },
-  { number: "07", title: "Review", copy: "Recall without the hints.", icon: RefreshCw },
+  {
+    number: "01",
+    title: "Story",
+    copy: "Understand the lesson situation and meet the target language in context.",
+    icon: BookOpenText,
+  },
+  {
+    number: "02",
+    title: "Vocabulary + Kanji",
+    copy: "Practise the useful words and focus kanji that appear in the lesson.",
+    icon: Languages,
+  },
+  {
+    number: "03",
+    title: "Grammar",
+    copy: "Learn the target patterns, answer grammar questions, then use Japanese in adaptive translation practice.",
+    icon: Lightbulb,
+  },
+  {
+    number: "04",
+    title: "Reading",
+    copy: "Recognise the same language again in text and answer from meaning and context.",
+    icon: Eye,
+  },
+  {
+    number: "05",
+    title: "Listening",
+    copy: "Follow the lesson language in audio and build recognition without changing topics.",
+    icon: Ear,
+  },
+  {
+    number: "06",
+    title: "Speaking",
+    copy: "Use the microphone to turn familiar lesson language into spoken Japanese.",
+    icon: Mic,
+  },
 ];
 
 const learningSignals = [
-  "Incorrect answers",
-  "Revealed readings",
-  "Opened meanings",
-  "Repeated listening",
+  "Vocabulary + kanji answers",
+  "Grammar practice answers",
+  "AI-validated translations",
+  "Reading responses",
+  "Listening activity",
   "Speaking attempts",
-  "Review performance",
 ];
 
 const plans = [
   {
     name: "Free",
-    copy: "A clear, structured way to begin learning.",
+    copy: "The core AIko learning path for Japanese.",
     features: [
-      "Structured language lessons",
-      "Limited learning sessions",
-      "Basic vocabulary and grammar review",
-      "Basic progress tracking",
-      "Limited speaking practice",
-      "Random non-repeating lessons at your level",
+      "Core six-phase Japanese lessons",
+      "Level-matched lesson assignment",
+      "Automatic mastery and progress tracking",
+      "Grammar translation inside the lesson flow",
+      "Assigned lessons stay out of rotation once started",
     ],
     price: "¥0",
     cadence: "",
@@ -121,22 +146,19 @@ const plans = [
     primary: false,
   },
   {
-    name: "Pro",
-    copy: "More freedom, feedback, and continuity as you grow.",
+    name: "Premium",
+    copy: "More control over lesson selection, generation, speaking, and learning insights.",
     features: [
-      "Unlimited learning sessions",
-      "Request lessons about your own topics",
-      "Level- and interest-matched lesson assignments",
-      "Voice-based speaking practice",
-      "Advanced reading and pronunciation feedback",
-      "Adaptive review and learner memory",
-      "Full progress insights",
-      "Future languages and premium tutors when available",
+      "Interest-based lesson recommendations",
+      "Custom-topic AI lesson generation",
+      "Unlimited adaptive lesson access",
+      "Extended speaking practice",
+      "Deeper progress analytics",
     ],
     price: "¥2,000",
     cadence: "/ month",
     annual: "¥20,000 / year",
-    cta: "Explore Pro",
+    cta: "Explore Premium",
     primary: true,
   },
 ];
@@ -158,23 +180,28 @@ export default function LandingPage() {
             <div className="animate-fade-up">
               <Badge className="gap-2 py-2">
                 <Sparkles className="size-3.5" aria-hidden="true" />
-                Structured language learning, personalised by AI
+                One story. Six connected phases. Adaptive mastery.
               </Badge>
               <h1
                 id="hero-heading"
                 className="mt-7 max-w-4xl text-5xl font-semibold leading-[1.03] tracking-[-0.045em] text-ink sm:text-6xl lg:text-[4.5rem]"
               >
-                Learn a language through lessons that{" "}
+                Learn Japanese through lessons that{" "}
                 <span className="font-serif font-normal italic text-persimmon-500">
-                  adapt to you.
+                  build on each other.
                 </span>
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-8 text-stone-600">
-                AIko combines structured lessons, speaking practice, review, and personalised
-                guidance in one learning experience. Japanese is only the beginning.
+                AIko gives you one level-matched lesson at a time. A single story becomes
+                Vocabulary + Kanji, Grammar, Reading, Listening, and Speaking practice, while
+                your activity updates mastery automatically and helps shape what comes next.
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                <PublicPrimaryAction signedOutLabel="Start learning" hideWhenSignedIn className="group px-7" />
+                <PublicPrimaryAction
+                  signedOutLabel="Start learning"
+                  hideWhenSignedIn
+                  className="group px-7"
+                />
                 <a
                   href="#learning-system"
                   className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold text-ink hover:bg-white ${focusRing}`}
@@ -185,7 +212,7 @@ export default function LandingPage() {
               </div>
               <p className="mt-5 flex items-center gap-2 text-sm font-medium text-stone-500">
                 <span className="size-2 rounded-full bg-persimmon-500" aria-hidden="true" />
-                Currently launching with Japanese.
+                Currently focused on Japanese.
               </p>
             </div>
 
@@ -198,19 +225,19 @@ export default function LandingPage() {
                 <div className="rounded-[1.6rem] bg-moss-900 p-6 text-white sm:p-7">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-xs font-semibold uppercase tracking-[.18em] text-moss-200">
-                      One connected system
+                      The current AIko lesson
                     </span>
-                    <Badge tone="orange">Built to adapt</Badge>
+                    <Badge tone="orange">6 phases</Badge>
                   </div>
                   <h2 className="mt-5 max-w-sm text-2xl font-semibold leading-tight sm:text-3xl">
-                    A learning loop built around your practice.
+                    One lesson context, reused until you can understand and produce it.
                   </h2>
                   <div className="mt-6 grid grid-cols-2 gap-2.5">
                     {[
-                      { label: "Learn", icon: BookOpenText },
-                      { label: "Practise", icon: Mic },
-                      { label: "Review", icon: RefreshCw },
-                      { label: "Adapt", icon: BrainCircuit },
+                      { label: "Story", icon: BookOpenText },
+                      { label: "Vocabulary + Kanji", icon: Languages },
+                      { label: "Grammar + Translation", icon: Lightbulb },
+                      { label: "Read · Listen · Speak", icon: Mic },
                     ].map(({ label, icon: Icon }) => (
                       <div
                         key={label}
@@ -226,12 +253,12 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center gap-3 px-4 py-3.5">
                   <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-moss-100 text-moss-700">
-                    <Languages className="size-5" aria-hidden="true" />
+                    <BrainCircuit className="size-5" aria-hidden="true" />
                   </span>
                   <div>
-                    <p className="text-sm font-semibold text-ink">Japanese first</p>
+                    <p className="text-sm font-semibold text-ink">Mastery stays in the background</p>
                     <p className="text-xs leading-5 text-stone-500">
-                      More languages will follow as AIko grows.
+                      No separate Review stage is required after the lesson.
                     </p>
                   </div>
                 </div>
@@ -246,14 +273,14 @@ export default function LandingPage() {
         >
           <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
             <div className="mx-auto max-w-3xl text-center">
-              <p className="section-kicker">A connected learning loop</p>
+              <p className="section-kicker">The current learning loop</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-                More than lessons. A learning system.
+                AIko chooses the lesson. Your practice shapes the path.
               </h2>
               <p className="mt-5 text-lg leading-8 text-stone-500">
-                Each activity builds on the one before it. What you practise, reveal, retry,
-                and remember helps AIko decide where your attention may be most useful next.
-                Learners do not browse or star lessons; the path handles that decision.
+                Learners do not browse a catalog for the next standard lesson. AIko assigns one
+                suitable lesson, keeps its language connected across all six phases, records
+                learning evidence automatically, and uses that evidence for future targeting.
               </p>
             </div>
             <ol className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -286,16 +313,17 @@ export default function LandingPage() {
                 id="adapt-heading"
                 className="mt-4 max-w-xl text-4xl font-semibold tracking-tight sm:text-5xl"
               >
-                Guidance based on what you actually do.
+                Mastery comes from what you actually do.
               </h2>
               <p className="mt-4 max-w-xl text-lg leading-8 text-stone-500">
-                AIko does not guess what you are thinking. It uses learning evidence from the
-                lesson to shape review and future recommendations.
+                AIko uses evidence created inside the lesson to update progress and help target
+                future lessons. Mastery is recorded automatically instead of being presented as
+                a separate learner-facing Review phase.
               </p>
               <p className="mt-5 max-w-xl rounded-2xl border-l-4 border-persimmon-500 bg-white px-5 py-4 font-medium leading-7 shadow-card">
-                AIko adapts using what you practise, reveal, retry, and remember.
+                Grammar also includes adaptive English-to-Japanese translation, so production
+                can contribute evidence instead of relying only on recognition questions.
               </p>
-
             </div>
             <div className="rounded-4xl bg-moss-900 p-7 text-white sm:p-8">
               <p className="text-sm font-semibold text-moss-200">Learning evidence may include</p>
@@ -324,19 +352,19 @@ export default function LandingPage() {
             <div className="max-w-3xl">
               <p className="section-kicker">The lesson journey</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-                One lesson. Seven connected stages.
+                One lesson. Six connected phases.
               </h2>
               <p className="mt-5 text-lg leading-8 text-stone-500">
-                Every phase uses the same lesson context, so vocabulary, grammar, reading,
-                listening, and speaking reinforce one another. Japanese is the first language
-                to use this system; the structure is designed to support more.
+                Every phase keeps the same story context. Grammar contains its own adaptive
+                translation practice, so Translation is part of Grammar rather than a seventh
+                phase. Standalone Review is not part of the learner journey.
               </p>
             </div>
-            <ol className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
+            <ol className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
               {lessonStages.map(({ number, title, copy, icon: Icon }) => (
                 <li
                   key={title}
-                  className="relative rounded-3xl border border-black/[.06] bg-paper p-5 lg:min-h-56"
+                  className="relative rounded-3xl border border-black/[.06] bg-paper p-5 xl:min-h-64"
                 >
                   <div className="flex items-center justify-between">
                     <span className="grid size-10 place-items-center rounded-2xl bg-white text-moss-700 shadow-card">
@@ -349,6 +377,11 @@ export default function LandingPage() {
                 </li>
               ))}
             </ol>
+            <div className="mt-6 rounded-3xl border border-persimmon-100 bg-persimmon-50 px-5 py-4 text-sm leading-6 text-stone-600 sm:px-6">
+              <strong className="text-ink">One-sitting rule:</strong> a lesson does not pause for
+              later. If you leave after starting, that attempt ends and the lesson will not be
+              surfaced again as your next assignment. Learning evidence already recorded stays saved.
+            </div>
           </div>
         </section>
 
@@ -358,14 +391,14 @@ export default function LandingPage() {
         >
           <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">
             <div className="mx-auto max-w-3xl text-center">
-              <p className="section-kicker">Free and Pro</p>
+              <p className="section-kicker">Free and Premium</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-                Begin with structure. Add depth as you grow.
+                Keep the core path. Add more control with Premium.
               </h2>
               <p className="mt-5 text-lg leading-8 text-stone-500">
-                Start with the essentials, then choose Pro when you want more sessions,
-                feedback, and lessons built around your interests. Every plan remains
-                level-based, and AIko never reassigns the same lesson.
+                Free keeps the core six-phase learning path. Premium adds the capabilities that
+                the current subscription screen actually unlocks: interest-shaped lesson
+                recommendations, custom-topic generation, extended speaking, and deeper insights.
               </p>
             </div>
             <div className="mt-10 grid gap-6 md:grid-cols-2">
@@ -381,22 +414,34 @@ export default function LandingPage() {
                   <div>
                     <div className="flex items-center justify-between gap-4">
                       <h3 className="text-3xl font-semibold">{plan.name}</h3>
-                      {plan.primary && <Badge tone="orange">More ways to learn</Badge>}
+                      {plan.primary && <Badge tone="orange">Current Premium model</Badge>}
                     </div>
                     <div className="mt-6 flex flex-wrap items-end gap-x-2 gap-y-1">
                       <span className="text-4xl font-semibold tracking-tight">{plan.price}</span>
                       {plan.cadence && (
-                        <span className={plan.primary ? "pb-1 text-white/60" : "pb-1 text-stone-500"}>
+                        <span
+                          className={
+                            plan.primary ? "pb-1 text-white/60" : "pb-1 text-stone-500"
+                          }
+                        >
                           {plan.cadence}
                         </span>
                       )}
                     </div>
                     {plan.annual && (
-                      <p className={`mt-2 text-sm font-semibold ${plan.primary ? "text-persimmon-400" : "text-moss-700"}`}>
+                      <p
+                        className={`mt-2 text-sm font-semibold ${
+                          plan.primary ? "text-persimmon-400" : "text-moss-700"
+                        }`}
+                      >
                         {plan.annual}
                       </p>
                     )}
-                    <p className={`mt-4 leading-7 ${plan.primary ? "text-white/65" : "text-stone-500"}`}>
+                    <p
+                      className={`mt-4 leading-7 ${
+                        plan.primary ? "text-white/65" : "text-stone-500"
+                      }`}
+                    >
                       {plan.copy}
                     </p>
                   </div>
@@ -420,7 +465,7 @@ export default function LandingPage() {
                   </ul>
                   <PublicPrimaryAction
                     signedOutLabel={plan.cta}
-                    signedInLabel={plan.primary ? "Explore Pro" : "Go to dashboard"}
+                    signedInLabel={plan.primary ? "Explore Premium" : "Go to dashboard"}
                     signedInHref={plan.primary ? "/subscription" : "/home"}
                     hideWhenSignedIn={!plan.primary}
                     showAiIcon={plan.primary}
@@ -434,8 +479,10 @@ export default function LandingPage() {
                 </Card>
               ))}
             </div>
-            <p className="mt-5 text-center text-sm text-stone-400">
-              Pro costs ¥2,000 per month or ¥20,000 per year.
+            <p className="mx-auto mt-5 max-w-2xl text-center text-sm leading-6 text-stone-400">
+              Premium checkout is not connected yet, so the app cannot charge you from the
+              subscription page today. The current planned options are ¥2,000/month or
+              ¥20,000/year; beta Premium access can be assigned administratively.
             </p>
           </div>
         </section>
@@ -452,21 +499,20 @@ export default function LandingPage() {
               </h2>
               <div className="mt-6 max-w-2xl space-y-4 text-lg leading-8 text-stone-500">
                 <p>
-                  AIko is being created by Logan, an independent AI researcher
-                  and language learner based in Tokyo. While learning Japanese himself, he kept
-                  meeting the same problem: lessons, weak points, and progress were scattered,
-                  while general AI tutors did not reliably remember what needed more practice.
+                  AIko is being created by Logan, an independent AI researcher and language
+                  learner in Japan. While learning Japanese himself, he kept meeting the same
+                  problem: lessons, weak points, and progress were scattered, while general AI
+                  tutors did not reliably remember what needed more practice.
                 </p>
                 <p>
-                  That frustration became AIko—a structured system where stories, vocabulary,
-                  grammar, reading, listening, speaking, and review stay connected. Japanese is
-                  the first language because it is the challenge he knows personally, but the
-                  platform is being designed to support many languages.
+                  That frustration became AIko: one story reused through Story, Vocabulary +
+                  Kanji, Grammar, Reading, Listening, and Speaking, with learning evidence and
+                  mastery recorded automatically instead of adding a separate Review stage.
                 </p>
                 <p>
                   Logan leads the learning design, product direction, experiments, and
                   decisions. AI helps him explore, code, test, and refine the app, turning one
-                  person&apos;s idea into a real product while human judgement stays in charge.
+                  person&apos;s idea into a working product while human judgement stays in charge.
                 </p>
               </div>
               <p className="mt-6 font-serif text-xl italic text-moss-700">
@@ -477,8 +523,8 @@ export default function LandingPage() {
               <div className="flex flex-col gap-4" aria-label="About AIko's founder">
                 {[
                   {
-                    label: "Learning in Japan",
-                    copy: "Based in Tokyo and preparing for JLPT N2, he builds around problems he experiences firsthand.",
+                    label: "Learning Japanese in Japan",
+                    copy: "The product is shaped around problems its founder experiences while learning the language himself.",
                     icon: UserRound,
                   },
                   {
@@ -517,19 +563,23 @@ export default function LandingPage() {
 
         <section className="px-5 py-12 sm:px-8 sm:py-16" aria-labelledby="final-cta-heading">
           <div className="mx-auto max-w-7xl overflow-hidden rounded-4xl bg-persimmon-50 px-6 py-10 text-center sm:px-16 sm:py-12">
-            <p className="section-kicker !text-persimmon-600">Your first language awaits</p>
+            <p className="section-kicker !text-persimmon-600">Your next Japanese lesson</p>
             <h2
               id="final-cta-heading"
               className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl"
             >
-              Start with Japanese. Grow with AIko.
+              One story. Six phases. One adaptive path.
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-stone-500">
-              Begin with structured lessons today. As AIko grows, more languages, lesson
-              styles, and AI tutors will follow.
+              Begin with one level-matched lesson. AIko keeps the language connected across the
+              whole lesson and uses what you do to help shape what comes next.
             </p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-              <PublicPrimaryAction signedOutLabel="Create your account" hideWhenSignedIn className="group" />
+              <PublicPrimaryAction
+                signedOutLabel="Create your account"
+                hideWhenSignedIn
+                className="group"
+              />
             </div>
           </div>
         </section>
