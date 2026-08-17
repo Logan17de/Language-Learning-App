@@ -17,7 +17,6 @@ export const defaultPreferences: OnboardingPreferences = {
   goal: null,
   level: null,
   dailyMinutes: null,
-  interests: [],
   readingPermissionUnderstood: false,
   completed: false,
 };
