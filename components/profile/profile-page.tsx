@@ -12,7 +12,6 @@ import {
   LogOut,
   Mail,
   MessageCircleMore,
-  Route,
   Sparkles,
   TrendingUp,
 } from "lucide-react";
@@ -33,13 +32,6 @@ const premiumFeatures = [
     action: "Create a lesson",
   },
   {
-    icon: Route,
-    title: "Interest-shaped path",
-    copy: "AIko ranks suitable lessons using your interests while preventing repeated lesson assignments.",
-    href: "/learn",
-    action: "Continue learning",
-  },
-  {
     icon: MessageCircleMore,
     title: "Extended speaking",
     copy: "Use the full speaking progression and meaning-based response evaluation.",
@@ -49,7 +41,7 @@ const premiumFeatures = [
   {
     icon: TrendingUp,
     title: "Complete insights",
-    copy: "See deeper strength, weakness, mastery, and adaptive-review signals.",
+    copy: "See deeper strength, weakness, mastery, and learning signals.",
     href: "/progress",
     action: "View insights",
   },
@@ -57,12 +49,11 @@ const premiumFeatures = [
 
 const freeIncluded = [
   "Level-matched lessons selected by AIko",
-  "Core story, vocabulary, grammar, and review",
+  "Core six-phase lesson flow",
   "Basic progress and strength/weakness feedback",
 ];
 
 const freeLocked = [
-  "Interest-based lesson recommendations",
   "Custom-topic AI lesson generation",
   "Extended speaking and semantic evaluation",
   "Deeper mastery analytics and adaptive insights",
@@ -76,9 +67,7 @@ export function ProfilePage() {
 }
 
 function PremiumAccountPage() {
-  const onboarding = useAppStore((state) => state.onboarding);
   const subscription = useAppStore((state) => state.subscription);
-  const hasInterests = onboarding.interests.length > 0;
 
   return (
     <AccountLayout eyebrow="Premium account" title="Your complete AIko learning system.">
@@ -92,9 +81,7 @@ function PremiumAccountPage() {
             </div>
             <h2 className="mt-5 text-2xl font-semibold">Everything is unlocked.</h2>
             <p className="mt-2 text-sm leading-6 text-white/65">
-              {hasInterests
-                ? "Your interests are actively shaping lesson selection and custom generation."
-                : "Add interests to your learning profile so AIko can personalise your premium path."}
+              Custom lessons, extended speaking, and complete learning insights are available on this account.
             </p>
             <ButtonLink href="/subscription" className="mt-5 w-full bg-persimmon-500 hover:bg-persimmon-600">
               Premium account details
@@ -120,10 +107,10 @@ function PremiumAccountPage() {
           </section>
           <Card className="p-6 sm:p-7">
             <div className="mb-5">
-              <Badge tone="moss"><Brain className="mr-1 size-3" /> Personalisation active</Badge>
+              <Badge tone="moss"><Brain className="mr-1 size-3" /> Learning profile</Badge>
               <h2 className="mt-3 text-2xl font-semibold">Learning profile</h2>
               <p className="mt-2 text-sm leading-6 text-stone-500">
-                These preferences directly influence premium lesson ranking and AI-generated content.
+                Keep your level, learning goal, and daily study target up to date.
               </p>
             </div>
             <ProfileForm />
@@ -149,7 +136,7 @@ function FreeAccountPage() {
               <Badge tone="neutral">Current free access</Badge>
               <h2 className="mt-3 text-2xl font-semibold">Keep learning at your level.</h2>
               <p className="mt-2 text-sm leading-6 text-stone-500">
-                AIko assigns random, non-repeating lessons at your current level. Interests can be saved, but they do not affect free lesson selection.
+                AIko assigns non-repeating lessons at your current level and records learning evidence as you practise.
               </p>
             </div>
             <div className="grid gap-px bg-stone-100 sm:grid-cols-2">
@@ -161,9 +148,9 @@ function FreeAccountPage() {
           <Card className="border-persimmon-100 bg-persimmon-50/60 p-6 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-7">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[.18em] text-persimmon-700">Unlock the full system</p>
-              <h2 className="mt-2 text-2xl font-semibold">Personalise every part of learning.</h2>
+              <h2 className="mt-2 text-2xl font-semibold">Add more control to learning.</h2>
               <p className="mt-2 max-w-xl text-sm leading-6 text-stone-600">
-                Premium adds custom AI lessons, interest matching, extended speaking, and complete progress insights.
+                Premium adds custom AI lessons, extended speaking, and complete progress insights.
               </p>
             </div>
             <ButtonLink href="/subscription" className="mt-5 shrink-0 bg-persimmon-500 hover:bg-persimmon-600 sm:mt-0">
@@ -175,7 +162,7 @@ function FreeAccountPage() {
             <div className="mb-5">
               <h2 className="text-2xl font-semibold">Learning profile</h2>
               <p className="mt-2 text-sm leading-6 text-stone-500">
-                Your level and study preferences still guide pacing. Saved interests activate after upgrading.
+                Keep your level, learning goal, and daily study target up to date.
               </p>
             </div>
             <ProfileForm />
