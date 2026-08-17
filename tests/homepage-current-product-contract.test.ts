@@ -28,13 +28,14 @@ describe("homepage reflects the current AIko product", () => {
     expect(homepage).not.toContain("Review performance");
   });
 
-  it("does not advertise retired or roadmap Premium features as current", () => {
+  it("does not advertise retired or removed Premium features as current", () => {
     expect(homepage).not.toContain("Advanced reading and pronunciation feedback");
     expect(homepage).not.toContain("Adaptive review and learner memory");
     expect(homepage).not.toContain("Future languages and premium tutors when available");
+    expect(homepage.toLowerCase()).not.toContain("interest");
+    expect(subscription.toLowerCase()).not.toContain("interest");
 
     for (const feature of [
-      "Interest-based lesson recommendations",
       "Custom-topic AI lesson generation",
       "Unlimited adaptive lesson access",
       "Extended speaking practice",
