@@ -54,7 +54,7 @@ export function LessonResult({ lesson, result }: { lesson: LessonPackage; result
             <span className="text-7xl font-semibold tracking-tight text-moss-700">{result.score}</span>
             <span className="mb-2 text-2xl font-semibold text-stone-400">%</span>
           </div>
-          <p className="mt-2 text-sm text-stone-500">{result.score >= 80 ? "Strong retrieval across today’s lesson." : "A solid session with a clear review path."}</p>
+          <p className="mt-2 text-sm text-stone-500">{result.score >= 80 ? "Strong retrieval across today’s lesson." : "A solid session with a few items to strengthen."}</p>
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
@@ -68,15 +68,15 @@ export function LessonResult({ lesson, result }: { lesson: LessonPackage; result
             <h2 className="flex items-center gap-2 font-semibold"><BookOpenCheck className="size-5 text-moss-600" /> Today’s language</h2>
             <div className="mt-5">
               <p className="text-xs font-bold uppercase tracking-wide text-stone-400">Kanji practiced</p>
-              <div className="mt-2 flex gap-2">{lesson.kanji.filter((item) => !item.isReview).map((item) => <span key={item.character} className="grid size-12 place-items-center rounded-2xl bg-moss-50 text-xl font-semibold">{item.character}</span>)}</div>
+              <div className="mt-2 flex gap-2">{lesson.kanji.map((item) => <span key={item.character} className="grid size-12 place-items-center rounded-2xl bg-moss-50 text-xl font-semibold">{item.character}</span>)}</div>
             </div>
             <div className="mt-6">
               <p className="text-xs font-bold uppercase tracking-wide text-stone-400">Grammar practiced</p>
               <div className="mt-2 flex flex-wrap gap-2">{lesson.grammar.map((item) => <Badge key={item.id}>{item.pattern}</Badge>)}</div>
             </div>
             <div className="mt-6">
-              <p className="text-xs font-bold uppercase tracking-wide text-stone-400">Review recommendation</p>
-              <p className="mt-2 text-sm leading-6 text-stone-500">Spend five minutes tomorrow retrieving {result.wordsNeedingReview.join(" and ")} before your next lesson.</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-stone-400">Needs attention</p>
+              <p className="mt-2 text-sm leading-6 text-stone-500">{result.wordsNeedingReview.length ? `Strengthen ${result.wordsNeedingReview.join(" and ")} in future practice.` : "No weak items were detected in this lesson."}</p>
             </div>
           </Card>
           <Card className="p-7">
@@ -93,7 +93,7 @@ export function LessonResult({ lesson, result }: { lesson: LessonPackage; result
         <Card className="mt-6 p-6">
           <button type="button" onClick={() => setShowMistakes((value) => !value)} className="flex min-h-12 w-full items-center gap-3 text-left focus:outline-none focus:ring-4 focus:ring-moss-100">
             <RotateCcw className="size-5 text-persimmon-500" />
-            <div className="flex-1"><p className="font-semibold">Review mistakes</p><p className="text-xs text-stone-400">{result.wordsNeedingReview.length} recommended item{result.wordsNeedingReview.length === 1 ? "" : "s"}</p></div>
+            <div className="flex-1"><p className="font-semibold">Items to strengthen</p><p className="text-xs text-stone-400">{result.wordsNeedingReview.length} item{result.wordsNeedingReview.length === 1 ? "" : "s"}</p></div>
             <ChevronDown className={`size-5 text-stone-400 transition ${showMistakes ? "rotate-180" : ""}`} />
           </button>
           {showMistakes && (
@@ -101,14 +101,14 @@ export function LessonResult({ lesson, result }: { lesson: LessonPackage; result
               {result.wordsNeedingReview.length ? (
                 <div className="flex flex-wrap gap-2">{result.wordsNeedingReview.map((item) => <Badge key={item} tone="orange">{item}</Badge>)}</div>
               ) : (
-                <p className="flex items-center gap-2 text-sm text-moss-700"><Check className="size-4" /> No review mistakes in this lesson.</p>
+                <p className="flex items-center gap-2 text-sm text-moss-700"><Check className="size-4" /> No weak items detected in this lesson.</p>
               )}
             </div>
           )}
         </Card>
 
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Button type="button" variant="secondary" onClick={() => setShowMistakes(true)}><RotateCcw className="size-4" /> Review Mistakes</Button>
+          <Button type="button" variant="secondary" onClick={() => setShowMistakes(true)}><RotateCcw className="size-4" /> See Weak Items</Button>
           <ButtonLink href="/home" variant="dark">Return Home</ButtonLink>
           <ButtonLink href={`/lesson/${lesson.id}/preview`}>Continue Learning <ArrowRight className="size-4" /></ButtonLink>
         </div>
