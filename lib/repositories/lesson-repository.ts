@@ -32,8 +32,7 @@ export interface AssignedLesson {
   assignmentId: string;
   lessonId: string;
   lessonVersionId: string;
-  selectionMode: "free_random" | "pro_interest" | "pro_custom";
-  interestMatches: string[];
+  selectionMode: "standard" | "pro_custom";
   reused: boolean;
 }
 
@@ -48,23 +47,12 @@ function assignmentFromJson(value: unknown): AssignedLesson | null {
     return null;
   }
   const mode = row.selection_mode;
-  if (
-    mode !== "free_random" &&
-    mode !== "pro_interest" &&
-    mode !== "pro_custom"
-  ) {
-    return null;
-  }
+  if (mode !== "standard" && mode !== "pro_custom") return null;
   return {
     assignmentId: row.assignment_id,
     lessonId: row.lesson_id,
     lessonVersionId: row.lesson_version_id,
     selectionMode: mode,
-    interestMatches: Array.isArray(row.interest_matches)
-      ? row.interest_matches.filter(
-          (item): item is string => typeof item === "string",
-        )
-      : [],
     reused: row.reused === true,
   };
 }
