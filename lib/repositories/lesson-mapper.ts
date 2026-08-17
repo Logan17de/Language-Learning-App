@@ -203,7 +203,7 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
   const practice = practiceQuestions(value.practice);
   const kanji = metadataKanji(value.version.metadata);
 
-  const result: LessonPackage = {
+  return {
     id: lesson.legacy_id ?? lesson.id,
     title: metadataText(value.version.metadata, "title") ?? lesson.title,
     japaneseTitle:
@@ -239,7 +239,6 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
     vocabulary,
     vocabularyQuestions: practice.vocabulary,
     grammarQuestions: practice.grammar,
-    reviewItems: value.version.review_items,
     story: value.story.map((item) => {
       const words = value.storyWords
         .filter((word) => word.story_line_id === item.id)
@@ -345,34 +344,10 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
       targetItemIds: item.target_item_ids,
       inspectableTerms: inspectableTerms(item.inspectable_terms),
     })),
-    reviewQuestions: value.review.map((item) => ({
-      id: item.id,
-      prompt: item.prompt,
-      choices: item.choices,
-      correctAnswer: item.correct_answer,
-      explanation: item.explanation,
-      questionType:
-        item.question_type === "ordering" ||
-        item.question_type === "fill-blank" ||
-        item.question_type === "true-false"
-          ? item.question_type
-          : "multiple-choice",
-      category:
-        item.category === "kanji" ||
-        item.category === "vocabulary" ||
-        item.category === "grammar" ||
-        item.category === "listening" ||
-        item.category === "speaking"
-          ? item.category
-          : "vocabulary",
-      targetItemIds: item.target_item_ids,
-    })),
-    answerKeys: value.version.answer_keys,
     phases: normalizeLessonPhases(value.version.phases),
     runtimeAudio:
       metadataText(value.version.metadata, "runtimeAudio") === "browser_tts"
         ? "browser_tts"
         : "stored_or_api",
   };
-  return result;
 }
