@@ -13,6 +13,7 @@ interface BackendLessonState {
   error: string;
   load: () => Promise<void>;
   loadOne: (id: string) => Promise<LessonPackage | undefined>;
+  invalidate: () => void;
 }
 
 export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
@@ -54,4 +55,11 @@ export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
     }));
     return lesson;
   },
+  invalidate: () =>
+    set({
+      lessons: [],
+      loading: false,
+      loaded: false,
+      error: "",
+    }),
 }));
