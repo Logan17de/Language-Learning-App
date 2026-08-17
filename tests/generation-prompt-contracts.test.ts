@@ -36,7 +36,6 @@ describe("custom lesson generation prompt contracts", () => {
     const prompt = storyGenerationPrompt({
       languageLevel: "JLPT N5",
       topic: "A day at school",
-      naturalInterests: ["Books", "Sports"],
       targetGrammar: ["～ながら", "～たいです", "～てもいいです"],
       targetKanji: ["学", "校", "友", "食", "見"],
     });
@@ -45,11 +44,11 @@ describe("custom lesson generation prompt contracts", () => {
     expect(prompt).toContain("Naturally use every provided target grammar pattern at least once.");
     expect(prompt).toContain("Naturally use every provided target kanji at least once.");
     expect(prompt).toContain("one continuous string, not an array");
+    expect(prompt.toLowerCase()).not.toContain("interest");
     expect(storyGenerationSchema).toMatchObject({
       type: "object",
       additionalProperties: false,
       required: [
-        "selected_interest",
         "japanese_title",
         "english_title",
         "japanese_story",
@@ -134,12 +133,12 @@ describe("custom lesson generation prompt contracts", () => {
     const passagePrompt = readingPassagePrompt({
       languageLevel: "JLPT N5",
       topic: "A day at school",
-      naturalInterests: ["Books"],
       targetGrammar: ["～たい"],
       targetKanji: ["学"],
     });
     expect(passagePrompt).toContain("Generate a Japanese language-learning story.");
     expect(passagePrompt).toContain("Write one coherent story containing 10–15 natural Japanese sentences.");
+    expect(passagePrompt.toLowerCase()).not.toContain("interest");
     expect(readingPassageSchema).toBe(storyGenerationSchema);
 
     const questionsPrompt = readingQuestionsPrompt({
