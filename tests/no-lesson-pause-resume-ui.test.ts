@@ -15,8 +15,8 @@ describe("lesson pause and resume UX stays retired", () => {
     expect(preview).not.toContain('"Resume lesson"');
     expect(preview).not.toContain("saved progress in this lesson");
     expect(preview).not.toContain("Your progress will be saved locally");
-    expect(preview).toContain("Finish the lesson in one session.");
-    expect(preview).toContain("there is no Pause or Resume action");
+    expect(preview).toContain("This lesson is designed for one sitting.");
+    expect(preview).toContain("There is no pause or resume inside a lesson.");
   });
 
   it("warns before an explicit lesson exit", () => {
@@ -25,8 +25,10 @@ describe("lesson pause and resume UX stays retired", () => {
     expect(player).toContain("start from the beginning next time");
   });
 
-  it("sets the same expectation before starting from Home or Learn", () => {
-    expect(home).toContain("AIko does not pause lessons for later");
-    expect(learn).toContain("lessons are not paused for later");
+  it("routes Home and Learn through the commitment preview before playback", () => {
+    expect(home).toContain("/preview");
+    expect(home).not.toContain("selectedLesson.id}/play");
+    expect(learn).toContain("/preview");
+    expect(learn).toContain("Complete in one sitting");
   });
 });
