@@ -26,7 +26,7 @@ type GenerationResult = {
   error?: string;
 };
 
-const openingStages = ["Writing your story", "Opening the lesson reader"];
+const openingStages = ["Writing your story", "Opening your lesson"];
 
 export function CustomTopicPage() {
   const router = useRouter();
@@ -65,7 +65,7 @@ export function CustomTopicPage() {
         | null;
       if (!response.ok) {
         setError(
-          result?.error || "AIko could not create this story. Please try again.",
+          result?.error || "AIko could not create this lesson. Please try again.",
         );
         setState("error");
         return;
@@ -75,14 +75,14 @@ export function CustomTopicPage() {
         return;
       }
       if (!result?.requestId) {
-        setError("The generation request was not queued. Please try again.");
+        setError("The lesson request could not be started. Please try again.");
         setState("error");
         return;
       }
       router.replace(`/lesson/building/${encodeURIComponent(result.requestId)}`);
     } catch {
       setError(
-        "The connection was interrupted while queuing your story. Please try again.",
+        "The connection was interrupted while starting your lesson. Please try again.",
       );
       setState("error");
     }
@@ -97,11 +97,10 @@ export function CustomTopicPage() {
             Pro feature
           </Badge>
           <h1 className="mt-4 max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
-            Turn your topic into a complete Japanese lesson.
+            Choose the context. AIko builds the lesson.
           </h1>
-          <p className="mt-5 max-w-xl leading-7 text-white/65">
-            Pro combines your topic and current JLPT level to create a story and
-            the full seven-stage lesson package.
+          <p className="mt-5 max-w-2xl leading-7 text-white/65">
+            Pick a topic and Japanese level. AIko turns it into the same six-phase learning experience: story, vocabulary + kanji, grammar, reading, listening, and speaking.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <ButtonLink
@@ -115,7 +114,7 @@ export function CustomTopicPage() {
               variant="secondary"
               className="border-white/20 bg-white/10 text-white hover:bg-white/15"
             >
-              Return to my lesson
+              Return to my learning path
             </ButtonLink>
           </div>
         </div>
@@ -131,21 +130,19 @@ export function CustomTopicPage() {
         <ButtonLink href="/learn" variant="ghost" className="px-0">
           <ArrowLeft className="size-4" /> My learning path
         </ButtonLink>
-        <p className="section-kicker mt-6">Pro custom topic</p>
+        <p className="section-kicker mt-6">Custom lesson</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight">
-          What should your next story be about?
+          Learn Japanese through something you care about.
         </h1>
         <p className="mt-3 max-w-2xl leading-7 text-stone-500">
-          Once the story passes its checks, AIko opens it directly in the lesson
-          reader. The remaining lesson readiness stays visible beside your
-          reading.
+          Give AIko a topic and level. It writes the story first so you can start reading, then builds the other five practice phases from the same language.
         </p>
       </header>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
         <Card className="p-6 sm:p-7">
           <form className="space-y-5" onSubmit={submit}>
-            <Field label="Topic">
+            <Field label="What do you want to learn through?">
               <input
                 required
                 minLength={2}
@@ -157,7 +154,7 @@ export function CustomTopicPage() {
                 placeholder="A sustainable farm, my first day at work…"
               />
             </Field>
-            <Field label="Level">
+            <Field label="Japanese level">
               <select
                 value={level}
                 onChange={(event) =>
@@ -189,7 +186,7 @@ export function CustomTopicPage() {
               ) : (
                 <WandSparkles className="size-4" />
               )}
-              {busy ? "Writing your story…" : "Create my lesson"}
+              {busy ? "Starting your lesson…" : "Create my lesson"}
             </Button>
           </form>
         </Card>
@@ -197,13 +194,12 @@ export function CustomTopicPage() {
         <Card className="min-h-[25rem] p-7 sm:p-9">
           {busy ? (
             <div role="status" aria-live="polite">
-              <Badge tone="moss">Story generation</Badge>
+              <Badge tone="moss">Building your lesson</Badge>
               <h2 className="mt-4 text-2xl font-semibold">
-                AIko is preparing the first phase.
+                AIko writes the story first.
               </h2>
               <p className="mt-3 text-sm leading-6 text-stone-500">
-                This page is only the launch screen. The approved story will
-                open automatically in the full lesson layout.
+                As soon as the story is ready, it opens in the lesson reader. Vocabulary, grammar, reading, listening, and speaking continue preparing from that same story.
               </p>
               <div className="mt-7">
                 <GenerationProgress stages={openingStages} currentIndex={0} />
@@ -211,9 +207,9 @@ export function CustomTopicPage() {
             </div>
           ) : (
             <div>
-              <Badge tone="moss">How it opens</Badge>
+              <Badge tone="moss">What AIko builds</Badge>
               <h2 className="mt-4 text-2xl font-semibold">
-                Start reading without waiting for the whole lesson.
+                Your topic becomes a complete learning loop.
               </h2>
               <div className="mt-7 space-y-5">
                 <div className="flex gap-4">
@@ -221,10 +217,9 @@ export function CustomTopicPage() {
                     <BookOpen className="size-5" />
                   </span>
                   <div>
-                    <p className="font-semibold">Story opens in the real reader</p>
+                    <p className="font-semibold">1. A story at your level</p>
                     <p className="mt-1 text-sm leading-6 text-stone-500">
-                      Supported story words remain tappable, and story audio stays
-                      off.
+                      AIko turns your topic into Japanese you can read in context, with supported words available to inspect.
                     </p>
                   </div>
                 </div>
@@ -233,10 +228,9 @@ export function CustomTopicPage() {
                     <LoaderCircle className="size-5" />
                   </span>
                   <div>
-                    <p className="font-semibold">Activities build beside you</p>
+                    <p className="font-semibold">2. Five practice phases from the same story</p>
                     <p className="mt-1 text-sm leading-6 text-stone-500">
-                      The readiness panel tracks questions, quality checks,
-                      saving, and audio.
+                      Vocabulary + kanji, grammar, reading, listening, and speaking all reuse the language you just met.
                     </p>
                   </div>
                 </div>
@@ -245,12 +239,9 @@ export function CustomTopicPage() {
                     <CheckCircle2 className="size-5" />
                   </span>
                   <div>
-                    <p className="font-semibold">
-                      Continue when vocabulary is ready
-                    </p>
+                    <p className="font-semibold">3. Start before every asset is finished</p>
                     <p className="mt-1 text-sm leading-6 text-stone-500">
-                      Listening and speaking audio may continue preparing in the
-                      background.
+                      You can begin with the story while later activities and audio continue preparing.
                     </p>
                   </div>
                 </div>
