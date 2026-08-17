@@ -13,7 +13,10 @@ import {
   storyCheckpointIssues,
   type ActivityGroupName,
 } from "@/lib/custom-lessons/checkpoint-validation";
-import { saveGenerationTrace, withGenerationTraceContext } from "@/lib/custom-lessons/generation-trace";
+import {
+  saveGenerationTrace,
+  withGenerationTraceContext,
+} from "@/lib/custom-lessons/generation-trace";
 import { ensureLessonPlanTeachingRecords } from "@/lib/custom-lessons/placeholder-enrichment";
 import {
   classifyGenerationError,
@@ -24,14 +27,12 @@ import {
 import { generateAdaptiveStoryDraft } from "@/lib/gemini/adaptive-story-generation";
 import {
   assemblePlayableLesson,
-  generateFinalReviewActivities,
   generateGrammarAndReadingActivities,
   generateListeningAndSpeakingActivities,
   generateVocabularyAndKanjiActivities,
   type ActivityGroups,
   type CommunicationGroup,
   type GrammarReadingGroup,
-  type ReviewGroup,
   type VocabularyKanjiGroup,
 } from "@/lib/gemini/lesson-activity-groups";
 import type {
@@ -42,7 +43,10 @@ import type {
 import { selectLessonPlanV3 } from "@/lib/gemini/lesson-plan-v3";
 import { enrichGeneratedStoryVocabulary } from "@/lib/gemini/simple-story-enrichment";
 import { resolveStoryFromExistingLibrary } from "@/lib/gemini/story-library-existing-only";
-import type { LessonPlanV3, StoryOnlyDraft } from "@/lib/gemini/story-pipeline-v3";
+import type {
+  LessonPlanV3,
+  StoryOnlyDraft,
+} from "@/lib/gemini/story-pipeline-v3";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database, Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
@@ -73,7 +77,6 @@ export interface ProgressiveLessonJob {
   vocabulary_kanji_group: Json | null;
   grammar_reading_group: Json | null;
   communication_group: Json | null;
-  review_group: Json | null;
   worker_token: string | null;
   claimed_at: string | null;
   last_action: string | null;
@@ -97,8 +100,7 @@ type AdminClient = SupabaseClient;
 type GroupPayload =
   | VocabularyKanjiGroup
   | GrammarReadingGroup
-  | CommunicationGroup
-  | ReviewGroup;
+  | CommunicationGroup;
 
 function adminClient(): AdminClient {
   return createAdminClient() as unknown as AdminClient;
@@ -113,7 +115,14 @@ function text(value: unknown): string | null {
 }
 
 function asJob(value: unknown): ProgressiveLessonJob | null {
-  if (!isRecord(value) || !text(value.request_id) || !text(value.user_id) || !text(value.topic)) return null;
+  if (
+    !isRecord(value) ||
+    !text(value.request_id) ||
+    !text(value.user_id) ||
+    !text(value.topic)
+  ) {
+    return null;
+  }
   return value as unknown as ProgressiveLessonJob;
 }
 
@@ -130,8 +139,10 @@ function auditEntries(value: Json): GenerationAuditEntry[] {
   const entries: GenerationAuditEntry[] = [];
   for (const entry of value) {
     if (
-      isRecord(entry) && typeof entry.stage === "string" &&
-      typeof entry.model === "string" && typeof entry.repaired === "boolean"
+      isRecord(entry) &&
+      typeof entry.stage === "string" &&
+      typeof entry.model === "string" &&
+      typeof entry.repaired === "boolean"
     ) {
       entries.push(entry as unknown as GenerationAuditEntry);
     }
@@ -143,7 +154,9 @@ function resultRecord(value: unknown): Record<string, unknown> {
   return isRecord(value) ? value : {};
 }
 
-function storyKanjiCounts(draft: StoryOnlyDraft): Array<{ character: string; count: number }> {
+function storyKanjiCounts(
+  draft: StoryOnlyDraft,
+): Array<{ character: string; count: number }> {
   const counts = new Map<string, number>();
   for (const line of draft.lines) {
     for (const character of line.japanese.match(/\p{Script=Han}/gu) ?? []) {
@@ -153,31 +166,52 @@ function storyKanjiCounts(draft: StoryOnlyDraft): Array<{ character: string; cou
   return [...counts].map(([character, count]) => ({ character, count }));
 }
 
-function groupPayload(job: ProgressiveLessonJob, group: ActivityGroupName): Json | null {
+function groupPayload(
+  job: ProgressiveLessonJob,
+  group: ActivityGroupName,
+): Json | null {
   if (group === "vocabulary_and_kanji") return job.vocabulary_kanji_group;
   if (group === "grammar_and_reading") return job.grammar_reading_group;
-  if (group === "listening_and_speaking") return job.communication_group;
-  return job.review_group;
+  return job.communication_group;
 }
 
-function checkpoints(job: ProgressiveLessonJob): Partial<Record<ActivityGroupName, unknown>> {
-  return Object.fromEntries(ACTIVITY_GROUPS.map((group) => [group, groupPayload(job, group)]));
+function checkpoints(
+  job: ProgressiveLessonJob,
+): Partial<Record<ActivityGroupName, unknown>> {
+  return Object.fromEntries(
+    ACTIVITY_GROUPS.map((group) => [group, groupPayload(job, group)]),
+  );
 }
 
 function groupsFromJob(job: ProgressiveLessonJob): ActivityGroups | null {
-  if (!isRecord(job.vocabulary_kanji_group) || !isRecord(job.grammar_reading_group) ||
-      !isRecord(job.communication_group) || !isRecord(job.review_group)) return null;
+  if (
+    !isRecord(job.vocabulary_kanji_group) ||
+    !isRecord(job.grammar_reading_group) ||
+    !isRecord(job.communication_group)
+  ) {
+    return null;
+  }
   return {
-    vocabularyAndKanji: job.vocabulary_kanji_group as unknown as VocabularyKanjiGroup,
-    grammarAndReading: job.grammar_reading_group as unknown as GrammarReadingGroup,
+    vocabularyAndKanji:
+      job.vocabulary_kanji_group as unknown as VocabularyKanjiGroup,
+    grammarAndReading:
+      job.grammar_reading_group as unknown as GrammarReadingGroup,
     communication: job.communication_group as unknown as CommunicationGroup,
-    review: job.review_group as unknown as ReviewGroup,
   };
 }
 
-async function loadJob(admin: AdminClient, requestId: string): Promise<ProgressiveLessonJob | null> {
-  const found = await admin.from("progressive_lesson_drafts").select("*").eq("request_id", requestId).maybeSingle();
-  if (found.error) throw Object.assign(new Error(found.error.message), { code: found.error.code });
+async function loadJob(
+  admin: AdminClient,
+  requestId: string,
+): Promise<ProgressiveLessonJob | null> {
+  const found = await admin
+    .from("progressive_lesson_drafts")
+    .select("*")
+    .eq("request_id", requestId)
+    .maybeSingle();
+  if (found.error) {
+    throw Object.assign(new Error(found.error.message), { code: found.error.code });
+  }
   return asJob(found.data);
 }
 
@@ -194,18 +228,34 @@ async function claimedUpdate(
     .eq("worker_token", job.worker_token)
     .select("request_id")
     .maybeSingle();
-  if (saved.error) throw Object.assign(new Error(saved.error.message), { code: saved.error.code });
-  if (!saved.data) throw Object.assign(new Error("Generation job is no longer claimed."), { code: "40001" });
+  if (saved.error) {
+    throw Object.assign(new Error(saved.error.message), { code: saved.error.code });
+  }
+  if (!saved.data) {
+    throw Object.assign(new Error("Generation job is no longer claimed."), {
+      code: "40001",
+    });
+  }
 }
 
-async function failRequestPermanently(admin: AdminClient, requestId: string, message: string): Promise<void> {
+async function failRequestPermanently(
+  admin: AdminClient,
+  requestId: string,
+  message: string,
+): Promise<void> {
   await Promise.all([
-    admin.from("custom_lesson_requests").update({ status: "failed", updated_at: new Date().toISOString() }).eq("id", requestId),
-    admin.from("generated_lesson_jobs").update({
-      status: "failed",
-      error_message: message.slice(0, 500),
-      updated_at: new Date().toISOString(),
-    }).eq("custom_lesson_request_id", requestId),
+    admin
+      .from("custom_lesson_requests")
+      .update({ status: "failed", updated_at: new Date().toISOString() })
+      .eq("id", requestId),
+    admin
+      .from("generated_lesson_jobs")
+      .update({
+        status: "failed",
+        error_message: message.slice(0, 500),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("custom_lesson_request_id", requestId),
   ]);
 }
 
@@ -235,7 +285,8 @@ async function finishStage(
     requestId: job.request_id,
     status: nextStage,
     lessonReady: Boolean(values.lesson_id ?? job.lesson_id),
-    audioStatus: (values.audio_status ?? job.audio_status) as ProgressiveLessonJob["audio_status"],
+    audioStatus: (values.audio_status ??
+      job.audio_status) as ProgressiveLessonJob["audio_status"],
   };
 }
 
@@ -249,12 +300,14 @@ async function scheduleFailure(input: {
   error: unknown;
 }): Promise<CustomLessonWorkerResult> {
   const failure = classifyGenerationError(input.error);
-  const exhausted = input.attempt >= (input.group ? MAX_GROUP_ATTEMPTS : MAX_STAGE_ATTEMPTS);
+  const exhausted =
+    input.attempt >= (input.group ? MAX_GROUP_ATTEMPTS : MAX_STAGE_ATTEMPTS);
   const permanent = !failure.retryable || exhausted;
   const durationMs = Date.now() - input.startedAt;
-  const delayMs = failure.classification === "content"
-    ? 1_000
-    : retryBackoffMs(input.attempt, Math.random());
+  const delayMs =
+    failure.classification === "content"
+      ? 1_000
+      : retryBackoffMs(input.attempt, Math.random());
   const nextAttemptAt = new Date(Date.now() + delayMs).toISOString();
   await claimedUpdate(input.admin, input.job, {
     status: permanent ? "permanent_failure" : "retryable_failure",
@@ -266,11 +319,18 @@ async function scheduleFailure(input: {
     failure_classification: failure.classification,
     provider_request_id: failure.providerRequestId,
     last_duration_ms: durationMs,
-    last_action: failure.classification === "content" ? "regenerated" : "resumed",
+    last_action:
+      failure.classification === "content" ? "regenerated" : "resumed",
     worker_token: null,
     claimed_at: null,
   });
-  if (permanent) await failRequestPermanently(input.admin, input.job.request_id, failure.message);
+  if (permanent) {
+    await failRequestPermanently(
+      input.admin,
+      input.job.request_id,
+      failure.message,
+    );
+  }
 
   const metadata = {
     requestId: input.job.request_id,
@@ -280,13 +340,21 @@ async function scheduleFailure(input: {
     errorClassification: failure.classification,
     providerRequestId: failure.providerRequestId,
     durationMs,
-    action: failure.classification === "content" ? "regenerated" : "resumed",
+    action:
+      failure.classification === "content" ? "regenerated" : "resumed",
     permanent,
     delayMs: permanent ? null : delayMs,
   };
-  console.error("Custom lesson stage failed.", { ...metadata, message: failure.message });
+  console.error("Custom lesson stage failed.", {
+    ...metadata,
+    message: failure.message,
+  });
   await saveGenerationTrace({
-    trace: { requestId: input.job.request_id, stage: input.stage, group: input.group },
+    trace: {
+      requestId: input.job.request_id,
+      stage: input.stage,
+      group: input.group,
+    },
     name: input.group ?? input.stage,
     eventType: "stage_failure",
     attempt: input.attempt,
@@ -310,25 +378,61 @@ function collectIds(value: unknown, output = new Set<string>()): Set<string> {
   }
   if (!isRecord(value)) return output;
   for (const [key, child] of Object.entries(value)) {
-    if ((key === "libraryId" || key === "targetItemIds") && typeof child === "string") output.add(child);
-    if (key === "targetItemIds" && Array.isArray(child)) child.forEach((id) => { if (typeof id === "string") output.add(id); });
+    if (
+      (key === "libraryId" || key === "targetItemIds") &&
+      typeof child === "string"
+    ) {
+      output.add(child);
+    }
+    if (key === "targetItemIds" && Array.isArray(child)) {
+      child.forEach((id) => {
+        if (typeof id === "string") output.add(id);
+      });
+    }
     collectIds(child, output);
   }
   return output;
 }
 
-async function existingLibraryIds(admin: AdminClient, ...values: unknown[]): Promise<Set<string>> {
-  const requested = [...values.reduce<Set<string>>((ids, value) => collectIds(value, ids), new Set<string>())];
+async function existingLibraryIds(
+  admin: AdminClient,
+  ...values: unknown[]
+): Promise<Set<string>> {
+  const requested = [
+    ...values.reduce<Set<string>>(
+      (ids, value) => collectIds(value, ids),
+      new Set<string>(),
+    ),
+  ];
   if (requested.length < 1) return new Set();
   const [kanji, vocabulary, grammar] = await Promise.all([
-    admin.from("kanji_records").select("id").in("id", requested).is("archived_at", null).neq("quality_status", "rejected"),
-    admin.from("vocabulary_records").select("id").in("id", requested).is("archived_at", null).neq("quality_status", "rejected"),
-    admin.from("grammar_records").select("id").in("id", requested).is("archived_at", null).neq("quality_status", "rejected"),
+    admin
+      .from("kanji_records")
+      .select("id")
+      .in("id", requested)
+      .is("archived_at", null)
+      .neq("quality_status", "rejected"),
+    admin
+      .from("vocabulary_records")
+      .select("id")
+      .in("id", requested)
+      .is("archived_at", null)
+      .neq("quality_status", "rejected"),
+    admin
+      .from("grammar_records")
+      .select("id")
+      .in("id", requested)
+      .is("archived_at", null)
+      .neq("quality_status", "rejected"),
   ]);
   const error = kanji.error ?? vocabulary.error ?? grammar.error;
-  if (error) throw Object.assign(new Error(error.message), { code: error.code });
-  return new Set([...(kanji.data ?? []), ...(vocabulary.data ?? []), ...(grammar.data ?? [])]
-    .flatMap((row) => typeof row.id === "string" ? [row.id] : []));
+  if (error) {
+    throw Object.assign(new Error(error.message), { code: error.code });
+  }
+  return new Set(
+    [...(kanji.data ?? []), ...(vocabulary.data ?? []), ...(grammar.data ?? [])]
+      .flatMap((row) => (typeof row.id === "string" ? [row.id] : [])),
+  );
 }
 
 async function invalidateGroup(
@@ -343,7 +447,11 @@ async function invalidateGroup(
     p_group: group,
     p_reason: reason.slice(0, 1_000),
   });
-  if (invalidated.error) throw Object.assign(new Error(invalidated.error.message), { code: invalidated.error.code });
+  if (invalidated.error) {
+    throw Object.assign(new Error(invalidated.error.message), {
+      code: invalidated.error.code,
+    });
+  }
 }
 
 async function persistGroup(
@@ -360,7 +468,9 @@ async function persistGroup(
     p_payload: payload as unknown as Json,
     p_audit: audit as unknown as Json,
   });
-  if (saved.error) throw Object.assign(new Error(saved.error.message), { code: saved.error.code });
+  if (saved.error) {
+    throw Object.assign(new Error(saved.error.message), { code: saved.error.code });
+  }
 }
 
 async function generateGroup(
@@ -374,13 +484,19 @@ async function generateGroup(
     library: ResolvedLessonLibrary;
   },
 ): Promise<{ value: GroupPayload; audit: GenerationAuditEntry }> {
-  if (group === "vocabulary_and_kanji") return generateVocabularyAndKanjiActivities(input);
-  if (group === "grammar_and_reading") return generateGrammarAndReadingActivities(input);
-  if (group === "listening_and_speaking") return generateListeningAndSpeakingActivities(input);
-  return generateFinalReviewActivities(input);
+  if (group === "vocabulary_and_kanji") {
+    return generateVocabularyAndKanjiActivities(input);
+  }
+  if (group === "grammar_and_reading") {
+    return generateGrammarAndReadingActivities(input);
+  }
+  return generateListeningAndSpeakingActivities(input);
 }
 
-async function processStory(admin: AdminClient, job: ProgressiveLessonJob): Promise<CustomLessonWorkerResult> {
+async function processStory(
+  admin: AdminClient,
+  job: ProgressiveLessonJob,
+): Promise<CustomLessonWorkerResult> {
   const plan = await selectLessonPlanV3(
     admin as unknown as SupabaseClient<Database>,
     job.user_id,
@@ -394,11 +510,16 @@ async function processStory(admin: AdminClient, job: ProgressiveLessonJob): Prom
     plan,
   });
   const issues = storyCheckpointIssues(story.draft);
-  if (issues.length > 0) throw new Error(`Story checkpoint validation failed: ${issues.join(" ")}`);
+  if (issues.length > 0) {
+    throw new Error(`Story checkpoint validation failed: ${issues.join(" ")}`);
+  }
   const result = await finishStage(admin, job, "vocabulary_enrichment", 10, {
     lesson_plan: plan as unknown as Json,
     story_draft: story.draft as unknown as Json,
-    generation_audit: [...auditEntries(job.generation_audit), story.audit] as unknown as Json,
+    generation_audit: [
+      ...auditEntries(job.generation_audit),
+      story.audit,
+    ] as unknown as Json,
   });
   const exposureStartedAt = Date.now();
   const exposures = await admin.rpc("record_story_kanji_exposures_background", {
@@ -417,7 +538,11 @@ async function processStory(admin: AdminClient, job: ProgressiveLessonJob): Prom
       action: "resumed",
     });
     await saveGenerationTrace({
-      trace: { requestId: job.request_id, stage: "story_building", group: "kanji_exposure" },
+      trace: {
+        requestId: job.request_id,
+        stage: "story_building",
+        group: "kanji_exposure",
+      },
       name: "kanji_exposure",
       eventType: "stage_failure",
       attempt: numericAttempt(job.stage_attempts, "story_building"),
@@ -438,10 +563,17 @@ async function processStory(admin: AdminClient, job: ProgressiveLessonJob): Prom
   return result;
 }
 
-async function processVocabularyEnrichment(admin: AdminClient, job: ProgressiveLessonJob): Promise<CustomLessonWorkerResult> {
+async function processVocabularyEnrichment(
+  admin: AdminClient,
+  job: ProgressiveLessonJob,
+): Promise<CustomLessonWorkerResult> {
   const draft = job.story_draft as unknown as StoryOnlyDraft;
   const storyIssues = storyCheckpointIssues(draft);
-  if (storyIssues.length > 0) throw new Error(`Story checkpoint validation failed: ${storyIssues.join(" ")}`);
+  if (storyIssues.length > 0) {
+    throw new Error(
+      `Story checkpoint validation failed: ${storyIssues.join(" ")}`,
+    );
+  }
   const enrichment = await enrichGeneratedStoryVocabulary({
     admin,
     requestId: job.request_id,
@@ -449,15 +581,23 @@ async function processVocabularyEnrichment(admin: AdminClient, job: ProgressiveL
     draft,
   });
   return finishStage(admin, job, "library_resolution", 16, {
-    generation_audit: [...auditEntries(job.generation_audit), enrichment.audit] as unknown as Json,
+    generation_audit: [
+      ...auditEntries(job.generation_audit),
+      enrichment.audit,
+    ] as unknown as Json,
   });
 }
 
-async function processLibraryResolution(admin: AdminClient, job: ProgressiveLessonJob): Promise<CustomLessonWorkerResult> {
+async function processLibraryResolution(
+  admin: AdminClient,
+  job: ProgressiveLessonJob,
+): Promise<CustomLessonWorkerResult> {
   const plan = job.lesson_plan as unknown as LessonPlanV3;
   const draft = job.story_draft as unknown as StoryOnlyDraft;
   if (!plan || !Array.isArray(plan.kanji) || !Array.isArray(plan.grammar)) {
-    throw new Error("Story plan checkpoint validation failed: selected targets are missing.");
+    throw new Error(
+      "Story plan checkpoint validation failed: selected targets are missing.",
+    );
   }
   const enrichmentAudit = await ensureLessonPlanTeachingRecords({
     admin,
@@ -475,7 +615,9 @@ async function processLibraryResolution(admin: AdminClient, job: ProgressiveLess
     ...storyCheckpointIssues(resolved.draft),
     ...resolvedLibraryCheckpointIssues(resolved.library, validIds),
   ];
-  if (issues.length > 0) throw new Error(`Library checkpoint validation failed: ${issues.join(" ")}`);
+  if (issues.length > 0) {
+    throw new Error(`Library checkpoint validation failed: ${issues.join(" ")}`);
+  }
   return finishStage(admin, job, "activity_groups", 22, {
     story_draft: resolved.draft as unknown as Json,
     library_snapshot: resolved.library as unknown as Json,
@@ -487,7 +629,10 @@ async function processLibraryResolution(admin: AdminClient, job: ProgressiveLess
   });
 }
 
-async function processActivityGroup(admin: AdminClient, job: ProgressiveLessonJob): Promise<CustomLessonWorkerResult> {
+async function processActivityGroup(
+  admin: AdminClient,
+  job: ProgressiveLessonJob,
+): Promise<CustomLessonWorkerResult> {
   const startedAt = Date.now();
   const draft = job.story_draft as unknown as StoryDraft;
   const library = job.library_snapshot as unknown as ResolvedLessonLibrary;
@@ -501,15 +646,23 @@ async function processActivityGroup(admin: AdminClient, job: ProgressiveLessonJo
     });
   }
   let current = job;
-  let inspection = inspectPersistedActivityCheckpoints(checkpoints(current), validIds);
-  const invalidatedGroups = new Set(inspection.invalid.map((item) => item.group));
+  let inspection = inspectPersistedActivityCheckpoints(
+    checkpoints(current),
+    validIds,
+  );
+  const invalidatedGroups = new Set(
+    inspection.invalid.map((item) => item.group),
+  );
   for (const invalid of inspection.invalid) {
     await invalidateGroup(admin, current, invalid.group, invalid.issues.join(" "));
   }
   if (inspection.invalid.length > 0) {
-    current = await loadJob(admin, job.request_id) ?? job;
+    current = (await loadJob(admin, job.request_id)) ?? job;
     validIds = await existingLibraryIds(admin, library, checkpoints(current));
-    inspection = inspectPersistedActivityCheckpoints(checkpoints(current), validIds);
+    inspection = inspectPersistedActivityCheckpoints(
+      checkpoints(current),
+      validIds,
+    );
   }
 
   const group = inspection.missing[0];
@@ -523,7 +676,9 @@ async function processActivityGroup(admin: AdminClient, job: ProgressiveLessonJo
       group,
       attempt,
       startedAt,
-      error: new Error(`${group} checkpoint validation failed after ${MAX_GROUP_ATTEMPTS} attempts.`),
+      error: new Error(
+        `${group} checkpoint validation failed after ${MAX_GROUP_ATTEMPTS} attempts.`,
+      ),
     });
   }
   const groupAttempts = {
@@ -541,21 +696,33 @@ async function processActivityGroup(admin: AdminClient, job: ProgressiveLessonJo
   try {
     const generated = await withGenerationTraceContext(
       { requestId: current.request_id, stage: "activity_groups", group },
-      () => generateGroup(group, {
-        requestId: current.request_id,
-        admin,
-        topic: current.topic,
-        level: current.jlpt_level,
-        draft,
-        library,
-      }),
+      () =>
+        generateGroup(group, {
+          requestId: current.request_id,
+          admin,
+          topic: current.topic,
+          level: current.jlpt_level,
+          draft,
+          library,
+        }),
     );
-    const normalized = normalizeGeneratedCheckpoint(generated.value) as GroupPayload;
+    const normalized = normalizeGeneratedCheckpoint(
+      generated.value,
+    ) as GroupPayload;
     const ids = await existingLibraryIds(admin, library, normalized);
     const issues = activityGroupCheckpointIssues(group, normalized, ids);
-    if (issues.length > 0) throw new Error(`${group} checkpoint validation failed: ${issues.join(" ")}`);
+    if (issues.length > 0) {
+      throw new Error(
+        `${group} checkpoint validation failed: ${issues.join(" ")}`,
+      );
+    }
     await persistGroup(admin, current, group, normalized, generated.audit);
-    return finishStage(admin, current, "activity_groups", Math.min(74, 26 + (inspection.valid.length + 1) * 12));
+    return finishStage(
+      admin,
+      current,
+      "activity_groups",
+      Math.min(74, 26 + (inspection.valid.length + 1) * 12),
+    );
   } catch (error) {
     return scheduleFailure({
       admin,
@@ -569,7 +736,10 @@ async function processActivityGroup(admin: AdminClient, job: ProgressiveLessonJo
   }
 }
 
-async function processFinalValidation(admin: AdminClient, job: ProgressiveLessonJob): Promise<CustomLessonWorkerResult> {
+async function processFinalValidation(
+  admin: AdminClient,
+  job: ProgressiveLessonJob,
+): Promise<CustomLessonWorkerResult> {
   const library = job.library_snapshot as unknown as ResolvedLessonLibrary;
   const validIds = await existingLibraryIds(admin, library, checkpoints(job));
   const libraryIssues = resolvedLibraryCheckpointIssues(library, validIds);
@@ -580,12 +750,17 @@ async function processFinalValidation(admin: AdminClient, job: ProgressiveLesson
       last_action: "invalidated_checkpoint",
     });
   }
-  const inspection = inspectPersistedActivityCheckpoints(checkpoints(job), validIds);
+  const inspection = inspectPersistedActivityCheckpoints(
+    checkpoints(job),
+    validIds,
+  );
   if (inspection.invalid.length > 0) {
     for (const invalid of inspection.invalid) {
       await invalidateGroup(admin, job, invalid.group, invalid.issues.join(" "));
     }
-    return finishStage(admin, job, "activity_groups", 78, { last_action: "invalidated_checkpoint" });
+    return finishStage(admin, job, "activity_groups", 78, {
+      last_action: "invalidated_checkpoint",
+    });
   }
   const groups = groupsFromJob(job);
   if (!groups || inspection.missing.length > 0) {
@@ -593,7 +768,11 @@ async function processFinalValidation(admin: AdminClient, job: ProgressiveLesson
   }
   const audit = [
     ...auditEntries(job.generation_audit),
-    { stage: "lesson_assembly", model: "deterministic", repaired: false } as GenerationAuditEntry,
+    {
+      stage: "lesson_assembly",
+      model: "deterministic",
+      repaired: false,
+    } as GenerationAuditEntry,
   ];
   const lesson = assemblePlayableLesson({
     topic: job.topic,
@@ -605,15 +784,29 @@ async function processFinalValidation(admin: AdminClient, job: ProgressiveLesson
   });
   const issues = playableLessonPackageIssues(lesson);
   if (issues.length > 0) {
-    const groupsToInvalidate = [...new Set(issues.flatMap((issue) => {
-      const group = groupForPackageIssue(issue);
-      return group ? [group] : [];
-    }))];
+    const groupsToInvalidate = [
+      ...new Set(
+        issues.flatMap((issue) => {
+          const group = groupForPackageIssue(issue);
+          return group ? [group] : [];
+        }),
+      ),
+    ];
     if (groupsToInvalidate.length > 0) {
-      for (const group of groupsToInvalidate) await invalidateGroup(admin, job, group, issues.join(" "));
-      return finishStage(admin, job, "activity_groups", 78, { last_action: "invalidated_checkpoint" });
+      for (const group of groupsToInvalidate) {
+        await invalidateGroup(admin, job, group, issues.join(" "));
+      }
+      return finishStage(admin, job, "activity_groups", 78, {
+        last_action: "invalidated_checkpoint",
+      });
     }
-    if (issues.some((issue) => /story|lesson requires non-empty (title|japaneseTitle|summary)/iu.test(issue))) {
+    if (
+      issues.some((issue) =>
+        /story|lesson requires non-empty (title|japaneseTitle|summary)/iu.test(
+          issue,
+        ),
+      )
+    ) {
       return finishStage(admin, job, "story_building", 10, {
         lesson_plan: null,
         story_draft: null,
@@ -622,7 +815,6 @@ async function processFinalValidation(admin: AdminClient, job: ProgressiveLesson
         vocabulary_kanji_group: null,
         grammar_reading_group: null,
         communication_group: null,
-        review_group: null,
         completed_groups: [],
         failed_groups: [],
         group_attempts: {},
@@ -637,7 +829,9 @@ async function processFinalValidation(admin: AdminClient, job: ProgressiveLesson
       });
     }
     throw Object.assign(
-      new Error(`Playable lesson package validation failed: ${issues.join(" ")}`),
+      new Error(
+        `Playable lesson package validation failed: ${issues.join(" ")}`,
+      ),
       { code: "NONRETRYABLE_CONTENT" },
     );
   }
@@ -647,9 +841,19 @@ async function processFinalValidation(admin: AdminClient, job: ProgressiveLesson
   });
 }
 
-async function processLessonSaving(admin: AdminClient, job: ProgressiveLessonJob): Promise<CustomLessonWorkerResult> {
-  const validIds = await existingLibraryIds(admin, job.library_snapshot, checkpoints(job));
-  const libraryIssues = resolvedLibraryCheckpointIssues(job.library_snapshot, validIds);
+async function processLessonSaving(
+  admin: AdminClient,
+  job: ProgressiveLessonJob,
+): Promise<CustomLessonWorkerResult> {
+  const validIds = await existingLibraryIds(
+    admin,
+    job.library_snapshot,
+    checkpoints(job),
+  );
+  const libraryIssues = resolvedLibraryCheckpointIssues(
+    job.library_snapshot,
+    validIds,
+  );
   if (libraryIssues.length > 0) {
     return finishStage(admin, job, "library_resolution", 78, {
       library_snapshot: null,
@@ -657,7 +861,10 @@ async function processLessonSaving(admin: AdminClient, job: ProgressiveLessonJob
       last_action: "invalidated_checkpoint",
     });
   }
-  const inspection = inspectPersistedActivityCheckpoints(checkpoints(job), validIds);
+  const inspection = inspectPersistedActivityCheckpoints(
+    checkpoints(job),
+    validIds,
+  );
   if (inspection.invalid.length > 0) {
     for (const invalid of inspection.invalid) {
       await invalidateGroup(admin, job, invalid.group, invalid.issues.join(" "));
@@ -676,13 +883,19 @@ async function processLessonSaving(admin: AdminClient, job: ProgressiveLessonJob
   const lesson = job.lesson_package;
   const issues = playableLessonPackageIssues(lesson);
   if (issues.length > 0) {
-    const group = issues.map(groupForPackageIssue).find((value) => value !== null);
+    const group = issues
+      .map(groupForPackageIssue)
+      .find((value) => value !== null);
     if (group) {
       await invalidateGroup(admin, job, group, issues.join(" "));
-      return finishStage(admin, job, "activity_groups", 78, { lesson_package: null });
+      return finishStage(admin, job, "activity_groups", 78, {
+        lesson_package: null,
+      });
     }
     throw Object.assign(
-      new Error(`Playable lesson package validation failed: ${issues.join(" ")}`),
+      new Error(
+        `Playable lesson package validation failed: ${issues.join(" ")}`,
+      ),
       { code: "NONRETRYABLE_CONTENT" },
     );
   }
@@ -692,12 +905,18 @@ async function processLessonSaving(admin: AdminClient, job: ProgressiveLessonJob
       p_package: lesson,
       p_generation_seconds: 0,
     });
-    if (stored.error) throw Object.assign(new Error(stored.error.message), { code: stored.error.code });
+    if (stored.error) {
+      throw Object.assign(new Error(stored.error.message), {
+        code: stored.error.code,
+      });
+    }
     const value = resultRecord(stored.data);
     const lessonId = text(value.lesson_id);
     const lessonVersionId = text(value.lesson_version_id);
     const assignmentId = text(value.assignment_id);
-    if (!lessonId || !lessonVersionId) throw new Error("The saved lesson identifiers were not returned.");
+    if (!lessonId || !lessonVersionId) {
+      throw new Error("The saved lesson identifiers were not returned.");
+    }
     return finishStage(admin, job, "audio", 90, {
       lesson_id: lessonId,
       lesson_version_id: lessonVersionId,
@@ -708,7 +927,12 @@ async function processLessonSaving(admin: AdminClient, job: ProgressiveLessonJob
   } catch (error) {
     const action = finalizationFailureAction(error);
     if (action.kind === "invalidate_group") {
-      await invalidateGroup(admin, job, action.group as ActivityGroupName, error instanceof Error ? error.message : String(error));
+      await invalidateGroup(
+        admin,
+        job,
+        action.group as ActivityGroupName,
+        error instanceof Error ? error.message : String(error),
+      );
       return finishStage(admin, job, "activity_groups", 78, {
         lesson_package: null,
         last_action: "invalidated_checkpoint",
@@ -724,8 +948,13 @@ async function processLessonSaving(admin: AdminClient, job: ProgressiveLessonJob
   }
 }
 
-async function processAudio(admin: AdminClient, job: ProgressiveLessonJob): Promise<CustomLessonWorkerResult> {
-  if (!job.lesson_version_id) throw new Error("The lesson version is missing before audio preparation.");
+async function processAudio(
+  admin: AdminClient,
+  job: ProgressiveLessonJob,
+): Promise<CustomLessonWorkerResult> {
+  if (!job.lesson_version_id) {
+    throw new Error("The lesson version is missing before audio preparation.");
+  }
   const startedAt = Date.now();
   const attempt = numericAttempt(job.stage_attempts, "audio");
   try {
@@ -750,17 +979,20 @@ async function processAudio(admin: AdminClient, job: ProgressiveLessonJob): Prom
         claimed_at: null,
         last_action: "audio_non_blocking_failure",
       });
-      console.error("Custom lesson audio failed without blocking the lesson.", {
-        requestId: job.request_id,
-        stage: "audio",
-        group: null,
-        attempt,
-        errorClassification: failure.classification,
-        providerRequestId: failure.providerRequestId,
-        durationMs: Date.now() - startedAt,
-        action: "audio_non_blocking_failure",
-        message: failure.message,
-      });
+      console.error(
+        "Custom lesson audio failed without blocking the lesson.",
+        {
+          requestId: job.request_id,
+          stage: "audio",
+          group: null,
+          attempt,
+          errorClassification: failure.classification,
+          providerRequestId: failure.providerRequestId,
+          durationMs: Date.now() - startedAt,
+          action: "audio_non_blocking_failure",
+          message: failure.message,
+        },
+      );
       await saveGenerationTrace({
         trace: { requestId: job.request_id, stage: "audio" },
         name: "audio",
@@ -789,25 +1021,47 @@ async function processAudio(admin: AdminClient, job: ProgressiveLessonJob): Prom
         retryable: false,
       };
     }
-    return scheduleFailure({ admin, job, stage: "audio", attempt, startedAt, error });
+    return scheduleFailure({
+      admin,
+      job,
+      stage: "audio",
+      attempt,
+      startedAt,
+      error,
+    });
   }
 }
 
-async function processClaimedStage(admin: AdminClient, job: ProgressiveLessonJob): Promise<CustomLessonWorkerResult> {
+async function processClaimedStage(
+  admin: AdminClient,
+  job: ProgressiveLessonJob,
+): Promise<CustomLessonWorkerResult> {
   const startedAt = Date.now();
   const stage = job.status;
-  const attempt = stage === "activity_groups"
-    ? 0
-    : numericAttempt(job.stage_attempts, stage);
+  const attempt =
+    stage === "activity_groups" ? 0 : numericAttempt(job.stage_attempts, stage);
   try {
     return await withGenerationTraceContext(
-      { requestId: job.request_id, stage, attempt, resumed: job.last_action?.startsWith("resumed") === true },
+      {
+        requestId: job.request_id,
+        stage,
+        attempt,
+        resumed: job.last_action?.startsWith("resumed") === true,
+      },
       async () => {
         if (stage === "story_building") return processStory(admin, job);
-        if (stage === "vocabulary_enrichment") return processVocabularyEnrichment(admin, job);
-        if (stage === "library_resolution") return processLibraryResolution(admin, job);
-        if (stage === "activity_groups") return processActivityGroup(admin, job);
-        if (stage === "final_validation") return processFinalValidation(admin, job);
+        if (stage === "vocabulary_enrichment") {
+          return processVocabularyEnrichment(admin, job);
+        }
+        if (stage === "library_resolution") {
+          return processLibraryResolution(admin, job);
+        }
+        if (stage === "activity_groups") {
+          return processActivityGroup(admin, job);
+        }
+        if (stage === "final_validation") {
+          return processFinalValidation(admin, job);
+        }
         if (stage === "lesson_saving") return processLessonSaving(admin, job);
         if (stage === "audio") return processAudio(admin, job);
         throw new Error(`Unsupported claimed custom lesson stage ${stage}.`);
@@ -815,7 +1069,8 @@ async function processClaimedStage(admin: AdminClient, job: ProgressiveLessonJob
     );
   } catch (error) {
     if (stage === "activity_groups") {
-      const infrastructureAttempt = numericAttempt(job.group_attempts, "activity_infrastructure") + 1;
+      const infrastructureAttempt =
+        numericAttempt(job.group_attempts, "activity_infrastructure") + 1;
       await claimedUpdate(admin, job, {
         group_attempts: {
           ...(isRecord(job.group_attempts) ? job.group_attempts : {}),
@@ -835,31 +1090,48 @@ async function processClaimedStage(admin: AdminClient, job: ProgressiveLessonJob
   }
 }
 
-async function claimStage(admin: AdminClient, requestId?: string): Promise<ProgressiveLessonJob | null> {
-  const claim = await admin.rpc("claim_custom_lesson_stage", { p_request_id: requestId ?? null });
-  if (claim.error) throw Object.assign(new Error(claim.error.message), { code: claim.error.code });
+async function claimStage(
+  admin: AdminClient,
+  requestId?: string,
+): Promise<ProgressiveLessonJob | null> {
+  const claim = await admin.rpc("claim_custom_lesson_stage", {
+    p_request_id: requestId ?? null,
+  });
+  if (claim.error) {
+    throw Object.assign(new Error(claim.error.message), { code: claim.error.code });
+  }
   return asJob(claim.data);
 }
 
-export async function processCustomLessonJobs(options: {
-  requestId?: string;
-  maxCycles?: number;
-} = {}): Promise<CustomLessonWorkerResult> {
+export async function processCustomLessonJobs(
+  options: { requestId?: string; maxCycles?: number } = {},
+): Promise<CustomLessonWorkerResult> {
   const admin = adminClient();
   const startedAt = Date.now();
-  const cycles = Math.max(1, Math.min(options.maxCycles ?? DEFAULT_MAX_CYCLES, 3));
+  const cycles = Math.max(
+    1,
+    Math.min(options.maxCycles ?? DEFAULT_MAX_CYCLES, 3),
+  );
   let latest: CustomLessonWorkerResult | null = null;
   for (let cycle = 0; cycle < cycles; cycle += 1) {
     if (Date.now() - startedAt >= SOFT_RUNTIME_LIMIT_MS) break;
     const job = await claimStage(admin, options.requestId);
     if (!job) break;
     latest = await processClaimedStage(admin, job);
-    if (latest.status === "retryable_failure" || latest.status === "permanent_failure" || latest.status === "completed") break;
+    if (
+      latest.status === "retryable_failure" ||
+      latest.status === "permanent_failure" ||
+      latest.status === "completed"
+    ) {
+      break;
+    }
   }
-  return latest ?? {
-    claimed: false,
-    requestId: options.requestId ?? null,
-    status: "idle",
-    lessonReady: false,
-  };
+  return (
+    latest ?? {
+      claimed: false,
+      requestId: options.requestId ?? null,
+      status: "idle",
+      lessonReady: false,
+    }
+  );
 }
