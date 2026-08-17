@@ -26,6 +26,16 @@ describe("abandoned lessons are never shown as the next lesson", () => {
     expect(migration).toContain("active_session.status = 'active'");
   });
 
+  it("never reuses a started assignment as the next lesson", () => {
+    expect(migration).toContain(
+      "where user_id = auth.uid()\n    and status = 'assigned'",
+    );
+    expect(migration).toContain("'level-v3-no-resume'");
+    expect(migration).toContain(
+      "Started, abandoned, and completed lessons are never surfaced again as next lessons.",
+    );
+  });
+
   it("revalidates the backend assignment whenever Learn mounts", () => {
     expect(backendStore).not.toContain("get().loaded) return");
     expect(backendStore).toContain(
