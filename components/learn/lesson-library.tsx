@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { ArrowRight, CheckCircle2, Play } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useAppStore } from "@/store/app-store";
 import { useBackendLessonStore } from "@/store/backend-lesson-store";
 
 const learningSteps = [
@@ -22,11 +23,15 @@ const learningSteps = [
 ];
 
 export function LessonLibrary() {
+  const progress = useAppStore((state) => state.progress);
   const backendLessons = useBackendLessonStore((state) => state.lessons);
   const backendLoading = useBackendLessonStore((state) => state.loading);
   const backendError = useBackendLessonStore((state) => state.error);
   const loadBackendLessons = useBackendLessonStore((state) => state.load);
-  const assignedLesson = backendLessons[0] ?? null;
+  const assignedLesson =
+    backendLessons.find(
+      (lesson) => !progress.completedLessonIds.includes(lesson.id),
+    ) ?? backendLessons[0] ?? null;
 
   useEffect(() => {
     void loadBackendLessons();
