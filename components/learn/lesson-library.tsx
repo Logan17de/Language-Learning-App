@@ -91,7 +91,7 @@ export function LessonLibrary() {
                   6 connected phases
                 </span>
                 <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                  Complete in one sitting
+                  Grammar + translation
                 </span>
                 <span className="rounded-full bg-white/[0.07] px-3 py-2">
                   Progress updates automatically
