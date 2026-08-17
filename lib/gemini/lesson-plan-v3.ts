@@ -12,7 +12,6 @@ import {
 } from "@/lib/mastery-target-selection";
 
 const LEVELS: JLPTLevel[] = ["N5", "N4", "N3", "N2", "N1"];
-const REINFORCEMENT_MASTERY_MIN = 60;
 
 interface Mastery {
   mastery: number;
@@ -113,8 +112,7 @@ const cachedCatalogSnapshot = unstable_cache(
  *
  * Learned means mastery >= 80. Learned kanji/grammar are never selected as new
  * lesson targets. Each lesson chooses from the ten lowest-mastery eligible
- * items: five kanji and three grammar patterns. Translation reinforcement then
- * adds two different grammar patterns from the learner's 60-80 mastery band.
+ * items: five kanji and three grammar patterns.
  */
 export async function selectLessonPlanV3(
   client: SupabaseClient<Database>,
@@ -201,65 +199,6 @@ export async function selectLessonPlanV3(
     );
   }
 
-  const targetPatterns = new Set(grammar.map((item) => item.pattern));
-  const reinforcementCandidates = catalog.grammarCatalog
-    .map((row) => ({
-      value: { pattern: row.pattern, level: row.jlpt_level },
-      mastery: grammarMastery.get(row.pattern)?.mastery ?? 0,
-      requestedLevel: row.jlpt_level === level,
-      sourceOrder: row.source_order,
-      selectionSeed: `${userId}:${topic}:translation:${row.pattern}`,
-    }))
-    .filter(
-      (candidate) =>
-        !targetPatterns.has(candidate.value.pattern) &&
-        candidate.mastery >= REINFORCEMENT_MASTERY_MIN &&
-        candidate.mastery < LEARNED_MASTERY_THRESHOLD,
-    );
-
-  const reinforcementGrammar = selectFromLowestMasteryPool(
-    reinforcementCandidates,
-    2,
-  );
-
-  // Brand-new learners can have no items in the 60-80 band yet. Keep lesson
-  // creation usable by filling only the missing reinforcement slots with the
-  // strongest sub-60 patterns; as soon as two 60-80 items exist, this fallback
-  // is not used.
-  if (reinforcementGrammar.length < 2) {
-    const selected = new Set([
-      ...targetPatterns,
-      ...reinforcementGrammar.map((item) => item.pattern),
-    ]);
-    const fallback = catalog.grammarCatalog
-      .map((row) => ({
-        value: { pattern: row.pattern, level: row.jlpt_level },
-        mastery: grammarMastery.get(row.pattern)?.mastery ?? 0,
-        requestedLevel: row.jlpt_level === level,
-        sourceOrder: row.source_order,
-      }))
-      .filter(
-        (candidate) =>
-          !selected.has(candidate.value.pattern) &&
-          candidate.mastery < REINFORCEMENT_MASTERY_MIN,
-      )
-      .sort((left, right) => {
-        const masteryDifference = right.mastery - left.mastery;
-        if (masteryDifference !== 0) return masteryDifference;
-        if (left.requestedLevel !== right.requestedLevel) {
-          return left.requestedLevel ? -1 : 1;
-        }
-        return left.sourceOrder - right.sourceOrder;
-      })
-      .slice(0, 2 - reinforcementGrammar.length)
-      .map((candidate) => candidate.value);
-    reinforcementGrammar.push(...fallback);
-  }
-
-  if (reinforcementGrammar.length !== 2) {
-    throw new Error("Not enough additional grammar patterns are available for translation reinforcement.");
-  }
-
   const knownKanji = [...kanjiMastery.entries()]
     .filter(([, mastery]) => mastery.mastery >= LEARNED_MASTERY_THRESHOLD)
     .map(([character]) => character);
@@ -267,5 +206,5 @@ export async function selectLessonPlanV3(
   const profile = profileResult.data as InterestRow | null;
   const interests = normalizedInterests(preferences?.interests, profile?.interests);
 
-  return { kanji, grammar, reinforcementGrammar, knownKanji, interests };
+  return { kanji, grammar, knownKanji, interests };
 }
