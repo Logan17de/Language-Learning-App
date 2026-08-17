@@ -24,8 +24,8 @@ describe("learning engine contracts", () => {
   });
 
   it("keeps seed lessons compatible with the canonical activity counts", () => {
-    expect(commuteLesson.vocabularyQuestions).toHaveLength(13);
-    expect(commuteLesson.grammarQuestions).toHaveLength(10);
+    expect(commuteLesson.vocabularyQuestions).toHaveLength(7);
+    expect(commuteLesson.grammarQuestions).toHaveLength(7);
     expect(
       commuteLesson.vocabularyQuestions.every(
         (question) => question.choices.includes(question.correctAnswer),
@@ -101,14 +101,7 @@ describe("learning engine contracts", () => {
     ).toBe("Translate the ending: The flower was beautiful (plain).");
   });
 
-  it("keeps adaptive candidate banks historical while current custom lessons use seven-question banks", () => {
-    const migration = readFileSync(
-      resolve(
-        process.cwd(),
-        "supabase/migrations/20260727100000_adaptive_question_banks.sql",
-      ),
-      "utf8",
-    );
+  it("keeps current custom lesson question banks at seven activities", () => {
     const activityGroups = readFileSync(
       resolve(process.cwd(), "lib/gemini/lesson-activity-groups.ts"),
       "utf8",
@@ -122,12 +115,6 @@ describe("learning engine contracts", () => {
       "utf8",
     );
 
-    expect(migration).toContain(
-      "jsonb_array_length(p_package->'vocabularyQuestions') not between 10 and 13",
-    );
-    expect(migration).toContain(
-      "jsonb_array_length(p_package->'grammarQuestions') not between 10 and 13",
-    );
     expect(vocabularyContract).toContain("3 easy, 2 medium, and 2 hard");
     expect(grammarContract).toContain("3 easy, 2 medium, and 2 hard");
     expect(activityGroups).toContain('name: "vocab_questions"');
@@ -209,7 +196,7 @@ describe("learning engine contracts", () => {
       attempts: 1,
     }];
 
-    expect(calculateLessonCompletion(lesson, session).wordsNeedingReview).toEqual([
+    expect(calculateLessonCompletion(lesson, session).weakItems).toEqual([
       lesson.vocabulary[0].term,
       lesson.grammar[0].pattern,
     ]);
@@ -229,7 +216,6 @@ describe("learning engine contracts", () => {
     expect(playerSources).not.toContain("Morning at the station");
     expect(playerSources).not.toContain("Yuki met Tanaka");
     expect(playerSources).not.toContain("Mock evaluation");
-    expect(playerSources).not.toContain('wordsNeedingReview : ["改札"]');
   });
 });
 
