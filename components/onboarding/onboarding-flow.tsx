@@ -7,20 +7,16 @@ import {
   ArrowRight,
   BriefcaseBusiness,
   Check,
-  CircleHelp,
   Clock3,
-  Compass,
   Headphones,
   Languages,
   LoaderCircle,
   Map,
   Mic2,
-  PartyPopper,
   Plane,
   Sparkles,
   Target,
   UserRound,
-  Utensils,
 } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
 import { Button } from "@/components/ui/button";
@@ -72,37 +68,23 @@ const levels: Array<{ value: LearnerLevel; detail: string }> = [
   { value: "Not sure", detail: "Help me find the right starting point" },
 ];
 
-const interests = [
-  { name: "Daily life", icon: Compass },
-  { name: "Technology", icon: Sparkles },
-  { name: "Anime", icon: PartyPopper },
-  { name: "Work", icon: BriefcaseBusiness },
-  { name: "Travel", icon: Plane },
-  { name: "Food", icon: Utensils },
-  { name: "AI", icon: CircleHelp },
-];
-
 export function OnboardingFlow() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
-  const [customInterest, setCustomInterest] = useState("");
   const [showSkipDialog, setShowSkipDialog] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const {
     user,
     onboarding,
-    subscription,
     setGoal,
     setLevel,
     setDailyMinutes,
-    setInterests,
     acknowledgeReading,
     completeOnboarding,
     signIn,
   } = useAppStore();
-  const isPro = subscription.plan === "premium";
 
   useEffect(() => {
     setName((current) =>
@@ -110,7 +92,7 @@ export function OnboardingFlow() {
     );
   }, [user.name]);
 
-  const totalSteps = 7;
+  const totalSteps = 6;
   const canContinue = useMemo(() => {
     if (step === 0) return Boolean(name.trim());
     if (step === 1) return Boolean(onboarding.goal);
@@ -120,8 +102,8 @@ export function OnboardingFlow() {
   }, [name, step, onboarding]);
 
   function next() {
-    if (step === 5) acknowledgeReading();
-    if (step === 6) {
+    if (step === 4) acknowledgeReading();
+    if (step === 5) {
       void finishOnboarding("/learn");
       return;
     }
@@ -151,25 +133,6 @@ export function OnboardingFlow() {
     completeOnboarding();
     router.push(destination);
   }
-
-  function toggleInterest(interest: string) {
-    setInterests(
-      onboarding.interests.includes(interest)
-        ? onboarding.interests.filter((item) => item !== interest)
-        : [...onboarding.interests, interest],
-    );
-  }
-
-  function addCustomInterest() {
-    const interest = customInterest.trim();
-    if (!interest || onboarding.interests.includes(interest)) return;
-    setInterests([...onboarding.interests, interest]);
-    setCustomInterest("");
-  }
-
-  const interestDescription = isPro
-    ? "Pro uses these interests to rank level-matched lessons and personalize future content. You can also continue without them."
-    : "You can save interests to your profile now, but Free lesson selection stays random within your level. Interest-based recommendations are a Pro feature.";
 
   return (
     <main className="min-h-screen bg-paper">
@@ -318,75 +281,6 @@ export function OnboardingFlow() {
 
           {step === 4 && (
             <StepShell
-              kicker="Make it relevant"
-              title="What do you enjoy talking about?"
-              description={interestDescription}
-            >
-              <div className="mb-7 rounded-2xl border border-moss-100 bg-moss-50/70 px-4 py-3 text-sm leading-6 text-moss-800">
-                {isPro
-                  ? "No interests yet? You can continue. AIko will use random level-matched lessons until you add them."
-                  : "Free tier: adding interests saves them to your profile, but it does not change lesson selection."}
-              </div>
-              <div className="flex flex-wrap gap-3">
-                {interests.map(({ name, icon: Icon }) => (
-                  <button
-                    key={name}
-                    onClick={() => toggleInterest(name)}
-                    className={cn(
-                      "inline-flex min-h-12 items-center gap-2 rounded-full border px-5 text-sm font-semibold transition",
-                      onboarding.interests.includes(name)
-                        ? "border-moss-600 bg-moss-600 text-white"
-                        : "border-stone-200 bg-white text-stone-600 hover:border-moss-300",
-                    )}
-                  >
-                    <Icon className="size-4" />
-                    {name}
-                  </button>
-                ))}
-                {onboarding.interests
-                  .filter(
-                    (item) =>
-                      !interests.some((interest) => interest.name === item),
-                  )
-                  .map((item) => (
-                    <button
-                      key={item}
-                      onClick={() => toggleInterest(item)}
-                      className="inline-flex min-h-12 items-center gap-2 rounded-full border border-moss-600 bg-moss-600 px-5 text-sm font-semibold text-white"
-                    >
-                      <Check className="size-4" />
-                      {item}
-                    </button>
-                  ))}
-              </div>
-              <div className="mt-7 flex gap-2">
-                <input
-                  value={customInterest}
-                  onChange={(event) => setCustomInterest(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      event.preventDefault();
-                      addCustomInterest();
-                    }
-                  }}
-                  className="form-input"
-                  placeholder="Add your own interest…"
-                  aria-label="Custom interest"
-                />
-                <Button
-                  type="button"
-                  onClick={addCustomInterest}
-                  variant="secondary"
-                  className="shrink-0 px-5"
-                >
-                  Add
-                </Button>
-              </div>
-            </StepShell>
-          )}
-
-          {step === 5 && (
-            <StepShell
               kicker="Speaking practice"
               title="You’ll use the language out loud, too."
               description="When you start a speaking activity, AIko asks for microphone access, transcribes what you say, and compares it with the practice sentence."
@@ -415,7 +309,7 @@ export function OnboardingFlow() {
             </StepShell>
           )}
 
-          {step === 6 && (
+          {step === 5 && (
             <div className="mx-auto max-w-xl py-8 text-center">
               <span className="mx-auto grid size-20 place-items-center rounded-[2rem] bg-persimmon-100 text-persimmon-500">
                 <Sparkles className="size-9" />
@@ -428,24 +322,8 @@ export function OnboardingFlow() {
                 Your daily goal is {onboarding.dailyMinutes} minutes. AIko will start you with a lesson at your starting level, then reuse its story across vocabulary + kanji, grammar, reading, listening, and speaking.
               </p>
               <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-stone-500">
-                {isPro
-                  ? onboarding.interests.length
-                    ? "Your interests help rank suitable lessons. What you do inside each lesson updates mastery and progress automatically."
-                    : "Add interests later to enable Pro interest-based recommendations. What you do inside each lesson still updates mastery and progress automatically."
-                  : "Free lessons are selected randomly within your level. What you do inside each lesson updates mastery and progress automatically."}
+                What you do inside each lesson updates mastery and progress automatically, so later lessons can keep focusing on what still needs practice.
               </p>
-              {onboarding.interests.length > 0 && (
-                <div className="mt-8 flex flex-wrap justify-center gap-2">
-                  {onboarding.interests.map((interest) => (
-                    <span
-                      key={interest}
-                      className="rounded-full bg-moss-100 px-3 py-1.5 text-xs font-semibold text-moss-700"
-                    >
-                      {interest}
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -471,13 +349,11 @@ export function OnboardingFlow() {
               {saving && <LoaderCircle className="size-4 animate-spin" />}
               {saving
                 ? "Saving…"
-                : step === 6
+                : step === 5
                   ? "See my first lesson"
-                  : step === 5
+                  : step === 4
                     ? "I understand"
-                    : step === 4 && onboarding.interests.length === 0
-                      ? "Continue without interests"
-                      : "Continue"}
+                    : "Continue"}
               {!saving && <ArrowRight className="size-4" />}
             </Button>
           </div>
@@ -506,24 +382,10 @@ export function OnboardingFlow() {
               Complete your profile later?
             </h2>
             <p className="mt-3 leading-7 text-stone-500">
-              You can skip now and finish your learning profile any time from
-              Profile.
+              You can skip now and update your learning goal, level, and daily study target any time from Profile.
             </p>
             <div className="mt-5 rounded-2xl bg-sand/70 p-4 text-sm leading-6 text-stone-600">
-              {isPro ? (
-                <>
-                  <strong className="text-ink">Pro plan:</strong> without
-                  interests, AIko will show random lessons at your level.
-                  Interest-based recommendations and content generation begin
-                  after you add your interests.
-                </>
-              ) : (
-                <>
-                  <strong className="text-ink">Free plan:</strong> lessons are
-                  selected randomly at your level, even if interests are added.
-                  Interest-based recommendations are a Pro feature.
-                </>
-              )}
+              AIko can still assign your next lesson. Finishing the setup gives it a clearer starting level and daily study target.
             </div>
             {error && (
               <p
