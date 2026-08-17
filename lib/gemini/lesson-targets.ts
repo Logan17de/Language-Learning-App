@@ -45,6 +45,9 @@ function targetPriority(
   mastery: MasteryValue | null,
   seed: string,
 ): [number, number, number, number] {
+  // The mastery engine's learned boundary is 80. An assumed lower-level 100
+  // therefore stays out of the weak pool even with zero evidence, while any
+  // real score that falls below 80 becomes eligible for correction again.
   const belowMasteryThreshold = !mastery || mastery.mastery < LEARNED_MASTERY_THRESHOLD;
   const weakKnown = Boolean(
     mastery
