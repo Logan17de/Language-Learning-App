@@ -44,9 +44,29 @@ export function calculateLessonCompletion(
     session.vocabularyAnswers.filter((answer) => answer.correct).length,
     Math.max(1, lesson.vocabularyQuestions.length),
   );
+  const translationQuestions = session.grammarTranslationQuestions ?? [];
+  const staticGrammarIds = new Set(lesson.grammarQuestions.map((question) => question.id));
+  const translationIds = new Set(translationQuestions.map((question) => question.id));
+  const relevantGrammarAnswers = session.grammarAnswers.filter(
+    (answer) => staticGrammarIds.has(answer.questionId) || translationIds.has(answer.questionId),
+  );
   const grammarAccuracy = ratio(
-    session.grammarAnswers.filter((answer) => answer.correct).length,
+    relevantGrammarAnswers.filter((answer) => answer.correct).length,
+    Math.max(1, lesson.grammarQuestions.length + translationQuestions.length),
+  );
+  const grammarUnderstandingAnswers = relevantGrammarAnswers.filter((answer) =>
+    staticGrammarIds.has(answer.questionId),
+  );
+  const grammarProductionAnswers = relevantGrammarAnswers.filter((answer) =>
+    translationIds.has(answer.questionId),
+  );
+  const grammarUnderstandingAccuracy = ratio(
+    grammarUnderstandingAnswers.filter((answer) => answer.correct).length,
     Math.max(1, lesson.grammarQuestions.length),
+  );
+  const grammarProductionAccuracy = ratio(
+    grammarProductionAnswers.filter((answer) => answer.correct).length,
+    Math.max(1, translationQuestions.length),
   );
   const readingQuestions = lesson.readingQuestions ?? [];
   const readingCorrect = session.readingAnswers.filter((answer) => {
@@ -142,14 +162,16 @@ export function calculateLessonCompletion(
       ),
     ...session.grammarAnswers
       .filter((answer) => !answer.correct)
-      .flatMap((answer) =>
-        exerciseTerms(
-          lesson,
-          lesson.grammarQuestions.find(
-            (question) => question.id === answer.questionId,
-          )?.targetItemIds,
-        ),
-      ),
+      .flatMap((answer) => {
+        const staticQuestion = lesson.grammarQuestions.find(
+          (question) => question.id === answer.questionId,
+        );
+        if (staticQuestion) return exerciseTerms(lesson, staticQuestion.targetItemIds);
+        const translation = translationQuestions.find(
+          (question) => question.id === answer.questionId,
+        );
+        return translation ? [translation.targetPattern] : [];
+      }),
     ...session.readingEvents
       .filter((event) =>
         ["paused-before-word", "pronunciation-issue", "stopped-at-word"].includes(
@@ -180,8 +202,8 @@ export function calculateLessonCompletion(
       speaking?.evaluationAvailable
         ? Math.max(0, Math.round((speaking.pronunciationConfidence - 60) / 8))
         : 0,
-    grammarUnderstandingChange: Math.max(1, Math.round(grammarAccuracy * 4)),
-    grammarProductionChange: Math.max(1, Math.round(grammarAccuracy * 3)),
+    grammarUnderstandingChange: Math.max(1, Math.round(grammarUnderstandingAccuracy * 4)),
+    grammarProductionChange: Math.max(1, Math.round(grammarProductionAccuracy * 4)),
     wordsNeedingReview,
     completedAt: new Date().toISOString(),
   };
