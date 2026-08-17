@@ -210,10 +210,7 @@ export function GrammarPhase({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          lessonId: lesson.id,
           questionId: translationQuestion.id,
-          english: translationQuestion.english,
-          targetItemId: translationQuestion.targetItemId,
           answer: selectedAnswer,
         }),
       });
@@ -340,9 +337,9 @@ export function GrammarPhase({
                 : "Translation practice needs another try."}
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-stone-500">
-              AIko uses your three lesson patterns plus two patterns from your
-              current reinforcement range, then writes English sentences where
-              each pattern fits naturally in Japanese.
+              AIko builds production prompts from this lesson’s grammar and your
+              previous grammar practice. When there is not enough history yet, it
+              reuses lesson grammar instead of testing something unseen.
             </p>
             {translationError && (
               <p
@@ -372,24 +369,13 @@ export function GrammarPhase({
       <div className="mx-auto max-w-3xl">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <div className="flex flex-wrap gap-2">
-              <Badge tone="orange">Translation</Badge>
-              <Badge tone="neutral">
-                {translationQuestion.role === "lesson_target"
-                  ? "Lesson pattern"
-                  : "Reinforcement"}
-              </Badge>
-            </div>
+            <Badge tone="orange">Translation</Badge>
             <h2 className="mt-4 text-3xl font-semibold">
               Turn the meaning into Japanese.
             </h2>
             <p className="mt-2 text-sm leading-6 text-stone-500">
-              Use{" "}
-              <span className="font-serif font-semibold text-ink">
-                {translationQuestion.targetPattern}
-              </span>
-              . AIko checks meaning, grammar, and naturalness—not an exact model
-              sentence.
+              Translate naturally using grammar you’ve learned. AIko checks the
+              meaning and grammar without requiring one exact model sentence.
             </p>
           </div>
           <p className="shrink-0 text-sm font-semibold text-stone-500">
@@ -408,9 +394,6 @@ export function GrammarPhase({
           </p>
           <p className="mt-4 text-xl font-semibold leading-8 text-ink sm:text-2xl">
             {translationQuestion.english}
-          </p>
-          <p className="mt-3 text-sm text-stone-500">
-            Target meaning: {translationQuestion.targetMeaning}
           </p>
 
           <label
@@ -699,27 +682,21 @@ export function GrammarPhase({
 }
 
 function grammarAnswerIsCorrect(
-  selectedAnswer: string,
+  answer: string,
   correctAnswer: string,
-  acceptedAnswers: string[] = [],
-): boolean {
-  const normalizedSelected = normalizeGrammarAnswer(selectedAnswer);
+  acceptedAnswers: string[],
+) {
+  const normalized = answer.normalize("NFKC").replace(/\s+/g, "").trim();
   return [correctAnswer, ...acceptedAnswers].some(
-    (candidate) => normalizeGrammarAnswer(candidate) === normalizedSelected,
+    (candidate) =>
+      candidate.normalize("NFKC").replace(/\s+/g, "").trim() === normalized,
   );
 }
 
-function normalizeGrammarAnswer(value: string): string {
-  return value
-    .trim()
-    .toLocaleLowerCase()
-    .replace(/[\s。、，,.!?！？]/g, "");
-}
-
-function difficultyTone(
-  difficulty: ExerciseDifficulty,
-): "moss" | "orange" | "neutral" {
-  if (difficulty === "Hard") return "orange";
-  if (difficulty === "Medium") return "neutral";
-  return "moss";
+function difficultyTone(difficulty: ExerciseDifficulty) {
+  return difficulty === "Easy"
+    ? "moss"
+    : difficulty === "Medium"
+      ? "orange"
+      : "neutral";
 }
