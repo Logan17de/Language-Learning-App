@@ -22,20 +22,26 @@ export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
   error: "",
   load: async () => {
     if (getBackendMode() !== "supabase" || get().loading) return;
-    // Revalidate whenever a learner-facing assignment screen mounts. A lesson
-    // can become completed or abandoned while this store still holds an older
-    // assignment, and stale assignments must never be shown as "next lesson".
-    set({ loading: true, error: "" });
+
+    // First visit may need a visible loading state. Once a learner already has
+    // assignment data in memory, revalidate it silently. This keeps Learn/Home
+    // visually static when their components remount or the auth session refreshes.
+    const current = get();
+    const blocking = !current.loaded && current.lessons.length === 0;
+    if (blocking) set({ loading: true, error: "" });
+    else if (current.error) set({ error: "" });
+
     const result = await lessonRepository.assignNext();
     if (!result.ok) {
-      set({
-        lessons: [],
+      set((state) => ({
+        lessons: blocking ? [] : state.lessons,
         loading: false,
         loaded: true,
         error: result.error.message,
-      });
+      }));
       return;
     }
+
     const lessons = result.data
       ? [mapCanonicalLesson(result.data.lesson)]
       : [];
