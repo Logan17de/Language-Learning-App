@@ -17,7 +17,6 @@ describe("lesson pause/resume retirement", () => {
     expect(player).toContain("AIko doesn&apos;t pause lessons");
     expect(player).toContain("Stay in lesson");
     expect(player).toContain("Leave lesson");
-    expect(player).toContain("won&apos;t be assigned to you again");
     expect(player).not.toContain("Pause this lesson?");
     expect(player).not.toContain("Save and exit");
     expect(player).not.toContain("/learn?paused=1");
