@@ -166,11 +166,12 @@ export function calculateLessonCompletion(
         const staticQuestion = lesson.grammarQuestions.find(
           (question) => question.id === answer.questionId,
         );
-        if (staticQuestion) return exerciseTerms(lesson, staticQuestion.targetItemIds);
-        const translation = translationQuestions.find(
-          (question) => question.id === answer.questionId,
-        );
-        return translation ? [translation.targetPattern] : [];
+        // Runtime translation targets are intentionally server-owned. Their
+        // incorrect/correct evidence is already persisted by the validation
+        // endpoint, so completion scoring must not reconstruct or expose them.
+        return staticQuestion
+          ? exerciseTerms(lesson, staticQuestion.targetItemIds)
+          : [];
       }),
     ...session.readingEvents
       .filter((event) =>
