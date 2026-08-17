@@ -11,39 +11,80 @@ export function BackendSessionHydrator() {
   const syncBackendIdentity = useAppStore((state) => state.syncBackendIdentity);
   const signOut = useAppStore((state) => state.signOut);
   const setSubscription = useAppStore((state) => state.setSubscription);
-  const hydrateBackendProgress = useAppStore((state) => state.hydrateBackendProgress);
+  const hydrateBackendProgress = useAppStore(
+    (state) => state.hydrateBackendProgress,
+  );
+  const setBackendSessionChecked = useAppStore(
+    (state) => state.setBackendSessionChecked,
+  );
   const [loading, setLoading] = useState(backendMode === "supabase");
 
   useEffect(() => {
-    if (backendMode !== "supabase") return;
+    if (backendMode !== "supabase") {
+      setBackendSessionChecked(true);
+      return;
+    }
+
     let active = true;
+
     async function hydrate() {
+      setBackendSessionChecked(false);
+      if (active) setLoading(true);
+
       const result = await authService.getIdentity();
       if (!result.ok || !result.data) {
         signOut();
         if (active) setLoading(false);
         return;
       }
-      syncBackendIdentity(result.data.displayName, result.data.email);
+
+      syncBackendIdentity(
+        result.data.id,
+        result.data.displayName,
+        result.data.email,
+        result.data.onboardingComplete,
+      );
       setSubscription(
         result.data.subscriptionPlan === "free" ? "free" : "premium",
         result.data.subscriptionPlan === "premium_annual" ? "annual" : "monthly",
       );
+
       const progress = await progressRepository.loadCurrent();
       if (progress.ok) hydrateBackendProgress(progress.data);
+      setBackendSessionChecked(true);
       if (active) setLoading(false);
     }
+
     void hydrate();
     const unsubscribe = authService.subscribe((signedIn) => {
-      if (!signedIn) signOut();
-      else void hydrate();
+      if (!signedIn) {
+        signOut();
+        if (active) setLoading(false);
+        return;
+      }
+      void hydrate();
     });
+
     return () => {
       active = false;
       unsubscribe();
     };
-  }, [backendMode, hydrateBackendProgress, setSubscription, signOut, syncBackendIdentity]);
+  }, [
+    backendMode,
+    hydrateBackendProgress,
+    setBackendSessionChecked,
+    setSubscription,
+    signOut,
+    syncBackendIdentity,
+  ]);
 
   if (!loading) return null;
-  return <div className="fixed inset-x-0 top-0 z-[120] h-1 overflow-hidden bg-moss-100" aria-label="Restoring account session"><span className="block h-full w-1/2 animate-pulse bg-moss-600" /></div>;
+  return (
+    <div
+      className="fixed inset-x-0 top-0 z-[120] h-1 overflow-hidden bg-moss-100"
+      aria-label="Restoring account session"
+    >
+      <span className="block h-full w-1/2 animate-pulse bg-moss-600" />
+    </div>
+  );
 }

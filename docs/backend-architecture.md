@@ -1,49 +1,66 @@
 # Backend architecture
 
-## Runtime split
+## Runtime boundary
 
-`lib/supabase/client.ts` creates the cookie-aware browser client. `lib/supabase/server.ts` creates a request-scoped server client. `lib/supabase/admin.ts` is marked `server-only` and is the only service-role entry point. `proxy.ts` refreshes Auth cookies and pre-filters learner/admin paths.
+`lib/supabase/client.ts` creates the browser client, `lib/supabase/server.ts` creates a request-scoped server client, and `lib/supabase/admin.ts` is the server-only service-role entry point. `proxy.ts` refreshes Auth cookies and provides an early route filter.
 
-The browser selects a mode from public environment variables:
+Authenticated learner and admin flows require Supabase configuration. Missing or placeholder backend configuration fails closed; the application does not promote localStorage, bundled lessons, mock users, or demo credentials into an alternate authenticated mode.
 
-- Supabase configured: authenticated backend mode
-- Supabase absent/placeholder: deterministic demo mode during local development
+## Authorization
 
-Production admin routes fail closed with `404` if Supabase is not configured; the mock admin workspace is never a production fallback.
+Production administration is owner-only. The database stores one protected `admin_owner` user ID and `current_app_role()` returns effective admin access only for that active Supabase user. Legacy enum values may remain in schema history for compatibility, but they do not create a client-side authorization path.
 
-## Authorization boundary
+Proxy is an early filter, not the final boundary. Sensitive authorization is repeated at the server/data layer:
 
-Production administration is owner-only. The database stores one protected `admin_owner` user ID and `current_app_role()` returns effective `admin` only for that active Supabase user. Legacy `content_editor` and `support` role values remain schema-compatible but do not receive production operational permissions.
+- `/admin/*` restores and verifies the Supabase identity before rendering the workspace.
+- trusted mutation routes call server authorization before service-role access.
+- RLS policies enforce database access independently of the UI.
+- client state, localStorage, hidden navigation, profile strings, and OAuth metadata never grant admin authority.
 
-Proxy is an early route filter, not the final authorization boundary. Sensitive authorization is repeated at the server/data layer:
+## Learner data flow
 
-- `/admin/*` resolves the effective database role before rendering the workspace.
-- trusted mutation routes call `lib/auth/server-authorization.ts` before service-role access.
-- RLS staff policies call `has_app_role()`, which grants operational access only to the effective owner-admin.
-- the `admin_owner` table has RLS enabled and browser roles have no table privileges.
+UI components call typed repositories/application services. Zustand stores transient UI state, active lesson interaction, and local lesson checkpoints, but Supabase is authoritative for authenticated identity, profile data, assignment, progress, content, subscriptions, and persisted learning evidence.
 
-Client state, localStorage, hidden navigation, profile strings, or OAuth metadata never grant admin authority.
+Persisted client state is not accepted as proof of authentication. Backend session hydration verifies the current Supabase user before protected learner screens render.
 
-## Data flow
+Lessons are assigned and loaded through the backend lesson repository/store. There is no bundled/mock lesson fallback on protected learner routes.
 
-UI components call typed repositories or application services. Repositories normalize errors into `RepositoryResult<T>` and never return raw Supabase response objects. Zustand retains active lesson interaction, optimistic UI, and cached summaries, but Supabase is authoritative for authenticated persistent data.
+## Lesson sessions and mastery
 
-Published backend lessons are reconstructed from a lesson identity, immutable current version, and normalized child rows. Active sessions store both `lesson_id` and `lesson_version_id`, so a later publication cannot alter an in-progress attempt.
+Active lesson sessions persist checkpoints, answers, events, and mastery evidence. Offline checkpoint/completion failures may enter the bounded local sync queue and retry when connectivity returns. Database idempotency protects completion/reward reconciliation.
 
-Lesson checkpoints save on meaningful changes and every ten elapsed seconds. Event/answer payloads remain batched in the checkpoint. Offline failures enter a bounded local queue with dedupe keys. An online event retries the queue; database reward idempotency makes reconciliation safe.
+Standalone Quick Review has been retired. Weak-item/mastery records remain internal learning evidence and targeting data; the learner application does not maintain a separate review session/runtime.
+
+## Custom lesson generation
+
+Custom-topic generation is a durable staged job:
+
+1. select lesson plan/targets;
+2. generate the story;
+3. match original-story tappable vocabulary against the curated JLPT CSV catalog;
+4. resolve library identities;
+5. generate the three persisted activity groups;
+6. validate/assemble the playable package;
+7. save the lesson;
+8. prepare audio without blocking lesson availability.
+
+The worker claims stages atomically from PostgreSQL. Successful checkpoints are durable and retries regenerate only missing/invalid work. Supabase `pg_cron` + `pg_net` invoke the protected worker using endpoint/secret values stored in Vault.
+
+Story tappability does not use JMdict or an AI enrichment pass. Later reading/listening/speaking generation does not create additional vocabulary records.
 
 ## Trusted mutations
 
-PostgreSQL functions handle:
+PostgreSQL functions and trusted server routes cover operations such as:
 
-- lesson completion and reward claim
-- review completion and reward claim
-- lesson publication/version cloning
-- transactional progress reset
-- one-time legacy import
+- lesson completion and reward reconciliation;
+- lesson publication/versioning;
+- transactional learner progress reset;
+- custom-generation claims/checkpoints/storage;
+- admin user/subscription/report/support/service operations;
+- authenticated data export and reset operations.
 
-Trusted route handlers handle operations that require server-side validation or service-role writes, including admin audit creation, user status, subscription changes, report status, support replies, export, and reset. Operational handlers require the effective owner-admin role before the service-role client is used.
+Historical migrations may contain functions for systems that have since been retired. Migration history is forward-only and should not be read as a list of currently exposed application features.
 
 ## Failure behavior
 
-Missing configuration activates explicit demo mode for local development. In production, missing configuration blocks `/admin*` instead of exposing mock administration. Repository errors distinguish missing configuration, expired authentication, permission denial, conflict, missing records, offline state, and retryable unknown failures. Public bundled content remains available in demo mode. Backend mode does not claim a queued change is synced until the repository succeeds.
+Missing backend configuration, expired authentication, or failed authorization does not fall back to prototype data. Learner/admin protected routes fail closed and repositories return explicit errors. A queued local checkpoint is not represented as synced until its backend write succeeds.

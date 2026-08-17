@@ -6,14 +6,24 @@ import {
   type RepositoryResult,
 } from "@/lib/repositories/result";
 import type {
+  DailyMinutes,
+  LearnerLevel,
+  LearningGoal,
+} from "@/types/learner";
+import type {
   Achievement,
   MasteryItem,
   RecentLesson,
-  ReviewQueueItem,
   WeeklyActivity,
 } from "@/types/progress";
 
 export interface BackendProgressSnapshot {
+  currentLevel: LearnerLevel;
+  learningGoal: LearningGoal | null;
+  interests: string[];
+  dailyGoalMinutes: DailyMinutes;
+  minutesStudiedToday: number;
+  joinDate: string;
   levelCompletion: number;
   learnedVocabularyCount: number;
   learnedKanjiCount: number;
@@ -28,33 +38,7 @@ export interface BackendProgressSnapshot {
   grammarToReview: MasteryItem[];
   recentLessons: RecentLesson[];
   completedLessonIds: string[];
-  reviewQueue: ReviewQueueItem[];
   achievements: Achievement[];
-}
-
-function promptText(value: unknown, key: string): string | undefined {
-  return typeof value === "object" &&
-    value !== null &&
-    !Array.isArray(value) &&
-    key in value &&
-    typeof value[key as keyof typeof value] === "string"
-    ? (value[key as keyof typeof value] as string)
-    : undefined;
-}
-
-function promptFirst(value: unknown, key: string): string | undefined {
-  if (
-    typeof value !== "object" ||
-    value === null ||
-    Array.isArray(value) ||
-    !(key in value)
-  ) {
-    return undefined;
-  }
-  const items = value[key as keyof typeof value];
-  return Array.isArray(items) && typeof items[0] === "string"
-    ? items[0]
-    : undefined;
 }
 
 function summaryNumber(value: unknown, key: string): number {
@@ -67,10 +51,28 @@ function summaryNumber(value: unknown, key: string): number {
     : 0;
 }
 
+function dateInTimeZone(timeZone: string): string {
+  try {
+    const parts = new Intl.DateTimeFormat("en", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(new Date());
+    const part = (type: Intl.DateTimeFormatPartTypes) =>
+      parts.find((item) => item.type === type)?.value ?? "";
+    return `${part("year")}-${part("month")}-${part("day")}`;
+  } catch {
+    return new Date().toISOString().slice(0, 10);
+  }
+}
+
+function dailyMinutes(value: number): DailyMinutes {
+  return value === 15 || value === 45 || value === 60 ? value : 30;
+}
+
 export const progressRepository = {
-  async loadCurrent(): Promise<
-    RepositoryResult<BackendProgressSnapshot>
-  > {
+  async loadCurrent(): Promise<RepositoryResult<BackendProgressSnapshot>> {
     const client = createClient();
     if (!client) return notConfigured();
     const { data: auth } = await client.auth.getUser();
@@ -84,7 +86,6 @@ export const progressRepository = {
       weekly,
       mastery,
       completions,
-      queue,
       earned,
       definitions,
       lessons,
@@ -92,7 +93,7 @@ export const progressRepository = {
       client
         .from("profiles")
         .select(
-          "xp,streak_days,longest_streak,total_study_minutes,daily_study_minutes",
+          "xp,streak_days,longest_streak,total_study_minutes,daily_study_minutes,current_jlpt_level,learning_goal,interests,created_at,timezone",
         )
         .eq("id", userId)
         .single(),
@@ -116,12 +117,6 @@ export const progressRepository = {
         .eq("user_id", userId)
         .order("completed_at", { ascending: false })
         .limit(20),
-      client
-        .from("review_queue")
-        .select("*")
-        .eq("user_id", userId)
-        .in("status", ["due", "scheduled"])
-        .order("due_at"),
       client.from("user_achievements").select("*").eq("user_id", userId),
       client.from("achievements").select("*").eq("active", true),
       client.from("lessons").select("id,legacy_id,title"),
@@ -132,7 +127,6 @@ export const progressRepository = {
       weekly,
       mastery,
       completions,
-      queue,
       earned,
       definitions,
       lessons,
@@ -141,9 +135,8 @@ export const progressRepository = {
       return failure(firstError, "Your progress could not be loaded.");
     }
 
-    const allKeys = [...(mastery.data ?? []), ...(queue.data ?? [])];
     const ids = (type: string) =>
-      allKeys
+      (mastery.data ?? [])
         .filter((item) => item.item_type === type)
         .map((item) => item.item_key)
         .filter((item, index, items) => items.indexOf(item) === index);
@@ -222,7 +215,18 @@ export const progressRepository = {
     const earnedMap = new Map(
       (earned.data ?? []).map((item) => [item.achievement_id, item]),
     );
+    const today = dateInTimeZone(profile.data.timezone);
+    const minutesStudiedToday =
+      (weekly.data ?? []).find((item) => item.activity_date === today)?.minutes ?? 0;
+    const goalMinutes = dailyMinutes(profile.data.daily_study_minutes);
+
     return success({
+      currentLevel: profile.data.current_jlpt_level as LearnerLevel,
+      learningGoal: profile.data.learning_goal as LearningGoal | null,
+      interests: profile.data.interests ?? [],
+      dailyGoalMinutes: goalMinutes,
+      minutesStudiedToday,
+      joinDate: profile.data.created_at.slice(0, 10),
       levelCompletion: summaryNumber(summary.data, "level_completion"),
       learnedVocabularyCount: summaryNumber(
         summary.data,
@@ -238,11 +242,12 @@ export const progressRepository = {
         .slice()
         .reverse()
         .map((item) => ({
-          day: new Date(
-            `${item.activity_date}T00:00:00`,
-          ).toLocaleDateString("en", { weekday: "short" }),
+          day: new Date(`${item.activity_date}T00:00:00`).toLocaleDateString(
+            "en",
+            { weekday: "short" },
+          ),
           minutes: item.minutes,
-          goal: profile.data.daily_study_minutes,
+          goal: goalMinutes,
         })),
       weakKanji: masteryFor("kanji"),
       weakVocabulary: masteryFor("vocabulary"),
@@ -259,45 +264,8 @@ export const progressRepository = {
       }),
       completedLessonIds: (completions.data ?? []).map(
         (completion) =>
-          lessonMap.get(completion.lesson_id)?.legacy_id ??
-          completion.lesson_id,
+          lessonMap.get(completion.lesson_id)?.legacy_id ?? completion.lesson_id,
       ),
-      reviewQueue: (queue.data ?? []).map((item) => {
-        const kanjiRecord = kanjiMap.get(item.item_key);
-        const vocabularyRecord = vocabularyMap.get(item.item_key);
-        const grammarRecord = grammarMap.get(item.item_key);
-        const term =
-          promptText(item.prompt_data, "term") ??
-          promptText(item.prompt_data, "character") ??
-          promptText(item.prompt_data, "pattern") ??
-          kanjiRecord?.character ??
-          vocabularyRecord?.written_form ??
-          grammarRecord?.pattern ??
-          item.item_key;
-        const reading =
-          promptText(item.prompt_data, "reading") ??
-          promptFirst(item.prompt_data, "readings") ??
-          kanjiRecord?.readings[0] ??
-          vocabularyRecord?.reading;
-        const meaning =
-          promptText(item.prompt_data, "meaning") ??
-          promptFirst(item.prompt_data, "meanings") ??
-          kanjiRecord?.meanings[0] ??
-          vocabularyRecord?.meaning ??
-          grammarRecord?.meaning;
-        return {
-          id: item.id,
-          type: item.item_type as ReviewQueueItem["type"],
-          term,
-          dueLabel:
-            new Date(item.due_at) <= new Date() ? "Today" : "Scheduled",
-          confidence: item.confidence,
-          reading,
-          meaning,
-          reason: item.reason,
-          overdue: new Date(item.due_at) < new Date(),
-        };
-      }),
       achievements: (definitions.data ?? []).map((definition) => {
         const item = earnedMap.get(definition.id);
         return {

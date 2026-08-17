@@ -5,7 +5,7 @@ import type {
   InspectableTerm,
   ResolvedLessonLibrary,
 } from "@/lib/gemini/lesson-engine-v2";
-import type { RawStoryVocabulary } from "@/lib/gemini/simple-story-enrichment-contract";
+import type { RawStoryVocabulary } from "@/lib/gemini/simple-story-enrichment";
 import type { Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
 
@@ -31,8 +31,8 @@ function vocabularyKey(word: string, reading: string, meaning: string): string {
 }
 
 /**
- * Store exact word/reading/meaning enrichment output and return the canonical
- * vocabulary IDs needed by every inspectable lesson region.
+ * Store dictionary-resolved vocabulary and return the canonical vocabulary IDs
+ * needed by every inspectable lesson region.
  */
 export async function storeGeneratedVocabularyTerms(input: {
   admin?: SupabaseClient;
@@ -51,14 +51,16 @@ export async function storeGeneratedVocabularyTerms(input: {
       p_source_model: input.model,
     });
     if (stored.error) {
-      throw new Error(`Generated vocabulary could not be stored: ${stored.error.message}`);
+      const error = new Error(`Dictionary vocabulary could not be stored: ${stored.error.message}`) as Error & { code?: string };
+      error.code = stored.error.code;
+      throw error;
     }
     const rows = await input.admin
       .from("story_vocabulary_enrichments")
       .select("vocabulary_id,word,reading,meaning")
       .eq("request_id", input.requestId);
     if (rows.error) {
-      throw new Error(`Generated vocabulary could not be loaded: ${rows.error.message}`);
+      throw new Error(`Dictionary vocabulary could not be loaded: ${rows.error.message}`);
     }
     storedRows = (rows.data ?? []) as StoredVocabularyRow[];
   }

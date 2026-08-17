@@ -24,7 +24,8 @@ const buildingRoute = readFileSync(
 
 describe("progressive custom lesson reading", () => {
   it("leaves the custom-topic builder as soon as the story request is ready", () => {
-    expect(customTopic).toContain('searchParams.get("requestId")');
+    expect(customTopic).toContain("new URL(window.location.href).searchParams.get(");
+    expect(customTopic).toContain('"requestId"');
     expect(customTopic).toContain(
       "router.replace(`/lesson/building/${encodeURIComponent(activeRequest)}`)",
     );
@@ -56,7 +57,10 @@ describe("progressive custom lesson reading", () => {
     expect(progressive).toContain("createEmptyLessonSession(lessonId)");
     expect(progressive).toContain("session.currentPhaseIndex = 1");
     expect(progressive).toContain("session.storyComplete = true");
-    expect(progressive).toContain("router.push(`/lesson/${lessonId}/play`)");
+    expect(progressive).toContain("router.replace(`/lesson/${lessonId}/play`)");
+    expect(progressive).toContain("continueToLesson();");
+    expect(progressive).toContain("window.sessionStorage");
+    expect(progressive).not.toContain("document.hidden ? 10_000");
     expect(progressive).toContain('continueLabel={lessonReady ? "Vocabulary"');
     expect(lessonPlayer).toContain(
       "const storedSessions = useAppStore.getState().lessonSessions",

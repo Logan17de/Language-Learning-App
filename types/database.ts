@@ -244,6 +244,14 @@ export interface Database {
         Args: { p_topic: string; p_level: Database["public"]["Enums"]["jlpt_level"] };
         Returns: Json;
       };
+      begin_custom_lesson_generation_v4: {
+        Args: { p_topic: string; p_level: Database["public"]["Enums"]["jlpt_level"] };
+        Returns: Json;
+      };
+      custom_lesson_scheduler_diagnostics: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
       enrich_custom_lesson_library: {
         Args: { p_level: Database["public"]["Enums"]["jlpt_level"]; p_seed: Json };
         Returns: Json;

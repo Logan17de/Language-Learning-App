@@ -44,9 +44,21 @@ body {
     radial-gradient(circle at 8% 0%, rgb(79 128 104 / 0.055), transparent 28rem),
     rgb(var(--aiko-paper));
   color: rgb(var(--aiko-ink));
-  font-family: Inter, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: Inter, var(--font-japanese), "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Japanese learning text should stay soft and highly legible everywhere.
+   Several lesson components historically used font-serif for Japanese, which
+   selected Mincho faces. Override that utility with the same Japanese sans
+   family so questions, story text, examples, choices, and previews are
+   visually consistent. */
+:lang(ja),
+.font-serif {
+  font-family: var(--font-japanese), "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif;
+  font-optical-sizing: auto;
+  font-kerning: normal;
 }
 
 ::selection {
@@ -128,6 +140,85 @@ button:not(:disabled),
     rgb(var(--aiko-progress-fill)) var(--progress-angle),
     rgb(var(--aiko-progress-track)) 0
   );
+}
+
+.answer-result-row {
+  animation: aiko-answer-result-in 220ms ease-out both;
+}
+
+.answer-choice-correct {
+  animation: aiko-answer-pop 360ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+.answer-choice-wrong {
+  animation: aiko-answer-nudge 260ms ease-out both;
+}
+
+.answer-celebration-core {
+  animation: aiko-celebration-core 620ms cubic-bezier(.2,.9,.2,1) both;
+}
+
+.answer-celebration-spark {
+  position: absolute;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 9999px;
+  background: #e57748;
+  box-shadow: 0 0 0 4px rgb(229 119 72 / 0.12);
+  animation: aiko-celebration-spark 620ms cubic-bezier(.2,.9,.2,1) both;
+}
+
+@keyframes aiko-answer-result-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aiko-answer-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.035); }
+  100% { transform: scale(1); }
+}
+
+@keyframes aiko-answer-nudge {
+  0%, 100% { transform: translateX(0); }
+  35% { transform: translateX(-3px); }
+  70% { transform: translateX(3px); }
+}
+
+@keyframes aiko-celebration-core {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.45) rotate(-14deg);
+  }
+  45% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.18) rotate(8deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes aiko-celebration-spark {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.2) translateY(-8px);
+  }
 }
 
 @layer components {

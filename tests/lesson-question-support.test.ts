@@ -28,10 +28,11 @@ describe("lesson question support rules", () => {
     expect(grammar).toContain("inspectChoices={false}");
   });
 
-  it("shows the Japanese grammar sentence stem without exposing the answer", () => {
-    expect(grammar).toContain("const productionStem = question.hintFront.trim()");
-    expect(grammar).toContain("text={productionStem}");
-    expect(grammar).toContain("＿＿");
+  it("keeps grammar practice hint-free without exposing answers", () => {
+    expect(grammar).not.toContain("Show hint");
+    expect(grammar).not.toContain("Hide hint");
+    expect(grammar).not.toContain("question.hintFront");
+    expect(grammar).not.toContain("question.hintBack");
     expect(grammar).not.toContain("text={question.correctAnswer}");
   });
 

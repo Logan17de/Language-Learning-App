@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { commuteLesson } from "@/data/mock-lessons";
-import { buildReviewActivities } from "@/lib/review-utils";
 import { calculateLessonCompletion } from "@/lib/scoring-utils";
 import { storyLengthRange } from "@/lib/story-support";
 import {
@@ -15,27 +14,9 @@ import {
 } from "@/lib/japanese-input";
 import { createEmptyLessonSession } from "@/store/app-store";
 import type { LessonPackage } from "@/types/lesson";
-import type { ReviewQueueItem } from "@/types/progress";
 import type { ExerciseDifficulty } from "@/types/lesson";
 
-function queueItem(
-  id: string,
-  confidence: number,
-  overrides: Partial<ReviewQueueItem> = {},
-): ReviewQueueItem {
-  return {
-    id,
-    type: "vocabulary",
-    term: id,
-    reading: `${id}-reading`,
-    meaning: `${id}-meaning`,
-    dueLabel: "Due now",
-    confidence,
-    ...overrides,
-  };
-}
-
-describe("learning engine V2 contracts", () => {
+describe("learning engine contracts", () => {
   it("grows story length from 10–12 lines at N5 to 18–20 at N1", () => {
     expect(storyLengthRange("N5")).toEqual({ min: 10, max: 12 });
     expect(storyLengthRange("N3")).toEqual({ min: 14, max: 16 });
@@ -120,16 +101,12 @@ describe("learning engine V2 contracts", () => {
     ).toBe("Translate the ending: The flower was beautiful (plain).");
   });
 
-  it("stores adaptive candidate banks without changing older ten-question lessons", () => {
+  it("keeps adaptive candidate banks historical while current custom lessons use seven-question banks", () => {
     const migration = readFileSync(
       resolve(
         process.cwd(),
         "supabase/migrations/20260727100000_adaptive_question_banks.sql",
       ),
-      "utf8",
-    );
-    const engine = readFileSync(
-      resolve(process.cwd(), "lib/gemini/lesson-engine-v2.ts"),
       "utf8",
     );
     const activityGroups = readFileSync(
@@ -151,27 +128,10 @@ describe("learning engine V2 contracts", () => {
     expect(migration).toContain(
       "jsonb_array_length(p_package->'grammarQuestions') not between 10 and 13",
     );
-    expect(vocabularyContract).toContain("6 easy, 4 medium, and 3 hard");
-    expect(grammarContract).toContain("3 easy, 4 medium, and 3 hard");
+    expect(vocabularyContract).toContain("3 easy, 2 medium, and 2 hard");
+    expect(grammarContract).toContain("3 easy, 2 medium, and 2 hard");
     expect(activityGroups).toContain('name: "vocab_questions"');
     expect(activityGroups).toContain('name: "grammar_questions"');
-    expect(engine).toContain("generateVocabularyAndKanjiActivities");
-  });
-
-  it("builds review only from real weak items and never invents fallbacks", () => {
-    const activities = buildReviewActivities([
-      queueItem("mastered", 92),
-      queueItem("weak", 40),
-      queueItem("overdue", 60, { overdue: true, type: "kanji" }),
-    ]);
-
-    expect(activities).toHaveLength(2);
-    expect(activities.map((activity) => activity.queueItemId)).toEqual([
-      "overdue",
-      "weak",
-    ]);
-    expect(buildReviewActivities([])).toEqual([]);
-    expect(buildReviewActivities([queueItem("mastered", 100)])).toEqual([]);
   });
 
   it("keeps level completion tied to finite JLPT catalogs", () => {
@@ -231,10 +191,7 @@ describe("learning engine V2 contracts", () => {
         ...question,
         targetItemIds: [`grammar-${index % commuteLesson.grammar.length}`],
       })),
-      reviewQuestions: commuteLesson.reviewQuestions.map((question) => ({
-        ...question,
-        targetItemIds: ["kanji-0"],
-      })),
+      reviewQuestions: [],
     };
     const session = createEmptyLessonSession(lesson.id);
     session.vocabularyAnswers = [{
@@ -252,17 +209,10 @@ describe("learning engine V2 contracts", () => {
       skill: lesson.grammarQuestions[0].skill,
       attempts: 1,
     }];
-    session.reviewAnswers = [{
-      questionId: lesson.reviewQuestions[0].id,
-      category: "kanji",
-      selectedAnswer: "wrong",
-      correct: false,
-    }];
 
     expect(calculateLessonCompletion(lesson, session).wordsNeedingReview).toEqual([
       lesson.vocabulary[0].term,
       lesson.grammar[0].pattern,
-      lesson.kanji[0].character,
     ]);
   });
 

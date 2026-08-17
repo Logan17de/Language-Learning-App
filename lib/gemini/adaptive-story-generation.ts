@@ -16,8 +16,8 @@ import { normalizeStoryPassage } from "@/lib/gemini/story-pipeline-v3";
 
 /**
  * API call 1. This call is intentionally limited to one passage-style story.
- * Existing library taps and all activities are resolved only after this
- * response has passed story validation.
+ * Target kanji and grammar are prompt guidance only. Acceptance is structural:
+ * a valid story is not rejected because the model used different content.
  */
 export async function generateAdaptiveStoryDraft(input: {
   requestId: string;
@@ -39,9 +39,6 @@ export async function generateAdaptiveStoryDraft(input: {
     schema: storyGenerationSchema,
     strictSchema: true,
     exactSchemaName: true,
-    // This deliberately mirrors the tested story_test.py flow: the provider's
-    // strict JSON schema is the story gate. Do not add a second semantic repair
-    // pass that rejects natural grammar variants after valid generation.
     validate: () => [],
     trace: {
       requestId: input.requestId,

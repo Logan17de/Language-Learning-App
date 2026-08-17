@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { appendInspectableInteraction } from "@/lib/lesson-support";
-import { ArrowRight, CheckCircle2, Languages, Lightbulb } from "lucide-react";
+import { ArrowRight, CheckCircle2, Languages } from "lucide-react";
 import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession } from "@/types/lesson-session";
 import { upsertGrammarAnswer } from "@/lib/scoring-utils";
@@ -19,7 +19,7 @@ import {
 } from "@/lib/japanese-input";
 import { selectNextAdaptiveQuestionIndex } from "@/lib/adaptive-difficulty";
 
-const QUESTION_TARGET = 10;
+const QUESTION_TARGET = 7;
 
 export function GrammarPhase({
   lesson,
@@ -32,7 +32,6 @@ export function GrammarPhase({
 }) {
   const [showLesson, setShowLesson] = useState(session.grammarAnswers.length === 0);
   const [typedAnswer, setTypedAnswer] = useState("");
-  const [hintQuestionId, setHintQuestionId] = useState<string | null>(null);
   const grammarQuestions = lesson.grammarQuestions;
 
   const answeredCount = session.grammarAnswers.filter((answer) =>
@@ -54,12 +53,10 @@ export function GrammarPhase({
   const question = grammarQuestions[currentIndex];
   const answer = session.grammarAnswers.find((item) => item.questionId === question.id);
   const roundComplete = answeredCount >= Math.min(QUESTION_TARGET, grammarQuestions.length);
-  const showHint = hintQuestionId === question.id;
   const convertedAnswer = japaneseInputPreview(typedAnswer);
   const inspectableTerms = question.inspectableTerms.length
     ? question.inspectableTerms
     : lesson.story.flatMap((line) => line.words);
-  const productionStem = question.hintFront.trim();
 
   function submitAnswer(selectedAnswer: string) {
     if (answer || !selectedAnswer.trim()) return;
@@ -89,12 +86,17 @@ export function GrammarPhase({
     );
     if (nextIndex === null) return;
     setTypedAnswer("");
-    setHintQuestionId(null);
     onChange({
       ...session,
       activityIndex: nextIndex,
     });
   }
+
+  const nextAction = answer && !roundComplete ? (
+    <Button type="button" className="h-full min-h-14 px-5" onClick={nextQuestion}>
+      Next <ArrowRight className="size-4" />
+    </Button>
+  ) : null;
 
   if (showLesson) {
     return (
@@ -102,7 +104,7 @@ export function GrammarPhase({
         <div className="max-w-2xl">
           <Badge>{lesson.grammar.length} lesson patterns</Badge>
           <h2 className="mt-4 text-3xl font-semibold tracking-tight">Notice the pattern, then use it.</h2>
-          <p className="mt-3 leading-7 text-stone-500">Review the structure and story example before the ten-question practice.</p>
+          <p className="mt-3 leading-7 text-stone-500">Review the structure and story example before the seven-question practice.</p>
         </div>
         <div className="mt-8 grid gap-5 lg:grid-cols-2">
           {lesson.grammar.map((point) => (
@@ -151,27 +153,6 @@ export function GrammarPhase({
       <ProgressBar value={(answeredCount / Math.min(QUESTION_TARGET, grammarQuestions.length)) * 100} className="mt-5" />
 
       <div className="mt-9 rounded-4xl border border-black/[.06] bg-white p-6 shadow-card sm:p-9">
-        <div className="mb-6 flex flex-wrap items-center gap-3">
-          <Button
-            type="button"
-            variant="secondary"
-            className="min-h-10 px-4"
-            disabled={Boolean(answer)}
-            onClick={() => setHintQuestionId(showHint ? null : question.id)}
-          >
-            <Lightbulb className="size-4" />
-            {showHint ? "Hide hint" : "Show hint"}
-          </Button>
-          {showHint && (
-            <div className="rounded-2xl bg-moss-50 px-4 py-3 text-sm text-moss-800" role="status">
-              <span className="font-medium">Partial sentence: </span>
-              <span className="font-serif">{question.hintFront}</span>
-              <span className="px-2 text-stone-400">…</span>
-              <span className="font-serif">{question.hintBack}</span>
-            </div>
-          )}
-        </div>
-
         {question.answerMode === "choice" ? (
           <MultipleChoiceCard
             prompt={question.prompt}
@@ -179,14 +160,15 @@ export function GrammarPhase({
             choices={question.choices}
             correctAnswer={question.correctAnswer}
             explanation={question.explanation}
-          selectedAnswer={answer?.selectedAnswer}
-          answered={Boolean(answer)}
-          answerCorrect={answer?.correct}
+            selectedAnswer={answer?.selectedAnswer}
+            answered={Boolean(answer)}
+            answerCorrect={answer?.correct}
             lockAfterAnswer
             inspectChoices={false}
             inspectableTerms={inspectableTerms}
             onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
             onSelect={submitAnswer}
+            answerAction={nextAction}
           />
         ) : (
           <section aria-labelledby="grammar-question-prompt">
@@ -197,18 +179,6 @@ export function GrammarPhase({
                 onReveal={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
               />
             </p>
-            {productionStem && (
-              <p className="mt-5 rounded-2xl bg-moss-50 px-5 py-4 font-serif text-xl leading-9 text-ink">
-                <InspectableText
-                  text={productionStem}
-                  terms={inspectableTerms}
-                  onReveal={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
-                />
-                <span className="ml-2 tracking-widest text-stone-400" aria-label="Complete the sentence">
-                  ＿＿
-                </span>
-              </p>
-            )}
             <label className="mt-7 block text-sm font-semibold text-stone-600" htmlFor="grammar-translation">
               Your answer
             </label>
@@ -242,23 +212,24 @@ export function GrammarPhase({
               </Button>
             )}
             {answer && (
-              <div className="mt-5">
-                <AnswerFeedback correct={answer.correct} explanation={question.explanation} />
-                {!answer.correct && (
-                  <p className="mt-3 rounded-2xl bg-stone-50 p-4 text-sm text-stone-600">
-                    <span className="font-semibold text-ink">Model answer: </span>
-                    <span className="font-serif">{question.correctAnswer}</span>
-                  </p>
+              <div className="answer-result-row mt-5 flex flex-col gap-3 sm:flex-row sm:items-stretch" data-answer-result-row>
+                <div className="min-w-0 flex-1">
+                  <AnswerFeedback correct={answer.correct} explanation={question.explanation} />
+                  {!answer.correct && (
+                    <p className="mt-3 rounded-2xl bg-stone-50 p-4 text-sm text-stone-600">
+                      <span className="font-semibold text-ink">Model answer: </span>
+                      <span className="font-serif">{question.correctAnswer}</span>
+                    </p>
+                  )}
+                </div>
+                {nextAction && (
+                  <div className="flex shrink-0 items-stretch sm:min-w-40 [&>*]:w-full">
+                    {nextAction}
+                  </div>
                 )}
               </div>
             )}
           </section>
-        )}
-
-        {answer && !roundComplete && (
-          <Button type="button" className="mt-6" onClick={nextQuestion}>
-            Next question <ArrowRight className="size-4" />
-          </Button>
         )}
 
         {answer && roundComplete && (

@@ -55,6 +55,49 @@ export const lessonSessionRepository = {
     return error ? failure(error, "Your lesson checkpoint is waiting to sync.") : success(data);
   },
 
+  async abandonActive(lessonReference: string): Promise<RepositoryResult<number>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { data: auth } = await client.auth.getUser();
+    if (!auth.user) return failure({ code: "AUTH" }, "Your session has expired.");
+
+    const byId = await client
+      .from("lessons")
+      .select("id")
+      .eq("id", lessonReference)
+      .maybeSingle();
+    if (byId.error) {
+      return failure(byId.error, "The lesson could not be identified.");
+    }
+    const lessonResult = byId.data
+      ? byId
+      : await client
+          .from("lessons")
+          .select("id")
+          .eq("legacy_id", lessonReference)
+          .maybeSingle();
+    if (lessonResult.error) {
+      return failure(lessonResult.error, "The lesson could not be identified.");
+    }
+    if (!lessonResult.data) {
+      return failure({ code: "PGRST116" }, "The lesson could not be identified.");
+    }
+
+    const { data, error } = await client
+      .from("lesson_sessions")
+      .update({
+        status: "abandoned",
+        last_saved_at: new Date().toISOString(),
+      })
+      .eq("user_id", auth.user.id)
+      .eq("lesson_id", lessonResult.data.id)
+      .eq("status", "active")
+      .select("id");
+    return error
+      ? failure(error, "The lesson could not be ended. Please try again.")
+      : success(data?.length ?? 0);
+  },
+
   async saveAnswers(answers: LessonAnswer[]): Promise<RepositoryResult<number>> {
     const client = createClient();
     if (!client) return notConfigured();

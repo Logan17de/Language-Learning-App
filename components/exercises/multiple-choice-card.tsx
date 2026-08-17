@@ -1,6 +1,7 @@
 "use client";
 
-import { Check, Circle } from "lucide-react";
+import type { ReactNode } from "react";
+import { Check, Circle, Sparkles } from "lucide-react";
 import type { StoryWord } from "@/types/lesson";
 import { cn } from "@/lib/utils";
 import { InspectableText } from "@/components/exercises/inspectable-text";
@@ -19,6 +20,7 @@ export function MultipleChoiceCard({
   disabled = false,
   inspectableTerms = [],
   inspectChoices = true,
+  answerAction,
   onInspect,
   onSelect,
 }: {
@@ -34,6 +36,7 @@ export function MultipleChoiceCard({
   disabled?: boolean;
   inspectableTerms?: StoryWord[];
   inspectChoices?: boolean;
+  answerAction?: ReactNode;
   onInspect?: (word: StoryWord, reveal: "reading" | "meaning") => void;
   onSelect: (answer: string) => void;
 }) {
@@ -41,7 +44,22 @@ export function MultipleChoiceCard({
   const locked = disabled || (answered && lockAfterAnswer);
 
   return (
-    <section aria-labelledby="question-prompt">
+    <section className="relative" aria-labelledby="question-prompt">
+      {answered && selectedAnswer && isCorrect && (
+        <div
+          key={selectedAnswer}
+          className="answer-celebration pointer-events-none absolute -right-2 -top-3 z-10 size-24"
+          aria-hidden="true"
+          data-answer-celebration
+        >
+          <Sparkles className="answer-celebration-core absolute left-1/2 top-1/2 size-9 -translate-x-1/2 -translate-y-1/2 text-persimmon-500" />
+          <span className="answer-celebration-spark left-2 top-2" />
+          <span className="answer-celebration-spark right-1 top-5 [animation-delay:70ms]" />
+          <span className="answer-celebration-spark bottom-2 right-4 [animation-delay:120ms]" />
+          <span className="answer-celebration-spark bottom-4 left-1 [animation-delay:160ms]" />
+        </div>
+      )}
+
       <p id="question-prompt" className="text-sm font-semibold text-stone-500">
         <InspectableText text={prompt} terms={inspectableTerms} onReveal={onInspect} />
       </p>
@@ -65,8 +83,8 @@ export function MultipleChoiceCard({
               onClick={() => onSelect(choice)}
               className={cn(
                 "flex min-h-16 items-center gap-3 rounded-2xl border bg-white p-4 text-left text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-moss-100 disabled:cursor-default",
-                correctChoice && "border-moss-500 bg-moss-50 text-moss-900",
-                wrongChoice && "border-persimmon-400 bg-persimmon-50 text-persimmon-600",
+                correctChoice && "answer-choice-correct border-moss-500 bg-moss-50 text-moss-900",
+                wrongChoice && "answer-choice-wrong border-persimmon-400 bg-persimmon-50 text-persimmon-600",
                 !correctChoice && !wrongChoice && selected && "border-moss-600",
                 !selected && !correctChoice && !locked && "border-stone-200 hover:border-moss-300",
                 !selected && !correctChoice && locked && "border-stone-200 opacity-55",
@@ -84,7 +102,22 @@ export function MultipleChoiceCard({
           );
         })}
       </div>
-      {answered && selectedAnswer && <div className="mt-5"><AnswerFeedback correct={isCorrect} explanation={explanation} /></div>}
+
+      {answered && selectedAnswer && (
+        <div
+          className="answer-result-row mt-5 flex flex-col gap-3 sm:flex-row sm:items-stretch"
+          data-answer-result-row
+        >
+          <div className="min-w-0 flex-1">
+            <AnswerFeedback correct={isCorrect} explanation={explanation} />
+          </div>
+          {answerAction && (
+            <div className="flex shrink-0 items-stretch sm:min-w-40 [&>*]:w-full">
+              {answerAction}
+            </div>
+          )}
+        </div>
+      )}
     </section>
   );
 }
