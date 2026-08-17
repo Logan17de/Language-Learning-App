@@ -71,23 +71,6 @@ function demoSpeakingExercises(): LessonPackage["speakingExercises"] {
   }));
 }
 
-function demoReviewQuestions(): LessonPackage["reviewQuestions"] {
-  const categories = ["kanji", "vocabulary", "grammar", "listening", "speaking"] as const;
-  return categories.map((category, index) => ({
-    id: `review_${index + 1}`,
-    category,
-    questionType: "multiple-choice",
-    prompt: index === 0 ? "What is the reading of 駅?" : "Choose the lesson answer.",
-    choices: index === 0
-      ? ["えき", "いき", "えぎ", "いけ"]
-      : ["At the ticket gate", "At the café", "At the office", "On the bus"],
-    correctAnswer: index === 0 ? "えき" : "At the ticket gate",
-    explanation: index === 0
-      ? "駅 is read えき and means station."
-      : "This answer matches the lesson context.",
-  }));
-}
-
 const commuteLessonBase: Omit<
   LessonPackage,
   "vocabularyQuestions" | "grammarQuestions"
@@ -128,7 +111,7 @@ const commuteLessonBase: Omit<
   kanji: [
     { character: "働", reading: "はたら", meaning: "work" },
     { character: "場", reading: "ば", meaning: "place" },
-    { character: "駅", reading: "えき", meaning: "station", isReview: true },
+    { character: "駅", reading: "えき", meaning: "station" },
     { character: "改札", reading: "かいさつ", meaning: "ticket gate" },
   ],
   vocabulary: [
@@ -138,7 +121,6 @@ const commuteLessonBase: Omit<
     { term: "一緒に", reading: "いっしょに", meaning: "together", partOfSpeech: "adverb" },
     { term: "改札", reading: "かいさつ", meaning: "ticket gate", partOfSpeech: "noun" },
   ],
-  reviewItems: ["駅", "〜ので"],
   story: [
     mockStoryLine("s1", "朝、ゆきさんは六時半に起きます。", "Yuki wakes up at 6:30 in the morning.", ["朝"]),
     mockStoryLine("s2", "最近、早く起きられるようになりました。", "Recently, she has become able to wake up early.", ["最近", "早く"]),
@@ -163,8 +145,6 @@ const commuteLessonBase: Omit<
   readingQuestions: demoReadingQuestions(),
   listeningExercises: demoListeningExercises(),
   speakingExercises: demoSpeakingExercises(),
-  reviewQuestions: demoReviewQuestions(),
-  answerKeys: ["えき", "At the ticket gate", "音楽を聞きながら、会社へ行きます。"],
   phases: canonicalLessonPhases(),
 };
 
