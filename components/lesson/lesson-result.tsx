@@ -76,7 +76,7 @@ export function LessonResult({ lesson, result }: { lesson: LessonPackage; result
             </div>
             <div className="mt-6">
               <p className="text-xs font-bold uppercase tracking-wide text-stone-400">Needs attention</p>
-              <p className="mt-2 text-sm leading-6 text-stone-500">{result.wordsNeedingReview.length ? `Strengthen ${result.wordsNeedingReview.join(" and ")} in future practice.` : "No weak items were detected in this lesson."}</p>
+              <p className="mt-2 text-sm leading-6 text-stone-500">{result.weakItems.length ? `Strengthen ${result.weakItems.join(" and ")} in future practice.` : "No weak items were detected in this lesson."}</p>
             </div>
           </Card>
           <Card className="p-7">
@@ -93,13 +93,13 @@ export function LessonResult({ lesson, result }: { lesson: LessonPackage; result
         <Card className="mt-6 p-6">
           <button type="button" onClick={() => setShowMistakes((value) => !value)} className="flex min-h-12 w-full items-center gap-3 text-left focus:outline-none focus:ring-4 focus:ring-moss-100">
             <RotateCcw className="size-5 text-persimmon-500" />
-            <div className="flex-1"><p className="font-semibold">Items to strengthen</p><p className="text-xs text-stone-400">{result.wordsNeedingReview.length} item{result.wordsNeedingReview.length === 1 ? "" : "s"}</p></div>
+            <div className="flex-1"><p className="font-semibold">Items to strengthen</p><p className="text-xs text-stone-400">{result.weakItems.length} item{result.weakItems.length === 1 ? "" : "s"}</p></div>
             <ChevronDown className={`size-5 text-stone-400 transition ${showMistakes ? "rotate-180" : ""}`} />
           </button>
           {showMistakes && (
             <div className="mt-4 border-t border-stone-100 pt-4">
-              {result.wordsNeedingReview.length ? (
-                <div className="flex flex-wrap gap-2">{result.wordsNeedingReview.map((item) => <Badge key={item} tone="orange">{item}</Badge>)}</div>
+              {result.weakItems.length ? (
+                <div className="flex flex-wrap gap-2">{result.weakItems.map((item) => <Badge key={item} tone="orange">{item}</Badge>)}</div>
               ) : (
                 <p className="flex items-center gap-2 text-sm text-moss-700"><Check className="size-4" /> No weak items detected in this lesson.</p>
               )}
