@@ -20,6 +20,15 @@ export interface VocabularyAnswer {
   attempts: number;
 }
 
+export interface GrammarTranslationQuestion {
+  id: string;
+  english: string;
+  targetPattern: string;
+  targetMeaning: string;
+  targetItemId: string;
+  role: "lesson_target" | "reinforcement";
+}
+
 export interface GrammarAnswer {
   questionId: string;
   type: GrammarExerciseType;
@@ -27,6 +36,9 @@ export interface GrammarAnswer {
   correct: boolean;
   skill: "understanding" | "production";
   attempts: number;
+  feedback?: string;
+  suggestion?: string;
+  suggestedAnswer?: string;
 }
 
 export type ReadingEventType =
@@ -127,6 +139,7 @@ export interface LessonSession {
   storyComplete: boolean;
   vocabularyAnswers: VocabularyAnswer[];
   grammarAnswers: GrammarAnswer[];
+  grammarTranslationQuestions: GrammarTranslationQuestion[];
   readingAnswers: ReadingComprehensionAnswer[];
   readingEvents: ReadingEvent[];
   readingComplete: boolean;
