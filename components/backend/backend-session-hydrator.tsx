@@ -27,12 +27,28 @@ export function BackendSessionHydrator() {
 
     let active = true;
 
-    async function hydrate() {
-      setBackendSessionChecked(false);
-      if (active) setLoading(true);
+    async function hydrate(blocking: boolean) {
+      // Only the first account restore is allowed to block protected routes.
+      // Supabase also emits auth events for token/session refreshes (commonly
+      // when a browser tab becomes active again). Those refreshes must happen
+      // silently so the learner page stays mounted and visually unchanged.
+      if (blocking) {
+        setBackendSessionChecked(false);
+        if (active) setLoading(true);
+      }
 
       const result = await authService.getIdentity();
-      if (!result.ok || !result.data) {
+      if (!result.ok) {
+        // A transient background refresh failure should not tear down a page
+        // that already has a valid learner session. The next auth event can
+        // retry it. Initial restoration remains strict.
+        if (blocking) {
+          signOut();
+          if (active) setLoading(false);
+        }
+        return;
+      }
+      if (!result.data) {
         signOut();
         if (active) setLoading(false);
         return;
@@ -52,17 +68,17 @@ export function BackendSessionHydrator() {
       const progress = await progressRepository.loadCurrent();
       if (progress.ok) hydrateBackendProgress(progress.data);
       setBackendSessionChecked(true);
-      if (active) setLoading(false);
+      if (blocking && active) setLoading(false);
     }
 
-    void hydrate();
+    void hydrate(true);
     const unsubscribe = authService.subscribe((signedIn) => {
       if (!signedIn) {
         signOut();
         if (active) setLoading(false);
         return;
       }
-      void hydrate();
+      void hydrate(false);
     });
 
     return () => {
