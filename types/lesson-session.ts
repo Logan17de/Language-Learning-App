@@ -20,13 +20,10 @@ export interface VocabularyAnswer {
   attempts: number;
 }
 
+/** Public runtime shape. Grammar targets and model answers stay server-owned. */
 export interface GrammarTranslationQuestion {
   id: string;
   english: string;
-  targetPattern: string;
-  targetMeaning: string;
-  targetItemId: string;
-  role: "lesson_target" | "reinforcement";
 }
 
 export interface GrammarAnswer {
