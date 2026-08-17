@@ -130,7 +130,6 @@ export interface ResolvedLessonLibrary {
   grammar: CanonicalGrammar[];
   vocabulary: CanonicalVocabulary[];
   generationContext?: {
-    interests: string[];
     targetGrammar: string[];
     targetKanji: string[];
   };
