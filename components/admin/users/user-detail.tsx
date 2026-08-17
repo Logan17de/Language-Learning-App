@@ -252,13 +252,6 @@ export function UserDetail({ userId }: { userId: string }) {
                 data.preferences?.onboarding_complete ? "Complete" : "Incomplete"
               }
             />
-            <Fact
-              label="Interests"
-              value={
-                (data.preferences?.interests ?? profile.interests).join(", ") ||
-                "None"
-              }
-            />
             <Fact label="Last active" value={lastActive} />
           </dl>
         </AdminSection>
