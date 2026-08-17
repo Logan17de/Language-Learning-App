@@ -6,7 +6,9 @@ import { createClient } from "@/lib/supabase/server";
 
 function field(body: Record<string, unknown>, key: string, maximum: number): string {
   const value = body[key];
-  return typeof value === "string" ? value.normalize("NFKC").trim().slice(0, maximum) : "";
+  return typeof value === "string"
+    ? value.normalize("NFKC").trim().slice(0, maximum)
+    : "";
 }
 
 export async function POST(request: NextRequest) {
@@ -20,69 +22,54 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid translation answer." }, { status: 400 });
   }
   const body = raw as Record<string, unknown>;
-  const lessonId = field(body, "lessonId", 160);
-  const questionId = field(body, "questionId", 180);
-  const english = field(body, "english", 300);
-  const targetItemId = field(body, "targetItemId", 80);
+  const questionId = field(body, "questionId", 80);
   const answer = field(body, "answer", 500);
-  if (!lessonId || !questionId || !english || !targetItemId || !answer) {
-    return NextResponse.json({ error: "The translation question and answer are required." }, { status: 400 });
+  if (!questionId || !answer) {
+    return NextResponse.json(
+      { error: "The translation question and answer are required." },
+      { status: 400 },
+    );
   }
 
   try {
-    const evaluation = await evaluateGrammarTranslation({
-      english,
-      targetItemId,
+    const checked = await evaluateGrammarTranslation({
+      userId: auth.userId,
+      questionId,
       learnerAnswer: answer,
     });
 
-    // Record the AI verdict as grammar mastery evidence when an active backend
-    // lesson session exists. Failure to sync mastery must not hide the feedback
-    // the learner has already received.
+    // The question id resolves to the authoritative session and grammar target on
+    // the server. A learner cannot redirect mastery by changing request metadata.
     let masterySaved = false;
     const client = await createClient();
     if (client) {
       const rawClient = client as unknown as SupabaseClient;
-      const byId = await rawClient.from("lessons").select("id").eq("id", lessonId).maybeSingle();
-      const lesson = byId.data
-        ? byId.data
-        : (await rawClient.from("lessons").select("id").eq("legacy_id", lessonId).maybeSingle()).data;
-      if (lesson?.id) {
-        const active = await rawClient
-          .from("lesson_sessions")
-          .select("id")
-          .eq("user_id", auth.userId)
-          .eq("lesson_id", lesson.id)
-          .eq("status", "active")
-          .order("started_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        if (active.data?.id) {
-          const evidence = await rawClient.rpc("record_mastery_evidence", {
-            p_session_id: active.data.id,
-            p_events: [{
-              clientEventId: `translation:${questionId}:${targetItemId}`,
-              itemType: "grammar",
-              itemKey: targetItemId,
-              dimension: "meaning",
-              signal: evaluation.correct ? "correct" : "incorrect",
-              data: {
-                source: "translation",
-                selectedAnswer: answer,
-                english,
-              },
-            }],
-          });
-          masterySaved = !evidence.error;
-        }
-      }
+      const evidence = await rawClient.rpc("record_mastery_evidence", {
+        p_session_id: checked.lessonSessionId,
+        p_events: [
+          {
+            clientEventId: `translation:${questionId}`,
+            itemType: "grammar",
+            itemKey: checked.targetItemId,
+            dimension: "meaning",
+            signal: checked.evaluation.correct ? "correct" : "incorrect",
+            data: {
+              source: "translation",
+              selectedAnswer: answer,
+              questionId,
+            },
+          },
+        ],
+      });
+      masterySaved = !evidence.error;
     }
 
-    return NextResponse.json({ ...evaluation, masterySaved });
+    return NextResponse.json({ ...checked.evaluation, masterySaved });
   } catch (error) {
-    const message = error instanceof Error
-      ? error.message
-      : "AIko could not check this translation.";
+    const message =
+      error instanceof Error
+        ? error.message
+        : "AIko could not check this translation.";
     return NextResponse.json({ error: message }, { status: 502 });
   }
 }
