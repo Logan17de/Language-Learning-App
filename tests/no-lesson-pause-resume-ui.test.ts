@@ -19,10 +19,11 @@ describe("lesson pause and resume UX stays retired", () => {
     expect(preview).toContain("There is no pause or resume inside a lesson.");
   });
 
-  it("warns before an explicit lesson exit", () => {
+  it("warns that an explicitly left lesson will not return", () => {
     expect(player).toContain("AIko doesn&apos;t pause lessons");
     expect(player).toContain("this attempt");
-    expect(player).toContain("start from the beginning next time");
+    expect(player).toContain("won&apos;t be assigned to you again");
+    expect(player).toContain("choose a different next lesson");
   });
 
   it("routes Home and Learn through the commitment preview before playback", () => {
