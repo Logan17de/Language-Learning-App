@@ -17,6 +17,7 @@ describe("lesson pause/resume retirement", () => {
     expect(player).toContain("AIko doesn&apos;t pause lessons");
     expect(player).toContain("Stay in lesson");
     expect(player).toContain("Leave lesson");
+    expect(player).toContain("won&apos;t be assigned to you again");
     expect(player).not.toContain("Pause this lesson?");
     expect(player).not.toContain("Save and exit");
     expect(player).not.toContain("/learn?paused=1");
@@ -34,10 +35,10 @@ describe("lesson pause/resume retirement", () => {
     expect(learn).not.toContain("Resume lesson");
     expect(learn).not.toContain("Your lesson is saved");
     expect(learn).not.toContain("Final review");
-    expect(learn).toContain("6 connected stages");
+    expect(learn).toContain("six connected phases");
     expect(home).not.toContain("Resume lesson");
     expect(home).not.toContain("Resume where you stopped");
-    expect(home).toContain("6 stages");
+    expect(home).toContain("6 connected phases");
     expect(backendStore).not.toContain("paused lesson");
   });
 });
