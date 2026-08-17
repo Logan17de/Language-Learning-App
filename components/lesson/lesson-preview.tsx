@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  AlertTriangle,
   ArrowLeft,
   ArrowRight,
   Check,
@@ -110,23 +109,6 @@ export function LessonPreview({ lesson }: { lesson: LessonPackage }) {
             </div>
           </div>
         </section>
-
-        {!isComplete && (
-          <div
-            className="mt-5 flex items-start gap-3 rounded-2xl border border-persimmon-200 bg-persimmon-50 p-4 text-sm text-persimmon-700"
-            role="note"
-          >
-            <AlertTriangle className="mt-0.5 size-5 shrink-0" />
-            <div>
-              <p className="font-semibold">This lesson is designed for one sitting.</p>
-              <p className="mt-1 leading-6">
-                There is no pause or resume inside a lesson. If you leave early,
-                the current attempt ends, but mastery from activities you already
-                completed stays saved.
-              </p>
-            </div>
-          </div>
-        )}
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_.72fr]">
           <div className="space-y-6">
