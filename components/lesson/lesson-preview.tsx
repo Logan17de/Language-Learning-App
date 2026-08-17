@@ -25,22 +25,22 @@ export function LessonPreview({ lesson }: { lesson: LessonPackage }) {
   const lessonHref = isComplete
     ? `/lesson/${lesson.id}/complete`
     : `/lesson/${lesson.id}/play`;
-  const actionLabel = isComplete ? "View lesson results" : "Start lesson";
+  const actionLabel = isComplete ? "View lesson results" : "Begin lesson";
 
   return (
     <div className="min-h-screen bg-paper">
       <header className="border-b border-black/[.05] bg-white/80 backdrop-blur">
         <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 sm:px-8">
           <Link
-            href="/home"
+            href="/learn"
             className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-semibold text-stone-500 hover:bg-moss-50 hover:text-moss-700"
           >
-            <ArrowLeft className="size-4" /> Home
+            <ArrowLeft className="size-4" /> Learning path
           </Link>
-          <span className="text-sm font-semibold">Lesson preview</span>
+          <span className="text-sm font-semibold">Before you start</span>
           <Link
-            href="/home"
-            aria-label="Close lesson preview"
+            href="/learn"
+            aria-label="Close lesson details"
             className="grid size-11 place-items-center rounded-full text-stone-400 hover:bg-stone-100"
           >
             <X className="size-5" />
@@ -88,10 +88,10 @@ export function LessonPreview({ lesson }: { lesson: LessonPackage }) {
                 <Clock3 className="size-5 text-persimmon-400" />
                 <div>
                   <p className="text-sm font-semibold">
-                    {lesson.durationMinutes} minutes
+                    About {lesson.durationMinutes} minutes
                   </p>
                   <p className="text-xs text-white/45">
-                    {lesson.phases.length} connected phases
+                    {lesson.phases.length} connected phases in one lesson
                   </p>
                 </div>
               </div>
@@ -103,7 +103,7 @@ export function LessonPreview({ lesson }: { lesson: LessonPackage }) {
                     {lesson.grammar.length} grammar · {lesson.kanji.length} target kanji
                   </p>
                   <p className="text-xs text-white/45">
-                    Mastery is updated as you complete activities
+                    Your activity updates mastery and future targeting
                   </p>
                 </div>
               </div>
@@ -118,11 +118,11 @@ export function LessonPreview({ lesson }: { lesson: LessonPackage }) {
           >
             <AlertTriangle className="mt-0.5 size-5 shrink-0" />
             <div>
-              <p className="font-semibold">Finish the lesson in one session.</p>
+              <p className="font-semibold">This lesson is designed for one sitting.</p>
               <p className="mt-1 leading-6">
-                AIko does not pause lessons for later. If you leave before finishing,
-                the current attempt ends. Mastery already recorded from completed
-                activities remains saved.
+                There is no pause or resume inside a lesson. If you leave early,
+                the current attempt ends, but mastery from activities you already
+                completed stays saved.
               </p>
             </div>
           </div>
@@ -136,9 +136,9 @@ export function LessonPreview({ lesson }: { lesson: LessonPackage }) {
                   <Layers3 className="size-5" />
                 </span>
                 <div>
-                  <h2 className="text-xl font-semibold">What you’ll learn</h2>
+                  <h2 className="text-xl font-semibold">What AIko will reinforce</h2>
                   <p className="text-sm text-stone-400">
-                    The targets used throughout this lesson
+                    These targets return across the lesson instead of appearing once
                   </p>
                 </div>
               </div>
@@ -164,7 +164,10 @@ export function LessonPreview({ lesson }: { lesson: LessonPackage }) {
           <aside>
             <Card className="sticky top-6 p-7">
               <p className="text-xs font-bold uppercase tracking-[.18em] text-moss-600">
-                Lesson flow
+                How this lesson works
+              </p>
+              <p className="mt-2 text-sm leading-6 text-stone-500">
+                Each phase reuses the same lesson context in a different way.
               </p>
               <ol className="mt-6 space-y-1">
                 {lesson.phases.map((phase, index) => (
@@ -185,16 +188,11 @@ export function LessonPreview({ lesson }: { lesson: LessonPackage }) {
                 {actionLabel} <ArrowRight className="size-4" />
               </ButtonLink>
               <Link
-                href="/home"
+                href="/learn"
                 className="mt-3 flex min-h-12 items-center justify-center rounded-full text-sm font-semibold text-stone-500 hover:bg-stone-50"
               >
-                Choose another lesson
+                Back to my learning path
               </Link>
-              {!isComplete && (
-                <p className="mt-4 text-center text-[11px] leading-5 text-stone-400">
-                  Leaving an active lesson ends that attempt; there is no Pause or Resume action.
-                </p>
-              )}
             </Card>
           </aside>
         </div>
