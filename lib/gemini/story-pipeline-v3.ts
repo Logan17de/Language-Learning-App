@@ -1,11 +1,14 @@
 import type {
   LessonPlan,
+  PlannedGrammar,
   StoryDraft,
 } from "@/lib/gemini/lesson-engine-v2";
 
 export interface LessonPlanV3 extends LessonPlan {
   /** Optional onboarding interests. Empty means the story prompt ignores interests. */
   interests: string[];
+  /** Two previously seen grammar patterns used only for translation reinforcement. */
+  reinforcementGrammar: PlannedGrammar[];
 }
 
 export interface StoryOnlyDraftLine {
