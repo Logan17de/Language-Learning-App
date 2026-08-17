@@ -139,7 +139,7 @@ export interface LessonSession {
   storyComplete: boolean;
   vocabularyAnswers: VocabularyAnswer[];
   grammarAnswers: GrammarAnswer[];
-  grammarTranslationQuestions: GrammarTranslationQuestion[];
+  grammarTranslationQuestions?: GrammarTranslationQuestion[];
   readingAnswers: ReadingComprehensionAnswer[];
   readingEvents: ReadingEvent[];
   readingComplete: boolean;
