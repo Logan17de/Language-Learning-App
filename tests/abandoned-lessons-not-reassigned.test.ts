@@ -36,11 +36,16 @@ describe("abandoned lessons are never shown as the next lesson", () => {
     );
   });
 
-  it("revalidates the backend assignment whenever Learn mounts", () => {
+  it("revalidates the backend assignment without flashing a loader after first load", () => {
     expect(backendStore).not.toContain("get().loaded) return");
     expect(backendStore).toContain(
-      "stale assignments must never be shown as \"next lesson\"",
+      "const blocking = !current.loaded && current.lessons.length === 0;",
     );
-    expect(backendStore).toContain("lessons: [],\n        loading: false");
+    expect(backendStore).toContain(
+      "if (blocking) set({ loading: true, error: \"\" });",
+    );
+    expect(backendStore).toContain(
+      "lessons: blocking ? [] : state.lessons",
+    );
   });
 });
