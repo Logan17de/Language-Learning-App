@@ -308,10 +308,9 @@ function Exercises({ lesson }: { lesson: LessonPackage }) {
   const groups = [
     ["Listening", lesson.listeningExercises],
     ["Speaking", lesson.speakingExercises],
-    ["Final review", lesson.reviewQuestions],
   ] as const;
   return (
-    <div className="grid gap-6 xl:grid-cols-3">
+    <div className="grid gap-6 xl:grid-cols-2">
       {groups.map(([label, items]) => (
         <AdminSection key={label} title={label}>
           <div className="space-y-3">
