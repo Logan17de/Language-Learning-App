@@ -24,9 +24,13 @@ const LEARNED_THRESHOLD = 80;
 
 interface LessonIdentity {
   id: string;
-  currentVersionId: string;
   level: JLPTLevel;
   topic: string;
+}
+
+interface ActiveLessonSession {
+  id: string;
+  lessonVersionId: string;
 }
 
 interface GrammarRecord {
@@ -35,6 +39,18 @@ interface GrammarRecord {
   pattern: string;
   meaning: string;
   jlpt_level: JLPTLevel;
+}
+
+interface StoredTranslationQuestion {
+  id: string;
+  english_prompt: string;
+  position: number;
+}
+
+export interface EvaluatedGrammarTranslation {
+  evaluation: TranslationEvaluation;
+  lessonSessionId: string;
+  targetItemId: string;
 }
 
 function allowedLevels(level: JLPTLevel): JLPTLevel[] {
@@ -51,7 +67,7 @@ async function resolveLesson(
 ): Promise<LessonIdentity> {
   const byId = await admin
     .from("lessons")
-    .select("id,current_version_id,jlpt_level,topic")
+    .select("id,jlpt_level,topic")
     .eq("id", lessonReference)
     .maybeSingle();
   if (byId.error) {
@@ -62,7 +78,7 @@ async function resolveLesson(
     ? null
     : await admin
         .from("lessons")
-        .select("id,current_version_id,jlpt_level,topic")
+        .select("id,jlpt_level,topic")
         .eq("legacy_id", lessonReference)
         .maybeSingle();
   if (byLegacy?.error) {
@@ -70,11 +86,7 @@ async function resolveLesson(
   }
 
   const result = byId.data ?? byLegacy?.data ?? null;
-  if (
-    !result ||
-    typeof result.id !== "string" ||
-    typeof result.current_version_id !== "string"
-  ) {
+  if (!result || typeof result.id !== "string") {
     throw new Error("This lesson is unavailable for translation practice.");
   }
   if (!isJlptLevel(result.jlpt_level)) {
@@ -82,22 +94,21 @@ async function resolveLesson(
   }
   return {
     id: result.id,
-    currentVersionId: result.current_version_id,
     level: result.jlpt_level,
     topic: typeof result.topic === "string" ? result.topic : "Japanese practice",
   };
 }
 
-async function activeVersionId(
+async function activeLessonSession(
   admin: SupabaseClient,
   userId: string,
-  lesson: LessonIdentity,
-): Promise<string> {
+  lessonId: string,
+): Promise<ActiveLessonSession> {
   const active = await admin
     .from("lesson_sessions")
-    .select("lesson_version_id")
+    .select("id,lesson_version_id")
     .eq("user_id", userId)
-    .eq("lesson_id", lesson.id)
+    .eq("lesson_id", lessonId)
     .eq("status", "active")
     .order("started_at", { ascending: false })
     .limit(1)
@@ -105,29 +116,60 @@ async function activeVersionId(
   if (active.error) {
     throw new Error(`Active lesson could not be loaded: ${active.error.message}`);
   }
-  return typeof active.data?.lesson_version_id === "string"
-    ? active.data.lesson_version_id
-    : lesson.currentVersionId;
+  if (
+    !active.data ||
+    typeof active.data.id !== "string" ||
+    typeof active.data.lesson_version_id !== "string"
+  ) {
+    throw new Error("Start this lesson before opening translation practice.");
+  }
+  return {
+    id: active.data.id,
+    lessonVersionId: active.data.lesson_version_id,
+  };
+}
+
+function publicQuestions(rows: StoredTranslationQuestion[]): GrammarTranslationQuestion[] {
+  return [...rows]
+    .sort((left, right) => left.position - right.position)
+    .map((row) => ({ id: row.id, english: row.english_prompt }));
+}
+
+async function storedQuestions(
+  admin: SupabaseClient,
+  userId: string,
+  sessionId: string,
+): Promise<StoredTranslationQuestion[]> {
+  const result = await admin
+    .from("lesson_translation_questions")
+    .select("id,english_prompt,position")
+    .eq("user_id", userId)
+    .eq("lesson_session_id", sessionId)
+    .order("position", { ascending: true });
+  if (result.error) {
+    throw new Error(
+      `Translation question state could not be loaded: ${result.error.message}`,
+    );
+  }
+  return (result.data ?? []) as StoredTranslationQuestion[];
 }
 
 async function translationTargets(
+  admin: SupabaseClient,
   userId: string,
-  lessonReference: string,
-): Promise<{ lesson: LessonIdentity; targets: TranslationQuestionTarget[] }> {
-  const admin = createAdminClient() as unknown as SupabaseClient;
-  const lesson = await resolveLesson(admin, lessonReference);
-  const versionId = await activeVersionId(admin, userId, lesson);
-
+  lesson: LessonIdentity,
+  lessonVersionId: string,
+): Promise<TranslationQuestionTarget[]> {
   const [lessonGrammar, mastery, records] = await Promise.all([
     admin
       .from("lesson_grammar")
       .select("grammar_id,pattern,meaning,position")
-      .eq("lesson_version_id", versionId)
+      .eq("lesson_version_id", lessonVersionId)
       .order("position", { ascending: true })
       .limit(3),
     admin
       .from("learner_mastery")
-      .select("item_key,mastery")
+      .select("item_key,mastery,evidence_count")
       .eq("user_id", userId)
       .eq("item_type", "grammar")
       .lt("mastery", LEARNED_THRESHOLD),
@@ -175,24 +217,32 @@ async function translationTargets(
   );
 
   const excluded = new Set(lessonTargets.map((target) => target.libraryId));
-  const masteryByRecord = new Map<string, number>();
+  const masteryByRecord = new Map<string, { score: number; evidenceCount: number }>();
   for (const row of mastery.data ?? []) {
-    if (typeof row.item_key !== "string" || typeof row.mastery !== "number") {
+    if (
+      typeof row.item_key !== "string" ||
+      typeof row.mastery !== "number" ||
+      typeof row.evidence_count !== "number"
+    ) {
       continue;
     }
     const record = byKey.get(row.item_key);
     if (!record || excluded.has(record.id)) continue;
     const previous = masteryByRecord.get(record.id);
-    if (previous === undefined || row.mastery > previous) {
-      masteryByRecord.set(record.id, row.mastery);
+    if (!previous || row.mastery > previous.score) {
+      masteryByRecord.set(record.id, {
+        score: row.mastery,
+        evidenceCount: row.evidence_count,
+      });
     }
   }
 
-  const ranked = [...masteryByRecord.entries()].flatMap(([id, score]) => {
+  const ranked = [...masteryByRecord.entries()].flatMap(([id, state]) => {
     const record = byKey.get(id);
-    return record ? [{ record, score }] : [];
+    return record ? [{ record, ...state }] : [];
   });
-  const reinforcement = ranked
+
+  const reinforcement: TranslationQuestionTarget[] = ranked
     .filter(
       ({ score }) =>
         score >= REINFORCEMENT_MIN && score < LEARNED_THRESHOLD,
@@ -207,71 +257,80 @@ async function translationTargets(
       return left.record.pattern.localeCompare(right.record.pattern, "ja");
     })
     .slice(0, 2)
-    .map(({ record }) => record);
+    .map(({ record }) => ({
+      libraryId: record.id,
+      pattern: record.pattern,
+      meaning: record.meaning,
+      role: "reinforcement" as const,
+    }));
 
-  // A learner can reach this feature before two grammar rows occupy the 60-80
-  // reinforcement band. Fill only missing slots from the strongest sub-60 rows,
-  // then unseen rows, so the phase remains playable. As soon as two 60-80 rows
-  // exist, this fallback is not used.
+  // If the learner does not yet have two patterns in the 60-80 band, use only
+  // grammar with real learner evidence. Do not silently test unseen grammar.
   if (reinforcement.length < 2) {
     const chosen = new Set([
       ...excluded,
-      ...reinforcement.map((record) => record.id),
+      ...reinforcement.map((target) => target.libraryId),
     ]);
-    const subSixty = ranked
+    const evidenceBackedSubSixty = ranked
       .filter(
-        ({ record, score }) =>
-          !chosen.has(record.id) && score < REINFORCEMENT_MIN,
+        ({ record, score, evidenceCount }) =>
+          !chosen.has(record.id) &&
+          score < REINFORCEMENT_MIN &&
+          evidenceCount > 0,
       )
-      .sort((left, right) => right.score - left.score)
-      .map(({ record }) => record);
-    const unseen = grammarRecords
-      .filter(
-        (record) => !chosen.has(record.id) && !masteryByRecord.has(record.id),
-      )
-      .sort((left, right) => {
-        const levelDifference =
-          Number(right.jlpt_level === lesson.level) -
-          Number(left.jlpt_level === lesson.level);
-        return (
-          levelDifference || left.pattern.localeCompare(right.pattern, "ja")
-        );
-      });
-    for (const record of [...subSixty, ...unseen]) {
+      .sort((left, right) => right.score - left.score);
+
+    for (const { record } of evidenceBackedSubSixty) {
       if (reinforcement.length >= 2) break;
       if (chosen.has(record.id)) continue;
-      reinforcement.push(record);
+      reinforcement.push({
+        libraryId: record.id,
+        pattern: record.pattern,
+        meaning: record.meaning,
+        role: "reinforcement",
+      });
       chosen.add(record.id);
     }
   }
 
-  if (reinforcement.length !== 2) {
-    throw new Error(
-      "Two additional grammar patterns are required for translation practice.",
-    );
+  // A brand-new learner may have no suitable history yet. In that case, repeat
+  // lesson grammar for extra production instead of exposing/testing unseen grammar.
+  while (reinforcement.length < 2) {
+    const fallback = lessonTargets[reinforcement.length % lessonTargets.length];
+    reinforcement.push({ ...fallback, role: "lesson_fallback" });
   }
 
-  return {
-    lesson,
-    targets: [
-      ...lessonTargets,
-      ...reinforcement.map((record) => ({
-        libraryId: record.id,
-        pattern: record.pattern,
-        meaning: record.meaning,
-        role: "reinforcement" as const,
-      })),
-    ],
-  };
+  return [...lessonTargets, ...reinforcement.slice(0, 2)];
 }
 
 export async function generateGrammarTranslationPractice(input: {
   userId: string;
   lessonId: string;
 }): Promise<GrammarTranslationQuestion[]> {
-  const { lesson, targets } = await translationTargets(
+  const admin = createAdminClient() as unknown as SupabaseClient;
+  const lesson = await resolveLesson(admin, input.lessonId);
+  const session = await activeLessonSession(admin, input.userId, lesson.id);
+
+  const existing = await storedQuestions(admin, input.userId, session.id);
+  if (existing.length === 5) return publicQuestions(existing);
+  if (existing.length > 0) {
+    const cleanup = await admin
+      .from("lesson_translation_questions")
+      .delete()
+      .eq("user_id", input.userId)
+      .eq("lesson_session_id", session.id);
+    if (cleanup.error) {
+      throw new Error(
+        `Incomplete translation state could not be reset: ${cleanup.error.message}`,
+      );
+    }
+  }
+
+  const targets = await translationTargets(
+    admin,
     input.userId,
-    input.lessonId,
+    lesson,
+    session.lessonVersionId,
   );
   const generated = await generateStructured<RawTranslationQuestions>({
     name: "grammar_translation_questions",
@@ -289,7 +348,8 @@ export async function generateGrammarTranslationPractice(input: {
   const byIndex = new Map(
     generated.value.questions.map((question) => [question.requestIndex, question]),
   );
-  return targets.map((target, index) => {
+
+  const rows = targets.map((target, index) => {
     const question = byIndex.get(index);
     if (!question) {
       throw new Error(`Translation question ${index + 1} is missing.`);
@@ -300,42 +360,91 @@ export async function generateGrammarTranslationPractice(input: {
       );
     }
     return {
-      id: `translation:${index}:${target.libraryId}`,
-      english: question.english.trim(),
-      targetPattern: target.pattern,
-      targetMeaning: target.meaning,
-      targetItemId: target.libraryId,
-      role: target.role,
+      user_id: input.userId,
+      lesson_session_id: session.id,
+      lesson_id: lesson.id,
+      lesson_version_id: session.lessonVersionId,
+      position: index + 1,
+      english_prompt: question.english.trim(),
+      target_item_id: target.libraryId,
+      target_pattern: target.pattern,
+      target_meaning: target.meaning,
+      target_role:
+        target.role === "lesson_target"
+          ? "lesson"
+          : target.role === "lesson_fallback"
+            ? "lesson_fallback"
+            : "reinforcement",
+      model_answer: question.modelAnswer.trim(),
     };
   });
+
+  const inserted = await admin
+    .from("lesson_translation_questions")
+    .insert(rows)
+    .select("id,english_prompt,position")
+    .order("position", { ascending: true });
+
+  if (inserted.error) {
+    // A second request can race the first one. The unique session/position key
+    // makes the first complete set authoritative; return it rather than creating
+    // a second client-visible set.
+    const raced = await storedQuestions(admin, input.userId, session.id);
+    if (raced.length === 5) return publicQuestions(raced);
+    throw new Error(
+      `Translation questions could not be stored: ${inserted.error.message}`,
+    );
+  }
+
+  return publicQuestions((inserted.data ?? []) as StoredTranslationQuestion[]);
 }
 
 export async function evaluateGrammarTranslation(input: {
-  english: string;
-  targetItemId: string;
+  userId: string;
+  questionId: string;
   learnerAnswer: string;
-}): Promise<TranslationEvaluation> {
+}): Promise<EvaluatedGrammarTranslation> {
   const admin = createAdminClient() as unknown as SupabaseClient;
-  const grammar = await admin
-    .from("grammar_records")
-    .select("id,pattern,meaning")
-    .eq("id", input.targetItemId)
-    .is("archived_at", null)
-    .neq("quality_status", "rejected")
+  const question = await admin
+    .from("lesson_translation_questions")
+    .select(
+      "id,user_id,lesson_session_id,lesson_id,lesson_version_id,english_prompt,target_item_id,target_pattern,target_meaning,model_answer",
+    )
+    .eq("id", input.questionId)
+    .eq("user_id", input.userId)
     .maybeSingle();
-  if (grammar.error) {
-    throw new Error(`Grammar target could not be loaded: ${grammar.error.message}`);
+  if (question.error) {
+    throw new Error(
+      `Translation question could not be loaded: ${question.error.message}`,
+    );
   }
-  if (!grammar.data || typeof grammar.data.pattern !== "string") {
-    throw new Error("This translation grammar target is unavailable.");
+  if (!question.data) {
+    throw new Error("This translation question is unavailable.");
   }
+
+  const active = await admin
+    .from("lesson_sessions")
+    .select("id")
+    .eq("id", question.data.lesson_session_id)
+    .eq("user_id", input.userId)
+    .eq("lesson_id", question.data.lesson_id)
+    .eq("lesson_version_id", question.data.lesson_version_id)
+    .eq("status", "active")
+    .maybeSingle();
+  if (active.error) {
+    throw new Error(`Lesson session could not be verified: ${active.error.message}`);
+  }
+  if (!active.data) {
+    throw new Error("This translation question no longer belongs to an active lesson.");
+  }
+
   const generated = await generateStructured<TranslationEvaluation>({
     name: "grammar_translation_validation",
     prompt: translationEvaluationPrompt({
-      english: input.english,
-      targetPattern: grammar.data.pattern,
-      targetMeaning:
-        typeof grammar.data.meaning === "string" ? grammar.data.meaning : "",
+      english: String(question.data.english_prompt ?? ""),
+      targetPattern: String(question.data.target_pattern ?? ""),
+      targetMeaning: String(question.data.target_meaning ?? ""),
+      modelAnswer: String(question.data.model_answer ?? ""),
       learnerAnswer: input.learnerAnswer,
     }),
     schema: translationEvaluationSchema,
@@ -344,5 +453,10 @@ export async function evaluateGrammarTranslation(input: {
     validate: translationEvaluationOutputIssues,
     trace: { stage: "grammar_translation_validation" },
   });
-  return generated.value;
+
+  return {
+    evaluation: generated.value,
+    lessonSessionId: String(question.data.lesson_session_id),
+    targetItemId: String(question.data.target_item_id),
+  };
 }
