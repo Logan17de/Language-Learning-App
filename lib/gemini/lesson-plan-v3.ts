@@ -17,10 +17,6 @@ interface Mastery {
   mastery: number;
 }
 
-interface InterestRow {
-  interests: string[];
-}
-
 interface CatalogSnapshot {
   kanjiCatalog: Array<{
     character: string;
@@ -48,17 +44,6 @@ interface CatalogSnapshot {
 
 function allowedLevels(level: JLPTLevel): JLPTLevel[] {
   return LEVELS.slice(0, LEVELS.indexOf(level) + 1);
-}
-
-function normalizedInterests(...sources: unknown[]): string[] {
-  const values = sources.flatMap((source) =>
-    Array.isArray(source)
-      ? source.filter((item): item is string => typeof item === "string")
-      : [],
-  );
-  return [...new Set(
-    values.map((item) => item.normalize("NFKC").trim()).filter(Boolean),
-  )].slice(0, 8);
 }
 
 const cachedCatalogSnapshot = unstable_cache(
@@ -107,8 +92,8 @@ const cachedCatalogSnapshot = unstable_cache(
 );
 
 /**
- * Static catalogs are cached for fifteen minutes. Learner mastery and interests
- * remain live and are fetched in parallel for every request.
+ * Static catalogs are cached for fifteen minutes. Learner mastery remains live
+ * and is fetched for every request.
  *
  * Learned means mastery >= 80. Learned kanji/grammar are never selected as new
  * lesson targets. Each lesson chooses from the ten lowest-mastery eligible
@@ -121,30 +106,17 @@ export async function selectLessonPlanV3(
   level: JLPTLevel,
 ): Promise<LessonPlanV3> {
   const levels = allowedLevels(level);
-  const rawClient = client as unknown as SupabaseClient;
-  const [catalog, masteryResult, preferenceResult, profileResult] = await Promise.all([
+  const [catalog, masteryResult] = await Promise.all([
     cachedCatalogSnapshot(levels.join(",")),
     client
       .from("learner_mastery")
       .select("item_type,item_key,mastery")
       .eq("user_id", userId)
       .in("item_type", ["kanji", "grammar"]),
-    rawClient
-      .from("user_preferences")
-      .select("interests")
-      .eq("user_id", userId)
-      .maybeSingle(),
-    rawClient
-      .from("profiles")
-      .select("interests")
-      .eq("id", userId)
-      .maybeSingle(),
   ]);
 
-  const firstError = [masteryResult, preferenceResult, profileResult]
-    .find((result) => result.error)?.error;
-  if (firstError) {
-    throw new Error(`Lesson targets could not be loaded: ${firstError.message}`);
+  if (masteryResult.error) {
+    throw new Error(`Lesson targets could not be loaded: ${masteryResult.error.message}`);
   }
 
   const kanjiKeys = new Map<string, string>();
@@ -202,9 +174,6 @@ export async function selectLessonPlanV3(
   const knownKanji = [...kanjiMastery.entries()]
     .filter(([, mastery]) => mastery.mastery >= LEARNED_MASTERY_THRESHOLD)
     .map(([character]) => character);
-  const preferences = preferenceResult.data as InterestRow | null;
-  const profile = profileResult.data as InterestRow | null;
-  const interests = normalizedInterests(preferences?.interests, profile?.interests);
 
-  return { kanji, grammar, knownKanji, interests };
+  return { kanji, grammar, knownKanji };
 }
