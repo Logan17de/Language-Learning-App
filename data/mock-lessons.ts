@@ -158,10 +158,10 @@ function seedVocabularyQuestions(
   const readings = vocabulary.map((item) => item.reading);
   const meanings = vocabulary.map((item) => item.meaning);
 
-  return Array.from({ length: 13 }, (_, index) => {
+  return Array.from({ length: 7 }, (_, index) => {
     const item = vocabulary[index % vocabulary.length];
     const reading = index % 2 === 0;
-    const difficulty = index < 6 ? ("Easy" as const) : index < 10 ? ("Medium" as const) : ("Hard" as const);
+    const difficulty = index < 3 ? ("Easy" as const) : index < 5 ? ("Medium" as const) : ("Hard" as const);
     return {
       id: `seed_vocab_${index + 1}`,
       mode: reading ? ("kanji-reading" as const) : ("reading-meaning" as const),
@@ -190,9 +190,9 @@ function seedGrammarQuestions(
     "even though",
   ];
 
-  return Array.from({ length: 10 }, (_, index) => {
+  return Array.from({ length: 7 }, (_, index) => {
     const point = grammar[index % grammar.length];
-    const difficulty = index < 3 ? ("Easy" as const) : index < 7 ? ("Medium" as const) : ("Hard" as const);
+    const difficulty = index < 3 ? ("Easy" as const) : index < 5 ? ("Medium" as const) : ("Hard" as const);
     return {
       id: `seed_grammar_${index + 1}`,
       type: "multiple-choice" as const,
