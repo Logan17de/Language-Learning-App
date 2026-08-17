@@ -12,6 +12,7 @@ import type {
 } from "@/lib/gemini/lesson-types";
 
 const LEVELS: JLPTLevel[] = ["N5", "N4", "N3", "N2", "N1"];
+const LEARNED_MASTERY_THRESHOLD = 80;
 
 interface MasteryValue {
   mastery: number;
@@ -44,12 +45,16 @@ function targetPriority(
   mastery: MasteryValue | null,
   seed: string,
 ): [number, number, number, number] {
-  const weakOrUnknown = !mastery || mastery.evidenceCount === 0 || mastery.mastery < 75;
-  const weakKnown = mastery && mastery.evidenceCount > 0 && mastery.mastery < 75;
+  const belowMasteryThreshold = !mastery || mastery.mastery < LEARNED_MASTERY_THRESHOLD;
+  const weakKnown = Boolean(
+    mastery
+      && mastery.evidenceCount > 0
+      && mastery.mastery < LEARNED_MASTERY_THRESHOLD,
+  );
   return [
-    weakKnown ? 0 : weakOrUnknown ? 1 : 2,
+    weakKnown ? 0 : belowMasteryThreshold ? 1 : 2,
     itemLevel === currentLevel ? 0 : 1,
-    mastery?.mastery ?? 50,
+    mastery?.mastery ?? 0,
     stableHash(seed),
   ];
 }
@@ -141,7 +146,7 @@ export async function selectLessonTargets(
       level: row.jlpt_level,
       meanings: row.meanings,
       readings: row.readings,
-      isKnown: Boolean(mastery && mastery.evidenceCount > 0),
+      isKnown: Boolean(mastery && mastery.mastery >= LEARNED_MASTERY_THRESHOLD),
       mastery: mastery?.mastery ?? null,
     };
     return {
@@ -162,7 +167,7 @@ export async function selectLessonTargets(
       usageNotes: row.usage_notes,
       nuance: row.nuance,
       examples: row.example_sentences,
-      isKnown: Boolean(mastery && mastery.evidenceCount > 0),
+      isKnown: Boolean(mastery && mastery.mastery >= LEARNED_MASTERY_THRESHOLD),
       mastery: mastery?.mastery ?? null,
     };
     return {
