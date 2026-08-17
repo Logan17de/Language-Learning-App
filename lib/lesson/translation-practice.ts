@@ -4,6 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { storyUsesGrammarPattern } from "@/lib/gemini/lesson-validation";
 import { generateStructured } from "@/lib/gemini/structured-output";
 import {
+  translationEvaluationOutputIssues,
   translationEvaluationPrompt,
   translationEvaluationSchema,
   translationQuestionOutputIssues,
@@ -340,6 +341,7 @@ export async function evaluateGrammarTranslation(input: {
     schema: translationEvaluationSchema,
     strictSchema: true,
     exactSchemaName: true,
+    validate: translationEvaluationOutputIssues,
     trace: { stage: "grammar_translation_validation" },
   });
   return generated.value;
