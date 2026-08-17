@@ -70,7 +70,7 @@ const learningFlow: Array<{
   {
     number: "06",
     title: "What you do shapes what comes next",
-    copy: "Your level and learning evidence guide future targeting. Once a lesson has been started, it does not return as your next assigned lesson.",
+    copy: "Your level and learning evidence guide future targeting, helping AIko decide which language needs more attention in later lessons.",
     icon: Sparkles,
   },
 ];
@@ -137,7 +137,7 @@ const plans = [
       "Level-matched lesson assignment",
       "Automatic mastery and progress tracking",
       "Grammar translation inside the lesson flow",
-      "Assigned lessons stay out of rotation once started",
+      "Speaking practice in the core lesson flow",
     ],
     price: "¥0",
     cadence: "",
@@ -377,11 +377,6 @@ export default function LandingPage() {
                 </li>
               ))}
             </ol>
-            <div className="mt-6 rounded-3xl border border-persimmon-100 bg-persimmon-50 px-5 py-4 text-sm leading-6 text-stone-600 sm:px-6">
-              <strong className="text-ink">One-sitting rule:</strong> a lesson does not pause for
-              later. If you leave after starting, that attempt ends and the lesson will not be
-              surfaced again as your next assignment. Learning evidence already recorded stays saved.
-            </div>
           </div>
         </section>
 
