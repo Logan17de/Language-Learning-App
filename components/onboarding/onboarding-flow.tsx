@@ -389,7 +389,7 @@ export function OnboardingFlow() {
             <StepShell
               kicker="Speaking practice"
               title="You’ll use the language out loud, too."
-              description="Reading-aloud feedback is currently simulated; the microphone and speech service are not connected yet."
+              description="When you start a speaking activity, AIko asks for microphone access, transcribes what you say, and compares it with the practice sentence."
             >
               <div className="relative overflow-hidden rounded-4xl bg-moss-900 p-8 text-white sm:p-12">
                 <div className="absolute -right-12 -top-12 size-48 rounded-full bg-persimmon-400/20 blur-2xl" />
@@ -401,9 +401,9 @@ export function OnboardingFlow() {
                 </p>
                 <div className="relative mt-8 grid gap-3 text-sm text-white/65 sm:grid-cols-3">
                   {[
-                    "You choose when to start",
-                    "No recording is uploaded",
-                    "Feedback is simulated",
+                    "Microphone starts only when you record",
+                    "Up to 10 seconds per attempt",
+                    "Live transcript + sentence match",
                   ].map((item) => (
                     <span key={item} className="flex items-center gap-2">
                       <Check className="size-4 text-moss-200" />
@@ -425,7 +425,7 @@ export function OnboardingFlow() {
                 AIko will take it from here.
               </h1>
               <p className="mx-auto mt-5 max-w-lg leading-7 text-stone-500">
-                Your daily goal is {onboarding.dailyMinutes} minutes. AIko will choose a {onboarding.level} lesson, start you with a story, and reuse its Japanese across vocabulary + kanji, grammar, reading, listening, and speaking.
+                Your daily goal is {onboarding.dailyMinutes} minutes. AIko will start you with a lesson at your starting level, then reuse its story across vocabulary + kanji, grammar, reading, listening, and speaking.
               </p>
               <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-stone-500">
                 {isPro
