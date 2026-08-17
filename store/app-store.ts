@@ -604,7 +604,7 @@ export const useAppStore = create<AppState>()(
                 state.progress.totalStudyMinutes + result.durationMinutes,
               weakVocabulary: mergeWeakVocabulary(
                 state.progress.weakVocabulary,
-                result.wordsNeedingReview,
+                result.weakItems,
               ),
               kanjiRecognition: Math.min(
                 100,
