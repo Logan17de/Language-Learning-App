@@ -1,11 +1,11 @@
 "use client";
 
 import {
+  BookOpen,
   ChartNoAxesColumnIncreasing,
   CircleHelp,
   Crown,
   House,
-  LibraryBig,
   Settings,
   Sparkles,
   UserRound,
@@ -17,13 +17,13 @@ import { cn } from "@/lib/utils";
 
 const primary = [
   { label: "Home", href: "/home", icon: House },
-  { label: "Learn", href: "/learn", icon: LibraryBig },
+  { label: "Learn", href: "/learn", icon: BookOpen },
   { label: "Progress", href: "/progress", icon: ChartNoAxesColumnIncreasing },
   { label: "Profile", href: "/profile", icon: UserRound },
 ];
 
 const secondary = [
-  { label: "Custom topic", href: "/custom-topic", icon: Sparkles },
+  { label: "Create lesson", href: "/custom-topic", icon: Sparkles },
   { label: "Subscription", href: "/subscription", icon: Crown },
   { label: "Settings", href: "/settings", icon: Settings },
   { label: "Support", href: "/support", icon: CircleHelp },
