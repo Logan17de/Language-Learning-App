@@ -5,7 +5,7 @@ export interface TranslationQuestionTarget {
   libraryId: string;
   pattern: string;
   meaning: string;
-  role: "lesson_target" | "reinforcement";
+  role: "lesson_target" | "reinforcement" | "lesson_fallback";
 }
 
 export interface RawTranslationQuestion {
@@ -80,8 +80,9 @@ ${JSON.stringify(indexedTargets)}
 
 RULES
 - Return one question for every supplied target, preserving requestIndex exactly once from 0 through 4.
-- The first three targets are the lesson's current grammar targets. The final two are previously seen reinforcement patterns.
-- Write the QUESTION itself in natural English. Do not put Japanese, a grammar hint, or the target pattern inside the English question.
+- The first three targets are the lesson's current grammar targets.
+- The final two normally reinforce previously practised grammar in the learner's 60-80 mastery band. If learner history is still sparse, a lesson target may intentionally appear again as extra production practice.
+- Write the QUESTION itself in natural English. Do not put Japanese, a grammar hint, the target pattern, or the target meaning inside the English question.
 - Most importantly: create an English sentence whose meaning makes the supplied Japanese target grammar pattern a genuinely natural translation choice. Never force a pattern into a context where a Japanese speaker would normally choose something else.
 - modelAnswer must be a natural Japanese translation of english and must use the corresponding target grammar pattern correctly.
 - Preserve the English meaning, tense, polarity, person, and pragmatic nuance in modelAnswer.
@@ -96,6 +97,7 @@ export function translationEvaluationPrompt(input: {
   english: string;
   targetPattern: string;
   targetMeaning: string;
+  modelAnswer: string;
   learnerAnswer: string;
 }): string {
   return `Evaluate one learner's English-to-Japanese translation.
@@ -107,11 +109,15 @@ REQUIRED GRAMMAR PATTERN
 ${input.targetPattern}
 Meaning/usage: ${input.targetMeaning}
 
+HIDDEN REFERENCE ANSWER
+${input.modelAnswer}
+
 LEARNER ANSWER
 ${input.learnerAnswer}
 
 EVALUATION RULES
 - Judge meaning and natural Japanese, not exact string matching.
+- The hidden reference answer is an example of the intended meaning and grammar use, not a string the learner must copy.
 - Mark correct only when the learner preserves the important meaning of the English source AND uses the required grammar pattern correctly and naturally.
 - Accept normal Japanese variation in vocabulary, particles, word order, politeness, contractions, kanji/kana choice, and omitted subjects when the meaning remains clear.
 - Do not mark an answer wrong for harmless punctuation or spacing differences.
