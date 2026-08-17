@@ -143,7 +143,6 @@ export interface GenerationAuditEntry {
     | "vocabulary_activities"
     | "grammar_reading_activities"
     | "communication_activities"
-    | "review_activities"
     | "lesson_assembly"
     | "audio";
   model: string;
@@ -198,15 +197,6 @@ interface RawSpeakingExercise {
   targetItemIds: string[];
 }
 
-interface RawReviewQuestion {
-  category: "kanji" | "vocabulary" | "grammar" | "listening" | "speaking";
-  prompt: string;
-  choices: string[];
-  correctAnswer: string;
-  explanation: string;
-  targetItemIds: string[];
-}
-
 export interface InspectableTerm {
   libraryId: string;
   libraryType: "kanji" | "vocabulary";
@@ -220,11 +210,7 @@ export interface PlayablePracticeQuestion extends RawPracticeQuestion {
   inspectableTerms: InspectableTerm[];
 }
 
-/**
- * Compatibility package shape consumed by the current activity assembler and
- * persistence adapter. The old monolithic V2 generation functions were removed;
- * durable generation is orchestrated by lib/custom-lessons/job-runner.ts.
- */
+/** Current durable custom-lesson package assembled from the three activity groups. */
 export interface PlayableLessonPackageV2 {
   schemaVersion: 2;
   title: string;
@@ -273,7 +259,6 @@ export interface PlayableLessonPackageV2 {
   speakingExercises: Array<
     RawSpeakingExercise & { inspectableTerms: InspectableTerm[] }
   >;
-  reviewQuestions: RawReviewQuestion[];
   generationAudit: {
     calls: GenerationAuditEntry[];
   };
