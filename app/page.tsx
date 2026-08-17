@@ -40,7 +40,7 @@ const learningFlow: Array<{
   {
     number: "01",
     title: "AIko chooses one next lesson",
-    copy: "You receive one level-matched assignment instead of browsing a lesson catalog. Premium learners can also use their interests to rank suitable lessons.",
+    copy: "You receive one level-matched assignment instead of browsing a lesson catalog. Your learning evidence helps AIko keep targeting language that still needs practice.",
     icon: BrainCircuit,
   },
   {
@@ -147,9 +147,8 @@ const plans = [
   },
   {
     name: "Premium",
-    copy: "More control over lesson selection, generation, speaking, and learning insights.",
+    copy: "More control over lesson generation, speaking, and learning insights.",
     features: [
-      "Interest-based lesson recommendations",
       "Custom-topic AI lesson generation",
       "Unlimited adaptive lesson access",
       "Extended speaking practice",
@@ -392,8 +391,8 @@ export default function LandingPage() {
               </h2>
               <p className="mt-5 text-lg leading-8 text-stone-500">
                 Free keeps the core six-phase learning path. Premium adds the capabilities that
-                the current subscription screen actually unlocks: interest-shaped lesson
-                recommendations, custom-topic generation, extended speaking, and deeper insights.
+                the current subscription screen actually unlocks: custom-topic generation,
+                extended speaking, and deeper learning insights.
               </p>
             </div>
             <div className="mt-10 grid gap-6 md:grid-cols-2">
