@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import {
+  BookOpen,
   ChartNoAxesColumnIncreasing,
   House,
-  LibraryBig,
   UserRound,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -15,7 +15,7 @@ const items = [
   {
     label: "Learn",
     href: "/learn",
-    icon: LibraryBig,
+    icon: BookOpen,
     matches: ["/learn", "/lesson", "/custom-topic"],
   },
   {
