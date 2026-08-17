@@ -122,13 +122,13 @@ export function OnboardingFlow() {
   function next() {
     if (step === 5) acknowledgeReading();
     if (step === 6) {
-      void finishOnboarding();
+      void finishOnboarding("/learn");
       return;
     }
     setStep((current) => Math.min(totalSteps - 1, current + 1));
   }
 
-  async function finishOnboarding() {
+  async function finishOnboarding(destination = "/home") {
     if (saving) return;
     setSaving(true);
     setError("");
@@ -149,7 +149,7 @@ export function OnboardingFlow() {
 
     signIn(displayName);
     completeOnboarding();
-    router.push("/home");
+    router.push(destination);
   }
 
   function toggleInterest(interest: string) {
@@ -168,8 +168,8 @@ export function OnboardingFlow() {
   }
 
   const interestDescription = isPro
-    ? "Pro uses these interests for lesson recommendations and future content generation. Without interests, lessons stay random at your level."
-    : "You can save interests for later, but Free lessons stay random at your level. Interest-based recommendations are a Pro feature.";
+    ? "Pro uses these interests to rank level-matched lessons and personalize future content. You can also continue without them."
+    : "You can save interests to your profile now, but Free lesson selection stays random within your level. Interest-based recommendations are a Pro feature.";
 
   return (
     <main className="min-h-screen bg-paper">
@@ -254,7 +254,7 @@ export function OnboardingFlow() {
             <StepShell
               kicker="Your starting point"
               title="Where are you now?"
-              description="A rough answer is perfect. This shapes which level of lessons you see first."
+              description="A rough answer is enough. AIko uses it to choose the level of lessons you see first."
             >
               <div className="grid gap-3 sm:grid-cols-2">
                 {levels.map(({ value, detail }) => (
@@ -282,7 +282,7 @@ export function OnboardingFlow() {
             <StepShell
               kicker="Your rhythm"
               title="How much time feels realistic?"
-              description="A sustainable daily goal beats an ambitious one you avoid."
+              description="Choose a daily study target. This tracks your overall study time; it is not a promised lesson duration."
             >
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {([15, 30, 45, 60] as DailyMinutes[]).map((minutes) => (
@@ -387,9 +387,9 @@ export function OnboardingFlow() {
 
           {step === 5 && (
             <StepShell
-              kicker="Reading aloud"
-              title="Your voice can guide your practice."
-              description="This prototype simulates reading feedback—no microphone or speech service is connected."
+              kicker="Speaking practice"
+              title="You’ll use the language out loud, too."
+              description="Reading-aloud feedback is currently simulated; the microphone and speech service are not connected yet."
             >
               <div className="relative overflow-hidden rounded-4xl bg-moss-900 p-8 text-white sm:p-12">
                 <div className="absolute -right-12 -top-12 size-48 rounded-full bg-persimmon-400/20 blur-2xl" />
@@ -397,8 +397,7 @@ export function OnboardingFlow() {
                   <Mic2 className="size-7 text-persimmon-400" />
                 </span>
                 <p className="relative mt-8 text-xl font-medium leading-8">
-                  “Press Start Reading and read aloud. Your reading helps the
-                  app identify difficult words and personalize future lessons.”
+                  “Speaking comes after you’ve already met the same Japanese in the story and practice phases, so you’re not starting from zero.”
                 </p>
                 <div className="relative mt-8 grid gap-3 text-sm text-white/65 sm:grid-cols-3">
                   {[
@@ -423,18 +422,17 @@ export function OnboardingFlow() {
               </span>
               <p className="section-kicker mt-8">Your path is ready</p>
               <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-                Let’s make Japanese part of your day.
+                AIko will take it from here.
               </h1>
-              <p className="mx-auto mt-5 max-w-md leading-7 text-stone-500">
-                We’ll start with a {onboarding.dailyMinutes}-minute{" "}
-                {onboarding.level} lesson for {onboarding.goal?.toLowerCase()}.
+              <p className="mx-auto mt-5 max-w-lg leading-7 text-stone-500">
+                Your daily goal is {onboarding.dailyMinutes} minutes. AIko will choose a {onboarding.level} lesson, start you with a story, and reuse its Japanese across vocabulary + kanji, grammar, reading, listening, and speaking.
               </p>
-              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">
+              <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-stone-500">
                 {isPro
                   ? onboarding.interests.length
-                    ? "Your Pro plan will use your interests to rank suitable lessons."
-                    : "Add interests later to enable Pro interest-based recommendations. Until then, lessons are random at your level."
-                  : "Free lessons are selected randomly at your level. Upgrade to Pro later for interest-based recommendations."}
+                    ? "Your interests help rank suitable lessons. What you do inside each lesson updates mastery and progress automatically."
+                    : "Add interests later to enable Pro interest-based recommendations. What you do inside each lesson still updates mastery and progress automatically."
+                  : "Free lessons are selected randomly within your level. What you do inside each lesson updates mastery and progress automatically."}
               </p>
               {onboarding.interests.length > 0 && (
                 <div className="mt-8 flex flex-wrap justify-center gap-2">
@@ -474,7 +472,7 @@ export function OnboardingFlow() {
               {saving
                 ? "Saving…"
                 : step === 6
-                  ? "Go to my home"
+                  ? "See my first lesson"
                   : step === 5
                     ? "I understand"
                     : step === 4 && onboarding.interests.length === 0
