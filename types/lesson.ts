@@ -19,7 +19,6 @@ export interface KanjiItem {
   character: string;
   reading: string;
   meaning: string;
-  isReview?: boolean;
 }
 
 export interface VocabularyItem {
@@ -90,7 +89,6 @@ export interface ChoiceExercise {
   conversationLines?: string[];
   audioAssetId?: string;
   questionType?: "multiple-choice" | "ordering" | "fill-blank" | "true-false";
-  category?: "kanji" | "vocabulary" | "grammar" | "listening" | "speaking";
   targetItemIds?: string[];
   inspectableTerms?: StoryWord[];
   difficulty?: ExerciseDifficulty;
@@ -177,7 +175,6 @@ export interface LessonPackage {
   vocabulary: VocabularyItem[];
   vocabularyQuestions: VocabularyQuestion[];
   grammarQuestions: GrammarQuestion[];
-  reviewItems: string[];
   story: StoryLine[];
   images: LessonImage[];
   readingTitle?: string;
@@ -186,8 +183,6 @@ export interface LessonPackage {
   readingQuestions?: ReadingComprehensionQuestion[];
   listeningExercises: ChoiceExercise[];
   speakingExercises: SpeakingExercise[];
-  reviewQuestions: ChoiceExercise[];
-  answerKeys: string[];
   phases: LessonPhase[];
   runtimeAudio?: "stored_or_api" | "browser_tts";
 }
