@@ -50,11 +50,19 @@ export function GrammarPhase({
 }) {
   const standardQuestions = lesson.grammarQuestions;
   const translationQuestions = session.grammarTranslationQuestions ?? [];
+  const initiallyAnsweredTranslations = session.grammarAnswers.filter((answer) =>
+    translationQuestions.some((question) => question.id === answer.questionId),
+  ).length;
   const [showLesson, setShowLesson] = useState(
     session.grammarAnswers.length === 0 && translationQuestions.length === 0,
   );
   const [translationStarted, setTranslationStarted] = useState(
     translationQuestions.length === TRANSLATION_TARGET,
+  );
+  const [translationIndex, setTranslationIndex] = useState(() =>
+    translationQuestions.length > 0
+      ? Math.min(initiallyAnsweredTranslations, translationQuestions.length - 1)
+      : 0,
   );
   const [typedAnswer, setTypedAnswer] = useState("");
   const [translationLoading, setTranslationLoading] = useState(false);
@@ -163,22 +171,22 @@ export function GrammarPhase({
         setTranslationError("Translation practice did not return five questions.");
         return;
       }
+      setTranslationIndex(0);
       setTypedAnswer("");
       onChange({
         ...session,
         grammarTranslationQuestions: result.questions,
       });
     } catch {
-      setTranslationError("The connection was interrupted while preparing translation practice.");
+      setTranslationError(
+        "The connection was interrupted while preparing translation practice.",
+      );
     } finally {
       setTranslationLoading(false);
     }
   }
 
-  const translationQuestion = translationQuestions.find(
-    (item) =>
-      !session.grammarAnswers.some((answer) => answer.questionId === item.id),
-  ) ?? translationQuestions.at(-1);
+  const translationQuestion = translationQuestions[translationIndex];
   const translationAnswer = translationQuestion
     ? session.grammarAnswers.find(
         (item) => item.questionId === translationQuestion.id,
@@ -239,7 +247,9 @@ export function GrammarPhase({
         }),
       });
     } catch {
-      setTranslationError("The connection was interrupted while AIko checked your answer.");
+      setTranslationError(
+        "The connection was interrupted while AIko checked your answer.",
+      );
     } finally {
       setTranslationChecking(false);
     }
@@ -247,6 +257,9 @@ export function GrammarPhase({
 
   function nextTranslation() {
     if (!translationAnswer || translationComplete) return;
+    setTranslationIndex((current) =>
+      Math.min(current + 1, TRANSLATION_TARGET - 1),
+    );
     setTypedAnswer("");
     setTranslationError("");
   }
@@ -260,7 +273,8 @@ export function GrammarPhase({
             Notice the pattern, then use it.
           </h2>
           <p className="mt-3 leading-7 text-stone-500">
-            Review the structure and story example first. After recognition practice, you’ll translate five English sentences into Japanese.
+            Review the structure and story example first. After recognition
+            practice, you’ll translate five English sentences into Japanese.
           </p>
         </div>
         <div className="mt-8 grid gap-5 lg:grid-cols-2">
@@ -287,14 +301,22 @@ export function GrammarPhase({
                   <dt className="text-xs font-bold uppercase tracking-wide text-stone-400">
                     From the story
                   </dt>
-                  <dd className="mt-1 font-serif text-lg leading-7">{point.example}</dd>
-                  <dd className="mt-1 text-xs text-stone-400">{point.translation}</dd>
+                  <dd className="mt-1 font-serif text-lg leading-7">
+                    {point.example}
+                  </dd>
+                  <dd className="mt-1 text-xs text-stone-400">
+                    {point.translation}
+                  </dd>
                 </div>
               </dl>
             </Card>
           ))}
         </div>
-        <Button type="button" className="mt-7" onClick={() => setShowLesson(false)}>
+        <Button
+          type="button"
+          className="mt-7"
+          onClick={() => setShowLesson(false)}
+        >
           Start grammar practice <ArrowRight className="size-4" />
         </Button>
       </div>
@@ -318,15 +340,24 @@ export function GrammarPhase({
                 : "Translation practice needs another try."}
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-stone-500">
-              AIko uses your three lesson patterns plus two patterns from your current reinforcement range, then writes English sentences where each pattern fits naturally in Japanese.
+              AIko uses your three lesson patterns plus two patterns from your
+              current reinforcement range, then writes English sentences where
+              each pattern fits naturally in Japanese.
             </p>
             {translationError && (
-              <p role="alert" className="mt-5 rounded-2xl bg-red-50 p-4 text-sm font-semibold text-red-700">
+              <p
+                role="alert"
+                className="mt-5 rounded-2xl bg-red-50 p-4 text-sm font-semibold text-red-700"
+              >
                 {translationError}
               </p>
             )}
             {!translationLoading && (
-              <Button type="button" className="mt-6" onClick={() => void beginTranslation()}>
+              <Button
+                type="button"
+                className="mt-6"
+                onClick={() => void beginTranslation()}
+              >
                 Try again
               </Button>
             )}
@@ -336,10 +367,7 @@ export function GrammarPhase({
     }
 
     if (!translationQuestion) return null;
-    const currentNumber = Math.min(
-      translationAnsweredCount + (translationAnswer ? 0 : 1),
-      TRANSLATION_TARGET,
-    );
+    const currentNumber = translationIndex + 1;
     return (
       <div className="mx-auto max-w-3xl">
         <div className="flex items-end justify-between gap-4">
@@ -352,9 +380,16 @@ export function GrammarPhase({
                   : "Reinforcement"}
               </Badge>
             </div>
-            <h2 className="mt-4 text-3xl font-semibold">Turn the meaning into Japanese.</h2>
+            <h2 className="mt-4 text-3xl font-semibold">
+              Turn the meaning into Japanese.
+            </h2>
             <p className="mt-2 text-sm leading-6 text-stone-500">
-              Use <span className="font-serif font-semibold text-ink">{translationQuestion.targetPattern}</span>. AIko checks meaning, grammar, and naturalness—not an exact model sentence.
+              Use{" "}
+              <span className="font-serif font-semibold text-ink">
+                {translationQuestion.targetPattern}
+              </span>
+              . AIko checks meaning, grammar, and naturalness—not an exact model
+              sentence.
             </p>
           </div>
           <p className="shrink-0 text-sm font-semibold text-stone-500">
@@ -378,7 +413,10 @@ export function GrammarPhase({
             Target meaning: {translationQuestion.targetMeaning}
           </p>
 
-          <label className="mt-7 block text-sm font-semibold text-stone-600" htmlFor="grammar-translation">
+          <label
+            className="mt-7 block text-sm font-semibold text-stone-600"
+            htmlFor="grammar-translation"
+          >
             Your Japanese
           </label>
           <textarea
@@ -392,7 +430,10 @@ export function GrammarPhase({
           />
 
           {!translationAnswer && convertedAnswer && (
-            <div className="mt-3 rounded-2xl border border-moss-100 bg-moss-50 p-4" role="status">
+            <div
+              className="mt-3 rounded-2xl border border-moss-100 bg-moss-50 p-4"
+              role="status"
+            >
               <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-moss-600">
                 <Languages className="size-4" /> Japanese input preview
               </p>
@@ -403,7 +444,10 @@ export function GrammarPhase({
           )}
 
           {translationError && (
-            <p role="alert" className="mt-4 rounded-2xl bg-red-50 p-4 text-sm font-semibold text-red-700">
+            <p
+              role="alert"
+              className="mt-4 rounded-2xl bg-red-50 p-4 text-sm font-semibold text-red-700"
+            >
               {translationError}
             </p>
           )}
@@ -415,7 +459,9 @@ export function GrammarPhase({
               disabled={!typedAnswer.trim() || translationChecking}
               onClick={() => void submitTranslation()}
             >
-              {translationChecking && <LoaderCircle className="size-4 animate-spin" />}
+              {translationChecking && (
+                <LoaderCircle className="size-4 animate-spin" />
+              )}
               {translationChecking ? "AIko is checking…" : "Check with AIko"}
             </Button>
           )}
@@ -424,7 +470,9 @@ export function GrammarPhase({
             <div className="mt-6">
               <AnswerFeedback
                 correct={translationAnswer.correct}
-                explanation={translationAnswer.feedback || "AIko checked your translation."}
+                explanation={
+                  translationAnswer.feedback || "AIko checked your translation."
+                }
               />
               {translationAnswer.suggestion && (
                 <div className="mt-3 rounded-2xl bg-moss-50 p-4 text-sm leading-6 text-moss-800">
@@ -442,16 +490,23 @@ export function GrammarPhase({
               )}
 
               {!translationComplete ? (
-                <Button type="button" className="mt-5" onClick={nextTranslation}>
+                <Button
+                  type="button"
+                  className="mt-5"
+                  onClick={nextTranslation}
+                >
                   Next translation <ArrowRight className="size-4" />
                 </Button>
               ) : (
                 <div className="mt-5 flex items-start gap-3 rounded-2xl bg-moss-50 p-4 text-sm text-moss-800">
                   <CheckCircle2 className="mt-0.5 size-5 shrink-0" />
                   <div>
-                    <p className="font-semibold">Translation practice complete</p>
+                    <p className="font-semibold">
+                      Translation practice complete
+                    </p>
                     <p className="mt-1 text-moss-700">
-                      {translationCorrectCount} of {TRANSLATION_TARGET} accepted. Continue to Reading when you’re ready.
+                      {translationCorrectCount} of {TRANSLATION_TARGET} accepted.
+                      Continue to Reading when you’re ready.
                     </p>
                   </div>
                 </div>
@@ -465,7 +520,11 @@ export function GrammarPhase({
 
   if (!question) return null;
   const nextAction = answer && !standardComplete ? (
-    <Button type="button" className="h-full min-h-14 px-5" onClick={nextStandardQuestion}>
+    <Button
+      type="button"
+      className="h-full min-h-14 px-5"
+      onClick={nextStandardQuestion}
+    >
       Next <ArrowRight className="size-4" />
     </Button>
   ) : null;
@@ -475,21 +534,32 @@ export function GrammarPhase({
       <div className="flex items-end justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge tone={difficultyTone(question.difficulty)}>{question.difficulty}</Badge>
+            <Badge tone={difficultyTone(question.difficulty)}>
+              {question.difficulty}
+            </Badge>
             <Badge tone="neutral">{question.skill}</Badge>
           </div>
           <h2 className="mt-4 text-3xl font-semibold">Grammar practice</h2>
           <p className="mt-2 text-sm leading-6 text-stone-500">
-            First recognize how the lesson patterns work. Then you’ll produce them yourself in translation.
+            First recognize how the lesson patterns work. Then you’ll produce
+            them yourself in translation.
           </p>
         </div>
         <p className="shrink-0 text-sm font-semibold text-stone-500">
-          {Math.min(standardAnsweredCount + (answer ? 0 : 1), QUESTION_TARGET)} / {Math.min(QUESTION_TARGET, standardQuestions.length)}
+          {Math.min(
+            standardAnsweredCount + (answer ? 0 : 1),
+            QUESTION_TARGET,
+          )}{" "}
+          / {Math.min(QUESTION_TARGET, standardQuestions.length)}
         </p>
       </div>
 
       <ProgressBar
-        value={(standardAnsweredCount / Math.min(QUESTION_TARGET, standardQuestions.length)) * 100}
+        value={
+          (standardAnsweredCount /
+            Math.min(QUESTION_TARGET, standardQuestions.length)) *
+          100
+        }
         className="mt-5"
       />
 
@@ -508,23 +578,38 @@ export function GrammarPhase({
             inspectChoices={false}
             inspectableTerms={inspectableTerms}
             onInspect={(word, reveal) =>
-              onChange(appendInspectableInteraction(session, question.id, word, reveal))
+              onChange(
+                appendInspectableInteraction(session, question.id, word, reveal),
+              )
             }
             onSelect={submitStandardAnswer}
             answerAction={nextAction}
           />
         ) : (
           <section aria-labelledby="grammar-question-prompt">
-            <p id="grammar-question-prompt" className="text-sm font-semibold text-stone-500">
+            <p
+              id="grammar-question-prompt"
+              className="text-sm font-semibold text-stone-500"
+            >
               <InspectableText
                 text={safeProductionPrompt(question.prompt, question.cue)}
                 terms={inspectableTerms}
                 onReveal={(word, reveal) =>
-                  onChange(appendInspectableInteraction(session, question.id, word, reveal))
+                  onChange(
+                    appendInspectableInteraction(
+                      session,
+                      question.id,
+                      word,
+                      reveal,
+                    ),
+                  )
                 }
               />
             </p>
-            <label className="mt-7 block text-sm font-semibold text-stone-600" htmlFor="grammar-answer">
+            <label
+              className="mt-7 block text-sm font-semibold text-stone-600"
+              htmlFor="grammar-answer"
+            >
               Your answer
             </label>
             <textarea
@@ -537,7 +622,10 @@ export function GrammarPhase({
               className="mt-2 w-full resize-none rounded-2xl border border-stone-200 bg-white px-4 py-3 font-serif text-lg leading-7 outline-none transition focus:border-moss-500 focus:ring-4 focus:ring-moss-100 disabled:cursor-default disabled:bg-stone-50"
             />
             {!answer && convertedAnswer && (
-              <div className="mt-3 rounded-2xl border border-moss-100 bg-moss-50 p-4" role="status">
+              <div
+                className="mt-3 rounded-2xl border border-moss-100 bg-moss-50 p-4"
+                role="status"
+              >
                 <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-moss-600">
                   <Languages className="size-4" /> Japanese input preview
                 </p>
@@ -551,18 +639,28 @@ export function GrammarPhase({
                 type="button"
                 className="mt-4"
                 disabled={!typedAnswer.trim()}
-                onClick={() => submitStandardAnswer(convertedAnswer ?? typedAnswer)}
+                onClick={() =>
+                  submitStandardAnswer(convertedAnswer ?? typedAnswer)
+                }
               >
                 Check answer
               </Button>
             )}
             {answer && (
-              <div className="answer-result-row mt-5 flex flex-col gap-3 sm:flex-row sm:items-stretch" data-answer-result-row>
+              <div
+                className="answer-result-row mt-5 flex flex-col gap-3 sm:flex-row sm:items-stretch"
+                data-answer-result-row
+              >
                 <div className="min-w-0 flex-1">
-                  <AnswerFeedback correct={answer.correct} explanation={question.explanation} />
+                  <AnswerFeedback
+                    correct={answer.correct}
+                    explanation={question.explanation}
+                  />
                   {!answer.correct && (
                     <p className="mt-3 rounded-2xl bg-stone-50 p-4 text-sm text-stone-600">
-                      <span className="font-semibold text-ink">Model answer: </span>
+                      <span className="font-semibold text-ink">
+                        Model answer:{" "}
+                      </span>
                       <span className="font-serif">{question.correctAnswer}</span>
                     </p>
                   )}
@@ -584,7 +682,9 @@ export function GrammarPhase({
               <div className="flex-1">
                 <p className="font-semibold">Recognition practice complete</p>
                 <p className="mt-1 text-sm text-moss-700">
-                  {standardCorrectCount} of {standardAnsweredCount} correct. Next, use the patterns yourself in five English-to-Japanese translations.
+                  {standardCorrectCount} of {standardAnsweredCount} correct. Next,
+                  use the patterns yourself in five English-to-Japanese
+                  translations.
                 </p>
               </div>
               <Button type="button" onClick={() => void beginTranslation()}>
