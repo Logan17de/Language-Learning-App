@@ -47,7 +47,8 @@ describe("custom lesson story pipeline v3", () => {
   it("makes the first model call story-only and treats selected targets as prompt guidance", () => {
     expect(storyContract).toContain("const STORY_MIN_SENTENCES = 10");
     expect(storyContract).toContain("const STORY_MAX_SENTENCES = 15");
-    expect(storyContract).toContain('"selected_interest"');
+    expect(storyContract).not.toContain('"selected_interest"');
+    expect(storyContract.toLowerCase()).not.toContain("interest");
     expect(storyContract).toContain('"japanese_story"');
     expect(storyCall).toContain('name: "japanese_lesson"');
     expect(storyCall).toContain("strictSchema: true");
@@ -55,12 +56,12 @@ describe("custom lesson story pipeline v3", () => {
     expect(storyCall).toContain("validate: () => []");
     expect(storyCall).not.toContain("Story target validation failed");
     expect(storyCall).toContain("normalizeStoryPassage(result.value)");
-    expect(plan).toContain('.from("user_preferences")');
+    expect(plan).not.toContain('.from("user_preferences")');
+    expect(plan.toLowerCase()).not.toContain("interest");
   });
 
   it("normalizes the story passage into the reader line", () => {
     const draft = normalizeStoryPassage({
-      selected_interest: "Travel",
       japanese_title: "東京の一日",
       english_title: "A Day in Tokyo",
       japanese_story: "朝、東京へ行きました。友達と駅で会いました。",
@@ -68,7 +69,7 @@ describe("custom lesson story pipeline v3", () => {
     });
     expect(draft.title).toBe("A Day in Tokyo");
     expect(draft.japaneseTitle).toBe("東京の一日");
-    expect(draft.tags).toEqual(["Travel"]);
+    expect(draft.tags).toEqual([]);
     expect(draft.lines[0]?.japanese).toContain("東京");
   });
 
@@ -111,6 +112,7 @@ describe("custom lesson story pipeline v3", () => {
     expect(readingContract).toContain("exactly four distinct choices");
     expect(readingGeneration).not.toContain("lookupJapaneseDictionaryVocabulary");
     expect(readingGeneration).toContain("inspectableTerms: []");
+    expect(readingGeneration.toLowerCase()).not.toContain("interest");
     expect(reading).toContain("question?.choices");
   });
 
