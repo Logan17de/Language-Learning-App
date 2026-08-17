@@ -13,7 +13,6 @@ interface BackendLessonState {
   error: string;
   load: () => Promise<void>;
   loadOne: (id: string) => Promise<LessonPackage | undefined>;
-  invalidate: () => void;
 }
 
 export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
@@ -22,11 +21,19 @@ export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
   loaded: false,
   error: "",
   load: async () => {
-    if (getBackendMode() !== "supabase" || get().loading || get().loaded) return;
+    if (getBackendMode() !== "supabase" || get().loading) return;
+    // Revalidate whenever a learner-facing assignment screen mounts. A lesson
+    // can become completed or abandoned while this store still holds an older
+    // assignment, and stale assignments must never be shown as "next lesson".
     set({ loading: true, error: "" });
     const result = await lessonRepository.assignNext();
     if (!result.ok) {
-      set({ loading: false, loaded: true, error: result.error.message });
+      set({
+        lessons: [],
+        loading: false,
+        loaded: true,
+        error: result.error.message,
+      });
       return;
     }
     const lessons = result.data
@@ -55,11 +62,4 @@ export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
     }));
     return lesson;
   },
-  invalidate: () =>
-    set({
-      lessons: [],
-      loading: false,
-      loaded: false,
-      error: "",
-    }),
 }));
