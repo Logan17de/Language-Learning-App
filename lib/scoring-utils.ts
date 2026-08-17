@@ -123,9 +123,6 @@ export function calculateLessonCompletion(
       ? 1
       : 0;
 
-  // The lesson has six learner phases and no Final Review. Keep every active
-  // phase represented in the final score instead of reserving weight for the
-  // retired review stage.
   const score = Math.round(
     storyIndependence * 15 +
       vocabularyAccuracy * 25 +
@@ -135,7 +132,7 @@ export function calculateLessonCompletion(
       speakingAccuracy * 10,
   );
 
-  const wordsNeedingReview = unique([
+  const weakItems = unique([
     ...storyWords
       .filter((item) => {
         const scores = storyWordScores(
@@ -166,9 +163,8 @@ export function calculateLessonCompletion(
         const staticQuestion = lesson.grammarQuestions.find(
           (question) => question.id === answer.questionId,
         );
-        // Runtime translation targets are intentionally server-owned. Their
-        // incorrect/correct evidence is already persisted by the validation
-        // endpoint, so completion scoring must not reconstruct or expose them.
+        // Runtime translation targets stay server-owned. Their mastery evidence
+        // is persisted by validation, so completion scoring does not reconstruct them.
         return staticQuestion
           ? exerciseTerms(lesson, staticQuestion.targetItemIds)
           : [];
@@ -205,7 +201,7 @@ export function calculateLessonCompletion(
         : 0,
     grammarUnderstandingChange: Math.max(1, Math.round(grammarUnderstandingAccuracy * 4)),
     grammarProductionChange: Math.max(1, Math.round(grammarProductionAccuracy * 4)),
-    wordsNeedingReview,
+    weakItems,
     completedAt: new Date().toISOString(),
   };
 }
