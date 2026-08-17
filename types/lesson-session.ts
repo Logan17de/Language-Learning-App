@@ -106,7 +106,7 @@ export interface LessonCompletionResult {
   pronunciationChange: number;
   grammarUnderstandingChange: number;
   grammarProductionChange: number;
-  wordsNeedingReview: string[];
+  weakItems: string[];
   completedAt: string;
 }
 
