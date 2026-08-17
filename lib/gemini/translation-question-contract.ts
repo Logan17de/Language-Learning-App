@@ -18,6 +18,13 @@ export interface RawTranslationQuestions {
   questions: RawTranslationQuestion[];
 }
 
+export interface TranslationEvaluation {
+  correct: boolean;
+  feedback: string;
+  suggestion: string;
+  suggestedAnswer: string;
+}
+
 export const translationQuestionSchema: JsonSchema = {
   type: "object",
   additionalProperties: false,
@@ -38,6 +45,18 @@ export const translationQuestionSchema: JsonSchema = {
         },
       },
     },
+  },
+};
+
+export const translationEvaluationSchema: JsonSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["correct", "feedback", "suggestion", "suggestedAnswer"],
+  properties: {
+    correct: { type: "boolean" },
+    feedback: { type: "string", minLength: 1, maxLength: 500 },
+    suggestion: { type: "string", minLength: 1, maxLength: 500 },
+    suggestedAnswer: { type: "string", minLength: 1, maxLength: 240 },
   },
 };
 
@@ -63,12 +82,45 @@ RULES
 - Return one question for every supplied target, preserving requestIndex exactly once from 0 through 4.
 - The first three targets are the lesson's current grammar targets. The final two are previously seen reinforcement patterns.
 - Write the QUESTION itself in natural English. Do not put Japanese, a grammar hint, or the target pattern inside the English question.
-- Most importantly: choose an English meaning/context for which the supplied Japanese target grammar pattern is a genuinely natural translation choice. Never force a pattern into a sentence where a Japanese speaker would normally choose something else.
+- Most importantly: create an English sentence whose meaning makes the supplied Japanese target grammar pattern a genuinely natural translation choice. Never force a pattern into a context where a Japanese speaker would normally choose something else.
 - modelAnswer must be a natural Japanese translation of english and must use the corresponding target grammar pattern correctly.
 - Preserve the English meaning, tense, polarity, person, and pragmatic nuance in modelAnswer.
 - Keep vocabulary appropriate for ${input.level}; the grammar target may be the challenging part.
 - Each English prompt must stand on its own. Avoid trivia, ambiguity, and sentences with several equally likely interpretations.
 - Do not turn the task into multiple choice and do not provide explanations.
+
+Return only the requested structured object.`;
+}
+
+export function translationEvaluationPrompt(input: {
+  english: string;
+  targetPattern: string;
+  targetMeaning: string;
+  learnerAnswer: string;
+}): string {
+  return `Evaluate one learner's English-to-Japanese translation.
+
+ENGLISH SOURCE
+${input.english}
+
+REQUIRED GRAMMAR PATTERN
+${input.targetPattern}
+Meaning/usage: ${input.targetMeaning}
+
+LEARNER ANSWER
+${input.learnerAnswer}
+
+EVALUATION RULES
+- Judge meaning and natural Japanese, not exact string matching.
+- Mark correct only when the learner preserves the important meaning of the English source AND uses the required grammar pattern correctly and naturally.
+- Accept normal Japanese variation in vocabulary, particles, word order, politeness, contractions, kanji/kana choice, and omitted subjects when the meaning remains clear.
+- Do not mark an answer wrong for harmless punctuation or spacing differences.
+- A grammatically valid Japanese sentence that avoids the required target pattern is incorrect for this exercise.
+- A sentence that contains the pattern mechanically but uses it with the wrong meaning, formation, tense, polarity, or nuance is incorrect.
+- feedback: briefly say why the answer is correct or what specifically is wrong.
+- suggestion: give one concrete improvement or natural alternative. Even when correct, give a useful refinement rather than empty praise.
+- suggestedAnswer: provide one natural Japanese answer that preserves the English meaning and uses the required target pattern.
+- Keep feedback and suggestion concise and learner-friendly.
 
 Return only the requested structured object.`;
 }
