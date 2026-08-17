@@ -1,0 +1,2137 @@
+﻿id,kanji,english_meaning,readings_kana,reading_count,introduced_level,compound_count,compound_refs
+N5_K001,人,person; human,じん | にん | ひと,3,N5,16,N5_V002 N5_V005 N5_V008 N5_V010 N5_V098 N5_V099 N5_V100 N5_V101 N5_V102 N5_V103 N5_V104 N5_V105 N5_V106 N5_V107 N5_V108 N5_V120
+N5_K002,一,one,いち | いつ | ひと | ひとつ,4,N5,12,N5_V042 N5_V071 N5_V082 N5_V092 N5_V098 N5_V181 N5_V184 N5_V193 N5_V208 N5_V210 N5_V212 N5_V213
+N5_K003,日,day; sun,にち | じつ | ひ | か,4,N5,29,N5_V001 N5_V002 N5_V003 N5_V048 N5_V049 N5_V050 N5_V055 N5_V070 N5_V071 N5_V072 N5_V073 N5_V074 N5_V075 N5_V076 N5_V077 N5_V078 N5_V079 N5_V080 N5_V081 N5_V162 N5_V163 N5_V164 N5_V165 N5_V166 N5_V167 N5_V168 N5_V169 N5_V198 N5_V207
+N5_K004,大,big; large,だい | たい | おお | おおきい | おおいに,5,N5,6,N5_V010 N5_V011 N5_V012 N5_V159 N5_V160 N5_V187
+N5_K005,年,year,ねん | とし,2,N5,11,N5_V058 N5_V065 N5_V066 N5_V067 N5_V068 N5_V095 N5_V121 N5_V122 N5_V197 N5_V212 N5_V213
+N5_K006,出,exit; go out; come out,しゅつ | でる | だす,3,N5,2,N5_V124 N5_V125
+N5_K007,本,book; origin; main,ほん | もと,2,N5,4,N5_V001 N5_V002 N5_V003 N5_V194
+N5_K008,中,middle; inside,ちゅう | なか,2,N5,5,N5_V007 N5_V008 N5_V009 N5_V017 N5_V018
+N5_K009,子,child,し | す | こ,3,N5,4,N5_V109 N5_V110 N5_V111 N5_V112
+N5_K010,見,see; look,けん | みる | みえる | みせる,4,N5,1,N5_V203
+N5_K011,国,country,こく | くに,2,N5,7,N5_V004 N5_V005 N5_V006 N5_V007 N5_V008 N5_V009 N5_V201
+N5_K012,上,up; above; top,じょう | うえ | かみ | あげる | あがる | のぼる | のぼせる | のぼす,8,N5,2,N5_V121 N5_V191
+N5_K013,分,part; minute; divide; understand,ぶん | ふん | ぶ | わける | わかれる | わかる | わかつ,7,N5,3,N5_V097 N5_V183 N5_V186
+N5_K014,生,life; birth; live,せい | しょう | いきる | いかす | いける | うまれる | うむ | おう | はえる | はやす | き | なま,12,N5,8,N5_V012 N5_V013 N5_V016 N5_V018 N5_V020 N5_V021 N5_V023 N5_V198
+N5_K015,行,go; carry out; line,こう | ぎょう | いく | ゆく | おこなう,5,N5,2,N5_V132 N5_V139
+N5_K016,二,two,に | ふた | ふたつ,3,N5,7,N5_V043 N5_V072 N5_V083 N5_V093 N5_V099 N5_V209 N5_V211
+N5_K017,間,interval; between; space,かん | けん | あいだ | ま,4,N5,6,N5_V041 N5_V042 N5_V043 N5_V044 N5_V208 N5_V209
+N5_K018,時,time; hour,じ | とき,2,N5,5,N5_V041 N5_V042 N5_V043 N5_V044 N5_V096
+N5_K019,気,spirit; feeling; air,き | け,2,N5,4,N5_V152 N5_V156 N5_V157 N5_V158
+N5_K020,十,ten,じゅう | じっ | とお | と,4,N5,5,N5_V080 N5_V091 N5_V092 N5_V093 N5_V107
+N5_K021,女,woman; female,じょ | にょ | おんな | め,4,N5,3,N5_V109 N5_V111 N5_V113
+N5_K022,三,three,さん | み | みつ | みっつ,4,N5,3,N5_V073 N5_V084 N5_V100
+N5_K023,前,front; before,ぜん | まえ,2,N5,4,N5_V032 N5_V045 N5_V126 N5_V212
+N5_K024,入,enter; put in,にゅう | いる | いれる | はいる,4,N5,3,N5_V024 N5_V123 N5_V125
+N5_K025,小,small,しょう | ちいさい | こ | お,4,N5,3,N5_V015 N5_V016 N5_V205
+N5_K026,後,after; behind,ご | こう | のち | うしろ | あと | おくれる,6,N5,2,N5_V046 N5_V213
+N5_K027,長,long; leader; chief,ちょう | ながい,2,N5,1,N5_V022
+N5_K028,下,down; below,か | げ | した | しも | もと | さげる | さがる | くだる | くだす | くださる | おろす | おりる,12,N5,3,N5_V122 N5_V155 N5_V192
+N5_K029,学,study; learning,がく | まなぶ,2,N5,12,N5_V011 N5_V012 N5_V013 N5_V014 N5_V015 N5_V016 N5_V017 N5_V018 N5_V023 N5_V024 N5_V202 N5_V203
+N5_K030,月,month; moon,げつ | がつ | つき,3,N5,21,N5_V057 N5_V062 N5_V063 N5_V064 N5_V069 N5_V082 N5_V083 N5_V084 N5_V085 N5_V086 N5_V087 N5_V088 N5_V089 N5_V090 N5_V091 N5_V092 N5_V093 N5_V094 N5_V168 N5_V210 N5_V211
+N5_K031,何,what; how many,か | なに,2,N5,7,N5_V081 N5_V094 N5_V095 N5_V096 N5_V097 N5_V108 N5_V169
+N5_K032,来,come; next,らい | くる | きたる | きたす,4,N5,3,N5_V060 N5_V063 N5_V066
+N5_K033,話,talk; story; conversation,わ | はなす | はなし,3,N5,3,N5_V035 N5_V036 N5_V037
+N5_K034,山,mountain,さん | やま,2,N5,1,N5_V204
+N5_K035,高,high; expensive,こう | たかい | たか | たかまる | たかめる,5,N5,2,N5_V019 N5_V020
+N5_K036,今,now; present,こん | きん | いま,3,N5,6,N5_V048 N5_V051 N5_V052 N5_V059 N5_V062 N5_V065
+N5_K037,書,write; writing; book,しょ | かく,2,N5,3,N5_V029 N5_V030 N5_V031
+N5_K038,五,five,ご | いつ | いつつ,3,N5,3,N5_V075 N5_V086 N5_V102
+N5_K039,名,name; reputation,めい | みょう | な,3,N5,2,N5_V032 N5_V189
+N5_K040,金,gold; money; metal,きん | こん | かね,3,N5,1,N5_V165
+N5_K041,男,man; male,だん | なん | おとこ,3,N5,3,N5_V110 N5_V112 N5_V113
+N5_K042,外,outside; foreign,がい | げ | そと | ほか | はずす | はずれる,6,N5,3,N5_V004 N5_V005 N5_V006
+N5_K043,四,four,し | よ | よつ | よっつ | よん,5,N5,3,N5_V074 N5_V085 N5_V101
+N5_K044,先,ahead; previous; earlier,せん | さき,2,N5,3,N5_V021 N5_V061 N5_V064
+N5_K045,川,river,せん | かわ,2,N5,1,N5_V205
+N5_K046,東,east,とう | ひがし,2,N5,2,N5_V170 N5_V174
+N5_K047,聞,hear; listen; ask,ぶん | もん | きく | きこえる,4,N5,1,N5_V038
+N5_K048,語,language; word,ご | かたる | かたらう,3,N5,4,N5_V003 N5_V006 N5_V009 N5_V034
+N5_K049,九,nine,きゅう | く | ここの | ここのつ,4,N5,3,N5_V079 N5_V090 N5_V106
+N5_K050,食,eat; food,しょく | くう | くらう | たべる,4,N5,6,N5_V141 N5_V142 N5_V143 N5_V144 N5_V145 N5_V146
+N5_K051,八,eight,はち | や | やつ | やっつ,4,N5,4,N5_V078 N5_V089 N5_V105 N5_V195
+N5_K052,水,water,すい | みず,2,N5,1,N5_V163
+N5_K053,天,heaven; sky,てん | あめ,2,N5,1,N5_V156
+N5_K054,木,tree; wood,ぼく | もく | き,3,N5,1,N5_V164
+N5_K055,六,six,ろく | む | むつ | むっつ,4,N5,3,N5_V076 N5_V087 N5_V103
+N5_K056,万,ten thousand,まん | ばん,2,N5,3,N5_V181 N5_V182 N5_V197
+N5_K057,白,white,はく | びゃく | しろ | しろい,4,N5,1,N5_V206
+N5_K058,七,seven,しち | なな | ななつ,3,N5,3,N5_V077 N5_V088 N5_V104
+N5_K059,円,yen; circle,えん | まるい,2,N5,4,N5_V179 N5_V180 N5_V181 N5_V182
+N5_K060,電,electricity,でん,1,N5,4,N5_V036 N5_V037 N5_V152 N5_V153
+N5_K061,父,father,ふ | ちち,2,N5,1,N5_V118
+N5_K062,北,north,ほく | きた,2,N5,2,N5_V173 N5_V175
+N5_K063,車,car; vehicle,しゃ | くるま,2,N5,2,N5_V153 N5_V154
+N5_K064,母,mother,ぼ | はは,2,N5,1,N5_V118
+N5_K065,半,half,はん | なかば,2,N5,5,N5_V044 N5_V068 N5_V069 N5_V070 N5_V183
+N5_K066,百,hundred,ひゃく,1,N5,3,N5_V179 N5_V182 N5_V195
+N5_K067,土,earth; soil,ど | と | つち,3,N5,1,N5_V166
+N5_K068,西,west,せい | さい | にし,3,N5,2,N5_V171 N5_V174
+N5_K069,読,read,どく | とく | よむ,3,N5,1,N5_V030
+N5_K070,千,thousand,せん | ち,2,N5,1,N5_V180
+N5_K071,校,school,こう,1,N5,6,N5_V014 N5_V015 N5_V017 N5_V019 N5_V020 N5_V022
+N5_K072,右,right,う | ゆう | みぎ,3,N5,2,N5_V176 N5_V177
+N5_K073,南,south,なん | みなみ,2,N5,2,N5_V172 N5_V175
+N5_K074,左,left,さ | ひだり,2,N5,2,N5_V176 N5_V178
+N5_K075,友,friend,ゆう | とも,2,N5,2,N5_V119 N5_V120
+N5_K076,火,fire,か | ひ,2,N5,2,N5_V162 N5_V204
+N5_K077,毎,every,まい,1,N5,6,N5_V053 N5_V054 N5_V055 N5_V056 N5_V057 N5_V058
+N5_K078,雨,rain,う | あめ,2,N5,1,N5_V159
+N5_K079,休,rest; holiday,きゅう | やすむ | やすまる | やすめる,4,N5,1,N5_V207
+N5_K080,午,noon,ご,1,N5,3,N5_V045 N5_V046 N5_V047
+N4_K001,言,say; word; speech,げん | ごん | いう | こと,4,N4,2,N4_V001 N4_V002
+N4_K002,手,hand,しゅ | て,2,N4,4,N4_V003 N4_V004 N4_V154 N4_V323
+N4_K003,自,self; oneself,じ | し | みずから,3,N4,3,N4_V005 N4_V006 N4_V105
+N4_K004,者,person; someone,しゃ | もの,2,N4,4,N4_V007 N4_V008 N4_V170 N4_V347
+N4_K005,事,thing; matter; event,じ | こと,2,N4,5,N4_V009 N4_V010 N4_V016 N4_V145 N4_V299
+N4_K006,思,think; thought,し | おもう,2,N4,2,N4_V011 N4_V012
+N4_K007,会,meet; meeting,かい | え | あう,3,N4,8,N4_V013 N4_V014 N4_V015 N4_V122 N4_V260 N4_V282 N4_V310 N4_V333
+N4_K008,家,house; home; family,か | け | いえ | や,4,N4,5,N4_V016 N4_V017 N4_V018 N4_V393 N4_V413
+N4_K009,的,target; -like; adjectival suffix,てき | まと,2,N4,3,N4_V019 N4_V020 N4_V114
+N4_K010,方,direction; way; person (polite),ほう | かた,2,N4,9,N4_V021 N4_V022 N4_V023 N4_V025 N4_V118 N4_V140 N4_V179 N4_V181 N4_V184
+N4_K011,地,ground; land; place,ち | じ,2,N4,4,N4_V024 N4_V025 N4_V026 N4_V201
+N4_K012,目,eye; item; order,もく | め,2,N4,5,N4_V019 N4_V027 N4_V028 N4_V114 N4_V137
+N4_K013,場,place; location,じょう | ば,2,N4,5,N4_V015 N4_V029 N4_V030 N4_V036 N4_V234
+N4_K014,代,generation; substitute; fee,だい | たい | かわる | かえる | よ | しろ,6,N4,6,N4_V031 N4_V032 N4_V033 N4_V068 N4_V127 N4_V251
+N4_K015,私,I; private,し | わたくし | わたし,3,N4,2,N4_V034 N4_V035
+N4_K016,立,stand; establish,りつ | たつ | たてる,3,N4,4,N4_V034 N4_V036 N4_V037 N4_V165
+N4_K017,物,thing; object,ぶつ | もつ | もの,3,N4,5,N4_V038 N4_V039 N4_V040 N4_V194 N4_V286
+N4_K018,田,rice field,でん | た,2,N4,2,N4_V041 N4_V042
+N4_K019,体,body; form,たい | てい | からだ,3,N4,7,N4_V043 N4_V044 N4_V045 N4_V103 N4_V156 N4_V334 N4_V353
+N4_K020,動,move; motion,どう | うごく | うごかす,3,N4,4,N4_V005 N4_V038 N4_V046 N4_V216
+N4_K021,社,company; shrine; society,しゃ | やしろ,2,N4,3,N4_V013 N4_V047 N4_V048
+N4_K022,知,know; knowledge,ち | しる,2,N4,3,N4_V049 N4_V050 N4_V051
+N4_K023,理,reason; logic,り,1,N4,3,N4_V052 N4_V053 N4_V143
+N4_K024,同,same,どう | おなじ,2,N4,2,N4_V054 N4_V055
+N4_K025,心,heart; mind,しん | こころ,2,N4,3,N4_V056 N4_V057 N4_V058
+N4_K026,発,depart; emit; start,はつ | ほつ,2,N4,7,N4_V002 N4_V059 N4_V060 N4_V061 N4_V073 N4_V120 N4_V255
+N4_K027,作,make; create,さく | さ | つくる,3,N4,5,N4_V004 N4_V007 N4_V018 N4_V062 N4_V063
+N4_K028,新,new,しん | あたらしい | あらた | にい,4,N4,3,N4_V064 N4_V065 N4_V321
+N4_K029,世,world; generation,せい | せ | よ,3,N4,3,N4_V066 N4_V067 N4_V068
+N4_K030,度,degree; time; occurrence,ど | たび,2,N4,3,N4_V069 N4_V070 N4_V071
+N4_K031,明,bright; clear,めい | みょう | あかり | あかるい | あかるむ | あからむ | あきらか | あける | あく | あくる | あかす,11,N4,4,N4_V072 N4_V073 N4_V074 N4_V362
+N4_K032,力,power; strength,りょく | りき | ちから,3,N4,5,N4_V043 N4_V075 N4_V076 N4_V077 N4_V176
+N4_K033,意,idea; intention; meaning,い,1,N4,6,N4_V012 N4_V055 N4_V078 N4_V079 N4_V080 N4_V233
+N4_K034,用,use; business,よう | もちいる,2,N4,6,N4_V009 N4_V035 N4_V080 N4_V081 N4_V082 N4_V320
+N4_K035,主,main; master; owner,しゅ | ぬし | おも,3,N4,3,N4_V083 N4_V084 N4_V085
+N4_K036,通,pass through; commute; communicate,つう | とおる | とおす | かよう,4,N4,4,N4_V051 N4_V086 N4_V087 N4_V088
+N4_K037,文,sentence; writing; culture,ぶん | もん | ふみ,3,N4,7,N4_V063 N4_V089 N4_V090 N4_V297 N4_V309 N4_V326 N4_V408
+N4_K038,屋,shop; roof; room,おく | や,2,N4,4,N4_V091 N4_V092 N4_V093 N4_V389
+N4_K039,業,business; work; industry,ぎょう | ごう | わざ,3,N4,4,N4_V094 N4_V095 N4_V096 N4_V141
+N4_K040,持,hold; have,じ | もつ,2,N4,3,N4_V097 N4_V098 N4_V099
+N4_K041,道,road; way,どう | みち,2,N4,5,N4_V100 N4_V101 N4_V102 N4_V328 N4_V360
+N4_K042,身,body; oneself,しん | み,2,N4,3,N4_V103 N4_V104 N4_V105
+N4_K043,不,not; un-; non-,ふ | ぶ,2,N4,3,N4_V106 N4_V107 N4_V108
+N4_K044,口,mouth; opening,こう | く | くち,3,N4,5,N4_V109 N4_V110 N4_V111 N4_V231 N4_V276
+N4_K045,多,many; much,た | おおい,2,N4,4,N4_V112 N4_V113 N4_V114 N4_V148
+N4_K046,野,field; area,や | の,2,N4,5,N4_V115 N4_V116 N4_V117 N4_V381 N4_V385
+N4_K047,考,think; consider,こう | かんがえる,2,N4,3,N4_V011 N4_V118 N4_V119
+N4_K048,開,open,かい | ひらく | ひらける | あく | あける,5,N4,3,N4_V120 N4_V121 N4_V253
+N4_K049,教,teach; religion,きょう | おしえる | おそわる,3,N4,3,N4_V122 N4_V123 N4_V124
+N4_K050,近,near; recent,きん | ちかい,2,N4,3,N4_V125 N4_V126 N4_V127
+N4_K051,以,by means of; from; compared with,い,1,N4,3,N4_V128 N4_V129 N4_V130
+N4_K052,問,question; ask; problem,もん | とう | とい,3,N4,3,N4_V131 N4_V132 N4_V133
+N4_K053,正,correct; proper,せい | しょう | ただしい | ただす | まさ,5,N4,3,N4_V134 N4_V135 N4_V136
+N4_K054,真,true; real,しん | ま,2,N4,2,N4_V137 N4_V138
+N4_K055,味,taste; meaning,み | あじ | あじわう,3,N4,2,N4_V139 N4_V140
+N4_K056,界,world; boundary,かい,1,N4,3,N4_V066 N4_V141 N4_V142
+N4_K057,無,nothing; without,む | ぶ | ない,3,N4,3,N4_V143 N4_V144 N4_V145
+N4_K058,少,few; little,しょう | すくない | すこし,3,N4,3,N4_V146 N4_V147 N4_V148
+N4_K059,海,sea; ocean,かい | うみ,2,N4,3,N4_V149 N4_V150 N4_V151
+N4_K060,切,cut; important,せつ | きる | きれる,3,N4,3,N4_V152 N4_V153 N4_V154
+N4_K061,重,heavy; important; overlap,じゅう | ちょう | え | おもい | かさねる | かさなる,6,N4,3,N4_V155 N4_V156 N4_V157
+N4_K062,集,gather; collect,しゅう | あつまる | あつめる | つどう,4,N4,3,N4_V158 N4_V159 N4_V160
+N4_K063,員,member; employee,いん,1,N4,3,N4_V161 N4_V162 N4_V163
+N4_K064,公,public; official,こう | おおやけ,2,N4,3,N4_V121 N4_V164 N4_V165
+N4_K065,画,picture; plan; stroke,が | かく,2,N4,3,N4_V166 N4_V167 N4_V168
+N4_K066,死,death; die,し | しぬ,2,N4,3,N4_V169 N4_V170 N4_V171
+N4_K067,安,cheap; safe; peaceful,あん | やすい,2,N4,4,N4_V058 N4_V106 N4_V172 N4_V173
+N4_K068,親,parent; intimate,しん | おや | したしい | したしむ,4,N4,3,N4_V153 N4_V174 N4_V175
+N4_K069,強,strong; force,きょう | ごう | つよい | つよまる | つよめる | しいる,6,N4,2,N4_V176 N4_V177
+N4_K070,使,use; messenger,し | つかう,2,N4,3,N4_V082 N4_V178 N4_V179
+N4_K071,朝,morning; dynasty,ちょう | あさ,2,N4,5,N4_V180 N4_V181 N4_V275 N4_V386 N4_V394
+N4_K072,題,topic; problem; title,だい,1,N4,2,N4_V182 N4_V183
+N4_K073,仕,serve; do,し | つかえる,2,N4,2,N4_V184 N4_V185
+N4_K074,京,capital,きょう | けい,2,N4,3,N4_V186 N4_V187 N4_V188
+N4_K075,足,foot; leg; enough,そく | あし | たりる | たる | たす,5,N4,3,N4_V108 N4_V189 N4_V190
+N4_K076,品,goods; quality; item,ひん | しな,2,N4,5,N4_V062 N4_V065 N4_V191 N4_V192 N4_V278
+N4_K077,着,arrive; wear,ちゃく | きる | きせる | つく | つける,5,N4,3,N4_V193 N4_V194 N4_V195
+N4_K078,別,separate; different,べつ | わかれる,2,N4,2,N4_V196 N4_V197
+N4_K079,音,sound,おん | いん | おと | ね,4,N4,3,N4_V059 N4_V198 N4_V199
+N4_K080,元,origin; former; base,げん | がん | もと,3,N4,3,N4_V189 N4_V200 N4_V201
+N4_K081,特,special,とく,1,N4,3,N4_V196 N4_V202 N4_V203
+N4_K082,風,wind; style,ふう | かぜ,2,N4,4,N4_V177 N4_V204 N4_V205 N4_V367
+N4_K083,夜,night,や | よ | よる,3,N4,4,N4_V206 N4_V207 N4_V208 N4_V400
+N4_K084,空,sky; empty,くう | そら | あく | あける | から,5,N4,3,N4_V209 N4_V210 N4_V211
+N4_K085,有,have; exist,ゆう | う | ある,3,N4,3,N4_V212 N4_V213 N4_V214
+N4_K086,起,rise; wake; occur,き | おきる | おこる | おこす,4,N4,3,N4_V215 N4_V216 N4_V217
+N4_K087,運,carry; luck; movement,うん | はこぶ,2,N4,3,N4_V046 N4_V218 N4_V219
+N4_K088,料,fee; material,りょう,1,N4,6,N4_V144 N4_V212 N4_V220 N4_V221 N4_V265 N4_V350
+N4_K089,楽,comfort; music; enjoyable,がく | らく | たのしい | たのしむ,4,N4,2,N4_V222 N4_V223
+N4_K090,色,color,しょく | しき | いろ,3,N4,6,N4_V203 N4_V224 N4_V225 N4_V316 N4_V329 N4_V357
+N4_K091,帰,return,き | かえる | かえす,3,N4,3,N4_V226 N4_V227 N4_V228
+N4_K092,歩,walk; step,ほ | ぶ | あるく | あゆむ,4,N4,3,N4_V102 N4_V229 N4_V230
+N4_K093,悪,bad; evil,あく | お | わるい,3,N4,3,N4_V231 N4_V232 N4_V233
+N4_K094,広,wide; broad,こう | ひろい | ひろまる | ひろめる | ひろがる | ひろげる,6,N4,3,N4_V234 N4_V235 N4_V236
+N4_K095,店,shop; store,てん | みせ,2,N4,4,N4_V161 N4_V237 N4_V238 N4_V244
+N4_K096,町,town; neighborhood,ちょう | まち,2,N4,3,N4_V239 N4_V240 N4_V241
+N4_K097,住,live; reside,じゅう | すむ | すまう,3,N4,2,N4_V242 N4_V243
+N4_K098,売,sell,ばい | うる | うれる,3,N4,3,N4_V244 N4_V245 N4_V246
+N4_K099,待,wait,たい | まつ,2,N4,3,N4_V247 N4_V248 N4_V249
+N4_K100,古,old,こ | ふるい | ふるす,3,N4,3,N4_V250 N4_V251 N4_V252
+N4_K101,始,begin,し | はじめる | はじまる,3,N4,3,N4_V253 N4_V254 N4_V255
+N4_K102,終,end,しゅう | おわる | おえる,3,N4,3,N4_V256 N4_V257 N4_V258
+N4_K103,計,measure; plan; total,けい | はかる | はからう,3,N4,3,N4_V166 N4_V259 N4_V260
+N4_K104,院,institution; hospital,いん,1,N4,3,N4_V261 N4_V262 N4_V263
+N4_K105,送,send,そう | おくる,2,N4,3,N4_V264 N4_V265 N4_V266
+N4_K106,族,family; tribe; group,ぞく,1,N4,2,N4_V267 N4_V268
+N4_K107,映,reflect; project,えい | うつる | うつす | はえる,4,N4,2,N4_V269 N4_V270
+N4_K108,買,buy,ばい | かう,2,N4,2,N4_V245 N4_V271
+N4_K109,病,illness; sick,びょう | やむ | やまい,3,N4,3,N4_V272 N4_V273 N4_V274
+N4_K110,早,early; fast,そう | はやい | はやまる | はやめる,4,N4,3,N4_V275 N4_V276 N4_V277
+N4_K111,質,quality; substance; question,しつ | しち,2,N4,3,N4_V131 N4_V278 N4_V279
+N4_K112,台,stand; platform; counter for machines,だい | たい,2,N4,2,N4_V280 N4_V281
+N4_K113,室,room,しつ | むろ,2,N4,3,N4_V249 N4_V274 N4_V282
+N4_K114,可,possible; acceptable,か,1,N4,3,N4_V283 N4_V284 N4_V285
+N4_K115,建,build,けん | たてる | たつ,3,N4,3,N4_V286 N4_V287 N4_V288
+N4_K116,転,turn; roll; transfer,てん | ころがる | ころげる | ころがす | ころぶ,5,N4,3,N4_V218 N4_V289 N4_V290
+N4_K117,医,medicine; doctor,い,1,N4,3,N4_V008 N4_V291 N4_V292
+N4_K118,止,stop,し | とまる | とめる,3,N4,3,N4_V293 N4_V294 N4_V295
+N4_K119,字,character; letter,じ | あざ,2,N4,5,N4_V296 N4_V297 N4_V298 N4_V305 N4_V327
+N4_K120,工,craft; construction; industry,こう | く,2,N4,3,N4_V030 N4_V095 N4_V299
+N4_K121,急,hurry; sudden; urgent,きゅう | いそぐ,2,N4,3,N4_V202 N4_V300 N4_V301
+N4_K122,図,diagram; map; plan,ず | と | はかる,3,N4,3,N4_V024 N4_V302 N4_V303
+N4_K123,黒,black,こく | くろ | くろい,3,N4,2,N4_V304 N4_V305
+N4_K124,花,flower,か | はな,2,N4,3,N4_V306 N4_V307 N4_V308
+N4_K125,英,English; outstanding,えい,1,N4,3,N4_V309 N4_V310 N4_V311
+N4_K126,走,run,そう | はしる,2,N4,3,N4_V312 N4_V313 N4_V314
+N4_K127,青,blue; green; youth,せい | あお | あおい,3,N4,4,N4_V210 N4_V315 N4_V316 N4_V330
+N4_K128,答,answer,とう | こたえる | こたえ,3,N4,4,N4_V132 N4_V317 N4_V318 N4_V319
+N4_K129,紙,paper,し | かみ,2,N4,3,N4_V320 N4_V321 N4_V322
+N4_K130,歌,song; sing,か | うた | うたう,3,N4,3,N4_V323 N4_V324 N4_V325
+N4_K131,注,pour; note; attention,ちゅう | そそぐ,2,N4,3,N4_V027 N4_V079 N4_V326
+N4_K132,赤,red,せき | あか | あかい | あからむ | あからめる,5,N4,3,N4_V327 N4_V328 N4_V329
+N4_K133,春,spring,しゅん | はる,2,N4,3,N4_V330 N4_V331 N4_V332
+N4_K134,館,building; hall,かん | やかた,2,N4,4,N4_V268 N4_V333 N4_V334 N4_V335
+N4_K135,旅,travel; trip,りょ | たび,2,N4,3,N4_V335 N4_V336 N4_V337
+N4_K136,験,test; experience,けん,1,N4,3,N4_V338 N4_V339 N4_V340
+N4_K137,写,copy; photograph,しゃ | うつす | うつる,3,N4,2,N4_V341 N4_V342
+N4_K138,去,leave; past,きょ | こ | さる,3,N4,2,N4_V343 N4_V344
+N4_K139,研,polish; research,けん | とぐ,2,N4,3,N4_V345 N4_V346 N4_V347
+N4_K140,飲,drink,いん | のむ,2,N4,3,N4_V348 N4_V349 N4_V350
+N4_K141,肉,meat; flesh,にく,1,N4,4,N4_V351 N4_V352 N4_V353 N4_V390
+N4_K142,服,clothes; obey,ふく,1,N4,5,N4_V354 N4_V355 N4_V356 N4_V379 N4_V403
+N4_K143,銀,silver,ぎん,1,N4,2,N4_V357 N4_V358
+N4_K144,茶,tea,ちゃ | さ,2,N4,3,N4_V225 N4_V359 N4_V360
+N4_K145,究,investigate; research,きゅう | きわめる,2,N4,4,N4_V345 N4_V347 N4_V361 N4_V362
+N4_K146,洋,ocean; Western style,よう,1,N4,4,N4_V205 N4_V354 N4_V363 N4_V364
+N4_K147,兄,older brother,けい | あに,2,N4,1,N4_V365
+N4_K148,秋,autumn,しゅう | あき,2,N4,3,N4_V366 N4_V367 N4_V368
+N4_K149,堂,hall,どう,1,N4,1,N4_V369
+N4_K150,週,week,しゅう,1,N4,2,N4_V370 N4_V371
+N4_K151,習,learn; practice,しゅう | ならう,2,N4,3,N4_V372 N4_V373 N4_V374
+N4_K152,試,try; test,し | こころみる | ためす,3,N4,3,N4_V339 N4_V375 N4_V376
+N4_K153,夏,summer,か | なつ,2,N4,3,N4_V377 N4_V378 N4_V379
+N4_K154,弟,younger brother,てい | おとうと,2,N4,1,N4_V380
+N4_K155,鳥,bird,ちょう | とり,2,N4,2,N4_V381 N4_V382
+N4_K156,犬,dog,けん | いぬ,2,N4,3,N4_V383 N4_V384 N4_V385
+N4_K157,夕,evening,せき | ゆう,2,N4,4,N4_V023 N4_V386 N4_V387 N4_V396
+N4_K158,魚,fish,ぎょ | うお | さかな,3,N4,3,N4_V388 N4_V389 N4_V390
+N4_K159,借,borrow; rent,しゃく | かりる,2,N4,3,N4_V391 N4_V392 N4_V393
+N4_K160,飯,meal; cooked rice,はん | めし,2,N4,3,N4_V394 N4_V395 N4_V396
+N4_K161,駅,station,えき,1,N4,2,N4_V162 N4_V397
+N4_K162,昼,daytime; noon,ちゅう | ひる,2,N4,4,N4_V395 N4_V398 N4_V399 N4_V400
+N4_K163,冬,winter,とう | ふゆ,2,N4,3,N4_V401 N4_V402 N4_V403
+N4_K164,姉,older sister,し | あね,2,N4,1,N4_V404
+N4_K165,曜,weekday,よう,1,N4,2,N4_V405 N4_V406
+N4_K166,漢,China; Chinese; Han,かん,1,N4,3,N4_V296 N4_V407 N4_V408
+N4_K167,牛,cow; beef,ぎゅう | うし,2,N4,3,N4_V351 N4_V409 N4_V410
+N4_K168,妹,younger sister,まい | いもうと,2,N4,2,N4_V404 N4_V411
+N4_K169,貸,lend; rent out,たい | かす,2,N4,3,N4_V392 N4_V412 N4_V413
+N4_K170,勉,make an effort; study,べん,1,N4,2,N4_V414 N4_V415
+N3_K001,合,fit; join; combine,ごう | がっ | あう | あわす | あわせる,5,N3,6,N3_V001 N3_V130 N3_V211 N3_V360 N3_V388 N3_V507
+N3_K002,部,part; section; department,ぶ,1,N3,2,N3_V002 N3_V365
+N3_K003,彼,he; him; that,ひ | かれ,2,N3,2,N3_V003 N3_V163
+N3_K004,内,inside; within,ない | うち,2,N3,3,N3_V004 N3_V366 N3_V384
+N3_K005,実,truth; reality; fruit,じつ | み | みのる,3,N3,3,N3_V005 N3_V355 N3_V404
+N3_K006,当,hit; correspond; appropriate,とう | あたる | あてる,3,N3,3,N3_V006 N3_V316 N3_V395
+N3_K007,戦,war; battle; fight,せん | いくさ | たたかう,3,N3,2,N3_V007 N3_V293
+N3_K008,性,nature; sex; characteristic,せい | しょう,2,N3,2,N3_V008 N3_V367
+N3_K009,対,opposite; versus; pair,たい | つい,2,N3,4,N3_V009 N3_V200 N3_V374 N3_V436
+N3_K010,関,relation; barrier; concern,かん | せき | かかわる,3,N3,2,N3_V010 N3_V368
+N3_K011,感,feeling; sensation,かん,1,N3,4,N3_V011 N3_V109 N3_V139 N3_V534
+N3_K012,定,decide; fixed; determine,てい | じょう | さだめる | さだまる | さだか,5,N3,12,N3_V012 N3_V058 N3_V132 N3_V147 N3_V155 N3_V229 N3_V230 N3_V320 N3_V385 N3_V412 N3_V424 N3_V505
+N3_K013,政,government; politics,せい | まつりごと,2,N3,3,N3_V013 N3_V369 N3_V531
+N3_K014,取,take; get,しゅ | とる,2,N3,3,N3_V014 N3_V370 N3_V493
+N3_K015,所,place; point,しょ | ところ,2,N3,2,N3_V015 N3_V121
+N3_K016,現,present; appear; actual,げん | あらわれる | あらわす,3,N3,2,N3_V005 N3_V016
+N3_K017,最,most; extreme,さい | もっとも,2,N3,3,N3_V063 N3_V371 N3_V567
+N3_K018,化,change; transform; -ization,か | け | ばける | ばかす,4,N3,3,N3_V017 N3_V372 N3_V443
+N3_K019,民,people; nation,みん | たみ,2,N3,3,N3_V018 N3_V052 N3_V110
+N3_K020,相,mutual; aspect; minister,そう | しょう | あい,3,N3,5,N3_V019 N3_V216 N3_V407 N3_V532 N3_V578
+N3_K021,法,law; method,ほう,1,N3,2,N3_V020 N3_V373
+N3_K022,全,whole; all,ぜん | まったく | すべて,3,N3,2,N3_V021 N3_V281
+N3_K023,情,feeling; condition; information,じょう | なさけ,2,N3,4,N3_V011 N3_V022 N3_V102 N3_V244
+N3_K024,向,direction; face toward,こう | むく | むける | むかう | むこう,5,N3,2,N3_V023 N3_V374
+N3_K025,平,flat; peaceful; equal,へい | びょう | たいら | ひら,4,N3,2,N3_V024 N3_V222
+N3_K026,成,become; accomplish,せい | なる | なす,3,N3,6,N3_V025 N3_V145 N3_V146 N3_V346 N3_V420 N3_V541
+N3_K027,経,pass through; manage; experience,けい | きょう | へる,3,N3,2,N3_V026 N3_V375
+N3_K028,信,believe; trust; message,しん,1,N3,5,N3_V027 N3_V169 N3_V182 N3_V383 N3_V418
+N3_K029,面,face; surface; aspect,めん | おも | おもて | つら,4,N3,3,N3_V028 N3_V037 N3_V326
+N3_K030,連,connect; take along,れん | つらなる | つらねる | つれる,4,N3,3,N3_V029 N3_V368 N3_V376
+N3_K031,原,field; origin; original,げん | はら,2,N3,2,N3_V030 N3_V377
+N3_K032,顔,face,がん | かお,2,N3,4,N3_V031 N3_V263 N3_V341 N3_V470
+N3_K033,機,machine; opportunity; function,き | はた,2,N3,4,N3_V032 N3_V378 N3_V437 N3_V528
+N3_K034,次,next; order,じ | し | つぐ | つぎ,4,N3,2,N3_V033 N3_V379
+N3_K035,数,number; count,すう | かず | かぞえる,3,N3,6,N3_V034 N3_V036 N3_V080 N3_V201 N3_V400 N3_V597
+N3_K036,美,beauty; beautiful,び | うつくしい,2,N3,2,N3_V035 N3_V380
+N3_K037,回,turn; occurrence; revolve,かい | まわる | まわす,3,N3,2,N3_V033 N3_V036
+N3_K038,表,surface; table; express,ひょう | おもて | あらわす | あらわれる,4,N3,2,N3_V037 N3_V168
+N3_K039,声,voice,せい | こえ,2,N3,4,N3_V038 N3_V066 N3_V545 N3_V547
+N3_K040,報,report; information; reward,ほう | むくいる,2,N3,3,N3_V022 N3_V039 N3_V445
+N3_K041,要,need; important; main point,よう | かなめ | いる,3,N3,4,N3_V040 N3_V207 N3_V215 N3_V297
+N3_K042,変,change; strange,へん | かわる | かえる,3,N3,3,N3_V017 N3_V041 N3_V329
+N3_K043,神,god; spirit,しん | じん | かみ,3,N3,2,N3_V042 N3_V231
+N3_K044,記,write down; record,き | しるす,2,N3,3,N3_V043 N3_V179 N3_V270
+N3_K045,和,harmony; Japanese style; sum,わ | やわらぐ | やわらげる | なごむ | なごやか,5,N3,2,N3_V024 N3_V044
+N3_K046,引,pull; draw; subtract,いん | ひく | ひける,3,N3,4,N3_V014 N3_V045 N3_V226 N3_V491
+N3_K047,治,govern; cure,じ | ち | おさめる | おさまる | なおる | なおす,6,N3,2,N3_V013 N3_V046
+N3_K048,決,decide; settle,けつ | きめる | きまる,3,N3,2,N3_V012 N3_V047
+N3_K049,太,thick; fat,たい | た | ふとい | ふとる,4,N3,2,N3_V048 N3_V381
+N3_K050,込,crowded; go into; included,こむ | こめる,2,N3,2,N3_V049 N3_V382
+N3_K051,受,receive; accept,じゅ | うける | うかる,3,N3,2,N3_V050 N3_V383
+N3_K052,解,untie; solve; understand,かい | げ | とく | とかす | とける,5,N3,4,N3_V051 N3_V285 N3_V344 N3_V557
+N3_K053,市,city; market,し | いち,2,N3,2,N3_V052 N3_V384
+N3_K054,期,period; term; expect,き,1,N3,3,N3_V053 N3_V385 N3_V492
+N3_K055,様,manner; appearance; honorific,よう | さま,2,N3,5,N3_V042 N3_V054 N3_V171 N3_V189 N3_V338
+N3_K056,活,lively; activity,かつ,1,N3,2,N3_V055 N3_V386
+N3_K057,頭,head,とう | ず | あたま | かしら,4,N3,2,N3_V056 N3_V387
+N3_K058,組,group; assemble,そ | くむ | くみ,3,N3,2,N3_V057 N3_V388
+N3_K059,指,finger; point; indicate,し | ゆび | さす,3,N3,2,N3_V058 N3_V389
+N3_K060,説,explain; theory,せつ | とく,2,N3,4,N3_V051 N3_V059 N3_V192 N3_V398
+N3_K061,能,ability; function,のう,1,N3,3,N3_V060 N3_V328 N3_V378
+N3_K062,葉,leaf; word,よう | は,2,N3,2,N3_V352 N3_V390
+N3_K063,流,flow; style; current,りゅう | ながれる | ながす,3,N3,2,N3_V061 N3_V111
+N3_K064,然,so; natural,ぜん | ねん,2,N3,3,N3_V062 N3_V143 N3_V347
+N3_K065,初,first; beginning,しょ | はじめ | はじめて | はつ | うい | そめる,6,N3,2,N3_V063 N3_V391
+N3_K066,在,exist; be located,ざい | ある,2,N3,3,N3_V016 N3_V064 N3_V137
+N3_K067,調,investigate; tune; condition,ちょう | しらべる | ととのう | ととのえる,4,N3,2,N3_V065 N3_V392
+N3_K068,笑,laugh; smile,しょう | わらう | えむ,3,N3,2,N3_V031 N3_V066
+N3_K069,議,deliberation; discussion,ぎ,1,N3,2,N3_V067 N3_V393
+N3_K070,直,straight; direct; fix,ちょく | じき | ただちに | なおす | なおる,5,N3,2,N3_V068 N3_V394
+N3_K071,夫,husband; man,ふ | おっと,2,N3,2,N3_V069 N3_V218
+N3_K072,選,choose; select,せん | えらぶ,2,N3,2,N3_V070 N3_V395
+N3_K073,権,right; authority,けん,1,N3,2,N3_V071 N3_V396
+N3_K074,利,profit; advantage; benefit,り | きく,2,N3,3,N3_V072 N3_V315 N3_V396
+N3_K075,制,system; control,せい,1,N3,2,N3_V073 N3_V212
+N3_K076,続,continue,ぞく | つずく | つずける,3,N3,3,N3_V029 N3_V074 N3_V434
+N3_K077,石,stone,せき | いし,2,N3,3,N3_V075 N3_V372 N3_V397
+N3_K078,進,advance; progress,しん | すすむ | すすめる,3,N3,2,N3_V076 N3_V446
+N3_K079,伝,transmit; tradition,でん | つたわる | つたえる | つたう,4,N3,2,N3_V077 N3_V398
+N3_K080,加,add; join,か | くわえる | くわわる,3,N3,4,N3_V078 N3_V160 N3_V184 N3_V498
+N3_K081,助,help; assist,じょ | たすける | たすかる | すけ,4,N3,2,N3_V079 N3_V399
+N3_K082,点,point; dot; score,てん,1,N3,3,N3_V080 N3_V138 N3_V324
+N3_K083,産,produce; birth; property,さん | うむ | うまれる | うぶ,4,N3,4,N3_V081 N3_V254 N3_V265 N3_V519
+N3_K084,務,duty; work,む | つとめる | つとまる,3,N3,4,N3_V082 N3_V302 N3_V313 N3_V444
+N3_K085,件,matter; case; item,けん,1,N3,2,N3_V083 N3_V400
+N3_K086,命,life; order; fate,めい | みょう | いのち,3,N3,3,N3_V084 N3_V362 N3_V518
+N3_K087,番,number; turn; watch,ばん,1,N3,3,N3_V057 N3_V401 N3_V572
+N3_K088,落,fall; drop,らく | おちる | おとす,3,N3,2,N3_V085 N3_V352
+N3_K089,付,attach; add,ふ | つける | つく,3,N3,3,N3_V050 N3_V086 N3_V180
+N3_K090,得,gain; obtain,とく | える | うる,3,N3,3,N3_V015 N3_V087 N3_V370
+N3_K091,好,like; favorable,こう | このむ | すく,3,N3,4,N3_V088 N3_V129 N3_V167 N3_V410
+N3_K092,違,differ; violate,い | ちがう | ちがえる,3,N3,2,N3_V089 N3_V402
+N3_K093,殺,kill,さつ | ころす,2,N3,3,N3_V090 N3_V403 N3_V598
+N3_K094,置,put; place,ち | おく,2,N3,2,N3_V091 N3_V354
+N3_K095,返,return; repay,へん | かえす | かえる,3,N3,2,N3_V092 N3_V127
+N3_K096,論,argument; theory,ろん,1,N3,3,N3_V067 N3_V093 N3_V096
+N3_K097,際,occasion; edge,さい | きわ,2,N3,2,N3_V094 N3_V404
+N3_K098,歳,year of age,さい,1,N3,2,N3_V095 N3_V405
+N3_K099,反,opposite; anti-; reverse,はん | そる | そらす,3,N3,4,N3_V009 N3_V089 N3_V096 N3_V436
+N3_K100,形,shape; form,けい | ぎょう | かた | かたち,4,N3,3,N3_V097 N3_V144 N3_V431
+N3_K101,光,light; shine,こう | ひかる | ひかり,3,N3,2,N3_V098 N3_V406
+N3_K102,首,neck; head; chief,しゅ | くび,2,N3,2,N3_V099 N3_V407
+N3_K103,勝,win; victory,しょう | かつ | まさる,3,N3,4,N3_V072 N3_V100 N3_V174 N3_V408
+N3_K104,必,certain; inevitable,ひつ | かならず,2,N3,2,N3_V040 N3_V408
+N3_K105,係,relation; person in charge,けい | かかる | かかり,3,N3,2,N3_V010 N3_V101
+N3_K106,由,reason; means,ゆ | ゆう | よし,3,N3,3,N3_V353 N3_V375 N3_V409
+N3_K107,愛,love,あい,1,N3,2,N3_V102 N3_V410
+N3_K108,都,capital; metropolis,と | つ | みやこ,3,N3,2,N3_V099 N3_V103
+N3_K109,放,release; let go; broadcast,ほう | はなす | はなつ | はなれる | ほうる,5,N3,3,N3_V354 N3_V411 N3_V450
+N3_K110,確,certain; confirm,かく | たしか | たしかめる,3,N3,2,N3_V104 N3_V412
+N3_K111,過,pass; exceed; past,か | すぎる | すごす | あやまつ | あやまち,5,N3,2,N3_V105 N3_V413
+N3_K112,約,promise; approximately,やく,1,N3,2,N3_V106 N3_V208
+N3_K113,馬,horse,ば | うま,2,N3,2,N3_V107 N3_V414
+N3_K114,状,condition; form; letter,じょう,1,N3,2,N3_V108 N3_V415
+N3_K115,想,thought; idea,そう,1,N3,3,N3_V109 N3_V416 N3_V440
+N3_K116,官,government official,かん,1,N3,2,N3_V110 N3_V417
+N3_K117,交,mix; associate; exchange,こう | まじわる | まじえる | まじる | まざる | まぜる | かう | かわす,8,N3,2,N3_V111 N3_V327
+N3_K118,米,rice; America,べい | まい | こめ,3,N3,2,N3_V112 N3_V190
+N3_K119,配,distribute; worry,はい | くばる,2,N3,2,N3_V113 N3_V418
+N3_K120,若,young; if,じゃく | わかい | もしくは,3,N3,2,N3_V114 N3_V419
+N3_K121,資,resources; capital,し,1,N3,2,N3_V115 N3_V175
+N3_K122,常,usual; normal,じょう | つね | とこ,3,N3,4,N3_V116 N3_V236 N3_V459 N3_V509
+N3_K123,果,fruit; result,か | はたす | はてる | はて,4,N3,2,N3_V355 N3_V420
+N3_K124,呼,call; breathe,こ | よぶ,2,N3,2,N3_V117 N3_V421
+N3_K125,共,together; both,きょう | とも,2,N3,3,N3_V118 N3_V422 N3_V480
+N3_K126,残,remain; leftover,ざん | のこる | のこす,3,N3,2,N3_V119 N3_V423
+N3_K127,判,judge; stamp,はん | ばん,2,N3,2,N3_V120 N3_V424
+N3_K128,役,role; duty,やく | えき,2,N3,2,N3_V121 N3_V425
+N3_K129,他,other,た | ほか,2,N3,2,N3_V122 N3_V426
+N3_K130,術,skill; technique,じゅつ,1,N3,2,N3_V035 N3_V123
+N3_K131,支,support; branch,し | ささえる,2,N3,2,N3_V124 N3_V291
+N3_K132,両,both; two,りょう,1,N3,1,N3_V125
+N3_K133,乗,ride; multiply,じょう | のる | のせる,3,N3,2,N3_V126 N3_V427
+N3_K134,済,finish; settle,さい | すむ | すます,3,N3,2,N3_V026 N3_V127
+N3_K135,供,offer; accompany; child,きょう | そなえる | とも,3,N3,2,N3_V128 N3_V428
+N3_K136,格,status; standard,かく,1,N3,3,N3_V001 N3_V008 N3_V129
+N3_K137,打,hit; strike,だ | うつ,2,N3,3,N3_V130 N3_V429 N3_V522
+N3_K138,御,honorable; imperial,ぎょ | ご | おん,3,N3,2,N3_V131 N3_V430
+N3_K139,断,cut off; decide; refuse,だん | たつ | ことわる,3,N3,3,N3_V120 N3_V132 N3_V183
+N3_K140,式,style; ceremony; formula,しき,1,N3,2,N3_V133 N3_V431
+N3_K141,師,teacher; master; expert,し,1,N3,2,N3_V134 N3_V432
+N3_K142,告,tell; announce,こく | つげる,2,N3,4,N3_V039 N3_V135 N3_V194 N3_V460
+N3_K143,深,deep,しん | ふかい | ふかまる | ふかめる,4,N3,2,N3_V136 N3_V433
+N3_K144,存,exist; know,そん | ぞん,2,N3,2,N3_V137 N3_V434
+N3_K145,争,dispute; contend,そう | あらそう,2,N3,2,N3_V007 N3_V138
+N3_K146,覚,remember; wake; sense,かく | おぼえる | さます | さめる,4,N3,2,N3_V139 N3_V435
+N3_K147,側,side,そく | がわ,2,N3,2,N3_V140 N3_V436
+N3_K148,飛,fly; jump,ひ | とぶ | とばす,3,N3,3,N3_V141 N3_V382 N3_V437
+N3_K149,参,participate; visit,さん | まいる,2,N3,3,N3_V078 N3_V142 N3_V476
+N3_K150,突,thrust; sudden,とつ | つく,2,N3,2,N3_V143 N3_V438
+N3_K151,容,contain; appearance,よう,1,N3,4,N3_V004 N3_V144 N3_V310 N3_V361
+N3_K152,育,raise; grow,いく | そだつ | そだてる | はぐくむ,4,N3,2,N3_V145 N3_V439
+N3_K153,構,construct; mind,こう | かまえる | かまう,3,N3,2,N3_V146 N3_V440
+N3_K154,認,recognize; admit,にん | みとめる,2,N3,2,N3_V104 N3_V147
+N3_K155,位,rank; position,い | くらい,2,N3,2,N3_V091 N3_V148
+N3_K156,達,reach; plural suffix,たつ,1,N3,6,N3_V113 N3_V149 N3_V335 N3_V474 N3_V488 N3_V516
+N3_K157,守,protect; obey,しゅ | まもる | もり,3,N3,2,N3_V150 N3_V441
+N3_K158,満,full; satisfy,まん | みちる | みたす,3,N3,3,N3_V151 N3_V442 N3_V504
+N3_K159,消,erase; extinguish,しょう | きえる | けす,3,N3,2,N3_V152 N3_V443
+N3_K160,任,duty; entrust,にん | まかせる | まかす,3,N3,3,N3_V153 N3_V444 N3_V570
+N3_K161,居,reside; be,きょ | いる,2,N3,2,N3_V154 N3_V309
+N3_K162,予,in advance; beforehand,よ,1,N3,3,N3_V155 N3_V416 N3_V445
+N3_K163,路,road; route,ろ | じ,2,N3,3,N3_V156 N3_V446 N3_V576
+N3_K164,座,seat; sit,ざ | すわる,2,N3,2,N3_V157 N3_V447
+N3_K165,客,guest; customer,きゃく | かく,2,N3,3,N3_V158 N3_V427 N3_V448
+N3_K166,船,ship; boat,せん | ふね,2,N3,3,N3_V159 N3_V449 N3_V566
+N3_K167,追,chase; follow,つい | おう,2,N3,2,N3_V160 N3_V450
+N3_K168,背,back; height; disobey,はい | せ | せい | そむく | そむける,5,N3,2,N3_V161 N3_V451
+N3_K169,観,view; observe,かん,1,N3,6,N3_V098 N3_V142 N3_V158 N3_V162 N3_V197 N3_V300
+N3_K170,誰,who,だれ,1,N3,2,N3_V163 N3_V452
+N3_K171,息,breath; son,そく | いき,2,N3,2,N3_V164 N3_V453
+N3_K172,失,lose; error,しつ | うしなう,2,N3,2,N3_V105 N3_V165
+N3_K173,老,old; age,ろう | おいる | ふける,3,N3,2,N3_V166 N3_V454
+N3_K174,良,good,りょう | よい,2,N3,2,N3_V167 N3_V455
+N3_K175,示,show; indicate,じ | し | しめす,3,N3,3,N3_V168 N3_V389 N3_V456
+N3_K176,号,number; designation; signal,ごう,1,N3,3,N3_V169 N3_V457 N3_V535
+N3_K177,職,job; occupation,しょく,1,N3,2,N3_V170 N3_V357
+N3_K178,王,king,おう,1,N3,2,N3_V171 N3_V458
+N3_K179,識,knowledge; discern,しき,1,N3,2,N3_V172 N3_V459
+N3_K180,警,warn; police,けい,1,N3,3,N3_V173 N3_V417 N3_V460
+N3_K181,優,excellent; gentle,ゆう | やさしい | すぐれる,3,N3,2,N3_V038 N3_V174
+N3_K182,投,throw; invest,とう | なげる,2,N3,2,N3_V175 N3_V461
+N3_K183,局,bureau; office; situation,きょく,1,N3,2,N3_V176 N3_V462
+N3_K184,難,difficult; disaster,なん | かたい | むずかしい,3,N3,3,N3_V177 N3_V463 N3_V582
+N3_K185,種,kind; seed,しゅ | たね,2,N3,2,N3_V178 N3_V464
+N3_K186,念,thought; concern,ねん,1,N3,3,N3_V179 N3_V423 N3_V465
+N3_K187,寄,approach; contribute,き | よる | よせる,3,N3,2,N3_V180 N3_V466
+N3_K188,商,commerce; merchant,しょう | あきなう,2,N3,2,N3_V356 N3_V467
+N3_K189,害,harm; damage,がい,1,N3,2,N3_V181 N3_V468
+N3_K190,頼,rely; request,らい | たのむ | たのもしい | たよる,4,N3,2,N3_V182 N3_V469
+N3_K191,横,sideways; horizontal,おう | よこ,2,N3,2,N3_V183 N3_V470
+N3_K192,増,increase,ぞう | ます | ふえる | ふやす,4,N3,2,N3_V184 N3_V471
+N3_K193,差,difference,さ | さす,2,N3,2,N3_V185 N3_V472
+N3_K194,苦,suffering; bitter,く | くるしい | くるしむ | くるしめる | にがい | にがる,6,N3,2,N3_V186 N3_V273
+N3_K195,収,receive; collect,しゅう | おさめる | おさまる,3,N3,2,N3_V187 N3_V306
+N3_K196,段,step; grade,だん,1,N3,3,N3_V188 N3_V397 N3_V473
+N3_K197,俺,I; me (male informal),おれ,1,N3,2,N3_V189 N3_V474
+N3_K198,渡,cross; hand over,と | わたる | わたす,3,N3,2,N3_V190 N3_V475
+N3_K199,与,give; grant,よ | あたえる,2,N3,2,N3_V191 N3_V476
+N3_K200,演,perform; act; present,えん,1,N3,3,N3_V192 N3_V477 N3_V517
+N3_K201,備,prepare; equip,び | そなえる | そなわる,3,N3,3,N3_V193 N3_V441 N3_V478
+N3_K202,申,say; apply,しん | もうす,2,N3,2,N3_V049 N3_V194
+N3_K203,例,example,れい | たとえる,2,N3,4,N3_V195 N3_V456 N3_V479 N3_V583
+N3_K204,働,work,どう | はたらく,2,N3,2,N3_V196 N3_V480
+N3_K205,景,scene; view,けい,1,N3,3,N3_V197 N3_V451 N3_V481
+N3_K206,抜,pull out; omit,ばつ | ぬく | ぬける | ぬかす | ぬかる,5,N3,2,N3_V198 N3_V482
+N3_K207,遠,far,えん | とおい,2,N3,3,N3_V199 N3_V483 N3_V599
+N3_K208,絶,cut off; cease; absolute,ぜつ | たえる | たやす | たつ,4,N3,2,N3_V200 N3_V484
+N3_K209,負,lose; bear; negative,ふ | まける | まかす | おう,4,N3,3,N3_V100 N3_V201 N3_V232
+N3_K210,福,fortune; blessing,ふく,1,N3,3,N3_V202 N3_V485 N3_V497
+N3_K211,球,ball; sphere,きゅう | たま,2,N3,2,N3_V203 N3_V486
+N3_K212,酒,alcohol; sake,しゅ | さけ,2,N3,2,N3_V204 N3_V487
+N3_K213,君,you; lord,くん | きみ,2,N3,2,N3_V205 N3_V488
+N3_K214,察,guess; inspect,さつ,1,N3,3,N3_V162 N3_V173 N3_V206
+N3_K215,望,hope; desire; view,ぼう | もう | のぞむ,3,N3,3,N3_V207 N3_V282 N3_V484
+N3_K216,婚,marriage,こん,1,N3,2,N3_V208 N3_V489
+N3_K217,単,single; simple,たん,1,N3,2,N3_V148 N3_V209
+N3_K218,押,push; press,おう | おす | おさえる,3,N3,2,N3_V210 N3_V490
+N3_K219,割,divide; rate,かつ | わる | わり | われる | さく,5,N3,2,N3_V211 N3_V491
+N3_K220,限,limit,げん | かぎる,2,N3,2,N3_V212 N3_V492
+N3_K221,戻,return; go back,れい | もどす | もどる,3,N3,3,N3_V213 N3_V493 N3_V550
+N3_K222,科,department; subject,か,1,N3,2,N3_V214 N3_V494
+N3_K223,求,seek; request,きゅう | もとめる,2,N3,3,N3_V215 N3_V239 N3_V277
+N3_K224,談,talk; discuss,だん,1,N3,3,N3_V216 N3_V356 N3_V533
+N3_K225,降,descend; fall,こう | おりる | おろす | ふる,4,N3,2,N3_V217 N3_V495
+N3_K226,妻,wife,さい | つま,2,N3,2,N3_V218 N3_V496
+N3_K227,岡,hill,おか,1,N3,2,N3_V219 N3_V497
+N3_K228,熱,heat; fever; passion,ねつ | あつい,2,N3,2,N3_V220 N3_V498
+N3_K229,浮,float,ふ | うく | うかれる | うかぶ | うかべる,5,N3,2,N3_V221 N3_V499
+N3_K230,等,equal; class; etc.,とう | ひとしい,2,N3,2,N3_V222 N3_V500
+N3_K231,末,end; tip,まつ | ばつ | すえ,3,N3,3,N3_V223 N3_V405 N3_V501
+N3_K232,幸,happiness; fortune,こう | さいわい | さち | しあわせ,4,N3,2,N3_V202 N3_V224
+N3_K233,草,grass,そう | くさ,2,N3,2,N3_V225 N3_V322
+N3_K234,越,cross over; exceed,えつ | こす | こえる,3,N3,2,N3_V226 N3_V502
+N3_K235,登,climb; register,とう | と | のぼる,3,N3,2,N3_V227 N3_V503
+N3_K236,類,kind; class,るい | たぐい,2,N3,3,N3_V178 N3_V228 N3_V530
+N3_K237,未,not yet,み,1,N3,2,N3_V229 N3_V504
+N3_K238,規,rule; standard,き,1,N3,2,N3_V230 N3_V505
+N3_K239,精,spirit; refined; vitality,せい,1,N3,2,N3_V231 N3_V506
+N3_K240,抱,embrace; hold,ほう | だく | いだく | かかえる,4,N3,2,N3_V232 N3_V507
+N3_K241,労,labor; effort,ろう,1,N3,4,N3_V186 N3_V196 N3_V233 N3_V574
+N3_K242,処,deal with; place,しょ,1,N3,2,N3_V234 N3_V508
+N3_K243,退,retreat; resign,たい | しりぞく | しりぞける,3,N3,2,N3_V357 N3_V363
+N3_K244,費,expense; consume,ひ | ついやす | ついえる,3,N3,2,N3_V152 N3_V235
+N3_K245,非,wrong; non-,ひ,1,N3,2,N3_V236 N3_V509
+N3_K246,喜,rejoice,き | よろこぶ,2,N3,2,N3_V237 N3_V510
+N3_K247,娘,daughter; girl,むすめ,1,N3,2,N3_V238 N3_V511
+N3_K248,逃,escape,とう | にげる | にがす | のがす | のがれる,5,N3,2,N3_V358 N3_V512
+N3_K249,探,search,たん | さぐる | さがす,3,N3,2,N3_V239 N3_V513
+N3_K250,犯,crime; offender,はん | おかす,2,N3,2,N3_V240 N3_V283
+N3_K251,薬,medicine,やく | くすり,2,N3,2,N3_V176 N3_V241
+N3_K252,園,garden; park,えん | その,2,N3,2,N3_V242 N3_V266
+N3_K253,疑,doubt; suspect,ぎ | うたがう,2,N3,2,N3_V243 N3_V514
+N3_K254,緒,cord; beginning; emotion,しょ | お,2,N3,2,N3_V244 N3_V409
+N3_K255,静,quiet,せい | しず | しずか | しずまる | しずめる,5,N3,2,N3_V245 N3_V259
+N3_K256,具,tool; ingredient,ぐ,1,N3,2,N3_V246 N3_V515
+N3_K257,席,seat; occasion,せき,1,N3,3,N3_V157 N3_V247 N3_V575
+N3_K258,速,fast; speed,そく | はやい | はやめる | はやまる | すみやか,5,N3,2,N3_V248 N3_V516
+N3_K259,舞,dance,ぶ | まう | まい,3,N3,2,N3_V359 N3_V517
+N3_K260,宿,lodging; inn; dwell,しゅく | やど | やどる | やどす,4,N3,2,N3_V360 N3_V518
+N3_K261,程,extent; degree,てい | ほど,2,N3,2,N3_V249 N3_V413
+N3_K262,倒,fall; collapse,とう | たおれる | たおす,3,N3,2,N3_V250 N3_V519
+N3_K263,寝,sleep; lie down,しん | ねる | ねかす,3,N3,2,N3_V251 N3_V520
+N3_K264,宅,home; residence,たく,1,N3,2,N3_V252 N3_V521
+N3_K265,絵,picture,かい | え,2,N3,2,N3_V253 N3_V263
+N3_K266,破,tear; break,は | やぶる | やぶれる,3,N3,2,N3_V254 N3_V522
+N3_K267,庭,garden; yard,てい | にわ,2,N3,2,N3_V255 N3_V334
+N3_K268,婦,woman; wife,ふ,1,N3,2,N3_V069 N3_V256
+N3_K269,余,remainder; surplus,よ | あまる | あます,3,N3,2,N3_V257 N3_V523
+N3_K270,訪,visit,ほう | おとずれる | たずねる,3,N3,2,N3_V258 N3_V524
+N3_K271,冷,cold; cool,れい | つめたい | ひえる | ひや | ひやす | ひやかす | さめる | さます,8,N3,2,N3_V259 N3_V525
+N3_K272,暮,live; evening,ぼ | くれる | くらす,3,N3,2,N3_V260 N3_V526
+N3_K273,腹,belly; abdomen,ふく | はら,2,N3,2,N3_V261 N3_V527
+N3_K274,危,dangerous,き | あぶない | あやうい | あやぶむ,4,N3,2,N3_V262 N3_V528
+N3_K275,許,permit; forgive,きょ | ゆるす,2,N3,2,N3_V361 N3_V529
+N3_K276,似,resemble,じ | にる,2,N3,3,N3_V263 N3_V514 N3_V530
+N3_K277,険,steep; dangerous,けん | けわしい,2,N3,2,N3_V262 N3_V264
+N3_K278,財,wealth; property,ざい,1,N3,2,N3_V265 N3_V531
+N3_K279,遊,play; travel,ゆう | あそぶ,2,N3,2,N3_V266 N3_V532
+N3_K280,雑,miscellaneous; rough,ざつ | ぞう,2,N3,2,N3_V267 N3_V533
+N3_K281,恐,fear,きょう | おそれる | おそろしい,3,N3,2,N3_V268 N3_V534
+N3_K282,値,value; price,ち | ね | あたい,3,N3,2,N3_V188 N3_V269
+N3_K283,暗,dark; memorize,あん | くらい,2,N3,2,N3_V270 N3_V535
+N3_K284,積,pile; accumulate,せき | つむ | つもる,3,N3,2,N3_V028 N3_V271
+N3_K285,夢,dream,む | ゆめ,2,N3,2,N3_V272 N3_V536
+N3_K286,痛,pain; hurt,つう | いたい | いたむ | いためる,4,N3,3,N3_V056 N3_V273 N3_V527
+N3_K287,富,wealth; rich,ふ | とむ | とみ,3,N3,2,N3_V274 N3_V342
+N3_K288,刻,engrave; moment,こく | きざむ,2,N3,3,N3_V136 N3_V275 N3_V321
+N3_K289,鳴,cry; sound,めい | なく | なる | ならす,4,N3,3,N3_V276 N3_V288 N3_V540
+N3_K290,欲,desire; want,よく | ほっする | ほしい,3,N3,2,N3_V277 N3_V537
+N3_K291,途,way; route,と,1,N3,2,N3_V278 N3_V538
+N3_K292,曲,bend; tune,きょく | まがる | まげる,3,N3,2,N3_V279 N3_V539
+N3_K293,耳,ear,じ | みみ,2,N3,2,N3_V280 N3_V540
+N3_K294,完,complete,かん,1,N3,2,N3_V281 N3_V541
+N3_K295,願,wish; request,がん | ねがう,2,N3,3,N3_V282 N3_V465 N3_V542
+N3_K296,罪,crime; guilt,ざい | つみ,2,N3,2,N3_V283 N3_V543
+N3_K297,陽,sun; positive,よう,1,N3,2,N3_V048 N3_V284
+N3_K298,亡,die; flee,ぼう | ない,2,N3,2,N3_V358 N3_V362
+N3_K299,散,scatter,さん | ちる | ちらす | ちらかす | ちらかる,5,N3,2,N3_V285 N3_V544
+N3_K300,掛,hang; multiply; concern,かける | かかる | かかり,3,N3,2,N3_V286 N3_V545
+N3_K301,昨,yesterday; previous,さく,1,N3,2,N3_V287 N3_V546
+N3_K302,怒,anger,ど | いかる | おこる,3,N3,3,N3_V288 N3_V510 N3_V547
+N3_K303,留,stop; stay; retain,りゅう | とめる | とまる,3,N3,2,N3_V150 N3_V548
+N3_K304,礼,courtesy; thanks,れい | らい,2,N3,2,N3_V131 N3_V289
+N3_K305,列,row; line,れつ,1,N3,2,N3_V290 N3_V549
+N3_K306,雪,snow,せつ | ゆき,2,N3,2,N3_V271 N3_V317
+N3_K307,払,pay; sweep,ふつ | はらう,2,N3,2,N3_V291 N3_V550
+N3_K308,給,supply; salary,きゅう,1,N3,3,N3_V128 N3_V191 N3_V292
+N3_K309,敗,defeat; fail,はい | やぶれる,2,N3,2,N3_V165 N3_V293
+N3_K310,捕,catch; capture,ほ | とらえる | とらわれる | とる | つかまえる | つかまる,6,N3,2,N3_V294 N3_V551
+N3_K311,忘,forget,ぼう | わすれる,2,N3,2,N3_V295 N3_V552
+N3_K312,晴,clear weather,せい | はれる | はらす,3,N3,2,N3_V296 N3_V553
+N3_K313,因,cause; factor,いん | よる,2,N3,2,N3_V030 N3_V297
+N3_K314,折,fold; break,せつ | おる | おり | おれる,4,N3,2,N3_V298 N3_V554
+N3_K315,迎,welcome; meet,げい | むかえる,2,N3,2,N3_V299 N3_V555
+N3_K316,悲,sad,ひ | かなしい | かなしむ,3,N3,2,N3_V276 N3_V300
+N3_K317,港,harbor,こう | みなと,2,N3,2,N3_V301 N3_V556
+N3_K318,責,responsibility; blame,せき | せめる,2,N3,2,N3_V153 N3_V302
+N3_K319,除,remove; exclude,じょ | のぞく,2,N3,2,N3_V303 N3_V557
+N3_K320,困,trouble; difficulty,こん | こまる,2,N3,2,N3_V177 N3_V304
+N3_K321,閉,close,へい | とじる | とざす | しめる | しまる,5,N3,2,N3_V305 N3_V558
+N3_K322,吸,inhale; suck,きゅう | すう,2,N3,2,N3_V117 N3_V306
+N3_K323,髪,hair,はつ | かみ,2,N3,2,N3_V307 N3_V559
+N3_K324,束,bundle; bind; tie,そく | たば,2,N3,2,N3_V106 N3_V308
+N3_K325,眠,sleep,みん | ねむる | ねむい,3,N3,2,N3_V309 N3_V560
+N3_K326,易,easy; exchange,えき | い | やさしい,3,N3,2,N3_V310 N3_V561
+N3_K327,窓,window,そう | まど,2,N3,2,N3_V311 N3_V562
+N3_K328,祖,ancestor,そ,1,N3,2,N3_V312 N3_V563
+N3_K329,勤,work; diligence,きん | つとめる | つとまる,3,N3,2,N3_V313 N3_V564
+N3_K330,昔,long ago,せき | むかし,2,N3,2,N3_V314 N3_V565
+N3_K331,便,convenience; mail,べん | びん | たより,3,N3,2,N3_V315 N3_V566
+N3_K332,適,suitable; appropriate,てき,1,N3,2,N3_V316 N3_V567
+N3_K333,吹,blow,すい | ふく,2,N3,2,N3_V317 N3_V568
+N3_K334,候,season; candidate,こう | そうろう,2,N3,2,N3_V318 N3_V569
+N3_K335,怖,scary; fear,ふ | こわい,2,N3,3,N3_V268 N3_V319 N3_V534
+N3_K336,辞,resign; word; diction,じ | やめる,2,N3,2,N3_V363 N3_V570
+N3_K337,否,no; deny; negate,ひ | いな,2,N3,3,N3_V320 N3_V571 N3_V596
+N3_K338,遅,late; slow,ち | おくれる | おくらす | おそい,4,N3,2,N3_V321 N3_V572
+N3_K339,煙,smoke,えん | けむる | けむり | けむい,4,N3,2,N3_V322 N3_V573
+N3_K340,徒,follower; on foot; futile,と,1,N3,2,N3_V323 N3_V574
+N3_K341,欠,lack; absence,けつ | かける | かく,3,N3,2,N3_V324 N3_V575
+N3_K342,迷,get lost; hesitate,めい | まよう,2,N3,2,N3_V325 N3_V576
+N3_K343,洗,wash,せん | あらう,2,N3,2,N3_V326 N3_V577
+N3_K344,互,mutual,ご | たがい,2,N3,2,N3_V327 N3_V578
+N3_K345,才,talent; years old,さい,1,N3,2,N3_V328 N3_V579
+N3_K346,更,again; renew,こう | さら | ふける | ふかす,4,N3,2,N3_V329 N3_V580
+N3_K347,歯,tooth,し | は,2,N3,2,N3_V330 N3_V581
+N3_K348,盗,steal,とう | ぬすむ,2,N3,2,N3_V331 N3_V582
+N3_K349,慣,become accustomed,かん | なれる | ならす,3,N3,2,N3_V332 N3_V583
+N3_K350,晩,evening; late,ばん,1,N3,1,N3_V333
+N3_K351,箱,box,はこ,1,N3,2,N3_V334 N3_V584
+N3_K352,到,arrive; reach,とう,1,N3,2,N3_V335 N3_V585
+N3_K353,頂,summit; receive,ちょう | いただく | いただき,3,N3,2,N3_V336 N3_V586
+N3_K354,杯,cup; counter for cups,はい | さかずき,2,N3,2,N3_V337 N3_V587
+N3_K355,皆,all; everyone,かい | みな,2,N3,2,N3_V338 N3_V588
+N3_K356,招,invite; beckon,しょう | まねく,2,N3,2,N3_V108 N3_V589
+N3_K357,寒,cold,かん | さむい,2,N3,2,N3_V339 N3_V590
+N3_K358,恥,shame,ち | はじる | はじ | はじらう | はずかしい,5,N3,2,N3_V340 N3_V591
+N3_K359,疲,tired; fatigue,ひ | つかれる,2,N3,2,N3_V233 N3_V341
+N3_K360,貧,poor; poverty,ひん | びん | まずしい,3,N3,2,N3_V304 N3_V342
+N3_K361,猫,cat,びょう | ねこ,2,N3,2,N3_V343 N3_V592
+N3_K362,誤,mistake,ご | あやまる,2,N3,2,N3_V344 N3_V593
+N3_K363,努,endeavor,ど | つとめる,2,N3,2,N3_V364 N3_V594
+N3_K364,幾,how many; several,き | いく,2,N3,2,N3_V345 N3_V595
+N3_K365,賛,approve; praise,さん,1,N3,2,N3_V346 N3_V596
+N3_K366,偶,even; chance,ぐう,1,N3,2,N3_V347 N3_V597
+N3_K367,忙,busy,ぼう | いそがしい,2,N3,2,N3_V348 N3_V598
+N3_K368,泳,swim,えい | およぐ,2,N3,2,N3_V349 N3_V599
+N3_K369,靴,shoes,か | くつ,2,N3,2,N3_V350 N3_V600
+N3_K370,偉,great; admirable,い | えらい,2,N3,2,N3_V351 N3_V601
+N2_K001,軍,army; military,ぐん,1,N2,2,N2_V001 N2_V364
+N2_K002,兵,soldier; troops,へい | ひょう,2,N2,2,N2_V002 N2_V365
+N2_K003,島,island,とう | しま,2,N2,3,N2_V003 N2_V177 N2_V366
+N2_K004,村,village,そん | むら,2,N2,2,N2_V004 N2_V367
+N2_K005,門,gate; branch; field,もん | かど,2,N2,3,N2_V005 N2_V122 N2_V368
+N2_K006,戸,door; household,こ | と,2,N2,1,N2_V006
+N2_K007,武,military; warrior,ぶ | む,2,N2,2,N2_V007 N2_V369
+N2_K008,城,castle,じょう | しろ,2,N2,2,N2_V008 N2_V370
+N2_K009,総,whole; general; total,そう,1,N2,2,N2_V009 N2_V371
+N2_K010,団,group; association,だん,1,N2,2,N2_V010 N2_V372
+N2_K011,線,line; track; wire,せん,1,N2,2,N2_V011 N2_V373
+N2_K012,設,establish; set up,せつ | もうける,2,N2,1,N2_V012
+N2_K013,勢,force; power; condition,せい | いきおい,2,N2,2,N2_V013 N2_V374
+N2_K014,党,party; faction,とう,1,N2,2,N2_V014 N2_V375
+N2_K015,史,history,し,1,N2,2,N2_V015 N2_V376
+N2_K016,営,manage; operate; camp,えい | いとなむ,2,N2,1,N2_V377
+N2_K017,府,urban prefecture; government office,ふ,1,N2,2,N2_V016 N2_V378
+N2_K018,巻,roll; volume; wind,かん | まく | まき,3,N2,2,N2_V017 N2_V379
+N2_K019,介,mediate; assist; introduce,かい,1,N2,3,N2_V018 N2_V185 N2_V380
+N2_K020,蔵,storehouse; store; possess,ぞう | くら,2,N2,2,N2_V019 N2_V381
+N2_K021,造,make; build; create,ぞう | つくる,2,N2,2,N2_V020 N2_V382
+N2_K022,根,root; basis,こん | ね,2,N2,3,N2_V021 N2_V383 N2_V451
+N2_K023,寺,Buddhist temple,じ | てら,2,N2,2,N2_V022 N2_V384
+N2_K024,査,investigate; inspect,さ,1,N2,2,N2_V023 N2_V179
+N2_K025,将,commander; future; about to,しょう,1,N2,2,N2_V024 N2_V385
+N2_K026,改,reform; revise; change,かい | あらためる | あらたまる,3,N2,5,N2_V025 N2_V085 N2_V240 N2_V382 N2_V386
+N2_K027,県,prefecture,けん,1,N2,3,N2_V026 N2_V387 N2_V506
+N2_K028,泉,spring; fountain,せん | いずみ,2,N2,1,N2_V027
+N2_K029,像,image; statue,ぞう,1,N2,4,N2_V028 N2_V347 N2_V388 N2_V435
+N2_K030,細,thin; fine; detailed,さい | ほそい | ほそる | こまか | こまかい,5,N2,1,N2_V029
+N2_K031,谷,valley,こく | たに,2,N2,1,N2_V030
+N2_K032,奥,interior; inner part,おう | おく,2,N2,1,N2_V031
+N2_K033,再,again; re-,さい | ふたたび,2,N2,2,N2_V032 N2_V389
+N2_K034,血,blood,けつ | ち,2,N2,4,N2_V033 N2_V211 N2_V390 N2_V443
+N2_K035,算,calculate; count,さん,1,N2,2,N2_V034 N2_V391
+N2_K036,象,elephant; image; phenomenon,しょう | ぞう,2,N2,2,N2_V035 N2_V115
+N2_K037,清,pure; clean,せい | きよい | きよまる | きよめる,4,N2,4,N2_V036 N2_V312 N2_V336 N2_V392
+N2_K038,技,skill; technique,ぎ | わざ,2,N2,3,N2_V037 N2_V393 N2_V412
+N2_K039,州,state; province; sandbank,しゅう | す,2,N2,2,N2_V038 N2_V394
+N2_K040,領,territory; domain; receive,りょう,1,N2,2,N2_V039 N2_V395
+N2_K041,橋,bridge,きょう | はし,2,N2,1,N2_V040
+N2_K042,芸,art; performance,げい,1,N2,2,N2_V041 N2_V396
+N2_K043,型,type; model; mold,けい | かた,2,N2,2,N2_V042 N2_V397
+N2_K044,香,fragrance; incense,こう | か | かおり | かおる,4,N2,2,N2_V043 N2_V398
+N2_K045,量,quantity; measure,りょう | はかる,2,N2,3,N2_V044 N2_V094 N2_V399
+N2_K046,久,long time,きゅう | ひさしい,2,N2,1,N2_V045
+N2_K047,境,boundary; border; situation,きょう | さかい,2,N2,2,N2_V046 N2_V400
+N2_K048,階,floor; level; rank,かい,1,N2,3,N2_V047 N2_V168 N2_V401
+N2_K049,区,district; ward; divide,く,1,N2,2,N2_V048 N2_V402
+N2_K050,波,wave,は | なみ,2,N2,3,N2_V049 N2_V403 N2_V463
+N2_K051,移,move; transfer,い | うつる | うつす,3,N2,2,N2_V050 N2_V404
+N2_K052,域,area; region,いき,1,N2,2,N2_V051 N2_V395
+N2_K053,周,circumference; around,しゅう | まわり,2,N2,2,N2_V052 N2_V069
+N2_K054,接,contact; connect,せつ | つぐ,2,N2,2,N2_V053 N2_V142
+N2_K055,鉄,iron; railway,てつ,1,N2,4,N2_V040 N2_V054 N2_V264 N2_V313
+N2_K056,頃,around; about; time,ころ,1,N2,1,N2_V055
+N2_K057,材,material; timber; talent,ざい,1,N2,1,N2_V056
+N2_K058,個,individual; counter for items,こ,1,N2,1,N2_V057
+N2_K059,協,cooperate; cooperation,きょう,1,N2,1,N2_V058
+N2_K060,各,each; every,かく | おのおの,2,N2,2,N2_V059 N2_V405
+N2_K061,帯,belt; zone; carry,たい | おびる | おび,3,N2,1,N2_V060
+N2_K062,歴,history; career,れき,1,N2,2,N2_V015 N2_V061
+N2_K063,編,compile; edit; knit,へん | あむ,2,N2,2,N2_V062 N2_V406
+N2_K064,裏,back; reverse; inside,り | うら,2,N2,2,N2_V063 N2_V407
+N2_K065,比,compare; ratio,ひ | くらべる,2,N2,2,N2_V064 N2_V408
+N2_K066,坂,slope; hill,はん | さか,2,N2,1,N2_V065
+N2_K067,装,dress; equip; attire,そう | しょう | よそおう,3,N2,3,N2_V186 N2_V409 N2_V597
+N2_K068,省,ministry; omit; reflect,せい | しょう | かえりみる | はぶく,4,N2,2,N2_V066 N2_V410
+N2_K069,税,tax,ぜい,1,N2,2,N2_V067 N2_V411
+N2_K070,競,compete,きょう | けい | きそう | せる,4,N2,2,N2_V068 N2_V412
+N2_K071,囲,surround; enclose,い | かこむ | かこう,3,N2,3,N2_V069 N2_V418 N2_V505
+N2_K072,辺,area; vicinity; side,へん | あたり | べ,3,N2,3,N2_V052 N2_V070 N2_V462
+N2_K073,河,river,か | かわ,2,N2,2,N2_V071 N2_V413
+N2_K074,極,extreme; pole,きょく | ごく | きわめる | きわまる | きわみ,5,N2,2,N2_V072 N2_V414
+N2_K075,防,prevent; defend,ぼう | ふせぐ,2,N2,2,N2_V073 N2_V415
+N2_K076,低,low,てい | ひくい | ひくめる | ひくまる,4,N2,2,N2_V074 N2_V416
+N2_K077,林,woods; grove,りん | はやし,2,N2,4,N2_V075 N2_V077 N2_V127 N2_V466
+N2_K078,導,guide; lead,どう | みちびく,2,N2,2,N2_V076 N2_V417
+N2_K079,森,forest,しん | もり,2,N2,1,N2_V077
+N2_K080,丸,circle; round; whole,がん | まる | まるい | まるめる,4,N2,1,N2_V078
+N2_K081,胸,chest; heart,きょう | むね,2,N2,2,N2_V079 N2_V418
+N2_K082,陸,land,りく,1,N2,2,N2_V080 N2_V419
+N2_K083,療,heal; treatment,りょう,1,N2,1,N2_V081
+N2_K084,諸,various; many,しょ,1,N2,2,N2_V082 N2_V420
+N2_K085,管,pipe; manage; control,かん | くだ,2,N2,1,N2_V083
+N2_K086,仲,relationship; intermediary,ちゅう | なか,2,N2,1,N2_V084
+N2_K087,革,leather; reform,かく | かわ,2,N2,2,N2_V085 N2_V421
+N2_K088,担,carry; bear; take charge,たん | かつぐ | になう,3,N2,2,N2_V086 N2_V422
+N2_K089,効,effect; efficiency,こう | きく,2,N2,2,N2_V087 N2_V453
+N2_K090,賞,prize; reward; praise,しょう,1,N2,2,N2_V088 N2_V423
+N2_K091,星,star,せい | ほし,2,N2,2,N2_V089 N2_V424
+N2_K092,復,return; restore; repeat,ふく,1,N2,2,N2_V090 N2_V425
+N2_K093,片,one side; fragment,へん | かた,2,N2,3,N2_V091 N2_V301 N2_V426
+N2_K094,並,line up; ordinary,へい | なみ | ならべる | ならぶ | ならびに,5,N2,2,N2_V092 N2_V427
+N2_K095,底,bottom,てい | そこ,2,N2,1,N2_V093
+N2_K096,温,warm; temperature,おん | あたたか | あたたかい | あたたまる | あたためる,5,N2,2,N2_V027 N2_V428
+N2_K097,軽,light; slight,けい | かるい | かろやか,3,N2,2,N2_V094 N2_V429
+N2_K098,録,record,ろく,1,N2,1,N2_V095
+N2_K099,腰,waist; lower back,よう | こし,2,N2,1,N2_V096
+N2_K100,著,write; notable; remarkable,ちょ | あらわす | いちじるしい,3,N2,2,N2_V097 N2_V430
+N2_K101,乱,disorder; disturb,らん | みだれる | みだす,3,N2,2,N2_V098 N2_V431
+N2_K102,章,chapter; badge,しょう,1,N2,1,N2_V432
+N2_K103,殿,palace; lord; hall,でん | てん | との | どの,4,N2,1,N2_V099
+N2_K104,布,cloth; spread,ふ | ぬの,2,N2,2,N2_V100 N2_V433
+N2_K105,角,angle; corner; horn,かく | かど | つの,3,N2,4,N2_V101 N2_V299 N2_V434 N2_V631
+N2_K106,仏,Buddha; France,ぶつ | ほとけ,2,N2,2,N2_V102 N2_V435
+N2_K107,永,eternal; long,えい | ながい,2,N2,2,N2_V045 N2_V103
+N2_K108,誌,magazine; record,し,1,N2,2,N2_V104 N2_V436
+N2_K109,減,decrease; reduce,げん | へる | へらす,3,N2,2,N2_V105 N2_V437
+N2_K110,略,abbreviate; omit; strategy,りゃく,1,N2,2,N2_V066 N2_V106
+N2_K111,準,standard; semi-; prepare,じゅん,1,N2,2,N2_V107 N2_V438
+N2_K112,委,committee; entrust,い | ゆだねる,2,N2,2,N2_V108 N2_V439
+N2_K113,令,order; command,れい,1,N2,2,N2_V109 N2_V440
+N2_K114,刊,publish; edition,かん,1,N2,2,N2_V110 N2_V441
+N2_K115,焼,burn; bake,しょう | やく | やける,3,N2,3,N2_V111 N2_V442 N2_V546
+N2_K116,里,village; hometown; ri,り | さと,2,N2,1,N2_V112
+N2_K117,圧,pressure; press,あつ,1,N2,2,N2_V113 N2_V443
+N2_K118,額,amount; forehead; frame,がく | ひたい,2,N2,3,N2_V114 N2_V444 N2_V481
+N2_K119,印,mark; seal; print,いん | しるし,2,N2,3,N2_V115 N2_V317 N2_V445
+N2_K120,池,pond,ち | いけ,2,N2,2,N2_V116 N2_V446
+N2_K121,臣,retainer; minister,しん | じん,2,N2,2,N2_V117 N2_V447
+N2_K122,庫,warehouse; storage,こ,1,N2,2,N2_V118 N2_V448
+N2_K123,農,agriculture; farming,のう,1,N2,3,N2_V119 N2_V367 N2_V626
+N2_K124,板,board; plank; plate,はん | ばん | いた,3,N2,3,N2_V345 N2_V449 N2_V630
+N2_K125,恋,romance; love,れん | こう | こい | こいしい,4,N2,2,N2_V120 N2_V450
+N2_K126,羽,feather; wing; counter for birds,う | は | はね,3,N2,2,N2_V121 N2_V451
+N2_K127,専,specialty; exclusive,せん | もっぱら,2,N2,3,N2_V122 N2_V368 N2_V452
+N2_K128,逆,reverse; opposite,ぎゃく | さか | さからう,3,N2,2,N2_V123 N2_V453
+N2_K129,腕,arm; ability,わん | うで,2,N2,2,N2_V124 N2_V454
+N2_K130,短,short; defect,たん | みじかい,2,N2,2,N2_V125 N2_V455
+N2_K131,普,universal; general,ふ,1,N2,1,N2_V456
+N2_K132,岩,rock; boulder,がん | いわ,2,N2,3,N2_V126 N2_V457 N2_V613
+N2_K133,竹,bamboo,ちく | たけ,2,N2,2,N2_V127 N2_V458
+N2_K134,児,child,じ,1,N2,4,N2_V128 N2_V228 N2_V459 N2_V509
+N2_K135,毛,hair; fur,もう | け,2,N2,6,N2_V100 N2_V121 N2_V129 N2_V303 N2_V564 N2_V618
+N2_K136,版,printing plate; edition,はん,1,N2,2,N2_V130 N2_V460
+N2_K137,宇,eaves; universe; space,う,1,N2,1,N2_V131
+N2_K138,況,condition; situation,きょう,1,N2,1,N2_V132
+N2_K139,被,suffer; be subjected to; cover,ひ | こうむる,2,N2,2,N2_V133 N2_V461
+N2_K140,岸,shore; coast,がん | きし,2,N2,1,N2_V462
+N2_K141,超,exceed; super-,ちょう | こえる | こす,3,N2,2,N2_V134 N2_V463
+N2_K142,豊,abundant; rich,ほう | ゆたか,2,N2,2,N2_V135 N2_V464
+N2_K143,含,include; contain,がん | ふくむ | ふくめる,3,N2,2,N2_V136 N2_V465
+N2_K144,植,plant,しょく | うえる | うわる,3,N2,2,N2_V137 N2_V466
+N2_K145,補,supplement; compensate; candidate,ほ | おぎなう,2,N2,2,N2_V138 N2_V467
+N2_K146,暴,violent; expose,ぼう | あばく | あばれる,3,N2,2,N2_V139 N2_V468
+N2_K147,課,section; lesson; task,か,1,N2,2,N2_V140 N2_V469
+N2_K148,跡,trace; remains; track,せき | あと,2,N2,2,N2_V141 N2_V470
+N2_K149,触,touch; contact,しょく | ふれる | さわる,3,N2,2,N2_V142 N2_V471
+N2_K150,玉,jewel; ball,ぎょく | たま,2,N2,2,N2_V143 N2_V472
+N2_K151,震,quake; shake,しん | ふるう | ふるえる,3,N2,1,N2_V144
+N2_K152,億,hundred million,おく,1,N2,2,N2_V145 N2_V473
+N2_K153,肩,shoulder,けん | かた,2,N2,1,N2_V146
+N2_K154,劇,drama; intense,げき,1,N2,2,N2_V147 N2_V474
+N2_K155,刺,stab; thorn; calling card,し | さす | ささる,3,N2,2,N2_V148 N2_V475
+N2_K156,述,state; mention,じゅつ | のべる,2,N2,2,N2_V149 N2_V476
+N2_K157,輪,wheel; ring,りん | わ,2,N2,2,N2_V150 N2_V477
+N2_K158,浅,shallow,せん | あさい,2,N2,1,N2_V151
+N2_K159,純,pure; genuine,じゅん,1,N2,2,N2_V152 N2_V478
+N2_K160,薄,thin; weak; pale,はく | うすい | うすめる | うすまる | うすらぐ | うすれる,6,N2,2,N2_V153 N2_V479
+N2_K161,阪,slope; Osaka,はん,1,N2,1,N2_V154
+N2_K162,韓,Korea,かん,1,N2,1,N2_V155
+N2_K163,固,hard; firm; solid,こ | かためる | かたまる | かたい,4,N2,2,N2_V156 N2_V480
+N2_K164,巨,gigantic; huge,きょ,1,N2,2,N2_V157 N2_V481
+N2_K165,講,lecture; explain,こう,1,N2,2,N2_V158 N2_V482
+N2_K166,般,general; sort,はん,1,N2,1,N2_V159
+N2_K167,湯,hot water; bath,とう | ゆ,2,N2,2,N2_V160 N2_V483
+N2_K168,捨,discard; throw away,しゃ | すてる,2,N2,1,N2_V161
+N2_K169,衣,clothing; garment,い | ころも,2,N2,1,N2_V162
+N2_K170,替,replace; exchange,たい | かえる | かわる,3,N2,2,N2_V163 N2_V484
+N2_K171,央,center; middle,おう,1,N2,1,N2_V164
+N2_K172,骨,bone,こつ | ほね,2,N2,2,N2_V165 N2_V485
+N2_K173,齢,age,れい,1,N2,2,N2_V166 N2_V486
+N2_K174,照,shine; illuminate; compare,しょう | てる | てらす | てれる,4,N2,2,N2_V167 N2_V487
+N2_K175,層,layer; stratum,そう,1,N2,2,N2_V168 N2_V488
+N2_K176,弱,weak,じゃく | よわい | よわる | よわまる | よわめる,5,N2,3,N2_V169 N2_V355 N2_V489
+N2_K177,築,build; construct,ちく | きずく,2,N2,1,N2_V490
+N2_K178,脳,brain,のう,1,N2,2,N2_V170 N2_V491
+N2_K179,航,navigate; voyage,こう,1,N2,2,N2_V171 N2_V492
+N2_K180,快,pleasant; cheerful; rapid,かい | こころよい,2,N2,2,N2_V172 N2_V493
+N2_K181,翌,next; following,よく,1,N2,2,N2_V173 N2_V494
+N2_K182,旧,old; former,きゅう,1,N2,2,N2_V174 N2_V495
+N2_K183,筆,writing brush; writing,ひつ | ふで,2,N2,2,N2_V175 N2_V496
+N2_K184,換,exchange; replace,かん | かえる | かわる,3,N2,2,N2_V176 N2_V497
+N2_K185,群,group; flock,ぐん | むれる | むれ,3,N2,2,N2_V177 N2_V498
+N2_K186,爆,explode; bomb,ばく,1,N2,2,N2_V178 N2_V499
+N2_K187,捜,search; investigate,そう | さがす,2,N2,1,N2_V179
+N2_K188,油,oil,ゆ | あぶら,2,N2,3,N2_V180 N2_V308 N2_V500
+N2_K189,叫,shout; cry out,きょう | さけぶ,2,N2,1,N2_V181
+N2_K190,伸,stretch; extend,しん | のびる | のばす | のべる,4,N2,2,N2_V182 N2_V501
+N2_K191,承,consent; receive; acknowledge,しょう | うけたまわる,2,N2,2,N2_V183 N2_V502
+N2_K192,雲,cloud,うん | くも,2,N2,2,N2_V184 N2_V503
+N2_K193,練,practice; train; refine,れん | ねる,2,N2,2,N2_V281 N2_V504
+N2_K194,紹,introduce,しょう,1,N2,2,N2_V018 N2_V185
+N2_K195,包,wrap; enclose; include,ほう | つつむ,2,N2,4,N2_V186 N2_V409 N2_V465 N2_V505
+N2_K196,庁,government office; agency,ちょう,1,N2,2,N2_V187 N2_V506
+N2_K197,測,measure; estimate,そく | はかる,2,N2,2,N2_V188 N2_V507
+N2_K198,占,occupy; hold; fortune-tell,せん | しめる | うらなう,3,N2,1,N2_V189
+N2_K199,混,mix; blend; crowded,こん | まじる | まざる | まぜる | こむ,5,N2,2,N2_V098 N2_V190
+N2_K200,倍,double; times,ばい,1,N2,2,N2_V191 N2_V508
+N2_K201,乳,milk; breast,にゅう | ちち | ち,3,N2,1,N2_V509
+N2_K202,荒,rough; wild; desolate,こう | あらい | あれる | あらす,4,N2,2,N2_V192 N2_V510
+N2_K203,詰,pack; fill; question closely,きつ | つめる | つまる | つむ,4,N2,2,N2_V193 N2_V511
+N2_K204,栄,prosper; glory,えい | さかえる | はえ | はえる,4,N2,1,N2_V194
+N2_K205,床,floor; bed,しょう | とこ | ゆか,3,N2,1,N2_V195
+N2_K206,則,rule; principle,そく,1,N2,2,N2_V196 N2_V512
+N2_K207,禁,prohibit; ban,きん,1,N2,1,N2_V513
+N2_K208,順,order; obey,じゅん,1,N2,2,N2_V197 N2_V514
+N2_K209,枚,counter for flat objects,まい,1,N2,2,N2_V198 N2_V515
+N2_K210,厚,thick; kind,こう | あつい,2,N2,2,N2_V199 N2_V516
+N2_K211,皮,skin; hide,ひ | かわ,2,N2,3,N2_V129 N2_V200 N2_V343
+N2_K212,輸,transport; import/export,ゆ,1,N2,1,N2_V201
+N2_K213,濃,thick; concentrated,のう | こい,2,N2,2,N2_V202 N2_V516
+N2_K214,簡,simple; brief,かん,1,N2,2,N2_V203 N2_V517
+N2_K215,孫,grandchild; descendant,そん | まご,2,N2,2,N2_V204 N2_V518
+N2_K216,丈,length; sturdy,じょう | たけ,2,N2,2,N2_V205 N2_V519
+N2_K217,黄,yellow,こう | おう | き,3,N2,3,N2_V206 N2_V520 N2_V609
+N2_K218,届,deliver; reach; report,とどける | とどく,2,N2,1,N2_V207
+N2_K219,絡,entangle; contact,らく | からむ | からまる | からめる,4,N2,1,N2_V208
+N2_K220,採,gather; adopt,さい | とる,2,N2,2,N2_V209 N2_V521
+N2_K221,傾,incline; lean; tendency,けい | かたむく | かたむける,3,N2,1,N2_V210
+N2_K222,鼻,nose,び | はな,2,N2,1,N2_V211
+N2_K223,宝,treasure,ほう | たから,2,N2,2,N2_V212 N2_V522
+N2_K224,患,suffer; patient,かん | わずらう,2,N2,2,N2_V213 N2_V523
+N2_K225,延,extend; postpone,えん | のびる | のべる | のばす,4,N2,2,N2_V214 N2_V524
+N2_K226,律,law; rhythm,りつ,1,N2,2,N2_V215 N2_V525
+N2_K227,希,hope; rare,き,1,N2,2,N2_V216 N2_V526
+N2_K228,甘,sweet; indulgent; lenient,かん | あまい | あまえる | あまやかす,4,N2,2,N2_V217 N2_V527
+N2_K229,湾,bay; gulf,わん,1,N2,1,N2_V218
+N2_K230,沈,sink; submerge; be depressed,ちん | しずむ | しずめる,3,N2,1,N2_V219
+N2_K231,販,sell; marketing,はん,1,N2,1,N2_V220
+N2_K232,欧,Europe,おう,1,N2,2,N2_V221 N2_V528
+N2_K233,砂,sand,さ | しゃ | すな,3,N2,2,N2_V222 N2_V529
+N2_K234,尊,respect; noble,そん | たっとい | とうとい | たっとぶ | とうとぶ,5,N2,2,N2_V223 N2_V530
+N2_K235,紅,crimson; red,こう | べに | くれない,3,N2,1,N2_V531
+N2_K236,複,duplicate; compound,ふく,1,N2,2,N2_V224 N2_V532
+N2_K237,泊,stay overnight,はく | とまる | とめる,3,N2,2,N2_V225 N2_V533
+N2_K238,荷,load; baggage,か | に,2,N2,1,N2_V534
+N2_K239,枝,branch; twig,し | えだ,2,N2,2,N2_V226 N2_V535
+N2_K240,依,depend; rely,い,1,N2,2,N2_V227 N2_V536
+N2_K241,幼,young; early childhood; immature,よう | おさない,2,N2,2,N2_V228 N2_V537
+N2_K242,斬,cut; behead,ざん | きる,2,N2,1,N2_V229
+N2_K243,勇,courage; brave,ゆう | いさむ,2,N2,2,N2_V230 N2_V538
+N2_K244,昇,rise; ascend,しょう | のぼる,2,N2,2,N2_V231 N2_V539
+N2_K245,寿,longevity; congratulations,じゅ | ことぶき,2,N2,2,N2_V232 N2_V540
+N2_K246,菜,vegetable; greens,さい | な,2,N2,1,N2_V541
+N2_K247,季,season,き,1,N2,2,N2_V233 N2_V542
+N2_K248,液,liquid,えき,1,N2,4,N2_V234 N2_V324 N2_V344 N2_V390
+N2_K249,券,ticket; certificate,けん,1,N2,2,N2_V235 N2_V543
+N2_K250,祭,festival; worship,さい | まつる | まつり,3,N2,2,N2_V236 N2_V544
+N2_K251,袋,bag; sack,たい | ふくろ,2,N2,2,N2_V237 N2_V545
+N2_K252,燃,burn; combust; fuel,ねん | もえる | もやす | もす,4,N2,2,N2_V238 N2_V546
+N2_K253,毒,poison,どく,1,N2,2,N2_V239 N2_V547
+N2_K254,札,bill; tag; card,さつ | ふだ,2,N2,2,N2_V240 N2_V548
+N2_K255,狙,aim at; target,そ | ねらう,2,N2,1,N2_V241
+N2_K256,脇,side; armpit,わき,1,N2,2,N2_V242 N2_V549
+N2_K257,卒,graduate; soldier,そつ,1,N2,1,N2_V550
+N2_K258,副,vice-; secondary; copy,ふく,1,N2,2,N2_V243 N2_V551
+N2_K259,敬,respect,けい | うやまう,2,N2,2,N2_V223 N2_V244
+N2_K260,針,needle; pointer,しん | はり,2,N2,2,N2_V245 N2_V552
+N2_K261,拝,worship; humbly see,はい | おがむ,2,N2,2,N2_V246 N2_V553
+N2_K262,浴,bathe,よく | あびる | あびせる,3,N2,2,N2_V247 N2_V554
+N2_K263,悩,worry; trouble,のう | なやむ | なやます,3,N2,2,N2_V248 N2_V555
+N2_K264,汚,dirty; pollute,お | けがす | けがれる | けがらわしい | よごす | よごれる | きたない,7,N2,2,N2_V249 N2_V556
+N2_K265,灯,lamp; light,とう | ひ,2,N2,2,N2_V250 N2_V557
+N2_K266,坊,boy; Buddhist monk; priest,ぼう,1,N2,2,N2_V251 N2_V558
+N2_K267,尻,buttocks; rear,しり,1,N2,1,N2_V252
+N2_K268,涙,tear,るい | なみだ,2,N2,2,N2_V253 N2_V559
+N2_K269,停,stop; halt,てい,1,N2,2,N2_V254 N2_V560
+N2_K270,了,finish; understand,りょう,1,N2,2,N2_V255 N2_V561
+N2_K271,汗,sweat,かん | あせ,2,N2,2,N2_V256 N2_V562
+N2_K272,郵,mail; postal,ゆう,1,N2,2,N2_V257 N2_V563
+N2_K273,幅,width; breadth; range,ふく | はば,2,N2,1,N2_V258
+N2_K274,童,child,どう | わらべ,2,N2,2,N2_V128 N2_V259
+N2_K275,虫,insect,ちゅう | むし,2,N2,2,N2_V260 N2_V564
+N2_K276,埋,bury; fill,まい | うめる | うまる | うもれる,4,N2,1,N2_V261
+N2_K277,舟,boat,しゅう | ふね,2,N2,1,N2_V262
+N2_K278,闇,darkness,やみ,1,N2,2,N2_V263 N2_V565
+N2_K279,棒,stick; rod,ぼう,1,N2,2,N2_V264 N2_V599
+N2_K280,貨,goods; money,か,1,N2,3,N2_V265 N2_V304 N2_V566
+N2_K281,肌,skin,はだ,1,N2,1,N2_V266
+N2_K282,臓,internal organ,ぞう,1,N2,2,N2_V267 N2_V567
+N2_K283,塩,salt,えん | しお,2,N2,2,N2_V268 N2_V568
+N2_K284,均,equal; average,きん,1,N2,2,N2_V269 N2_V569
+N2_K285,湖,lake,こ | みずうみ,2,N2,2,N2_V270 N2_V570
+N2_K286,損,loss; damage,そん | そこなう | そこねる,3,N2,2,N2_V271 N2_V571
+N2_K287,膝,knee,ひざ,1,N2,1,N2_V272
+N2_K288,辛,spicy; bitter; painful,しん | からい,2,N2,2,N2_V273 N2_V572
+N2_K289,双,pair; twin,そう | ふた,2,N2,2,N2_V274 N2_V573
+N2_K290,軒,eaves; counter for houses,けん | のき,2,N2,2,N2_V275 N2_V574
+N2_K291,績,achievement; result,せき,1,N2,2,N2_V276 N2_V575
+N2_K292,干,dry; interfere,かん | ほす | ひる,3,N2,1,N2_V277
+N2_K293,姓,surname,せい | しょう,2,N2,2,N2_V278 N2_V576
+N2_K294,掘,dig,くつ | ほる,2,N2,1,N2_V279
+N2_K295,籍,register; membership; record,せき,1,N2,1,N2_V577
+N2_K296,珍,rare; unusual,ちん | めずらしい,2,N2,2,N2_V280 N2_V578
+N2_K297,訓,instruction; reading; lesson,くん,1,N2,3,N2_V281 N2_V504 N2_V579
+N2_K298,預,deposit; entrust,よ | あずける | あずかる,3,N2,1,N2_V282
+N2_K299,署,government office; signature,しょ,1,N2,1,N2_V283
+N2_K300,漁,fishing,ぎょ | りょう,2,N2,2,N2_V284 N2_V580
+N2_K301,緑,green,りょく | みどり,2,N2,2,N2_V285 N2_V581
+N2_K302,畳,tatami; fold,じょう | たたむ | たたみ,3,N2,1,N2_V286
+N2_K303,咲,bloom,さく,1,N2,1,N2_V287
+N2_K304,貿,trade,ぼう,1,N2,1,N2_V288
+N2_K305,踊,dance,よう | おどる | おどり,3,N2,2,N2_V289 N2_V582
+N2_K306,封,seal; close,ふう | ほう,2,N2,2,N2_V290 N2_V583
+N2_K307,兆,sign; trillion,ちょう | きざす | きざし,3,N2,2,N2_V291 N2_V584
+N2_K308,柱,pillar; column,ちゅう | はしら,2,N2,2,N2_V292 N2_V585
+N2_K309,駐,station; be stationed; reside,ちゅう,1,N2,1,N2_V293
+N2_K310,祝,celebrate,しゅく | いわう,2,N2,2,N2_V294 N2_V586
+N2_K311,炭,charcoal; coal,たん | すみ,2,N2,2,N2_V295 N2_V587
+N2_K312,柔,soft; gentle; flexible,じゅう | にゅう | やわらか | やわらかい,4,N2,2,N2_V296 N2_V588
+N2_K313,雇,employ; hire,こ | やとう,2,N2,2,N2_V297 N2_V589
+N2_K314,乾,dry; heaven,かん | かわく | かわかす,3,N2,2,N2_V298 N2_V362
+N2_K315,鋭,sharp; acute,えい | するどい,2,N2,2,N2_V299 N2_V590
+N2_K316,氷,ice,ひょう | こおり | ひ,3,N2,2,N2_V300 N2_V591
+N2_K317,隅,corner,ぐう | すみ,2,N2,2,N2_V301 N2_V592
+N2_K318,冊,counter for books; volume,さつ | さく,2,N2,2,N2_V302 N2_V593
+N2_K319,糸,thread,し | いと,2,N2,2,N2_V303 N2_V594
+N2_K320,募,recruit; collect,ぼ | つのる,2,N2,1,N2_V595
+N2_K321,硬,hard; stiff,こう | かたい,2,N2,2,N2_V304 N2_V596
+N2_K322,塗,paint; coat,と | ぬる,2,N2,2,N2_V305 N2_V597
+N2_K323,憎,hate,ぞう | にくむ | にくい | にくらしい | にくしみ,5,N2,2,N2_V306 N2_V598
+N2_K324,泥,mud,でい | どろ,2,N2,2,N2_V307 N2_V599
+N2_K325,脂,fat; grease,し | あぶら,2,N2,1,N2_V308
+N2_K326,粉,powder,ふん | こ | こな,3,N2,2,N2_V309 N2_V600
+N2_K327,詞,word; part of speech,し,1,N2,2,N2_V310 N2_V601
+N2_K328,筒,tube; cylinder,とう | つつ,2,N2,2,N2_V311 N2_V602
+N2_K329,掃,sweep; clean,そう | はく,2,N2,3,N2_V312 N2_V392 N2_V603
+N2_K330,塔,tower; pagoda,とう,1,N2,2,N2_V313 N2_V604
+N2_K331,賢,wise; clever,けん | かしこい,2,N2,2,N2_V314 N2_V605
+N2_K332,拾,pick up,しゅう | じゅう | ひろう,3,N2,2,N2_V315 N2_V606
+N2_K333,麦,wheat; barley,ばく | むぎ,2,N2,2,N2_V316 N2_V607
+N2_K334,刷,print,さつ | する,2,N2,2,N2_V317 N2_V608
+N2_K335,卵,egg,らん | たまご,2,N2,2,N2_V318 N2_V609
+N2_K336,械,machine; mechanism,かい,1,N2,1,N2_V319
+N2_K337,皿,plate; dish,さら,1,N2,2,N2_V320 N2_V610
+N2_K338,祈,pray,き | いのる,2,N2,2,N2_V321 N2_V611
+N2_K339,灰,ash,かい | はい,2,N2,2,N2_V320 N2_V322
+N2_K340,召,summon; call,しょう | めす,2,N2,2,N2_V323 N2_V612
+N2_K341,溶,melt; dissolve,よう | とける | とかす | とく,4,N2,2,N2_V324 N2_V613
+N2_K342,磨,polish; grind,ま | みがく,2,N2,2,N2_V325 N2_V614
+N2_K343,粒,grain; particle,りゅう | つぶ,2,N2,2,N2_V326 N2_V615
+N2_K344,喫,consume; drink; smoke,きつ,1,N2,2,N2_V327 N2_V616
+N2_K345,机,desk,き | つくえ,2,N2,1,N2_V328
+N2_K346,貯,save; store,ちょ,1,N2,3,N2_V329 N2_V446 N2_V617
+N2_K347,匹,counter for small animals,ひつ | ひき,2,N2,1,N2_V330
+N2_K348,綿,cotton,めん | わた,2,N2,2,N2_V331 N2_V618
+N2_K349,贈,give; present,ぞう | おくる,2,N2,2,N2_V332 N2_V619
+N2_K350,凍,freeze,とう | こおる | こごえる,3,N2,1,N2_V333
+N2_K351,瓶,bottle,びん,1,N2,2,N2_V334 N2_V620
+N2_K352,帽,hat; cap,ぼう,1,N2,1,N2_V335
+N2_K353,涼,cool; refreshing,りょう | すずしい | すずむ,3,N2,2,N2_V336 N2_V621
+N2_K354,秒,second,びょう,1,N2,2,N2_V337 N2_V622
+N2_K355,湿,damp; humid,しつ | しめる | しめす,3,N2,2,N2_V338 N2_V623
+N2_K356,蒸,steam; evaporate,じょう | むす | むれる | むらす,4,N2,2,N2_V339 N2_V624
+N2_K357,菓,confectionery,か,1,N2,2,N2_V340 N2_V625
+N2_K358,耕,cultivate; plow,こう | たがやす,2,N2,2,N2_V341 N2_V626
+N2_K359,鉱,mineral; ore,こう,1,N2,2,N2_V342 N2_V627
+N2_K360,膚,skin,ふ,1,N2,1,N2_V343
+N2_K361,胃,stomach,い,1,N2,2,N2_V344 N2_V628
+N2_K362,挟,insert; pinch; between,きょう | はさむ | はさまる,3,N2,1,N2_V345
+N2_K363,郊,suburb; outskirts,こう,1,N2,2,N2_V346 N2_V629
+N2_K364,銅,copper,どう,1,N2,2,N2_V347 N2_V630
+N2_K365,鈍,dull; blunt,どん | にぶい | にぶる,3,N2,2,N2_V348 N2_V631
+N2_K366,貝,shellfish; shell,かい,1,N2,1,N2_V349
+N2_K367,缶,can; tin,かん,1,N2,2,N2_V193 N2_V350
+N2_K368,枯,wither; dry up,こ | かれる | からす,3,N2,2,N2_V351 N2_V632
+N2_K369,滴,drop; drip,てき | しずく | したたる,3,N2,2,N2_V352 N2_V633
+N2_K370,符,sign; symbol,ふ,1,N2,2,N2_V353 N2_V634
+N2_K371,畜,livestock,ちく,1,N2,1,N2_V354
+N2_K372,軟,soft; flexible,なん | やわらか | やわらかい,3,N2,2,N2_V355 N2_V635
+N2_K373,濯,wash; rinse,たく,1,N2,1,N2_V356
+N2_K374,隻,counter for ships; one of a pair,せき,1,N2,1,N2_V357
+N2_K375,伺,ask; visit; inquire humbly,し | うかがう,2,N2,1,N2_V358
+N2_K376,沸,boil,ふつ | わく | わかす,3,N2,1,N2_V359
+N2_K377,曇,cloudy,どん | くもる,2,N2,1,N2_V360
+N2_K378,肯,agree; affirm,こう,1,N2,1,N2_V361
+N2_K379,燥,dry; parched,そう,1,N2,1,N2_V362
+N2_K380,零,zero; spill,れい,1,N2,2,N2_V363 N2_V636
+N1_K0001,郎,young man; son,ろう,1,N1,1,N1_V0001
+N1_K0002,結,tie; bind; conclude,けつ | むすぶ | ゆう | ゆわえる,4,N1,2,N1_V0002 N1_V0198
+N1_K0003,氏,family name; clan,し | うじ,2,N1,1,N1_V0003
+N1_K0004,衛,defense; guard,えい,1,N1,1,N1_V0004
+N1_K0005,第,ordinal prefix,だい,1,N1,1,N1_V0005
+N1_K0006,保,protect; preserve,ほ | たもつ,2,N1,1,N1_V0006
+N1_K0007,義,justice; meaning; duty,ぎ,1,N1,1,N1_V0007
+N1_K0008,吉,good luck,きち | きつ,2,N1,2,N1_V0008 N1_V0625
+N1_K0009,士,warrior; professional,し,1,N1,4,N1_V0009 N1_V0129 N1_V0366 N1_V0709
+N1_K0010,藤,wisteria,とう | ふじ,2,N1,1,N1_V0010
+N1_K0011,井,well,せい | い,2,N1,1,N1_V0011
+N1_K0012,江,inlet; bay,こう | え,2,N1,1,N1_V0012
+N1_K0013,張,stretch; spread,ちょう | はる,2,N1,3,N1_V0013 N1_V0409 N1_V0465
+N1_K0014,松,pine tree,しょう | まつ,2,N1,1,N1_V0014
+N1_K0015,応,respond; apply,おう | こたえる,2,N1,2,N1_V0015 N1_V0303
+N1_K0016,視,look; regard,し,1,N1,1,N1_V0016
+N1_K0017,態,condition; attitude,たい,1,N1,2,N1_V0017 N1_V0797
+N1_K0018,姿,figure; appearance,し | すがた,2,N1,1,N1_V0018
+N1_K0019,皇,emperor; imperial,こう | おう,2,N1,3,N1_V0019 N1_V0162 N1_V0649
+N1_K0020,宮,palace; shrine,きゅう | ぐう | みや,3,N1,1,N1_V0020
+N1_K0021,離,separate; detach,り | はなれる | はなす,3,N1,3,N1_V0021 N1_V0304 N1_V1086
+N1_K0022,基,base; foundation,き | もと | もとい,3,N1,3,N1_V0022 N1_V0321 N1_V0556
+N1_K0023,隊,group; corps,たい,1,N1,1,N1_V0023
+N1_K0024,素,element; plain,そ | す,2,N1,4,N1_V0024 N1_V0216 N1_V0720 N1_V0979
+N1_K0025,価,value; price,か | あたい,2,N1,3,N1_V0025 N1_V0056 N1_V1017
+N1_K0026,撃,attack; strike,げき | うつ,2,N1,2,N1_V0026 N1_V0174
+N1_K0027,振,shake; swing,しん | ふる | ふるう | ふれる,4,N1,1,N1_V0027
+N1_K0028,証,proof; certificate,しょう,1,N1,1,N1_V0028
+N1_K0029,派,faction; school,は,1,N1,1,N1_V0029
+N1_K0030,僕,I; servant,ぼく,1,N1,1,N1_V0030
+N1_K0031,佐,assist; help,さ,1,N1,1,N1_V0031
+N1_K0032,紀,chronicle; era,き,1,N1,1,N1_V0032
+N1_K0033,統,govern; unite,とう | すべる,2,N1,1,N1_V0033
+N1_K0034,器,vessel; instrument,き | うつわ,2,N1,5,N1_V0034 N1_V0196 N1_V0592 N1_V0669 N1_V0885
+N1_K0035,異,different; unusual,い | こと,2,N1,2,N1_V0035 N1_V0102
+N1_K0036,護,protect; defend,ご,1,N1,4,N1_V0006 N1_V0009 N1_V0264 N1_V0743
+N1_K0037,条,clause; article,じょう,1,N1,1,N1_V0036
+N1_K0038,独,alone; independent,どく | ひとり,2,N1,2,N1_V0037 N1_V0439
+N1_K0039,源,source; origin,げん | みなもと,2,N1,1,N1_V0038
+N1_K0040,影,shadow; influence,えい | かげ,2,N1,2,N1_V0039 N1_V0187
+N1_K0041,眼,eye,がん | まなこ,2,N1,1,N1_V0040
+N1_K0042,企,plan; undertake,き | くわだてる,2,N1,1,N1_V0041
+N1_K0043,津,harbor; ferry,しん | つ,2,N1,1,N1_V0042
+N1_K0044,案,plan; proposal,あん,1,N1,1,N1_V0043
+N1_K0045,策,plan; policy,さく,1,N1,1,N1_V0044
+N1_K0046,宗,religion; sect,しゅう | そう,2,N1,1,N1_V0045
+N1_K0047,提,present; propose,てい | さげる,2,N1,2,N1_V0043 N1_V0046
+N1_K0048,昭,bright; clear,しょう,1,N1,1,N1_V0047
+N1_K0049,密,dense; secret,みつ,1,N1,1,N1_V0048
+N1_K0050,司,administer; director,し,1,N1,1,N1_V0049
+N1_K0051,検,examine; inspect,けん,1,N1,3,N1_V0050 N1_V0353 N1_V0657
+N1_K0052,康,health; peace,こう,1,N1,1,N1_V0051
+N1_K0053,沢,swamp; abundance,たく | さわ,2,N1,2,N1_V0052 N1_V0609
+N1_K0054,秀,excel; outstanding,しゅう | ひいでる,2,N1,1,N1_V0053
+N1_K0055,興,interest; prosper,こう | きょう | おこる | おこす,4,N1,1,N1_V0054
+N1_K0056,率,rate; ratio,そつ | りつ | ひきいる,3,N1,1,N1_V0055
+N1_K0057,評,evaluate; comment,ひょう,1,N1,1,N1_V0056
+N1_K0058,監,oversee,かん,1,N1,2,N1_V0057 N1_V0445
+N1_K0059,崎,cape; promontory,さき,1,N1,1,N1_V0058
+N1_K0060,鮮,fresh; vivid,せん | あざやか,2,N1,1,N1_V0059
+N1_K0061,激,violent; intense,げき | はげしい,2,N1,2,N1_V0060 N1_V0593
+N1_K0062,徳,virtue,とく,1,N1,1,N1_V0061
+N1_K0063,挙,raise; conduct,きょ | あげる | あがる,3,N1,1,N1_V0062
+N1_K0064,志,intention; aspiration,し | こころざす | こころざし,3,N1,1,N1_V0063
+N1_K0065,敷,spread; lay,ふ | しく,2,N1,1,N1_V0064
+N1_K0066,系,system; lineage,けい,1,N1,1,N1_V0065
+N1_K0067,織,weave; fabric,しょく | しき | おる,3,N1,2,N1_V0066 N1_V0793
+N1_K0068,製,manufacture,せい,1,N1,1,N1_V0067
+N1_K0069,端,edge; end,たん | はし | は | はた,4,N1,1,N1_V0068
+N1_K0070,遺,leave behind,い,1,N1,2,N1_V0069 N1_V1060
+N1_K0071,房,room; cluster,ぼう | ふさ,2,N1,1,N1_V0070
+N1_K0072,街,street; town,がい | まち,2,N1,1,N1_V0071
+N1_K0073,尾,tail; end,び | お,2,N1,1,N1_V0072
+N1_K0074,株,stock; share,かぶ,1,N1,1,N1_V0073
+N1_K0075,従,follow; obey,じゅう | したがう | したがえる,3,N1,2,N1_V0074 N1_V0290
+N1_K0076,敵,enemy; opponent,てき | かたき,2,N1,1,N1_V0075
+N1_K0077,展,expand; exhibit,てん,1,N1,1,N1_V0076
+N1_K0078,描,draw; depict,びょう | えがく | かく,3,N1,1,N1_V0077
+N1_K0079,修,discipline; repair,しゅう | おさめる | おさまる,3,N1,2,N1_V0078 N1_V1003
+N1_K0080,我,self; ego,が | われ | わ,3,N1,1,N1_V0079
+N1_K0081,載,load; publish,さい | のせる | のる,3,N1,2,N1_V0080 N1_V0852
+N1_K0082,響,echo; influence,きょう | ひびく,2,N1,1,N1_V0039
+N1_K0083,秘,secret,ひ | ひめる,2,N1,1,N1_V0048
+N1_K0084,攻,attack,こう | せめる,2,N1,1,N1_V0026
+N1_K0085,健,healthy; strong,けん | すこやか,2,N1,2,N1_V0051 N1_V0543
+N1_K0086,裁,judge; cut,さい | たつ | さばく,3,N1,2,N1_V0081 N1_V0704
+N1_K0087,隠,hide; conceal,いん | かくす | かくれる,3,N1,2,N1_V0082 N1_V0961
+N1_K0088,環,ring; environment,かん,1,N1,2,N1_V0083 N1_V0791
+N1_K0089,援,aid; assist,えん,1,N1,1,N1_V0084
+N1_K0090,故,reason; deceased,こ | ゆえ,2,N1,2,N1_V0085 N1_V0152
+N1_K0091,幕,curtain;幕府,まく | ばく,2,N1,1,N1_V0086
+N1_K0092,督,supervise,とく,1,N1,1,N1_V0057
+N1_K0093,倉,warehouse,そう | くら,2,N1,2,N1_V0087 N1_V0469
+N1_K0094,施,carry out; bestow,し | せ | ほどこす,3,N1,1,N1_V0088
+N1_K0095,嫌,dislike; hate,けん | きらう | いや,3,N1,1,N1_V0089
+N1_K0096,継,succeed; inherit,けい | つぐ,2,N1,2,N1_V0090 N1_V0859
+N1_K0097,障,hinder; obstacle,しょう | さわる,2,N1,2,N1_V0085 N1_V0091
+N1_K0098,貴,precious; noble,き | たっとい | とうとい | たっとぶ | とうとぶ,5,N1,1,N1_V0092
+N1_K0099,整,arrange; organize,せい | ととのえる | ととのう,3,N1,1,N1_V0093
+N1_K0100,衆,masses; multitude,しゅう,1,N1,1,N1_V0094
+N1_K0101,及,reach; extend,きゅう | およぶ | および | およぼす,4,N1,2,N1_V0095 N1_V0993
+N1_K0102,盛,prosper;盛る,せい | もる | さかる | さかん,4,N1,3,N1_V0096 N1_V0309 N1_V1014
+N1_K0103,玄,mysterious; profound,げん,1,N1,1,N1_V0097
+N1_K0104,恵,blessing; favor,けい | え | めぐむ,3,N1,1,N1_V0098
+N1_K0105,授,grant; teach,じゅ | さずける | さずかる,3,N1,1,N1_V0099
+N1_K0106,弾,bullet;弹,だん | ひく | はずむ | たま,4,N1,4,N1_V0100 N1_V0218 N1_V0992 N1_V1069
+N1_K0107,養,foster; nourish,よう | やしなう,2,N1,5,N1_V0101 N1_V0700 N1_V0833 N1_V0838 N1_V1055
+N1_K0108,驚,surprise; astonish,きょう | おどろく | おどろかす,3,N1,1,N1_V0102
+N1_K0109,奈,phonetic kanji; Nara element,な,1,N1,1,N1_V0103
+N1_K0110,推,infer; recommend,すい | おす,2,N1,1,N1_V0104
+N1_K0111,樹,tree; timber,じゅ,1,N1,1,N1_V0105
+N1_K0112,為,do; cause; sake,い,1,N1,1,N1_V0106
+N1_K0113,雄,male; hero,ゆう | お | おす,3,N1,2,N1_V0107 N1_V0995
+N1_K0114,刀,sword; blade,とう | かたな,2,N1,1,N1_V0108
+N1_K0115,弁,speech; valve; discriminate,べん,1,N1,2,N1_V0009 N1_V0109
+N1_K0116,妙,strange; exquisite,みょう,1,N1,1,N1_V0110
+N1_K0117,模,model; pattern,も | ぼ,2,N1,3,N1_V0111 N1_V0950 N1_V0969
+N1_K0118,抗,resist; oppose,こう,1,N1,1,N1_V0112
+N1_K0119,級,grade; class,きゅう,1,N1,1,N1_V0113
+N1_K0120,瞬,blink; instant,しゅん | またたく,2,N1,1,N1_V0114
+N1_K0121,称,name; title; praise,しょう,1,N1,1,N1_V0115
+N1_K0122,華,splendor; flower,か | はな,2,N1,2,N1_V0116 N1_V0389
+N1_K0123,傷,wound; injury,しょう | きず | いたむ | いためる,4,N1,2,N1_V0117 N1_V0767
+N1_K0124,闘,fight; struggle,とう | たたかう,2,N1,1,N1_V0118
+N1_K0125,筋,muscle; line,きん | すじ,2,N1,1,N1_V0119
+N1_K0126,訳,reason; translation,やく | わけ,2,N1,1,N1_V0120
+N1_K0127,射,shoot; radiate,しゃ | いる,2,N1,1,N1_V0121
+N1_K0128,善,good; virtue,ぜん | よい,2,N1,2,N1_V0122 N1_V0740
+N1_K0129,黙,silence,もく | だまる,2,N1,2,N1_V0123 N1_V0987
+N1_K0130,柄,handle; pattern; character,へい | がら | え,3,N1,2,N1_V0124 N1_V0468
+N1_K0131,刑,punishment,けい,1,N1,1,N1_V0125
+N1_K0132,節,season; section; joint,せつ | ふし,2,N1,2,N1_V0126 N1_V0419
+N1_K0133,脱,remove; escape,だつ | ぬぐ | ぬげる,3,N1,2,N1_V0127 N1_V0547
+N1_K0134,厳,strict; severe,げん | おごそか | きびしい,3,N1,1,N1_V0128
+N1_K0135,博,extensive; doctor,はく,1,N1,2,N1_V0129 N1_V0630
+N1_K0136,陣,camp; battle formation,じん,1,N1,1,N1_V0130
+N1_K0137,奇,strange; odd,き,1,N1,1,N1_V0131
+N1_K0138,忠,loyalty,ちゅう,1,N1,1,N1_V0132
+N1_K0139,染,dye; stain,せん | そめる | そまる | しみる | しみ,5,N1,1,N1_V0133
+N1_K0140,微,tiny; delicate,び,1,N1,1,N1_V0110
+N1_K0141,標,mark; standard,ひょう,1,N1,1,N1_V0134
+N1_K0142,縁,relation; edge,えん | ふち,2,N1,1,N1_V0135
+N1_K0143,壁,wall,へき | かべ,2,N1,1,N1_V0136
+N1_K0144,駆,drive; gallop,く | かける | かる,3,N1,1,N1_V0137
+N1_K0145,麻,hemp;麻,ま | あさ,2,N1,1,N1_V0138
+N1_K0146,甲,armor; first class,こう | かん,2,N1,1,N1_V0139
+N1_K0147,藩,feudal domain,はん,1,N1,1,N1_V0140
+N1_K0148,迫,press; approach,はく | せまる,2,N1,2,N1_V0141 N1_V0420
+N1_K0149,踏,step; tread,とう | ふむ | ふまえる,3,N1,1,N1_V0142
+N1_K0150,討,attack; discuss,とう | うつ,2,N1,1,N1_V0143
+N1_K0151,聖,holy; saint,せい,1,N1,1,N1_V0144
+N1_K0152,典,code; ceremony; reference,てん,1,N1,1,N1_V0145
+N1_K0153,剣,sword,けん | つるぎ,2,N1,1,N1_V0146
+N1_K0154,症,symptom; disease,しょう,1,N1,2,N1_V0147 N1_V0392
+N1_K0155,納,pay; supply; accept,のう | おさめる | おさまる,3,N1,1,N1_V0148
+N1_K0156,弥,increasingly; more and more,や,1,N1,1,N1_V0149
+N1_K0157,融,melt; finance; harmonize,ゆう,1,N1,1,N1_V0150
+N1_K0158,浜,beach; seashore,ひん | はま,2,N1,1,N1_V0151
+N1_K0159,郷,hometown; countryside,きょう | ごう,2,N1,1,N1_V0152
+N1_K0160,惑,confuse; doubt,わく | まどう,2,N1,1,N1_V0153
+N1_K0161,柳,willow,りゅう | やなぎ,2,N1,1,N1_V0154
+N1_K0162,拠,base; grounds,きょ | こ,2,N1,1,N1_V0155
+N1_K0163,奉,dedicate; serve,ほう | たてまつる,2,N1,1,N1_V0156
+N1_K0164,壊,break; destroy,かい | こわす | こわれる,3,N1,1,N1_V0157
+N1_K0165,益,benefit; profit,えき,1,N1,1,N1_V0158
+N1_K0166,句,phrase; clause,く,1,N1,1,N1_V0159
+N1_K0167,属,belong; genus,ぞく,1,N1,2,N1_V0160 N1_V0795
+N1_K0168,功,achievement; merit,こう,1,N1,1,N1_V0161
+N1_K0169,帝,emperor,てい,1,N1,1,N1_V0162
+N1_K0170,賀,congratulations,が,1,N1,1,N1_V0163
+N1_K0171,堀,moat; canal,ほり,1,N1,1,N1_V0164
+N1_K0172,創,create; originate,そう | つくる,2,N1,1,N1_V0165
+N1_K0173,泣,cry; weep,きゅう | なく,2,N1,1,N1_V0166
+N1_K0174,憶,remember; recollection,おく,1,N1,1,N1_V0167
+N1_K0175,幹,trunk; core; executive,かん | みき,2,N1,1,N1_V0168
+N1_K0176,露,dew; expose,ろ | つゆ,2,N1,2,N1_V0169 N1_V0651
+N1_K0177,矢,arrow,し | や,2,N1,1,N1_V0170
+N1_K0178,握,grip; grasp,あく | にぎる,2,N1,2,N1_V0171 N1_V0705
+N1_K0179,儀,ceremony; rule,ぎ,1,N1,1,N1_V0172
+N1_K0180,聴,listen,ちょう | きく,2,N1,1,N1_V0173
+N1_K0181,襲,attack; inherit,しゅう | おそう,2,N1,1,N1_V0174
+N1_K0182,徴,sign; collect,ちょう,1,N1,1,N1_V0175
+N1_K0183,丁,street block;丁寧,ちょう | てい,2,N1,1,N1_V0176
+N1_K0184,憲,constitution; law,けん,1,N1,1,N1_V0177
+N1_K0185,閣,cabinet; tower,かく,1,N1,1,N1_V0178
+N1_K0186,救,rescue; save,きゅう | すくう,2,N1,1,N1_V0179
+N1_K0187,陰,shade; negative,いん | かげ | かげる,3,N1,2,N1_V0180 N1_V0280
+N1_K0188,繰,wind; repeat,くる,1,N1,1,N1_V0181
+N1_K0189,那,what; phonetic element,な,1,N1,1,N1_V0182
+N1_K0190,操,operate; chastity,そう | みさお | あやつる,3,N1,2,N1_V0183 N1_V0502
+N1_K0191,騒,make noise; disturb,そう | さわぐ,2,N1,1,N1_V0184
+N1_K0192,己,self,こ | き | おのれ,3,N1,1,N1_V0185
+N1_K0193,魔,demon; magic,ま,1,N1,2,N1_V0186 N1_V0339
+N1_K0194,撮,photograph,さつ | とる,2,N1,1,N1_V0187
+N1_K0195,携,carry; portable,けい | たずさえる | たずさわる,3,N1,1,N1_V0188
+N1_K0196,隣,neighbor,りん | となる | となり,3,N1,1,N1_V0189
+N1_K0197,宣,proclaim,せん,1,N1,1,N1_V0190
+N1_K0198,遣,dispatch; use,けん | つかう | つかわす,3,N1,1,N1_V0029
+N1_K0199,訴,sue; appeal,そ | うったえる,2,N1,1,N1_V0191
+N1_K0200,茂,grow thick; luxuriant,も | しげる,2,N1,1,N1_V0192
+N1_K0201,釣,fish; angle,ちょう | つる,2,N1,1,N1_V0193
+N1_K0202,批,criticize,ひ,1,N1,2,N1_V0194 N1_V1015
+N1_K0203,誘,invite; induce,ゆう | さそう,2,N1,3,N1_V0195 N1_V0461 N1_V0939
+N1_K0204,核,nucleus; core,かく,1,N1,1,N1_V0196
+N1_K0205,哲,philosophy; wisdom,てつ,1,N1,1,N1_V0197
+N1_K0206,豪,powerful; splendid,ごう,1,N1,1,N1_V0116
+N1_K0207,締,tighten; conclude,てい | しまる | しめる,3,N1,1,N1_V0198
+N1_K0208,鹿,deer,しか,1,N1,1,N1_V0199
+N1_K0209,就,take position; engage,しゅう | つく | つける,3,N1,1,N1_V0200
+N1_K0210,滅,destroy; perish,めつ | ほろびる | ほろぼす,3,N1,1,N1_V0201
+N1_K0211,仰,look up; respect,ぎょう | あおぐ | おおせ,3,N1,1,N1_V0202
+N1_K0212,瀬,rapids; shallows,せ,1,N1,1,N1_V0203
+N1_K0213,致,bring about; do,ち | いたす,2,N1,2,N1_V0204 N1_V0636
+N1_K0214,伏,bow down; hide,ふく | ふせる | ふす,3,N1,1,N1_V0205
+N1_K0215,杉,cedar,すぎ,1,N1,1,N1_V0206
+N1_K0216,審,judge; examine,しん,1,N1,2,N1_V0207 N1_V0994
+N1_K0217,避,avoid,ひ | さける,2,N1,1,N1_V0208
+N1_K0218,揺,shake; sway,よう | ゆれる | ゆる | ゆらぐ | ゆるぐ | ゆする | ゆさぶる | ゆすぶる,8,N1,1,N1_V0209
+N1_K0219,浦,bay; seashore,うら,1,N1,1,N1_V0210
+N1_K0220,至,arrive; utmost,し | いたる,2,N1,1,N1_V0211
+N1_K0221,裕,abundant;裕福,ゆう,1,N1,1,N1_V0212
+N1_K0222,盟,alliance; oath,めい,1,N1,1,N1_V0213
+N1_K0223,執,grasp; execute,しつ | しゅう | とる,3,N1,1,N1_V0214
+N1_K0224,崩,collapse; crumble,ほう | くずれる | くずす,3,N1,1,N1_V0157
+N1_K0225,鬼,demon; ogre,き | おに,2,N1,1,N1_V0215
+N1_K0226,酸,acid; sour,さん | すい,2,N1,3,N1_V0216 N1_V0928 N1_V0966
+N1_K0227,拡,expand,かく,1,N1,1,N1_V0217
+N1_K0228,銃,gun,じゅう,1,N1,2,N1_V0218 N1_V0729
+N1_K0229,維,maintain; fiber,い,1,N1,2,N1_V0219 N1_V0703
+N1_K0230,縄,rope,じょう | なわ,2,N1,2,N1_V0220 N1_V0229
+N1_K0231,詩,poem,し,1,N1,1,N1_V0221
+N1_K0232,廃,abolish; waste,はい | すたれる | すたる,3,N1,1,N1_V0222
+N1_K0233,充,fill; allocate,じゅう | あてる,2,N1,2,N1_V0223 N1_V1029
+N1_K0234,鏡,mirror,きょう | かがみ,2,N1,2,N1_V0040 N1_V0224
+N1_K0235,仮,temporary;假,か | かり,2,N1,1,N1_V0225
+N1_K0236,吐,spit;吐息,と | はく,2,N1,1,N1_V0226
+N1_K0237,請,request,せい | こう | うける,3,N1,1,N1_V0227
+N1_K0238,眺,look out; gaze,ちょう | ながめる,2,N1,1,N1_V0228
+N1_K0239,沖,offshore,ちゅう | おき,2,N1,1,N1_V0229
+N1_K0240,躍,leap;活躍,やく | おどる,2,N1,2,N1_V0230 N1_V0564
+N1_K0241,威,power;威力,い,1,N1,2,N1_V0231 N1_V1031
+N1_K0242,屈,bend; yield,くつ,1,N1,2,N1_V0232 N1_V0687
+N1_K0243,勘,intuition,かん,1,N1,1,N1_V0233
+N1_K0244,徹,penetrate; thorough,てつ,1,N1,1,N1_V0234
+N1_K0245,斎,purification; room,さい,1,N1,1,N1_V0235
+N1_K0246,謝,apologize; thank,しゃ | あやまる,2,N1,2,N1_V0236 N1_V0605
+N1_K0247,艦,warship,かん,1,N1,2,N1_V0237 N1_V0915
+N1_K0248,催,hold; urge,さい | もよおす,2,N1,1,N1_V0238
+N1_K0249,舎,building; quarters,しゃ,1,N1,1,N1_V0239
+N1_K0250,仁,benevolence,じん,1,N1,1,N1_V0240
+N1_K0251,衝,collide; impact,しょう,1,N1,1,N1_V0241
+N1_K0252,脚,leg; script,きゃく | あし,2,N1,1,N1_V0242
+N1_K0253,虎,tiger,こ | とら,2,N1,1,N1_V0243
+N1_K0254,潮,tide,ちょう | しお,2,N1,1,N1_V0244
+N1_K0255,穴,hole,けつ | あな,2,N1,1,N1_V0245
+N1_K0256,怪,suspicious;怪物,かい | あやしい | あやしむ,3,N1,2,N1_V0246 N1_V0699
+N1_K0257,仙,hermit;仙人,せん,1,N1,1,N1_V0247
+N1_K0258,輝,shine,き | かがやく,2,N1,1,N1_V0248
+N1_K0259,緊,tight; urgent,きん,1,N1,1,N1_V0249
+N1_K0260,唇,lips,しん | くちびる,2,N1,1,N1_V0250
+N1_K0261,忍,endure; stealth,にん | しのぶ | しのばせる,3,N1,2,N1_V0251 N1_V0654
+N1_K0262,狂,mad;狂気,きょう | くるう | くるおしい,3,N1,1,N1_V0252
+N1_K0263,奪,rob; take by force,だつ | うばう,2,N1,1,N1_V0253
+N1_K0264,診,diagnose,しん | みる,2,N1,1,N1_V0254
+N1_K0265,竜,dragon,りゅう | たつ,2,N1,1,N1_V0255
+N1_K0266,債,debt; bond,さい,1,N1,1,N1_V0256
+N1_K0267,鈴,bell,れい | りん | すず,3,N1,1,N1_V0257
+N1_K0268,僧,monk,そう,1,N1,2,N1_V0258 N1_V0817
+N1_K0269,掲,post; display,けい | かかげる,2,N1,3,N1_V0080 N1_V0259 N1_V0364
+N1_K0270,伯,count; earl,はく,1,N1,1,N1_V0260
+N1_K0271,熊,bear,くま,1,N1,1,N1_V0261
+N1_K0272,浪,wave; wandering,ろう,1,N1,1,N1_V0262
+N1_K0273,梅,plum,ばい | うめ,2,N1,1,N1_V0263
+N1_K0274,看,watch; nursing,かん,1,N1,1,N1_V0264
+N1_K0275,俊,talented;俊才,しゅん,1,N1,1,N1_V0265
+N1_K0276,摘,pick; extract,てき | つむ,2,N1,1,N1_V0266
+N1_K0277,項,item; clause,こう,1,N1,1,N1_V0267
+N1_K0278,霊,spirit,れい | りょう | たま,3,N1,2,N1_V0268 N1_V0674
+N1_K0279,垣,fence,かき,1,N1,1,N1_V0269
+N1_K0280,慢,arrogant; chronic,まん,1,N1,4,N1_V0079 N1_V0270 N1_V0768 N1_V0965
+N1_K0281,扱,handle; treat,あつかう,1,N1,1,N1_V0271
+N1_K0282,渉,ford; negotiate,しょう,1,N1,1,N1_V0272
+N1_K0283,如,like; as,じょ | にょ,2,N1,1,N1_V0273
+N1_K0284,縮,shrink,しゅく | ちじむ | ちじまる | ちじめる | ちじれる | ちじらす,6,N1,3,N1_V0274 N1_V0498 N1_V0977
+N1_K0285,詳,detailed,しょう | くわしい,2,N1,1,N1_V0275
+N1_K0286,旦,dawn,たん | だん,2,N1,1,N1_V0276
+N1_K0287,慮,consider,りょ,1,N1,1,N1_V0277
+N1_K0288,雅,elegant,が,1,N1,1,N1_V0278
+N1_K0289,砲,cannon,ほう,1,N1,1,N1_V0279
+N1_K0290,謀,plot; plan,ぼう | はかる,2,N1,1,N1_V0280
+N1_K0291,懐,bosom; nostalgia,かい | ふところ | なつかしい | なつかしむ | なつく | なつける,6,N1,1,N1_V0281
+N1_K0292,愚,foolish,ぐ | おろか,2,N1,1,N1_V0282
+N1_K0293,舌,tongue,ぜつ | した,2,N1,1,N1_V0283
+N1_K0294,駄,poor quality; burden,だ,1,N1,1,N1_V0284
+N1_K0295,奴,fellow; servant,ど,1,N1,1,N1_V0285
+N1_K0296,豆,bean,とう | まめ,2,N1,1,N1_V0286
+N1_K0297,又,again;また,また,1,N1,2,N1_V0287 N1_V0959
+N1_K0298,銭,coin; money,せん | ぜに,2,N1,2,N1_V0193 N1_V0288
+N1_K0299,抑,suppress,よく | おさえる,2,N1,1,N1_V0289
+N1_K0300,侍,samurai; serve,じ | さむらい,2,N1,1,N1_V0290
+N1_K0301,宙,midair; space,ちゅう,1,N1,1,N1_V0291
+N1_K0302,範,model; scope,はん,1,N1,1,N1_V0292
+N1_K0303,潜,dive; hide,せん | ひそむ | もぐる,3,N1,2,N1_V0205 N1_V0293
+N1_K0304,酔,intoxicated,すい | よう,2,N1,2,N1_V0138 N1_V0294
+N1_K0305,呂,spine; musical note,ろ,1,N1,1,N1_V0295
+N1_K0306,還,return,かん,1,N1,1,N1_V0296
+N1_K0307,丹,red; sincerity,たん,1,N1,1,N1_V0297
+N1_K0308,亜,sub-; Asia,あ,1,N1,1,N1_V0298
+N1_K0309,亀,turtle,き | かめ,2,N1,1,N1_V0299
+N1_K0310,沼,marsh,しょう | ぬま,2,N1,1,N1_V0300
+N1_K0311,巡,patrol; go around,じゅん | めぐる,2,N1,1,N1_V0301
+N1_K0312,臭,smell; odor,しゅう | くさい | におう,3,N1,1,N1_V0302
+N1_K0313,慶,celebrate; joy,けい,1,N1,1,N1_V0303
+N1_K0314,距,distance,きょ,1,N1,1,N1_V0304
+N1_K0315,釈,explain; release,しゃく,1,N1,1,N1_V0305
+N1_K0316,侵,invade,しん | おかす,2,N1,1,N1_V0306
+N1_K0317,僚,colleague; official,りょう,1,N1,1,N1_V0307
+N1_K0318,悟,understand; enlightenment,ご | さとる,2,N1,1,N1_V0308
+N1_K0319,隆,prosper; rise,りゅう,1,N1,1,N1_V0309
+N1_K0320,裂,split; tear,れつ | さく | さける,3,N1,2,N1_V0299 N1_V0310
+N1_K0321,尋,inquire; fathom,じん | たずねる,2,N1,1,N1_V0311
+N1_K0322,旗,flag,き | はた,2,N1,1,N1_V0312
+N1_K0323,羅,gauze; spread,ら,1,N1,1,N1_V0313
+N1_K0324,揮,brandish; command,き,1,N1,1,N1_V0314
+N1_K0325,票,ballot;票数,ひょう,1,N1,1,N1_V0315
+N1_K0326,稲,rice plant,とう | いね,2,N1,2,N1_V0316 N1_V0396
+N1_K0327,胞,cell; placenta,ほう,1,N1,1,N1_V0317
+N1_K0328,懸,hang; concern,けん | かける | かかる,3,N1,1,N1_V0318
+N1_K0329,稿,draft; manuscript,こう,1,N1,1,N1_V0319
+N1_K0330,塚,mound,つか,1,N1,1,N1_V0320
+N1_K0331,盤,board; disk,ばん,1,N1,1,N1_V0321
+N1_K0332,災,disaster,さい | わざわい,2,N1,2,N1_V0322 N1_V1006
+N1_K0333,曹,sergeant; official,そう,1,N1,1,N1_V0323
+N1_K0334,尽,exhaust;尽力,じん | つくす | つきる | つかす,4,N1,1,N1_V0324
+N1_K0335,嫁,bride; marry,か | よめ | とつぐ,3,N1,1,N1_V0325
+N1_K0336,繁,prosper;繁栄,はん,1,N1,3,N1_V0192 N1_V0326 N1_V0570
+N1_K0337,即,immediate,そく,1,N1,1,N1_V0327
+N1_K0338,帳,book; curtain,ちょう,1,N1,1,N1_V0328
+N1_K0339,飾,decorate,しょく | かざる,2,N1,1,N1_V0329
+N1_K0340,沿,along; follow,えん | そう,2,N1,1,N1_V0330
+N1_K0341,獲,capture; obtain,かく | える,2,N1,1,N1_V0331
+N1_K0342,伴,accompany,はん | ばん | ともなう,3,N1,1,N1_V0332
+N1_K0343,唐,Tang; China,とう | から,2,N1,1,N1_V0333
+N1_K0344,狭,narrow,きょう | せまい | せばめる | せばまる,4,N1,1,N1_V0334
+N1_K0345,添,add; accompany,てん | そえる | そう,3,N1,1,N1_V0335
+N1_K0346,剤,medicine; agent,ざい,1,N1,2,N1_V0336 N1_V0837
+N1_K0347,魅,charm,み,1,N1,1,N1_V0337
+N1_K0348,契,contract; pledge,けい | ちぎる,2,N1,1,N1_V0338
+N1_K0349,邪,wicked;邪魔,じゃ,1,N1,1,N1_V0339
+N1_K0350,挑,challenge,ちょう | いどむ,2,N1,1,N1_V0340
+N1_K0351,免,exempt;免許,めん | まぬかれる,2,N1,2,N1_V0341 N1_V1040
+N1_K0352,爵,nobility rank,しゃく,1,N1,2,N1_V0260 N1_V0342
+N1_K0353,択,choose,たく,1,N1,1,N1_V0343
+N1_K0354,廊,corridor,ろう,1,N1,1,N1_V0344
+N1_K0355,析,analyze,せき,1,N1,1,N1_V0345
+N1_K0356,輩,fellow; group,はい,1,N1,1,N1_V0346
+N1_K0357,敏,quick; clever,びん,1,N1,1,N1_V0347
+N1_K0358,鶴,crane,つる,1,N1,1,N1_V0348
+N1_K0359,虚,empty; false,きょ,1,N1,2,N1_V0349 N1_V0642
+N1_K0360,往,go; past,おう,1,N1,1,N1_V0350
+N1_K0361,趣,gist;趣味,しゅ | おもむき,2,N1,2,N1_V0351 N1_V0497
+N1_K0362,烈,violent; intense,れつ,1,N1,1,N1_V0352
+N1_K0363,索,search; rope,さく,1,N1,2,N1_V0353 N1_V0870
+N1_K0364,匂,fragrance,におう,1,N1,1,N1_V0354
+N1_K0365,摩,rub; friction,ま,1,N1,1,N1_V0355
+N1_K0366,菊,chrysanthemum,きく,1,N1,1,N1_V0356
+N1_K0367,滑,slip; smooth,かつ | こつ | すべる | なめらか,4,N1,1,N1_V0357
+N1_K0368,沙,sand,さ,1,N1,2,N1_V0358 N1_V0747
+N1_K0369,裸,naked,ら | はだか,2,N1,1,N1_V0359
+N1_K0370,孝,filial piety,こう,1,N1,1,N1_V0360
+N1_K0371,綱,rope; guideline,こう | つな,2,N1,1,N1_V0361
+N1_K0372,邸,residence,てい,1,N1,1,N1_V0362
+N1_K0373,邦,country; Japan,ほう,1,N1,1,N1_V0363
+N1_K0374,揚,raise; fry,よう | あげる | あがる,3,N1,1,N1_V0364
+N1_K0375,卓,table;卓越,たく,1,N1,1,N1_V0365
+N1_K0376,騎,horse riding,き,1,N1,1,N1_V0366
+N1_K0377,墓,grave,ぼ | はか,2,N1,1,N1_V0367
+N1_K0378,姫,princess,ひめ,1,N1,1,N1_V0368
+N1_K0379,孔,hole;孔子,こう,1,N1,2,N1_V0369 N1_V0778
+N1_K0380,耐,endure,たい | たえる,2,N1,2,N1_V0251 N1_V0370
+N1_K0381,須,must;須要,す,1,N1,1,N1_V0371
+N1_K0382,臨,face; attend,りん | のぞむ,2,N1,1,N1_V0372
+N1_K0383,献,offer; dedicate,けん,1,N1,1,N1_V0373
+N1_K0384,脈,vein; pulse,みゃく,1,N1,1,N1_V0374
+N1_K0385,芝,lawn,しば,1,N1,1,N1_V0375
+N1_K0386,唱,chant; advocate,しょう | となえる,2,N1,2,N1_V0376 N1_V0822
+N1_K0387,亭,pavilion; restaurant suffix,てい,1,N1,1,N1_V0377
+N1_K0388,誕,birth,たん,1,N1,1,N1_V0378
+N1_K0389,貫,pierce;贯,かん | つらぬく,2,N1,1,N1_V0379
+N1_K0390,偽,false; deceive,ぎ | いつわる | にせ,3,N1,2,N1_V0349 N1_V0380
+N1_K0391,奮,stir oneself,ふん | ふるう,2,N1,1,N1_V0054
+N1_K0392,桜,cherry blossom,おう | さくら,2,N1,1,N1_V0381
+N1_K0393,熟,ripen; skilled,じゅく | うれる,2,N1,1,N1_V0382
+N1_K0394,排,exclude;排除,はい,1,N1,2,N1_V0383 N1_V1048
+N1_K0395,透,transparent; penetrate,とう | すく | すかす | すける,4,N1,1,N1_V0384
+N1_K0396,棄,abandon,き,1,N1,1,N1_V0385
+N1_K0397,削,shave; reduce,さく | けずる,2,N1,1,N1_V0386
+N1_K0398,奏,play music; report,そう | かなでる,2,N1,1,N1_V0387
+N1_K0399,幻,illusion,げん | まぼろし,2,N1,1,N1_V0388
+N1_K0400,麗,beautiful,れい | うるわしい,2,N1,1,N1_V0389
+N1_K0401,逮,apprehend; catch,たい,1,N1,1,N1_V0390
+N1_K0402,誠,sincerity,せい | まこと,2,N1,1,N1_V0391
+N1_K0403,炎,flame,えん | ほのお,2,N1,2,N1_V0392 N1_V0694
+N1_K0404,椅,chair,い,1,N1,1,N1_V0393
+N1_K0405,寛,broad; tolerant,かん,1,N1,1,N1_V0394
+N1_K0406,斉,equal;齐,せい,1,N1,1,N1_V0395
+N1_K0407,穂,ear of grain,すい | ほ,2,N1,1,N1_V0396
+N1_K0408,兼,concurrently; combine,けん | かねる,2,N1,1,N1_V0397
+N1_K0409,飼,raise animals,し | かう,2,N1,1,N1_V0398
+N1_K0410,促,urge; accelerate,そく | うながす,2,N1,1,N1_V0399
+N1_K0411,尚,still; esteem,しょう,1,N1,1,N1_V0400
+N1_K0412,彩,coloring,さい | いろどる,2,N1,2,N1_V0401 N1_V0972
+N1_K0413,暖,warm,だん | あたたか | あたたかい | あたたまる | あたためる,5,N1,3,N1_V0070 N1_V0402 N1_V0616
+N1_K0414,俗,custom; vulgar,ぞく,1,N1,1,N1_V0403
+N1_K0415,較,compare,かく,1,N1,1,N1_V0404
+N1_K0416,傍,beside,ぼう | かたわら,2,N1,1,N1_V0405
+N1_K0417,肝,liver; core,かん | きも,2,N1,1,N1_V0406
+N1_K0418,畑,field,はた | はたけ,2,N1,2,N1_V0407 N1_V0734
+N1_K0419,峰,peak,ほう | みね,2,N1,1,N1_V0408
+N1_K0420,抵,resist,てい,1,N1,1,N1_V0112
+N1_K0421,恩,favor; grace,おん,1,N1,2,N1_V0098 N1_V0819
+N1_K0422,誇,boast; pride,こ | ほこる,2,N1,1,N1_V0409
+N1_K0423,網,net; network,もう | あみ,2,N1,1,N1_V0410
+N1_K0424,渋,astringent; reluctant,じゅう | しぶ | しぶい | しぶる,4,N1,1,N1_V0411
+N1_K0425,魂,soul,こん | たましい,2,N1,1,N1_V0412
+N1_K0426,牧,pasture; shepherd,ぼく | まき,2,N1,1,N1_V0413
+N1_K0427,控,refrain; note down,こう | ひかえる,2,N1,1,N1_V0414
+N1_K0428,紛,confuse; distract,ふん | まぎれる | まぎらす | まぎらわす | まぎらわしい,5,N1,1,N1_V0415
+N1_K0429,戒,admonish;戒律,かい | いましめる,2,N1,2,N1_V0416 N1_V0792
+N1_K0430,没,sink; die,ぼつ,1,N1,2,N1_V0417 N1_V0458
+N1_K0431,既,already,き | すでに,2,N1,1,N1_V0418
+N1_K0432,股,thigh; crotch,こ | また,2,N1,1,N1_V0419
+N1_K0433,脅,threaten,きょう | おびやかす | おどす | おどかす,4,N1,1,N1_V0420
+N1_K0434,征,conquer; campaign,せい,1,N1,1,N1_V0421
+N1_K0435,覆,cover; overturn,ふく | おおう | くつがえす | くつがえる,4,N1,1,N1_V0422
+N1_K0436,郡,county; district,ぐん,1,N1,1,N1_V0423
+N1_K0437,丘,hill,きゅう | おか,2,N1,1,N1_V0424
+N1_K0438,佳,excellent; beautiful,か,1,N1,1,N1_V0425
+N1_K0439,叔,uncle/aunt element,しゅく,1,N1,1,N1_V0426
+N1_K0440,託,entrust,たく,1,N1,1,N1_V0427
+N1_K0441,哀,sorrow,あい | あわれ | あわれむ,3,N1,2,N1_V0428 N1_V0945
+N1_K0442,肥,fertile; fat,ひ | こえる | こえ | こやす | こやし,5,N1,2,N1_V0429 N1_V1071
+N1_K0443,朗,bright; cheerful,ろう | ほがらか,2,N1,1,N1_V0430
+N1_K0444,慎,careful; prudent,しん | つつしむ,2,N1,2,N1_V0431 N1_V0970
+N1_K0445,悠,calm; distant,ゆう,1,N1,1,N1_V0432
+N1_K0446,眉,eyebrow,び | まゆ,2,N1,1,N1_V0433
+N1_K0447,拒,refuse,きょ | こばむ,2,N1,1,N1_V0434
+N1_K0448,概,outline; general,がい,1,N1,1,N1_V0435
+N1_K0449,顧,look back; consider,こ | かえりみる,2,N1,1,N1_V0436
+N1_K0450,腐,rot; decay,ふ | くさる | くされる | くさらす,4,N1,1,N1_V0437
+N1_K0451,挨,approach; greeting element,あい,1,N1,1,N1_V0438
+N1_K0452,孤,orphan; alone,こ,1,N1,1,N1_V0439
+N1_K0453,拶,press; greeting element,さつ,1,N1,1,N1_V0438
+N1_K0454,却,reject; retreat,きゃく,1,N1,1,N1_V0440
+N1_K0455,賊,thief; rebel,ぞく,1,N1,1,N1_V0441
+N1_K0456,荘,villa;庄,そう,1,N1,1,N1_V0442
+N1_K0457,匠,artisan,しょう,1,N1,1,N1_V0443
+N1_K0458,悔,regret,かい | くいる | くやむ | くやしい,4,N1,1,N1_V0444
+N1_K0459,獄,prison,ごく,1,N1,1,N1_V0445
+N1_K0460,滞,stagnate; stay,たい | とどこおる,2,N1,2,N1_V0411 N1_V0446
+N1_K0461,遇,meet; treatment,ぐう,1,N1,1,N1_V0447
+N1_K0462,淡,pale;淡水,たん | あわい,2,N1,1,N1_V0448
+N1_K0463,購,purchase,こう,1,N1,1,N1_V0449
+N1_K0464,併,combine,へい | あわせる,2,N1,1,N1_V0450
+N1_K0465,崇,revere,すう,1,N1,1,N1_V0451
+N1_K0466,唯,only,ゆい,1,N1,1,N1_V0452
+N1_K0467,垂,hang down,すい | たれる | たらす,3,N1,1,N1_V0453
+N1_K0468,岐,branch; fork,き,1,N1,2,N1_V0454 N1_V0855
+N1_K0469,俳,haiku; actor,はい,1,N1,2,N1_V0455 N1_V1056
+N1_K0470,斜,diagonal; slant,しゃ | ななめ,2,N1,1,N1_V0456
+N1_K0471,嬢,young lady,じょう,1,N1,1,N1_V0457
+N1_K0472,陥,fall into; trap,かん | おちいる | おとしいれる,3,N1,1,N1_V0458
+N1_K0473,償,compensate,しょう | つぐなう,2,N1,1,N1_V0459
+N1_K0474,鑑,model;鉴,かん | かんがみる,2,N1,1,N1_V0460
+N1_K0475,勧,recommend; urge,かん | すすめる,2,N1,1,N1_V0461
+N1_K0476,葬,bury,そう | ほうむる,2,N1,1,N1_V0462
+N1_K0477,焦,burn;焦点,しょう | こげる | こがす | こがれる | あせる,5,N1,1,N1_V0463
+N1_K0478,剛,strong; sturdy,ごう,1,N1,1,N1_V0464
+N1_K0479,膨,swell,ぼう | ふくらむ | ふくれる,3,N1,1,N1_V0465
+N1_K0480,廷,court,てい,1,N1,1,N1_V0466
+N1_K0481,紫,purple,し | むらさき,2,N1,1,N1_V0467
+N1_K0482,銘,inscription; brand,めい,1,N1,1,N1_V0468
+N1_K0483,鎌,sickle,かま,1,N1,1,N1_V0469
+N1_K0484,菌,germ; fungus,きん,1,N1,1,N1_V0470
+N1_K0485,稼,earn; operate,か | かせぐ,2,N1,1,N1_V0471
+N1_K0486,譲,yield; transfer,じょう | ゆずる,2,N1,1,N1_V0472
+N1_K0487,随,follow,ずい,1,N1,1,N1_V0473
+N1_K0488,猛,fierce,もう,1,N1,2,N1_V0352 N1_V0531
+N1_K0489,遂,accomplish,すい | とげる,2,N1,1,N1_V0474
+N1_K0490,冒,risk;冒険,ぼう | おかす,2,N1,1,N1_V0475
+N1_K0491,泰,peaceful; grand,たい,1,N1,1,N1_V0476
+N1_K0492,翼,wing,よく | つばさ,2,N1,1,N1_V0477
+N1_K0493,凄,terrific;凄惨,せい,1,N1,1,N1_V0478
+N1_K0494,序,order; preface,じょ,1,N1,2,N1_V0479 N1_V0672
+N1_K0495,扉,door,ひ | とびら,2,N1,1,N1_V0480
+N1_K0496,是,right; this,ぜ,1,N1,1,N1_V0481
+N1_K0497,寸,measurement; tiny,すん,1,N1,1,N1_V0482
+N1_K0498,賃,fare; wages,ちん,1,N1,1,N1_V0483
+N1_K0499,偵,spy; investigate,てい,1,N1,1,N1_V0484
+N1_K0500,澄,clear;澄む,ちょう | すむ | すます,3,N1,1,N1_V0485
+N1_K0501,殊,especially; unusual,しゅ | こと,2,N1,1,N1_V0486
+N1_K0502,緩,loose;缓,かん | ゆるい | ゆるやか | ゆるむ | ゆるめる,5,N1,1,N1_V0487
+N1_K0503,頑,stubborn,がん,1,N1,1,N1_V0488
+N1_K0504,紋,crest; pattern,もん,1,N1,1,N1_V0489
+N1_K0505,糖,sugar,とう,1,N1,1,N1_V0490
+N1_K0506,煮,boil; simmer,しゃ | にる | にえる | にやす,4,N1,1,N1_V0491
+N1_K0507,芳,fragrant; favorable,ほう | かんばしい,2,N1,1,N1_V0492
+N1_K0508,惨,miserable; cruel,さん | ざん | みじめ,3,N1,2,N1_V0478 N1_V0493
+N1_K0509,歓,joy,かん,1,N1,1,N1_V0494
+N1_K0510,虐,oppress; cruel,ぎゃく | しいたげる,2,N1,1,N1_V0495
+N1_K0511,喉,throat,こう | のど,2,N1,1,N1_V0496
+N1_K0512,旨,gist; tasty,し | むね,2,N1,1,N1_V0497
+N1_K0513,凝,congeal; concentrate,ぎょう | こる | こらす,3,N1,1,N1_V0498
+N1_K0514,圏,sphere; zone,けん,1,N1,1,N1_V0499
+N1_K0515,拭,wipe,しょく | ふく | ぬぐう,3,N1,1,N1_V0500
+N1_K0516,涯,horizon; limit,がい,1,N1,1,N1_V0501
+N1_K0517,貞,chastity; upright,てい,1,N1,1,N1_V0502
+N1_K0518,堅,hard; firm,けん | かたい,2,N1,1,N1_V0503
+N1_K0519,倫,ethics; relations,りん,1,N1,1,N1_V0504
+N1_K0520,壇,platform,だん,1,N1,1,N1_V0505
+N1_K0521,呉,Wu; give,ご,1,N1,1,N1_V0506
+N1_K0522,暇,free time,か | ひま,2,N1,1,N1_V0507
+N1_K0523,貌,appearance,ぼう,1,N1,1,N1_V0508
+N1_K0524,塞,block; fortress,さい | そく | ふさぐ | ふさがる,4,N1,2,N1_V0509 N1_V0931
+N1_K0525,噴,spout; eject,ふん | ふく,2,N1,1,N1_V0510
+N1_K0526,婆,old woman,ば,1,N1,1,N1_V0511
+N1_K0527,岳,mountain peak,がく | たけ,2,N1,1,N1_V0512
+N1_K0528,蹴,kick,しゅう | ける,2,N1,1,N1_V0513
+N1_K0529,鍵,key,けん | かぎ,2,N1,1,N1_V0514
+N1_K0530,膳,meal tray,ぜん,1,N1,1,N1_V0515
+N1_K0531,尺,shaku; measure,しゃく,1,N1,1,N1_V0516
+N1_K0532,罰,punishment,ばつ | ばち,2,N1,1,N1_V0517
+N1_K0533,漏,leak,ろう | もる | もれる | もらす,4,N1,1,N1_V0518
+N1_K0534,朱,vermilion,しゅ,1,N1,1,N1_V0519
+N1_K0535,覧,view; inspect,らん,1,N1,2,N1_V0520 N1_V0921
+N1_K0536,漂,drift,ひょう | ただよう,2,N1,1,N1_V0521
+N1_K0537,汁,juice; soup,じゅう | しる,2,N1,2,N1_V0522 N1_V0724
+N1_K0538,寂,lonely; quiet,じゃく | さび | さびしい | さびれる,4,N1,1,N1_V0523
+N1_K0539,嘆,sigh; lament,たん | なげく | なげかわしい,3,N1,1,N1_V0524
+N1_K0540,禅,Zen,ぜん,1,N1,1,N1_V0525
+N1_K0541,浄,clean; pure,じょう,1,N1,1,N1_V0526
+N1_K0542,酷,cruel; severe,こく,1,N1,2,N1_V0527 N1_V0666
+N1_K0543,刃,blade,じん | は,2,N1,1,N1_V0528
+N1_K0544,漫,casual; rambling,まん,1,N1,1,N1_V0529
+N1_K0545,霧,fog,む | きり,2,N1,1,N1_V0530
+N1_K0546,暑,hot weather,しょ | あつい,2,N1,1,N1_V0531
+N1_K0547,棚,shelf,たな,1,N1,1,N1_V0532
+N1_K0548,袖,sleeve,しゅう | そで,2,N1,1,N1_V0533
+N1_K0549,壮,robust; grand,そう,1,N1,1,N1_V0534
+N1_K0550,旬,season; ten-day period,じゅん,1,N1,1,N1_V0535
+N1_K0551,彫,carve,ちょう | ほる,2,N1,1,N1_V0536
+N1_K0552,需,demand,じゅ,1,N1,1,N1_V0537
+N1_K0553,鎖,chain,さ | くさり,2,N1,1,N1_V0538
+N1_K0554,潰,crush; collapse,かい | つぶす | つぶれる,3,N1,1,N1_V0539
+N1_K0555,縦,vertical,じゅう | たて,2,N1,1,N1_V0540
+N1_K0556,粧,makeup; adorn,しょう,1,N1,1,N1_V0541
+N1_K0557,慌,flustered,こう | あわてる | あわただしい,3,N1,1,N1_V0542
+N1_K0558,穏,calm,おん | おだやか,2,N1,1,N1_V0543
+N1_K0559,枠,frame,わく,1,N1,1,N1_V0544
+N1_K0560,謎,riddle,なぞ,1,N1,1,N1_V0545
+N1_K0561,誉,honor; praise,よ | ほまれ,2,N1,1,N1_V0546
+N1_K0562,逸,deviate; excellent,いつ,1,N1,1,N1_V0547
+N1_K0563,駒,chess piece; horse,こま,1,N1,1,N1_V0548
+N1_K0564,惜,regret;惜別,せき | おしい | おしむ,3,N1,1,N1_V0549
+N1_K0565,措,set aside; measure,そ,1,N1,1,N1_V0550
+N1_K0566,晶,crystal; sparkle,しょう,1,N1,1,N1_V0551
+N1_K0567,琴,koto,きん | こと,2,N1,1,N1_V0552
+N1_K0568,摂,take in;摄,せつ,1,N1,1,N1_V0553
+N1_K0569,拍,clap; beat,はく,1,N1,1,N1_V0554
+N1_K0570,稽,consider; practice,けい,1,N1,1,N1_V0555
+N1_K0571,礎,foundation stone,そ | いしずえ,2,N1,1,N1_V0556
+N1_K0572,遭,encounter,そう | あう,2,N1,1,N1_V0557
+N1_K0573,掌,palm; manage,しょう,1,N1,1,N1_V0558
+N1_K0574,鍋,pot,なべ,1,N1,1,N1_V0559
+N1_K0575,弓,bow,きゅう | ゆみ,2,N1,1,N1_V0560
+N1_K0576,克,overcome,こく,1,N1,1,N1_V0561
+N1_K0577,据,install; set,すえる | すわる,2,N1,1,N1_V0562
+N1_K0578,胆,gallbladder; courage,たん,1,N1,2,N1_V0412 N1_V0563
+N1_K0579,跳,jump,ちょう | はねる | とぶ,3,N1,1,N1_V0564
+N1_K0580,縛,bind,ばく | しばる,2,N1,1,N1_V0565
+N1_K0581,鎮,calm; suppress,ちん | しずめる | しずまる,3,N1,1,N1_V0566
+N1_K0582,雷,thunder,らい | かみなり,2,N1,1,N1_V0567
+N1_K0583,恨,grudge,こん | うらむ | うらめしい,3,N1,1,N1_V0568
+N1_K0584,顕,appear; prominent,けん,1,N1,1,N1_V0569
+N1_K0585,殖,multiply; breed,しょく | ふえる | ふやす,3,N1,1,N1_V0570
+N1_K0586,寧,peaceful; rather,ねい,1,N1,1,N1_V0176
+N1_K0587,湧,well up,ゆう | わく,2,N1,1,N1_V0571
+N1_K0588,棋,board game,き,1,N1,1,N1_V0572
+N1_K0589,巧,skillful,こう | たくみ,2,N1,1,N1_V0573
+N1_K0590,浸,soak; immerse,しん | ひたす | ひたる,3,N1,1,N1_V0574
+N1_K0591,桃,peach,とう | もも,2,N1,1,N1_V0575
+N1_K0592,隔,separate,かく | へだてる | へだたる,3,N1,1,N1_V0576
+N1_K0593,班,group; squad,はん,1,N1,1,N1_V0577
+N1_K0594,甚,very;甚大,じん | はなはだ | はなはだしい,3,N1,1,N1_V0578
+N1_K0595,妊,pregnancy,にん,1,N1,1,N1_V0579
+N1_K0596,祉,welfare,し,1,N1,1,N1_V0580
+N1_K0597,獣,beast,じゅう | けもの,2,N1,1,N1_V0581
+N1_K0598,疾,disease; rapid,しつ,1,N1,1,N1_V0582
+N1_K0599,塾,cram school,じゅく,1,N1,1,N1_V0583
+N1_K0600,潟,lagoon,かた,1,N1,1,N1_V0584
+N1_K0601,撲,strike; beat,ぼく,1,N1,1,N1_V0585
+N1_K0602,塊,clump; mass,かい | かたまり,2,N1,1,N1_V0586
+N1_K0603,絞,strangle; squeeze,こう | しぼる | しめる | しまる,4,N1,1,N1_V0587
+N1_K0604,履,wear;履歴,り | はく,2,N1,1,N1_V0588
+N1_K0605,苗,seedling,びょう | なえ,2,N1,1,N1_V0589
+N1_K0606,芋,potato,いも,1,N1,1,N1_V0590
+N1_K0607,冗,redundant; superfluous,じょう,1,N1,1,N1_V0591
+N1_K0608,陶,pottery,とう,1,N1,1,N1_V0592
+N1_K0609,励,encourage,れい | はげむ | はげます,3,N1,1,N1_V0593
+N1_K0610,陳,state; display,ちん,1,N1,1,N1_V0594
+N1_K0611,猿,monkey,えん | さる,2,N1,1,N1_V0595
+N1_K0612,葛,kudzu,かつ | くず,2,N1,1,N1_V0596
+N1_K0613,傘,umbrella,さん | かさ,2,N1,1,N1_V0597
+N1_K0614,啓,enlighten; open,けい,1,N1,1,N1_V0598
+N1_K0615,劣,inferior,れつ | おとる,2,N1,2,N1_V0599 N1_V0634
+N1_K0616,撤,remove; withdraw,てつ,1,N1,1,N1_V0600
+N1_K0617,殴,strike; beat,おう | なぐる,2,N1,1,N1_V0601
+N1_K0618,盾,shield,じゅん | たて,2,N1,1,N1_V0602
+N1_K0619,衰,decline,すい | おとろえる,2,N1,1,N1_V0603
+N1_K0620,滝,waterfall,たき,1,N1,1,N1_V0604
+N1_K0621,慰,console,い | なぐさめる | なぐさむ,3,N1,1,N1_V0605
+N1_K0622,蛇,snake,じゃ | だ | へび,3,N1,1,N1_V0606
+N1_K0623,梨,pear,なし,1,N1,1,N1_V0607
+N1_K0624,癖,habit,へき | くせ,2,N1,1,N1_V0608
+N1_K0625,潤,moist; profit,じゅん | うるおう | うるおす | うるむ,4,N1,1,N1_V0609
+N1_K0626,鉢,bowl,はち,1,N1,1,N1_V0610
+N1_K0627,戯,play; joke,ぎ | たわむれる,2,N1,1,N1_V0611
+N1_K0628,腸,intestine,ちょう,1,N1,1,N1_V0612
+N1_K0629,偏,lean; partial,へん | かたよる,2,N1,1,N1_V0613
+N1_K0630,巣,nest,そう | す,2,N1,1,N1_V0614
+N1_K0631,宴,banquet,えん,1,N1,1,N1_V0615
+N1_K0632,炉,hearth; furnace,ろ,1,N1,1,N1_V0616
+N1_K0633,棟,ridge; building counter,とう | むね,2,N1,1,N1_V0617
+N1_K0634,洞,cave,どう | ほら,2,N1,2,N1_V0245 N1_V0618
+N1_K0635,狩,hunt,しゅ | かる | かり,3,N1,1,N1_V0619
+N1_K0636,陛,imperial steps,へい,1,N1,1,N1_V0620
+N1_K0637,磁,magnetism,じ,1,N1,1,N1_V0621
+N1_K0638,潔,clean; pure,けつ | いさぎよい,2,N1,1,N1_V0622
+N1_K0639,膜,membrane,まく,1,N1,1,N1_V0623
+N1_K0640,乏,scarce,ぼう | とぼしい,2,N1,1,N1_V0624
+N1_K0641,祥,auspicious,しょう,1,N1,1,N1_V0625
+N1_K0642,曽,formerly,そう,1,N1,1,N1_V0626
+N1_K0643,舗,shop; pavement,ほ,1,N1,1,N1_V0627
+N1_K0644,抽,extract,ちゅう,1,N1,1,N1_V0628
+N1_K0645,睡,sleep,すい,1,N1,1,N1_V0629
+N1_K0646,賭,gamble,と | かける,2,N1,1,N1_V0630
+N1_K0647,括,bundle; summarize,かつ,1,N1,1,N1_V0631
+N1_K0648,貢,tribute; contribute,こう | みつぐ,2,N1,1,N1_V0373
+N1_K0649,犠,sacrifice,ぎ,1,N1,1,N1_V0632
+N1_K0650,粗,coarse; rough,そ | あらい,2,N1,1,N1_V0633
+N1_K0651,卑,lowly; base,ひ | いやしい | いやしむ | いやしめる,4,N1,1,N1_V0634
+N1_K0652,貼,stick; paste,ちょう | はる,2,N1,1,N1_V0635
+N1_K0653,拉,kidnap; pull,ら,1,N1,1,N1_V0636
+N1_K0654,牲,sacrifice; animal,せい,1,N1,1,N1_V0632
+N1_K0655,帆,sail,はん | ほ,2,N1,1,N1_V0637
+N1_K0656,挿,insert,そう | さす,2,N1,1,N1_V0638
+N1_K0657,翻,turn over; translate,ほん | ひるがえる | ひるがえす,3,N1,2,N1_V0120 N1_V0847
+N1_K0658,羊,sheep,よう | ひつじ,2,N1,1,N1_V0639
+N1_K0659,枕,pillow,まくら,1,N1,1,N1_V0640
+N1_K0660,錯,confused; mix,さく,1,N1,1,N1_V0641
+N1_K0661,謙,humble,けん,1,N1,2,N1_V0642 N1_V1013
+N1_K0662,珠,pearl; bead,しゅ,1,N1,1,N1_V0643
+N1_K0663,蓄,store; accumulate,ちく | たくわえる,2,N1,1,N1_V0644
+N1_K0664,拓,open land; expand,たく,1,N1,1,N1_V0645
+N1_K0665,鼓,drum;鼓舞,こ | つずみ,2,N1,1,N1_V0646
+N1_K0666,粋,chic; essence,すい | いき,2,N1,1,N1_V0647
+N1_K0667,尉,officer rank,い,1,N1,1,N1_V0648
+N1_K0668,后,empress,こう,1,N1,1,N1_V0649
+N1_K0669,粘,sticky,ねん | ねばる,2,N1,2,N1_V0623 N1_V0650
+N1_K0670,披,expose; open,ひ,1,N1,1,N1_V0651
+N1_K0671,徐,slowly,じょ,1,N1,1,N1_V0652
+N1_K0672,悦,joy,えつ,1,N1,1,N1_V0653
+N1_K0673,堪,endure,かん | たえる,2,N1,1,N1_V0654
+N1_K0674,冠,crown,かん | かんむり,2,N1,1,N1_V0655
+N1_K0675,愉,pleasant,ゆ,1,N1,1,N1_V0656
+N1_K0676,尿,urine,にょう,1,N1,1,N1_V0657
+N1_K0677,顎,jaw,がく | あご,2,N1,1,N1_V0658
+N1_K0678,誓,vow,せい | ちかう,2,N1,1,N1_V0659
+N1_K0679,憂,grief; anxiety,ゆう | うれえる | うれい | うい,4,N1,1,N1_V0660
+N1_K0680,簿,register; ledger,ぼ,1,N1,1,N1_V0661
+N1_K0681,糧,food; provisions,りょう | かて,2,N1,1,N1_V0662
+N1_K0682,架,rack;架橋,か | かける | かかる,3,N1,1,N1_V0663
+N1_K0683,芽,bud; sprout,が | め,2,N1,1,N1_V0664
+N1_K0684,軸,axis; shaft,じく,1,N1,1,N1_V0665
+N1_K0685,苛,harsh; torment,か,1,N1,1,N1_V0666
+N1_K0686,蓋,lid; cover,がい | ふた,2,N1,1,N1_V0667
+N1_K0687,盆,tray; Bon festival,ぼん,1,N1,1,N1_V0668
+N1_K0688,凶,bad luck,きょう,1,N1,1,N1_V0669
+N1_K0689,妃,princess; consort,ひ,1,N1,1,N1_V0670
+N1_K0690,庶,common; various,しょ,1,N1,1,N1_V0671
+N1_K0691,秩,order;秩序,ちつ,1,N1,1,N1_V0672
+N1_K0692,裾,hem,すそ,1,N1,1,N1_V0673
+N1_K0693,幽,faint; secluded,ゆう,1,N1,1,N1_V0674
+N1_K0694,凡,ordinary,ぼん,1,N1,2,N1_V0675 N1_V1001
+N1_K0695,漠,vague; desert,ばく,1,N1,2,N1_V0358 N1_V0676
+N1_K0696,拙,clumsy,せつ | つたない,2,N1,1,N1_V0677
+N1_K0697,恒,constant,こう,1,N1,1,N1_V0678
+N1_K0698,暦,calendar,れき | こよみ,2,N1,1,N1_V0679
+N1_K0699,腫,swelling; tumor,しゅ | はれる | はらす,3,N1,1,N1_V0680
+N1_K0700,峠,mountain pass,とうげ,1,N1,1,N1_V0681
+N1_K0701,宰,oversee; minister,さい,1,N1,1,N1_V0682
+N1_K0702,蛮,barbarian; savage,ばん,1,N1,1,N1_V0683
+N1_K0703,窮,distress; cornered,きゅう | きわめる | きわまる,3,N1,1,N1_V0684
+N1_K0704,擦,rub,さつ | する | すれる,3,N1,1,N1_V0355
+N1_K0705,爪,claw; nail,つめ,1,N1,1,N1_V0685
+N1_K0706,稚,young; immature,ち,1,N1,1,N1_V0686
+N1_K0707,辱,humiliate,じょく | はずかしめる,2,N1,2,N1_V0687 N1_V0895
+N1_K0708,嵐,storm,あらし,1,N1,1,N1_V0688
+N1_K0709,憤,indignation,ふん | いきどおる,2,N1,1,N1_V0689
+N1_K0710,癒,heal,ゆ | いえる | いやす,3,N1,1,N1_V0690
+N1_K0711,鬱,gloom; depression,うつ,1,N1,1,N1_V0660
+N1_K0712,疎,sparse;疎外,そ | うとい | うとむ,3,N1,1,N1_V0691
+N1_K0713,雰,atmosphere element,ふん,1,N1,1,N1_V0692
+N1_K0714,彰,make clear; praise,しょう,1,N1,1,N1_V0693
+N1_K0715,肺,lung,はい,1,N1,1,N1_V0694
+N1_K0716,傑,great; outstanding,けつ,1,N1,1,N1_V0695
+N1_K0717,拘,restrain; arrest,こう,1,N1,1,N1_V0696
+N1_K0718,頻,frequent,ひん,1,N1,1,N1_V0697
+N1_K0719,緯,latitude; weft,い,1,N1,1,N1_V0698
+N1_K0720,妖,bewitching; supernatural,よう | あやしい,2,N1,1,N1_V0699
+N1_K0721,豚,pig,とん | ぶた,2,N1,1,N1_V0700
+N1_K0722,藍,indigo,らん | あい,2,N1,1,N1_V0701
+N1_K0723,矛,spear,む | ほこ,2,N1,1,N1_V0602
+N1_K0724,鍛,forge; train,たん | きたえる,2,N1,1,N1_V0702
+N1_K0725,繊,fine; fiber,せん,1,N1,1,N1_V0703
+N1_K0726,縫,sew,ほう | ぬう,2,N1,1,N1_V0704
+N1_K0727,把,grasp; bundle,は,1,N1,1,N1_V0705
+N1_K0728,楼,tower,ろう,1,N1,1,N1_V0706
+N1_K0729,捉,catch; grasp,そく | とらえる,2,N1,1,N1_V0707
+N1_K0730,漬,pickle; soak,つける | つかる,2,N1,1,N1_V0708
+N1_K0731,紳,gentleman,しん,1,N1,1,N1_V0709
+N1_K0732,飽,satiated; bored,ほう | あきる | あかす,3,N1,1,N1_V0710
+N1_K0733,宛,address; to,あてる,1,N1,1,N1_V0711
+N1_K0734,閥,clique,ばつ,1,N1,1,N1_V0712
+N1_K0735,旋,rotate,せん,1,N1,1,N1_V0713
+N1_K0736,坪,tsubo measure,つぼ,1,N1,1,N1_V0714
+N1_K0737,崖,cliff,がい | がけ,2,N1,1,N1_V0715
+N1_K0738,叱,scold,しつ | しかる,2,N1,1,N1_V0716
+N1_K0739,鶏,chicken,けい | にわとり,2,N1,1,N1_V0717
+N1_K0740,峡,gorge,きょう,1,N1,1,N1_V0718
+N1_K0741,溝,ditch; groove,こう | みぞ,2,N1,1,N1_V0719
+N1_K0742,朴,simple; plain,ぼく,1,N1,1,N1_V0720
+N1_K0743,軌,track; orbit,き,1,N1,1,N1_V0721
+N1_K0744,瓦,tile,が | かわら,2,N1,1,N1_V0722
+N1_K0745,喪,mourning; loss,そう | も,2,N1,1,N1_V0723
+N1_K0746,墨,ink,ぼく | すみ,2,N1,1,N1_V0724
+N1_K0747,疫,epidemic,えき,1,N1,1,N1_V0725
+N1_K0748,遍,everywhere; times,へん,1,N1,1,N1_V0726
+N1_K0749,濁,muddy; voiced,だく | にごる | にごす,3,N1,1,N1_V0727
+N1_K0750,扇,fan,せん | おうぎ,2,N1,1,N1_V0728
+N1_K0751,拳,fist,けん | こぶし,2,N1,1,N1_V0729
+N1_K0752,乙,second; strange,おつ,1,N1,1,N1_V0730
+N1_K0753,酵,fermentation,こう,1,N1,1,N1_V0731
+N1_K0754,堤,embankment,てい | つつみ,2,N1,1,N1_V0732
+N1_K0755,阻,obstruct,そ | はばむ,2,N1,1,N1_V0733
+N1_K0756,桑,mulberry,そう | くわ,2,N1,1,N1_V0734
+N1_K0757,虜,captive,りょ,1,N1,1,N1_V0735
+N1_K0758,乞,beg,こう,1,N1,1,N1_V0736
+N1_K0759,恭,respectful,きょう | うやうやしい,2,N1,1,N1_V0737
+N1_K0760,鐘,bell,しょう | かね,2,N1,1,N1_V0738
+N1_K0761,剰,surplus,じょう,1,N1,1,N1_V0739
+N1_K0762,慈,mercy,じ | いつくしむ,2,N1,1,N1_V0740
+N1_K0763,径,diameter; path,けい,1,N1,1,N1_V0741
+N1_K0764,培,cultivate,ばい | つちかう,2,N1,1,N1_V0742
+N1_K0765,擁,embrace; support,よう,1,N1,1,N1_V0743
+N1_K0766,郭,enclosure,かく,1,N1,1,N1_V0744
+N1_K0767,呪,curse,じゅ | のろう,2,N1,1,N1_V0745
+N1_K0768,砕,shatter,さい | くだく | くだける,3,N1,1,N1_V0746
+N1_K0769,汰,select; wash away,た,1,N1,1,N1_V0747
+N1_K0770,勃,rise suddenly,ぼつ,1,N1,1,N1_V0748
+N1_K0771,翁,old man,おう,1,N1,1,N1_V0749
+N1_K0772,絹,silk,けん | きぬ,2,N1,1,N1_V0750
+N1_K0773,譜,music score; genealogy,ふ,1,N1,1,N1_V0751
+N1_K0774,陵,mausoleum; hill,りょう | みささぎ,2,N1,1,N1_V0424
+N1_K0775,痴,foolish;痴呆,ち,1,N1,2,N1_V0282 N1_V0752
+N1_K0776,笛,flute,てき | ふえ,2,N1,1,N1_V0753
+N1_K0777,昧,obscure,まい,1,N1,1,N1_V0754
+N1_K0778,訟,lawsuit,しょう,1,N1,1,N1_V0191
+N1_K0779,唾,saliva,だ | つば,2,N1,1,N1_V0755
+N1_K0780,肪,fat,ぼう,1,N1,1,N1_V0756
+N1_K0781,塀,wall,へい,1,N1,1,N1_V0757
+N1_K0782,碁,Go game,ご,1,N1,1,N1_V0758
+N1_K0783,敢,daring,かん,1,N1,1,N1_V0759
+N1_K0784,塁,base; fort,るい,1,N1,1,N1_V0760
+N1_K0785,暁,dawn,ぎょう | あかつき,2,N1,1,N1_V0761
+N1_K0786,胴,trunk; torso,どう,1,N1,1,N1_V0762
+N1_K0787,謡,chant; song,よう | うたい | うたう,3,N1,1,N1_V0763
+N1_K0788,飢,hunger,き | うえる,2,N1,1,N1_V0764
+N1_K0789,欄,column; rail,らん,1,N1,1,N1_V0765
+N1_K0790,艶,gloss; charm,えん | つや,2,N1,1,N1_V0766
+N1_K0791,痕,mark; scar,こん | あと,2,N1,2,N1_V0685 N1_V0767
+N1_K0792,怠,neglect,たい | おこたる | なまける,3,N1,2,N1_V0768 N1_V1054
+N1_K0793,欺,deceive,ぎ | あざむく,2,N1,1,N1_V0769
+N1_K0794,弦,string; chord,げん | つる,2,N1,1,N1_V0770
+N1_K0795,泡,bubble,ほう | あわ,2,N1,1,N1_V0771
+N1_K0796,諦,give up; truth,てい | あきらめる,2,N1,1,N1_V0772
+N1_K0797,伐,cut down,ばつ,1,N1,1,N1_V0773
+N1_K0798,餅,rice cake,へい | もち,2,N1,1,N1_V0774
+N1_K0799,寮,dormitory,りょう,1,N1,1,N1_V0775
+N1_K0800,厄,misfortune,やく,1,N1,1,N1_V0776
+N1_K0801,奔,run wildly,ほん,1,N1,1,N1_V0777
+N1_K0802,瞳,pupil of eye,どう | ひとみ,2,N1,1,N1_V0778
+N1_K0803,昆,descendants; insect element,こん,1,N1,1,N1_V0779
+N1_K0804,椎,chinquapin; vertebra,つい,1,N1,1,N1_V0780
+N1_K0805,懇,cordial; earnest,こん | ねんごろ,2,N1,1,N1_V0781
+N1_K0806,唄,song,うた | ばい,2,N1,1,N1_V0782
+N1_K0807,渦,whirlpool,か | うず,2,N1,1,N1_V0783
+N1_K0808,襟,collar,きん | えり,2,N1,1,N1_V0784
+N1_K0809,吟,chant;吟味,ぎん,1,N1,1,N1_V0785
+N1_K0810,覇,supremacy,は,1,N1,1,N1_V0786
+N1_K0811,衡,balance,こう,1,N1,1,N1_V0787
+N1_K0812,呈,present; display,てい,1,N1,1,N1_V0788
+N1_K0813,隙,gap,げき | すき,2,N1,1,N1_V0789
+N1_K0814,淫,lewd; excessive,いん | みだら,2,N1,1,N1_V0790
+N1_K0815,娠,pregnancy,しん,1,N1,1,N1_V0579
+N1_K0816,循,circulate; follow,じゅん,1,N1,1,N1_V0791
+N1_K0817,懲,punish; chastise,ちょう | こりる | こらす | こらしめる,4,N1,1,N1_V0792
+N1_K0818,錦,brocade,きん | にしき,2,N1,1,N1_V0793
+N1_K0819,猟,hunt,りょう,1,N1,1,N1_V0619
+N1_K0820,幣,currency; offering,へい,1,N1,1,N1_V0794
+N1_K0821,附,attach;附属,ふ,1,N1,1,N1_V0795
+N1_K0822,箇,counter; item,か,1,N1,1,N1_V0796
+N1_K0823,醜,ugly,しゅう | みにくい,2,N1,1,N1_V0797
+N1_K0824,箸,chopsticks,はし,1,N1,1,N1_V0798
+N1_K0825,戚,relative; grief,せき,1,N1,1,N1_V0799
+N1_K0826,喚,call; shout,かん,1,N1,1,N1_V0800
+N1_K0827,紺,dark blue,こん,1,N1,1,N1_V0801
+N1_K0828,某,certain; some,ぼう,1,N1,1,N1_V0802
+N1_K0829,鋼,steel,こう | はがね,2,N1,1,N1_V0803
+N1_K0830,褒,praise,ほう | ほめる,2,N1,1,N1_V0804
+N1_K0831,赴,proceed; go to,ふ | おもむく,2,N1,1,N1_V0805
+N1_K0832,媒,mediate; medium,ばい,1,N1,1,N1_V0806
+N1_K0833,妬,jealous,と | ねたむ,2,N1,1,N1_V0807
+N1_K0834,遮,block; intercept,しゃ | さえぎる,2,N1,1,N1_V0808
+N1_K0835,窯,kiln,よう | かま,2,N1,1,N1_V0809
+N1_K0836,侯,marquis; lord,こう,1,N1,1,N1_V0810
+N1_K0837,釜,kettle,かま,1,N1,1,N1_V0811
+N1_K0838,茎,stem,けい | くき,2,N1,1,N1_V0812
+N1_K0839,蔑,despise,べつ | さげすむ,2,N1,1,N1_V0813
+N1_K0840,嗅,smell; sniff,きゅう | かぐ,2,N1,1,N1_V0814
+N1_K0841,壌,soil,じょう,1,N1,1,N1_V0815
+N1_K0842,蜜,honey,みつ,1,N1,1,N1_V0816
+N1_K0843,尼,nun,に | あま,2,N1,1,N1_V0817
+N1_K0844,肢,limb,し,1,N1,1,N1_V0818
+N1_K0845,赦,pardon,しゃ,1,N1,1,N1_V0819
+N1_K0846,酬,repay; reward,しゅう,1,N1,1,N1_V0820
+N1_K0847,戴,receive humbly; crown,たい,1,N1,1,N1_V0821
+N1_K0848,詠,compose; recite,えい | よむ,2,N1,1,N1_V0822
+N1_K0849,斗,measure; ladle,と,1,N1,1,N1_V0823
+N1_K0850,宜,suitable,ぎ,1,N1,1,N1_V0824
+N1_K0851,殻,shell,かく | から,2,N1,1,N1_V0825
+N1_K0852,墳,mound; tomb,ふん,1,N1,1,N1_V0826
+N1_K0853,炊,cook rice,すい | たく,2,N1,1,N1_V0827
+N1_K0854,碑,monument,ひ,1,N1,1,N1_V0828
+N1_K0855,痩,thin; lose weight,そう | やせる,2,N1,1,N1_V0829
+N1_K0856,但,however,ただし,1,N1,1,N1_V0830
+N1_K0857,奨,encourage,しょう,1,N1,1,N1_V0831
+N1_K0858,践,practice; tread,せん,1,N1,1,N1_V0832
+N1_K0859,滋,nourish,じ,1,N1,1,N1_V0833
+N1_K0860,儒,Confucian,じゅ,1,N1,1,N1_V0834
+N1_K0861,薦,recommend,せん | すすめる,2,N1,1,N1_V0104
+N1_K0862,怨,resentment,えん | おん,2,N1,1,N1_V0568
+N1_K0863,栽,plant; cultivate,さい,1,N1,1,N1_V0742
+N1_K0864,刈,cut; reap,かる,1,N1,1,N1_V0835
+N1_K0865,閑,leisure; quiet,かん,1,N1,1,N1_V0836
+N1_K0866,錠,lock; tablet,じょう,1,N1,1,N1_V0837
+N1_K0867,扶,help; support,ふ,1,N1,1,N1_V0838
+N1_K0868,妥,proper; compromise,だ,1,N1,1,N1_V0839
+N1_K0869,妨,hinder,ぼう | さまたげる,2,N1,1,N1_V0840
+N1_K0870,醒,awaken; sober,せい,1,N1,1,N1_V0841
+N1_K0871,詣,visit a shrine,けい | もうでる,2,N1,1,N1_V0842
+N1_K0872,胎,womb; fetus,たい,1,N1,1,N1_V0843
+N1_K0873,窟,cave,くつ,1,N1,1,N1_V0618
+N1_K0874,巾,cloth; width,きん,1,N1,1,N1_V0844
+N1_K0875,蜂,bee,ほう | はち,2,N1,1,N1_V0816
+N1_K0876,忌,mourning; avoid,き | いむ | いまわしい,3,N1,1,N1_V0845
+N1_K0877,骸,bone; corpse,がい,1,N1,1,N1_V0846
+N1_K0878,弄,play with; tamper,ろう | もてあそぶ,2,N1,1,N1_V0847
+N1_K0879,嫉,jealous,しつ,1,N1,1,N1_V0807
+N1_K0880,粛,solemn; purge,しゅく,1,N1,1,N1_V0848
+N1_K0881,罵,abuse verbally,ば | ののしる,2,N1,1,N1_V0849
+N1_K0882,囚,prisoner,しゅう,1,N1,1,N1_V0850
+N1_K0883,鉛,lead metal,えん | なまり,2,N1,2,N1_V0851 N1_V0873
+N1_K0884,搭,board; load,とう,1,N1,1,N1_V0852
+N1_K0885,諭,admonish; explain,ゆ | さとす,2,N1,1,N1_V0853
+N1_K0886,璧,jade disk; perfection,へき,1,N1,1,N1_V0854
+N1_K0887,阜,hill; mound,ふ,1,N1,1,N1_V0855
+N1_K0888,喝,shout;喝采,かつ,1,N1,1,N1_V0856
+N1_K0889,享,enjoy; receive,きょう,1,N1,1,N1_V0857
+N1_K0890,騰,rise; soar,とう,1,N1,1,N1_V0858
+N1_K0891,嗣,heir; successor,し,1,N1,1,N1_V0859
+N1_K0892,勅,imperial order,ちょく,1,N1,1,N1_V0860
+N1_K0893,篤,sincere; serious,とく,1,N1,1,N1_V0861
+N1_K0894,勲,merit,くん,1,N1,1,N1_V0862
+N1_K0895,埼,cape;崎,さい,1,N1,1,N1_V0863
+N1_K0896,伎,deed; skill,き,1,N1,1,N1_V0864
+N1_K0897,曖,unclear,あい,1,N1,1,N1_V0754
+N1_K0898,詐,deceive,さ,1,N1,1,N1_V0769
+N1_K0899,餌,bait; feed,じ | えさ | え,3,N1,1,N1_V0865
+N1_K0900,岬,cape,みさき,1,N1,1,N1_V0866
+N1_K0901,暫,briefly,ざん,1,N1,1,N1_V0867
+N1_K0902,爽,refreshing,そう | さわやか,2,N1,1,N1_V0868
+N1_K0903,肖,resemblance,しょう,1,N1,1,N1_V0869
+N1_K0904,詮,discussion; result,せん,1,N1,1,N1_V0870
+N1_K0905,諾,consent,だく,1,N1,1,N1_V0871
+N1_K0906,柿,persimmon,かき,1,N1,1,N1_V0872
+N1_K0907,芯,core,しん,1,N1,1,N1_V0873
+N1_K0908,綻,come apart,たん | ほころびる,2,N1,1,N1_V0874
+N1_K0909,訂,revise,てい,1,N1,1,N1_V0875
+N1_K0910,汽,steam,き,1,N1,2,N1_V0753 N1_V0876
+N1_K0911,薫,fragrance,くん | かおる,2,N1,1,N1_V0877
+N1_K0912,隷,slave,れい,1,N1,1,N1_V0285
+N1_K0913,俵,straw bag,ひょう | たわら,2,N1,1,N1_V0878
+N1_K0914,遷,transition; move,せん,1,N1,1,N1_V0879
+N1_K0915,枢,hinge; center,すう,1,N1,1,N1_V0880
+N1_K0916,肘,elbow,ひじ,1,N1,1,N1_V0881
+N1_K0917,麓,foot of mountain,ろく | ふもと,2,N1,1,N1_V0882
+N1_K0918,憧,long for,しょう | あこがれる,2,N1,1,N1_V0883
+N1_K0919,帥,commander,すい,1,N1,1,N1_V0884
+N1_K0920,漆,lacquer,しつ | うるし,2,N1,1,N1_V0885
+N1_K0921,酌,pour sake; consider,しゃく | くむ,2,N1,1,N1_V0886
+N1_K0922,頓,sudden; immediately,とん,1,N1,1,N1_V0887
+N1_K0923,賠,compensate,ばい,1,N1,1,N1_V0459
+N1_K0924,渇,thirst,かつ | かわく,2,N1,1,N1_V0888
+N1_K0925,慕,adore,ぼ | したう,2,N1,1,N1_V0889
+N1_K0926,婿,son-in-law; groom,せい | むこ,2,N1,1,N1_V0890
+N1_K0927,妄,reckless; delusion,もう | ぼう,2,N1,1,N1_V0891
+N1_K0928,慨,lament,がい,1,N1,2,N1_V0689 N1_V0892
+N1_K0929,匿,hide,とく,1,N1,1,N1_V0893
+N1_K0930,渓,valley; stream,けい,1,N1,1,N1_V0894
+N1_K0931,侮,despise,ぶ | あなどる,2,N1,1,N1_V0895
+N1_K0932,髄,marrow,ずい,1,N1,2,N1_V0896 N1_V1036
+N1_K0933,穀,grain,こく,1,N1,1,N1_V0897
+N1_K0934,薪,firewood,しん | たきぎ,2,N1,1,N1_V0898
+N1_K0935,轄,control; jurisdiction,かつ,1,N1,1,N1_V0899
+N1_K0936,洪,flood,こう,1,N1,1,N1_V0900
+N1_K0937,牙,fang,が | きば,2,N1,1,N1_V0901
+N1_K0938,咽,throat,いん,1,N1,2,N1_V0496 N1_V0902
+N1_K0939,迅,swift,じん,1,N1,1,N1_V0903
+N1_K0940,該,that; applicable,がい,1,N1,1,N1_V0904
+N1_K0941,逐,pursue; one by one,ちく,1,N1,1,N1_V0905
+N1_K0942,嘲,ridicule,ちょう | あざける,2,N1,1,N1_V0906
+N1_K0943,墜,fall; crash,つい,1,N1,1,N1_V0907
+N1_K0944,臆,cowardly; conjecture,おく,1,N1,1,N1_V0908
+N1_K0945,餓,starve,が,1,N1,1,N1_V0764
+N1_K0946,挫,crush; fail,ざ,1,N1,3,N1_V0887 N1_V0909 N1_V0973
+N1_K0947,錬,refine; train,れん,1,N1,1,N1_V0702
+N1_K0948,桟,platform; pier,さん,1,N1,1,N1_V0910
+N1_K0949,溺,drown,でき | おぼれる,2,N1,1,N1_V0911
+N1_K0950,賄,bribe; provide,わい | まかなう,2,N1,1,N1_V0912
+N1_K0951,盲,blind,もう,1,N1,1,N1_V0913
+N1_K0952,鯨,whale,げい | くじら,2,N1,1,N1_V0914
+N1_K0953,侶,companion,りょ,1,N1,1,N1_V0258
+N1_K0954,艇,small boat,てい,1,N1,1,N1_V0915
+N1_K0955,丼,bowl,どんぶり,1,N1,1,N1_V0916
+N1_K0956,堕,fall; degenerate,だ,1,N1,1,N1_V0917
+N1_K0957,瘍,ulcer,よう,1,N1,2,N1_V0539 N1_V0680
+N1_K0958,槽,vat; tank,そう,1,N1,1,N1_V0918
+N1_K0959,憩,rest,けい | いこい | いこう,3,N1,1,N1_V0919
+N1_K0960,僅,slight; few,きん | わずか,2,N1,1,N1_V0920
+N1_K0961,閲,review; inspect,えつ,1,N1,1,N1_V0921
+N1_K0962,柵,fence,さく,1,N1,1,N1_V0922
+N1_K0963,畔,ridge; shore,はん,1,N1,1,N1_V0923
+N1_K0964,睦,intimate; harmonious,ぼく,1,N1,1,N1_V0924
+N1_K0965,唆,tempt; instigate,さ | そそのかす,2,N1,1,N1_V0925
+N1_K0966,悼,mourn,とう | いたむ,2,N1,1,N1_V0428
+N1_K0967,吏,official,り,1,N1,1,N1_V0926
+N1_K0968,穫,harvest,かく,1,N1,1,N1_V0927
+N1_K0969,酢,vinegar,さく | す,2,N1,1,N1_V0928
+N1_K0970,賜,grant; gift,し | たまわる,2,N1,1,N1_V0929
+N1_K0971,腎,kidney,じん,1,N1,1,N1_V0930
+N1_K0972,梗,stem; obstruction,こう,1,N1,1,N1_V0931
+N1_K0973,瑠,lapis element,る,1,N1,1,N1_V0932
+N1_K0974,羨,envy,せん | うらやむ | うらやましい,3,N1,1,N1_V0933
+N1_K0975,搬,carry,はん,1,N1,1,N1_V0934
+N1_K0976,剖,dissect,ぼう,1,N1,1,N1_V0935
+N1_K0977,酎,distilled liquor,ちゅう,1,N1,1,N1_V0936
+N1_K0978,畿,capital region,き,1,N1,1,N1_V0937
+N1_K0979,宵,evening,しょう | よい,2,N1,1,N1_V0938
+N1_K0980,拐,kidnap,かい,1,N1,1,N1_V0939
+N1_K0981,醸,brew; foster,じょう | かもす,2,N1,1,N1_V0940
+N1_K0982,猶,still; further,ゆう,1,N1,1,N1_V0941
+N1_K0983,諮,consult,し | はかる,2,N1,1,N1_V0942
+N1_K0984,畏,fear; respect,い | おそれる,2,N1,1,N1_V0943
+N1_K0985,泌,secrete,ひつ | ひ,2,N1,1,N1_V0944
+N1_K0986,愁,sorrow,しゅう | うれえる | うれい,3,N1,1,N1_V0945
+N1_K0987,逝,die; depart,せい | ゆく | いく,3,N1,1,N1_V0946
+N1_K0988,朽,decay,きゅう | くちる,2,N1,1,N1_V0947
+N1_K0989,硫,sulfur,りゅう,1,N1,1,N1_V0948
+N1_K0990,瞭,clear,りょう,1,N1,1,N1_V0949
+N1_K0991,擬,imitate; pseudo-,ぎ,1,N1,1,N1_V0950
+N1_K0992,叙,describe; confer,じょ,1,N1,1,N1_V0951
+N1_K0993,弊,harm;弊害,へい,1,N1,1,N1_V0952
+N1_K0994,累,accumulate; involve,るい,1,N1,1,N1_V0953
+N1_K0995,煩,trouble; vex,はん | わずらう | わずらわす,3,N1,1,N1_V0954
+N1_K0996,踪,trace,そう,1,N1,1,N1_V0955
+N1_K0997,藻,seaweed,そう | も,2,N1,1,N1_V0956
+N1_K0998,蚊,mosquito,か,1,N1,1,N1_V0957
+N1_K0999,栃,horse chestnut,とち,1,N1,1,N1_V0958
+N1_K1000,且,also; moreover,かつ,1,N1,1,N1_V0959
+N1_K1001,鋳,cast metal,ちゅう | いる,2,N1,1,N1_V0960
+N1_K1002,蔽,cover; conceal,へい,1,N1,1,N1_V0961
+N1_K1003,茨,thorn,いばら,1,N1,1,N1_V0962
+N1_K1004,棺,coffin,かん,1,N1,1,N1_V0963
+N1_K1005,慄,shudder,りつ,1,N1,1,N1_V0964
+N1_K1006,傲,proud; arrogant,ごう,1,N1,1,N1_V0965
+N1_K1007,硝,nitrate,しょう,1,N1,1,N1_V0966
+N1_K1008,舶,ship,はく,1,N1,1,N1_V0967
+N1_K1009,租,tax; rent,そ,1,N1,1,N1_V0968
+N1_K1010,倣,imitate,ほう | ならう,2,N1,1,N1_V0969
+N1_K1011,謹,respectful; careful,きん | つつしむ,2,N1,1,N1_V0970
+N1_K1012,抹,rub; erase,まつ,1,N1,1,N1_V0971
+N1_K1013,虹,rainbow,にじ,1,N1,1,N1_V0972
+N1_K1014,捻,twist,ねん | ひねる,2,N1,1,N1_V0973
+N1_K1015,娯,recreation,ご,1,N1,1,N1_V0974
+N1_K1016,臼,mortar,きゅう | うす,2,N1,1,N1_V0975
+N1_K1017,喩,metaphor,ゆ,1,N1,1,N1_V0976
+N1_K1018,萎,wither,い | なえる,2,N1,1,N1_V0977
+N1_K1019,蛍,firefly,けい | ほたる,2,N1,1,N1_V0978
+N1_K1020,窒,choke; nitrogen element,ちつ,1,N1,1,N1_V0979
+N1_K1021,腺,gland,せん,1,N1,1,N1_V0980
+N1_K1022,桁,beam; digit,けた,1,N1,1,N1_V0981
+N1_K1023,玩,play; toy,がん,1,N1,1,N1_V0982
+N1_K1024,冶,smelting,や,1,N1,1,N1_V0983
+N1_K1025,羞,shame,しゅう,1,N1,1,N1_V0984
+N1_K1026,栓,stopper,せん,1,N1,1,N1_V0985
+N1_K1027,惧,fear,ぐ,1,N1,1,N1_V0986
+N1_K1028,寡,few; widow,か,1,N1,1,N1_V0987
+N1_K1029,畝,furrow; area unit,うね,1,N1,1,N1_V0988
+N1_K1030,淑,graceful; virtuous,しゅく,1,N1,1,N1_V0989
+N1_K1031,嫡,legitimate heir,ちゃく,1,N1,1,N1_V0990
+N1_K1032,屯,barracks; station,とん,1,N1,1,N1_V0991
+N1_K1033,糾,investigate; twist,きゅう,1,N1,1,N1_V0992
+N1_K1034,遡,go upstream; retroactive,そ | さかのぼる,2,N1,1,N1_V0993
+N1_K1035,陪,accompany; auxiliary,ばい,1,N1,1,N1_V0994
+N1_K1036,雌,female,し | め | めす,3,N1,1,N1_V0995
+N1_K1037,舷,gunwale; ship side,げん,1,N1,1,N1_V0996
+N1_K1038,霜,frost,そう | しも,2,N1,1,N1_V0997
+N1_K1039,殉,die for; martyr,じゅん,1,N1,1,N1_V0998
+N1_K1040,紡,spin thread,ぼう | つむぐ,2,N1,1,N1_V0999
+N1_K1041,貪,greedy,どん | むさぼる,2,N1,1,N1_V1000
+N1_K1042,庸,ordinary; employment,よう,1,N1,1,N1_V1001
+N1_K1043,韻,rhyme; tone,いん,1,N1,1,N1_V1002
+N1_K1044,繕,mend,ぜん | つくろう,2,N1,1,N1_V1003
+N1_K1045,搾,squeeze,さく | しぼる,2,N1,1,N1_V1004
+N1_K1046,刹,temple; instant,さつ | せつ,2,N1,1,N1_V0182
+N1_K1047,采,appearance; select,さい,1,N1,1,N1_V0856
+N1_K1048,堆,pile,たい,1,N1,1,N1_V1005
+N1_K1049,禍,calamity,か,1,N1,1,N1_V1006
+N1_K1050,煎,roast; decoct,せん | いる,2,N1,1,N1_V1007
+N1_K1051,姻,marriage relation,いん,1,N1,1,N1_V1008
+N1_K1052,斑,spot; mottled,はん,1,N1,1,N1_V1009
+N1_K1053,冥,dark; underworld,めい | みょう,2,N1,1,N1_V1010
+N1_K1054,抄,extract; copy,しょう,1,N1,1,N1_V1011
+N1_K1055,拷,torture,ごう,1,N1,1,N1_V1012
+N1_K1056,遜,humble,そん,1,N1,1,N1_V1013
+N1_K1057,旺,flourishing,おう,1,N1,1,N1_V1014
+N1_K1058,准,quasi-; semi-,じゅん,1,N1,1,N1_V1015
+N1_K1059,勾,curve; hook,こう,1,N1,1,N1_V1016
+N1_K1060,廉,honest; cheap,れん,1,N1,1,N1_V1017
+N1_K1061,礁,reef,しょう,1,N1,1,N1_V1018
+N1_K1062,壱,one (formal),いち,1,N1,1,N1_V1019
+N1_K1063,麺,noodles,めん,1,N1,1,N1_V1020
+N1_K1064,升,sho measure,しょう | ます,2,N1,1,N1_V1021
+N1_K1065,卸,wholesale,おろす | おろし,2,N1,1,N1_V1022
+N1_K1066,耗,decrease; consume,もう,1,N1,1,N1_V1023
+N1_K1067,謁,audience,えつ,1,N1,1,N1_V1024
+N1_K1068,璃,glass; lapis element,り,1,N1,1,N1_V0932
+N1_K1069,坑,pit; mine,こう,1,N1,1,N1_V1025
+N1_K1070,串,spit; skewer,くし,1,N1,1,N1_V1026
+N1_K1071,弔,mourn,ちょう | とむらう,2,N1,1,N1_V1027
+N1_K1072,賓,guest,ひん,1,N1,1,N1_V1028
+N1_K1073,塡,fill,てん,1,N1,1,N1_V1029
+N1_K1074,痢,diarrhea,り,1,N1,1,N1_V1030
+N1_K1075,嚇,threaten,かく,1,N1,1,N1_V1031
+N1_K1076,濫,excessive; overflow,らん,1,N1,1,N1_V1032
+N1_K1077,俸,salary,ほう,1,N1,1,N1_V1033
+N1_K1078,箋,paper; note,せん,1,N1,1,N1_V1034
+N1_K1079,凸,convex,とつ,1,N1,2,N1_V1035 N1_V1039
+N1_K1080,脊,spine,せき,1,N1,2,N1_V0780 N1_V1036
+N1_K1081,詔,imperial edict,しょう | みことのり,2,N1,1,N1_V1037
+N1_K1082,緻,fine; precise,ち,1,N1,1,N1_V1038
+N1_K1083,凹,concave,おう,1,N1,2,N1_V1035 N1_V1039
+N1_K1084,罷,quit; dismiss,ひ,1,N1,1,N1_V1040
+N1_K1085,漸,gradually,ぜん,1,N1,1,N1_V1041
+N1_K1086,賦,levy; poem,ふ,1,N1,1,N1_V1042
+N1_K1087,弧,arc,こ,1,N1,1,N1_V1043
+N1_K1088,褐,brown,かつ,1,N1,1,N1_V1044
+N1_K1089,辣,pungent; severe,らつ,1,N1,1,N1_V1045
+N1_K1090,摯,serious; sincere,し,1,N1,1,N1_V1046
+N1_K1091,汎,general; pan-,はん,1,N1,1,N1_V1047
+N1_K1092,斥,reject; repel,せき,1,N1,1,N1_V1048
+N1_K1093,厘,small unit,りん,1,N1,1,N1_V1049
+N1_K1094,矯,correct; straighten,きょう | ためる,2,N1,1,N1_V1050
+N1_K1095,毀,destroy; damage,き,1,N1,1,N1_V1051
+N1_K1096,窃,steal; secretly,せつ,1,N1,1,N1_V1052
+N1_K1097,遵,obey,じゅん,1,N1,1,N1_V1053
+N1_K1098,賂,bribe,ろ,1,N1,1,N1_V0912
+N1_K1099,惰,lazy,だ,1,N1,1,N1_V1054
+N1_K1100,蚕,silkworm,さん | かいこ,2,N1,1,N1_V1055
+N1_K1101,氾,overflow,はん,1,N1,1,N1_V1032
+N1_K1102,諧,harmony; humor,かい,1,N1,1,N1_V1056
+N1_K1103,倹,frugal,けん,1,N1,1,N1_V1057
+N1_K1104,款,article; goodwill,かん,1,N1,1,N1_V1058
+N1_K1105,媛,princess; lady,えん,1,N1,1,N1_V1059
+N1_K1106,憾,regret,かん,1,N1,1,N1_V1060
+N1_K1107,哺,nurse; feed,ほ,1,N1,1,N1_V1061
+N1_K1108,衷,inmost; sincerity,ちゅう,1,N1,1,N1_V1062
+N1_K1109,彙,collection,い,1,N1,1,N1_V1063
+N1_K1110,迭,alternate,てつ,1,N1,1,N1_V1064
+N1_K1111,嘱,entrust; request,しょく,1,N1,1,N1_V1065
+N1_K1112,恣,selfish; arbitrary,し,1,N1,1,N1_V1066
+N1_K1113,墾,cultivate land,こん,1,N1,1,N1_V1067
+N1_K1114,逓,relay; gradual,てい,1,N1,1,N1_V1068
+N1_K1115,劾,impeach,がい,1,N1,1,N1_V1069
+N1_K1116,酪,dairy,らく,1,N1,1,N1_V1070
+N1_K1117,沃,fertile,よく,1,N1,1,N1_V1071
+N1_K1118,塑,model; mold,そ,1,N1,1,N1_V1072
+N1_K1119,痘,smallpox,とう,1,N1,1,N1_V1073
+N1_K1120,憬,long for,けい,1,N1,1,N1_V0883
+N1_K1121,朕,imperial we,ちん,1,N1,1,N1_V1074
+N1_K1122,虞,fear; concern,おそれ,1,N1,1,N1_V1075
+N1_K1123,丙,third; fire element,へい,1,N1,1,N1_V1076
+N1_K1124,斤,kin weight; axe,きん,1,N1,1,N1_V1077
+N1_K1125,捗,make progress,ちょく,1,N1,1,N1_V1078
+N1_K1126,弐,two (formal),に,1,N1,1,N1_V1079
+N1_K1127,訃,obituary,ふ,1,N1,1,N1_V1080
+N1_K1128,謄,copy,とう,1,N1,1,N1_V1081
+N1_K1129,繭,cocoon,けん | まゆ,2,N1,1,N1_V1082
+N1_K1130,璽,imperial seal,じ,1,N1,1,N1_V1083
+N1_K1131,頒,distribute,はん,1,N1,1,N1_V1084
+N1_K1132,楷,standard script,かい,1,N1,1,N1_V1085
+N1_K1133,剥,peel,はく | はがす | はぐ | はがれる | はげる,5,N1,1,N1_V1086
+N1_K1134,籠,basket; confine,ろう | かご | こもる,3,N1,1,N1_V1087
+N1_K1135,錮,confine,こ,1,N1,1,N1_V1088
+N1_K1136,頰,cheek,ほお,1,N1,1,N1_V1089
