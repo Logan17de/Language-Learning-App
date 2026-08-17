@@ -20,7 +20,6 @@ import type {
 export interface BackendProgressSnapshot {
   currentLevel: LearnerLevel;
   learningGoal: LearningGoal | null;
-  interests: string[];
   dailyGoalMinutes: DailyMinutes;
   minutesStudiedToday: number;
   joinDate: string;
@@ -93,7 +92,7 @@ export const progressRepository = {
       client
         .from("profiles")
         .select(
-          "xp,streak_days,longest_streak,total_study_minutes,daily_study_minutes,current_jlpt_level,learning_goal,interests,created_at,timezone",
+          "xp,streak_days,longest_streak,total_study_minutes,daily_study_minutes,current_jlpt_level,learning_goal,created_at,timezone",
         )
         .eq("id", userId)
         .single(),
@@ -223,7 +222,6 @@ export const progressRepository = {
     return success({
       currentLevel: profile.data.current_jlpt_level as LearnerLevel,
       learningGoal: profile.data.learning_goal as LearningGoal | null,
-      interests: profile.data.interests ?? [],
       dailyGoalMinutes: goalMinutes,
       minutesStudiedToday,
       joinDate: profile.data.created_at.slice(0, 10),
