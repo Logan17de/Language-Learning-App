@@ -48,9 +48,11 @@ function asStoryVocabulary(match: CuratedVocabularyMatch): RawStoryVocabulary {
 }
 
 /**
- * Story tappability now comes only from the manually curated JLPT compound
- * catalogs committed under Vocabs/. No external dictionary or local JMdict
- * cache participates in lesson generation.
+ * Story tappability comes only from the manually curated JLPT catalogs committed
+ * under Vocabs/: compound vocabulary plus the solo-kanji reading catalog. Known
+ * compounds win overlapping matches; otherwise an individual kanji can provide
+ * its curated readings and meaning as a tappable fallback. No external dictionary
+ * or local JMdict cache participates in lesson generation.
  */
 export function lookupCuratedStoryVocabulary(draft: StoryOnlyDraft): RawStoryVocabulary[] {
   return matchCuratedStoryVocabulary(storyJapanese(draft)).map(asStoryVocabulary);
