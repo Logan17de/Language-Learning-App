@@ -3,8 +3,12 @@ import { describe, expect, it } from "vitest";
 import { PASSWORD_RECOVERY_TTL_MS } from "@/lib/auth/password-recovery";
 
 const authService = readFileSync("lib/auth/auth-service.ts", "utf8");
+const authForm = readFileSync("components/auth/auth-form.tsx", "utf8");
 const forgotPasswordPage = readFileSync("app/forgot-password/page.tsx", "utf8");
 const resetPasswordPage = readFileSync("app/reset-password/page.tsx", "utf8");
+const forgotPasswordLayout = readFileSync("app/forgot-password/layout.tsx", "utf8");
+const resetPasswordLayout = readFileSync("app/reset-password/layout.tsx", "utf8");
+const loginPage = readFileSync("app/login/page.tsx", "utf8");
 const supabaseConfig = readFileSync("supabase/config.toml", "utf8");
 const recoveryTemplate = readFileSync("supabase/templates/recovery.html", "utf8");
 
@@ -17,12 +21,14 @@ describe("password recovery code flow", () => {
     expect(authService).toContain('type: "recovery"');
   });
 
-  it("moves the learner from email entry to code verification", () => {
+  it("moves the learner from email entry to code verification while preserving next", () => {
+    expect(authForm).toContain('withSafeNext("/forgot-password", requestedNext)');
     expect(forgotPasswordPage).toContain("savePasswordRecoveryAttempt(normalizedEmail)");
-    expect(forgotPasswordPage).toContain('router.push("/reset-password")');
+    expect(forgotPasswordPage).toContain('router.push(withSafeNext("/reset-password", requestedNext))');
     expect(resetPasswordPage).toContain('autoComplete="one-time-code"');
     expect(resetPasswordPage).toContain("verifyPasswordResetCode(attempt.email, code)");
     expect(resetPasswordPage).toContain("if (!verified)");
+    expect(resetPasswordPage).toContain('withSafeNext("/login", requestedNext)');
   });
 
   it("gives clear incorrect and expired code feedback", () => {
@@ -31,6 +37,23 @@ describe("password recovery code flow", () => {
       "That code has expired. Request a new password-reset code.",
     );
     expect(resetPasswordPage).toContain("Code expires in");
+  });
+
+  it("keeps recovery navigation explicit and readable", () => {
+    expect(forgotPasswordPage).toContain("Back to login");
+    expect(resetPasswordPage).toContain("Back to login");
+    expect(resetPasswordPage).not.toContain("text-stone-400");
+  });
+
+  it("noindexes auth recovery routes with route-specific metadata", () => {
+    for (const metadataSource of [loginPage, forgotPasswordLayout, resetPasswordLayout]) {
+      expect(metadataSource).toContain("index: false");
+      expect(metadataSource).toContain("follow: false");
+    }
+    expect(loginPage).toContain('canonical: "/login"');
+    expect(forgotPasswordLayout).toContain('title: "Reset password"');
+    expect(forgotPasswordLayout).toContain('canonical: "/forgot-password"');
+    expect(resetPasswordLayout).toContain('canonical: "/reset-password"');
   });
 
   it("sends a code-only automated recovery email with the support address", () => {
