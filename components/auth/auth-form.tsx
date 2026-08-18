@@ -8,7 +8,10 @@ import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter
 import { useAppStore } from "@/store/app-store";
 import { authService } from "@/lib/auth/auth-service";
 import { prepareAccountScope } from "@/lib/auth/account-scope";
-import { safeInternalRedirect } from "@/lib/auth/safe-internal-redirect";
+import {
+  safeInternalRedirect,
+  withSafeNext,
+} from "@/lib/auth/safe-internal-redirect";
 import { getBackendMode } from "@/lib/supabase/config";
 import {
   isStrongEnough,
@@ -27,6 +30,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [requestedNext, setRequestedNext] = useState<string | null>(null);
   const backendMode = getBackendMode();
 
   useEffect(() => {
@@ -56,7 +60,9 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     };
     const message = code ? messages[code] : null;
     const confirmationRequired = params.get("confirmation") === "required";
+    const next = safeInternalRedirect(params.get("next"));
     const timer = window.setTimeout(() => {
+      setRequestedNext(next);
       if (message) setError(message);
       if (confirmationRequired) {
         setNotice(
@@ -66,13 +72,6 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
-
-  const requestedNext = () => {
-    if (typeof window === "undefined") return null;
-    return safeInternalRedirect(
-      new URLSearchParams(window.location.search).get("next"),
-    );
-  };
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -87,7 +86,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       return;
     }
 
-    const next = requestedNext();
+    const next = requestedNext;
     const onboardingHref = next
       ? `/onboarding?next=${encodeURIComponent(next)}`
       : "/onboarding";
@@ -135,7 +134,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     setLoading(true);
     const result = await authService.signInWithGoogle(
       mode,
-      requestedNext() ?? undefined,
+      requestedNext ?? undefined,
     );
     if (!result.ok) {
       setLoading(false);
@@ -243,7 +242,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       {mode === "login" && (
         <div className="text-right">
           <a
-            href="/forgot-password"
+            href={withSafeNext("/forgot-password", requestedNext)}
             className="text-sm font-semibold text-moss-700 hover:underline"
           >
             Forgot password?
