@@ -16,10 +16,17 @@ export function AuthShell({ children }: { children: ReactNode }) {
         <div className="relative flex h-full flex-col justify-between p-14 text-white">
           <p className="font-serif text-7xl text-white/10">学</p>
           <div>
-            <p className="max-w-xl text-4xl font-semibold leading-tight">Japanese that stays with you—because every lesson responds to what you find difficult.</p>
+            <p className="max-w-xl text-4xl font-semibold leading-tight">
+              Language that stays with you—because every lesson responds to what you find difficult.
+            </p>
             <div className="mt-10 flex gap-3">
-              {["Context first", "Active recall", "Personal review"].map((item) => (
-                <span key={item} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold">{item}</span>
+              {["Context first", "Active recall", "Adaptive practice"].map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold"
+                >
+                  {item}
+                </span>
               ))}
             </div>
           </div>
