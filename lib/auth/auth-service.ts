@@ -125,6 +125,14 @@ function friendlyRecoveryCodeMessage(message: string, code?: string): string {
 }
 
 export const authService = {
+  async hasSession(): Promise<boolean> {
+    const client = createClient();
+    if (!client) return false;
+    const { data, error } = await client.auth.getSession();
+    if (error) return false;
+    return Boolean(data.session?.user);
+  },
+
   async getIdentity(): Promise<RepositoryResult<AuthIdentity | null>> {
     const client = createClient();
     if (!client) return notConfigured();
