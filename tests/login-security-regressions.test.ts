@@ -45,12 +45,12 @@ describe("login security regressions", () => {
     expect(authService).toContain("Your onboarding status could not be loaded.");
   });
 
-  it("requires an active learner profile in middleware and Google OAuth", () => {
+  it("requires an active learner profile in middleware and auth callbacks", () => {
     expect(middleware).toContain("if (userId && protectedLearner)");
     expect(middleware).toContain('.select("status")');
     expect(middleware).toContain('profile.data.status !== "active"');
-    expect(oauthCallback).toContain('returnToAuth(googleFlow, "account-inactive", explicitNext)');
-    expect(oauthCallback).toContain('returnToAuth(googleFlow, "preferences-load", explicitNext)');
+    expect(oauthCallback).toContain('returnToAuth(callbackFlow, "account-inactive", explicitNext)');
+    expect(oauthCallback).toContain('returnToAuth(callbackFlow, "preferences-load", explicitNext)');
   });
 
   it("preserves next through login, signup, OAuth errors, and onboarding", () => {
