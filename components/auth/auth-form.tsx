@@ -83,6 +83,11 @@ export function AuthForm({
       return;
     }
 
+    const next = requestedNext();
+    const onboardingHref = next
+      ? `/onboarding?next=${encodeURIComponent(next)}`
+      : "/onboarding";
+
     setLoading(true);
     let accountOnboardingComplete = false;
     if (mode === "signup") {
@@ -90,7 +95,8 @@ export function AuthForm({
       setLoading(false);
       if (!result.ok) return setError(result.error.message);
       if (result.data.confirmationRequired) {
-        router.push("/login?confirmation=required");
+        const nextQuery = next ? `&next=${encodeURIComponent(next)}` : "";
+        router.push(`/login?confirmation=required${nextQuery}`);
         return;
       }
       signIn(name);
@@ -103,8 +109,8 @@ export function AuthForm({
     }
     router.push(
       mode === "signup" || !accountOnboardingComplete
-        ? "/onboarding"
-        : (requestedNext() ?? "/home"),
+        ? onboardingHref
+        : (next ?? "/home"),
     );
     router.refresh();
   }
@@ -156,7 +162,7 @@ export function AuthForm({
             value={name}
             onChange={(event) => setName(event.target.value)}
             className="form-input"
-            placeholder="Hana"
+            placeholder="Your name"
             autoComplete="given-name"
           />
         </label>
