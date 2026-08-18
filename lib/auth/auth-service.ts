@@ -100,6 +100,30 @@ function friendlyAuthMessage(message: string, code?: string): string {
   return "Authentication could not be completed. Please try again.";
 }
 
+function friendlyRecoveryCodeMessage(message: string, code?: string): string {
+  const lower = message.toLowerCase();
+  const normalizedCode = code?.toLowerCase();
+
+  if (
+    normalizedCode === "otp_expired" ||
+    normalizedCode === "otp_disabled" ||
+    lower.includes("expired")
+  ) {
+    return "That code has expired. Request a new password-reset code.";
+  }
+
+  if (
+    normalizedCode === "otp_invalid" ||
+    normalizedCode === "invalid_otp" ||
+    lower.includes("invalid") ||
+    lower.includes("token")
+  ) {
+    return "That code is incorrect. Check the 6 digits and try again.";
+  }
+
+  return "That code could not be verified. Check the 6 digits and try again.";
+}
+
 export const authService = {
   async getIdentity(): Promise<RepositoryResult<AuthIdentity | null>> {
     const client = createClient();
@@ -252,11 +276,25 @@ export const authService = {
   async requestPasswordReset(email: string): Promise<RepositoryResult<null>> {
     const client = createClient();
     if (!client) return notConfigured();
-    const { error } = await client.auth.resetPasswordForEmail(email, {
-      redirectTo: `${getAppUrl()}/auth/callback?next=/reset-password`,
-    });
+    const { error } = await client.auth.resetPasswordForEmail(email);
     return error
       ? failure(error, friendlyAuthMessage(error.message, error.code))
+      : success(null);
+  },
+
+  async verifyPasswordResetCode(
+    email: string,
+    token: string,
+  ): Promise<RepositoryResult<null>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { error } = await client.auth.verifyOtp({
+      email,
+      token,
+      type: "recovery",
+    });
+    return error
+      ? failure(error, friendlyRecoveryCodeMessage(error.message, error.code))
       : success(null);
   },
 
