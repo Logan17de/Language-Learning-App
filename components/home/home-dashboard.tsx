@@ -7,12 +7,17 @@ import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { progressRepository } from "@/lib/repositories/progress-repository";
+import { getBackendMode } from "@/lib/supabase/config";
 import { useAppStore } from "@/store/app-store";
 import { useBackendLessonStore } from "@/store/backend-lesson-store";
 
 export function HomeDashboard() {
   const user = useAppStore((state) => state.user);
   const progress = useAppStore((state) => state.progress);
+  const hydrateBackendProgress = useAppStore(
+    (state) => state.hydrateBackendProgress,
+  );
   const backendLessons = useBackendLessonStore((state) => state.lessons);
   const backendLoading = useBackendLessonStore((state) => state.loading);
   const backendError = useBackendLessonStore((state) => state.error);
@@ -20,7 +25,11 @@ export function HomeDashboard() {
 
   useEffect(() => {
     void loadBackendLessons();
-  }, [loadBackendLessons]);
+    if (getBackendMode() !== "supabase") return;
+    void progressRepository.loadCurrent().then((result) => {
+      if (result.ok) hydrateBackendProgress(result.data);
+    });
+  }, [hydrateBackendProgress, loadBackendLessons]);
 
   const selectedLesson =
     backendLessons.find(
@@ -109,9 +118,7 @@ export function HomeDashboard() {
             <p className="mt-5 text-3xl font-semibold tabular-nums">
               {user.streakDays}
             </p>
-            <p className="mt-1 text-sm font-semibold text-ink">
-              {user.streakDays === 1 ? "day streak" : "day streak"}
-            </p>
+            <p className="mt-1 text-sm font-semibold text-ink">day streak</p>
             <p className="mt-2 text-xs leading-5 text-muted">
               Complete at least one lesson on consecutive days to keep your streak alive.
             </p>
