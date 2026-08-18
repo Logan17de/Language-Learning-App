@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
 import { useAppStore } from "@/store/app-store";
@@ -29,10 +29,12 @@ export function AuthForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const backendMode = getBackendMode();
 
   useEffect(() => {
-    const code = new URLSearchParams(window.location.search).get("error");
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("error");
     const messages: Record<string, string> = {
       "no-google-account":
         "Hey there! Looks like you don’t have an AIko account yet — no worries, we’ve all been there! Jump in and create one to start learning. You’ve got this! 😗",
@@ -50,8 +52,15 @@ export function AuthForm({
         "Google sign-in could not be completed. Please try again.",
     };
     const message = code ? messages[code] : null;
-    if (!message) return;
-    const timer = window.setTimeout(() => setError(message), 0);
+    const confirmationRequired = params.get("confirmation") === "required";
+    const timer = window.setTimeout(() => {
+      if (message) setError(message);
+      if (confirmationRequired) {
+        setNotice(
+          "Account created. Check your email and confirm your address, then come back here to log in.",
+        );
+      }
+    }, 0);
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -64,6 +73,7 @@ export function AuthForm({
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setNotice("");
     if (backendMode !== "supabase") {
       setError("Authentication is not configured for this deployment.");
       return;
@@ -101,6 +111,7 @@ export function AuthForm({
 
   async function googleSignIn() {
     setError("");
+    setNotice("");
     if (backendMode !== "supabase") {
       setError("Authentication is not configured for this deployment.");
       return;
@@ -224,6 +235,15 @@ export function AuthForm({
             </a>
           )}
         </div>
+      )}
+      {notice && (
+        <p
+          role="status"
+          className="flex gap-2 rounded-xl bg-moss-50 px-4 py-3 text-sm font-semibold leading-6 text-moss-800"
+        >
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
+          {notice}
+        </p>
       )}
       {error && (
         <p
