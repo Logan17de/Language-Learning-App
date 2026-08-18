@@ -10,6 +10,10 @@ const authActions = readFileSync(
   "utf8",
 );
 const authForm = readFileSync("components/auth/auth-form.tsx", "utf8");
+const oauthCallback = readFileSync(
+  "components/auth/oauth-callback.tsx",
+  "utf8",
+);
 const onboarding = readFileSync(
   "components/onboarding/onboarding-flow.tsx",
   "utf8",
@@ -32,9 +36,10 @@ describe("global landing page positioning", () => {
     expect(landing).toContain('signedOutHref={plan.primary ? "/signup?next=/subscription" : "/signup"}');
   });
 
-  it("preserves Premium intent through signup and onboarding", () => {
+  it("preserves Premium intent through email or Google signup and onboarding", () => {
     expect(authForm).toContain('`/onboarding?next=${encodeURIComponent(next)}`');
     expect(authForm).toContain('`&next=${encodeURIComponent(next)}`');
+    expect(oauthCallback).toContain('`/onboarding?next=${encodeURIComponent(explicitNext)}`');
     expect(onboarding).toContain('new URLSearchParams(window.location.search).get("next")');
     expect(onboarding).toContain('finishOnboarding(requestedNext() ?? "/learn")');
     expect(onboarding).toContain('router.push(destination ?? requestedNext() ?? "/home")');
