@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Check, Pencil, Plus, X } from "lucide-react";
+import { Check, Pencil } from "lucide-react";
 import type { DailyMinutes, LearnerLevel, LearningGoal } from "@/types/learner";
 import { useAppStore } from "@/store/app-store";
 import { Button } from "@/components/ui/button";
@@ -39,8 +39,6 @@ export function ProfileForm() {
   const [minutes, setMinutes] = useState<DailyMinutes>(
     onboarding.dailyMinutes ?? 30,
   );
-  const [interests, setInterests] = useState(onboarding.interests);
-  const [newInterest, setNewInterest] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -54,24 +52,16 @@ export function ProfileForm() {
         level === "Beginner" || level === "Not sure" ? "N5" : level,
       learning_goal: goal,
       daily_study_minutes: minutes,
-      interests,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     setLoading(false);
     if (!result.ok) return setError(result.error.message);
 
-    updateProfile({ name, level, goal, dailyMinutes: minutes, interests });
+    updateProfile({ name, level, goal, dailyMinutes: minutes });
     completeOnboarding();
     setEditing(false);
     setSaved(true);
     window.setTimeout(() => setSaved(false), 2200);
-  }
-
-  function addInterest() {
-    const value = newInterest.trim();
-    if (!value || interests.includes(value)) return;
-    setInterests([...interests, value]);
-    setNewInterest("");
   }
 
   if (!editing) {
@@ -88,14 +78,6 @@ export function ProfileForm() {
             value={
               onboarding.dailyMinutes
                 ? `${onboarding.dailyMinutes} minutes`
-                : "Not added yet"
-            }
-          />
-          <Detail
-            label="Interests"
-            value={
-              onboarding.interests.length
-                ? onboarding.interests.join(", ")
                 : "Not added yet"
             }
           />
@@ -151,46 +133,6 @@ export function ProfileForm() {
           options={["15", "30", "45", "60"]}
           suffix=" minutes"
         />
-      </div>
-      <div>
-        <p className="mb-2 text-sm font-semibold">Interests</p>
-        {interests.length === 0 && (
-          <p className="mb-3 text-sm leading-6 text-stone-500">
-            Add interests if you want lesson selection and custom generation to
-            reflect the topics you care about.
-          </p>
-        )}
-        <div className="flex flex-wrap gap-2">
-          {interests.map((interest) => (
-            <button
-              key={interest}
-              type="button"
-              onClick={() =>
-                setInterests(interests.filter((item) => item !== interest))
-              }
-              className="inline-flex min-h-10 items-center gap-2 rounded-full bg-moss-50 px-4 text-xs font-semibold text-moss-700"
-            >
-              {interest}
-              <X className="size-3" />
-            </button>
-          ))}
-        </div>
-        <div className="mt-3 flex gap-2">
-          <input
-            value={newInterest}
-            onChange={(event) => setNewInterest(event.target.value)}
-            className="form-input"
-            placeholder="Add an interest"
-          />
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={addInterest}
-            className="shrink-0 px-4"
-          >
-            <Plus className="size-4" /> Add
-          </Button>
-        </div>
       </div>
       {error && (
         <p

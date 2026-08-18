@@ -5,7 +5,6 @@ import {
 } from "@/lib/gemini/story-generation-contract";
 
 export interface RawReadingPassage {
-  selected_interest: string;
   japanese_title: string;
   english_title: string;
   japanese_story: string;
@@ -62,14 +61,12 @@ export const readingQuestionsSchema: JsonSchema = {
 export function readingPassagePrompt(input: {
   languageLevel: string;
   topic: string;
-  naturalInterests: string[];
   targetGrammar: string[];
   targetKanji: string[];
 }): string {
   return storyGenerationPrompt({
     languageLevel: input.languageLevel,
     topic: input.topic,
-    naturalInterests: input.naturalInterests,
     targetGrammar: input.targetGrammar,
     targetKanji: input.targetKanji,
   });

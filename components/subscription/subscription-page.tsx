@@ -7,7 +7,6 @@ import {
   CircleCheckBig,
   Crown,
   MessageCircleMore,
-  Route,
   Sparkles,
   TrendingUp,
 } from "lucide-react";
@@ -19,11 +18,6 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const premiumFeatures = [
-  {
-    icon: Route,
-    title: "Interest-based recommendations",
-    copy: "Your interests rank suitable lessons while completed and assigned lessons stay out of rotation.",
-  },
   {
     icon: Sparkles,
     title: "Custom-topic AI lessons",
@@ -42,7 +36,6 @@ const premiumFeatures = [
 ] as const;
 
 const proFeatureNames = [
-  "Interest-based lesson recommendations",
   "Custom-topic AI lesson generation",
   "Unlimited adaptive lesson access",
   "Extended speaking practice",
@@ -66,7 +59,7 @@ function PremiumSubscriptionPage() {
           <Badge tone="orange"><Crown className="mr-1 size-3" /> Premium account</Badge>
           <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">Your full AIko experience is active.</h1>
           <p className="mt-3 max-w-2xl leading-7 text-white/65">
-            Custom generation, interest-shaped recommendations, extended speaking, and complete learning insights are unlocked.
+            Custom generation, extended speaking, and complete learning insights are unlocked.
           </p>
         </div>
         <div className="shrink-0 rounded-3xl border border-white/10 bg-white/8 px-6 py-5">
@@ -104,7 +97,7 @@ function PremiumSubscriptionPage() {
             </ButtonLink>
             <ButtonLink href="/progress" variant="secondary">View complete insights</ButtonLink>
             <ButtonLink href="/learn" variant="secondary">Continue my lesson</ButtonLink>
-            <ButtonLink href="/profile" variant="secondary">Update interests</ButtonLink>
+            <ButtonLink href="/profile" variant="secondary">View learning profile</ButtonLink>
           </div>
         </Card>
         <Card className="p-6 sm:p-7">
@@ -137,7 +130,7 @@ function FreeSubscriptionPage() {
           Unlock the complete AIko system.
         </h1>
         <p className="mx-auto mt-3 max-w-2xl leading-7 text-stone-500">
-          Your free account keeps the core learning path. Premium adds personal lesson selection, AI-generated topics, extended speaking, and deeper insights.
+          Your free account keeps the core learning path. Premium adds custom AI-generated topics, extended speaking, and deeper insights.
         </p>
       </header>
 

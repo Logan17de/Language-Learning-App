@@ -67,7 +67,6 @@ interface AppState {
   setGoal: (goal: LearningGoal) => void;
   setLevel: (level: LearnerLevel) => void;
   setDailyMinutes: (minutes: DailyMinutes) => void;
-  setInterests: (interests: string[]) => void;
   acknowledgeReading: () => void;
   completeOnboarding: () => void;
   updateProfile: (edits: ProfileEdits) => void;
@@ -210,6 +209,20 @@ function normalizeUserSettings(value: unknown): UserSettings {
     readingDifficulty,
     speakingDifficulty,
     theme,
+  };
+}
+
+function normalizeOnboardingPreferences(
+  value: unknown,
+): Partial<OnboardingPreferences> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const source = value as Record<string, unknown>;
+  return {
+    goal: source.goal as OnboardingPreferences["goal"],
+    level: source.level as OnboardingPreferences["level"],
+    dailyMinutes: source.dailyMinutes as OnboardingPreferences["dailyMinutes"],
+    readingPermissionUnderstood: source.readingPermissionUnderstood === true,
+    completed: source.completed === true,
   };
 }
 
@@ -365,7 +378,6 @@ export const useAppStore = create<AppState>()(
             goal: snapshot.learningGoal,
             level: snapshot.currentLevel,
             dailyMinutes: snapshot.dailyGoalMinutes as DailyMinutes,
-            interests: snapshot.interests,
           },
           progress: {
             ...state.progress,
@@ -404,8 +416,6 @@ export const useAppStore = create<AppState>()(
           onboarding: { ...state.onboarding, dailyMinutes },
           user: { ...state.user, dailyGoalMinutes: dailyMinutes },
         })),
-      setInterests: (interests) =>
-        set((state) => ({ onboarding: { ...state.onboarding, interests } })),
       acknowledgeReading: () =>
         set((state) => ({
           onboarding: {
@@ -430,7 +440,6 @@ export const useAppStore = create<AppState>()(
             goal: edits.goal,
             level: edits.level,
             dailyMinutes: edits.dailyMinutes,
-            interests: edits.interests,
           },
         })),
       updateSettings: (next) => {
@@ -554,6 +563,7 @@ export const useAppStore = create<AppState>()(
       rewardLessonCompletion: (lesson, result) => {
         const session = get().lessonSessions[lesson.id];
         if (!session || session.rewarded) return false;
+        const serverOwnsRewards = getBackendMode() === "supabase";
         set((state) => {
           const currentSession = state.lessonSessions[lesson.id];
           if (!currentSession || currentSession.rewarded) return state;
@@ -565,13 +575,15 @@ export const useAppStore = create<AppState>()(
             durationMinutes: result.durationMinutes,
           };
           return {
-            user: {
-              ...state.user,
-              xp: state.user.xp + result.xpGained,
-              streakDays: Math.max(state.user.streakDays, 1),
-              minutesStudiedToday:
-                state.user.minutesStudiedToday + result.durationMinutes,
-            },
+            user: serverOwnsRewards
+              ? state.user
+              : {
+                  ...state.user,
+                  xp: state.user.xp + result.xpGained,
+                  streakDays: Math.max(state.user.streakDays, 1),
+                  minutesStudiedToday:
+                    state.user.minutesStudiedToday + result.durationMinutes,
+                },
             progress: {
               ...state.progress,
               completedLessonIds: [
@@ -587,15 +599,18 @@ export const useAppStore = create<AppState>()(
                 ...state.progress.lessonProgress,
                 [lesson.id]: 100,
               },
-              weeklyActivity: addMinutesToToday(
-                state.progress.weeklyActivity,
-                result.durationMinutes,
-              ),
-              totalStudyMinutes:
-                state.progress.totalStudyMinutes + result.durationMinutes,
+              weeklyActivity: serverOwnsRewards
+                ? state.progress.weeklyActivity
+                : addMinutesToToday(
+                    state.progress.weeklyActivity,
+                    result.durationMinutes,
+                  ),
+              totalStudyMinutes: serverOwnsRewards
+                ? state.progress.totalStudyMinutes
+                : state.progress.totalStudyMinutes + result.durationMinutes,
               weakVocabulary: mergeWeakVocabulary(
                 state.progress.weakVocabulary,
-                result.wordsNeedingReview,
+                result.weakItems,
               ),
               kanjiRecognition: Math.min(
                 100,
@@ -678,14 +693,17 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: "aiko-app-state",
-      version: 7,
+      version: 8,
       storage: createJSONStorage(() => safeStorage),
       migrate: (persistedState) => persistedState as Partial<AppState>,
       merge: (persisted, current) => {
         const saved = persisted as Partial<AppState>;
         return {
           ...current,
-          onboarding: { ...current.onboarding, ...saved.onboarding },
+          onboarding: {
+            ...current.onboarding,
+            ...normalizeOnboardingPreferences(saved.onboarding),
+          },
           progress: {
             ...current.progress,
             lessonProgress: saved.progress?.lessonProgress ?? {},
@@ -721,9 +739,9 @@ function addMinutesToToday(
   minutes: number,
 ): LearnerProgress["weeklyActivity"] {
   if (!activity.length) return activity;
-  const index = activity.length - 1;
-  return activity.map((day, dayIndex) =>
-    dayIndex === index ? { ...day, minutes: day.minutes + minutes } : day,
+  const today = new Date().toLocaleDateString("en", { weekday: "short" });
+  return activity.map((day) =>
+    day.day === today ? { ...day, minutes: day.minutes + minutes } : day,
   );
 }
 

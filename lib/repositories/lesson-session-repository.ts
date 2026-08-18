@@ -8,7 +8,8 @@ type LessonAnswer = Database["public"]["Tables"]["lesson_activity_answers"]["Ins
 export interface LessonCompletionInput {
   sessionId: string;
   score: number;
-  xp: number;
+  /** Legacy client field accepted during rollout; the server ignores it. */
+  xp?: number;
   durationMinutes: number;
   completionData: Json;
 }
@@ -142,7 +143,9 @@ export const lessonSessionRepository = {
     const { data, error } = await client.rpc("complete_lesson_session", {
       p_session_id: input.sessionId,
       p_score: input.score,
-      p_xp: input.xp,
+      // Kept only for compatibility with the existing RPC signature. The server
+      // calculates canonical XP and deliberately ignores this placeholder.
+      p_xp: 0,
       p_duration_minutes: input.durationMinutes,
       p_completion_data: input.completionData,
     });

@@ -18,13 +18,16 @@ export interface CuratedVocabularyMatch extends CuratedVocabularyEntry {
   end: number;
 }
 
-const CATALOG_FILES = [
+const COMPOUND_CATALOG_FILES = [
   "Vocabs/jlpt_n5_compounds.csv",
   "Vocabs/jlpt_n4_compounds.csv",
   "Vocabs/jlpt_n3_compounds.csv",
   "Vocabs/jlpt_n2_compounds(1).csv",
   "Vocabs/jlpt_n1_compounds.csv",
 ] as const;
+
+export const SOLO_KANJI_CATALOG_FILE =
+  "Vocabs/jlpt_all_kanji_with_kana_readings.csv" as const;
 
 let catalogCache: CuratedVocabularyEntry[] | null = null;
 
@@ -73,7 +76,7 @@ function isJlptLevel(value: string): value is JLPTLevel {
   return value === "N5" || value === "N4" || value === "N3" || value === "N2" || value === "N1";
 }
 
-function loadCatalogFile(sourceFile: string): CuratedVocabularyEntry[] {
+function loadCompoundCatalogFile(sourceFile: string): CuratedVocabularyEntry[] {
   const rows = parseCsvRows(readFileSync(join(process.cwd(), sourceFile), "utf8"));
   const header = rows[0]?.map((value) => value.trim()) ?? [];
   const idIndex = header.indexOf("id");
@@ -96,13 +99,47 @@ function loadCatalogFile(sourceFile: string): CuratedVocabularyEntry[] {
   });
 }
 
+function loadSoloKanjiCatalogFile(sourceFile: string): CuratedVocabularyEntry[] {
+  const rows = parseCsvRows(readFileSync(join(process.cwd(), sourceFile), "utf8"));
+  const header = rows[0]?.map((value) => value.trim()) ?? [];
+  const idIndex = header.indexOf("id");
+  const kanjiIndex = header.indexOf("kanji");
+  const readingIndex = header.indexOf("readings_kana");
+  const meaningIndex = header.indexOf("english_meaning");
+  const levelIndex = header.indexOf("introduced_level");
+  if ([idIndex, kanjiIndex, readingIndex, meaningIndex, levelIndex].some((index) => index < 0)) {
+    throw new Error(`Curated solo-kanji CSV ${sourceFile} has an unexpected header.`);
+  }
+
+  return rows.slice(1).flatMap((row) => {
+    const id = row[idIndex]?.trim() ?? "";
+    const word = row[kanjiIndex]?.normalize("NFKC").trim() ?? "";
+    const reading = row[readingIndex]?.normalize("NFKC").trim() ?? "";
+    const meaning = row[meaningIndex]?.trim() ?? "";
+    const studyLevel = row[levelIndex]?.trim() ?? "";
+    if (
+      !id ||
+      Array.from(word).length !== 1 ||
+      !reading ||
+      !meaning ||
+      !isJlptLevel(studyLevel)
+    ) {
+      return [];
+    }
+    return [{ id, word, reading, meaning, studyLevel, sourceFile }];
+  });
+}
+
 export function loadCuratedVocabularyCatalog(): CuratedVocabularyEntry[] {
   if (catalogCache) return catalogCache;
   const byId = new Map<string, CuratedVocabularyEntry>();
-  for (const sourceFile of CATALOG_FILES) {
-    for (const entry of loadCatalogFile(sourceFile)) {
+  for (const sourceFile of COMPOUND_CATALOG_FILES) {
+    for (const entry of loadCompoundCatalogFile(sourceFile)) {
       if (!byId.has(entry.id)) byId.set(entry.id, entry);
     }
+  }
+  for (const entry of loadSoloKanjiCatalogFile(SOLO_KANJI_CATALOG_FILE)) {
+    if (!byId.has(entry.id)) byId.set(entry.id, entry);
   }
   catalogCache = [...byId.values()];
   return catalogCache;
@@ -110,8 +147,10 @@ export function loadCuratedVocabularyCatalog(): CuratedVocabularyEntry[] {
 
 /**
  * Finds exact curated vocabulary spellings in the generated story. When words
- * overlap, the longest spelling at each position wins (日本人 over 日本, etc.).
- * Returned entries are unique but ordered by their first occurrence.
+ * overlap, the longest spelling at each position wins (日本人 over 日本, and a
+ * known compound over its individual kanji). Solo-kanji entries therefore act
+ * as a fallback only where no longer curated vocabulary match occupies that
+ * character. Returned entries are unique but ordered by first occurrence.
  */
 export function matchCuratedStoryVocabulary(japanese: string): CuratedVocabularyMatch[] {
   const story = japanese.normalize("NFKC");
@@ -137,6 +176,8 @@ export function matchCuratedStoryVocabulary(japanese: string): CuratedVocabulary
     if (!candidates?.length) continue;
     candidates.sort((left, right) =>
       (right.end - right.start) - (left.end - left.start) ||
+      Number(left.sourceFile === SOLO_KANJI_CATALOG_FILE) -
+        Number(right.sourceFile === SOLO_KANJI_CATALOG_FILE) ||
       left.id.localeCompare(right.id),
     );
     const best = candidates[0]!;

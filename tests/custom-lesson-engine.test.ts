@@ -59,8 +59,8 @@ const catalog = JSON.parse(readFileSync("data/jlpt-catalog.json", "utf8")) as {
 
 describe("custom lesson engine contract", () => {
   it("asks the learner for only topic and level", () => {
-    expect(form).toContain('<Field label="Topic">');
-    expect(form).toContain('<Field label="Level">');
+    expect(form).toContain('<Field label="What do you want to learn through?">');
+    expect(form).toContain('<Field label="Japanese level">');
     expect(form).not.toContain('<Field label="Lesson length">');
     expect(form).not.toContain('<Field label="Preferred focus">');
     expect(form).not.toContain('<Field label="Speaking difficulty">');
@@ -73,8 +73,8 @@ describe("custom lesson engine contract", () => {
 
   it("opens the resolved story in the real reader and polls durable backend progress", () => {
     expect(form).toContain('role="status"');
-    expect(form).toContain("AIko is preparing the first phase.");
-    expect(form).toContain("Opening the lesson reader");
+    expect(form).toContain("AIko writes the story first.");
+    expect(form).toContain('"Opening your lesson"');
     expect(form).toContain(
       "router.replace(`/lesson/building/${encodeURIComponent(result.requestId)}`)",
     );

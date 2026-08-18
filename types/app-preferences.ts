@@ -27,7 +27,6 @@ export interface ProfileEdits {
   level: LearnerLevel;
   goal: LearningGoal;
   dailyMinutes: 15 | 30 | 45 | 60;
-  interests: string[];
 }
 
 export interface CustomLessonRequest {

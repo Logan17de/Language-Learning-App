@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Brand } from "@/components/ui/brand";
 import { ButtonLink } from "@/components/ui/button";
+import { AIKO_SUPPORT_EMAIL, AIKO_SUPPORT_MAILTO } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Terms",
@@ -39,6 +40,16 @@ export default function TermsPage() {
               <p className="mt-3 leading-7 text-stone-500">
                 Free and Pro describe the intended product tiers. Paid subscriptions are not
                 offered until pricing and payment terms are published in the product.
+              </p>
+            </section>
+            <section>
+              <h2 className="text-xl font-semibold">Contact</h2>
+              <p className="mt-3 leading-7 text-stone-500">
+                Questions about these terms or your AIko account can be sent to{" "}
+                <a className="font-semibold text-moss-700 hover:underline" href={AIKO_SUPPORT_MAILTO}>
+                  {AIKO_SUPPORT_EMAIL}
+                </a>
+                .
               </p>
             </section>
           </div>

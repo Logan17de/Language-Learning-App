@@ -23,11 +23,21 @@ export function phaseIsComplete(
         lesson.vocabularyQuestions.map((question) => question.id),
         session.vocabularyAnswers.map((answer) => answer.questionId),
       );
-    case "grammar":
-      return hasAnswerForEveryQuestion(
-        lesson.grammarQuestions.map((question) => question.id),
-        session.grammarAnswers.map((answer) => answer.questionId),
+    case "grammar": {
+      const answerIds = session.grammarAnswers.map((answer) => answer.questionId);
+      const translationQuestions = session.grammarTranslationQuestions ?? [];
+      return (
+        hasAnswerForEveryQuestion(
+          lesson.grammarQuestions.map((question) => question.id),
+          answerIds,
+        ) &&
+        translationQuestions.length === 5 &&
+        hasAnswerForEveryQuestion(
+          translationQuestions.map((question) => question.id),
+          answerIds,
+        )
       );
+    }
     case "reading":
       return hasAnswerForEveryQuestion(
         (lesson.readingQuestions ?? []).map((question) => question.id),

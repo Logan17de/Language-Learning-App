@@ -9,25 +9,52 @@ import {
   createGoogleOAuthClient,
 } from "@/lib/supabase/client";
 import { canAccessAdmin, type AppRole } from "@/lib/auth/permissions";
+import { clearPendingSignupConfirmation } from "@/lib/auth/pending-signup-confirmation";
+import { safeInternalRedirect } from "@/lib/auth/safe-internal-redirect";
 import { useAdminSessionStore } from "@/store/admin-session-store";
 
 type GoogleFlow = "login" | "signup" | "admin";
+type AuthCallbackFlow = GoogleFlow | "email-confirmation";
 
-function returnToAuth(flow: GoogleFlow | null, error: string) {
+function callbackParam(url: URL, key: string) {
+  const queryValue = url.searchParams.get(key);
+  if (queryValue) return queryValue;
+  const hash = url.hash.startsWith("#") ? url.hash.slice(1) : url.hash;
+  return new URLSearchParams(hash).get(key);
+}
+
+function returnToAuth(
+  flow: AuthCallbackFlow | null,
+  error: string,
+  next?: string | null,
+) {
   const pathname =
-    flow === "signup"
+    flow === "signup" || flow === "email-confirmation"
       ? "/signup"
       : flow === "admin"
         ? "/admin/login"
         : "/login";
   const target = new URL(pathname, window.location.origin);
   target.searchParams.set("error", error);
+  const safeNext = safeInternalRedirect(next);
+  if (safeNext) target.searchParams.set("next", safeNext);
   window.location.replace(target.toString());
+}
+
+function confirmationErrorReason(url: URL, fallback?: string) {
+  const errorCode = callbackParam(url, "error_code")?.toLowerCase() ?? "";
+  const description =
+    callbackParam(url, "error_description")?.toLowerCase() ??
+    fallback?.toLowerCase() ??
+    "";
+  return errorCode.includes("expired") || description.includes("expired")
+    ? "confirmation-expired"
+    : "confirmation-failed";
 }
 
 export function OAuthCallback() {
   const started = useRef(false);
-  const [status, setStatus] = useState("Completing your Google sign-in…");
+  const [status, setStatus] = useState("Completing account setup…");
 
   useEffect(() => {
     if (started.current) return;
@@ -36,41 +63,69 @@ export function OAuthCallback() {
     async function complete() {
       const url = new URL(window.location.href);
       const requestedFlow = url.searchParams.get("flow");
-      const googleFlow: GoogleFlow | null =
+      const callbackFlow: AuthCallbackFlow | null =
         requestedFlow === "login" ||
         requestedFlow === "signup" ||
-        requestedFlow === "admin"
+        requestedFlow === "admin" ||
+        requestedFlow === "email-confirmation"
           ? requestedFlow
           : null;
-      const requestedNext = url.searchParams.get("next");
-      const explicitNext =
-        requestedNext?.startsWith("/") && !requestedNext.startsWith("//")
-          ? requestedNext
+      const googleFlow: GoogleFlow | null =
+        callbackFlow === "login" ||
+        callbackFlow === "signup" ||
+        callbackFlow === "admin"
+          ? callbackFlow
           : null;
+      const explicitNext = safeInternalRedirect(url.searchParams.get("next"));
+      const callbackError = callbackParam(url, "error");
 
-      if (url.searchParams.has("error")) {
-        returnToAuth(googleFlow, "oauth-cancelled");
+      if (callbackError) {
+        returnToAuth(
+          callbackFlow,
+          callbackFlow === "email-confirmation"
+            ? confirmationErrorReason(url)
+            : "oauth-cancelled",
+          explicitNext,
+        );
         return;
       }
 
-      const code = url.searchParams.get("code");
+      const code = callbackParam(url, "code");
       const client = createClient();
-      const exchangeClient = googleFlow
-        ? createGoogleOAuthClient()
-        : client;
+      const exchangeClient = googleFlow ? createGoogleOAuthClient() : client;
       if (!client || !exchangeClient) {
-        returnToAuth(googleFlow, "backend-not-configured");
+        returnToAuth(callbackFlow, "backend-not-configured", explicitNext);
         return;
       }
       if (!code) {
-        returnToAuth(googleFlow, "auth-callback");
+        returnToAuth(
+          callbackFlow,
+          callbackFlow === "email-confirmation"
+            ? "confirmation-failed"
+            : "auth-callback",
+          explicitNext,
+        );
         return;
       }
 
-      setStatus("Securing your AIko session…");
+      setStatus(
+        callbackFlow === "email-confirmation"
+          ? "Confirming your email…"
+          : googleFlow
+            ? "Securing your AIko session…"
+            : "Completing account setup…",
+      );
       const { data: exchangeData, error: exchangeError } =
         await exchangeClient.auth.exchangeCodeForSession(code);
       if (exchangeError) {
+        if (callbackFlow === "email-confirmation") {
+          returnToAuth(
+            callbackFlow,
+            confirmationErrorReason(url, exchangeError.message),
+            explicitNext,
+          );
+          return;
+        }
         const lower = exchangeError.message.toLowerCase();
         const reason =
           exchangeError.code === "bad_code_verifier" ||
@@ -80,13 +135,13 @@ export function OAuthCallback() {
                 exchangeError.code === "flow_state_not_found"
               ? "oauth-expired"
               : "oauth-exchange";
-        returnToAuth(googleFlow, reason);
+        returnToAuth(callbackFlow, reason, explicitNext);
         return;
       }
 
       if (googleFlow) {
         if (!exchangeData.session) {
-          returnToAuth(googleFlow, "oauth-exchange");
+          returnToAuth(googleFlow, "oauth-exchange", explicitNext);
           return;
         }
         const { error: sessionError } = await client.auth.setSession({
@@ -94,7 +149,7 @@ export function OAuthCallback() {
           refresh_token: exchangeData.session.refresh_token,
         });
         if (sessionError) {
-          returnToAuth(googleFlow, "oauth-exchange");
+          returnToAuth(googleFlow, "oauth-exchange", explicitNext);
           return;
         }
         clearGoogleOAuthStorage();
@@ -104,7 +159,14 @@ export function OAuthCallback() {
 
       const { data: auth, error: userError } = await client.auth.getUser();
       if (userError || !auth.user) {
-        returnToAuth(googleFlow, "oauth-exchange");
+        await client.auth.signOut({ scope: "local" });
+        returnToAuth(
+          callbackFlow,
+          callbackFlow === "email-confirmation"
+            ? "confirmation-failed"
+            : "oauth-exchange",
+          explicitNext,
+        );
         return;
       }
 
@@ -124,7 +186,7 @@ export function OAuthCallback() {
             data: { aiko_google_registration_complete: false },
           });
           await client.auth.signOut({ scope: "local" });
-          returnToAuth(googleFlow, "no-google-account");
+          returnToAuth(googleFlow, "no-google-account", explicitNext);
           return;
         }
 
@@ -151,7 +213,7 @@ export function OAuthCallback() {
           !canAccessAdmin(role)
         ) {
           await client.auth.signOut({ scope: "local" });
-          returnToAuth("admin", "admin-access-denied");
+          returnToAuth("admin", "admin-access-denied", explicitNext);
           return;
         }
 
@@ -167,16 +229,46 @@ export function OAuthCallback() {
         return;
       }
 
-      const preferences = await client
-        .from("user_preferences")
-        .select("onboarding_complete")
-        .eq("user_id", auth.user.id)
-        .maybeSingle();
+      const [profile, preferences] = await Promise.all([
+        client
+          .from("profiles")
+          .select("status")
+          .eq("id", auth.user.id)
+          .maybeSingle(),
+        client
+          .from("user_preferences")
+          .select("onboarding_complete")
+          .eq("user_id", auth.user.id)
+          .maybeSingle(),
+      ]);
+
+      if (profile.error || !profile.data) {
+        await client.auth.signOut({ scope: "local" });
+        returnToAuth(callbackFlow, "profile-load", explicitNext);
+        return;
+      }
+      if (profile.data.status !== "active") {
+        await client.auth.signOut({ scope: "local" });
+        returnToAuth(callbackFlow, "account-inactive", explicitNext);
+        return;
+      }
+      if (preferences.error) {
+        await client.auth.signOut({ scope: "local" });
+        returnToAuth(callbackFlow, "preferences-load", explicitNext);
+        return;
+      }
+
+      if (callbackFlow === "email-confirmation") {
+        clearPendingSignupConfirmation();
+      }
+
       const onboardingComplete =
         preferences.data?.onboarding_complete ?? false;
       const next = onboardingComplete
         ? (explicitNext ?? "/home")
-        : "/onboarding";
+        : explicitNext
+          ? `/onboarding?next=${encodeURIComponent(explicitNext)}`
+          : "/onboarding";
       window.location.replace(next);
     }
 
@@ -191,7 +283,7 @@ export function OAuthCallback() {
         </div>
         <LoaderCircle className="mx-auto mt-10 size-8 animate-spin text-moss-700" />
         <h1 className="mt-6 text-2xl font-semibold text-ink">
-          Finishing sign-in
+          Completing account setup
         </h1>
         <p className="mt-3 text-sm leading-6 text-stone-500">{status}</p>
       </div>

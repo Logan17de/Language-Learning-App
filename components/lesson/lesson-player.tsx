@@ -130,10 +130,10 @@ export function LessonPlayer({
 
   useEffect(() => {
     if (!session) return;
-    const timer = window.setInterval(
-      () => setElapsedSeconds((value) => value + 1),
-      1000,
-    );
+    const timer = window.setInterval(() => {
+      if (document.visibilityState !== "visible") return;
+      setElapsedSeconds((value) => value + 1);
+    }, 1000);
     return () => window.clearInterval(timer);
   }, [session]);
 
@@ -377,8 +377,9 @@ export function LessonPlayer({
             </h2>
             <p className="mt-3 leading-7 text-stone-500">
               AIko doesn&apos;t pause lessons. If you leave now, this attempt
-              will end and you&apos;ll start from the beginning next time.
-              Mastery already recorded from completed activities stays saved.
+              will end and this lesson won&apos;t be assigned to you again. AIko
+              will choose a different next lesson. Mastery already recorded
+              from completed activities stays saved.
             </p>
             {exitError && (
               <p

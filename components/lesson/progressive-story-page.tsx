@@ -160,26 +160,26 @@ function readinessLabel(
   lessonReady: boolean,
   audioStatus: string,
 ): string {
-  if (lessonReady && audioStatus === "building") return "Preparing activity audio";
-  if (lessonReady && audioStatus === "queued") return "Activity audio queued";
-  if (lessonReady && audioStatus === "failed") return "Lesson ready · audio needs retry";
+  if (lessonReady && audioStatus === "building") return "Preparing listening audio";
+  if (lessonReady && audioStatus === "queued") return "Listening audio queued";
+  if (lessonReady && audioStatus === "failed") return "Lesson ready · listening audio needs retry";
   if (lessonReady) return "Complete lesson ready";
   const labels: Record<string, string> = {
-    queued: "Lesson queued",
+    queued: "Starting your lesson",
     story_building: "Writing your story",
-    vocabulary_enrichment: "Enriching story vocabulary",
-    library_resolution: "Resolving the lesson library",
-    activity_groups: "Creating lesson activities",
-    final_validation: "Checking lesson quality",
-    lesson_saving: "Saving your lesson",
-    audio: "Preparing optional audio",
-    retryable_failure: "Retrying a lesson stage",
-    permanent_failure: "Lesson generation stopped",
+    vocabulary_enrichment: "Adding word help",
+    library_resolution: "Connecting readings and meanings",
+    activity_groups: "Building practice from your story",
+    final_validation: "Finalizing your lesson",
+    lesson_saving: "Adding lesson to your path",
+    audio: "Preparing listening audio",
+    retryable_failure: "Trying that step again",
+    permanent_failure: "Lesson preparation stopped",
     completed: "Complete lesson ready",
   };
   const exact = labels[currentStage];
   if (exact) return exact;
-  if (currentStage.startsWith("activity_groups:")) return "Creating lesson activities";
+  if (currentStage.startsWith("activity_groups:")) return "Building practice from your story";
   return "Preparing your lesson";
 }
 
@@ -208,14 +208,14 @@ function buildNotice(
   }
   if (lessonReady) {
     return {
-      title: "Preparing activity audio",
+      title: "Preparing listening audio",
       detail: "The lesson is playable now while listening audio finishes in the background.",
       complete: false,
       attention: false,
     };
   }
 
-  const completedDetail = `${completedGroups} of ${ACTIVITY_GROUP_COUNT} activity groups ready.`;
+  const completedDetail = `${completedGroups} of ${ACTIVITY_GROUP_COUNT} practice sets ready.`;
   const completedGroupNotices: Record<string, string> = {
     vocabulary_and_kanji: "Vocabulary & kanji ready",
     grammar_and_reading: "Grammar & reading ready",
@@ -231,15 +231,15 @@ function buildNotice(
   }
   if (currentStage === "final_validation") {
     return {
-      title: "Checking lesson quality",
-      detail: "AIko is checking the complete activity package.",
+      title: "Finalizing your lesson",
+      detail: "AIko is making sure all six phases are ready.",
       complete: false,
       attention: false,
     };
   }
   if (currentStage === "lesson_saving") {
     return {
-      title: "Saving your lesson",
+      title: "Adding lesson to your path",
       detail: "Your finished lesson is being added to your learning path.",
       complete: false,
       attention: false,
@@ -250,7 +250,7 @@ function buildNotice(
     detail:
       completedGroups > 0
         ? completedDetail
-        : "Vocabulary, grammar, reading, listening, and speaking are being built.",
+        : "Vocabulary + kanji, grammar, reading, listening, and speaking are being built from your story.",
     complete: false,
     attention: false,
   };
@@ -307,8 +307,8 @@ function BuildStatusToast({
           setDisplayed({
             key: nextKey,
             value: {
-              title: "Creating remaining activities",
-              detail: `${completedGroups} of ${ACTIVITY_GROUP_COUNT} activity groups ready.`,
+              title: "Building remaining practice",
+              detail: `${completedGroups} of ${ACTIVITY_GROUP_COUNT} practice sets ready.`,
               complete: false,
               attention: false,
             },
@@ -376,7 +376,7 @@ function BuildStatusToast({
             ) : (
               <RotateCcw className="size-4" />
             )}
-            {retrying ? "Queuing…" : "Retry activity audio"}
+            {retrying ? "Queuing…" : "Retry listening audio"}
           </Button>
         )}
       </Card>
@@ -441,7 +441,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
             "AIko could not finish the remaining lesson activities.",
         );
       } else if (result.audioStatus === "failed") {
-        setError("The lesson is ready, but activity audio needs another attempt.");
+        setError("The lesson is ready, but listening audio needs another attempt.");
       } else {
         setError("");
       }
@@ -598,13 +598,13 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
   if (lines.length < 1) {
     const stageTitle = readinessLabel(currentStage, false, audioStatus);
     const stageDetails: Record<string, string> = {
-      queued: "Your request is safely queued and can continue without this page open.",
+      queued: "Your lesson is in line and will keep preparing even if you leave this page.",
       story_building:
-        "AIko is selecting targets and writing the checked story passage.",
+        "AIko is choosing lesson targets and writing your story.",
       vocabulary_enrichment:
-        "The story is saved. AIko is preparing tappable vocabulary.",
+        "Your story is ready. AIko is adding words you can tap for reading and meaning.",
       library_resolution:
-        "AIko is validating and resolving every teaching record used by the story.",
+        "AIko is connecting the words in your story to their readings and meanings.",
     };
     return (
       <main
@@ -623,7 +623,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
           <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">
             {error ||
               stageDetails[currentStage] ||
-              "The durable worker is preparing the next saved checkpoint."}
+              "AIko is preparing the next part of your lesson."}
           </p>
           {!error && (
             <div className="mx-auto mt-5 h-2 w-64 overflow-hidden rounded-full bg-stone-200">
@@ -670,16 +670,16 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
                 {storyTitle}
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-500">
-                Read naturally. Touch a supported word only when you need its
+                Read naturally. Tap a supported word only when you need its
                 reading or meaning. Story audio is off.
               </p>
             </div>
             <div className="rounded-2xl border border-moss-100 bg-moss-50 px-4 py-3 text-xs text-moss-800">
               <p className="font-semibold">
-                {supportedWordCount} library-backed taps
+                {supportedWordCount} words with reading or meaning help
               </p>
               <p className="mt-1 text-moss-600">
-                Unsupported words remain normal text
+                Tap supported words whenever you need help
               </p>
             </div>
           </div>
@@ -720,7 +720,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
                 </p>
                 <p className="mt-1 text-xs text-stone-500">
                   One click finishes Story. Vocabulary opens automatically as
-                  soon as the generated lesson is ready.
+                  soon as the rest of your lesson is ready.
                 </p>
               </div>
               {!storyComplete && (
@@ -741,7 +741,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
         error={
           error ||
           (failedGroups.length > 0
-            ? `${failedGroups.length} activity group needs another attempt.`
+            ? `${failedGroups.length} practice set needs another attempt.`
             : "")
         }
         canRetry={canRetry}

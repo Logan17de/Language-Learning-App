@@ -1,3 +1,5 @@
+import { AIKO_CANONICAL_ORIGIN } from "@/lib/app-url";
+
 export interface SupabasePublicConfig {
   url: string;
   anonKey: string;
@@ -42,19 +44,7 @@ export function requireSupabasePublicConfig(): SupabasePublicConfig {
 }
 
 export function getAppUrl(): string {
-  // OAuth and email-auth actions begin in the browser, so the current origin is
-  // the authoritative callback host. This also prevents a stale development
-  // NEXT_PUBLIC_APP_URL from sending a deployed user back to localhost.
-  if (typeof window !== "undefined") return window.location.origin;
-
-  const configuredUrl =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
-  if (configuredUrl) return configuredUrl;
-
-  const vercelUrl =
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-    process.env.VERCEL_URL;
-  return vercelUrl
-    ? "https://" + vercelUrl.replace(/\/$/, "")
-    : "http://localhost:3000";
+  // AIko uses one auth origin only. Local, preview, and generated Vercel
+  // hostnames must never become OAuth, confirmation, or password-reset targets.
+  return AIKO_CANONICAL_ORIGIN;
 }

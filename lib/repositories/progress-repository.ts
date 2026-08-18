@@ -20,7 +20,6 @@ import type {
 export interface BackendProgressSnapshot {
   currentLevel: LearnerLevel;
   learningGoal: LearningGoal | null;
-  interests: string[];
   dailyGoalMinutes: DailyMinutes;
   minutesStudiedToday: number;
   joinDate: string;
@@ -28,6 +27,7 @@ export interface BackendProgressSnapshot {
   learnedVocabularyCount: number;
   learnedKanjiCount: number;
   learnedGrammarCount: number;
+  completedLessonCount: number;
   xp: number;
   streakDays: number;
   longestStreak: number;
@@ -67,6 +67,24 @@ function dateInTimeZone(timeZone: string): string {
   }
 }
 
+function shiftIsoDate(value: string, days: number): string {
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day + days));
+  return date.toISOString().slice(0, 10);
+}
+
+export function effectiveStreakDays(
+  storedStreak: number,
+  latestActivityDate: string | null | undefined,
+  today: string,
+): number {
+  if (!latestActivityDate) return 0;
+  const yesterday = shiftIsoDate(today, -1);
+  return latestActivityDate === today || latestActivityDate === yesterday
+    ? Math.max(0, storedStreak)
+    : 0;
+}
+
 function dailyMinutes(value: number): DailyMinutes {
   return value === 15 || value === 45 || value === 60 ? value : 30;
 }
@@ -86,6 +104,7 @@ export const progressRepository = {
       weekly,
       mastery,
       completions,
+      completionCount,
       earned,
       definitions,
       lessons,
@@ -93,7 +112,7 @@ export const progressRepository = {
       client
         .from("profiles")
         .select(
-          "xp,streak_days,longest_streak,total_study_minutes,daily_study_minutes,current_jlpt_level,learning_goal,interests,created_at,timezone",
+          "xp,streak_days,longest_streak,total_study_minutes,daily_study_minutes,current_jlpt_level,learning_goal,created_at,timezone",
         )
         .eq("id", userId)
         .single(),
@@ -117,6 +136,10 @@ export const progressRepository = {
         .eq("user_id", userId)
         .order("completed_at", { ascending: false })
         .limit(20),
+      client
+        .from("lesson_completions")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId),
       client.from("user_achievements").select("*").eq("user_id", userId),
       client.from("achievements").select("*").eq("active", true),
       client.from("lessons").select("id,legacy_id,title"),
@@ -127,6 +150,7 @@ export const progressRepository = {
       weekly,
       mastery,
       completions,
+      completionCount,
       earned,
       definitions,
       lessons,
@@ -216,6 +240,7 @@ export const progressRepository = {
       (earned.data ?? []).map((item) => [item.achievement_id, item]),
     );
     const today = dateInTimeZone(profile.data.timezone);
+    const latestActivityDate = (weekly.data ?? [])[0]?.activity_date;
     const minutesStudiedToday =
       (weekly.data ?? []).find((item) => item.activity_date === today)?.minutes ?? 0;
     const goalMinutes = dailyMinutes(profile.data.daily_study_minutes);
@@ -223,7 +248,6 @@ export const progressRepository = {
     return success({
       currentLevel: profile.data.current_jlpt_level as LearnerLevel,
       learningGoal: profile.data.learning_goal as LearningGoal | null,
-      interests: profile.data.interests ?? [],
       dailyGoalMinutes: goalMinutes,
       minutesStudiedToday,
       joinDate: profile.data.created_at.slice(0, 10),
@@ -234,8 +258,13 @@ export const progressRepository = {
       ),
       learnedKanjiCount: summaryNumber(summary.data, "learned_kanji"),
       learnedGrammarCount: summaryNumber(summary.data, "learned_grammar"),
+      completedLessonCount: completionCount.count ?? 0,
       xp: profile.data.xp,
-      streakDays: profile.data.streak_days,
+      streakDays: effectiveStreakDays(
+        profile.data.streak_days,
+        latestActivityDate,
+        today,
+      ),
       longestStreak: profile.data.longest_streak,
       totalStudyMinutes: profile.data.total_study_minutes,
       weeklyActivity: (weekly.data ?? [])
@@ -256,7 +285,7 @@ export const progressRepository = {
         const lesson = lessonMap.get(completion.lesson_id);
         return {
           lessonId: lesson?.legacy_id ?? completion.lesson_id,
-          title: lesson?.title ?? "Japanese lesson",
+          title: lesson?.title ?? "Language lesson",
           completedAt: completion.completed_at,
           score: completion.score,
           durationMinutes: completion.duration_minutes,

@@ -120,7 +120,6 @@ export async function generateReadingRegion(input: {
     prompt: readingPassagePrompt({
       languageLevel: `JLPT ${input.level}`,
       topic: input.topic,
-      naturalInterests: context?.interests ?? input.draft.tags,
       targetGrammar: context?.targetGrammar ?? input.library.grammar.map((item) => item.pattern),
       targetKanji: context?.targetKanji ?? input.library.kanji.slice(0, 5).map((item) => item.character),
     }),

@@ -3,10 +3,7 @@ import type {
   StoryDraft,
 } from "@/lib/gemini/lesson-engine-v2";
 
-export interface LessonPlanV3 extends LessonPlan {
-  /** Optional onboarding interests. Empty means the story prompt ignores interests. */
-  interests: string[];
-}
+export type LessonPlanV3 = LessonPlan;
 
 export interface StoryOnlyDraftLine {
   japanese: string;
@@ -27,7 +24,6 @@ export interface StoryOnlyDraft {
 }
 
 export interface StoryPassageOutput {
-  selected_interest: string;
   japanese_title: string;
   english_title: string;
   japanese_story: string;
@@ -53,7 +49,7 @@ export function normalizeStoryPassage(
     japaneseTitle: value.japanese_title.trim(),
     summary: firstSentence(value.english_translation),
     storyPreview: firstSentence(value.japanese_story),
-    tags: [value.selected_interest.trim()].filter(Boolean),
+    tags: [],
     lines: [{
       japanese: value.japanese_story.trim(),
       english: value.english_translation.trim(),

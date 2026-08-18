@@ -4,12 +4,16 @@ Custom-topic generation uses a durable database job and an every-minute Supabase
 
 ## Production configuration
 
+The canonical AIko production origin is `https://aiko.zetbros.com`.
+
 1. Generate one random secret with at least 16 characters. Set it as the server-only Vercel environment variable `CUSTOM_LESSON_WORKER_SECRET`.
 2. Open **Supabase Dashboard → Database → Vault** and create these two secrets. Do not commit either value.
 
-   - Name `custom_lesson_worker_url`: the deployed origin followed by `/api/internal/custom-lessons/process`. It must be the full HTTPS endpoint and must not end with a slash.
+   - Name `custom_lesson_worker_url`: `https://aiko.zetbros.com/api/internal/custom-lessons/process`
    - Name `custom_lesson_worker_secret`: the exact value of the Vercel `CUSTOM_LESSON_WORKER_SECRET` environment variable.
 3. Apply the database migrations, then redeploy the existing Vercel project. No Vercel Cron configuration is required.
+
+Do not point the production Vault URL at a generated `*.vercel.app` deployment hostname. Keeping the worker on `aiko.zetbros.com` means deployment hostnames can change without breaking the scheduler.
 
 To rotate either secret, find its ID and update it without changing its stable name:
 
@@ -28,6 +32,7 @@ The generation endpoint checks scheduler readiness before it persists a new job.
 Set `CUSTOM_LESSON_WORKER_URL` in your shell to the same full endpoint stored in Vault, then run the protected HTTP diagnostic with the worker bearer token:
 
 ```bash
+export CUSTOM_LESSON_WORKER_URL="https://aiko.zetbros.com/api/internal/custom-lessons/process"
 curl -H "Authorization: Bearer $CUSTOM_LESSON_WORKER_SECRET" \
   "${CUSTOM_LESSON_WORKER_URL}?diagnostics=1"
 ```

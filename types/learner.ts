@@ -19,7 +19,6 @@ export interface OnboardingPreferences {
   goal: LearningGoal | null;
   level: LearnerLevel | null;
   dailyMinutes: DailyMinutes | null;
-  interests: string[];
   readingPermissionUnderstood: boolean;
   completed: boolean;
 }

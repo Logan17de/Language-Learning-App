@@ -28,7 +28,6 @@ export type ProfileRow = Timestamps & {
   current_jlpt_level: Database["public"]["Enums"]["jlpt_level"];
   learning_goal: string | null;
   daily_study_minutes: number;
-  interests: string[];
   subscription_plan: Database["public"]["Enums"]["subscription_plan"];
   role: Database["public"]["Enums"]["app_role"];
   status: Database["public"]["Enums"]["account_status"];
@@ -111,7 +110,7 @@ export interface Database {
   public: {
     Tables: {
       profiles: TableDef<ProfileRow>;
-      user_preferences: TableDef<OwnedRow & { learning_goal: string | null; daily_study_minutes: number; interests: string[]; onboarding_complete: boolean }>;
+      user_preferences: TableDef<OwnedRow & { learning_goal: string | null; daily_study_minutes: number; onboarding_complete: boolean }>;
       user_settings: TableDef<OwnedRow & { settings: Json }>;
       user_subscriptions: TableDef<OwnedRow & { plan: Database["public"]["Enums"]["subscription_plan"]; status: Database["public"]["Enums"]["subscription_status"]; billing_interval: string | null; starts_at: string; renews_at: string | null; cancelled_at: string | null; mock_payment_status: string }>;
       curriculum_levels: TableDef<Timestamps & { id: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; title: string; description: string; sequence_order: number }>;
@@ -142,7 +141,7 @@ export interface Database {
       lesson_activity_answers: TableDef<OwnedRow & { lesson_session_id: string; phase: string; activity_id: string; selected_answer: string; correct: boolean; attempts: number; answer_data: Json }>;
       lesson_events: TableDef<OwnedRow & { lesson_session_id: string; client_event_id: string; phase: string; event_type: string; event_data: Json; occurred_at: string }>;
       lesson_completions: TableDef<OwnedRow & { lesson_id: string; lesson_version_id: string; lesson_session_id: string; score: number; xp_awarded: number; duration_minutes: number; completion_data: Json; completed_at: string }>;
-      lesson_assignments: TableDef<Timestamps & { id: string; user_id: string; lesson_id: string; lesson_version_id: string; selection_mode: "free_random" | "pro_interest" | "pro_custom"; status: "assigned" | "started" | "completed"; algorithm_version: string; interest_matches: string[]; assigned_at: string; started_at: string | null; completed_at: string | null }>;
+      lesson_assignments: TableDef<Timestamps & { id: string; user_id: string; lesson_id: string; lesson_version_id: string; selection_mode: "standard" | "pro_custom"; status: "assigned" | "started" | "completed" | "abandoned"; algorithm_version: string; assigned_at: string; started_at: string | null; completed_at: string | null }>;
       learner_mastery: TableDef<OwnedRow & { item_type: string; item_key: string; mastery: number; confidence: number; last_reviewed_at: string | null; next_review_at: string | null; evidence_count: number; meaning_score: number; recognition_score: number; pronunciation_score: number }>;
       learner_mastery_events: TableDef<{ id: string; user_id: string; lesson_id: string | null; lesson_version_id: string | null; lesson_session_id: string | null; client_event_id: string; item_type: "kanji" | "vocabulary" | "grammar"; item_key: string; dimension: "meaning" | "recognition" | "pronunciation"; signal: "exposure" | "revealed_reading" | "revealed_meaning" | "correct" | "incorrect" | "pronunciation_correct" | "pronunciation_incorrect"; score_delta: number; event_data: Json; occurred_at: string; created_at: string }>;
       review_queue: TableDef<OwnedRow & { item_type: string; item_key: string; prompt_data: Json; due_at: string; confidence: number; reason: string; status: string }>;
@@ -230,10 +229,6 @@ export interface Database {
       };
       assign_next_lesson: {
         Args: Record<string, never>;
-        Returns: Json;
-      };
-      begin_custom_lesson_generation: {
-        Args: { p_topic: string; p_duration_minutes: number; p_focus: string; p_speaking_difficulty: string; p_note: string };
         Returns: Json;
       };
       begin_custom_lesson_generation_v2: {

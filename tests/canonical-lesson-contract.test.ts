@@ -40,7 +40,7 @@ function sessionFor(lesson: LessonPackage): LessonSession {
 }
 
 describe("canonical lesson contract", () => {
-  it("uses the six-phase learner order with no final review", () => {
+  it("uses the six-phase learner order", () => {
     expect(CANONICAL_LESSON_PHASES.map((phase) => phase.id)).toEqual([
       "story",
       "vocabulary",
@@ -50,16 +50,13 @@ describe("canonical lesson contract", () => {
       "speaking",
     ]);
 
-    const oldStoredOrder = [
+    const incompleteStoredOrder = [
       { id: "story", label: "Story", description: "Story" },
-      { id: "vocabulary", label: "Vocabulary", description: "Vocabulary" },
       { id: "grammar", label: "Grammar", description: "Grammar" },
       { id: "speaking", label: "Speaking", description: "Speaking" },
-      { id: "reading", label: "Reading", description: "Reading" },
-      { id: "listening", label: "Listening", description: "Listening" },
-      { id: "review", label: "Review", description: "Review" },
+      { id: "unknown", label: "Unknown", description: "Unknown" },
     ];
-    expect(normalizeLessonPhases(oldStoredOrder).map((phase) => phase.id)).toEqual([
+    expect(normalizeLessonPhases(incompleteStoredOrder).map((phase) => phase.id)).toEqual([
       "story",
       "vocabulary",
       "grammar",
@@ -69,21 +66,18 @@ describe("canonical lesson contract", () => {
     ]);
   });
 
-  it("does not treat old 13-10-5 demo packages as the current generated format", () => {
-    const issues = lessonContractIssues(commuteLesson);
-    expect(issues).toContain("Vocabulary practice must contain exactly 7 activities; found 13.");
-    expect(issues).toContain("Grammar practice must contain exactly 7 activities; found 10.");
-    expect(isCanonicalPlayableLesson(commuteLesson)).toBe(false);
+  it("keeps seed lessons playable under the current generated format", () => {
+    expect(lessonContractIssues(commuteLesson)).toEqual([]);
+    expect(isCanonicalPlayableLesson(commuteLesson)).toBe(true);
   });
 
-  it("uses 7-7-5-5-5 for generated practice and no review bank", () => {
+  it("uses 7-7-5-5-5 for generated practice", () => {
     expect(CANONICAL_LESSON_ACTIVITY_COUNTS).toEqual({
       vocabulary: 7,
       grammar: 7,
       reading: 5,
       listening: 5,
       speaking: 5,
-      review: 0,
     });
   });
 
@@ -144,7 +138,6 @@ describe("canonical lesson contract", () => {
     expect(listening).toContain("maxItems: 5");
     expect(speaking).toContain("minItems: 5");
     expect(speaking).toContain("maxItems: 5");
-    expect(migration).toContain("reviewQuestions must be empty");
     expect(migration).toContain("add column if not exists choices text[]");
     expect(curatedMigration).toContain("vocabulary must be an array");
   });

@@ -28,7 +28,6 @@ export async function generateAdaptiveStoryDraft(input: {
   const prompt = storyGenerationPrompt({
     languageLevel: `JLPT ${input.level}`,
     topic: input.topic,
-    naturalInterests: input.plan.interests,
     targetGrammar: input.plan.grammar.map((item) => item.pattern),
     targetKanji: input.plan.kanji.map((item) => item.character),
   });

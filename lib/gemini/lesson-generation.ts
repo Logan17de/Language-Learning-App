@@ -80,35 +80,35 @@ async function generateSection<T>(
   const attempts: GenerationAttempt[] = result.repaired
     ? [
         {
-section: definition.name,
-model: result.model,
-repaired: false,
-issues: result.issues,
+          section: definition.name,
+          model: result.model,
+          repaired: false,
+          issues: result.issues,
         },
         {
-section: definition.name,
-model: result.model,
-repaired: true,
-issues: [],
+          section: definition.name,
+          model: result.model,
+          repaired: true,
+          issues: [],
         },
       ]
     : [
         {
-section: definition.name,
-model: result.model,
-repaired: false,
-issues: [],
+          section: definition.name,
+          model: result.model,
+          repaired: false,
+          issues: [],
         },
       ];
   return { value: result.value, attempts };
 }
+
 function promptHeader(input: LessonGenerationInput): string {
   return [
     "You are AIko's Japanese lesson generation engine.",
     "Return only the structured JSON required by the supplied response schema.",
     `Learner level: ${input.level}. Never exceed this JLPT level.`,
     `Topic: ${input.topic}`,
-    `Interests: ${input.interests.join(", ") || "none supplied"}`,
     `Duration: ${input.durationMinutes} minutes`,
     `Focus: ${input.focus}`,
     `Speaking difficulty preference: ${input.speakingDifficulty}`,
@@ -329,9 +329,6 @@ function referenceIssues(value: unknown, input: LessonGenerationInput): string[]
     for (const [key, child] of Object.entries(node)) {
       if ((key === "inspectableTerms" || key === "transcriptTerms" || key === "promptTerms")
         && Array.isArray(child)) {
-        // Inspectable metadata is canonicalized after generation. A model-created
-        // ID is acceptable when its surface or reading maps to the supplied
-        // reusable library; unresolved metadata is safely omitted.
         continue;
       } else if (key === "targetIds" && Array.isArray(child)) {
         for (const id of child) {
@@ -625,7 +622,7 @@ function legacyPackage(input: LessonGenerationInput, universal: UniversalLessonP
     japaneseTitle: universal.blueprint.japaneseTitle,
     summary: universal.blueprint.summary,
     storyPreview: universal.story.preview,
-    tags: [input.level, input.topic, ...input.interests].slice(0, 8),
+    tags: [input.level, input.topic].slice(0, 8),
     reviewItems: [
       ...input.targets.kanji.map((item) => item.character),
       ...input.targets.grammar.map((item) => item.pattern),

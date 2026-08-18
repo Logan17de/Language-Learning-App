@@ -39,7 +39,6 @@ export const CANONICAL_LESSON_ACTIVITY_COUNTS = {
   reading: 5,
   listening: 5,
   speaking: 5,
-  review: 0,
 } as const;
 
 const canonicalPhaseIds = CANONICAL_LESSON_PHASES.map((phase) => phase.id);
@@ -119,11 +118,6 @@ export function lessonContractIssues(lesson: LessonPackage): string[] {
     "Speaking practice",
     lesson.speakingExercises.length,
     CANONICAL_LESSON_ACTIVITY_COUNTS.speaking,
-  ));
-  issues.push(...exactCountIssue(
-    "Final review",
-    lesson.reviewQuestions.length,
-    CANONICAL_LESSON_ACTIVITY_COUNTS.review,
   ));
 
   if (!splitMatches(

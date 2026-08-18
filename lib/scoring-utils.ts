@@ -3,6 +3,7 @@ import {
   storyWordIndependence,
   storyWordScores,
 } from "@/lib/story-support";
+import { calculateLessonXp } from "@/lib/xp";
 import type {
   GrammarAnswer,
   LessonCompletionResult,
@@ -44,9 +45,29 @@ export function calculateLessonCompletion(
     session.vocabularyAnswers.filter((answer) => answer.correct).length,
     Math.max(1, lesson.vocabularyQuestions.length),
   );
+  const translationQuestions = session.grammarTranslationQuestions ?? [];
+  const staticGrammarIds = new Set(lesson.grammarQuestions.map((question) => question.id));
+  const translationIds = new Set(translationQuestions.map((question) => question.id));
+  const relevantGrammarAnswers = session.grammarAnswers.filter(
+    (answer) => staticGrammarIds.has(answer.questionId) || translationIds.has(answer.questionId),
+  );
   const grammarAccuracy = ratio(
-    session.grammarAnswers.filter((answer) => answer.correct).length,
+    relevantGrammarAnswers.filter((answer) => answer.correct).length,
+    Math.max(1, lesson.grammarQuestions.length + translationQuestions.length),
+  );
+  const grammarUnderstandingAnswers = relevantGrammarAnswers.filter((answer) =>
+    staticGrammarIds.has(answer.questionId),
+  );
+  const grammarProductionAnswers = relevantGrammarAnswers.filter((answer) =>
+    translationIds.has(answer.questionId),
+  );
+  const grammarUnderstandingAccuracy = ratio(
+    grammarUnderstandingAnswers.filter((answer) => answer.correct).length,
     Math.max(1, lesson.grammarQuestions.length),
+  );
+  const grammarProductionAccuracy = ratio(
+    grammarProductionAnswers.filter((answer) => answer.correct).length,
+    Math.max(1, translationQuestions.length),
   );
   const readingQuestions = lesson.readingQuestions ?? [];
   const readingCorrect = session.readingAnswers.filter((answer) => {
@@ -103,9 +124,6 @@ export function calculateLessonCompletion(
       ? 1
       : 0;
 
-  // The lesson has six learner phases and no Final Review. Keep every active
-  // phase represented in the final score instead of reserving weight for the
-  // retired review stage.
   const score = Math.round(
     storyIndependence * 15 +
       vocabularyAccuracy * 25 +
@@ -115,7 +133,7 @@ export function calculateLessonCompletion(
       speakingAccuracy * 10,
   );
 
-  const wordsNeedingReview = unique([
+  const weakItems = unique([
     ...storyWords
       .filter((item) => {
         const scores = storyWordScores(
@@ -142,14 +160,16 @@ export function calculateLessonCompletion(
       ),
     ...session.grammarAnswers
       .filter((answer) => !answer.correct)
-      .flatMap((answer) =>
-        exerciseTerms(
-          lesson,
-          lesson.grammarQuestions.find(
-            (question) => question.id === answer.questionId,
-          )?.targetItemIds,
-        ),
-      ),
+      .flatMap((answer) => {
+        const staticQuestion = lesson.grammarQuestions.find(
+          (question) => question.id === answer.questionId,
+        );
+        // Runtime translation targets stay server-owned. Their mastery evidence
+        // is persisted by validation, so completion scoring does not reconstruct them.
+        return staticQuestion
+          ? exerciseTerms(lesson, staticQuestion.targetItemIds)
+          : [];
+      }),
     ...session.readingEvents
       .filter((event) =>
         ["paused-before-word", "pronunciation-issue", "stopped-at-word"].includes(
@@ -173,16 +193,16 @@ export function calculateLessonCompletion(
   return {
     lessonId: lesson.id,
     score,
-    xpGained: 80 + Math.round(score * 0.7),
+    xpGained: calculateLessonXp(score),
     durationMinutes: Math.max(1, Math.round(session.elapsedSeconds / 60)),
     recognitionChange: score >= 80 ? 4 : 2,
     pronunciationChange:
       speaking?.evaluationAvailable
         ? Math.max(0, Math.round((speaking.pronunciationConfidence - 60) / 8))
         : 0,
-    grammarUnderstandingChange: Math.max(1, Math.round(grammarAccuracy * 4)),
-    grammarProductionChange: Math.max(1, Math.round(grammarAccuracy * 3)),
-    wordsNeedingReview,
+    grammarUnderstandingChange: Math.max(1, Math.round(grammarUnderstandingAccuracy * 4)),
+    grammarProductionChange: Math.max(1, Math.round(grammarProductionAccuracy * 4)),
+    weakItems,
     completedAt: new Date().toISOString(),
   };
 }

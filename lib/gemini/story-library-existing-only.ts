@@ -314,7 +314,6 @@ export async function resolveStoryFromExistingLibrary(
         (item) => `${item.libraryId}\u0000${item.term}\u0000${item.reading}`,
       ),
       generationContext: {
-        interests: input.plan.interests,
         targetGrammar: input.plan.grammar.map((item) => item.pattern),
         targetKanji: input.plan.kanji.map((item) => item.character),
       },

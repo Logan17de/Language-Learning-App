@@ -2,11 +2,17 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
 import { useAppStore } from "@/store/app-store";
 import { authService } from "@/lib/auth/auth-service";
+import { prepareAccountScope } from "@/lib/auth/account-scope";
+import { savePendingSignupConfirmation } from "@/lib/auth/pending-signup-confirmation";
+import {
+  safeInternalRedirect,
+  withSafeNext,
+} from "@/lib/auth/safe-internal-redirect";
 import { getBackendMode } from "@/lib/supabase/config";
 import {
   isStrongEnough,
@@ -14,24 +20,29 @@ import {
   PASSWORD_REQUIREMENTS_MESSAGE,
 } from "@/lib/auth/password-strength";
 
+const FIRST_NAME_MAX_LENGTH = 50;
+
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
-  const signIn = useAppStore((state) => state.signIn);
+  const syncBackendIdentity = useAppStore((state) => state.syncBackendIdentity);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [requestedNext, setRequestedNext] = useState<string | null>(null);
   const backendMode = getBackendMode();
 
   useEffect(() => {
-    const code = new URLSearchParams(window.location.search).get("error");
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("error");
     const messages: Record<string, string> = {
       "no-google-account":
-        "No AIko account is connected to this Google address. Create an account first, then use Google to log in.",
+        "No AIko account is linked to this Google account. Create an account first.",
       "oauth-cancelled":
-        "Google sign-in was cancelled or did not return an authorization code. Please try again.",
+        "Google sign-in was cancelled. You can try again when you’re ready.",
       "oauth-exchange":
         "Google sign-in could not be completed. Please try again.",
       "oauth-verifier":
@@ -41,60 +52,113 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       "backend-not-configured":
         "Authentication is not configured for this deployment.",
       "auth-callback":
-        "Google sign-in could not be completed. Please try again.",
+        "Account setup could not be completed. Please try again.",
+      "account-inactive":
+        "This account is not active. Contact support if you think this is a mistake.",
+      "profile-load":
+        "Your learner profile could not be verified. Please try signing in again.",
+      "preferences-load":
+        "Your learning preferences could not be loaded. Please try signing in again.",
     };
     const message = code ? messages[code] : null;
-    if (!message) return;
-    const timer = window.setTimeout(() => setError(message), 0);
+    const confirmationRequired = params.get("confirmation") === "required";
+    const next = safeInternalRedirect(params.get("next"));
+    const timer = window.setTimeout(() => {
+      setRequestedNext(next);
+      if (message) setError(message);
+      if (confirmationRequired) {
+        setNotice(
+          "Account created. Check your email and confirm your address before logging in.",
+        );
+      }
+    }, 0);
     return () => window.clearTimeout(timer);
   }, []);
-
-  const requestedNext = () => {
-    if (typeof window === "undefined") return null;
-    const value = new URLSearchParams(window.location.search).get("next");
-    return value?.startsWith("/") && !value.startsWith("//") ? value : null;
-  };
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setNotice("");
     if (backendMode !== "supabase") {
       setError("Authentication is not configured for this deployment.");
       return;
     }
-    if (mode === "signup" && !isStrongEnough(password)) {
-      setError(PASSWORD_REQUIREMENTS_MESSAGE);
-      return;
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedName = name.trim();
+    if (mode === "signup") {
+      if (!normalizedName) {
+        setError("Enter your first name.");
+        return;
+      }
+      if (normalizedName.length > FIRST_NAME_MAX_LENGTH) {
+        setError(`First name must be ${FIRST_NAME_MAX_LENGTH} characters or fewer.`);
+        return;
+      }
+      if (!isStrongEnough(password)) {
+        setError(PASSWORD_REQUIREMENTS_MESSAGE);
+        return;
+      }
     }
+
+    const next = requestedNext;
+    const onboardingHref = next
+      ? `/onboarding?next=${encodeURIComponent(next)}`
+      : "/onboarding";
 
     setLoading(true);
     let accountOnboardingComplete = false;
     if (mode === "signup") {
-      const result = await authService.signUp(email, password, name);
+      const result = await authService.signUp(
+        normalizedEmail,
+        password,
+        normalizedName,
+        next ?? undefined,
+      );
       setLoading(false);
       if (!result.ok) return setError(result.error.message);
       if (result.data.confirmationRequired) {
-        router.push("/login?confirmation=required");
+        savePendingSignupConfirmation(normalizedEmail, next);
+        router.push(withSafeNext("/signup?confirmation=required", next));
         return;
       }
-      signIn(name);
+      if (!result.data.identity) {
+        setError("Your new account could not be initialized. Please try again.");
+        return;
+      }
+      accountOnboardingComplete = result.data.identity.onboardingComplete;
+      prepareAccountScope(
+        result.data.identity.id,
+        useAppStore.getState().signOut,
+      );
+      syncBackendIdentity(
+        result.data.identity.id,
+        result.data.identity.displayName,
+        result.data.identity.email,
+        result.data.identity.onboardingComplete,
+      );
     } else {
-      const result = await authService.signIn(email, password);
+      const result = await authService.signIn(normalizedEmail, password);
       setLoading(false);
       if (!result.ok) return setError(result.error.message);
       accountOnboardingComplete = result.data.onboardingComplete;
-      signIn(result.data.displayName);
+      prepareAccountScope(result.data.id, useAppStore.getState().signOut);
+      syncBackendIdentity(
+        result.data.id,
+        result.data.displayName,
+        result.data.email,
+        result.data.onboardingComplete,
+      );
     }
     router.push(
-      mode === "signup" || !accountOnboardingComplete
-        ? "/onboarding"
-        : (requestedNext() ?? "/home"),
+      !accountOnboardingComplete ? onboardingHref : (next ?? "/home"),
     );
     router.refresh();
   }
 
   async function googleSignIn() {
     setError("");
+    setNotice("");
     if (backendMode !== "supabase") {
       setError("Authentication is not configured for this deployment.");
       return;
@@ -102,7 +166,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     setLoading(true);
     const result = await authService.signInWithGoogle(
       mode,
-      requestedNext() ?? undefined,
+      requestedNext ?? undefined,
     );
     if (!result.ok) {
       setLoading(false);
@@ -112,6 +176,14 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
 
   return (
     <form className="mt-8 space-y-5" onSubmit={submit}>
+      {backendMode !== "supabase" && (
+        <p
+          role="alert"
+          className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold leading-6 text-red-700"
+        >
+          Authentication is unavailable because this deployment is missing its backend configuration.
+        </p>
+      )}
       <Button
         type="button"
         variant="secondary"
@@ -124,7 +196,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           ? "Log in with Google"
           : "Create account with Google"}
       </Button>
-      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[.16em] text-stone-300">
+      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[.16em] text-stone-500">
         <span className="h-px flex-1 bg-stone-200" />
         or use email
         <span className="h-px flex-1 bg-stone-200" />
@@ -136,10 +208,11 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           </span>
           <input
             required
+            maxLength={FIRST_NAME_MAX_LENGTH}
             value={name}
             onChange={(event) => setName(event.target.value)}
             className="form-input"
-            placeholder="Hana"
+            placeholder="Your name"
             autoComplete="given-name"
           />
         </label>
@@ -180,7 +253,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           <button
             type="button"
             onClick={() => setShowPassword((value) => !value)}
-            className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-stone-400 hover:bg-stone-50"
+            className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-stone-500 hover:bg-stone-50"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
@@ -193,7 +266,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         {mode === "signup" ? (
           <PasswordStrengthMeter password={password} />
         ) : (
-          <p className="mt-2 text-xs leading-5 text-stone-400">
+          <p className="mt-2 text-xs leading-5 text-stone-500">
             Password strength is checked when you create or reset a password.
             Enter the password for your existing AIko account here.
           </p>
@@ -202,12 +275,21 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       {mode === "login" && (
         <div className="text-right">
           <a
-            href="/forgot-password"
+            href={withSafeNext("/forgot-password", requestedNext)}
             className="text-sm font-semibold text-moss-700 hover:underline"
           >
             Forgot password?
           </a>
         </div>
+      )}
+      {notice && (
+        <p
+          role="status"
+          className="flex gap-2 rounded-xl bg-moss-50 px-4 py-3 text-sm font-semibold leading-6 text-moss-800"
+        >
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
+          {notice}
+        </p>
       )}
       {error && (
         <p
@@ -223,16 +305,11 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       >
         {loading && <LoaderCircle className="size-4 animate-spin" />}
         {loading
-          ? "Preparing your path…"
+          ? mode === "login" ? "Logging in…" : "Creating account…"
           : mode === "login"
             ? "Log in"
             : "Create my account"}
       </Button>
-      <p className="text-center text-xs leading-5 text-stone-400">
-        {backendMode === "supabase"
-          ? "Your account is secured by Supabase Auth."
-          : "Authentication is unavailable because the backend is not configured."}
-      </p>
     </form>
   );
 }
