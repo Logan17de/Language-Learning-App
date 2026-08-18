@@ -9,7 +9,7 @@ const onboarding = source("components/onboarding/onboarding-flow.tsx");
 const draft = source("lib/onboarding/onboarding-draft.ts");
 const profileRepository = source("lib/repositories/profile-repository.ts");
 const migration = source(
-  "supabase/migrations/20260818102000_onboarding_assignment_guards.sql",
+  "supabase/migrations/20260818103656_onboarding_assignment_guards.sql",
 );
 const onboardingPage = source("app/onboarding/page.tsx");
 
