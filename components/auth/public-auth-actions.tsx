@@ -8,21 +8,13 @@ import { authService } from "@/lib/auth/auth-service";
 import { getBackendMode } from "@/lib/supabase/config";
 import { useAppStore } from "@/store/app-store";
 
-type PublicPlan = "free" | "pro";
-
-function toPublicPlan(plan: string | undefined): PublicPlan {
-  return plan && plan !== "free" ? "pro" : "free";
-}
-
 function usePublicAuthState() {
   const router = useRouter();
   const hasHydrated = useAppStore((state) => state.hasHydrated);
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
-  const localSubscriptionPlan = useAppStore((state) => state.subscription.plan);
   const clearLocalSession = useAppStore((state) => state.signOut);
   const backendMode = getBackendMode();
-  const [backendSignedIn, setBackendSignedIn] = useState<boolean | null>(null);
-  const [backendPlan, setBackendPlan] = useState<PublicPlan | null>(null);
+  const [backendSignedIn, setBackendSignedIn] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   useEffect(() => {
@@ -30,23 +22,14 @@ function usePublicAuthState() {
 
     let active = true;
 
-    async function syncIdentity() {
-      const result = await authService.getIdentity();
-      if (!active) return;
-
-      const identity = result.ok ? result.data : null;
-      setBackendSignedIn(Boolean(identity));
-      setBackendPlan(identity ? toPublicPlan(identity.subscriptionPlan) : null);
-    }
-
-    void syncIdentity();
+    // Public entry actions should never wait on a profile/database lookup. Supabase
+    // session state is enough to choose between signed-out CTAs and dashboard actions.
+    void authService.hasSession().then((signedIn) => {
+      if (active) setBackendSignedIn(signedIn);
+    });
 
     const unsubscribe = authService.subscribe((signedIn) => {
-      if (!active) return;
-
-      setBackendSignedIn(signedIn);
-      if (signedIn) void syncIdentity();
-      else setBackendPlan(null);
+      if (active) setBackendSignedIn(signedIn);
     });
 
     return () => {
@@ -55,20 +38,10 @@ function usePublicAuthState() {
     };
   }, [backendMode]);
 
-  const resolved =
-    backendMode === "supabase"
-      ? backendSignedIn !== null && (!backendSignedIn || backendPlan !== null)
-      : hasHydrated;
   const signedIn =
     backendMode === "supabase"
-      ? backendSignedIn === true
+      ? backendSignedIn
       : hasHydrated && isAuthenticated;
-  const plan: PublicPlan =
-    backendMode === "supabase"
-      ? (backendPlan ?? "free")
-      : localSubscriptionPlan === "premium"
-        ? "pro"
-        : "free";
 
   async function signOut() {
     if (isSigningOut) return;
@@ -84,25 +57,15 @@ function usePublicAuthState() {
 
     clearLocalSession();
     setBackendSignedIn(false);
-    setBackendPlan(null);
     setIsSigningOut(false);
     router.refresh();
   }
 
-  return { isSigningOut, plan, resolved, signedIn, signOut };
+  return { isSigningOut, signedIn, signOut };
 }
 
 export function PublicHeaderActions() {
-  const { isSigningOut, resolved, signedIn, signOut } = usePublicAuthState();
-
-  if (!resolved) {
-    return (
-      <div
-        className="h-12 w-56 animate-pulse rounded-full bg-stone-100 motion-reduce:animate-none"
-        aria-label="Checking account session"
-      />
-    );
-  }
+  const { isSigningOut, signedIn, signOut } = usePublicAuthState();
 
   if (signedIn) {
     return (
@@ -153,16 +116,7 @@ export function PublicPrimaryAction({
   className?: string;
   variant?: "primary" | "secondary" | "ghost" | "dark";
 }) {
-  const { resolved, signedIn } = usePublicAuthState();
-
-  if (!resolved) {
-    return (
-      <span
-        className="inline-flex min-h-12 w-52 animate-pulse rounded-full bg-moss-100 motion-reduce:animate-none"
-        aria-label="Checking account session"
-      />
-    );
-  }
+  const { signedIn } = usePublicAuthState();
 
   if (signedIn && hideWhenSignedIn) {
     return null;
