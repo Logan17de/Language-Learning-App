@@ -24,6 +24,8 @@ import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { LessonReportDialog } from "@/components/support/lesson-report-dialog";
+import { progressRepository } from "@/lib/repositories/progress-repository";
+import { getBackendMode } from "@/lib/supabase/config";
 
 export function LessonResult({
   lesson,
@@ -35,15 +37,42 @@ export function LessonResult({
   const rewardLessonCompletion = useAppStore(
     (state) => state.rewardLessonCompletion,
   );
-  const rewarded = useAppStore(
-    (state) => state.lessonSessions[lesson.id]?.rewarded ?? false,
+  const hydrateBackendProgress = useAppStore(
+    (state) => state.hydrateBackendProgress,
   );
   const streak = useAppStore((state) => state.user.streakDays);
   const [showMistakes, setShowMistakes] = useState(false);
+  const [serverSynced, setServerSynced] = useState(
+    getBackendMode() !== "supabase",
+  );
 
   useEffect(() => {
     rewardLessonCompletion(lesson, result);
-  }, [lesson, result, rewardLessonCompletion]);
+    if (getBackendMode() !== "supabase") return;
+
+    let cancelled = false;
+    const wait = (milliseconds: number) =>
+      new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds));
+
+    async function refreshCanonicalRewards() {
+      for (const delay of [300, 900, 1800]) {
+        await wait(delay);
+        if (cancelled) return;
+        const snapshot = await progressRepository.loadCurrent();
+        if (cancelled || !snapshot.ok) continue;
+        hydrateBackendProgress(snapshot.data);
+        if (snapshot.data.completedLessonIds.includes(lesson.id)) {
+          setServerSynced(true);
+          return;
+        }
+      }
+    }
+
+    void refreshCanonicalRewards();
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrateBackendProgress, lesson, result, rewardLessonCompletion]);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-paper px-5 py-10 sm:px-8 sm:py-16">
@@ -246,7 +275,7 @@ export function LessonResult({
           />
         </div>
         <p className="mt-5 text-center text-xs text-stone-400">
-          {rewarded
+          {serverSynced
             ? "Rewards saved once to your AIko profile."
             : "Saving your rewards…"}
         </p>
