@@ -8,6 +8,8 @@ type LessonAnswer = Database["public"]["Tables"]["lesson_activity_answers"]["Ins
 export interface LessonCompletionInput {
   sessionId: string;
   score: number;
+  /** Legacy client field accepted during rollout; the server ignores it. */
+  xp?: number;
   durationMinutes: number;
   completionData: Json;
 }
