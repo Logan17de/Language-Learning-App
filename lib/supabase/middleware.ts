@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { canAccessAdminPath } from "@/lib/auth/permissions";
 import { safeInternalRedirect } from "@/lib/auth/safe-internal-redirect";
+import { safePostOnboardingDestination } from "@/lib/auth/post-onboarding-destination";
 import { getSupabasePublicConfig } from "@/lib/supabase/config";
 import type { Database } from "@/types/database";
 
@@ -18,13 +19,15 @@ const learnerPrefixes = [
 ];
 
 function currentInternalTarget(request: NextRequest): string {
-  return safeInternalRedirect(
-    `${request.nextUrl.pathname}${request.nextUrl.search}`,
-  ) ?? request.nextUrl.pathname;
+  return (
+    safeInternalRedirect(`${request.nextUrl.pathname}${request.nextUrl.search}`) ??
+    request.nextUrl.pathname
+  );
 }
 
 export async function updateSession(request: NextRequest): Promise<NextResponse> {
   const pathname = request.nextUrl.pathname;
+  const isOnboarding = pathname === "/onboarding";
   const isAdminLogin = pathname === "/admin/login";
   const anyAdminPath = pathname === "/admin" || pathname.startsWith("/admin/");
   const protectedAdmin = anyAdminPath && !isAdminLogin;
@@ -74,11 +77,18 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
   }
 
   if (userId && protectedLearner) {
-    const profile = await supabase
-      .from("profiles")
-      .select("status")
-      .eq("id", userId)
-      .maybeSingle();
+    const [profile, preferences] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("status")
+        .eq("id", userId)
+        .maybeSingle(),
+      supabase
+        .from("user_preferences")
+        .select("onboarding_complete")
+        .eq("user_id", userId)
+        .maybeSingle(),
+    ]);
 
     if (profile.error || !profile.data || profile.data.status !== "active") {
       const url = request.nextUrl.clone();
@@ -91,6 +101,35 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
           ? "account-inactive"
           : "profile-load",
       );
+      return NextResponse.redirect(url);
+    }
+
+    if (preferences.error || !preferences.data) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      url.search = "";
+      url.searchParams.set("next", currentInternalTarget(request));
+      url.searchParams.set("error", "preferences-load");
+      return NextResponse.redirect(url);
+    }
+
+    if (!preferences.data.onboarding_complete && !isOnboarding) {
+      const url = request.nextUrl.clone();
+      const next = safePostOnboardingDestination(currentInternalTarget(request));
+      url.pathname = "/onboarding";
+      url.search = "";
+      if (next) url.searchParams.set("next", next);
+      return NextResponse.redirect(url);
+    }
+
+    if (preferences.data.onboarding_complete && isOnboarding) {
+      const url = request.nextUrl.clone();
+      const next = safePostOnboardingDestination(
+        request.nextUrl.searchParams.get("next"),
+      );
+      url.pathname = next ?? "/home";
+      url.search = next?.includes("?") ? next.slice(next.indexOf("?")) : "";
+      if (next?.includes("#")) url.hash = next.slice(next.indexOf("#"));
       return NextResponse.redirect(url);
     }
   }
