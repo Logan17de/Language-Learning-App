@@ -22,6 +22,7 @@ import { Brand } from "@/components/ui/brand";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { cn } from "@/lib/utils";
+import { safeInternalRedirect } from "@/lib/auth/safe-internal-redirect";
 import { profileRepository } from "@/lib/repositories/profile-repository";
 import { getBackendMode } from "@/lib/supabase/config";
 import { useAppStore } from "@/store/app-store";
@@ -101,8 +102,9 @@ export function OnboardingFlow() {
 
   function requestedNext() {
     if (typeof window === "undefined") return null;
-    const value = new URLSearchParams(window.location.search).get("next");
-    return value?.startsWith("/") && !value.startsWith("//") ? value : null;
+    return safeInternalRedirect(
+      new URLSearchParams(window.location.search).get("next"),
+    );
   }
 
   function next() {
