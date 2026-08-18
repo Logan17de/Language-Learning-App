@@ -17,6 +17,12 @@ interface OnboardingUpdate {
   dailyMinutes: DailyMinutes | null;
 }
 
+interface LearningPreferenceUpdate {
+  level?: LearnerLevel;
+  dailyMinutes?: DailyMinutes;
+  goal?: LearningGoal | null;
+}
+
 function toDatabaseLevel(
   level: LearnerLevel,
 ): Database["public"]["Enums"]["jlpt_level"] {
@@ -83,6 +89,60 @@ export const profileRepository = {
           "Your learning preferences could not be updated.",
         )
       : success(data);
+  },
+
+  async updateLearningPreferences(
+    values: LearningPreferenceUpdate,
+  ): Promise<RepositoryResult<ProfileRow>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { data: auth } = await client.auth.getUser();
+    if (!auth.user) {
+      return failure(
+        { code: "AUTH" },
+        "Your session has expired. Please sign in again.",
+      );
+    }
+
+    const profileValues: ProfileUpdate = {
+      ...(values.level
+        ? { current_jlpt_level: toDatabaseLevel(values.level) }
+        : {}),
+      ...(values.dailyMinutes
+        ? { daily_study_minutes: values.dailyMinutes }
+        : {}),
+      ...(values.goal !== undefined ? { learning_goal: values.goal } : {}),
+    };
+    const { data, error } = await client
+      .from("profiles")
+      .update(profileValues)
+      .eq("id", auth.user.id)
+      .select("*")
+      .single();
+    if (error) {
+      return failure(error, "Your learning preferences could not be updated.");
+    }
+
+    const preferenceValues: Database["public"]["Tables"]["user_preferences"]["Update"] = {
+      ...(values.dailyMinutes
+        ? { daily_study_minutes: values.dailyMinutes }
+        : {}),
+      ...(values.goal !== undefined ? { learning_goal: values.goal } : {}),
+    };
+    if (Object.keys(preferenceValues).length) {
+      const preferences = await client
+        .from("user_preferences")
+        .update(preferenceValues)
+        .eq("user_id", auth.user.id);
+      if (preferences.error) {
+        return failure(
+          preferences.error,
+          "Your learning preferences could not be updated.",
+        );
+      }
+    }
+
+    return success(data);
   },
 
   async saveOnboarding(
