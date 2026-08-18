@@ -46,7 +46,7 @@ begin
     raise exception 'Invalid completion metrics' using errcode = '22023';
   end if;
 
-  if p_completion_data is null or jsonb_typeof(p_completion_data) <> 'object' then
+  if jsonb_typeof(p_completion_data) <> 'object' then
     raise exception 'Completion data is required' using errcode = '22023';
   end if;
 
