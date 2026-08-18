@@ -1,4 +1,5 @@
 export const PASSWORD_RECOVERY_TTL_MS = 5 * 60 * 1000;
+export const PASSWORD_RECOVERY_RESEND_COOLDOWN_MS = 60 * 1000;
 
 const EMAIL_KEY = "aiko-password-recovery-email";
 const SENT_AT_KEY = "aiko-password-recovery-sent-at";
@@ -37,4 +38,11 @@ export function passwordRecoveryRemainingMs(
   now = Date.now(),
 ): number {
   return Math.max(0, PASSWORD_RECOVERY_TTL_MS - (now - sentAt));
+}
+
+export function passwordRecoveryResendRemainingMs(
+  sentAt: number,
+  now = Date.now(),
+): number {
+  return Math.max(0, PASSWORD_RECOVERY_RESEND_COOLDOWN_MS - (now - sentAt));
 }
