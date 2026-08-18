@@ -22,11 +22,11 @@ import { Card } from "@/components/ui/card";
 export const metadata: Metadata = {
   title: "AIko — Adaptive Language Learning",
   description:
-    "Learn Japanese through one level-matched story lesson at a time: Story, Vocabulary + Kanji, Grammar, Reading, Listening, and Speaking. Mastery updates automatically from practice.",
+    "Adaptive language learning through connected story lessons, practice, speaking, and automatic mastery. Japanese is the first language available in AIko.",
   openGraph: {
     title: "AIko — Adaptive Language Learning",
     description:
-      "Six connected Japanese lesson phases, adaptive grammar translation, and automatic mastery that helps shape what comes next.",
+      "Connected language lessons, adaptive practice, and automatic mastery. Japanese is the first language available in AIko.",
     type: "website",
   },
 };
@@ -46,7 +46,7 @@ const learningFlow: Array<{
   {
     number: "02",
     title: "Start with one connected story",
-    copy: "The story introduces the situation, vocabulary, kanji, and grammar that the rest of the lesson will keep reusing.",
+    copy: "The story introduces the situation, vocabulary, writing system, and grammar that the rest of the lesson will keep reusing.",
     icon: BookOpenText,
   },
   {
@@ -57,8 +57,8 @@ const learningFlow: Array<{
   },
   {
     number: "04",
-    title: "Produce Japanese in Grammar",
-    copy: "After grammar practice, adaptive English-to-Japanese translation asks you to actively use the lesson grammar plus reinforcement patterns when available.",
+    title: "Produce the language in Grammar",
+    copy: "In the Japanese course, adaptive English-to-Japanese translation asks you to actively use the lesson grammar plus reinforcement patterns when available.",
     icon: Lightbulb,
   },
   {
@@ -90,13 +90,13 @@ const lessonStages: Array<{
   {
     number: "02",
     title: "Vocabulary + Kanji",
-    copy: "Practise the useful words and focus kanji that appear in the lesson.",
+    copy: "Practise the useful words and focus kanji that appear in the current Japanese lesson.",
     icon: Languages,
   },
   {
     number: "03",
     title: "Grammar",
-    copy: "Learn the target patterns, answer grammar questions, then use Japanese in adaptive translation practice.",
+    copy: "Learn the target patterns, answer grammar questions, then use the target language in adaptive translation practice.",
     icon: Lightbulb,
   },
   {
@@ -114,7 +114,7 @@ const lessonStages: Array<{
   {
     number: "06",
     title: "Speaking",
-    copy: "Use the microphone to turn familiar lesson language into spoken Japanese.",
+    copy: "Use the microphone to turn familiar lesson language into spoken language.",
     icon: Mic,
   },
 ];
@@ -131,9 +131,10 @@ const learningSignals = [
 const plans = [
   {
     name: "Free",
-    copy: "The core AIko learning path for Japanese.",
+    copy: "The core AIko language-learning path. Japanese is available first.",
     features: [
-      "Core six-phase Japanese lessons",
+      "Core six-phase language lessons",
+      "Japanese course available first",
       "Level-matched lesson assignment",
       "Automatic mastery and progress tracking",
       "Grammar translation inside the lesson flow",
@@ -185,15 +186,16 @@ export default function LandingPage() {
                 id="hero-heading"
                 className="mt-7 max-w-4xl text-5xl font-semibold leading-[1.03] tracking-[-0.045em] text-ink sm:text-6xl lg:text-[4.5rem]"
               >
-                Learn Japanese through lessons that{" "}
+                Learn languages through lessons that{" "}
                 <span className="font-serif font-normal italic text-persimmon-500">
                   build on each other.
                 </span>
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-8 text-stone-600">
-                AIko gives you one level-matched lesson at a time. A single story becomes
-                Vocabulary + Kanji, Grammar, Reading, Listening, and Speaking practice, while
-                your activity updates mastery automatically and helps shape what comes next.
+                AIko is built for adaptive language learning. Japanese is the first language
+                available: one level-matched story becomes Vocabulary + Kanji, Grammar, Reading,
+                Listening, and Speaking practice, while your activity updates mastery automatically
+                and helps shape what comes next.
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 <PublicPrimaryAction
@@ -211,7 +213,7 @@ export default function LandingPage() {
               </div>
               <p className="mt-5 flex items-center gap-2 text-sm font-medium text-stone-500">
                 <span className="size-2 rounded-full bg-persimmon-500" aria-hidden="true" />
-                Currently focused on Japanese.
+                Japanese is the first language available in AIko.
               </p>
             </div>
 
@@ -320,8 +322,8 @@ export default function LandingPage() {
                 a separate learner-facing Review phase.
               </p>
               <p className="mt-5 max-w-xl rounded-2xl border-l-4 border-persimmon-500 bg-white px-5 py-4 font-medium leading-7 shadow-card">
-                Grammar also includes adaptive English-to-Japanese translation, so production
-                can contribute evidence instead of relying only on recognition questions.
+                In the Japanese course, Grammar includes adaptive English-to-Japanese translation,
+                so production can contribute evidence instead of relying only on recognition questions.
               </p>
             </div>
             <div className="rounded-4xl bg-moss-900 p-7 text-white sm:p-8">
@@ -499,9 +501,9 @@ export default function LandingPage() {
                   tutors did not reliably remember what needed more practice.
                 </p>
                 <p>
-                  That frustration became AIko: one story reused through Story, Vocabulary +
-                  Kanji, Grammar, Reading, Listening, and Speaking, with learning evidence and
-                  mastery recorded automatically instead of adding a separate Review stage.
+                  That frustration became a broader language-learning system: one story reused
+                  through connected practice, with learning evidence and mastery recorded
+                  automatically. Japanese is the first language built on that system.
                 </p>
                 <p>
                   Logan leads the learning design, product direction, experiments, and
@@ -517,8 +519,8 @@ export default function LandingPage() {
               <div className="flex flex-col gap-4" aria-label="About AIko's founder">
                 {[
                   {
-                    label: "Learning Japanese in Japan",
-                    copy: "The product is shaped around problems its founder experiences while learning the language himself.",
+                    label: "Language learner in Japan",
+                    copy: "The product is shaped around real language-learning problems its founder experiences himself.",
                     icon: UserRound,
                   },
                   {
@@ -557,7 +559,7 @@ export default function LandingPage() {
 
         <section className="px-5 py-12 sm:px-8 sm:py-16" aria-labelledby="final-cta-heading">
           <div className="mx-auto max-w-7xl overflow-hidden rounded-4xl bg-persimmon-50 px-6 py-10 text-center sm:px-16 sm:py-12">
-            <p className="section-kicker !text-persimmon-600">Your next Japanese lesson</p>
+            <p className="section-kicker !text-persimmon-600">Start your language-learning path</p>
             <h2
               id="final-cta-heading"
               className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl"
