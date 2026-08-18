@@ -74,7 +74,7 @@ export function HomeDashboard() {
             </div>
 
             <h2 className="mt-7 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
-              One story. Six ways to make the Japanese stick.
+              One story. Six ways to make the language stick.
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
               {!selectedLesson
