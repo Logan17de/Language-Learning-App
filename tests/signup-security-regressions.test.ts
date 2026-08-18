@@ -67,4 +67,11 @@ describe("signup security regressions", () => {
     expect(callbackPage).toContain('canonical: "/auth/callback"');
     expect(callbackPage).toContain('title: "Completing account setup"');
   });
+
+  it("links account creation to the existing legal policies", () => {
+    expect(signupFlow).toContain("By creating an account, you agree to the");
+    expect(signupFlow).toContain('href="/terms"');
+    expect(signupFlow).toContain('href="/privacy"');
+    expect(signupFlow).toContain("Privacy Policy");
+  });
 });
