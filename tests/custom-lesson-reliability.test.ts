@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   classifyGenerationError,
@@ -29,6 +29,9 @@ const schedulerMigration = readFileSync(
   "supabase/migrations/20260810100000_supabase_custom_lesson_scheduler.sql",
   "utf8",
 );
+const vercelConfig = JSON.parse(readFileSync("vercel.json", "utf8")) as {
+  crons?: unknown;
+};
 
 describe("custom lesson retry reliability", () => {
   it("classifies transient failures and applies bounded exponential backoff", () => {
@@ -99,7 +102,7 @@ describe("custom lesson retry reliability", () => {
   });
 
   it("uses one idempotent Supabase schedule with Vault-backed worker credentials", () => {
-    expect(existsSync("vercel.json")).toBe(false);
+    expect(vercelConfig.crons).toBeUndefined();
     expect(schedulerMigration).toContain("create extension if not exists pg_cron");
     expect(schedulerMigration).toContain("create extension if not exists pg_net");
     expect(schedulerMigration).toContain("create extension if not exists supabase_vault");
