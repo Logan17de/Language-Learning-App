@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Clock3, Flame, Gem, Target } from "lucide-react";
+import { ArrowRight, Flame, Gem, Target } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -26,26 +26,17 @@ export function HomeDashboard() {
     backendLessons.find(
       (lesson) => !progress.completedLessonIds.includes(lesson.id),
     ) ?? backendLessons[0];
-  const dailyPercent = user.dailyGoalMinutes
-    ? Math.min(
-        100,
-        Math.round((user.minutesStudiedToday / user.dailyGoalMinutes) * 100),
-      )
-    : 0;
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-9 lg:py-10">
       <header className="flex items-start justify-between gap-5">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="section-kicker">Today</p>
-            <span className="text-xs font-semibold text-muted">{user.level}</span>
-          </div>
+          <p className="section-kicker">Today</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-            おはよう, {user.name}.
+            Welcome back, {user.name}.
           </h1>
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted sm:text-base">
-            AIko chooses what to teach next, then uses your lesson activity to shape what comes after.
+            AIko chooses what to teach next, then uses what you do in each lesson to shape the lessons that follow.
           </p>
         </div>
         <Link
@@ -68,26 +59,26 @@ export function HomeDashboard() {
               <Badge tone="orange">Chosen for you</Badge>
               {selectedLesson && (
                 <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-semibold text-white/70">
-                  {selectedLesson.level} · 6 phases
+                  6 connected phases
                 </span>
               )}
             </div>
 
             <h2 className="mt-7 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
-              One story. Six ways to make the language stick.
+              One lesson. Six connected ways to build the language.
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
               {!selectedLesson
                 ? backendLoading
-                  ? "Choosing the next lesson that fits your level."
+                  ? "Choosing the next lesson that fits your learning path."
                   : backendError ||
-                    "No published lesson is available for your current level yet."
-                : "Start with a story, then reuse its language through vocabulary + kanji, grammar, reading, listening, and speaking. What you do in the lesson updates your progress and future targeting."}
+                    "No published lesson is available for your current course yet."
+                : "Start in context, then reuse the same language through vocabulary, grammar, reading, listening, and speaking. Your performance updates mastery and helps AIko choose what should come next."}
             </p>
 
             <div className="mt-7 flex flex-wrap gap-2 text-xs font-medium text-white/65">
               <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                Story → practice
+                Context → practice
               </span>
               <span className="rounded-full bg-white/[0.07] px-3 py-2">
                 6 connected phases
@@ -110,53 +101,34 @@ export function HomeDashboard() {
           </div>
         </Card>
 
-        <div className="grid gap-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-1">
           <Card className="p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold text-ink">Daily study goal</p>
-                <p className="mt-1 text-xs leading-5 text-muted">
-                  This tracks study time across your day; it does not set lesson length.
-                </p>
-              </div>
-              <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-moss-100 text-moss-700">
-                <Clock3 className="size-5" aria-hidden="true" />
-              </span>
-            </div>
-            <div className="mt-6 flex items-end justify-between gap-4">
-              <p className="text-3xl font-semibold tabular-nums">
-                {user.minutesStudiedToday}
-                <span className="ml-1 text-base font-medium text-muted">
-                  / {user.dailyGoalMinutes} min
-                </span>
-              </p>
-              <span className="text-sm font-semibold tabular-nums text-moss-700">
-                {dailyPercent}%
-              </span>
-            </div>
-            <ProgressBar value={dailyPercent} className="mt-3" />
+            <span className="grid size-10 place-items-center rounded-2xl bg-persimmon-50 text-persimmon-500">
+              <Flame className="size-5" aria-hidden="true" />
+            </span>
+            <p className="mt-5 text-3xl font-semibold tabular-nums">
+              {user.streakDays}
+            </p>
+            <p className="mt-1 text-sm font-semibold text-ink">
+              {user.streakDays === 1 ? "day streak" : "day streak"}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-muted">
+              Complete at least one lesson on consecutive days to keep your streak alive.
+            </p>
           </Card>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="p-5">
-              <span className="grid size-10 place-items-center rounded-2xl bg-persimmon-50 text-persimmon-500">
-                <Flame className="size-5" aria-hidden="true" />
-              </span>
-              <p className="mt-5 text-2xl font-semibold tabular-nums">
-                {user.streakDays}
-              </p>
-              <p className="mt-1 text-xs font-medium text-muted">day streak</p>
-            </Card>
-            <Card className="p-5">
-              <span className="grid size-10 place-items-center rounded-2xl bg-surface-muted text-muted">
-                <Gem className="size-5" aria-hidden="true" />
-              </span>
-              <p className="mt-5 text-2xl font-semibold tabular-nums">
-                {user.xp.toLocaleString()}
-              </p>
-              <p className="mt-1 text-xs font-medium text-muted">total XP</p>
-            </Card>
-          </div>
+          <Card className="p-5 sm:p-6">
+            <span className="grid size-10 place-items-center rounded-2xl bg-moss-100 text-moss-700">
+              <Gem className="size-5" aria-hidden="true" />
+            </span>
+            <p className="mt-5 text-3xl font-semibold tabular-nums">
+              {user.xp.toLocaleString()}
+            </p>
+            <p className="mt-1 text-sm font-semibold text-ink">total XP</p>
+            <p className="mt-2 text-xs leading-5 text-muted">
+              Each completed lesson earns 50 base XP plus your lesson score, up to 150 XP.
+            </p>
+          </Card>
         </div>
       </section>
 
@@ -167,25 +139,25 @@ export function HomeDashboard() {
               <Target className="size-5" aria-hidden="true" />
             </span>
             <span className="text-sm font-semibold tabular-nums text-moss-700">
-              {user.level} · {progress.levelCompletion}%
+              {progress.levelCompletion}%
             </span>
           </div>
-          <h2 className="mt-6 text-xl font-semibold">What’s becoming familiar</h2>
+          <h2 className="mt-6 text-xl font-semibold">Your learning progress</h2>
           <p className="mt-2 text-sm leading-6 text-muted">
-            AIko records mastery automatically from lesson activities. You do not have to manage a separate review queue.
+            Mastery updates automatically from your answers, listening, reading, and speaking activity across lessons.
           </p>
           <ProgressBar value={progress.levelCompletion} className="mt-5" />
           <div className="mt-5 grid grid-cols-3 gap-2 text-center">
             <MiniStat value={progress.learnedVocabularyCount} label="vocabulary" />
-            <MiniStat value={progress.learnedKanjiCount} label="kanji" />
             <MiniStat value={progress.learnedGrammarCount} label="grammar" />
+            <MiniStat value={progress.completedLessonIds.length} label="lessons" />
           </div>
           <ButtonLink
             href="/progress"
             variant="secondary"
             className="mt-5 w-full sm:w-auto"
           >
-            See what I’ve learned
+            See my progress
           </ButtonLink>
         </Card>
       </section>
