@@ -259,7 +259,18 @@ export function SignupFlow() {
         Tell us a little about your goals after creating your account.
       </p>
       <AuthForm mode="signup" />
-      <p className="mt-8 text-center text-sm text-stone-500">
+      <p className="mt-4 text-center text-xs leading-5 text-stone-500">
+        By creating an account, you agree to the{" "}
+        <Link className="font-semibold text-moss-700 hover:underline" href="/terms">
+          Terms
+        </Link>{" "}
+        and acknowledge the{" "}
+        <Link className="font-semibold text-moss-700 hover:underline" href="/privacy">
+          Privacy Policy
+        </Link>
+        .
+      </p>
+      <p className="mt-6 text-center text-sm text-stone-500">
         Already have an account?{" "}
         <Link
           className="font-semibold text-moss-700 hover:underline"
