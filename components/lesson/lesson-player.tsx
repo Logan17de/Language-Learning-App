@@ -130,10 +130,10 @@ export function LessonPlayer({
 
   useEffect(() => {
     if (!session) return;
-    const timer = window.setInterval(
-      () => setElapsedSeconds((value) => value + 1),
-      1000,
-    );
+    const timer = window.setInterval(() => {
+      if (document.visibilityState !== "visible") return;
+      setElapsedSeconds((value) => value + 1);
+    }, 1000);
     return () => window.clearInterval(timer);
   }, [session]);
 
