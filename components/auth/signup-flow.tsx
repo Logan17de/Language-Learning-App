@@ -135,12 +135,22 @@ export function SignupFlow() {
     router.replace(withSafeNext("/signup", requestedNext));
   }
 
-  if (
-    redirectTargetReady &&
-    hasHydrated &&
-    backendSessionChecked &&
-    isAuthenticated
-  ) {
+  if (!redirectTargetReady || !hasHydrated || !backendSessionChecked) {
+    return (
+      <AuthShell>
+        <div className="grid min-h-72 place-items-center text-center" aria-live="polite">
+          <div>
+            <LoaderCircle className="mx-auto size-7 animate-spin text-moss-700" aria-hidden="true" />
+            <p className="mt-4 text-sm font-semibold text-stone-500">
+              Checking your account status…
+            </p>
+          </div>
+        </div>
+      </AuthShell>
+    );
+  }
+
+  if (isAuthenticated) {
     return (
       <AuthShell>
         <div className="grid min-h-72 place-items-center text-center" aria-live="polite">
