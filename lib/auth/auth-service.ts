@@ -125,6 +125,59 @@ function friendlyRecoveryCodeMessage(message: string, code?: string): string {
   return "That code could not be verified. Check the 6 digits and try again.";
 }
 
+async function loadActiveIdentity(
+  client: NonNullable<ReturnType<typeof createClient>>,
+  userId: string,
+  fallbackEmail: string,
+): Promise<RepositoryResult<AuthIdentity>> {
+  const [profile, preferences] = await Promise.all([
+    client
+      .from("profiles")
+      .select("display_name,role,status,subscription_plan")
+      .eq("id", userId)
+      .single(),
+    client
+      .from("user_preferences")
+      .select("onboarding_complete")
+      .eq("user_id", userId)
+      .maybeSingle(),
+  ]);
+  if (profile.error) {
+    await client.auth.signOut({ scope: "local" });
+    return failure(profile.error, "Your profile could not be loaded.");
+  }
+  if (preferences.error) {
+    await client.auth.signOut({ scope: "local" });
+    return failure(
+      preferences.error,
+      "Your onboarding status could not be loaded.",
+    );
+  }
+  if (profile.data.status !== "active") {
+    await client.auth.signOut({ scope: "local" });
+    return failure(
+      { code: "42501" },
+      "This account is not active. Contact support.",
+    );
+  }
+  return success({
+    id: userId,
+    email: fallbackEmail,
+    displayName: profile.data.display_name,
+    role: profile.data.role,
+    subscriptionPlan: profile.data.subscription_plan,
+    onboardingComplete: preferences.data?.onboarding_complete ?? false,
+  });
+}
+
+function emailConfirmationCallback(next?: string) {
+  const callbackUrl = new URL("/auth/callback", getAppUrl());
+  callbackUrl.searchParams.set("flow", "email-confirmation");
+  const safeNext = safeInternalRedirect(next);
+  if (safeNext) callbackUrl.searchParams.set("next", safeNext);
+  return callbackUrl.toString();
+}
+
 export const authService = {
   async hasSession(): Promise<boolean> {
     const client = createClient();
@@ -187,7 +240,12 @@ export const authService = {
     password: string,
     displayName: string,
     next?: string,
-  ): Promise<RepositoryResult<{ confirmationRequired: boolean }>> {
+  ): Promise<
+    RepositoryResult<{
+      confirmationRequired: boolean;
+      identity: AuthIdentity | null;
+    }>
+  > {
     if (!isStrongEnough(password)) {
       return failure(
         { code: "WEAK_PASSWORD" },
@@ -196,20 +254,46 @@ export const authService = {
     }
     const client = createClient();
     if (!client) return notConfigured();
-    const callbackUrl = new URL("/auth/callback", getAppUrl());
-    const safeNext = safeInternalRedirect(next);
-    if (safeNext) callbackUrl.searchParams.set("next", safeNext);
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedDisplayName = displayName.trim();
     const { data, error } = await client.auth.signUp({
-      email,
+      email: normalizedEmail,
       password,
       options: {
-        emailRedirectTo: callbackUrl.toString(),
-        data: { display_name: displayName },
+        emailRedirectTo: emailConfirmationCallback(next),
+        data: { display_name: normalizedDisplayName },
       },
+    });
+    if (error) {
+      return failure(error, friendlyAuthMessage(error.message, error.code));
+    }
+    if (!data.session) {
+      return success({ confirmationRequired: true, identity: null });
+    }
+
+    const identity = await loadActiveIdentity(
+      client,
+      data.session.user.id,
+      data.session.user.email ?? normalizedEmail,
+    );
+    if (!identity.ok) return identity;
+    return success({ confirmationRequired: false, identity: identity.data });
+  },
+
+  async resendSignUpConfirmation(
+    email: string,
+    next?: string,
+  ): Promise<RepositoryResult<null>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { error } = await client.auth.resend({
+      type: "signup",
+      email: email.trim().toLowerCase(),
+      options: { emailRedirectTo: emailConfirmationCallback(next) },
     });
     return error
       ? failure(error, friendlyAuthMessage(error.message, error.code))
-      : success({ confirmationRequired: !data.session });
+      : success(null);
   },
 
   async signIn(
@@ -218,49 +302,17 @@ export const authService = {
   ): Promise<RepositoryResult<AuthIdentity>> {
     const client = createClient();
     if (!client) return notConfigured();
+    const normalizedEmail = email.trim().toLowerCase();
     const { data, error } = await client.auth.signInWithPassword({
-      email,
+      email: normalizedEmail,
       password,
     });
     if (error) return failure(error, friendlyAuthMessage(error.message, error.code));
-    const [profile, preferences] = await Promise.all([
-      client
-        .from("profiles")
-        .select("display_name,role,status,subscription_plan")
-        .eq("id", data.user.id)
-        .single(),
-      client
-        .from("user_preferences")
-        .select("onboarding_complete")
-        .eq("user_id", data.user.id)
-        .maybeSingle(),
-    ]);
-    if (profile.error) {
-      await client.auth.signOut({ scope: "local" });
-      return failure(profile.error, "Your profile could not be loaded.");
-    }
-    if (preferences.error) {
-      await client.auth.signOut({ scope: "local" });
-      return failure(
-        preferences.error,
-        "Your onboarding status could not be loaded.",
-      );
-    }
-    if (profile.data.status !== "active") {
-      await client.auth.signOut({ scope: "local" });
-      return failure(
-        { code: "42501" },
-        "This account is not active. Contact support.",
-      );
-    }
-    return success({
-      id: data.user.id,
-      email: data.user.email ?? email,
-      displayName: profile.data.display_name,
-      role: profile.data.role,
-      subscriptionPlan: profile.data.subscription_plan,
-      onboardingComplete: preferences.data?.onboarding_complete ?? false,
-    });
+    return loadActiveIdentity(
+      client,
+      data.user.id,
+      data.user.email ?? normalizedEmail,
+    );
   },
 
   async signInWithGoogle(
