@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
 import { useAppStore } from "@/store/app-store";
 import { authService } from "@/lib/auth/auth-service";
+import { prepareAccountScope } from "@/lib/auth/account-scope";
 import { safeInternalRedirect } from "@/lib/auth/safe-internal-redirect";
 import { getBackendMode } from "@/lib/supabase/config";
 import {
@@ -108,6 +109,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       setLoading(false);
       if (!result.ok) return setError(result.error.message);
       accountOnboardingComplete = result.data.onboardingComplete;
+      prepareAccountScope(result.data.id, useAppStore.getState().signOut);
       syncBackendIdentity(
         result.data.id,
         result.data.displayName,
