@@ -15,6 +15,9 @@ const middleware = source("lib/supabase/middleware.ts");
 const hydrator = source("components/backend/backend-session-hydrator.tsx");
 const accountScope = source("lib/auth/account-scope.ts");
 const onboarding = source("components/onboarding/onboarding-flow.tsx");
+const postOnboardingDestination = source(
+  "lib/auth/post-onboarding-destination.ts",
+);
 
 describe("login security regressions", () => {
   it("accepts only normalized AIko-internal redirect targets", () => {
@@ -31,12 +34,13 @@ describe("login security regressions", () => {
     );
   });
 
-  it("uses the shared redirect validator throughout auth and onboarding", () => {
+  it("uses the shared redirect validator throughout auth and stricter onboarding handoff", () => {
     expect(authService).toContain("safeInternalRedirect(next)");
     expect(authForm).toContain("safeInternalRedirect(");
     expect(loginFlow).toContain("withSafeNext(\"/signup\", requestedNext)");
     expect(oauthCallback).toContain("safeInternalRedirect(url.searchParams.get(\"next\"))");
-    expect(onboarding).toContain("safeInternalRedirect(");
+    expect(postOnboardingDestination).toContain("safeInternalRedirect(value)");
+    expect(onboarding).toContain("safePostOnboardingDestination(");
   });
 
   it("cleans up invalid password sessions and rejects inactive identities", () => {
@@ -45,12 +49,12 @@ describe("login security regressions", () => {
     expect(authService).toContain("Your onboarding status could not be loaded.");
   });
 
-  it("requires an active learner profile in middleware and Google OAuth", () => {
+  it("requires an active learner profile in middleware and auth callbacks", () => {
     expect(middleware).toContain("if (userId && protectedLearner)");
     expect(middleware).toContain('.select("status")');
     expect(middleware).toContain('profile.data.status !== "active"');
-    expect(oauthCallback).toContain('returnToAuth(googleFlow, "account-inactive", explicitNext)');
-    expect(oauthCallback).toContain('returnToAuth(googleFlow, "preferences-load", explicitNext)');
+    expect(oauthCallback).toContain('returnToAuth(callbackFlow, "account-inactive", explicitNext)');
+    expect(oauthCallback).toContain('returnToAuth(callbackFlow, "preferences-load", explicitNext)');
   });
 
   it("preserves next through login, signup, OAuth errors, and onboarding", () => {
@@ -60,10 +64,13 @@ describe("login security regressions", () => {
     expect(oauthCallback).toContain("`/onboarding?next=${encodeURIComponent(explicitNext)}`");
   });
 
-  it("prevents cross-account local-state reuse", () => {
+  it("prevents cross-account local and backend-state reuse", () => {
     expect(accountScope).toContain("previousOwner !== userId");
     expect(accountScope).toContain("resetAccountState()");
-    expect(hydrator).toContain("prepareAccountScope(result.data.id, signOut)");
+    expect(hydrator).toContain("prepareAccountScope(userId, resetScopedState)");
+    expect(hydrator).toContain("useBackendLessonStore.getState().reset()");
+    expect(hydrator).toContain("useBackendProgressStore.getState().reset()");
+    expect(hydrator).toContain("useBackendLessonStore.getState().scopeTo(userId)");
     expect(authForm).toContain(
       "prepareAccountScope(result.data.id, useAppStore.getState().signOut)",
     );

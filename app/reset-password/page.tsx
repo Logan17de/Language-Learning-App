@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { CheckCircle2, Eye, EyeOff, KeyRound, ShieldCheck } from "lucide-react";
 import { AuthShell } from "@/components/auth/auth-shell";
@@ -18,6 +19,10 @@ import {
   PASSWORD_MIN_LENGTH,
   PASSWORD_REQUIREMENTS_MESSAGE,
 } from "@/lib/auth/password-strength";
+import {
+  safeInternalRedirect,
+  withSafeNext,
+} from "@/lib/auth/safe-internal-redirect";
 import { AIKO_SUPPORT_EMAIL, AIKO_SUPPORT_MAILTO } from "@/lib/contact";
 
 export default function ResetPasswordPage() {
@@ -32,11 +37,17 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [requestedNext, setRequestedNext] = useState<string | null>(null);
 
   useEffect(() => {
     const current = readPasswordRecoveryAttempt();
     setAttempt(current);
     if (current) setRemainingMs(passwordRecoveryRemainingMs(current.sentAt));
+    setRequestedNext(
+      safeInternalRedirect(
+        new URLSearchParams(window.location.search).get("next"),
+      ),
+    );
   }, []);
 
   useEffect(() => {
@@ -125,7 +136,7 @@ export default function ResetPasswordPage() {
         <p className="mt-3 leading-7 text-stone-500">
           Your new password is ready. Sign in again with your updated password.
         </p>
-        <ButtonLink href="/login" className="mt-8 w-full">
+        <ButtonLink href={withSafeNext("/login", requestedNext)} className="mt-8 w-full">
           Return to login
         </ButtonLink>
       </AuthShell>
@@ -142,9 +153,17 @@ export default function ResetPasswordPage() {
         <p className="mt-3 leading-7 text-stone-500">
           There isn’t an active password-reset request in this browser. Start again and we’ll email you a fresh 6-digit code.
         </p>
-        <ButtonLink href="/forgot-password" className="mt-8 w-full">
+        <ButtonLink href={withSafeNext("/forgot-password", requestedNext)} className="mt-8 w-full">
           Start password recovery
         </ButtonLink>
+        <p className="mt-5 text-center text-sm text-stone-600">
+          <Link
+            href={withSafeNext("/login", requestedNext)}
+            className="font-semibold text-moss-700 hover:underline"
+          >
+            Back to login
+          </Link>
+        </p>
       </AuthShell>
     );
   }
@@ -195,16 +214,28 @@ export default function ResetPasswordPage() {
         </form>
 
         {expired && (
-          <ButtonLink href="/forgot-password" variant="secondary" className="mt-3 w-full">
+          <ButtonLink
+            href={withSafeNext("/forgot-password", requestedNext)}
+            variant="secondary"
+            className="mt-3 w-full"
+          >
             Request a new code
           </ButtonLink>
         )}
-        <p className="mt-6 text-center text-xs leading-5 text-stone-400">
+        <p className="mt-6 text-center text-xs leading-5 text-stone-600">
           Need help? Email{" "}
           <a className="font-semibold text-moss-700 hover:underline" href={AIKO_SUPPORT_MAILTO}>
             {AIKO_SUPPORT_EMAIL}
           </a>
           .
+        </p>
+        <p className="mt-3 text-center text-sm text-stone-600">
+          <Link
+            href={withSafeNext("/login", requestedNext)}
+            className="font-semibold text-moss-700 hover:underline"
+          >
+            Back to login
+          </Link>
         </p>
       </AuthShell>
     );
@@ -291,7 +322,7 @@ function PasswordVisibility({
     <button
       type="button"
       onClick={onToggle}
-      className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-stone-400 hover:bg-stone-50"
+      className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-stone-600 hover:bg-stone-50"
       aria-label={shown ? "Hide password" : "Show password"}
     >
       {shown ? <EyeOff className="size-5" /> : <Eye className="size-5" />}

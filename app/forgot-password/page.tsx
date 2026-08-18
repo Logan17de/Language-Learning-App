@@ -1,18 +1,32 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import Link from "next/link";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Mail } from "lucide-react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
 import { authService } from "@/lib/auth/auth-service";
 import { savePasswordRecoveryAttempt } from "@/lib/auth/password-recovery";
+import {
+  safeInternalRedirect,
+  withSafeNext,
+} from "@/lib/auth/safe-internal-redirect";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [requestedNext, setRequestedNext] = useState<string | null>(null);
+
+  useEffect(() => {
+    setRequestedNext(
+      safeInternalRedirect(
+        new URLSearchParams(window.location.search).get("next"),
+      ),
+    );
+  }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -24,7 +38,7 @@ export default function ForgotPasswordPage() {
     if (!result.ok) return setError(result.error.message);
 
     savePasswordRecoveryAttempt(normalizedEmail);
-    router.push("/reset-password");
+    router.push(withSafeNext("/reset-password", requestedNext));
   }
 
   return (
@@ -63,6 +77,14 @@ export default function ForgotPasswordPage() {
           {loading ? "Sending code…" : "Send reset code"}
         </Button>
       </form>
+      <p className="mt-6 text-center text-sm text-stone-600">
+        <Link
+          href={withSafeNext("/login", requestedNext)}
+          className="font-semibold text-moss-700 hover:underline"
+        >
+          Back to login
+        </Link>
+      </p>
     </AuthShell>
   );
 }

@@ -8,6 +8,7 @@ function source(path: string): string {
 const hydrator = source("components/backend/backend-session-hydrator.tsx");
 const guard = source("components/auth/learner-route-guard.tsx");
 const backendStore = source("store/backend-lesson-store.ts");
+const progressStore = source("store/backend-progress-store.ts");
 
 describe("returning to the browser tab keeps learner pages static", () => {
   it("blocks the route only for the initial backend session restoration", () => {
@@ -26,11 +27,17 @@ describe("returning to the browser tab keeps learner pages static", () => {
     expect(guard).toContain("!backendSessionChecked");
   });
 
-  it("revalidates lesson assignment data without replacing an already-rendered card with loading UI", () => {
-    expect(backendStore).toContain(
-      "const blocking = !current.loaded && current.lessons.length === 0;",
-    );
-    expect(backendStore).toContain("if (blocking) set({ loading: true");
-    expect(backendStore).toContain("lessons: blocking ? [] : state.lessons");
+  it("revalidates a same-account lesson without replacing trusted assignment UI with loading", () => {
+    expect(backendStore).toContain("current.status === \"idle\"");
+    expect(backendStore).toContain("if (blocking) {");
+    expect(backendStore).toContain("status: \"loading\"");
+    expect(backendStore).toContain("const hasTrustedLesson = !blocking && get().lessons.length > 0");
+    expect(backendStore).toContain("status: hasTrustedLesson ? \"ready\" : \"error\"");
+  });
+
+  it("keeps the last trusted progress snapshot during silent background refresh failures", () => {
+    expect(progressStore).toContain("if (!blocking && current.status === \"ready\") return;");
+    expect(progressStore).toContain("if (!blocking && get().status === \"ready\") return;");
+    expect(hydrator).toContain(".fail(userId, progress.error.message, blocking)");
   });
 });

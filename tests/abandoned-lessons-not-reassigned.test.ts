@@ -36,16 +36,18 @@ describe("abandoned lessons are never shown as the next lesson", () => {
     );
   });
 
-  it("revalidates the backend assignment without flashing a loader after first load", () => {
+  it("revalidates a trusted same-account assignment without flashing a loader", () => {
     expect(backendStore).not.toContain("get().loaded) return");
+    expect(backendStore).toContain("const blocking =");
+    expect(backendStore).toContain('current.status === "idle"');
+    expect(backendStore).toContain('current.status === "error"');
+    expect(backendStore).toContain("if (blocking) {");
+    expect(backendStore).toContain('status: "loading"');
     expect(backendStore).toContain(
-      "const blocking = !current.loaded && current.lessons.length === 0;",
+      "const hasTrustedLesson = !blocking && get().lessons.length > 0",
     );
     expect(backendStore).toContain(
-      "if (blocking) set({ loading: true, error: \"\" });",
-    );
-    expect(backendStore).toContain(
-      "lessons: blocking ? [] : state.lessons",
+      'status: hasTrustedLesson ? "ready" : "error"',
     );
   });
 });

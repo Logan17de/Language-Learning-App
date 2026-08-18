@@ -27,6 +27,7 @@ export interface BackendProgressSnapshot {
   learnedVocabularyCount: number;
   learnedKanjiCount: number;
   learnedGrammarCount: number;
+  completedLessonCount: number;
   xp: number;
   streakDays: number;
   longestStreak: number;
@@ -103,6 +104,7 @@ export const progressRepository = {
       weekly,
       mastery,
       completions,
+      completionCount,
       earned,
       definitions,
       lessons,
@@ -134,6 +136,10 @@ export const progressRepository = {
         .eq("user_id", userId)
         .order("completed_at", { ascending: false })
         .limit(20),
+      client
+        .from("lesson_completions")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId),
       client.from("user_achievements").select("*").eq("user_id", userId),
       client.from("achievements").select("*").eq("active", true),
       client.from("lessons").select("id,legacy_id,title"),
@@ -144,6 +150,7 @@ export const progressRepository = {
       weekly,
       mastery,
       completions,
+      completionCount,
       earned,
       definitions,
       lessons,
@@ -251,6 +258,7 @@ export const progressRepository = {
       ),
       learnedKanjiCount: summaryNumber(summary.data, "learned_kanji"),
       learnedGrammarCount: summaryNumber(summary.data, "learned_grammar"),
+      completedLessonCount: completionCount.count ?? 0,
       xp: profile.data.xp,
       streakDays: effectiveStreakDays(
         profile.data.streak_days,

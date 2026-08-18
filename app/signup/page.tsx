@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { AuthForm } from "@/components/auth/auth-form";
-import { AuthShell } from "@/components/auth/auth-shell";
+import { SignupFlow } from "@/components/auth/signup-flow";
 
-export const metadata: Metadata = { title: "Sign up" };
+export const metadata: Metadata = {
+  title: "Sign up",
+  description: "Create your AIko language-learning account.",
+  robots: { index: false, follow: false },
+  alternates: { canonical: "/signup" },
+};
 
 export default function SignupPage() {
-  return (
-    <AuthShell>
-      <h1 className="mt-12 text-4xl font-semibold tracking-tight">Build language skills that last.</h1>
-      <p className="mt-3 text-stone-500">Tell us a little about your goals after creating your account.</p>
-      <AuthForm mode="signup" />
-      <p className="mt-8 text-center text-sm text-stone-500">Already have an account? <Link className="font-semibold text-moss-700 hover:underline" href="/login">Log in</Link></p>
-    </AuthShell>
-  );
+  return <SignupFlow />;
 }

@@ -8,7 +8,11 @@ import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter
 import { useAppStore } from "@/store/app-store";
 import { authService } from "@/lib/auth/auth-service";
 import { prepareAccountScope } from "@/lib/auth/account-scope";
-import { safeInternalRedirect } from "@/lib/auth/safe-internal-redirect";
+import { savePendingSignupConfirmation } from "@/lib/auth/pending-signup-confirmation";
+import {
+  safeInternalRedirect,
+  withSafeNext,
+} from "@/lib/auth/safe-internal-redirect";
 import { getBackendMode } from "@/lib/supabase/config";
 import {
   isStrongEnough,
@@ -16,9 +20,10 @@ import {
   PASSWORD_REQUIREMENTS_MESSAGE,
 } from "@/lib/auth/password-strength";
 
+const FIRST_NAME_MAX_LENGTH = 50;
+
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
-  const signIn = useAppStore((state) => state.signIn);
   const syncBackendIdentity = useAppStore((state) => state.syncBackendIdentity);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,6 +32,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [requestedNext, setRequestedNext] = useState<string | null>(null);
   const backendMode = getBackendMode();
 
   useEffect(() => {
@@ -46,7 +52,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       "backend-not-configured":
         "Authentication is not configured for this deployment.",
       "auth-callback":
-        "Google sign-in could not be completed. Please try again.",
+        "Account setup could not be completed. Please try again.",
       "account-inactive":
         "This account is not active. Contact support if you think this is a mistake.",
       "profile-load":
@@ -56,23 +62,18 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     };
     const message = code ? messages[code] : null;
     const confirmationRequired = params.get("confirmation") === "required";
+    const next = safeInternalRedirect(params.get("next"));
     const timer = window.setTimeout(() => {
+      setRequestedNext(next);
       if (message) setError(message);
       if (confirmationRequired) {
         setNotice(
-          "Account created. Check your email and confirm your address, then come back here to log in.",
+          "Account created. Check your email and confirm your address before logging in.",
         );
       }
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
-
-  const requestedNext = () => {
-    if (typeof window === "undefined") return null;
-    return safeInternalRedirect(
-      new URLSearchParams(window.location.search).get("next"),
-    );
-  };
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -82,12 +83,25 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       setError("Authentication is not configured for this deployment.");
       return;
     }
-    if (mode === "signup" && !isStrongEnough(password)) {
-      setError(PASSWORD_REQUIREMENTS_MESSAGE);
-      return;
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedName = name.trim();
+    if (mode === "signup") {
+      if (!normalizedName) {
+        setError("Enter your first name.");
+        return;
+      }
+      if (normalizedName.length > FIRST_NAME_MAX_LENGTH) {
+        setError(`First name must be ${FIRST_NAME_MAX_LENGTH} characters or fewer.`);
+        return;
+      }
+      if (!isStrongEnough(password)) {
+        setError(PASSWORD_REQUIREMENTS_MESSAGE);
+        return;
+      }
     }
 
-    const next = requestedNext();
+    const next = requestedNext;
     const onboardingHref = next
       ? `/onboarding?next=${encodeURIComponent(next)}`
       : "/onboarding";
@@ -95,17 +109,36 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     setLoading(true);
     let accountOnboardingComplete = false;
     if (mode === "signup") {
-      const result = await authService.signUp(email, password, name, next ?? undefined);
+      const result = await authService.signUp(
+        normalizedEmail,
+        password,
+        normalizedName,
+        next ?? undefined,
+      );
       setLoading(false);
       if (!result.ok) return setError(result.error.message);
       if (result.data.confirmationRequired) {
-        const nextQuery = next ? `&next=${encodeURIComponent(next)}` : "";
-        router.push(`/login?confirmation=required${nextQuery}`);
+        savePendingSignupConfirmation(normalizedEmail, next);
+        router.push(withSafeNext("/signup?confirmation=required", next));
         return;
       }
-      signIn(name);
+      if (!result.data.identity) {
+        setError("Your new account could not be initialized. Please try again.");
+        return;
+      }
+      accountOnboardingComplete = result.data.identity.onboardingComplete;
+      prepareAccountScope(
+        result.data.identity.id,
+        useAppStore.getState().signOut,
+      );
+      syncBackendIdentity(
+        result.data.identity.id,
+        result.data.identity.displayName,
+        result.data.identity.email,
+        result.data.identity.onboardingComplete,
+      );
     } else {
-      const result = await authService.signIn(email, password);
+      const result = await authService.signIn(normalizedEmail, password);
       setLoading(false);
       if (!result.ok) return setError(result.error.message);
       accountOnboardingComplete = result.data.onboardingComplete;
@@ -118,9 +151,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       );
     }
     router.push(
-      mode === "signup" || !accountOnboardingComplete
-        ? onboardingHref
-        : (next ?? "/home"),
+      !accountOnboardingComplete ? onboardingHref : (next ?? "/home"),
     );
     router.refresh();
   }
@@ -135,7 +166,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     setLoading(true);
     const result = await authService.signInWithGoogle(
       mode,
-      requestedNext() ?? undefined,
+      requestedNext ?? undefined,
     );
     if (!result.ok) {
       setLoading(false);
@@ -177,6 +208,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           </span>
           <input
             required
+            maxLength={FIRST_NAME_MAX_LENGTH}
             value={name}
             onChange={(event) => setName(event.target.value)}
             className="form-input"
@@ -243,7 +275,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       {mode === "login" && (
         <div className="text-right">
           <a
-            href="/forgot-password"
+            href={withSafeNext("/forgot-password", requestedNext)}
             className="text-sm font-semibold text-moss-700 hover:underline"
           >
             Forgot password?

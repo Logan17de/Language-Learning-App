@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { getBackendMode } from "@/lib/supabase/config";
 import { useAppStore } from "@/store/app-store";
+import { useBackendLessonStore } from "@/store/backend-lesson-store";
+import { useBackendProgressStore } from "@/store/backend-progress-store";
 import { authService } from "@/lib/auth/auth-service";
 import { prepareAccountScope } from "@/lib/auth/account-scope";
 import { progressRepository } from "@/lib/repositories/progress-repository";
@@ -29,6 +31,12 @@ export function BackendSessionHydrator() {
 
     let active = true;
 
+    function resetScopedState() {
+      signOut();
+      useBackendLessonStore.getState().reset();
+      useBackendProgressStore.getState().reset();
+    }
+
     async function hydrate(blocking: boolean) {
       // Only the first account restore is allowed to block protected routes.
       // Supabase also emits auth events for token/session refreshes (commonly
@@ -45,20 +53,24 @@ export function BackendSessionHydrator() {
         // that already has a valid learner session. The next auth event can
         // retry it. Initial restoration remains strict.
         if (blocking) {
-          signOut();
+          resetScopedState();
           if (active) setLoading(false);
         }
         return;
       }
       if (!result.data) {
-        signOut();
+        resetScopedState();
         if (active) setLoading(false);
         return;
       }
 
-      prepareAccountScope(result.data.id, signOut);
+      const userId = result.data.id;
+      prepareAccountScope(userId, resetScopedState);
+      useBackendLessonStore.getState().scopeTo(userId);
+      useBackendProgressStore.getState().begin(userId, blocking);
+
       syncBackendIdentity(
-        result.data.id,
+        userId,
         result.data.displayName,
         result.data.email,
         result.data.onboardingComplete,
@@ -72,20 +84,38 @@ export function BackendSessionHydrator() {
         progressRepository.loadCurrent(),
         settingsRepository.loadCurrent(),
       ]);
-      if (progress.ok) hydrateBackendProgress(progress.data);
-      if (settings.ok) {
+
+      const accountStillCurrent =
+        useBackendProgressStore.getState().ownerUserId === userId &&
+        useAppStore.getState().user.id === userId;
+
+      if (progress.ok) {
+        if (accountStillCurrent) {
+          hydrateBackendProgress(progress.data);
+          useBackendProgressStore
+            .getState()
+            .succeed(userId, progress.data.completedLessonCount);
+        }
+      } else {
+        useBackendProgressStore
+          .getState()
+          .fail(userId, progress.error.message, blocking);
+      }
+
+      if (settings.ok && accountStillCurrent) {
         // Server-backed settings replace any stale device-local settings without
         // writing them straight back to Supabase during hydration.
         useAppStore.setState({ settings: settings.data });
       }
-      setBackendSessionChecked(true);
+
+      if (accountStillCurrent) setBackendSessionChecked(true);
       if (blocking && active) setLoading(false);
     }
 
     void hydrate(true);
     const unsubscribe = authService.subscribe((signedIn) => {
       if (!signedIn) {
-        signOut();
+        resetScopedState();
         if (active) setLoading(false);
         return;
       }
