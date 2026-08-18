@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
 import { useAppStore } from "@/store/app-store";
 import { authService } from "@/lib/auth/auth-service";
+import { safeInternalRedirect } from "@/lib/auth/safe-internal-redirect";
 import { getBackendMode } from "@/lib/supabase/config";
 import {
   isStrongEnough,
@@ -14,15 +15,10 @@ import {
   PASSWORD_REQUIREMENTS_MESSAGE,
 } from "@/lib/auth/password-strength";
 
-export function AuthForm({
-  mode,
-  onForgotPassword,
-}: {
-  mode: "login" | "signup";
-  onForgotPassword?: () => void;
-}) {
+export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
   const signIn = useAppStore((state) => state.signIn);
+  const syncBackendIdentity = useAppStore((state) => state.syncBackendIdentity);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
@@ -37,9 +33,9 @@ export function AuthForm({
     const code = params.get("error");
     const messages: Record<string, string> = {
       "no-google-account":
-        "Hey there! Looks like you don’t have an AIko account yet — no worries, we’ve all been there! Jump in and create one to start learning. You’ve got this! 😗",
+        "No AIko account is linked to this Google account. Create an account first.",
       "oauth-cancelled":
-        "Google sign-in was cancelled or did not return an authorization code. Please try again.",
+        "Google sign-in was cancelled. You can try again when you’re ready.",
       "oauth-exchange":
         "Google sign-in could not be completed. Please try again.",
       "oauth-verifier":
@@ -50,6 +46,12 @@ export function AuthForm({
         "Authentication is not configured for this deployment.",
       "auth-callback":
         "Google sign-in could not be completed. Please try again.",
+      "account-inactive":
+        "This account is not active. Contact support if you think this is a mistake.",
+      "profile-load":
+        "Your learner profile could not be verified. Please try signing in again.",
+      "preferences-load":
+        "Your learning preferences could not be loaded. Please try signing in again.",
     };
     const message = code ? messages[code] : null;
     const confirmationRequired = params.get("confirmation") === "required";
@@ -66,8 +68,9 @@ export function AuthForm({
 
   const requestedNext = () => {
     if (typeof window === "undefined") return null;
-    const value = new URLSearchParams(window.location.search).get("next");
-    return value?.startsWith("/") && !value.startsWith("//") ? value : null;
+    return safeInternalRedirect(
+      new URLSearchParams(window.location.search).get("next"),
+    );
   };
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -91,7 +94,7 @@ export function AuthForm({
     setLoading(true);
     let accountOnboardingComplete = false;
     if (mode === "signup") {
-      const result = await authService.signUp(email, password, name);
+      const result = await authService.signUp(email, password, name, next ?? undefined);
       setLoading(false);
       if (!result.ok) return setError(result.error.message);
       if (result.data.confirmationRequired) {
@@ -105,7 +108,12 @@ export function AuthForm({
       setLoading(false);
       if (!result.ok) return setError(result.error.message);
       accountOnboardingComplete = result.data.onboardingComplete;
-      signIn(result.data.displayName);
+      syncBackendIdentity(
+        result.data.id,
+        result.data.displayName,
+        result.data.email,
+        result.data.onboardingComplete,
+      );
     }
     router.push(
       mode === "signup" || !accountOnboardingComplete
@@ -135,6 +143,14 @@ export function AuthForm({
 
   return (
     <form className="mt-8 space-y-5" onSubmit={submit}>
+      {backendMode !== "supabase" && (
+        <p
+          role="alert"
+          className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold leading-6 text-red-700"
+        >
+          Authentication is unavailable because this deployment is missing its backend configuration.
+        </p>
+      )}
       <Button
         type="button"
         variant="secondary"
@@ -147,7 +163,7 @@ export function AuthForm({
           ? "Log in with Google"
           : "Create account with Google"}
       </Button>
-      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[.16em] text-stone-300">
+      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[.16em] text-stone-500">
         <span className="h-px flex-1 bg-stone-200" />
         or use email
         <span className="h-px flex-1 bg-stone-200" />
@@ -203,7 +219,7 @@ export function AuthForm({
           <button
             type="button"
             onClick={() => setShowPassword((value) => !value)}
-            className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-stone-400 hover:bg-stone-50"
+            className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-stone-500 hover:bg-stone-50"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
@@ -216,7 +232,7 @@ export function AuthForm({
         {mode === "signup" ? (
           <PasswordStrengthMeter password={password} />
         ) : (
-          <p className="mt-2 text-xs leading-5 text-stone-400">
+          <p className="mt-2 text-xs leading-5 text-stone-500">
             Password strength is checked when you create or reset a password.
             Enter the password for your existing AIko account here.
           </p>
@@ -224,22 +240,12 @@ export function AuthForm({
       </label>
       {mode === "login" && (
         <div className="text-right">
-          {onForgotPassword ? (
-            <button
-              type="button"
-              className="text-sm font-semibold text-moss-700 hover:underline"
-              onClick={onForgotPassword}
-            >
-              Forgot password?
-            </button>
-          ) : (
-            <a
-              href="/forgot-password"
-              className="text-sm font-semibold text-moss-700 hover:underline"
-            >
-              Forgot password?
-            </a>
-          )}
+          <a
+            href="/forgot-password"
+            className="text-sm font-semibold text-moss-700 hover:underline"
+          >
+            Forgot password?
+          </a>
         </div>
       )}
       {notice && (
@@ -265,7 +271,7 @@ export function AuthForm({
       >
         {loading && <LoaderCircle className="size-4 animate-spin" />}
         {loading
-          ? "Preparing your path…"
+          ? mode === "login" ? "Logging in…" : "Creating account…"
           : mode === "login"
             ? "Log in"
             : "Create my account"}
