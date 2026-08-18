@@ -1,6 +1,8 @@
-# AIko — adaptive Japanese learning
+# AIko — adaptive language learning
 
-AIko is a Japanese-learning application built around connected lessons, durable custom-lesson generation, learner mastery, and a private owner-admin workspace.
+AIko is a language-learning application built around connected lessons, durable custom-lesson generation, learner mastery, and a private owner-admin workspace. Japanese is the first supported language.
+
+The canonical production origin is **https://aiko.zetbros.com**. Generated Vercel deployment hostnames are infrastructure addresses, not public AIko URLs.
 
 The repository is production-oriented. Supabase is the source of truth for authentication, learner data, lesson assignment, progress, content, and administration. Missing backend configuration fails closed; there is no local demo-login or mock production fallback.
 
@@ -59,7 +61,7 @@ Important constraints:
 
 Learner and admin authentication use Supabase Auth. Protected routes do not trust persisted client state as proof of authentication.
 
-Google OAuth requires the provider to be enabled in Supabase and the application callback URL to be registered. Email/password authentication is also supported when enabled in Supabase.
+Google OAuth requires the provider to be enabled in Supabase and the application callback URL to be registered. The canonical production callback base is `https://aiko.zetbros.com`; staging and localhost redirects are allowed separately for testing. Email/password authentication is also supported when enabled in Supabase.
 
 The owner-admin workspace is restricted by server-side authorization and database policy. Client role strings are not an authorization boundary.
 
@@ -74,10 +76,12 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_APP_URL=
+NEXT_PUBLIC_APP_URL=https://aiko.zetbros.com
 OPENAI_API_KEY=
 CUSTOM_LESSON_WORKER_SECRET=
 ```
+
+Production code treats `https://aiko.zetbros.com` as the canonical origin even if a stale Vercel URL remains in `NEXT_PUBLIC_APP_URL`. Preview deployments remain independently testable.
 
 Additional model/transcription variables are documented in `.env.example`.
 
@@ -90,7 +94,7 @@ The custom-lesson scheduler reads its endpoint and bearer value from Supabase Va
 - `custom_lesson_worker_url`
 - `custom_lesson_worker_secret`
 
-The URL points to `/api/internal/custom-lessons/process`. The bearer secret must match the server-only `CUSTOM_LESSON_WORKER_SECRET` configured for the deployment.
+For production, `custom_lesson_worker_url` is `https://aiko.zetbros.com/api/internal/custom-lessons/process`. The bearer secret must match the server-only `CUSTOM_LESSON_WORKER_SECRET` configured for the deployment.
 
 See `docs/custom-lesson-worker-scheduler.md` for deployment and diagnostic details.
 
