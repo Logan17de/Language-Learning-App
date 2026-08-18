@@ -5,6 +5,7 @@ import { ThemeSync } from "@/components/layout/theme-sync";
 import { SyncStatus } from "@/components/backend/sync-status";
 import { BackendSessionHydrator } from "@/components/backend/backend-session-hydrator";
 import { LearnerRouteGuard } from "@/components/auth/learner-route-guard";
+import { AIKO_CANONICAL_ORIGIN } from "@/lib/app-url";
 
 const japaneseSans = Noto_Sans_JP({
   variable: "--font-japanese",
@@ -13,17 +14,22 @@ const japaneseSans = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(AIKO_CANONICAL_ORIGIN),
   title: {
     default: "AIko — Adaptive Language Learning",
     template: "%s · AIko",
   },
   description:
     "Structured language learning through stories, vocabulary, grammar, reading, listening, speaking, and adaptive mastery. Launching first with Japanese.",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "AIko — Adaptive Language Learning",
     description:
       "Structured language learning through connected lessons and adaptive mastery. Launching first with Japanese.",
     type: "website",
+    url: AIKO_CANONICAL_ORIGIN,
   },
 };
 
