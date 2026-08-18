@@ -20,14 +20,14 @@ export const metadata: Metadata = {
     template: "%s · AIko",
   },
   description:
-    "Structured language learning through stories, vocabulary, grammar, reading, listening, speaking, and adaptive mastery. Launching first with Japanese.",
+    "Adaptive language learning through connected stories, vocabulary, grammar, reading, listening, speaking, and progress-aware practice.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "AIko — Adaptive Language Learning",
     description:
-      "Structured language learning through connected lessons and adaptive mastery. Launching first with Japanese.",
+      "Connected language lessons that adapt to what you understand, practise, and produce.",
     type: "website",
     url: AIKO_CANONICAL_ORIGIN,
   },
