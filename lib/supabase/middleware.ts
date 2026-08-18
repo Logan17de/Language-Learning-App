@@ -1,20 +1,27 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { canAccessAdminPath } from "@/lib/auth/permissions";
+import { safeInternalRedirect } from "@/lib/auth/safe-internal-redirect";
 import { getSupabasePublicConfig } from "@/lib/supabase/config";
 import type { Database } from "@/types/database";
 
 const learnerPrefixes = [
   "/home",
   "/learn",
-  "/review",
   "/progress",
   "/custom-topic",
   "/profile",
   "/settings",
   "/subscription",
   "/lesson",
+  "/onboarding",
 ];
+
+function currentInternalTarget(request: NextRequest): string {
+  return safeInternalRedirect(
+    `${request.nextUrl.pathname}${request.nextUrl.search}`,
+  ) ?? request.nextUrl.pathname;
+}
 
 export async function updateSession(request: NextRequest): Promise<NextResponse> {
   const pathname = request.nextUrl.pathname;
@@ -61,8 +68,31 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
   if (!userId && (protectedLearner || protectedAdmin)) {
     const url = request.nextUrl.clone();
     url.pathname = protectedAdmin ? "/admin/login" : "/login";
-    url.searchParams.set("next", pathname);
+    url.search = "";
+    url.searchParams.set("next", currentInternalTarget(request));
     return NextResponse.redirect(url);
+  }
+
+  if (userId && protectedLearner) {
+    const profile = await supabase
+      .from("profiles")
+      .select("status")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (profile.error || !profile.data || profile.data.status !== "active") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      url.search = "";
+      url.searchParams.set("next", currentInternalTarget(request));
+      url.searchParams.set(
+        "error",
+        profile.data && profile.data.status !== "active"
+          ? "account-inactive"
+          : "profile-load",
+      );
+      return NextResponse.redirect(url);
+    }
   }
 
   if (userId && protectedAdmin) {
