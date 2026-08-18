@@ -176,7 +176,9 @@ export function OAuthCallback() {
         preferences.data?.onboarding_complete ?? false;
       const next = onboardingComplete
         ? (explicitNext ?? "/home")
-        : "/onboarding";
+        : explicitNext
+          ? `/onboarding?next=${encodeURIComponent(explicitNext)}`
+          : "/onboarding";
       window.location.replace(next);
     }
 
