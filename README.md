@@ -61,7 +61,7 @@ Important constraints:
 
 Learner and admin authentication use Supabase Auth. Protected routes do not trust persisted client state as proof of authentication.
 
-Google OAuth requires the provider to be enabled in Supabase and the application callback URL to be registered. The canonical production callback base is `https://aiko.zetbros.com`; staging and localhost redirects are allowed separately for testing. Email/password authentication is also supported when enabled in Supabase.
+AIko uses one authentication origin only: `https://aiko.zetbros.com`. Google OAuth, email confirmation, and password-reset callbacks must remain on that host. Localhost, staging, and generated `*.vercel.app` URLs are not authentication redirect targets. Email/password authentication is also supported when enabled in Supabase.
 
 The owner-admin workspace is restricted by server-side authorization and database policy. Client role strings are not an authorization boundary.
 
@@ -81,7 +81,7 @@ OPENAI_API_KEY=
 CUSTOM_LESSON_WORKER_SECRET=
 ```
 
-Production code treats `https://aiko.zetbros.com` as the canonical origin even if a stale Vercel URL remains in `NEXT_PUBLIC_APP_URL`. Preview deployments remain independently testable.
+`https://aiko.zetbros.com` is the only app/auth origin. Preview and local deployments must not generate their own OAuth, confirmation, or password-reset callback origins.
 
 Additional model/transcription variables are documented in `.env.example`.
 
