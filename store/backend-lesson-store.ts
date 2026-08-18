@@ -59,11 +59,12 @@ export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
     const ownerUserId = current.ownerUserId;
     if (!ownerUserId || current.loading) return;
 
-    // First visit for this account needs a visible loading state. Once this
-    // same account already owns a valid assignment in memory, revalidate it
-    // silently so tab/session refreshes stay visually static.
+    // First visit and explicit retry for this account need a visible loading
+    // state. Once this same account already owns a valid assignment in memory,
+    // revalidate it silently so tab/session refreshes stay visually static.
     const blocking =
       current.status === "idle" ||
+      current.status === "error" ||
       (!current.loaded && current.lessons.length === 0);
     if (blocking) {
       set({ loading: true, status: "loading", error: "" });
