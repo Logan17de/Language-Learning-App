@@ -4,37 +4,92 @@ import { ArrowRight, Flame, Gem, Target } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
-import { ButtonLink } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { progressRepository } from "@/lib/repositories/progress-repository";
 import { getBackendMode } from "@/lib/supabase/config";
 import { useAppStore } from "@/store/app-store";
 import { useBackendLessonStore } from "@/store/backend-lesson-store";
+import { useBackendProgressStore } from "@/store/backend-progress-store";
 
 export function HomeDashboard() {
+  const backendMode = getBackendMode();
   const user = useAppStore((state) => state.user);
   const progress = useAppStore((state) => state.progress);
   const hydrateBackendProgress = useAppStore(
     (state) => state.hydrateBackendProgress,
   );
+
+  const backendOwnerUserId = useBackendLessonStore(
+    (state) => state.ownerUserId,
+  );
   const backendLessons = useBackendLessonStore((state) => state.lessons);
-  const backendLoading = useBackendLessonStore((state) => state.loading);
+  const backendStatus = useBackendLessonStore((state) => state.status);
   const backendError = useBackendLessonStore((state) => state.error);
   const loadBackendLessons = useBackendLessonStore((state) => state.load);
 
-  useEffect(() => {
-    void loadBackendLessons();
-    if (getBackendMode() !== "supabase") return;
-    void progressRepository.loadCurrent().then((result) => {
-      if (result.ok) hydrateBackendProgress(result.data);
-    });
-  }, [hydrateBackendProgress, loadBackendLessons]);
+  const progressOwnerUserId = useBackendProgressStore(
+    (state) => state.ownerUserId,
+  );
+  const backendProgressStatus = useBackendProgressStore(
+    (state) => state.status,
+  );
+  const backendProgressError = useBackendProgressStore((state) => state.error);
+  const completedLessonCount = useBackendProgressStore(
+    (state) => state.completedLessonCount,
+  );
 
+  useEffect(() => {
+    if (!user.id) return;
+    void loadBackendLessons(user.id);
+  }, [loadBackendLessons, user.id]);
+
+  const accountOwnsLessons =
+    backendMode !== "supabase" || backendOwnerUserId === user.id;
+  const accountLessons = accountOwnsLessons ? backendLessons : [];
+  const lessonStatus = accountOwnsLessons ? backendStatus : "idle";
   const selectedLesson =
-    backendLessons.find(
+    accountLessons.find(
       (lesson) => !progress.completedLessonIds.includes(lesson.id),
-    ) ?? backendLessons[0];
+    ) ?? accountLessons[0];
+
+  const progressReady =
+    backendMode !== "supabase" ||
+    (progressOwnerUserId === user.id && backendProgressStatus === "ready");
+  const progressFailed =
+    backendMode === "supabase" &&
+    progressOwnerUserId === user.id &&
+    backendProgressStatus === "error";
+  const progressLoading = backendMode === "supabase" && !progressReady && !progressFailed;
+  const authoritativeLessonCount =
+    backendMode === "supabase"
+      ? completedLessonCount
+      : progress.completedLessonIds.length;
+
+  async function retryProgress() {
+    if (!user.id) return;
+    const userId = user.id;
+    useBackendProgressStore.getState().begin(userId, true);
+    const result = await progressRepository.loadCurrent();
+
+    const accountStillCurrent =
+      useBackendProgressStore.getState().ownerUserId === userId &&
+      useAppStore.getState().user.id === userId;
+    if (!accountStillCurrent) return;
+
+    if (!result.ok) {
+      useBackendProgressStore
+        .getState()
+        .fail(userId, result.error.message, true);
+      return;
+    }
+
+    hydrateBackendProgress(result.data);
+    useBackendProgressStore
+      .getState()
+      .succeed(userId, result.data.completedLessonCount);
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-9 lg:py-10">
@@ -65,8 +120,10 @@ export function HomeDashboard() {
           />
           <div className="relative">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <Badge tone="orange">Chosen for you</Badge>
-              {selectedLesson && (
+              <Badge tone="orange">
+                {lessonStatus === "exhausted" ? "Course up to date" : "Chosen for you"}
+              </Badge>
+              {selectedLesson && lessonStatus === "ready" && (
                 <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-semibold text-white/70">
                   6 connected phases
                 </span>
@@ -74,98 +131,194 @@ export function HomeDashboard() {
             </div>
 
             <h2 className="mt-7 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
-              One lesson. Six connected ways to make the language stick.
+              {lessonStatus === "exhausted"
+                ? "You’ve completed every published lesson at this level."
+                : "One lesson. Six connected ways to make the language stick."}
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
-              {!selectedLesson
-                ? backendLoading
-                  ? "Choosing the next lesson that fits your learning path."
-                  : backendError ||
-                    "No published lesson is available for your current course yet."
-                : "Start in context, then reuse the same language through vocabulary, grammar, reading, listening, and speaking. Your performance updates mastery and helps AIko choose what should come next."}
+              {lessonStatus === "loading" || lessonStatus === "idle"
+                ? "Choosing the next lesson that fits your learning path."
+                : lessonStatus === "error"
+                  ? backendError || "AIko couldn’t choose your next lesson right now."
+                  : lessonStatus === "exhausted"
+                    ? "There isn’t another published lesson to assign right now. Your completed work and mastery are safe, and new eligible content will appear here when it becomes available."
+                    : selectedLesson
+                      ? "Start in context, then reuse the same language through vocabulary, grammar, reading, listening, and speaking. Your performance updates mastery and helps AIko choose what should come next."
+                      : "No published lesson is available for your current course yet."}
             </p>
 
-            <div className="mt-7 flex flex-wrap gap-2 text-xs font-medium text-white/65">
-              <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                Context → practice
-              </span>
-              <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                6 connected phases
-              </span>
-              <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                Future lessons adapt
-              </span>
-            </div>
+            {lessonStatus === "ready" && selectedLesson && (
+              <div className="mt-7 flex flex-wrap gap-2 text-xs font-medium text-white/65">
+                <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                  Context → practice
+                </span>
+                <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                  6 connected phases
+                </span>
+                <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                  Future lessons adapt
+                </span>
+              </div>
+            )}
 
-            <ButtonLink
-              href={selectedLesson ? `/lesson/${selectedLesson.id}/preview` : "/learn"}
-              className="mt-8 !bg-persimmon-500 px-7 hover:!bg-persimmon-600"
-            >
-              {backendLoading ? "Choosing lesson" : "See my next lesson"}
-              <ArrowRight
-                className="size-4 transition-transform duration-180 group-hover:translate-x-0.5"
-                aria-hidden="true"
-              />
-            </ButtonLink>
+            {lessonStatus === "ready" && selectedLesson ? (
+              <ButtonLink
+                href={`/lesson/${selectedLesson.id}/preview`}
+                className="mt-8 !bg-persimmon-500 px-7 hover:!bg-persimmon-600"
+              >
+                See my next lesson
+                <ArrowRight
+                  className="size-4 transition-transform duration-180 group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
+              </ButtonLink>
+            ) : lessonStatus === "error" ? (
+              <Button
+                type="button"
+                onClick={() => void loadBackendLessons(user.id)}
+                className="mt-8 !bg-persimmon-500 px-7 hover:!bg-persimmon-600"
+              >
+                Retry lesson selection
+              </Button>
+            ) : lessonStatus === "exhausted" ? (
+              <ButtonLink
+                href="/progress"
+                className="mt-8 !bg-persimmon-500 px-7 hover:!bg-persimmon-600"
+              >
+                See my progress
+              </ButtonLink>
+            ) : (
+              <Button
+                type="button"
+                disabled
+                className="mt-8 !bg-persimmon-500 px-7"
+              >
+                Choosing lesson…
+              </Button>
+            )}
           </div>
         </Card>
 
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-1">
-          <Card className="p-5 sm:p-6">
-            <span className="grid size-10 place-items-center rounded-2xl bg-persimmon-50 text-persimmon-500">
-              <Flame className="size-5" aria-hidden="true" />
-            </span>
-            <p className="mt-5 text-3xl font-semibold tabular-nums">
-              {user.streakDays}
-            </p>
-            <p className="mt-1 text-sm font-semibold text-ink">day streak</p>
-            <p className="mt-2 text-xs leading-5 text-muted">
-              Complete at least one lesson on consecutive days to keep your streak alive.
-            </p>
-          </Card>
+          {progressReady ? (
+            <>
+              <Card className="p-5 sm:p-6">
+                <span className="grid size-10 place-items-center rounded-2xl bg-persimmon-50 text-persimmon-500">
+                  <Flame className="size-5" aria-hidden="true" />
+                </span>
+                <p className="mt-5 text-3xl font-semibold tabular-nums">
+                  {user.streakDays}
+                </p>
+                <p className="mt-1 text-sm font-semibold text-ink">day streak</p>
+                <p className="mt-2 text-xs leading-5 text-muted">
+                  Complete at least one lesson on consecutive days to keep your streak alive.
+                </p>
+              </Card>
 
-          <Card className="p-5 sm:p-6">
-            <span className="grid size-10 place-items-center rounded-2xl bg-moss-100 text-moss-700">
-              <Gem className="size-5" aria-hidden="true" />
-            </span>
-            <p className="mt-5 text-3xl font-semibold tabular-nums">
-              {user.xp.toLocaleString()}
-            </p>
-            <p className="mt-1 text-sm font-semibold text-ink">total XP</p>
-            <p className="mt-2 text-xs leading-5 text-muted">
-              Each completed lesson earns 50 base XP plus your lesson score, up to 150 XP.
-            </p>
-          </Card>
+              <Card className="p-5 sm:p-6">
+                <span className="grid size-10 place-items-center rounded-2xl bg-moss-100 text-moss-700">
+                  <Gem className="size-5" aria-hidden="true" />
+                </span>
+                <p className="mt-5 text-3xl font-semibold tabular-nums">
+                  {user.xp.toLocaleString()}
+                </p>
+                <p className="mt-1 text-sm font-semibold text-ink">total XP</p>
+                <p className="mt-2 text-xs leading-5 text-muted">
+                  Each completed lesson earns 50 base XP plus your lesson score, up to 150 XP.
+                </p>
+              </Card>
+            </>
+          ) : (
+            <Card
+              className="col-span-2 p-5 sm:p-6 lg:col-span-1"
+              role={progressFailed ? "alert" : "status"}
+              aria-live="polite"
+            >
+              <span className="grid size-10 place-items-center rounded-2xl bg-moss-100 text-moss-700">
+                <Gem className="size-5" aria-hidden="true" />
+              </span>
+              <h2 className="mt-5 text-lg font-semibold">
+                {progressFailed ? "Progress unavailable" : "Loading your progress"}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-muted">
+                {progressFailed
+                  ? backendProgressError || "AIko couldn’t load your progress from the server."
+                  : "Your XP and streak will appear once the server confirms the latest values."}
+              </p>
+              {progressFailed && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => void retryProgress()}
+                  className="mt-4"
+                >
+                  Retry progress
+                </Button>
+              )}
+            </Card>
+          )}
         </div>
       </section>
 
       <section className="mt-5">
-        <Card className="p-6 sm:p-7">
+        <Card
+          className="p-6 sm:p-7"
+          role={!progressReady ? (progressFailed ? "alert" : "status") : undefined}
+          aria-live={!progressReady ? "polite" : undefined}
+        >
           <div className="flex items-start justify-between gap-4">
             <span className="grid size-11 place-items-center rounded-2xl bg-persimmon-50 text-persimmon-500">
               <Target className="size-5" aria-hidden="true" />
             </span>
-            <span className="text-sm font-semibold tabular-nums text-moss-700">
-              {progress.levelCompletion}%
-            </span>
+            {progressReady && (
+              <span className="text-sm font-semibold tabular-nums text-moss-700">
+                {progress.levelCompletion}%
+              </span>
+            )}
           </div>
           <h2 className="mt-6 text-xl font-semibold">Your learning progress</h2>
-          <p className="mt-2 text-sm leading-6 text-muted">
-            Mastery updates automatically from your answers, listening, reading, and speaking activity across lessons.
-          </p>
-          <ProgressBar value={progress.levelCompletion} className="mt-5" />
-          <div className="mt-5 grid grid-cols-3 gap-2 text-center">
-            <MiniStat value={progress.learnedVocabularyCount} label="vocabulary" />
-            <MiniStat value={progress.learnedGrammarCount} label="grammar" />
-            <MiniStat value={progress.completedLessonIds.length} label="lessons" />
-          </div>
-          <ButtonLink
-            href="/progress"
-            variant="secondary"
-            className="mt-5 w-full sm:w-auto"
-          >
-            See my progress
-          </ButtonLink>
+          {progressReady ? (
+            <>
+              <p className="mt-2 text-sm leading-6 text-muted">
+                Mastery updates automatically from your answers, listening, reading, and speaking activity across lessons.
+              </p>
+              <ProgressBar
+                value={progress.levelCompletion}
+                className="mt-5"
+                aria-label="Learning progress"
+              />
+              <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+                <MiniStat value={progress.learnedVocabularyCount} label="vocabulary" />
+                <MiniStat value={progress.learnedGrammarCount} label="grammar" />
+                <MiniStat value={authoritativeLessonCount ?? 0} label="lessons" />
+              </div>
+              <ButtonLink
+                href="/progress"
+                variant="secondary"
+                className="mt-5 w-full sm:w-auto"
+              >
+                See my progress
+              </ButtonLink>
+            </>
+          ) : (
+            <>
+              <p className="mt-2 text-sm leading-6 text-muted">
+                {progressFailed
+                  ? "These stats are hidden because the latest backend progress could not be verified."
+                  : "Waiting for the server to confirm your mastery and completion totals."}
+              </p>
+              {progressFailed && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => void retryProgress()}
+                  className="mt-5"
+                >
+                  Retry progress
+                </Button>
+              )}
+            </>
+          )}
         </Card>
       </section>
     </div>
