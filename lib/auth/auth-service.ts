@@ -10,6 +10,7 @@ import {
   isStrongEnough,
   PASSWORD_REQUIREMENTS_MESSAGE,
 } from "@/lib/auth/password-strength";
+import { safeInternalRedirect } from "@/lib/auth/safe-internal-redirect";
 import {
   failure,
   notConfigured,
@@ -158,7 +159,10 @@ export const authService = {
         preferences.error,
         "Your onboarding status could not be loaded.",
       );
-    if (!profile.data || profile.data.status !== "active") return success(null);
+    if (!profile.data || profile.data.status !== "active") {
+      await client.auth.signOut({ scope: "local" });
+      return success(null);
+    }
     return success({
       id: data.user.id,
       email: data.user.email ?? "",
@@ -182,6 +186,7 @@ export const authService = {
     email: string,
     password: string,
     displayName: string,
+    next?: string,
   ): Promise<RepositoryResult<{ confirmationRequired: boolean }>> {
     if (!isStrongEnough(password)) {
       return failure(
@@ -191,11 +196,14 @@ export const authService = {
     }
     const client = createClient();
     if (!client) return notConfigured();
+    const callbackUrl = new URL("/auth/callback", getAppUrl());
+    const safeNext = safeInternalRedirect(next);
+    if (safeNext) callbackUrl.searchParams.set("next", safeNext);
     const { data, error } = await client.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${getAppUrl()}/auth/callback?next=/onboarding`,
+        emailRedirectTo: callbackUrl.toString(),
         data: { display_name: displayName },
       },
     });
@@ -227,15 +235,19 @@ export const authService = {
         .eq("user_id", data.user.id)
         .maybeSingle(),
     ]);
-    if (profile.error)
+    if (profile.error) {
+      await client.auth.signOut({ scope: "local" });
       return failure(profile.error, "Your profile could not be loaded.");
-    if (preferences.error)
+    }
+    if (preferences.error) {
+      await client.auth.signOut({ scope: "local" });
       return failure(
         preferences.error,
         "Your onboarding status could not be loaded.",
       );
+    }
     if (profile.data.status !== "active") {
-      await client.auth.signOut();
+      await client.auth.signOut({ scope: "local" });
       return failure(
         { code: "42501" },
         "This account is not active. Contact support.",
@@ -258,8 +270,7 @@ export const authService = {
     clearGoogleOAuthStorage();
     const client = createGoogleOAuthClient();
     if (!client) return notConfigured();
-    const safeNext =
-      next?.startsWith("/") && !next.startsWith("//") ? next : null;
+    const safeNext = safeInternalRedirect(next);
     const callbackUrl = new URL("/auth/callback", getAppUrl());
     callbackUrl.searchParams.set("flow", mode);
     if (safeNext) callbackUrl.searchParams.set("next", safeNext);
