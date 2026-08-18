@@ -11,6 +11,9 @@ const profileRepository = source("lib/repositories/profile-repository.ts");
 const migration = source(
   "supabase/migrations/20260818103656_onboarding_assignment_guards.sql",
 );
+const privilegeMigration = source(
+  "supabase/migrations/20260818104032_restrict_onboarding_rpc_execution.sql",
+);
 const onboardingPage = source("app/onboarding/page.tsx");
 
 describe("onboarding flow regressions", () => {
@@ -61,6 +64,17 @@ describe("onboarding flow regressions", () => {
     );
     expect(migration).toContain("l.jlpt_level = v_profile.current_jlpt_level");
     expect(migration).toContain("level-v5-onboarding-guard");
+  });
+
+  it("does not expose onboarding-owned security-definer RPCs to anonymous callers", () => {
+    expect(privilegeMigration).toContain(
+      "revoke execute on function public.assign_next_lesson() from anon",
+    );
+    expect(privilegeMigration).toContain(
+      "revoke execute on function public.complete_onboarding(",
+    );
+    expect(privilegeMigration).toContain("from anon");
+    expect(privilegeMigration).toContain("to authenticated");
   });
 
   it("keeps wizard edits in an account-scoped draft until completion", () => {
