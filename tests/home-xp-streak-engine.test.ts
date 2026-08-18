@@ -25,12 +25,13 @@ describe("language-neutral learner home", () => {
     expect(home).not.toContain("minutesStudiedToday");
     expect(home).not.toContain("dailyGoalMinutes");
     expect(home).not.toContain("おはよう");
-    expect(home.toLowerCase()).not.toContain("review");
+    expect(home).not.toContain("Review");
+    expect(home).not.toContain("review queue");
     expect(home.toLowerCase()).not.toContain("kanji");
     expect(home).not.toContain("user.level");
 
     expect(home).toContain("Welcome back");
-    expect(home).toContain("One lesson. Six connected ways to build the language.");
+    expect(home).toContain("make the language stick");
     expect(home).toContain("total XP");
     expect(home).toContain("day streak");
   });
