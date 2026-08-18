@@ -228,11 +228,6 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             ? "Log in"
             : "Create my account"}
       </Button>
-      <p className="text-center text-xs leading-5 text-stone-400">
-        {backendMode === "supabase"
-          ? "Your account is secured by Supabase Auth."
-          : "Authentication is unavailable because the backend is not configured."}
-      </p>
     </form>
   );
 }
