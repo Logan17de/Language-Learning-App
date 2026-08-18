@@ -87,9 +87,7 @@ export function OnboardingFlow() {
   } = useAppStore();
 
   useEffect(() => {
-    setName((current) =>
-      current || (user.name === "Hana" ? "" : user.name),
-    );
+    setName((current) => current || user.name);
   }, [user.name]);
 
   const totalSteps = 6;
@@ -101,16 +99,22 @@ export function OnboardingFlow() {
     return true;
   }, [name, step, onboarding]);
 
+  function requestedNext() {
+    if (typeof window === "undefined") return null;
+    const value = new URLSearchParams(window.location.search).get("next");
+    return value?.startsWith("/") && !value.startsWith("//") ? value : null;
+  }
+
   function next() {
     if (step === 4) acknowledgeReading();
     if (step === 5) {
-      void finishOnboarding("/learn");
+      void finishOnboarding(requestedNext() ?? "/learn");
       return;
     }
     setStep((current) => Math.min(totalSteps - 1, current + 1));
   }
 
-  async function finishOnboarding(destination = "/home") {
+  async function finishOnboarding(destination?: string) {
     if (saving) return;
     setSaving(true);
     setError("");
@@ -131,7 +135,7 @@ export function OnboardingFlow() {
 
     signIn(displayName);
     completeOnboarding();
-    router.push(destination);
+    router.push(destination ?? requestedNext() ?? "/home");
   }
 
   return (
