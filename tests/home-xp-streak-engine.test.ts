@@ -15,7 +15,7 @@ const sessionRepository = readFileSync(
   "utf8",
 );
 const migration = readFileSync(
-  "supabase/migrations/20260818122000_xp_streak_completion_engine.sql",
+  "supabase/migrations/20260818070053_xp_streak_completion_engine.sql",
   "utf8",
 );
 
