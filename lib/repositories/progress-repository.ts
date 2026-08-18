@@ -66,6 +66,24 @@ function dateInTimeZone(timeZone: string): string {
   }
 }
 
+function shiftIsoDate(value: string, days: number): string {
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day + days));
+  return date.toISOString().slice(0, 10);
+}
+
+export function effectiveStreakDays(
+  storedStreak: number,
+  latestActivityDate: string | null | undefined,
+  today: string,
+): number {
+  if (!latestActivityDate) return 0;
+  const yesterday = shiftIsoDate(today, -1);
+  return latestActivityDate === today || latestActivityDate === yesterday
+    ? Math.max(0, storedStreak)
+    : 0;
+}
+
 function dailyMinutes(value: number): DailyMinutes {
   return value === 15 || value === 45 || value === 60 ? value : 30;
 }
@@ -215,6 +233,7 @@ export const progressRepository = {
       (earned.data ?? []).map((item) => [item.achievement_id, item]),
     );
     const today = dateInTimeZone(profile.data.timezone);
+    const latestActivityDate = (weekly.data ?? [])[0]?.activity_date;
     const minutesStudiedToday =
       (weekly.data ?? []).find((item) => item.activity_date === today)?.minutes ?? 0;
     const goalMinutes = dailyMinutes(profile.data.daily_study_minutes);
@@ -233,7 +252,11 @@ export const progressRepository = {
       learnedKanjiCount: summaryNumber(summary.data, "learned_kanji"),
       learnedGrammarCount: summaryNumber(summary.data, "learned_grammar"),
       xp: profile.data.xp,
-      streakDays: profile.data.streak_days,
+      streakDays: effectiveStreakDays(
+        profile.data.streak_days,
+        latestActivityDate,
+        today,
+      ),
       longestStreak: profile.data.longest_streak,
       totalStudyMinutes: profile.data.total_study_minutes,
       weeklyActivity: (weekly.data ?? [])
@@ -254,7 +277,7 @@ export const progressRepository = {
         const lesson = lessonMap.get(completion.lesson_id);
         return {
           lessonId: lesson?.legacy_id ?? completion.lesson_id,
-          title: lesson?.title ?? "Japanese lesson",
+          title: lesson?.title ?? "Language lesson",
           completedAt: completion.completed_at,
           score: completion.score,
           durationMinutes: completion.duration_minutes,
