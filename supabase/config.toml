@@ -22,7 +22,12 @@ port = 54323
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
-additional_redirect_urls = ["http://127.0.0.1:3000/**", "http://localhost:3000/**"]
+additional_redirect_urls = [
+  "http://127.0.0.1:3000/**",
+  "http://localhost:3000/**",
+  "https://aiko.zetbros.com/**",
+  "https://language-learning-app-git-staging-aiko-learner.vercel.app/**"
+]
 enable_signup = true
 
 [storage]
