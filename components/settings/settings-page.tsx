@@ -19,6 +19,7 @@ import { useAppStore } from "@/store/app-store";
 import { SettingsSection } from "@/components/settings/settings-section";
 import { Button } from "@/components/ui/button";
 import { getBackendMode } from "@/lib/supabase/config";
+import { profileRepository } from "@/lib/repositories/profile-repository";
 
 export function SettingsPage() {
   const settings = useAppStore((state) => state.settings);
@@ -30,6 +31,10 @@ export function SettingsPage() {
   const resetProgress = useAppStore((state) => state.resetProgress);
   const [confirmReset, setConfirmReset] = useState(false);
   const [exported, setExported] = useState(false);
+  const [preferenceError, setPreferenceError] = useState("");
+  const [savingPreference, setSavingPreference] = useState<
+    "level" | "daily" | null
+  >(null);
   const backendMode = getBackendMode();
 
   function exportData() {
@@ -50,6 +55,38 @@ export function SettingsPage() {
     URL.revokeObjectURL(url);
     setExported(true);
     window.setTimeout(() => setExported(false), 2200);
+  }
+
+  async function changeDailyGoal(value: string) {
+    const dailyMinutes = Number(value) as DailyMinutes;
+    setPreferenceError("");
+    if (backendMode === "supabase") {
+      setSavingPreference("daily");
+      const result = await profileRepository.updateLearningPreferences({
+        dailyMinutes,
+      });
+      setSavingPreference(null);
+      if (!result.ok) {
+        setPreferenceError(result.error.message);
+        return;
+      }
+    }
+    setDailyMinutes(dailyMinutes);
+  }
+
+  async function changeLevel(value: string) {
+    const level = value as LearnerLevel;
+    setPreferenceError("");
+    if (backendMode === "supabase") {
+      setSavingPreference("level");
+      const result = await profileRepository.updateLearningPreferences({ level });
+      setSavingPreference(null);
+      if (!result.ok) {
+        setPreferenceError(result.error.message);
+        return;
+      }
+    }
+    setLevel(level);
   }
 
   async function confirmProgressReset() {
@@ -84,14 +121,16 @@ export function SettingsPage() {
               label="Daily goal"
               value={String(user.dailyGoalMinutes)}
               options={["15", "30", "45", "60"]}
-              onChange={(value) => setDailyMinutes(Number(value) as DailyMinutes)}
+              onChange={(value) => void changeDailyGoal(value)}
               suffix=" minutes"
+              disabled={savingPreference !== null}
             />
             <Select
               label="Current level"
               value={String(user.level)}
               options={["Beginner", "N5", "N4", "N3", "N2", "N1", "Not sure"]}
-              onChange={(value) => setLevel(value as LearnerLevel)}
+              onChange={(value) => void changeLevel(value)}
+              disabled={savingPreference !== null}
             />
             <Select
               label="Preferred lesson length"
@@ -141,6 +180,14 @@ export function SettingsPage() {
               }
             />
           </div>
+          {preferenceError && (
+            <p
+              role="alert"
+              className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+            >
+              {preferenceError}
+            </p>
+          )}
         </SettingsSection>
 
         <SettingsSection
@@ -245,20 +292,23 @@ function Select({
   options,
   onChange,
   suffix = "",
+  disabled = false,
 }: {
   label: string;
   value: string;
   options: string[];
   onChange: (value: string) => void;
   suffix?: string;
+  disabled?: boolean;
 }) {
   return (
     <label>
       <span className="mb-2 block text-sm font-semibold">{label}</span>
       <select
         value={value}
+        disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
-        className="form-input capitalize"
+        className="form-input capitalize disabled:cursor-wait disabled:opacity-60"
       >
         {options.map((option) => (
           <option key={option} value={option}>
