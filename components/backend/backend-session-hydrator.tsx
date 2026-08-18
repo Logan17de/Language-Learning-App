@@ -5,6 +5,7 @@ import { getBackendMode } from "@/lib/supabase/config";
 import { useAppStore } from "@/store/app-store";
 import { authService } from "@/lib/auth/auth-service";
 import { progressRepository } from "@/lib/repositories/progress-repository";
+import { settingsRepository } from "@/lib/repositories/settings-repository";
 
 export function BackendSessionHydrator() {
   const backendMode = getBackendMode();
@@ -65,8 +66,16 @@ export function BackendSessionHydrator() {
         result.data.subscriptionPlan === "premium_annual" ? "annual" : "monthly",
       );
 
-      const progress = await progressRepository.loadCurrent();
+      const [progress, settings] = await Promise.all([
+        progressRepository.loadCurrent(),
+        settingsRepository.loadCurrent(),
+      ]);
       if (progress.ok) hydrateBackendProgress(progress.data);
+      if (settings.ok) {
+        // Server-backed settings replace any stale device-local settings without
+        // writing them straight back to Supabase during hydration.
+        useAppStore.setState({ settings: settings.data });
+      }
       setBackendSessionChecked(true);
       if (blocking && active) setLoading(false);
     }
