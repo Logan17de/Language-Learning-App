@@ -43,8 +43,9 @@ describe("global landing page positioning", () => {
     expect(signupFlow).toContain('withSafeNext("/login", requestedNext)');
     expect(oauthCallback).toContain('`/onboarding?next=${encodeURIComponent(explicitNext)}`');
     expect(onboarding).toContain('new URLSearchParams(window.location.search).get("next")');
-    expect(onboarding).toContain('finishOnboarding(requestedNext() ?? "/learn")');
-    expect(onboarding).toContain('router.push(destination ?? requestedNext() ?? "/home")');
+    expect(onboarding).toContain("safePostOnboardingDestination(");
+    expect(onboarding).toContain('void finishOnboarding(requestedNext ?? "/learn")');
+    expect(onboarding).toContain("router.replace(safeDestination)");
   });
 
   it("keeps authenticated conversion actions and accessible navigation", () => {
