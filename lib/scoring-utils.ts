@@ -3,6 +3,7 @@ import {
   storyWordIndependence,
   storyWordScores,
 } from "@/lib/story-support";
+import { calculateLessonXp } from "@/lib/xp";
 import type {
   GrammarAnswer,
   LessonCompletionResult,
@@ -192,7 +193,7 @@ export function calculateLessonCompletion(
   return {
     lessonId: lesson.id,
     score,
-    xpGained: 80 + Math.round(score * 0.7),
+    xpGained: calculateLessonXp(score),
     durationMinutes: Math.max(1, Math.round(session.elapsedSeconds / 60)),
     recognitionChange: score >= 80 ? 4 : 2,
     pronunciationChange:
