@@ -37,8 +37,6 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
 
   const config = getSupabasePublicConfig();
   if (!config) {
-    // Demo admin exists only for local development. A production deployment
-    // with missing backend configuration must never fall back to mock admin.
     if (process.env.NODE_ENV === "production" && anyAdminPath) {
       return new NextResponse("Not Found", {
         status: 404,
@@ -123,14 +121,10 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
     }
 
     if (preferences.data.onboarding_complete && isOnboarding) {
-      const url = request.nextUrl.clone();
       const next = safePostOnboardingDestination(
         request.nextUrl.searchParams.get("next"),
       );
-      url.pathname = next ?? "/home";
-      url.search = next?.includes("?") ? next.slice(next.indexOf("?")) : "";
-      if (next?.includes("#")) url.hash = next.slice(next.indexOf("#"));
-      return NextResponse.redirect(url);
+      return NextResponse.redirect(new URL(next ?? "/home", request.url));
     }
   }
 
