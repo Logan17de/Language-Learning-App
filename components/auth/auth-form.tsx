@@ -29,7 +29,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     const code = new URLSearchParams(window.location.search).get("error");
     const messages: Record<string, string> = {
       "no-google-account":
-        "Looks like you’re new to AIko — welcome! Create your account to start learning, then you can use Google to sign in anytime.",
+        "Hey there! Looks like you don’t have an AIko account yet — no worries, we’ve all been there! Jump in and create one to start learning. You’ve got this! 😗",
       "oauth-cancelled":
         "Google sign-in was cancelled or did not return an authorization code. Please try again.",
       "oauth-exchange":
