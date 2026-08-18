@@ -13,6 +13,12 @@ drop function if exists public.begin_custom_lesson_generation(
   text
 );
 
+-- Drop the legacy enum-like constraint before normalizing historical rows.
+-- The old constraint only permits free_random/pro_interest/pro_custom, so writing
+-- the new standard value while it is still active would fail the migration.
+alter table public.lesson_assignments
+  drop constraint if exists lesson_assignments_selection_mode_check;
+
 -- Normalize historical standard assignments before tightening the mode enum-like
 -- constraint. Pro custom assignments remain distinct because they represent a
 -- different lesson origin, not personalization by interests.
@@ -20,9 +26,6 @@ update public.lesson_assignments
 set selection_mode = 'standard',
     updated_at = now()
 where selection_mode in ('free_random', 'pro_interest');
-
-alter table public.lesson_assignments
-  drop constraint if exists lesson_assignments_selection_mode_check;
 
 alter table public.lesson_assignments
   add constraint lesson_assignments_selection_mode_check
