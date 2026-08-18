@@ -74,7 +74,10 @@ export default function ResetPasswordPage() {
         setRemainingMs(0);
         setError("That code has expired. Request a new password-reset code.");
       } else {
-        setError(result.error.message);
+        // Supabase can return an intentionally ambiguous "expired or invalid" token
+        // message. Inside AIko's still-active five-minute window, treat a rejected
+        // six-digit value as incorrect; the server remains the source of truth.
+        setError("That code is incorrect. Check the 6 digits and try again.");
       }
       return;
     }
