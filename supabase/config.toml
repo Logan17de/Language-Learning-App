@@ -25,6 +25,14 @@ site_url = "https://aiko.zetbros.com"
 additional_redirect_urls = ["https://aiko.zetbros.com/**"]
 enable_signup = true
 
+[auth.email]
+otp_length = 6
+otp_expiry = 300
+
+[auth.email.template.recovery]
+subject = "Your AIko password reset code"
+content_path = "./supabase/templates/recovery.html"
+
 [storage]
 enabled = true
 file_size_limit = "25MiB"
