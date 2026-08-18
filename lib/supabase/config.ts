@@ -1,3 +1,5 @@
+import { AIKO_CANONICAL_ORIGIN } from "@/lib/app-url";
+
 export interface SupabasePublicConfig {
   url: string;
   anonKey: string;
@@ -42,18 +44,19 @@ export function requireSupabasePublicConfig(): SupabasePublicConfig {
 }
 
 export function getAppUrl(): string {
-  // OAuth and email-auth actions begin in the browser, so the current origin is
-  // the authoritative callback host. This also prevents a stale development
-  // NEXT_PUBLIC_APP_URL from sending a deployed user back to localhost.
+  // Browser auth starts from the origin the learner is actually using. Production
+  // Vercel hostnames are redirected to the canonical zetbros.com origin by proxy.ts,
+  // while localhost and staging previews remain independently testable.
   if (typeof window !== "undefined") return window.location.origin;
 
-  const configuredUrl =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
+  // Production must never fall back to a generated Vercel hostname or a stale
+  // NEXT_PUBLIC_APP_URL value. All server-owned production links use AIko's domain.
+  if (process.env.VERCEL_ENV === "production") return AIKO_CANONICAL_ORIGIN;
+
+  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
   if (configuredUrl) return configuredUrl;
 
-  const vercelUrl =
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-    process.env.VERCEL_URL;
+  const vercelUrl = process.env.VERCEL_URL;
   return vercelUrl
     ? "https://" + vercelUrl.replace(/\/$/, "")
     : "http://localhost:3000";
