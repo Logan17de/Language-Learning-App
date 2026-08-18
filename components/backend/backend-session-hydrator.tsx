@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getBackendMode } from "@/lib/supabase/config";
 import { useAppStore } from "@/store/app-store";
 import { authService } from "@/lib/auth/auth-service";
+import { prepareAccountScope } from "@/lib/auth/account-scope";
 import { progressRepository } from "@/lib/repositories/progress-repository";
 import { settingsRepository } from "@/lib/repositories/settings-repository";
 
@@ -55,6 +56,7 @@ export function BackendSessionHydrator() {
         return;
       }
 
+      prepareAccountScope(result.data.id, signOut);
       syncBackendIdentity(
         result.data.id,
         result.data.displayName,
