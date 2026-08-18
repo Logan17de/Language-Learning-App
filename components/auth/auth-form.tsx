@@ -14,7 +14,13 @@ import {
   PASSWORD_REQUIREMENTS_MESSAGE,
 } from "@/lib/auth/password-strength";
 
-export function AuthForm({ mode }: { mode: "login" | "signup" }) {
+export function AuthForm({
+  mode,
+  onForgotPassword,
+}: {
+  mode: "login" | "signup";
+  onForgotPassword?: () => void;
+}) {
   const router = useRouter();
   const signIn = useAppStore((state) => state.signIn);
   const [showPassword, setShowPassword] = useState(false);
@@ -201,12 +207,22 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       </label>
       {mode === "login" && (
         <div className="text-right">
-          <a
-            href="/forgot-password"
-            className="text-sm font-semibold text-moss-700 hover:underline"
-          >
-            Forgot password?
-          </a>
+          {onForgotPassword ? (
+            <button
+              type="button"
+              className="text-sm font-semibold text-moss-700 hover:underline"
+              onClick={onForgotPassword}
+            >
+              Forgot password?
+            </button>
+          ) : (
+            <a
+              href="/forgot-password"
+              className="text-sm font-semibold text-moss-700 hover:underline"
+            >
+              Forgot password?
+            </a>
+          )}
         </div>
       )}
       {error && (
