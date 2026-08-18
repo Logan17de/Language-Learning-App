@@ -3,10 +3,11 @@ import { ArrowLeft } from "lucide-react";
 import { SupportPage } from "@/components/support/support-page";
 import { Brand } from "@/components/ui/brand";
 import { ButtonLink } from "@/components/ui/button";
+import { AIKO_SUPPORT_EMAIL, AIKO_SUPPORT_MAILTO } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Support",
-  description: "Find AIko help, browse frequently asked questions, and use the support chat.",
+  description: "Find AIko help, browse frequently asked questions, and contact support.",
 };
 
 export default function SupportRoute() {
@@ -26,7 +27,12 @@ export default function SupportRoute() {
 
       <footer className="border-t border-black/[.06] bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-7 text-sm text-stone-500 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <p>© 2026 AIko. Support information for learners and visitors.</p>
+          <p>
+            Need more help? Email{" "}
+            <a className="font-semibold text-moss-700 hover:underline" href={AIKO_SUPPORT_MAILTO}>
+              {AIKO_SUPPORT_EMAIL}
+            </a>
+          </p>
           <div className="flex gap-5">
             <a className="hover:text-ink" href="/privacy">
               Privacy
