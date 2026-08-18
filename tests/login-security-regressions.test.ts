@@ -64,10 +64,13 @@ describe("login security regressions", () => {
     expect(oauthCallback).toContain("`/onboarding?next=${encodeURIComponent(explicitNext)}`");
   });
 
-  it("prevents cross-account local-state reuse", () => {
+  it("prevents cross-account local and backend-state reuse", () => {
     expect(accountScope).toContain("previousOwner !== userId");
     expect(accountScope).toContain("resetAccountState()");
-    expect(hydrator).toContain("prepareAccountScope(result.data.id, signOut)");
+    expect(hydrator).toContain("prepareAccountScope(userId, resetScopedState)");
+    expect(hydrator).toContain("useBackendLessonStore.getState().reset()");
+    expect(hydrator).toContain("useBackendProgressStore.getState().reset()");
+    expect(hydrator).toContain("useBackendLessonStore.getState().scopeTo(userId)");
     expect(authForm).toContain(
       "prepareAccountScope(result.data.id, useAppStore.getState().signOut)",
     );
