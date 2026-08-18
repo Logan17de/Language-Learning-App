@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Languages } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
 
 export function AuthShell({ children }: { children: ReactNode }) {
@@ -14,7 +15,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
         <div className="absolute -right-24 -top-24 size-96 rounded-full bg-persimmon-400/20 blur-3xl" />
         <div className="absolute -bottom-32 -left-24 size-[28rem] rounded-full bg-moss-500/25 blur-3xl" />
         <div className="relative flex h-full flex-col justify-between p-14 text-white">
-          <p className="font-serif text-7xl text-white/10">学</p>
+          <Languages className="size-16 text-white/10" aria-hidden="true" />
           <div>
             <p className="max-w-xl text-4xl font-semibold leading-tight">
               Language that stays with you—because every lesson responds to what you find difficult.
