@@ -12,22 +12,30 @@ const signup = source("app/signup/page.tsx");
 const home = source("components/home/home-dashboard.tsx");
 
 describe("AIko product positioning", () => {
-  it("presents AIko as a language-learning product with Japanese available first", () => {
-    expect(landing).toContain("Learn languages through lessons");
-    expect(landing).toContain("Japanese is the first language available in AIko");
-    expect(layout).toContain("Launching first with Japanese");
+  it("presents AIko as a language-learning platform with one availability note", () => {
+    expect(landing).toContain("Adaptive language learning");
+    expect(landing).toContain("Available now: Japanese · More languages coming");
+    expect(landing.match(/Japanese/g) ?? []).toHaveLength(1);
+    expect(layout).not.toContain("Japanese");
   });
 
-  it("keeps generic account and dashboard copy from framing AIko as Japanese-only", () => {
+  it("keeps the public learning explanation language neutral", () => {
+    for (const term of [
+      "Vocabulary + Kanji",
+      "English-to-Japanese",
+      "JLPT",
+      "Tokyo",
+      "Review stage",
+    ]) {
+      expect(landing).not.toContain(term);
+    }
+    expect(landing).toContain("Story, Vocabulary, Grammar, Reading, Listening, and Speaking");
+  });
+
+  it("keeps generic account and dashboard copy from framing AIko as one-language-only", () => {
     expect(login).not.toContain("Continue your Japanese path");
     expect(signup).not.toContain("Build Japanese that lasts");
     expect(home).not.toContain("make the Japanese stick");
     expect(home).toContain("make the language stick");
-  });
-
-  it("still describes Japanese-specific mechanics honestly for the first course", () => {
-    expect(landing).toContain("In the Japanese course");
-    expect(landing).toContain("English-to-Japanese");
-    expect(landing).toContain("Vocabulary + Kanji");
   });
 });

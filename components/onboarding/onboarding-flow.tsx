@@ -22,6 +22,7 @@ import { Brand } from "@/components/ui/brand";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { cn } from "@/lib/utils";
+import { safeInternalRedirect } from "@/lib/auth/safe-internal-redirect";
 import { profileRepository } from "@/lib/repositories/profile-repository";
 import { getBackendMode } from "@/lib/supabase/config";
 import { useAppStore } from "@/store/app-store";
@@ -87,9 +88,7 @@ export function OnboardingFlow() {
   } = useAppStore();
 
   useEffect(() => {
-    setName((current) =>
-      current || (user.name === "Hana" ? "" : user.name),
-    );
+    setName((current) => current || user.name);
   }, [user.name]);
 
   const totalSteps = 6;
@@ -101,16 +100,23 @@ export function OnboardingFlow() {
     return true;
   }, [name, step, onboarding]);
 
+  function requestedNext() {
+    if (typeof window === "undefined") return null;
+    return safeInternalRedirect(
+      new URLSearchParams(window.location.search).get("next"),
+    );
+  }
+
   function next() {
     if (step === 4) acknowledgeReading();
     if (step === 5) {
-      void finishOnboarding("/learn");
+      void finishOnboarding(requestedNext() ?? "/learn");
       return;
     }
     setStep((current) => Math.min(totalSteps - 1, current + 1));
   }
 
-  async function finishOnboarding(destination = "/home") {
+  async function finishOnboarding(destination?: string) {
     if (saving) return;
     setSaving(true);
     setError("");
@@ -131,7 +137,7 @@ export function OnboardingFlow() {
 
     signIn(displayName);
     completeOnboarding();
-    router.push(destination);
+    router.push(destination ?? requestedNext() ?? "/home");
   }
 
   return (

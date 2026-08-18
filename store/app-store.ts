@@ -563,6 +563,7 @@ export const useAppStore = create<AppState>()(
       rewardLessonCompletion: (lesson, result) => {
         const session = get().lessonSessions[lesson.id];
         if (!session || session.rewarded) return false;
+        const serverOwnsRewards = getBackendMode() === "supabase";
         set((state) => {
           const currentSession = state.lessonSessions[lesson.id];
           if (!currentSession || currentSession.rewarded) return state;
@@ -574,13 +575,15 @@ export const useAppStore = create<AppState>()(
             durationMinutes: result.durationMinutes,
           };
           return {
-            user: {
-              ...state.user,
-              xp: state.user.xp + result.xpGained,
-              streakDays: Math.max(state.user.streakDays, 1),
-              minutesStudiedToday:
-                state.user.minutesStudiedToday + result.durationMinutes,
-            },
+            user: serverOwnsRewards
+              ? state.user
+              : {
+                  ...state.user,
+                  xp: state.user.xp + result.xpGained,
+                  streakDays: Math.max(state.user.streakDays, 1),
+                  minutesStudiedToday:
+                    state.user.minutesStudiedToday + result.durationMinutes,
+                },
             progress: {
               ...state.progress,
               completedLessonIds: [
@@ -596,12 +599,15 @@ export const useAppStore = create<AppState>()(
                 ...state.progress.lessonProgress,
                 [lesson.id]: 100,
               },
-              weeklyActivity: addMinutesToToday(
-                state.progress.weeklyActivity,
-                result.durationMinutes,
-              ),
-              totalStudyMinutes:
-                state.progress.totalStudyMinutes + result.durationMinutes,
+              weeklyActivity: serverOwnsRewards
+                ? state.progress.weeklyActivity
+                : addMinutesToToday(
+                    state.progress.weeklyActivity,
+                    result.durationMinutes,
+                  ),
+              totalStudyMinutes: serverOwnsRewards
+                ? state.progress.totalStudyMinutes
+                : state.progress.totalStudyMinutes + result.durationMinutes,
               weakVocabulary: mergeWeakVocabulary(
                 state.progress.weakVocabulary,
                 result.weakItems,
@@ -733,9 +739,9 @@ function addMinutesToToday(
   minutes: number,
 ): LearnerProgress["weeklyActivity"] {
   if (!activity.length) return activity;
-  const index = activity.length - 1;
-  return activity.map((day, dayIndex) =>
-    dayIndex === index ? { ...day, minutes: day.minutes + minutes } : day,
+  const today = new Date().toLocaleDateString("en", { weekday: "short" });
+  return activity.map((day) =>
+    day.day === today ? { ...day, minutes: day.minutes + minutes } : day,
   );
 }
 

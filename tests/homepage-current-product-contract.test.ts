@@ -9,26 +9,32 @@ const homepage = source("app/page.tsx");
 const subscription = source("components/subscription/subscription-page.tsx");
 
 describe("homepage reflects the current AIko product", () => {
-  it("describes the canonical six-phase learner journey", () => {
+  it("describes the canonical six-phase learner journey generically", () => {
     expect(homepage).toContain("One lesson. Six connected phases.");
-    expect(homepage).toContain('title: "Vocabulary + Kanji"');
-    expect(homepage).toContain('title: "Grammar"');
-    expect(homepage).toContain('title: "Reading"');
-    expect(homepage).toContain('title: "Listening"');
-    expect(homepage).toContain('title: "Speaking"');
+    for (const phase of [
+      "Story",
+      "Vocabulary",
+      "Grammar",
+      "Reading",
+      "Listening",
+      "Speaking",
+    ]) {
+      expect(homepage).toContain(`title: "${phase}"`);
+    }
 
-    expect(homepage).not.toContain("One lesson. Seven connected stages.");
+    expect(homepage).not.toContain("Seven connected stages");
     expect(homepage).not.toContain('title: "Review"');
+    expect(homepage).not.toContain("Vocabulary + Kanji");
   });
 
-  it("keeps translation inside Grammar and mastery in the background", () => {
-    expect(homepage).toContain("adaptive English-to-Japanese translation");
-    expect(homepage).toContain("There is no separate Review stage to complete.");
-    expect(homepage).toContain("AI-validated translations");
+  it("explains adaptation without language-specific mechanics", () => {
+    expect(homepage).toContain("Translation responses");
+    expect(homepage).toContain("Progress works quietly in the background");
+    expect(homepage).not.toContain("English-to-Japanese");
     expect(homepage).not.toContain("Review performance");
   });
 
-  it("does not advertise retired or removed Premium features as current", () => {
+  it("does not advertise retired or unsupported Premium features as current", () => {
     expect(homepage).not.toContain("Advanced reading and pronunciation feedback");
     expect(homepage).not.toContain("Adaptive review and learner memory");
     expect(homepage).not.toContain("Future languages and premium tutors when available");
@@ -45,8 +51,9 @@ describe("homepage reflects the current AIko product", () => {
     }
   });
 
-  it("discloses the current Premium checkout state", () => {
-    expect(subscription).toContain("Checkout is not connected yet");
+  it("presents Premium as coming soon without public yen pricing", () => {
+    expect(homepage).toContain("Coming soon");
     expect(homepage).toContain("Premium checkout is not connected yet");
+    expect(homepage).not.toContain("¥");
   });
 });
