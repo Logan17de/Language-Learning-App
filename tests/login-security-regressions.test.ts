@@ -15,6 +15,9 @@ const middleware = source("lib/supabase/middleware.ts");
 const hydrator = source("components/backend/backend-session-hydrator.tsx");
 const accountScope = source("lib/auth/account-scope.ts");
 const onboarding = source("components/onboarding/onboarding-flow.tsx");
+const postOnboardingDestination = source(
+  "lib/auth/post-onboarding-destination.ts",
+);
 
 describe("login security regressions", () => {
   it("accepts only normalized AIko-internal redirect targets", () => {
@@ -31,12 +34,13 @@ describe("login security regressions", () => {
     );
   });
 
-  it("uses the shared redirect validator throughout auth and onboarding", () => {
+  it("uses the shared redirect validator throughout auth and stricter onboarding handoff", () => {
     expect(authService).toContain("safeInternalRedirect(next)");
     expect(authForm).toContain("safeInternalRedirect(");
     expect(loginFlow).toContain("withSafeNext(\"/signup\", requestedNext)");
     expect(oauthCallback).toContain("safeInternalRedirect(url.searchParams.get(\"next\"))");
-    expect(onboarding).toContain("safeInternalRedirect(");
+    expect(postOnboardingDestination).toContain("safeInternalRedirect(value)");
+    expect(onboarding).toContain("safePostOnboardingDestination(");
   });
 
   it("cleans up invalid password sessions and rejects inactive identities", () => {
