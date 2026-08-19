@@ -7,5 +7,8 @@ import type { LessonPackage } from "@/types/lesson";
  * deliberate word inspection instead of appearing beside unknown kanji.
  */
 export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
-  return mapBaseLesson(value);
+  return {
+    ...mapBaseLesson(value),
+    premiumPhaseAccess: value.premiumPhaseAccess,
+  };
 }
