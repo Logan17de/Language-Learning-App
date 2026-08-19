@@ -2,17 +2,24 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, LoaderCircle } from "lucide-react";
+import {
+  AlertTriangle,
+  Crown,
+  Headphones,
+  LoaderCircle,
+  Mic2,
+} from "lucide-react";
 import type { LessonPackage } from "@/types/lesson";
 import type { LessonPhaseId, LessonSession } from "@/types/lesson-session";
 import { calculateLessonCompletion } from "@/lib/scoring-utils";
+import { calculateLessonXp } from "@/lib/xp";
 import { phaseIsComplete } from "@/lib/lesson-phase-progress";
 import {
   createEmptyLessonSession,
   normalizeLessonSession,
   useAppStore,
 } from "@/store/app-store";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { LessonPlayerShell } from "@/components/lesson/lesson-player-shell";
 import { StoryPhase } from "@/components/lesson/story-phase";
 import { VocabularyPhase } from "@/components/lesson/vocabulary-phase";
@@ -26,8 +33,6 @@ import {
   restoreLessonProgress,
   syncLessonProgress,
 } from "@/lib/sync/backend-sync";
-import { lessonSessionRepository } from "@/lib/repositories/lesson-session-repository";
-import { discardLessonSyncOperations } from "@/lib/sync/offline-queue";
 
 function preferAdvancedSession(
   local: LessonSession,
@@ -49,6 +54,31 @@ function preferAdvancedSession(
     : local;
 }
 
+function completionForAccess(
+  lesson: LessonPackage,
+  session: LessonSession,
+  premiumPhasesAccessible: boolean,
+) {
+  const result = calculateLessonCompletion(lesson, session);
+  if (premiumPhasesAccessible) return result;
+
+  // Listening and Speaking are 20% of the canonical score. Free learners who
+  // skip the gated phases are scored only on the four phases they can access.
+  const score = Math.min(100, Math.round(result.score / 0.8));
+  return {
+    ...result,
+    score,
+    xpGained: calculateLessonXp(score),
+    pronunciationChange: 0,
+  };
+}
+
+function isPremiumPhase(
+  phaseId: LessonPhaseId,
+): phaseId is "listening" | "speaking" {
+  return phaseId === "listening" || phaseId === "speaking";
+}
+
 export function LessonPlayer({
   lesson,
   routeLessonId = lesson.id,
@@ -58,16 +88,17 @@ export function LessonPlayer({
 }) {
   const router = useRouter();
   const hasHydrated = useAppStore((state) => state.hasHydrated);
+  const subscriptionPlan = useAppStore((state) => state.subscription.plan);
   const saveLessonSession = useAppStore((state) => state.saveLessonSession);
-  const resetLessonSession = useAppStore((state) => state.resetLessonSession);
   const [session, setSession] = useState<LessonSession | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [showExit, setShowExit] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
-  const [exitError, setExitError] = useState("");
   const restoredLessonRef = useRef<string | null>(null);
+  const premiumPhasesAccessible = subscriptionPlan === "premium";
 
   useEffect(() => {
+    if (!premiumPhasesAccessible) return;
     for (const exercise of lesson.listeningExercises) {
       void preloadListeningAudio({
         text: exercise.transcript,
@@ -75,7 +106,7 @@ export function LessonPlayer({
         browserTts: lesson.runtimeAudio === "browser_tts",
       }).catch(() => undefined);
     }
-  }, [lesson]);
+  }, [lesson, premiumPhasesAccessible]);
 
   useEffect(() => {
     if (!hasHydrated || restoredLessonRef.current === lesson.id) return;
@@ -94,8 +125,6 @@ export function LessonPlayer({
         )
       : canonicalSession;
 
-    // A checkpoint protects the learner from refreshes or browser suspension.
-    // It is not exposed as a pause/resume product feature.
     queueMicrotask(() => {
       if (!active) return;
       setSession(fallback);
@@ -166,9 +195,14 @@ export function LessonPlayer({
   );
 
   const phase = lesson.phases[session?.currentPhaseIndex ?? 0];
+  const premiumPhase =
+    !premiumPhasesAccessible && isPremiumPhase(phase.id) ? phase.id : null;
   const canContinue = useMemo(
-    () => (session ? phaseIsComplete(session, phase.id, lesson) : false),
-    [lesson, phase.id, session],
+    () =>
+      session && !premiumPhase
+        ? phaseIsComplete(session, phase.id, lesson)
+        : false,
+    [lesson, phase.id, premiumPhase, session],
   );
   const isLastPhase = session
     ? session.currentPhaseIndex === lesson.phases.length - 1
@@ -200,7 +234,6 @@ export function LessonPlayer({
   function back() {
     if (!session) return;
     if (session.currentPhaseIndex === 0) {
-      setExitError("");
       setShowExit(true);
       return;
     }
@@ -223,25 +256,36 @@ export function LessonPlayer({
     });
   }
 
+  function completeCurrentLesson(
+    currentPhaseId: LessonPhaseId,
+    base: LessonSession,
+  ) {
+    const timedSession = {
+      ...base,
+      elapsedSeconds,
+      completed: true,
+      completedPhaseIds: Array.from(
+        new Set([...base.completedPhaseIds, currentPhaseId]),
+      ),
+    };
+    const result = completionForAccess(
+      lesson,
+      timedSession,
+      premiumPhasesAccessible,
+    );
+    const completeSession = { ...timedSession, completionResult: result };
+    const saved = updateSession(completeSession);
+    void syncLessonProgress(lesson, saved, currentPhaseId).catch(
+      () => undefined,
+    );
+    router.push(`/lesson/${lesson.id}/complete`);
+  }
+
   function continueLesson() {
     if (!session || !canContinue) return;
     const currentPhase = lesson.phases[session.currentPhaseIndex];
     if (session.currentPhaseIndex === lesson.phases.length - 1) {
-      const timedSession = {
-        ...session,
-        elapsedSeconds,
-        completed: true,
-        completedPhaseIds: Array.from(
-          new Set([...session.completedPhaseIds, currentPhase.id]),
-        ),
-      };
-      const result = calculateLessonCompletion(lesson, timedSession);
-      const completeSession = { ...timedSession, completionResult: result };
-      const saved = updateSession(completeSession);
-      void syncLessonProgress(lesson, saved, currentPhase.id).catch(
-        () => undefined,
-      );
-      router.push(`/lesson/${lesson.id}/complete`);
+      completeCurrentLesson(currentPhase.id, session);
       return;
     }
     const nextIndex = session.currentPhaseIndex + 1;
@@ -268,26 +312,52 @@ export function LessonPlayer({
     );
   }
 
-  async function leaveLesson() {
-    if (!session || isLeaving) return;
-    setIsLeaving(true);
-    setExitError("");
-
-    const abandoned = await lessonSessionRepository.abandonActive(lesson.id);
-    if (!abandoned.ok) {
-      setExitError(abandoned.error.message);
-      setIsLeaving(false);
+  function skipPremiumPhase() {
+    if (!session || premiumPhasesAccessible || !isPremiumPhase(phase.id)) {
       return;
     }
 
-    discardLessonSyncOperations(lesson.id);
-    if (routeLessonId !== lesson.id) {
-      discardLessonSyncOperations(routeLessonId);
+    const skipped = {
+      ...session,
+      completedPhaseIds: Array.from(
+        new Set([...session.completedPhaseIds, phase.id]),
+      ),
+      activities: {
+        ...session.activities,
+        [phase.id]: {
+          phaseId: phase.id,
+          activityIndex: 0,
+          completed: true,
+          attempts: 0,
+        },
+      },
+    };
+
+    if (session.currentPhaseIndex === lesson.phases.length - 1) {
+      completeCurrentLesson(phase.id, skipped);
+      return;
     }
-    resetLessonSession(lesson.id);
-    if (routeLessonId !== lesson.id) {
-      resetLessonSession(routeLessonId);
-    }
+
+    const nextIndex = session.currentPhaseIndex + 1;
+    const nextPhase = lesson.phases[nextIndex];
+    const saved = updateSession({
+      ...skipped,
+      currentPhaseIndex: nextIndex,
+      activityIndex: session.activities[nextPhase.id]?.activityIndex ?? 0,
+    });
+    void syncLessonProgress(lesson, saved, phase.id).catch(() => undefined);
+  }
+
+  async function leaveLesson() {
+    if (!session || isLeaving) return;
+    setIsLeaving(true);
+
+    const checkpoint = {
+      ...session,
+      elapsedSeconds,
+    };
+    saveLessonSession(checkpoint);
+    await syncLessonProgress(lesson, checkpoint).catch(() => false);
     router.replace("/learn");
   }
 
@@ -303,10 +373,7 @@ export function LessonPlayer({
         continueLabel={isLastPhase ? "See results" : nextLabel(phase.id)}
         onBack={back}
         onContinue={continueLesson}
-        onExit={() => {
-          setExitError("");
-          setShowExit(true);
-        }}
+        onExit={() => setShowExit(true)}
       >
         <div className="mb-5 flex justify-end">
           <LessonReportDialog
@@ -317,47 +384,54 @@ export function LessonPlayer({
             compact
           />
         </div>
-        {phase.id === "story" && (
-          <StoryPhase
-            lesson={lesson}
-            session={session}
-            onChange={updateSession}
-          />
-        )}
-        {phase.id === "vocabulary" && (
-          <VocabularyPhase
-            lesson={lesson}
-            session={session}
-            onChange={updateSession}
-          />
-        )}
-        {phase.id === "grammar" && (
-          <GrammarPhase
-            lesson={lesson}
-            session={session}
-            onChange={updateSession}
-          />
-        )}
-        {phase.id === "reading" && (
-          <ReadingPhase
-            lesson={lesson}
-            session={session}
-            onChange={updateSession}
-          />
-        )}
-        {phase.id === "listening" && (
-          <ListeningPhase
-            lesson={lesson}
-            session={session}
-            onChange={updateSession}
-          />
-        )}
-        {phase.id === "speaking" && (
-          <SpeakingPhase
-            lesson={lesson}
-            session={session}
-            onChange={updateSession}
-          />
+
+        {premiumPhase ? (
+          <PremiumPhaseGate phase={premiumPhase} onSkip={skipPremiumPhase} />
+        ) : (
+          <>
+            {phase.id === "story" && (
+              <StoryPhase
+                lesson={lesson}
+                session={session}
+                onChange={updateSession}
+              />
+            )}
+            {phase.id === "vocabulary" && (
+              <VocabularyPhase
+                lesson={lesson}
+                session={session}
+                onChange={updateSession}
+              />
+            )}
+            {phase.id === "grammar" && (
+              <GrammarPhase
+                lesson={lesson}
+                session={session}
+                onChange={updateSession}
+              />
+            )}
+            {phase.id === "reading" && (
+              <ReadingPhase
+                lesson={lesson}
+                session={session}
+                onChange={updateSession}
+              />
+            )}
+            {phase.id === "listening" && (
+              <ListeningPhase
+                lesson={lesson}
+                session={session}
+                onChange={updateSession}
+              />
+            )}
+            {phase.id === "speaking" && (
+              <SpeakingPhase
+                lesson={lesson}
+                session={session}
+                onChange={updateSession}
+              />
+            )}
+          </>
         )}
       </LessonPlayerShell>
 
@@ -373,22 +447,13 @@ export function LessonPlayer({
               <AlertTriangle className="size-5" />
             </span>
             <h2 id="exit-title" className="mt-6 text-2xl font-semibold">
-              Leave this lesson?
+              Leave for now?
             </h2>
             <p className="mt-3 leading-7 text-stone-500">
-              AIko doesn&apos;t pause lessons. If you leave now, this attempt
-              will end and this lesson won&apos;t be assigned to you again. AIko
-              will choose a different next lesson. Mastery already recorded
-              from completed activities stays saved.
+              Your checkpoint stays saved. You can return to this same lesson
+              from Learn and continue where you stopped. Leaving does not refund
+              or consume another daily lesson.
             </p>
-            {exitError && (
-              <p
-                role="alert"
-                className="mt-4 rounded-2xl bg-persimmon-50 p-4 text-sm font-semibold text-persimmon-700"
-              >
-                {exitError}
-              </p>
-            )}
             <div className="mt-6 flex gap-3">
               <Button
                 type="button"
@@ -408,13 +473,57 @@ export function LessonPlayer({
                 {isLeaving ? (
                   <LoaderCircle className="size-4 animate-spin" />
                 ) : null}
-                {isLeaving ? "Ending…" : "Leave lesson"}
+                {isLeaving ? "Saving…" : "Save & leave"}
               </Button>
             </div>
           </div>
         </div>
       )}
     </>
+  );
+}
+
+function PremiumPhaseGate({
+  phase,
+  onSkip,
+}: {
+  phase: "listening" | "speaking";
+  onSkip: () => void;
+}) {
+  const Icon = phase === "listening" ? Headphones : Mic2;
+  const label = phase === "listening" ? "Listening" : "Speaking";
+
+  return (
+    <div className="mx-auto max-w-2xl rounded-4xl border border-persimmon-200 bg-white p-7 text-center shadow-card sm:p-10">
+      <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-persimmon-50 text-persimmon-600">
+        <Icon className="size-6" aria-hidden="true" />
+      </span>
+      <div className="mt-6 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-[.14em] text-persimmon-700">
+        <Crown className="size-4" aria-hidden="true" />
+        Premium phase
+      </div>
+      <h2 className="mt-3 text-3xl font-semibold tracking-tight">
+        {label} is ready when you want it.
+      </h2>
+      <p className="mx-auto mt-3 max-w-xl leading-7 text-muted">
+        AIko generated this phase as part of your lesson. Subscribe to Premium
+        to practice it now, or skip it and continue. Skipping does not block
+        lesson completion.
+      </p>
+      <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+        <ButtonLink href="/subscription" className="sm:min-w-36">
+          Subscribe
+        </ButtonLink>
+        <Button
+          type="button"
+          variant="secondary"
+          className="sm:min-w-36"
+          onClick={onSkip}
+        >
+          Skip
+        </Button>
+      </div>
+    </div>
   );
 }
 

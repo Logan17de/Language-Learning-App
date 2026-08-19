@@ -2,7 +2,6 @@
 
 import { ArrowRight, Flame, Gem, Target } from "lucide-react";
 import Link from "next/link";
-import { useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,7 +9,6 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { progressRepository } from "@/lib/repositories/progress-repository";
 import { getBackendMode } from "@/lib/supabase/config";
 import { useAppStore } from "@/store/app-store";
-import { useBackendLessonStore } from "@/store/backend-lesson-store";
 import { useBackendProgressStore } from "@/store/backend-progress-store";
 
 export function HomeDashboard() {
@@ -20,14 +18,6 @@ export function HomeDashboard() {
   const hydrateBackendProgress = useAppStore(
     (state) => state.hydrateBackendProgress,
   );
-
-  const backendOwnerUserId = useBackendLessonStore(
-    (state) => state.ownerUserId,
-  );
-  const backendLessons = useBackendLessonStore((state) => state.lessons);
-  const backendStatus = useBackendLessonStore((state) => state.status);
-  const backendError = useBackendLessonStore((state) => state.error);
-  const loadBackendLessons = useBackendLessonStore((state) => state.load);
 
   const progressOwnerUserId = useBackendProgressStore(
     (state) => state.ownerUserId,
@@ -40,20 +30,6 @@ export function HomeDashboard() {
     (state) => state.completedLessonCount,
   );
 
-  useEffect(() => {
-    if (!user.id) return;
-    void loadBackendLessons(user.id);
-  }, [loadBackendLessons, user.id]);
-
-  const accountOwnsLessons =
-    backendMode !== "supabase" || backendOwnerUserId === user.id;
-  const accountLessons = accountOwnsLessons ? backendLessons : [];
-  const lessonStatus = accountOwnsLessons ? backendStatus : "idle";
-  const selectedLesson =
-    accountLessons.find(
-      (lesson) => !progress.completedLessonIds.includes(lesson.id),
-    ) ?? accountLessons[0];
-
   const progressReady =
     backendMode !== "supabase" ||
     (progressOwnerUserId === user.id && backendProgressStatus === "ready");
@@ -61,7 +37,6 @@ export function HomeDashboard() {
     backendMode === "supabase" &&
     progressOwnerUserId === user.id &&
     backendProgressStatus === "error";
-  const progressLoading = backendMode === "supabase" && !progressReady && !progressFailed;
   const authoritativeLessonCount =
     backendMode === "supabase"
       ? completedLessonCount
@@ -100,7 +75,8 @@ export function HomeDashboard() {
             Welcome back, {user.name}.
           </h1>
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted sm:text-base">
-            AIko chooses what to teach next, then uses what you do in each lesson to shape the lessons that follow.
+            Pick something you want to learn through today. AIko turns your
+            topic into one connected Japanese lesson at your level.
           </p>
         </div>
         <Link
@@ -120,82 +96,43 @@ export function HomeDashboard() {
           />
           <div className="relative">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <Badge tone="orange">
-                {lessonStatus === "exhausted" ? "Course up to date" : "Chosen for you"}
-              </Badge>
-              {selectedLesson && lessonStatus === "ready" && (
-                <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-semibold text-white/70">
-                  6 connected phases
-                </span>
-              )}
+              <Badge tone="orange">Create your lesson</Badge>
+              <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-semibold text-white/70">
+                6 connected phases
+              </span>
             </div>
 
             <h2 className="mt-7 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
-              {lessonStatus === "exhausted"
-                ? "You’ve completed every published lesson at this level."
-                : "One lesson. Six connected ways to make the language stick."}
+              What do you want to learn through today?
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
-              {lessonStatus === "loading" || lessonStatus === "idle"
-                ? "Choosing the next lesson that fits your learning path."
-                : lessonStatus === "error"
-                  ? backendError || "AIko couldn’t choose your next lesson right now."
-                  : lessonStatus === "exhausted"
-                    ? "There isn’t another published lesson to assign right now. Your completed work and mastery are safe, and new eligible content will appear here when it becomes available."
-                    : selectedLesson
-                      ? "Start in context, then reuse the same language through vocabulary, grammar, reading, listening, and speaking. Your performance updates mastery and helps AIko choose what should come next."
-                      : "No published lesson is available for your current course yet."}
+              Choose a topic and Japanese level on Learn. AIko builds a story,
+              vocabulary, grammar, reading, listening, and speaking around the
+              language you actually asked for.
             </p>
 
-            {lessonStatus === "ready" && selectedLesson && (
-              <div className="mt-7 flex flex-wrap gap-2 text-xs font-medium text-white/65">
-                <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                  Context → practice
-                </span>
-                <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                  6 connected phases
-                </span>
-                <span className="rounded-full bg-white/[0.07] px-3 py-2">
-                  Future lessons adapt
-                </span>
-              </div>
-            )}
+            <div className="mt-7 flex flex-wrap gap-2 text-xs font-medium text-white/65">
+              <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                Your topic
+              </span>
+              <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                Your level
+              </span>
+              <span className="rounded-full bg-white/[0.07] px-3 py-2">
+                Resume anytime
+              </span>
+            </div>
 
-            {lessonStatus === "ready" && selectedLesson ? (
-              <ButtonLink
-                href={`/lesson/${selectedLesson.id}/preview`}
-                className="mt-8 !bg-persimmon-500 px-7 hover:!bg-persimmon-600"
-              >
-                See my next lesson
-                <ArrowRight
-                  className="size-4 transition-transform duration-180 group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                />
-              </ButtonLink>
-            ) : lessonStatus === "error" ? (
-              <Button
-                type="button"
-                onClick={() => void loadBackendLessons(user.id)}
-                className="mt-8 !bg-persimmon-500 px-7 hover:!bg-persimmon-600"
-              >
-                Retry lesson selection
-              </Button>
-            ) : lessonStatus === "exhausted" ? (
-              <ButtonLink
-                href="/progress"
-                className="mt-8 !bg-persimmon-500 px-7 hover:!bg-persimmon-600"
-              >
-                See my progress
-              </ButtonLink>
-            ) : (
-              <Button
-                type="button"
-                disabled
-                className="mt-8 !bg-persimmon-500 px-7"
-              >
-                Choosing lesson…
-              </Button>
-            )}
+            <ButtonLink
+              href="/learn"
+              className="mt-8 !bg-persimmon-500 px-7 hover:!bg-persimmon-600"
+            >
+              Create or resume a lesson
+              <ArrowRight
+                className="size-4 transition-transform duration-180 group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </ButtonLink>
           </div>
         </Card>
 
@@ -211,7 +148,8 @@ export function HomeDashboard() {
                 </p>
                 <p className="mt-1 text-sm font-semibold text-ink">day streak</p>
                 <p className="mt-2 text-xs leading-5 text-muted">
-                  Complete at least one lesson on consecutive days to keep your streak alive.
+                  Complete at least one lesson on consecutive days to keep your
+                  streak alive.
                 </p>
               </Card>
 
@@ -224,7 +162,8 @@ export function HomeDashboard() {
                 </p>
                 <p className="mt-1 text-sm font-semibold text-ink">total XP</p>
                 <p className="mt-2 text-xs leading-5 text-muted">
-                  Each completed lesson earns 50 base XP plus your lesson score, up to 150 XP.
+                  Each completed lesson earns 50 base XP plus your lesson score,
+                  up to 150 XP.
                 </p>
               </Card>
             </>
@@ -242,7 +181,8 @@ export function HomeDashboard() {
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted">
                 {progressFailed
-                  ? backendProgressError || "AIko couldn’t load your progress from the server."
+                  ? backendProgressError ||
+                    "AIko couldn’t load your progress from the server."
                   : "Your XP and streak will appear once the server confirms the latest values."}
               </p>
               {progressFailed && (
@@ -280,7 +220,8 @@ export function HomeDashboard() {
           {progressReady ? (
             <>
               <p className="mt-2 text-sm leading-6 text-muted">
-                Mastery updates automatically from your answers, listening, reading, and speaking activity across lessons.
+                Mastery updates automatically from your answers, listening,
+                reading, and speaking activity across lessons.
               </p>
               <ProgressBar
                 value={progress.levelCompletion}
@@ -288,9 +229,15 @@ export function HomeDashboard() {
                 aria-label="Learning progress"
               />
               <div className="mt-5 grid grid-cols-3 gap-2 text-center">
-                <MiniStat value={progress.learnedVocabularyCount} label="vocabulary" />
+                <MiniStat
+                  value={progress.learnedVocabularyCount}
+                  label="vocabulary"
+                />
                 <MiniStat value={progress.learnedGrammarCount} label="grammar" />
-                <MiniStat value={authoritativeLessonCount ?? 0} label="lessons" />
+                <MiniStat
+                  value={authoritativeLessonCount ?? 0}
+                  label="lessons"
+                />
               </div>
               <ButtonLink
                 href="/progress"
