@@ -79,6 +79,31 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // Story is the first usable learning content in the progressive flow. Once it
+  // is about to leave the server, a free learner's reserved daily entitlement is
+  // permanently consumed. A later generation failure therefore cannot refund a
+  // lesson the learner has already started using.
+  if (story) {
+    const consumed = await admin
+      .from("custom_lesson_requests")
+      .update({ entitlement_consumed_at: new Date().toISOString() })
+      .eq("id", requestId)
+      .eq("user_id", auth.userId)
+      .eq("uses_free_daily_entitlement", true)
+      .is("entitlement_consumed_at", null);
+    if (consumed.error) {
+      console.error("Free lesson entitlement could not be consumed before Story exposure.", {
+        requestId,
+        userId: auth.userId,
+        message: consumed.error.message,
+      });
+      return response(
+        { error: "AIko could not open this lesson safely. Please try again." },
+        500,
+      );
+    }
+  }
+
   const lessonId = typeof row.lesson_id === "string" ? row.lesson_id : null;
   const audioStatus = stringValue(row.audio_status, "pending");
   const retryable = status === "retryable_failure";
