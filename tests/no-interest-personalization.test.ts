@@ -5,24 +5,28 @@ function source(path: string): string {
   return readFileSync(path, "utf8");
 }
 
-describe("learner interests are not part of the active product", () => {
-  it("does not collect or persist interests in learner UI state", () => {
-    for (const path of [
-      "components/onboarding/onboarding-flow.tsx",
-      "components/profile/profile-form.tsx",
-      "store/app-store.ts",
-      "types/learner.ts",
-      "types/app-preferences.ts",
-      "data/default-learner-state.ts",
-      "lib/repositories/profile-repository.ts",
-      "lib/repositories/progress-repository.ts",
-    ]) {
-      expect(source(path).toLowerCase(), path).not.toContain("interest");
-    }
+const generationRoute = source("app/api/custom-lessons/generate/route.ts");
+const entitlementMigration = source(
+  "supabase/migrations/20260819115000_learn_entitlement_security_closure.sql",
+);
+const interestContractMigration = source(
+  "supabase/migrations/20260819122500_remove_custom_lesson_interest_contract.sql",
+);
+
+describe("learner interests never personalize lessons", () => {
+  it("starts lessons from only the explicit /learn topic and JLPT level", () => {
+    expect(generationRoute).toContain("const topic =");
+    expect(generationRoute).toContain("const level = input.level");
+    expect(generationRoute).toContain('rawClient.rpc("begin_custom_lesson_generation_v5"');
+    expect(generationRoute).toContain("p_topic: topic");
+    expect(generationRoute).toContain("p_level: level");
+    expect(generationRoute.toLowerCase()).not.toContain("interest");
   });
 
-  it("does not send interests into lesson generation or prompts", () => {
+  it("does not send interests into planning, activity generation, or prompts", () => {
     for (const path of [
+      "lib/custom-lessons/job-runner.ts",
+      "lib/custom-lessons/fast-path.ts",
       "lib/gemini/adaptive-story-generation.ts",
       "lib/gemini/lesson-plan-v3.ts",
       "lib/gemini/story-pipeline-v3.ts",
@@ -37,31 +41,80 @@ describe("learner interests are not part of the active product", () => {
     }
   });
 
-  it("does not expose interest-based assignment metadata in active TypeScript", () => {
-    const database = source("types/database.ts").toLowerCase();
-    const repository = source("lib/repositories/lesson-repository.ts").toLowerCase();
-
-    expect(database).not.toContain("interest");
-    expect(database).not.toContain("pro_interest");
-    expect(repository).not.toContain("interest");
-    expect(repository).not.toContain("pro_interest");
-    expect(repository).toContain('"standard" | "pro_custom"');
+  it("does not use interests in learner scoring, mastery, or lesson persistence", () => {
+    for (const path of [
+      "lib/sync/backend-sync.ts",
+      "lib/repositories/lesson-session-repository.ts",
+      "lib/lesson-phase-progress.ts",
+      "lib/repositories/lesson-repository.ts",
+    ]) {
+      expect(source(path).toLowerCase(), path).not.toContain("interest");
+    }
   });
 
-  it("removes interest ranking and columns in the current database migration", () => {
-    const migration = source(
-      "supabase/migrations/20260817150000_remove_interest_personalization.sql",
+  it("uses only requested level and normalized topic for exact lesson reuse", () => {
+    expect(entitlementMigration).toContain("v_normalized_topic := public.normalize_lesson_topic(p_topic)");
+    expect(entitlementMigration).toContain("candidate.jlpt_level = p_level");
+    expect(entitlementMigration).toContain("candidate.normalized_topic = v_normalized_topic");
+    expect(entitlementMigration).not.toContain("v_interests");
+  });
+
+  it("keeps the daily quota boundary independent from interests", () => {
+    const start = entitlementMigration.indexOf(
+      "create or replace function public.lesson_quota_timezone",
     );
-
-    expect(migration).toContain("set selection_mode = 'standard'");
-    expect(migration).toContain("drop column if exists interest_matches");
-    expect(migration).toContain("drop column if exists interests");
-    expect(migration).not.toContain("interest_score");
-    expect(migration).not.toContain("v_use_interests");
-    expect(migration).not.toContain("'pro_interest' end");
+    const end = entitlementMigration.indexOf(
+      "create or replace function public.begin_custom_lesson_generation_v5",
+    );
+    expect(start).toBeGreaterThanOrEqual(0);
+    expect(end).toBeGreaterThan(start);
+    expect(entitlementMigration.slice(start, end).toLowerCase()).not.toContain(
+      "interest",
+    );
   });
 
-  it("does not advertise interests on public or subscription pages", () => {
+  it("removes the interest field from the active assignment/storage contract", () => {
+    expect(interestContractMigration).toContain(
+      "drop function if exists public.begin_custom_lesson_generation_v2",
+    );
+    expect(interestContractMigration).toContain(
+      "drop function if exists public.begin_custom_lesson_generation_v3",
+    );
+    expect(interestContractMigration).toContain(
+      "drop function if exists public.begin_custom_lesson_generation_v4",
+    );
+    expect(interestContractMigration).toContain(
+      "drop function if exists public.store_generated_lesson_package(uuid, jsonb, integer)",
+    );
+    expect(interestContractMigration).toContain(
+      "v_definition := replace(v_definition, '''pro_custom''', '''custom_topic''')",
+    );
+    expect(interestContractMigration).toContain(
+      "column_name ilike '%interest%'",
+    );
+    expect(interestContractMigration).toContain(
+      "pg_get_functiondef(p.oid) ilike '%interest_matches%'",
+    );
+    expect(interestContractMigration).toContain(
+      "pg_get_functiondef(p.oid) ilike '%profiles.interests%'",
+    );
+    expect(interestContractMigration).toContain(
+      "pg_get_functiondef(p.oid) ilike '%pro_interest%'",
+    );
+  });
+
+  it("allows old assignment modes only as inactive history", () => {
+    expect(interestContractMigration).toContain("selection_mode = 'custom_topic'");
+    expect(interestContractMigration).toContain(
+      "selection_mode in ('standard', 'pro_custom')",
+    );
+    expect(interestContractMigration).toContain(
+      "status in ('completed', 'abandoned')",
+    );
+    expect(interestContractMigration).not.toContain("selection_mode = 'pro_interest'");
+  });
+
+  it("does not advertise interest personalization as a product feature", () => {
     expect(source("app/page.tsx").toLowerCase()).not.toContain("interest");
     expect(source("components/subscription/subscription-page.tsx").toLowerCase()).not.toContain("interest");
   });
