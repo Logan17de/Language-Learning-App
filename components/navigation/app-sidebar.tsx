@@ -83,6 +83,7 @@ function SidebarLink({
   return (
     <Link
       href={href}
+      prefetch={false}
       aria-current={active ? "page" : undefined}
       className={cn(
         "group flex min-h-12 items-center gap-3 rounded-2xl px-3 text-sm font-semibold transition duration-180 focus:outline-none focus-visible:ring-4 focus-visible:ring-moss-100",
