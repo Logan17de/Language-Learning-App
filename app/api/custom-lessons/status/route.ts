@@ -4,6 +4,7 @@ import { authorize } from "@/lib/auth/server-authorization";
 import { buildInteractiveStory } from "@/lib/gemini/lesson-activity-groups";
 import type { ResolvedLessonLibrary, StoryDraft } from "@/lib/gemini/lesson-engine-v2";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,70 +22,14 @@ function stringValue(value: unknown, fallback: string): string {
   return typeof value === "string" && value.trim() ? value : fallback;
 }
 
-async function confirmStoryEntitlement(
-  admin: SupabaseClient,
-  requestId: string,
-  userId: string,
-): Promise<{ ok: true } | { ok: false; message: string }> {
-  const [profile, request] = await Promise.all([
-    admin
-      .from("profiles")
-      .select("subscription_plan")
-      .eq("id", userId)
-      .maybeSingle(),
-    admin
-      .from("custom_lesson_requests")
-      .select("id,uses_free_daily_entitlement,entitlement_consumed_at")
-      .eq("id", requestId)
-      .eq("user_id", userId)
-      .maybeSingle(),
-  ]);
-
-  if (profile.error || request.error || !profile.data || !request.data) {
-    return { ok: false, message: "The lesson entitlement could not be verified." };
-  }
-
-  if (profile.data.subscription_plan !== "free") return { ok: true };
-  if (request.data.uses_free_daily_entitlement !== true) {
-    return { ok: false, message: "The free lesson entitlement is invalid." };
-  }
-  if (request.data.entitlement_consumed_at) return { ok: true };
-
-  const consumed = await admin
-    .from("custom_lesson_requests")
-    .update({ entitlement_consumed_at: new Date().toISOString() })
-    .eq("id", requestId)
-    .eq("user_id", userId)
-    .eq("uses_free_daily_entitlement", true)
-    .is("entitlement_consumed_at", null)
-    .select("id,entitlement_consumed_at")
-    .maybeSingle();
-
-  if (consumed.error) {
-    return { ok: false, message: consumed.error.message };
-  }
-  if (consumed.data?.id === requestId && consumed.data.entitlement_consumed_at) {
-    return { ok: true };
-  }
-
-  // A concurrent status poll may have consumed the reservation between the
-  // initial read and UPDATE. Re-read the exact row and accept only an explicit,
-  // already-consumed acknowledgement. A zero-row UPDATE never exposes Story by
-  // itself.
-  const acknowledged = await admin
-    .from("custom_lesson_requests")
-    .select("id,uses_free_daily_entitlement,entitlement_consumed_at")
-    .eq("id", requestId)
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (acknowledged.error) {
-    return { ok: false, message: acknowledged.error.message };
-  }
-  return acknowledged.data?.id === requestId &&
-    acknowledged.data.uses_free_daily_entitlement === true &&
-    Boolean(acknowledged.data.entitlement_consumed_at)
-    ? { ok: true }
-    : { ok: false, message: "The free lesson entitlement was not consumed." };
+async function confirmStoryEntitlement(requestId: string): Promise<boolean> {
+  const client = await createClient();
+  if (!client) return false;
+  const rawClient = client as unknown as SupabaseClient;
+  const result = await rawClient.rpc("consume_custom_lesson_story_entitlement", {
+    p_request_id: requestId,
+  });
+  return !result.error && result.data === true;
 }
 
 export async function GET(request: NextRequest) {
@@ -145,23 +90,19 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Story is the first usable learning content in the progressive flow. A free
-  // learner must receive a positive, persisted entitlement acknowledgement
-  // before Story can leave the server. Later generation failures cannot refund
-  // learning content that has already been exposed.
-  if (story) {
-    const entitlement = await confirmStoryEntitlement(admin, requestId, auth.userId);
-    if (!entitlement.ok) {
-      console.error("Free lesson entitlement could not be confirmed before Story exposure.", {
-        requestId,
-        userId: auth.userId,
-        message: entitlement.message,
-      });
-      return response(
-        { error: "AIko could not open this lesson safely. Please try again." },
-        409,
-      );
-    }
+  // Story is the first usable learning content in the progressive flow. The
+  // authenticated database function must positively acknowledge the request's
+  // entitlement before Story can leave the server. A zero-row/misflagged free
+  // request therefore fails closed rather than exposing learning content.
+  if (story && !(await confirmStoryEntitlement(requestId))) {
+    console.error("Lesson entitlement could not be confirmed before Story exposure.", {
+      requestId,
+      userId: auth.userId,
+    });
+    return response(
+      { error: "AIko could not open this lesson safely. Please try again." },
+      409,
+    );
   }
 
   const lessonId = typeof row.lesson_id === "string" ? row.lesson_id : null;
