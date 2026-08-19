@@ -3,31 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
-import {
-  clearGoogleOAuthStorage,
-  createClient,
-  createGoogleOAuthClient,
-} from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { canAccessAdmin, type AppRole } from "@/lib/auth/permissions";
 import { useAdminStore } from "@/store/admin-store";
 
-type GoogleFlow = "login" | "signup" | "admin";
-
-function returnToAuth(flow: GoogleFlow | null, error: string) {
-  const pathname =
-    flow === "signup"
-      ? "/signup"
-      : flow === "admin"
-        ? "/admin/login"
-        : "/login";
-  const target = new URL(pathname, window.location.origin);
+function returnToAuth(adminFlow: boolean, error: string) {
+  const target = new URL(adminFlow ? "/admin/login" : "/login", window.location.origin);
   target.searchParams.set("error", error);
   window.location.replace(target.toString());
 }
 
 export function OAuthCallback() {
   const started = useRef(false);
-  const [status, setStatus] = useState("Completing your Google sign-in…");
+  const [status, setStatus] = useState("Completing your sign-in…");
 
   useEffect(() => {
     if (started.current) return;
@@ -35,13 +23,7 @@ export function OAuthCallback() {
 
     async function complete() {
       const url = new URL(window.location.href);
-      const requestedFlow = url.searchParams.get("flow");
-      const googleFlow: GoogleFlow | null =
-        requestedFlow === "login" ||
-        requestedFlow === "signup" ||
-        requestedFlow === "admin"
-          ? requestedFlow
-          : null;
+      const adminFlow = url.searchParams.get("flow") === "admin";
       const requestedNext = url.searchParams.get("next");
       const explicitNext =
         requestedNext?.startsWith("/") && !requestedNext.startsWith("//")
@@ -49,94 +31,45 @@ export function OAuthCallback() {
           : null;
 
       if (url.searchParams.has("error")) {
-        returnToAuth(googleFlow, "oauth-cancelled");
+        returnToAuth(adminFlow, "oauth-cancelled");
         return;
       }
 
       const code = url.searchParams.get("code");
       const client = createClient();
-      const exchangeClient = googleFlow
-        ? createGoogleOAuthClient()
-        : client;
-      if (!client || !exchangeClient) {
-        returnToAuth(googleFlow, "backend-not-configured");
+      if (!client) {
+        returnToAuth(adminFlow, "backend-not-configured");
         return;
       }
       if (!code) {
-        returnToAuth(googleFlow, "auth-callback");
+        returnToAuth(adminFlow, "auth-callback");
         return;
       }
 
       setStatus("Securing your AIko session…");
-      const { data: exchangeData, error: exchangeError } =
-        await exchangeClient.auth.exchangeCodeForSession(code);
+      const { error: exchangeError } = await client.auth.exchangeCodeForSession(code);
       if (exchangeError) {
         const lower = exchangeError.message.toLowerCase();
         const reason =
-          exchangeError.code === "bad_code_verifier" ||
-          lower.includes("code verifier")
+          exchangeError.code === "bad_code_verifier" || lower.includes("code verifier")
             ? "oauth-verifier"
             : exchangeError.code === "flow_state_expired" ||
                 exchangeError.code === "flow_state_not_found"
               ? "oauth-expired"
               : "oauth-exchange";
-        returnToAuth(googleFlow, reason);
+        returnToAuth(adminFlow, reason);
         return;
       }
 
-      if (googleFlow) {
-        if (!exchangeData.session) {
-          returnToAuth(googleFlow, "oauth-exchange");
-          return;
-        }
-        const { error: sessionError } = await client.auth.setSession({
-          access_token: exchangeData.session.access_token,
-          refresh_token: exchangeData.session.refresh_token,
-        });
-        if (sessionError) {
-          returnToAuth(googleFlow, "oauth-exchange");
-          return;
-        }
-        clearGoogleOAuthStorage();
-      }
-
-      // Remove the one-time authorization code before any further navigation.
       window.history.replaceState({}, "", "/auth/callback");
 
       const { data: auth, error: userError } = await client.auth.getUser();
       if (userError || !auth.user) {
-        returnToAuth(googleFlow, "oauth-exchange");
+        returnToAuth(adminFlow, "oauth-exchange");
         return;
       }
 
-      if (googleFlow && googleFlow !== "admin") {
-        const registrationComplete =
-          auth.user.user_metadata?.aiko_google_registration_complete;
-        const createdAt = Date.parse(auth.user.created_at);
-        const newlyCreated =
-          Number.isFinite(createdAt) && Date.now() - createdAt < 5 * 60 * 1000;
-
-        if (
-          googleFlow === "login" &&
-          (registrationComplete === false ||
-            (registrationComplete !== true && newlyCreated))
-        ) {
-          await client.auth.updateUser({
-            data: { aiko_google_registration_complete: false },
-          });
-          await client.auth.signOut({ scope: "local" });
-          returnToAuth(googleFlow, "no-google-account");
-          return;
-        }
-
-        if (registrationComplete !== true) {
-          await client.auth.updateUser({
-            data: { aiko_google_registration_complete: true },
-          });
-        }
-      }
-
-      if (googleFlow === "admin") {
+      if (adminFlow) {
         const profile = await client
           .from("profiles")
           .select("email,display_name,role,status")
@@ -152,7 +85,7 @@ export function OAuthCallback() {
           !canAccessAdmin(role)
         ) {
           await client.auth.signOut({ scope: "local" });
-          returnToAuth("admin", "admin-access-denied");
+          returnToAuth(true, "admin-access-denied");
           return;
         }
 
@@ -168,17 +101,20 @@ export function OAuthCallback() {
         return;
       }
 
+      if (explicitNext === "/reset-password") {
+        window.location.replace(explicitNext);
+        return;
+      }
+
       const preferences = await client
         .from("user_preferences")
         .select("onboarding_complete")
         .eq("user_id", auth.user.id)
         .maybeSingle();
-      const onboardingComplete =
-        preferences.data?.onboarding_complete ?? false;
-      const next = onboardingComplete
-        ? (explicitNext ?? "/home")
-        : "/onboarding";
-      window.location.replace(next);
+      const onboardingComplete = preferences.data?.onboarding_complete ?? false;
+      window.location.replace(
+        onboardingComplete ? (explicitNext ?? "/home") : "/onboarding",
+      );
     }
 
     void complete();
