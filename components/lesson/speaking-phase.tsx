@@ -17,6 +17,11 @@ const LIVE_TRANSCRIPTION_INTERVAL_MS = 2_000;
 const VOICE_RMS_THRESHOLD = 0.018;
 const REQUIRED_VOICE_FRAMES = 6;
 
+type TranscriptionResult = {
+  transcript: string;
+  score?: number;
+};
+
 export function SpeakingPhase({
   lesson,
   session,
@@ -163,8 +168,8 @@ export function SpeakingPhase({
     partialRequestInFlightRef.current = true;
     const audio = new Blob([...chunksRef.current], { type: mimeType });
     try {
-      const transcript = await transcribe(audio, true);
-      if (transcript) setLiveTranscript(transcript);
+      const result = await transcribe(audio, true);
+      if (result.transcript) setLiveTranscript(result.transcript);
     } catch {
       // A partial recording can be too short to transcribe. The final request
       // remains authoritative and reports any real error to the learner.
@@ -178,13 +183,14 @@ export function SpeakingPhase({
     const attempt = exerciseEvents.length + 1;
     const retry = attempt > 1;
     try {
-      const transcript = await transcribe(audio, false);
-      if (!transcript) {
+      const checked = await transcribe(audio, false);
+      const transcript = checked.transcript;
+      if (!transcript || typeof checked.score !== "number") {
         setError("No speech was detected. Read the sentence aloud and try again.");
         return;
       }
       setLiveTranscript(transcript);
-      const sentenceMatch = similarity(transcript, exercise.modelAnswer);
+      const sentenceMatch = checked.score;
       const event: SpeakingEvent = {
         id: `speaking_${exercise.id}_${attempt}`,
         exerciseId: exercise.id,
@@ -216,10 +222,12 @@ export function SpeakingPhase({
     }
   }
 
-  async function transcribe(audio: Blob, partial: boolean): Promise<string> {
+  async function transcribe(audio: Blob, partial: boolean): Promise<TranscriptionResult> {
     const requestNumber = ++transcriptRequestRef.current;
     const form = new FormData();
     form.append("audio", audio, "aiko-speaking.webm");
+    form.append("partial", partial ? "true" : "false");
+    if (!partial) form.append("exerciseId", exercise.id);
     const response = await fetch("/api/audio/transcribe", {
       method: "POST",
       body: form,
@@ -230,6 +238,7 @@ export function SpeakingPhase({
         ? (result as Record<string, unknown>)
         : null;
     const transcript = typeof record?.transcript === "string" ? record.transcript.trim() : "";
+    const score = typeof record?.score === "number" ? record.score : undefined;
     if (!response.ok || !transcript) {
       const apiMessage = typeof record?.error === "string" ? record.error : "";
       throw new Error(
@@ -242,7 +251,7 @@ export function SpeakingPhase({
       appliedTranscriptRef.current = requestNumber;
       setLiveTranscript(transcript);
     }
-    return transcript;
+    return { transcript, score };
   }
 
   function startVoiceDetection(stream: MediaStream) {
@@ -369,32 +378,4 @@ export function SpeakingPhase({
       </Card>
     </div>
   );
-}
-
-function normalized(value: string): string {
-  return value
-    .normalize("NFKC")
-    .toLocaleLowerCase()
-    .replace(/[\s、。！？,.!?・「」『』（）()]/g, "");
-}
-
-function similarity(leftValue: string, rightValue: string): number {
-  const left = normalized(leftValue);
-  const right = normalized(rightValue);
-  if (!left || !right) return 0;
-  const rows = Array.from({ length: left.length + 1 }, (_, index) => index);
-  for (let column = 1; column <= right.length; column += 1) {
-    let diagonal = rows[0];
-    rows[0] = column;
-    for (let row = 1; row <= left.length; row += 1) {
-      const previous = rows[row];
-      rows[row] = Math.min(
-        rows[row] + 1,
-        rows[row - 1] + 1,
-        diagonal + (left[row - 1] === right[column - 1] ? 0 : 1),
-      );
-      diagonal = previous;
-    }
-  }
-  return Math.max(0, Math.round((1 - rows[left.length] / Math.max(left.length, right.length)) * 100));
 }
