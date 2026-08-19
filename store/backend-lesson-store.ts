@@ -15,14 +15,19 @@ interface BackendLessonState {
   load: () => Promise<void>;
   assignNew: (excludedLessonId: string) => Promise<LessonPackage | undefined>;
   loadOne: (id: string) => Promise<LessonPackage | undefined>;
+  reset: () => void;
 }
 
-export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
-  lessons: [],
+const emptyState = {
+  lessons: [] as LessonPackage[],
   loading: false,
   assigning: false,
   loaded: false,
   error: "",
+};
+
+export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
+  ...emptyState,
   load: async () => {
     if (getBackendMode() !== "supabase" || get().loading || get().loaded) return;
     set({ loading: true, error: "" });
@@ -92,4 +97,5 @@ export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
     }));
     return lesson;
   },
+  reset: () => set({ ...emptyState }),
 }));
