@@ -30,6 +30,18 @@ interface LearningPreferenceUpdate {
   goal?: LearningGoal | null;
 }
 
+interface UntypedRpcResult {
+  data: unknown;
+  error: { message: string; code?: string } | null;
+}
+
+interface UntypedRpcClient {
+  rpc: (
+    fn: string,
+    args: Record<string, unknown>,
+  ) => Promise<UntypedRpcResult>;
+}
+
 function toDatabaseLevel(
   level: LearnerLevel,
 ): Database["public"]["Enums"]["jlpt_level"] {
@@ -171,16 +183,10 @@ export const profileRepository = {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 
     // Keep the generated Database type compatible with older deployed schemas
-    // while this new RPC rolls out. The migration owns the authoritative
-    // signature and the cast can be removed after the next db:types refresh.
-    const rpc = client.rpc as unknown as (
-      fn: string,
-      args: Record<string, unknown>,
-    ) => Promise<{
-      data: unknown;
-      error: { message: string; code?: string } | null;
-    }>;
-    const { error } = await rpc("complete_onboarding", {
+    // while this RPC is absent from the generated type. Cast the client rather
+    // than extracting client.rpc: SupabaseClient.rpc uses `this.rest` internally.
+    const rpcClient = client as unknown as UntypedRpcClient;
+    const { error } = await rpcClient.rpc("complete_onboarding", {
       p_display_name: displayName,
       p_learning_goal: goal,
       p_level: level,
