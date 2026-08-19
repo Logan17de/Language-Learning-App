@@ -88,14 +88,13 @@ export function LessonPlayer({
 }) {
   const router = useRouter();
   const hasHydrated = useAppStore((state) => state.hasHydrated);
-  const subscriptionPlan = useAppStore((state) => state.subscription.plan);
   const saveLessonSession = useAppStore((state) => state.saveLessonSession);
   const [session, setSession] = useState<LessonSession | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [showExit, setShowExit] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const restoredLessonRef = useRef<string | null>(null);
-  const premiumPhasesAccessible = subscriptionPlan === "premium";
+  const premiumPhasesAccessible = lesson.premiumPhaseAccess !== "locked";
 
   useEffect(() => {
     if (!premiumPhasesAccessible) return;
