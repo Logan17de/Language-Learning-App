@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
 import { evaluateGrammarTranslation } from "@/lib/lesson/translation-practice";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 function field(body: Record<string, unknown>, key: string, maximum: number): string {
@@ -37,6 +38,33 @@ export async function POST(request: NextRequest) {
       questionId,
       learnerAnswer: answer,
     });
+
+    const admin = createAdminClient() as unknown as SupabaseClient;
+    const prior = await admin
+      .from("lesson_activity_answers")
+      .select("attempts")
+      .eq("lesson_session_id", checked.lessonSessionId)
+      .eq("phase", "grammar_translation")
+      .eq("activity_id", questionId)
+      .maybeSingle();
+    if (prior.error) throw new Error(prior.error.message);
+    const savedAnswer = await admin.from("lesson_activity_answers").upsert(
+      {
+        user_id: auth.userId,
+        lesson_session_id: checked.lessonSessionId,
+        phase: "grammar_translation",
+        activity_id: questionId,
+        selected_answer: answer,
+        correct: checked.evaluation.correct,
+        attempts: (prior.data?.attempts ?? 0) + 1,
+        answer_data: {
+          serverValidated: true,
+          targetItemId: checked.targetItemId,
+        },
+      },
+      { onConflict: "lesson_session_id,phase,activity_id" },
+    );
+    if (savedAnswer.error) throw new Error(savedAnswer.error.message);
 
     // The question id resolves to the authoritative session and grammar target on
     // the server. A learner cannot redirect mastery by changing request metadata.
