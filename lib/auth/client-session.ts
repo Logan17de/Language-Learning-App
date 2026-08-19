@@ -4,8 +4,14 @@ import { authService, type AuthIdentity } from "@/lib/auth/auth-service";
 import { progressRepository } from "@/lib/repositories/progress-repository";
 import type { RepositoryResult } from "@/lib/repositories/result";
 import { useAppStore } from "@/store/app-store";
+import { useBackendLessonStore } from "@/store/backend-lesson-store";
 
 let hydrationInFlight: Promise<RepositoryResult<AuthIdentity | null>> | null = null;
+
+export function clearClientAccountState(): void {
+  useAppStore.getState().resetDemo();
+  useBackendLessonStore.getState().reset();
+}
 
 export async function applyClientIdentity(identity: AuthIdentity): Promise<void> {
   const state = useAppStore.getState();
@@ -35,7 +41,7 @@ export async function hydrateClientSession(): Promise<
   const promise = (async () => {
     const identity = await authService.getIdentity();
     if (!identity.ok || !identity.data) {
-      useAppStore.getState().resetDemo();
+      clearClientAccountState();
       return identity;
     }
 
