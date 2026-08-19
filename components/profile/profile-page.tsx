@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   BookCheck,
   Brain,
@@ -8,6 +9,7 @@ import {
   Crown,
   Flame,
   Gem,
+  LoaderCircle,
   LockKeyhole,
   LogOut,
   Mail,
@@ -23,6 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { authService } from "@/lib/auth/auth-service";
+import { getBackendMode } from "@/lib/supabase/config";
 
 const premiumFeatures = [
   {
@@ -243,7 +246,31 @@ function AccountIdentityCard({ premium }: { premium: boolean }) {
 
 function AccountActions() {
   const router = useRouter();
-  const signOut = useAppStore((state) => state.signOut);
+  const resetAccountState = useAppStore((state) => state.resetDemo);
+  const [signingOut, setSigningOut] = useState(false);
+  const [error, setError] = useState("");
+
+  async function logout() {
+    if (signingOut) return;
+    setError("");
+    setSigningOut(true);
+
+    if (getBackendMode() === "demo") {
+      resetAccountState();
+      router.replace("/login");
+      return;
+    }
+
+    const result = await authService.signOut();
+    if (!result.ok) {
+      setSigningOut(false);
+      setError(result.error.message);
+      return;
+    }
+
+    router.replace("/login");
+  }
+
   return (
     <div className="grid gap-2">
       <ButtonLink href="/settings" variant="secondary">Settings</ButtonLink>
@@ -251,15 +278,21 @@ function AccountActions() {
       <Button
         type="button"
         variant="ghost"
-        onClick={async () => {
-          await authService.signOut();
-          signOut();
-          router.replace("/login");
-          router.refresh();
-        }}
+        disabled={signingOut}
+        onClick={logout}
       >
-        <LogOut className="size-4" /> Log out
+        {signingOut ? (
+          <LoaderCircle className="size-4 animate-spin" />
+        ) : (
+          <LogOut className="size-4" />
+        )}
+        {signingOut ? "Signing out…" : "Log out"}
       </Button>
+      {error && (
+        <p className="text-center text-xs font-semibold text-red-700" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
