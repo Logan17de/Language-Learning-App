@@ -8,6 +8,13 @@ import {
 } from "@/lib/repositories/result";
 import type { JLPTLevel } from "@/types/lesson";
 
+export type CurrentLessonState =
+  | "building"
+  | "ready"
+  | "active"
+  | "completed"
+  | null;
+
 export interface LessonCreationState {
   plan: "free" | "premium";
   localDate: string;
@@ -20,6 +27,7 @@ export interface LessonCreationState {
   topic: string | null;
   level: JLPTLevel | null;
   lessonId: string | null;
+  lessonState: CurrentLessonState;
   entitlementConsumed: boolean;
 }
 
@@ -40,6 +48,14 @@ function parseState(value: unknown): LessonCreationState | null {
   if (plan !== "free" && plan !== "premium") return null;
 
   const level = text(row.level);
+  const rawLessonState = text(row.lesson_state);
+  const lessonState: CurrentLessonState =
+    rawLessonState === "building" ||
+    rawLessonState === "ready" ||
+    rawLessonState === "active" ||
+    rawLessonState === "completed"
+      ? rawLessonState
+      : null;
   return {
     plan,
     localDate: text(row.local_date) ?? "",
@@ -59,6 +75,7 @@ function parseState(value: unknown): LessonCreationState | null {
         ? level
         : null,
     lessonId: text(row.lesson_id),
+    lessonState,
     entitlementConsumed: row.entitlement_consumed === true,
   };
 }
