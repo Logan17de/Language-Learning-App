@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
+import { hasPremiumLessonPhaseAccess } from "@/lib/auth/lesson-phase-access";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   ensureAudioAsset,
@@ -14,6 +15,12 @@ export async function POST(request: NextRequest) {
   const auth = await authorize("learn");
   if (!auth.ok) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
+  }
+  if (!(await hasPremiumLessonPhaseAccess(auth.userId))) {
+    return NextResponse.json(
+      { error: "Listening audio is available with Premium." },
+      { status: 403 },
+    );
   }
 
   const body: unknown = await request.json().catch(() => null);
