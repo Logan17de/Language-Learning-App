@@ -322,6 +322,10 @@ function BuildStatusToast({
   }, [completedGroups, displayed, lessonReady, nextKey]);
 
   const prepared = Math.max(progressPercent, lessonReady ? 90 : 20);
+  const retryLabel =
+    lessonReady && audioStatus === "failed"
+      ? "Retry listening audio"
+      : "Retry lesson practice";
   return (
     <aside
       className={`fixed right-4 top-24 z-40 w-[min(22rem,calc(100vw-2rem))] transition-all duration-200 sm:right-6 ${
@@ -376,7 +380,7 @@ function BuildStatusToast({
             ) : (
               <RotateCcw className="size-4" />
             )}
-            {retrying ? "Queuing…" : "Retry listening audio"}
+            {retrying ? "Queuing…" : retryLabel}
           </Button>
         )}
       </Card>
@@ -397,6 +401,8 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
   const [lessonId, setLessonId] = useState<string | null>(null);
   const [lessonReady, setLessonReady] = useState(false);
   const [audioStatus, setAudioStatus] = useState("pending");
+  const [retryableFailure, setRetryableFailure] = useState(false);
+  const [permanentFailure, setPermanentFailure] = useState(false);
   const [error, setError] = useState("");
   const [retrying, setRetrying] = useState(false);
   const [pollVersion, setPollVersion] = useState(0);
@@ -435,13 +441,24 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
         typeof result.lessonId === "string" ? result.lessonId : null;
       if (nextLessonId) setLessonId(nextLessonId);
       setLessonReady(result.lessonReady === true || Boolean(nextLessonId));
-      if (result.permanentFailure || result.status === "permanent_failure") {
+      const nextPermanentFailure =
+        result.permanentFailure === true || result.status === "permanent_failure";
+      setPermanentFailure(nextPermanentFailure);
+      setRetryableFailure(
+        result.retryable === true || result.status === "retryable_failure",
+      );
+      if (nextPermanentFailure) {
         setError(
           result.message ||
             "AIko could not finish the remaining lesson activities.",
         );
       } else if (result.audioStatus === "failed") {
         setError("The lesson is ready, but listening audio needs another attempt.");
+      } else if (result.status === "retryable_failure") {
+        setError(
+          result.message ||
+            "A practice-building step needs another attempt.",
+        );
       } else {
         setError("");
       }
@@ -537,13 +554,19 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
     [lines],
   );
   const canContinue = storyComplete && lessonReady && Boolean(lessonId);
-  const canRetry = !retrying && lessonReady && audioStatus === "failed";
+  const canRetryAudio = !retrying && lessonReady && audioStatus === "failed";
+  const canRetryActivities =
+    !retrying &&
+    !lessonReady &&
+    !permanentFailure &&
+    (retryableFailure || failedGroups.length > 0);
+  const canRetry = canRetryAudio || canRetryActivities;
 
   async function retryRemaining() {
     if (!canRetry) return;
     setRetrying(true);
     setError("");
-    const action = lessonReady && audioStatus === "failed" ? "audio" : "activities";
+    const action = canRetryAudio ? "audio" : "activities";
     try {
       const response = await fetch("/api/custom-lessons/complete", {
         method: "POST",
@@ -559,6 +582,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
         );
         return;
       }
+      setRetryableFailure(false);
       setCurrentStage(
         action === "audio" ? "audio_queued" : "activities_queued",
       );
@@ -633,14 +657,26 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
               />
             </div>
           )}
-          {error && (
+          {canRetryActivities && (
             <Button
               type="button"
               variant="secondary"
               className="mt-6"
-              onClick={() => router.push("/custom-topic")}
+              disabled={retrying}
+              onClick={() => void retryRemaining()}
             >
-              Return to custom topic
+              {retrying ? <LoaderCircle className="size-4 animate-spin" /> : <RotateCcw className="size-4" />}
+              {retrying ? "Queuing…" : "Retry lesson practice"}
+            </Button>
+          )}
+          {error && !canRetryActivities && (
+            <Button
+              type="button"
+              variant="secondary"
+              className="mt-6"
+              onClick={() => router.push("/learn")}
+            >
+              Return to Learn
             </Button>
           )}
         </div>
