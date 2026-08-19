@@ -109,16 +109,24 @@ export function lessonContractIssues(lesson: LessonPackage): string[] {
     lesson.readingQuestions?.length ?? 0,
     CANONICAL_LESSON_ACTIVITY_COUNTS.reading,
   ));
-  issues.push(...exactCountIssue(
-    "Listening practice",
-    lesson.listeningExercises.length,
-    CANONICAL_LESSON_ACTIVITY_COUNTS.listening,
-  ));
-  issues.push(...exactCountIssue(
-    "Speaking practice",
-    lesson.speakingExercises.length,
-    CANONICAL_LESSON_ACTIVITY_COUNTS.speaking,
-  ));
+
+  const protectedPhasesLocked = lesson.premiumPhaseAccess === "locked";
+  if (protectedPhasesLocked) {
+    if (lesson.listeningExercises.length > 0 || lesson.speakingExercises.length > 0) {
+      issues.push("Locked Premium phases must not include protected activity payloads.");
+    }
+  } else {
+    issues.push(...exactCountIssue(
+      "Listening practice",
+      lesson.listeningExercises.length,
+      CANONICAL_LESSON_ACTIVITY_COUNTS.listening,
+    ));
+    issues.push(...exactCountIssue(
+      "Speaking practice",
+      lesson.speakingExercises.length,
+      CANONICAL_LESSON_ACTIVITY_COUNTS.speaking,
+    ));
+  }
 
   if (!splitMatches(
     lesson.vocabularyQuestions.map((question) => question.difficulty),
@@ -138,14 +146,17 @@ export function lessonContractIssues(lesson: LessonPackage): string[] {
   )) {
     issues.push("Reading practice must contain 2 easy, 2 medium, and 1 hard question.");
   }
-  if (!splitMatches(
+  if (!protectedPhasesLocked && !splitMatches(
     lesson.speakingExercises.map((exercise) => exercise.mode),
     { easy: 2, medium: 2, hard: 1 },
   )) {
     issues.push("Speaking practice must contain 2 easy, 2 medium, and 1 hard sentence.");
   }
 
-  if (lesson.speakingExercises.some((exercise) => exercise.questionType !== "read_aloud")) {
+  if (
+    !protectedPhasesLocked &&
+    lesson.speakingExercises.some((exercise) => exercise.questionType !== "read_aloud")
+  ) {
     issues.push("Every speaking activity must use read_aloud mode.");
   }
 
