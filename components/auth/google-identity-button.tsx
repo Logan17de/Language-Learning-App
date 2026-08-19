@@ -154,7 +154,7 @@ export function GoogleIdentityButton({
         className={disabled ? "pointer-events-none opacity-50" : undefined}
         aria-disabled={disabled}
       >
-        <div ref={containerRef} className="min-h-11 w-full" />
+        <div ref={containerRef} className="flex min-h-11 w-full justify-center" />
       </div>
     </>
   );
