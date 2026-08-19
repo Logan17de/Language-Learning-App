@@ -1,5 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
+import { hasPremiumLessonPhaseAccess } from "@/lib/auth/lesson-phase-access";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -23,6 +26,12 @@ export async function POST(request: NextRequest) {
   if (!auth.ok) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
   }
+  if (!(await hasPremiumLessonPhaseAccess(auth.userId))) {
+    return NextResponse.json(
+      { error: "Speaking practice is available with Premium." },
+      { status: 403 },
+    );
+  }
 
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) {
@@ -34,8 +43,19 @@ export async function POST(request: NextRequest) {
 
   const input = await request.formData().catch(() => null);
   const audio = input?.get("audio");
+  const partial = input?.get("partial") === "true";
+  const exerciseId =
+    typeof input?.get("exerciseId") === "string"
+      ? String(input?.get("exerciseId")).trim()
+      : "";
   if (!(audio instanceof File) || audio.size === 0) {
     return NextResponse.json({ error: "An audio recording is required." }, { status: 400 });
+  }
+  if (!partial && !exerciseId) {
+    return NextResponse.json(
+      { error: "A speaking exercise is required." },
+      { status: 400 },
+    );
   }
   const mediaType = audio.type.split(";")[0].toLowerCase();
   if (!ALLOWED_AUDIO_TYPES.has(mediaType) || audio.size > MAX_AUDIO_BYTES) {
@@ -60,8 +80,7 @@ export async function POST(request: NextRequest) {
       "Transcribe only clearly audible Japanese speech, exactly as spoken, using normal Japanese script and punctuation.",
       "If there is no intelligible speech, return an empty transcription.",
       "Never infer, complete, or invent a lesson sentence from silence or unclear audio.",
-    ]
-      .join("\n"),
+    ].join("\n"),
   );
 
   try {
@@ -93,7 +112,68 @@ export async function POST(request: NextRequest) {
         { status: 422 },
       );
     }
-    return NextResponse.json({ transcript: normalizedTranscript });
+    if (partial) {
+      return NextResponse.json({ transcript: normalizedTranscript });
+    }
+
+    const admin = createAdminClient() as unknown as SupabaseClient;
+    const exercise = await admin
+      .from("lesson_speaking_activities")
+      .select("id,lesson_version_id,model_answer")
+      .eq("id", exerciseId)
+      .maybeSingle();
+    if (exercise.error || !exercise.data) {
+      return NextResponse.json(
+        { error: "This speaking exercise is unavailable." },
+        { status: 404 },
+      );
+    }
+
+    const session = await admin
+      .from("lesson_sessions")
+      .select("id")
+      .eq("user_id", auth.userId)
+      .eq("lesson_version_id", exercise.data.lesson_version_id)
+      .eq("status", "active")
+      .order("started_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (session.error || !session.data) {
+      return NextResponse.json(
+        { error: "Start this lesson before using speaking practice." },
+        { status: 409 },
+      );
+    }
+
+    const score = similarity(normalizedTranscript, exercise.data.model_answer);
+    const prior = await admin
+      .from("lesson_activity_answers")
+      .select("attempts")
+      .eq("lesson_session_id", session.data.id)
+      .eq("phase", "speaking")
+      .eq("activity_id", exerciseId)
+      .maybeSingle();
+    if (prior.error) throw new Error(prior.error.message);
+
+    const saved = await admin.from("lesson_activity_answers").upsert(
+      {
+        user_id: auth.userId,
+        lesson_session_id: session.data.id,
+        phase: "speaking",
+        activity_id: exerciseId,
+        selected_answer: normalizedTranscript,
+        correct: score >= 70,
+        attempts: (prior.data?.attempts ?? 0) + 1,
+        answer_data: {
+          serverValidated: true,
+          score,
+        },
+      },
+      { onConflict: "lesson_session_id,phase,activity_id" },
+    );
+    if (saved.error) throw new Error(saved.error.message);
+
+    return NextResponse.json({ transcript: normalizedTranscript, score });
   } catch (error) {
     console.error("OpenAI transcription request failed.", {
       userId: auth.userId,
@@ -104,4 +184,37 @@ export async function POST(request: NextRequest) {
       { status: 502 },
     );
   }
+}
+
+function normalized(value: string): string {
+  return value
+    .normalize("NFKC")
+    .toLocaleLowerCase()
+    .replace(/[\s、。！？,.!?・「」『』（）()]/g, "");
+}
+
+function similarity(leftValue: string, rightValue: string): number {
+  const left = normalized(leftValue);
+  const right = normalized(rightValue);
+  if (!left || !right) return 0;
+  const rows = Array.from({ length: left.length + 1 }, (_, index) => index);
+  for (let column = 1; column <= right.length; column += 1) {
+    let diagonal = rows[0];
+    rows[0] = column;
+    for (let row = 1; row <= left.length; row += 1) {
+      const previous = rows[row];
+      rows[row] = Math.min(
+        rows[row] + 1,
+        rows[row - 1] + 1,
+        diagonal + (left[row - 1] === right[column - 1] ? 0 : 1),
+      );
+      diagonal = previous;
+    }
+  }
+  return Math.max(
+    0,
+    Math.round(
+      (1 - rows[left.length] / Math.max(left.length, right.length)) * 100,
+    ),
+  );
 }
