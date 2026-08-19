@@ -7,7 +7,6 @@ import {
   Crown,
   House,
   Settings,
-  Sparkles,
   UserRound,
 } from "lucide-react";
 import Link from "next/link";
@@ -23,7 +22,6 @@ const primary = [
 ];
 
 const secondary = [
-  { label: "Create lesson", href: "/custom-topic", icon: Sparkles },
   { label: "Subscription", href: "/subscription", icon: Crown },
   { label: "Settings", href: "/settings", icon: Settings },
   { label: "Support", href: "/support", icon: CircleHelp },
