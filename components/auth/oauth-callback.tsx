@@ -3,18 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
-import {
-  clearGoogleOAuthStorage,
-  createClient,
-  createGoogleOAuthClient,
-} from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { canAccessAdmin, type AppRole } from "@/lib/auth/permissions";
 import { clearPendingSignupConfirmation } from "@/lib/auth/pending-signup-confirmation";
 import { safeInternalRedirect } from "@/lib/auth/safe-internal-redirect";
 import { useAdminSessionStore } from "@/store/admin-session-store";
 
-type GoogleFlow = "login" | "signup" | "admin";
-type AuthCallbackFlow = GoogleFlow | "email-confirmation";
+type AuthCallbackFlow = "admin" | "email-confirmation";
 
 function callbackParam(url: URL, key: string) {
   const queryValue = url.searchParams.get(key);
@@ -29,7 +24,7 @@ function returnToAuth(
   next?: string | null,
 ) {
   const pathname =
-    flow === "signup" || flow === "email-confirmation"
+    flow === "email-confirmation"
       ? "/signup"
       : flow === "admin"
         ? "/admin/login"
@@ -64,17 +59,8 @@ export function OAuthCallback() {
       const url = new URL(window.location.href);
       const requestedFlow = url.searchParams.get("flow");
       const callbackFlow: AuthCallbackFlow | null =
-        requestedFlow === "login" ||
-        requestedFlow === "signup" ||
-        requestedFlow === "admin" ||
-        requestedFlow === "email-confirmation"
+        requestedFlow === "admin" || requestedFlow === "email-confirmation"
           ? requestedFlow
-          : null;
-      const googleFlow: GoogleFlow | null =
-        callbackFlow === "login" ||
-        callbackFlow === "signup" ||
-        callbackFlow === "admin"
-          ? callbackFlow
           : null;
       const explicitNext = safeInternalRedirect(url.searchParams.get("next"));
       const callbackError = callbackParam(url, "error");
@@ -92,8 +78,7 @@ export function OAuthCallback() {
 
       const code = callbackParam(url, "code");
       const client = createClient();
-      const exchangeClient = googleFlow ? createGoogleOAuthClient() : client;
-      if (!client || !exchangeClient) {
+      if (!client) {
         returnToAuth(callbackFlow, "backend-not-configured", explicitNext);
         return;
       }
@@ -111,12 +96,10 @@ export function OAuthCallback() {
       setStatus(
         callbackFlow === "email-confirmation"
           ? "Confirming your email…"
-          : googleFlow
-            ? "Securing your AIko session…"
-            : "Completing account setup…",
+          : "Securing your AIko admin session…",
       );
-      const { data: exchangeData, error: exchangeError } =
-        await exchangeClient.auth.exchangeCodeForSession(code);
+      const { error: exchangeError } =
+        await client.auth.exchangeCodeForSession(code);
       if (exchangeError) {
         if (callbackFlow === "email-confirmation") {
           returnToAuth(
@@ -126,33 +109,8 @@ export function OAuthCallback() {
           );
           return;
         }
-        const lower = exchangeError.message.toLowerCase();
-        const reason =
-          exchangeError.code === "bad_code_verifier" ||
-          lower.includes("code verifier")
-            ? "oauth-verifier"
-            : exchangeError.code === "flow_state_expired" ||
-                exchangeError.code === "flow_state_not_found"
-              ? "oauth-expired"
-              : "oauth-exchange";
-        returnToAuth(callbackFlow, reason, explicitNext);
+        returnToAuth(callbackFlow, "oauth-exchange", explicitNext);
         return;
-      }
-
-      if (googleFlow) {
-        if (!exchangeData.session) {
-          returnToAuth(googleFlow, "oauth-exchange", explicitNext);
-          return;
-        }
-        const { error: sessionError } = await client.auth.setSession({
-          access_token: exchangeData.session.access_token,
-          refresh_token: exchangeData.session.refresh_token,
-        });
-        if (sessionError) {
-          returnToAuth(googleFlow, "oauth-exchange", explicitNext);
-          return;
-        }
-        clearGoogleOAuthStorage();
       }
 
       window.history.replaceState({}, "", "/auth/callback");
@@ -170,34 +128,7 @@ export function OAuthCallback() {
         return;
       }
 
-      if (googleFlow && googleFlow !== "admin") {
-        const registrationComplete =
-          auth.user.user_metadata?.aiko_google_registration_complete;
-        const createdAt = Date.parse(auth.user.created_at);
-        const newlyCreated =
-          Number.isFinite(createdAt) && Date.now() - createdAt < 5 * 60 * 1000;
-
-        if (
-          googleFlow === "login" &&
-          (registrationComplete === false ||
-            (registrationComplete !== true && newlyCreated))
-        ) {
-          await client.auth.updateUser({
-            data: { aiko_google_registration_complete: false },
-          });
-          await client.auth.signOut({ scope: "local" });
-          returnToAuth(googleFlow, "no-google-account", explicitNext);
-          return;
-        }
-
-        if (registrationComplete !== true) {
-          await client.auth.updateUser({
-            data: { aiko_google_registration_complete: true },
-          });
-        }
-      }
-
-      if (googleFlow === "admin") {
+      if (callbackFlow === "admin") {
         const profile = await client
           .from("profiles")
           .select("email,display_name,role,status")
@@ -258,9 +189,7 @@ export function OAuthCallback() {
         return;
       }
 
-      if (callbackFlow === "email-confirmation") {
-        clearPendingSignupConfirmation();
-      }
+      clearPendingSignupConfirmation();
 
       const onboardingComplete =
         preferences.data?.onboarding_complete ?? false;

@@ -1,23 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  clearClientAccountState,
+  hydrateClientSession,
+} from "@/lib/auth/client-session";
+import { authService } from "@/lib/auth/auth-service";
 import { getBackendMode } from "@/lib/supabase/config";
 import { useAppStore } from "@/store/app-store";
-import { useBackendLessonStore } from "@/store/backend-lesson-store";
-import { useBackendProgressStore } from "@/store/backend-progress-store";
-import { authService } from "@/lib/auth/auth-service";
-import { prepareAccountScope } from "@/lib/auth/account-scope";
-import { progressRepository } from "@/lib/repositories/progress-repository";
-import { settingsRepository } from "@/lib/repositories/settings-repository";
 
 export function BackendSessionHydrator() {
   const backendMode = getBackendMode();
-  const syncBackendIdentity = useAppStore((state) => state.syncBackendIdentity);
-  const signOut = useAppStore((state) => state.signOut);
-  const setSubscription = useAppStore((state) => state.setSubscription);
-  const hydrateBackendProgress = useAppStore(
-    (state) => state.hydrateBackendProgress,
-  );
   const setBackendSessionChecked = useAppStore(
     (state) => state.setBackendSessionChecked,
   );
@@ -31,109 +24,24 @@ export function BackendSessionHydrator() {
 
     let active = true;
 
-    function resetScopedState() {
-      signOut();
-      useBackendLessonStore.getState().reset();
-      useBackendProgressStore.getState().reset();
+    async function restoreSession() {
+      if (active) setLoading(true);
+      await hydrateClientSession(true);
+      if (active) setLoading(false);
     }
 
-    async function hydrate(blocking: boolean) {
-      // Only the first account restore is allowed to block protected routes.
-      // Supabase also emits auth events for token/session refreshes (commonly
-      // when a browser tab becomes active again). Those refreshes must happen
-      // silently so the learner page stays mounted and visually unchanged.
-      if (blocking) {
-        setBackendSessionChecked(false);
-        if (active) setLoading(true);
-      }
-
-      const result = await authService.getIdentity();
-      if (!result.ok) {
-        // A transient background refresh failure should not tear down a page
-        // that already has a valid learner session. The next auth event can
-        // retry it. Initial restoration remains strict.
-        if (blocking) {
-          resetScopedState();
-          if (active) setLoading(false);
-        }
-        return;
-      }
-      if (!result.data) {
-        resetScopedState();
-        if (active) setLoading(false);
-        return;
-      }
-
-      const userId = result.data.id;
-      prepareAccountScope(userId, resetScopedState);
-      useBackendLessonStore.getState().scopeTo(userId);
-      useBackendProgressStore.getState().begin(userId, blocking);
-
-      syncBackendIdentity(
-        userId,
-        result.data.displayName,
-        result.data.email,
-        result.data.onboardingComplete,
-      );
-      setSubscription(
-        result.data.subscriptionPlan === "free" ? "free" : "premium",
-        result.data.subscriptionPlan === "premium_annual" ? "annual" : "monthly",
-      );
-
-      const [progress, settings] = await Promise.all([
-        progressRepository.loadCurrent(),
-        settingsRepository.loadCurrent(),
-      ]);
-
-      const accountStillCurrent =
-        useBackendProgressStore.getState().ownerUserId === userId &&
-        useAppStore.getState().user.id === userId;
-
-      if (progress.ok) {
-        if (accountStillCurrent) {
-          hydrateBackendProgress(progress.data);
-          useBackendProgressStore
-            .getState()
-            .succeed(userId, progress.data.completedLessonCount);
-        }
-      } else {
-        useBackendProgressStore
-          .getState()
-          .fail(userId, progress.error.message, blocking);
-      }
-
-      if (settings.ok && accountStillCurrent) {
-        // Server-backed settings replace any stale device-local settings without
-        // writing them straight back to Supabase during hydration.
-        useAppStore.setState({ settings: settings.data });
-      }
-
-      if (accountStillCurrent) setBackendSessionChecked(true);
-      if (blocking && active) setLoading(false);
-    }
-
-    void hydrate(true);
+    void restoreSession();
     const unsubscribe = authService.subscribe((signedIn) => {
-      if (!signedIn) {
-        resetScopedState();
-        if (active) setLoading(false);
-        return;
-      }
-      void hydrate(false);
+      if (signedIn) return;
+      clearClientAccountState();
+      if (active) setLoading(false);
     });
 
     return () => {
       active = false;
       unsubscribe();
     };
-  }, [
-    backendMode,
-    hydrateBackendProgress,
-    setBackendSessionChecked,
-    setSubscription,
-    signOut,
-    syncBackendIdentity,
-  ]);
+  }, [backendMode, setBackendSessionChecked]);
 
   if (!loading) return null;
   return (

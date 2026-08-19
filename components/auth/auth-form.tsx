@@ -3,11 +3,11 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { GoogleIdentityButton } from "@/components/auth/google-identity-button";
 import { Button } from "@/components/ui/button";
 import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
-import { useAppStore } from "@/store/app-store";
 import { authService } from "@/lib/auth/auth-service";
-import { prepareAccountScope } from "@/lib/auth/account-scope";
+import { applyClientIdentity } from "@/lib/auth/client-session";
 import { savePendingSignupConfirmation } from "@/lib/auth/pending-signup-confirmation";
 import {
   safeInternalRedirect,
@@ -24,7 +24,6 @@ const FIRST_NAME_MAX_LENGTH = 50;
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
-  const syncBackendIdentity = useAppStore((state) => state.syncBackendIdentity);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
@@ -45,10 +44,6 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         "Google sign-in was cancelled. You can try again when you’re ready.",
       "oauth-exchange":
         "Google sign-in could not be completed. Please try again.",
-      "oauth-verifier":
-        "The temporary Google sign-in session was lost. Start again in the same browser without clearing cookies.",
-      "oauth-expired":
-        "The Google sign-in request expired or was already used. Please start again.",
       "backend-not-configured":
         "Authentication is not configured for this deployment.",
       "auth-callback":
@@ -74,6 +69,13 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
+
+  function destination(accountOnboardingComplete: boolean): string {
+    if (accountOnboardingComplete) return requestedNext ?? "/home";
+    return requestedNext
+      ? `/onboarding?next=${encodeURIComponent(requestedNext)}`
+      : "/onboarding";
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -101,77 +103,74 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       }
     }
 
-    const next = requestedNext;
-    const onboardingHref = next
-      ? `/onboarding?next=${encodeURIComponent(next)}`
-      : "/onboarding";
-
     setLoading(true);
-    let accountOnboardingComplete = false;
     if (mode === "signup") {
       const result = await authService.signUp(
         normalizedEmail,
         password,
         normalizedName,
-        next ?? undefined,
+        requestedNext ?? undefined,
       );
-      setLoading(false);
-      if (!result.ok) return setError(result.error.message);
+      if (!result.ok) {
+        setLoading(false);
+        setError(result.error.message);
+        return;
+      }
       if (result.data.confirmationRequired) {
-        savePendingSignupConfirmation(normalizedEmail, next);
-        router.push(withSafeNext("/signup?confirmation=required", next));
+        setLoading(false);
+        savePendingSignupConfirmation(normalizedEmail, requestedNext);
+        router.push(
+          withSafeNext("/signup?confirmation=required", requestedNext),
+        );
         return;
       }
       if (!result.data.identity) {
+        setLoading(false);
         setError("Your new account could not be initialized. Please try again.");
         return;
       }
-      accountOnboardingComplete = result.data.identity.onboardingComplete;
-      prepareAccountScope(
-        result.data.identity.id,
-        useAppStore.getState().signOut,
-      );
-      syncBackendIdentity(
-        result.data.identity.id,
-        result.data.identity.displayName,
-        result.data.identity.email,
-        result.data.identity.onboardingComplete,
-      );
-    } else {
-      const result = await authService.signIn(normalizedEmail, password);
+
+      await applyClientIdentity(result.data.identity);
       setLoading(false);
-      if (!result.ok) return setError(result.error.message);
-      accountOnboardingComplete = result.data.onboardingComplete;
-      prepareAccountScope(result.data.id, useAppStore.getState().signOut);
-      syncBackendIdentity(
-        result.data.id,
-        result.data.displayName,
-        result.data.email,
-        result.data.onboardingComplete,
-      );
+      router.replace(destination(result.data.identity.onboardingComplete));
+      return;
     }
-    router.push(
-      !accountOnboardingComplete ? onboardingHref : (next ?? "/home"),
-    );
-    router.refresh();
+
+    const result = await authService.signIn(normalizedEmail, password);
+    if (!result.ok) {
+      setLoading(false);
+      setError(result.error.message);
+      return;
+    }
+
+    await applyClientIdentity(result.data);
+    setLoading(false);
+    router.replace(destination(result.data.onboardingComplete));
   }
 
-  async function googleSignIn() {
+  async function googleSignIn(credential: string, nonce: string) {
     setError("");
     setNotice("");
     if (backendMode !== "supabase") {
       setError("Authentication is not configured for this deployment.");
       return;
     }
+
     setLoading(true);
-    const result = await authService.signInWithGoogle(
+    const result = await authService.signInWithGoogleIdToken(
       mode,
-      requestedNext ?? undefined,
+      credential,
+      nonce,
     );
     if (!result.ok) {
       setLoading(false);
       setError(result.error.message);
+      return;
     }
+
+    await applyClientIdentity(result.data);
+    setLoading(false);
+    router.replace(destination(result.data.onboardingComplete));
   }
 
   return (
@@ -184,18 +183,25 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           Authentication is unavailable because this deployment is missing its backend configuration.
         </p>
       )}
-      <Button
-        type="button"
-        variant="secondary"
-        className="w-full"
-        disabled={loading || backendMode !== "supabase"}
-        onClick={googleSignIn}
-      >
-        <GoogleMark />
-        {mode === "login"
-          ? "Log in with Google"
-          : "Create account with Google"}
-      </Button>
+      {backendMode === "supabase" ? (
+        <GoogleIdentityButton
+          mode={mode}
+          disabled={loading}
+          onCredential={googleSignIn}
+          onError={setError}
+        />
+      ) : (
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full"
+          disabled
+        >
+          {mode === "login"
+            ? "Log in with Google"
+            : "Create account with Google"}
+        </Button>
+      )}
       <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[.16em] text-stone-500">
         <span className="h-px flex-1 bg-stone-200" />
         or use email
@@ -305,34 +311,13 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       >
         {loading && <LoaderCircle className="size-4 animate-spin" />}
         {loading
-          ? mode === "login" ? "Logging in…" : "Creating account…"
+          ? mode === "login"
+            ? "Logging in…"
+            : "Creating account…"
           : mode === "login"
             ? "Log in"
             : "Create my account"}
       </Button>
     </form>
-  );
-}
-
-function GoogleMark() {
-  return (
-    <svg className="size-4" viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="#4285F4"
-        d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.6h3.3c1.9-1.8 2.9-4.4 2.9-7.5Z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 22c2.7 0 5-.9 6.7-2.3l-3.3-2.6c-.9.6-2.1 1-3.4 1a5.9 5.9 0 0 1-5.5-4.1H3.1v2.7A10 10 0 0 0 12 22Z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M6.5 14a6 6 0 0 1 0-3.9V7.4H3.1a10 10 0 0 0 0 9.3L6.5 14Z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 6c1.5 0 2.8.5 3.9 1.5l2.9-2.9A9.8 9.8 0 0 0 3.1 7.4l3.4 2.7A5.9 5.9 0 0 1 12 6Z"
-      />
-    </svg>
   );
 }

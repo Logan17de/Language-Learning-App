@@ -40,10 +40,12 @@ export function ButtonLink({
   className,
   variant = "primary",
   href,
-}: SharedProps & { href: string }) {
+  prefetch = false,
+}: SharedProps & { href: string; prefetch?: boolean }) {
   return (
     <Link
       href={href}
+      prefetch={prefetch}
       className={cn("group", baseClass, variants[variant], className)}
     >
       {children}

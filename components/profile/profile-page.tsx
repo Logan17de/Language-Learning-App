@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   BookCheck,
   Brain,
@@ -230,7 +231,8 @@ function AccountIdentityCard({ premium }: { premium: boolean }) {
 
 function AccountActions() {
   const router = useRouter();
-  const signOut = useAppStore((state) => state.signOut);
+  const [signingOut, setSigningOut] = useState(false);
+
   return (
     <div className="grid gap-2">
       <ButtonLink href="/settings" variant="secondary">Settings</ButtonLink>
@@ -238,14 +240,20 @@ function AccountActions() {
       <Button
         type="button"
         variant="ghost"
+        disabled={signingOut}
         onClick={async () => {
-          await authService.signOut();
-          signOut();
+          if (signingOut) return;
+          setSigningOut(true);
+          const result = await authService.signOut();
+          if (!result.ok) {
+            setSigningOut(false);
+            return;
+          }
           router.replace("/login");
-          router.refresh();
         }}
       >
-        <LogOut className="size-4" /> Log out
+        <LogOut className="size-4" />
+        {signingOut ? "Signing out…" : "Log out"}
       </Button>
     </div>
   );

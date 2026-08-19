@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  clearGoogleOAuthStorage,
-  createClient,
-  createGoogleOAuthClient,
-} from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { getAppUrl } from "@/lib/supabase/config";
 import {
   isStrongEnough,
@@ -229,8 +225,8 @@ export const authService = {
   subscribe(listener: (signedIn: boolean) => void): () => void {
     const client = createClient();
     if (!client) return () => undefined;
-    const { data } = client.auth.onAuthStateChange((event, session) => {
-      listener(event !== "SIGNED_OUT" && Boolean(session?.user));
+    const { data } = client.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") listener(false);
     });
     return () => data.subscription.unsubscribe();
   },
@@ -315,12 +311,72 @@ export const authService = {
     );
   },
 
+  async signInWithGoogleIdToken(
+    mode: "login" | "signup",
+    token: string,
+    nonce: string,
+  ): Promise<RepositoryResult<AuthIdentity>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { data, error } = await client.auth.signInWithIdToken({
+      provider: "google",
+      token,
+      nonce,
+    });
+    if (error) return failure(error, friendlyAuthMessage(error.message, error.code));
+    if (!data.user) {
+      return failure(
+        { code: "GOOGLE_ID_TOKEN_NO_USER" },
+        "Google sign-in could not be completed. Please try again.",
+      );
+    }
+
+    const registrationComplete =
+      data.user.user_metadata?.aiko_google_registration_complete;
+    const createdAt = Date.parse(data.user.created_at);
+    const newlyCreated =
+      Number.isFinite(createdAt) && Date.now() - createdAt < 5 * 60 * 1000;
+
+    if (
+      mode === "login" &&
+      (registrationComplete === false ||
+        (registrationComplete !== true && newlyCreated))
+    ) {
+      await client.auth.updateUser({
+        data: { aiko_google_registration_complete: false },
+      });
+      await client.auth.signOut({ scope: "local" });
+      return failure(
+        { code: "NO_GOOGLE_ACCOUNT" },
+        "No AIko account is linked to this Google account. Create an account first.",
+      );
+    }
+
+    if (registrationComplete !== true) {
+      const { error: updateError } = await client.auth.updateUser({
+        data: { aiko_google_registration_complete: true },
+      });
+      if (updateError) {
+        await client.auth.signOut({ scope: "local" });
+        return failure(
+          updateError,
+          "Your Google account was verified, but AIko could not finish account setup. Please try again.",
+        );
+      }
+    }
+
+    return loadActiveIdentity(
+      client,
+      data.user.id,
+      data.user.email ?? "",
+    );
+  },
+
   async signInWithGoogle(
-    mode: "login" | "signup" | "admin",
+    mode: "admin",
     next?: string,
   ): Promise<RepositoryResult<null>> {
-    clearGoogleOAuthStorage();
-    const client = createGoogleOAuthClient();
+    const client = createClient();
     if (!client) return notConfigured();
     const safeNext = safeInternalRedirect(next);
     const callbackUrl = new URL("/auth/callback", getAppUrl());
