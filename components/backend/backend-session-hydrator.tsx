@@ -3,14 +3,15 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { getBackendMode } from "@/lib/supabase/config";
-import { useAppStore } from "@/store/app-store";
 import { authService } from "@/lib/auth/auth-service";
-import { hydrateClientSession } from "@/lib/auth/client-session";
+import {
+  clearClientAccountState,
+  hydrateClientSession,
+} from "@/lib/auth/client-session";
 
 export function BackendSessionHydrator() {
   const pathname = usePathname() ?? "";
   const backendMode = getBackendMode();
-  const resetAccountState = useAppStore((state) => state.resetDemo);
   const shouldHydrate = backendMode === "supabase" && !pathname.startsWith("/admin");
   const [loading, setLoading] = useState(shouldHydrate);
 
@@ -29,13 +30,13 @@ export function BackendSessionHydrator() {
     setLoading(true);
     void hydrate();
     const unsubscribe = authService.subscribe((signedIn) => {
-      if (!signedIn) resetAccountState();
+      if (!signedIn) clearClientAccountState();
     });
     return () => {
       active = false;
       unsubscribe();
     };
-  }, [resetAccountState, shouldHydrate]);
+  }, [shouldHydrate]);
 
   if (!shouldHydrate || !loading) return null;
   return (
