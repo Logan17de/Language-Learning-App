@@ -23,37 +23,10 @@ export interface CanonicalLesson {
   readingQuestions: Database["public"]["Tables"]["lesson_reading_questions"]["Row"][];
   listening: Database["public"]["Tables"]["lesson_listening_activities"]["Row"][];
   speaking: Database["public"]["Tables"]["lesson_speaking_activities"]["Row"][];
+  /** Server-backed profile access. Locked payloads never contain Premium activities. */
+  premiumPhaseAccess: "full" | "locked";
   /** Learner-specific kanji with at least ten recorded story appearances. */
   knownKanji: string[];
-}
-
-export interface AssignedLesson {
-  assignmentId: string;
-  lessonId: string;
-  lessonVersionId: string;
-  selectionMode: "standard" | "pro_custom";
-  reused: boolean;
-}
-
-function assignmentFromJson(value: unknown): AssignedLesson | null {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const row = value as Record<string, unknown>;
-  if (
-    typeof row.assignment_id !== "string" ||
-    typeof row.lesson_id !== "string" ||
-    typeof row.lesson_version_id !== "string"
-  ) {
-    return null;
-  }
-  const mode = row.selection_mode;
-  if (mode !== "standard" && mode !== "pro_custom") return null;
-  return {
-    assignmentId: row.assignment_id,
-    lessonId: row.lesson_id,
-    lessonVersionId: row.lesson_version_id,
-    selectionMode: mode,
-    reused: row.reused === true,
-  };
 }
 
 async function loadContent(
@@ -64,6 +37,49 @@ async function loadContent(
   if (!client) return notConfigured();
   const rawClient = client as unknown as SupabaseClient;
   const versionId = version.id;
+
+  const { data: auth, error: authError } = await client.auth.getUser();
+  if (authError || !auth.user) {
+    return failure(authError ?? { code: "AUTH" }, "Your session has expired.");
+  }
+  const profile = await client
+    .from("profiles")
+    .select("subscription_plan,role")
+    .eq("id", auth.user.id)
+    .maybeSingle();
+  if (profile.error || !profile.data) {
+    return failure(profile.error, "Your lesson access could not be verified.");
+  }
+  const premiumPhaseAccess: CanonicalLesson["premiumPhaseAccess"] =
+    profile.data.subscription_plan !== "free" ||
+    profile.data.role === "admin" ||
+    profile.data.role === "content_editor"
+      ? "full"
+      : "locked";
+
+  const listeningPromise =
+    premiumPhaseAccess === "full"
+      ? client
+          .from("lesson_listening_activities")
+          .select("*")
+          .eq("lesson_version_id", versionId)
+          .order("position")
+      : Promise.resolve({
+          data: [] as CanonicalLesson["listening"],
+          error: null,
+        });
+  const speakingPromise =
+    premiumPhaseAccess === "full"
+      ? client
+          .from("lesson_speaking_activities")
+          .select("*")
+          .eq("lesson_version_id", versionId)
+          .order("position")
+      : Promise.resolve({
+          data: [] as CanonicalLesson["speaking"],
+          error: null,
+        });
+
   const [
     story,
     storyWords,
@@ -113,16 +129,8 @@ async function loadContent(
       .select("*")
       .eq("lesson_version_id", versionId)
       .order("position"),
-    client
-      .from("lesson_listening_activities")
-      .select("*")
-      .eq("lesson_version_id", versionId)
-      .order("position"),
-    client
-      .from("lesson_speaking_activities")
-      .select("*")
-      .eq("lesson_version_id", versionId)
-      .order("position"),
+    listeningPromise,
+    speakingPromise,
     rawClient
       .from("learner_kanji_exposure_progress")
       .select("character,appearance_count")
@@ -163,6 +171,7 @@ async function loadContent(
     readingQuestions: readingQuestionTableMissing ? [] : (readingQuestions.data ?? []),
     listening: listening.data ?? [],
     speaking: speaking.data ?? [],
+    premiumPhaseAccess,
     knownKanji: (knownKanji.data ?? []).flatMap((row) =>
       typeof row.character === "string" ? [row.character] : [],
     ),
@@ -170,21 +179,6 @@ async function loadContent(
 }
 
 export const lessonRepository = {
-  async assignNext(): Promise<
-    RepositoryResult<{ assignment: AssignedLesson; lesson: CanonicalLesson } | null>
-  > {
-    const client = createClient();
-    if (!client) return notConfigured();
-    const { data, error } = await client.rpc("assign_next_lesson");
-    if (error) return failure(error, "AIko could not select your next lesson.");
-    const assignment = assignmentFromJson(data);
-    if (!assignment) return success(null);
-    const lesson = await this.getPublished(assignment.lessonId);
-    return lesson.ok
-      ? success({ assignment, lesson: lesson.data })
-      : failure(lesson.error, lesson.error.message);
-  },
-
   async listPublished(): Promise<RepositoryResult<Lesson[]>> {
     const client = createClient();
     if (!client) return notConfigured();
