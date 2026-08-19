@@ -128,16 +128,7 @@ export function LessonLibrary() {
 
   const busy = state === "generating";
   const isFree = creationState?.plan === "free";
-  const activeLessonHref = creationState?.lessonId
-    ? `/lesson/${creationState.lessonId}/play`
-    : creationState?.requestId && creationState.requestStatus !== "failed"
-      ? `/lesson/building/${encodeURIComponent(creationState.requestId)}`
-      : null;
-  const activeLessonLabel = creationState?.lessonId
-    ? "Resume lesson"
-    : creationState?.requestId
-      ? "Continue building"
-      : null;
+  const currentLesson = currentLessonAction(creationState);
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
@@ -188,14 +179,14 @@ export function LessonLibrary() {
                   {isFree ? (
                     creationState.canCreate ? (
                       <>
-                        <strong>1 free lesson available today.</strong> Your daily
-                        lesson is reserved when creation starts and counts once a
-                        usable lesson exists.
+                        <strong>1 free lesson available today.</strong> AIko
+                        reserves the slot when creation starts. It becomes used
+                        as soon as your first usable Story is opened.
                       </>
                     ) : (
                       <>
                         <strong>
-                          Today&apos;s free lesson is already reserved.
+                          Today&apos;s free lesson is already reserved or used.
                         </strong>{" "}
                         You can keep returning to the same lesson without using
                         another daily lesson.
@@ -228,26 +219,24 @@ export function LessonLibrary() {
                 </div>
               )}
 
-              {activeLessonHref && activeLessonLabel && (
+              {currentLesson && (
                 <div className="mt-5 rounded-2xl border border-moss-200 bg-white p-4">
                   <p className="text-xs font-bold uppercase tracking-[.14em] text-moss-600">
-                    Your current lesson
+                    {currentLesson.kicker}
                   </p>
                   <p className="mt-2 font-semibold">
                     {creationState?.topic ?? "Your custom lesson"}
                     {creationState?.level ? ` · ${creationState.level}` : ""}
                   </p>
                   <p className="mt-1 text-sm leading-6 text-muted">
-                    {creationState?.lessonId
-                      ? "Your progress is saved. Continue from where you left off."
-                      : "AIko is still building this lesson. Return to its progress screen anytime."}
+                    {currentLesson.detail}
                   </p>
                   <ButtonLink
-                    href={activeLessonHref}
+                    href={currentLesson.href}
                     variant="secondary"
                     className="mt-4"
                   >
-                    {activeLessonLabel}
+                    {currentLesson.label}
                   </ButtonLink>
                 </div>
               )}
@@ -360,7 +349,7 @@ export function LessonLibrary() {
                 <Feature
                   icon={Headphones}
                   title="Listening is always generated"
-                  detail="Premium learners can practice it immediately. Free learners see a Subscribe or Skip choice at runtime."
+                  detail="Premium learners can practice it immediately. Free learners receive no protected activity payload and see a Subscribe or Skip choice at runtime."
                 />
                 <Feature
                   icon={Mic2}
@@ -403,6 +392,49 @@ export function LessonLibrary() {
       </section>
     </div>
   );
+}
+
+function currentLessonAction(state: LessonCreationState | null): {
+  href: string;
+  label: string;
+  kicker: string;
+  detail: string;
+} | null {
+  if (!state?.lessonState) return null;
+  if (state.lessonState === "building" && state.requestId) {
+    return {
+      href: `/lesson/building/${encodeURIComponent(state.requestId)}`,
+      label: "Continue building",
+      kicker: "Lesson in progress",
+      detail: "AIko is still building this lesson. Return to its progress screen anytime.",
+    };
+  }
+  if (!state.lessonId) return null;
+  if (state.lessonState === "active") {
+    return {
+      href: `/lesson/${state.lessonId}/play`,
+      label: "Resume lesson",
+      kicker: "Your current lesson",
+      detail: "Your checkpoint is saved. Continue from where you left off.",
+    };
+  }
+  if (state.lessonState === "ready") {
+    return {
+      href: `/lesson/${state.lessonId}/play`,
+      label: "Start lesson",
+      kicker: "Lesson ready",
+      detail: "Your lesson is ready to start.",
+    };
+  }
+  if (state.lessonState === "completed") {
+    return {
+      href: `/lesson/${state.lessonId}/complete`,
+      label: "View results",
+      kicker: "Completed today",
+      detail: "This lesson is complete. You can review its results without treating it as an active lesson.",
+    };
+  }
+  return null;
 }
 
 function Field({
