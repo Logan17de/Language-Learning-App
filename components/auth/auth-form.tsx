@@ -4,9 +4,14 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { GoogleIdentityButton } from "@/components/auth/google-identity-button";
 import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
 import { useAppStore } from "@/store/app-store";
 import { authService } from "@/lib/auth/auth-service";
+import {
+  applyClientIdentity,
+  hydrateClientSession,
+} from "@/lib/auth/client-session";
 import { getBackendMode } from "@/lib/supabase/config";
 import {
   isStrongEnough,
@@ -31,18 +36,10 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     const messages: Record<string, string> = {
       "no-google-account":
         "No AIko account is connected to this Google address. Create an account first, then use Google to log in.",
-      "oauth-cancelled":
-        "Google sign-in was cancelled or did not return an authorization code. Please try again.",
-      "oauth-exchange":
-        "Google sign-in could not be completed. Please try again.",
-      "oauth-verifier":
-        "The temporary Google sign-in session was lost. Start again in the same browser without clearing cookies.",
-      "oauth-expired":
-        "The Google sign-in request expired or was already used. Please start again.",
       "backend-not-configured":
         "Authentication is not configured for this deployment.",
       "auth-callback":
-        "Google sign-in could not be completed. Please try again.",
+        "Authentication could not be completed. Please try again.",
     };
     const message = code ? messages[code] : null;
     if (!message) return;
@@ -56,6 +53,12 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     return value?.startsWith("/") && !value.startsWith("//") ? value : null;
   };
 
+  function destination(accountOnboardingComplete: boolean): string {
+    return accountOnboardingComplete
+      ? (requestedNext() ?? "/home")
+      : "/onboarding";
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -67,42 +70,54 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     if (backendMode === "demo") {
       window.setTimeout(() => {
         signIn(mode === "signup" ? name : undefined);
-        const next = requestedNext();
         router.push(
           mode === "signup" || !onboardingComplete
             ? "/onboarding"
-            : (next ?? "/home"),
+            : (requestedNext() ?? "/home"),
         );
       }, 650);
       return;
     }
 
-    let accountOnboardingComplete = false;
     if (mode === "signup") {
       const result = await authService.signUp(email, password, name);
-      setLoading(false);
-      if (!result.ok) return setError(result.error.message);
+      if (!result.ok) {
+        setLoading(false);
+        setError(result.error.message);
+        return;
+      }
       if (result.data.confirmationRequired) {
+        setLoading(false);
         router.push("/login?confirmation=required");
         return;
       }
-      signIn(name);
-    } else {
-      const result = await authService.signIn(email, password);
+
+      const session = await hydrateClientSession();
       setLoading(false);
-      if (!result.ok) return setError(result.error.message);
-      accountOnboardingComplete = result.data.onboardingComplete;
-      signIn(result.data.displayName);
+      if (!session.ok || !session.data) {
+        setError(
+          session.ok
+            ? "Your account was created, but AIko could not load your profile. Please sign in again."
+            : session.error.message,
+        );
+        return;
+      }
+      router.replace(destination(session.data.onboardingComplete));
+      return;
     }
-    router.push(
-      mode === "signup" || !accountOnboardingComplete
-        ? "/onboarding"
-        : (requestedNext() ?? "/home"),
-    );
-    router.refresh();
+
+    const result = await authService.signIn(email, password);
+    if (!result.ok) {
+      setLoading(false);
+      setError(result.error.message);
+      return;
+    }
+    await applyClientIdentity(result.data);
+    setLoading(false);
+    router.replace(destination(result.data.onboardingComplete));
   }
 
-  async function googleSignIn() {
+  async function googleSignIn(credential: string, nonce: string) {
     setError("");
     if (backendMode === "demo") {
       setError(
@@ -110,31 +125,59 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       );
       return;
     }
+
     setLoading(true);
-    const result = await authService.signInWithGoogle(
+    const result = await authService.signInWithGoogleIdToken(
       mode,
-      requestedNext() ?? undefined,
+      credential,
+      nonce,
     );
     if (!result.ok) {
       setLoading(false);
       setError(result.error.message);
+      return;
     }
+
+    const session = await hydrateClientSession();
+    setLoading(false);
+    if (!session.ok || !session.data) {
+      setError(
+        session.ok
+          ? "Google sign-in succeeded, but AIko could not load your learner profile. Please try again."
+          : session.error.message,
+      );
+      return;
+    }
+
+    router.replace(destination(session.data.onboardingComplete));
   }
 
   return (
     <form className="mt-8 space-y-5" onSubmit={submit}>
-      <Button
-        type="button"
-        variant="secondary"
-        className="w-full"
-        disabled={loading}
-        onClick={googleSignIn}
-      >
-        <GoogleMark />
-        {mode === "login"
-          ? "Log in with Google"
-          : "Create account with Google"}
-      </Button>
+      {backendMode === "supabase" ? (
+        <GoogleIdentityButton
+          mode={mode}
+          disabled={loading}
+          onCredential={googleSignIn}
+          onError={setError}
+        />
+      ) : (
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full"
+          disabled={loading}
+          onClick={() =>
+            setError(
+              "Google sign-in becomes available when Supabase Auth is connected.",
+            )
+          }
+        >
+          {mode === "login"
+            ? "Log in with Google"
+            : "Create account with Google"}
+        </Button>
+      )}
       <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[.16em] text-stone-300">
         <span className="h-px flex-1 bg-stone-200" />
         or use email
@@ -244,28 +287,5 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           : "Your account is secured by Supabase Auth."}
       </p>
     </form>
-  );
-}
-
-function GoogleMark() {
-  return (
-    <svg className="size-4" viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="#4285F4"
-        d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.6h3.3c1.9-1.8 2.9-4.4 2.9-7.5Z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 22c2.7 0 5-.9 6.7-2.3l-3.3-2.6c-.9.6-2.1 1-3.4 1a5.9 5.9 0 0 1-5.5-4.1H3.1v2.7A10 10 0 0 0 12 22Z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M6.5 14a6 6 0 0 1 0-3.9V7.4H3.1a10 10 0 0 0 0 9.3L6.5 14Z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 6c1.5 0 2.8.5 3.9 1.5l2.9-2.9A9.8 9.8 0 0 0 3.1 7.4l3.4 2.7A5.9 5.9 0 0 1 12 6Z"
-      />
-    </svg>
   );
 }
