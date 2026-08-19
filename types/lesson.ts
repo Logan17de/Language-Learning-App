@@ -185,4 +185,6 @@ export interface LessonPackage {
   speakingExercises: SpeakingExercise[];
   phases: LessonPhase[];
   runtimeAudio?: "stored_or_api" | "browser_tts";
+  /** Server-derived access marker. Locked lessons never include Premium phase payloads. */
+  premiumPhaseAccess?: "full" | "locked";
 }
