@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   Crown,
   Headphones,
+  Languages,
   LoaderCircle,
   Mic2,
 } from "lucide-react";
@@ -13,7 +14,10 @@ import type { LessonPackage } from "@/types/lesson";
 import type { LessonPhaseId, LessonSession } from "@/types/lesson-session";
 import { calculateLessonCompletion } from "@/lib/scoring-utils";
 import { calculateLessonXp } from "@/lib/xp";
-import { phaseIsComplete } from "@/lib/lesson-phase-progress";
+import {
+  grammarStandardIsComplete,
+  phaseIsComplete,
+} from "@/lib/lesson-phase-progress";
 import { restartIncompleteLessonPhase } from "@/lib/lesson-resume";
 import {
   createEmptyLessonSession,
@@ -36,6 +40,8 @@ import {
   syncLessonPhaseCompletion,
   syncLessonProgress,
 } from "@/lib/sync/backend-sync";
+
+type ProtectedPractice = "translation" | "listening" | "speaking";
 
 function preferDurableSession(
   local: LessonSession,
@@ -62,8 +68,8 @@ function completionForAccess(
   const result = calculateLessonCompletion(lesson, session);
   if (premiumPhasesAccessible) return result;
 
-  // Listening and Speaking are 20% of the canonical score. Free learners who
-  // skip the gated phases are scored only on the four phases they can access.
+  // This remains only an offline/display fallback. The server is reward
+  // authority. Free learners skip protected Translation/Listening/Speaking.
   const score = Math.min(100, Math.round(result.score / 0.8));
   return {
     ...result,
@@ -199,12 +205,21 @@ export function LessonPlayer({
   const phase = lesson.phases[session?.currentPhaseIndex ?? 0];
   const premiumPhase =
     !premiumPhasesAccessible && isPremiumPhase(phase.id) ? phase.id : null;
+  const translationGate = Boolean(
+    session &&
+      !premiumPhasesAccessible &&
+      phase.id === "grammar" &&
+      grammarStandardIsComplete(session, lesson),
+  );
+  const protectedPractice: ProtectedPractice | null = translationGate
+    ? "translation"
+    : premiumPhase;
   const canContinue = useMemo(
     () =>
-      session && !premiumPhase
+      session && !protectedPractice
         ? phaseIsComplete(session, phase.id, lesson)
         : false,
-    [lesson, phase.id, premiumPhase, session],
+    [lesson, phase.id, protectedPractice, session],
   );
   const isLastPhase = session
     ? session.currentPhaseIndex === lesson.phases.length - 1
@@ -234,29 +249,9 @@ export function LessonPlayer({
   }
 
   function back() {
-    if (!session || isCommitting) return;
+    if (isCommitting) return;
     setCommitError(null);
-    if (session.currentPhaseIndex === 0) {
-      setShowExit(true);
-      return;
-    }
-    const currentPhase = lesson.phases[session.currentPhaseIndex];
-    const previousIndex = session.currentPhaseIndex - 1;
-    const previousPhase = lesson.phases[previousIndex];
-    updateSession({
-      ...session,
-      activities: {
-        ...session.activities,
-        [currentPhase.id]: {
-          phaseId: currentPhase.id,
-          activityIndex: session.activityIndex,
-          completed: phaseIsComplete(session, currentPhase.id, lesson),
-          attempts: 1,
-        },
-      },
-      currentPhaseIndex: previousIndex,
-      activityIndex: session.activities[previousPhase.id]?.activityIndex ?? 0,
-    });
+    setShowExit(true);
   }
 
   async function commitAndAdvance(
@@ -360,16 +355,15 @@ export function LessonPlayer({
     void commitAndAdvance(currentPhase.id, session);
   }
 
-  function skipPremiumPhase() {
-    if (
-      !session ||
-      isCommitting ||
-      premiumPhasesAccessible ||
-      !isPremiumPhase(phase.id)
-    ) {
+  function skipProtectedPractice() {
+    if (!session || isCommitting || premiumPhasesAccessible) return;
+    if (translationGate) {
+      void commitAndAdvance("grammar", session);
       return;
     }
-    void commitAndAdvance(phase.id, session);
+    if (premiumPhase) {
+      void commitAndAdvance(premiumPhase, session);
+    }
   }
 
   async function leaveLesson() {
@@ -427,11 +421,11 @@ export function LessonPlayer({
           </div>
         ) : null}
 
-        {premiumPhase ? (
-          <PremiumPhaseGate
-            phase={premiumPhase}
+        {protectedPractice ? (
+          <PremiumPracticeGate
+            practice={protectedPractice}
             busy={isCommitting}
-            onSkip={skipPremiumPhase}
+            onSkip={skipProtectedPractice}
           />
         ) : (
           <>
@@ -529,17 +523,27 @@ export function LessonPlayer({
   );
 }
 
-function PremiumPhaseGate({
-  phase,
+function PremiumPracticeGate({
+  practice,
   busy,
   onSkip,
 }: {
-  phase: "listening" | "speaking";
+  practice: ProtectedPractice;
   busy: boolean;
   onSkip: () => void;
 }) {
-  const Icon = phase === "listening" ? Headphones : Mic2;
-  const label = phase === "listening" ? "Listening" : "Speaking";
+  const Icon =
+    practice === "translation"
+      ? Languages
+      : practice === "listening"
+        ? Headphones
+        : Mic2;
+  const label =
+    practice === "translation"
+      ? "Translation"
+      : practice === "listening"
+        ? "Listening"
+        : "Speaking";
 
   return (
     <div className="mx-auto max-w-2xl rounded-4xl border border-persimmon-200 bg-white p-7 text-center shadow-card sm:p-10">
@@ -548,15 +552,15 @@ function PremiumPhaseGate({
       </span>
       <div className="mt-6 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-[.14em] text-persimmon-700">
         <Crown className="size-4" aria-hidden="true" />
-        Premium phase
+        Premium practice
       </div>
       <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-        {label} is ready when you want it.
+        {label} is available with Premium.
       </h2>
       <p className="mx-auto mt-3 max-w-xl leading-7 text-muted">
-        AIko generated this phase as part of your lesson. Subscribe to Premium
-        to practice it now, or skip it and continue. Skipping does not block
-        lesson completion.
+        Subscribe to practice {label.toLowerCase()} now, or skip it and keep
+        moving forward. Skipping protected practice does not block lesson
+        completion and awards no protected mastery.
       </p>
       <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
         <ButtonLink href="/subscription" className="sm:min-w-36">
