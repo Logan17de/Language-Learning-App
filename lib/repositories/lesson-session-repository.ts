@@ -1,28 +1,12 @@
 import { createClient } from "@/lib/supabase/client";
 import { failure, notConfigured, success, type RepositoryResult } from "@/lib/repositories/result";
+import { isMissingPhaseAtomicRpc } from "@/lib/sync/phase-rpc-compatibility";
 import type { Database, Json } from "@/types/database";
 import type { LessonPhaseId } from "@/types/lesson-session";
 
 type LessonSession = Database["public"]["Tables"]["lesson_sessions"]["Row"];
 type LessonAnswer = Database["public"]["Tables"]["lesson_activity_answers"]["Insert"];
 type LessonCompletion = Database["public"]["Tables"]["lesson_completions"]["Row"];
-
-type RpcErrorLike = {
-  code?: string;
-  message?: string;
-};
-
-function isMissingPhaseRpc(error: unknown): boolean {
-  if (!error || typeof error !== "object") return false;
-  const value = error as RpcErrorLike;
-  const message = value.message ?? "";
-  return (
-    value.code === "PGRST202" ||
-    value.code === "42883" ||
-    message.includes("Could not find the function") ||
-    message.includes("does not exist")
-  );
-}
 
 export interface LessonCompletionInput {
   sessionId: string;
@@ -141,8 +125,8 @@ export const lessonSessionRepository = {
   },
 
   /**
-   * Returns null only when the phase-atomic RPC is absent from the pre-migration
-   * database. Validation/auth failures remain hard failures and never fall back.
+   * Returns null only when commit_lesson_phase itself is absent from the
+   * pre-migration database. Validation/auth failures remain hard failures.
    */
   async commitPhase(
     sessionId: string,
@@ -154,7 +138,9 @@ export const lessonSessionRepository = {
       p_session_id: sessionId,
       p_phase: phase,
     });
-    if (error && isMissingPhaseRpc(error)) return success(null);
+    if (error && isMissingPhaseAtomicRpc(error, "commit_lesson_phase")) {
+      return success(null);
+    }
     return error
       ? failure(error, "This phase could not be committed. Please try again.")
       : success(data);
@@ -176,15 +162,16 @@ export const lessonSessionRepository = {
       : success(data);
   },
 
-  /** Null means the DB predates phase-atomic resume and the caller should use
-   * the persisted checkpoint plus the same client-side restart sanitizer. */
+  /** Null means only that reset_incomplete_lesson_phase is not deployed yet. */
   async resetIncompletePhase(sessionId: string): Promise<RepositoryResult<Json | null>> {
     const client = createClient();
     if (!client) return notConfigured();
     const { data, error } = await client.rpc("reset_incomplete_lesson_phase", {
       p_session_id: sessionId,
     });
-    if (error && isMissingPhaseRpc(error)) return success(null);
+    if (error && isMissingPhaseAtomicRpc(error, "reset_incomplete_lesson_phase")) {
+      return success(null);
+    }
     return error
       ? failure(error, "Your saved lesson could not be restored safely.")
       : success(data);
