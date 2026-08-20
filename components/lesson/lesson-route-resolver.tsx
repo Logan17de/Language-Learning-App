@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import type { LessonPackage } from "@/types/lesson";
 import { isPlayableLesson } from "@/lib/lesson-search-utils";
+import { learnProductContractIsActive } from "@/lib/learn-product-contract";
+import { createClient } from "@/lib/supabase/client";
 import { LessonPreview } from "@/components/lesson/lesson-preview";
 import { LessonPlayer } from "@/components/lesson/lesson-player";
 import { ButtonLink } from "@/components/ui/button";
@@ -24,6 +26,9 @@ export function LessonRouteResolver({
   const [backendResolved, setBackendResolved] = useState(
     Boolean(cachedBackendLesson),
   );
+  const [contractResolved, setContractResolved] = useState(mode === "preview");
+  const [translationPremiumContractActive, setTranslationPremiumContractActive] =
+    useState(false);
 
   useEffect(() => {
     if (cachedBackendLesson || !lessonId) {
@@ -41,9 +46,44 @@ export function LessonRouteResolver({
     };
   }, [cachedBackendLesson, lessonId, loadBackendLesson]);
 
+  useEffect(() => {
+    if (mode !== "play") {
+      setContractResolved(true);
+      return;
+    }
+
+    let active = true;
+    const client = createClient();
+    if (!client) {
+      // A configuration failure must not accidentally open protected practice.
+      setTranslationPremiumContractActive(true);
+      setContractResolved(true);
+      return;
+    }
+
+    void learnProductContractIsActive(client)
+      .then((enabled) => {
+        if (!active) return;
+        setTranslationPremiumContractActive(enabled);
+      })
+      .catch(() => {
+        if (!active) return;
+        // Unknown DB failures fail closed. Only a genuinely missing activation
+        // RPC is treated as the legacy rollout state by the helper.
+        setTranslationPremiumContractActive(true);
+      })
+      .finally(() => {
+        if (active) setContractResolved(true);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [mode]);
+
   const lesson = cachedBackendLesson ?? requestedBackendLesson;
 
-  if (!backendResolved) {
+  if (!backendResolved || (mode === "play" && !contractResolved)) {
     return (
       <main className="grid min-h-screen place-items-center bg-paper">
         <span className="size-10 animate-spin rounded-full border-4 border-moss-100 border-t-moss-600" />
@@ -72,6 +112,10 @@ export function LessonRouteResolver({
   return mode === "preview" ? (
     <LessonPreview lesson={lesson} />
   ) : (
-    <LessonPlayer lesson={lesson} routeLessonId={lessonId} />
+    <LessonPlayer
+      lesson={lesson}
+      routeLessonId={lessonId}
+      translationPremiumContractActive={translationPremiumContractActive}
+    />
   );
 }
