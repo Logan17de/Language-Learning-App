@@ -31,6 +31,7 @@ import { LessonReportDialog } from "@/components/support/lesson-report-dialog";
 import { preloadListeningAudio } from "@/components/exercises/audio-control";
 import {
   restoreLessonProgress,
+  syncLessonCompletion,
   syncLessonProgress,
 } from "@/lib/sync/backend-sync";
 
@@ -274,9 +275,15 @@ export function LessonPlayer({
     );
     const completeSession = { ...timedSession, completionResult: result };
     const saved = updateSession(completeSession);
-    void syncLessonProgress(lesson, saved, currentPhaseId).catch(
-      () => undefined,
-    );
+    void syncLessonCompletion(lesson, saved, currentPhaseId)
+      .then((canonicalResult) => {
+        if (!canonicalResult) return;
+        saveLessonSession({
+          ...saved,
+          completionResult: canonicalResult,
+        });
+      })
+      .catch(() => undefined);
     router.push(`/lesson/${lesson.id}/complete`);
   }
 
