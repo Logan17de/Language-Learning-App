@@ -14,6 +14,7 @@ import type { LessonPhaseId, LessonSession } from "@/types/lesson-session";
 import { calculateLessonCompletion } from "@/lib/scoring-utils";
 import { calculateLessonXp } from "@/lib/xp";
 import { phaseIsComplete } from "@/lib/lesson-phase-progress";
+import { restartIncompleteLessonPhase } from "@/lib/lesson-resume";
 import {
   createEmptyLessonSession,
   normalizeLessonSession,
@@ -32,23 +33,21 @@ import { preloadListeningAudio } from "@/components/exercises/audio-control";
 import {
   restoreLessonProgress,
   syncLessonCompletion,
+  syncLessonPhaseCompletion,
   syncLessonProgress,
 } from "@/lib/sync/backend-sync";
 
-function preferAdvancedSession(
+function preferDurableSession(
   local: LessonSession,
   candidate: LessonSession,
 ): LessonSession {
   if (local.completed !== candidate.completed) {
     return candidate.completed ? candidate : local;
   }
-  if (local.currentPhaseIndex !== candidate.currentPhaseIndex) {
-    return candidate.currentPhaseIndex > local.currentPhaseIndex
+  if (local.completedPhaseIds.length !== candidate.completedPhaseIds.length) {
+    return candidate.completedPhaseIds.length > local.completedPhaseIds.length
       ? candidate
       : local;
-  }
-  if (local.activityIndex !== candidate.activityIndex) {
-    return candidate.activityIndex > local.activityIndex ? candidate : local;
   }
   return Date.parse(candidate.updatedAt) > Date.parse(local.updatedAt)
     ? candidate
@@ -94,7 +93,10 @@ export function LessonPlayer({
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [showExit, setShowExit] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
+  const [isCommitting, setIsCommitting] = useState(false);
+  const [commitError, setCommitError] = useState<string | null>(null);
   const restoredLessonRef = useRef<string | null>(null);
+  const editedDuringRestoreRef = useRef(false);
   const premiumPhasesAccessible = lesson.premiumPhaseAccess !== "locked";
 
   useEffect(() => {
@@ -111,6 +113,7 @@ export function LessonPlayer({
   useEffect(() => {
     if (!hasHydrated || restoredLessonRef.current === lesson.id) return;
     restoredLessonRef.current = lesson.id;
+    editedDuringRestoreRef.current = false;
     let active = true;
     const storedSessions = useAppStore.getState().lessonSessions;
     const canonicalSession = normalizeLessonSession(
@@ -118,12 +121,13 @@ export function LessonPlayer({
       storedSessions[lesson.id] ?? createEmptyLessonSession(lesson.id),
     );
     const routeSession = storedSessions[routeLessonId];
-    const fallback = routeSession
-      ? preferAdvancedSession(
+    const selected = routeSession
+      ? preferDurableSession(
           canonicalSession,
           normalizeLessonSession(lesson.id, routeSession),
         )
       : canonicalSession;
+    const fallback = restartIncompleteLessonPhase(selected);
 
     queueMicrotask(() => {
       if (!active) return;
@@ -136,20 +140,15 @@ export function LessonPlayer({
 
     void restoreLessonProgress(lesson, fallback)
       .then((restored) => {
-        if (!active) return;
-        const latestLocal = normalizeLessonSession(
-          lesson.id,
-          useAppStore.getState().lessonSessions[lesson.id] ?? fallback,
-        );
-        const local = preferAdvancedSession(latestLocal, fallback);
-        const next = preferAdvancedSession(local, restored);
-        if (next.completed && next.completionResult) {
+        if (!active || editedDuringRestoreRef.current) return;
+        if (restored.completed && restored.completionResult) {
+          saveLessonSession(restored);
           router.replace(`/lesson/${lesson.id}/complete`);
           return;
         }
-        setSession(next);
-        setElapsedSeconds(next.elapsedSeconds);
-        saveLessonSession(next);
+        setSession(restored);
+        setElapsedSeconds(restored.elapsedSeconds);
+        saveLessonSession(restored);
       })
       .catch(() => undefined);
     return () => {
@@ -174,7 +173,9 @@ export function LessonPlayer({
     };
     const handleVisibility = () => {
       if (document.visibilityState !== "hidden") return;
-      saveLessonSession({ ...session, elapsedSeconds });
+      const checkpoint = { ...session, elapsedSeconds };
+      saveLessonSession(checkpoint);
+      void syncLessonProgress(lesson, checkpoint).catch(() => false);
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("visibilitychange", handleVisibility);
@@ -182,10 +183,11 @@ export function LessonPlayer({
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [elapsedSeconds, saveLessonSession, session]);
+  }, [elapsedSeconds, lesson, saveLessonSession, session]);
 
   const updateSession = useCallback(
     (next: LessonSession) => {
+      editedDuringRestoreRef.current = true;
       const withTime = { ...next, elapsedSeconds };
       setSession(withTime);
       saveLessonSession(withTime);
@@ -232,7 +234,8 @@ export function LessonPlayer({
   }
 
   function back() {
-    if (!session) return;
+    if (!session || isCommitting) return;
+    setCommitError(null);
     if (session.currentPhaseIndex === 0) {
       setShowExit(true);
       return;
@@ -256,114 +259,127 @@ export function LessonPlayer({
     });
   }
 
-  function completeCurrentLesson(
+  async function commitAndAdvance(
     currentPhaseId: LessonPhaseId,
     base: LessonSession,
   ) {
-    const timedSession = {
-      ...base,
-      elapsedSeconds,
-      completed: true,
-      completedPhaseIds: Array.from(
-        new Set([...base.completedPhaseIds, currentPhaseId]),
-      ),
-    };
-    const result = completionForAccess(
+    if (isCommitting) return;
+    setIsCommitting(true);
+    setCommitError(null);
+
+    const phaseSnapshot = { ...base, elapsedSeconds };
+    const committed = await syncLessonPhaseCompletion(
       lesson,
-      timedSession,
-      premiumPhasesAccessible,
+      phaseSnapshot,
+      currentPhaseId,
+    ).catch(() => false);
+    if (!committed) {
+      setCommitError(
+        "We couldn't safely save this phase yet. Your lesson is still open — try again when you're ready.",
+      );
+      setIsCommitting(false);
+      return;
+    }
+
+    const completedPhaseIds = Array.from(
+      new Set([...phaseSnapshot.completedPhaseIds, currentPhaseId]),
     );
-    const completeSession = { ...timedSession, completionResult: result };
-    const saved = updateSession(completeSession);
-    void syncLessonCompletion(lesson, saved, currentPhaseId)
-      .then((canonicalResult) => {
-        if (!canonicalResult) return;
-        const latest =
-          useAppStore.getState().lessonSessions[lesson.id] ?? saved;
-        saveLessonSession({
-          ...latest,
-          completionResult: canonicalResult,
-        });
-      })
-      .catch(() => undefined);
-    router.push(`/lesson/${lesson.id}/complete`);
+    const completedActivity = {
+      ...phaseSnapshot.activities,
+      [currentPhaseId]: {
+        phaseId: currentPhaseId,
+        activityIndex: phaseSnapshot.activityIndex,
+        completed: true,
+        attempts: phaseSnapshot.activities[currentPhaseId]?.attempts ?? 1,
+      },
+    };
+
+    if (phaseSnapshot.currentPhaseIndex === lesson.phases.length - 1) {
+      const pending = updateSession({
+        ...phaseSnapshot,
+        completedPhaseIds,
+        activities: completedActivity,
+        activityIndex: 0,
+        completionResult: null,
+        completionState: "completion_pending",
+        completed: false,
+      });
+      const fallbackResult = completionForAccess(
+        lesson,
+        pending,
+        premiumPhasesAccessible,
+      );
+      const canonicalResult = await syncLessonCompletion(
+        lesson,
+        pending,
+        fallbackResult,
+      ).catch(() => null);
+
+      if (!canonicalResult) {
+        setCommitError(
+          "The phase is saved, but lesson completion wasn't confirmed. Retry to finish — no XP or mastery will be duplicated.",
+        );
+        setIsCommitting(false);
+        return;
+      }
+
+      const latest =
+        useAppStore.getState().lessonSessions[lesson.id] ?? pending;
+      const completedSession: LessonSession = {
+        ...latest,
+        completedPhaseIds,
+        activities: completedActivity,
+        completionResult: canonicalResult,
+        completionState: "completed",
+        completed: true,
+      };
+      setSession(completedSession);
+      saveLessonSession(completedSession);
+      setIsCommitting(false);
+      router.push(`/lesson/${lesson.id}/complete`);
+      return;
+    }
+
+    const nextIndex = phaseSnapshot.currentPhaseIndex + 1;
+    updateSession({
+      ...phaseSnapshot,
+      completedPhaseIds,
+      activities: completedActivity,
+      currentPhaseIndex: nextIndex,
+      activityIndex: 0,
+      completionState: "active",
+      completed: false,
+      completionResult: null,
+    });
+    setIsCommitting(false);
   }
 
   function continueLesson() {
-    if (!session || !canContinue) return;
+    if (!session || !canContinue || isCommitting) return;
     const currentPhase = lesson.phases[session.currentPhaseIndex];
-    if (session.currentPhaseIndex === lesson.phases.length - 1) {
-      completeCurrentLesson(currentPhase.id, session);
-      return;
-    }
-    const nextIndex = session.currentPhaseIndex + 1;
-    const nextPhase = lesson.phases[nextIndex];
-    const saved = updateSession({
-      ...session,
-      completedPhaseIds: Array.from(
-        new Set([...session.completedPhaseIds, currentPhase.id]),
-      ),
-      activities: {
-        ...session.activities,
-        [currentPhase.id]: {
-          phaseId: currentPhase.id,
-          activityIndex: session.activityIndex,
-          completed: true,
-          attempts: 1,
-        },
-      },
-      currentPhaseIndex: nextIndex,
-      activityIndex: session.activities[nextPhase.id]?.activityIndex ?? 0,
-    });
-    void syncLessonProgress(lesson, saved, currentPhase.id).catch(
-      () => undefined,
-    );
+    void commitAndAdvance(currentPhase.id, session);
   }
 
   function skipPremiumPhase() {
-    if (!session || premiumPhasesAccessible || !isPremiumPhase(phase.id)) {
+    if (
+      !session ||
+      isCommitting ||
+      premiumPhasesAccessible ||
+      !isPremiumPhase(phase.id)
+    ) {
       return;
     }
-
-    const skipped = {
-      ...session,
-      completedPhaseIds: Array.from(
-        new Set([...session.completedPhaseIds, phase.id]),
-      ),
-      activities: {
-        ...session.activities,
-        [phase.id]: {
-          phaseId: phase.id,
-          activityIndex: 0,
-          completed: true,
-          attempts: 0,
-        },
-      },
-    };
-
-    if (session.currentPhaseIndex === lesson.phases.length - 1) {
-      completeCurrentLesson(phase.id, skipped);
-      return;
-    }
-
-    const nextIndex = session.currentPhaseIndex + 1;
-    const nextPhase = lesson.phases[nextIndex];
-    const saved = updateSession({
-      ...skipped,
-      currentPhaseIndex: nextIndex,
-      activityIndex: session.activities[nextPhase.id]?.activityIndex ?? 0,
-    });
-    void syncLessonProgress(lesson, saved, phase.id).catch(() => undefined);
+    void commitAndAdvance(phase.id, session);
   }
 
   async function leaveLesson() {
-    if (!session || isLeaving) return;
+    if (!session || isLeaving || isCommitting) return;
     setIsLeaving(true);
 
-    const checkpoint = {
+    const checkpoint = restartIncompleteLessonPhase({
       ...session,
       elapsedSeconds,
-    };
+    });
     saveLessonSession(checkpoint);
     await syncLessonProgress(lesson, checkpoint).catch(() => false);
     router.replace("/learn");
@@ -377,8 +393,16 @@ export function LessonPlayer({
         phaseNumber={session.currentPhaseIndex + 1}
         totalPhases={lesson.phases.length}
         progress={progress}
-        canContinue={canContinue}
-        continueLabel={isLastPhase ? "See results" : nextLabel(phase.id)}
+        canContinue={canContinue && !isCommitting}
+        continueLabel={
+          isCommitting
+            ? "Saving…"
+            : isLastPhase
+              ? session.completionState === "completion_pending"
+                ? "Retry completion"
+                : "See results"
+              : nextLabel(phase.id)
+        }
         onBack={back}
         onContinue={continueLesson}
         onExit={() => setShowExit(true)}
@@ -393,8 +417,22 @@ export function LessonPlayer({
           />
         </div>
 
+        {commitError ? (
+          <div
+            className="mb-6 flex items-start gap-3 rounded-2xl border border-persimmon-200 bg-persimmon-50 p-4 text-sm text-persimmon-900"
+            role="alert"
+          >
+            <AlertTriangle className="mt-0.5 size-5 shrink-0" />
+            <p>{commitError}</p>
+          </div>
+        ) : null}
+
         {premiumPhase ? (
-          <PremiumPhaseGate phase={premiumPhase} onSkip={skipPremiumPhase} />
+          <PremiumPhaseGate
+            phase={premiumPhase}
+            busy={isCommitting}
+            onSkip={skipPremiumPhase}
+          />
         ) : (
           <>
             {phase.id === "story" && (
@@ -458,9 +496,9 @@ export function LessonPlayer({
               Leave for now?
             </h2>
             <p className="mt-3 leading-7 text-stone-500">
-              Your checkpoint stays saved. You can return to this same lesson
-              from Learn and continue where you stopped. Leaving does not refund
-              or consume another daily lesson.
+              Completed phases stay saved. Your current unfinished phase will
+              restart from its first activity when you return. Leaving does not
+              refund or consume another daily lesson.
             </p>
             <div className="mt-6 flex gap-3">
               <Button
@@ -493,9 +531,11 @@ export function LessonPlayer({
 
 function PremiumPhaseGate({
   phase,
+  busy,
   onSkip,
 }: {
   phase: "listening" | "speaking";
+  busy: boolean;
   onSkip: () => void;
 }) {
   const Icon = phase === "listening" ? Headphones : Mic2;
@@ -526,9 +566,11 @@ function PremiumPhaseGate({
           type="button"
           variant="secondary"
           className="sm:min-w-36"
+          disabled={busy}
           onClick={onSkip}
         >
-          Skip
+          {busy ? <LoaderCircle className="size-4 animate-spin" /> : null}
+          {busy ? "Saving…" : "Skip"}
         </Button>
       </div>
     </div>
