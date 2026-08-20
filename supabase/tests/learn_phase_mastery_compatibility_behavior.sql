@@ -1,5 +1,5 @@
 -- Behavioral regression suite for phase-atomic mastery rollout compatibility.
--- Requires all repository migrations through 20260820021600.
+-- Requires the consolidated 20260820021500_phase_atomic_mastery_resume.sql.
 -- All fixtures are transaction-local and rolled back.
 
 begin;
@@ -9,8 +9,8 @@ select set_config('aiko.legacy_user', gen_random_uuid()::text, true);
 select set_config('aiko.phase_session', gen_random_uuid()::text, true);
 select set_config('aiko.legacy_session', gen_random_uuid()::text, true);
 
--- Use a real historical lesson version whose stored practice rows exceed the
--- current learner contract. The product still presents/completes seven items.
+-- Use the exact historical storage shape from the regression: 13 Vocabulary
+-- rows and 10-13 Grammar rows, while the playable UI completes seven of each.
 select set_config(
   'aiko.phase_lesson',
   fixture.lesson_id::text,
@@ -29,13 +29,13 @@ from (
       from public.lesson_practice_activities activity
       where activity.lesson_version_id = assignment.lesson_version_id
         and activity.phase = 'vocabulary'
-    ) > 7
+    ) = 13
     and (
       select count(*)
       from public.lesson_practice_activities activity
       where activity.lesson_version_id = assignment.lesson_version_id
         and activity.phase = 'grammar'
-    ) > 7
+    ) between 10 and 13
     and exists (
       select 1
       from public.lesson_grammar grammar
@@ -50,7 +50,7 @@ do $$
 begin
   if current_setting('aiko.phase_lesson', true) is null
      or current_setting('aiko.phase_version', true) is null then
-    raise exception 'Historical >7 Vocabulary/Grammar lesson fixture is required';
+    raise exception 'Historical 13 Vocabulary / 10-13 Grammar lesson fixture is required';
   end if;
 end
 $$;
@@ -169,8 +169,6 @@ insert into public.lesson_sessions (
     now()
   );
 
--- Story was already completed before this test's phase boundary. Mark it as a
--- rollout/backfill boundary without manufacturing Story mastery.
 insert into public.lesson_phase_mastery_commits (
   lesson_session_id, user_id, phase, mastery_event_count, commit_source
 ) values
@@ -185,8 +183,6 @@ insert into public.lesson_phase_mastery_commits (
     'story', 0, 'legacy_checkpoint'
   );
 
--- Persist exactly the seven Vocabulary activities the current UI completes,
--- even though this historical version stores more than seven.
 insert into public.lesson_activity_answers (
   user_id,
   lesson_session_id,
@@ -203,7 +199,7 @@ select
   'vocabulary',
   activity.id::text,
   activity.correct_answer,
-  false, -- deliberately untrusted; canonical engine recomputes correctness
+  false,
   1,
   '{}'::jsonb
 from (
@@ -264,8 +260,6 @@ $$;
 
 reset role;
 
--- Only the seven answered Vocabulary activities may appear in the canonical
--- mastery ledger. Hidden historical storage rows must not influence mastery.
 do $$
 begin
   if exists (
@@ -287,7 +281,6 @@ begin
 end
 $$;
 
--- Standard Grammar follows the same seven-answer contract.
 insert into public.lesson_activity_answers (
   user_id,
   lesson_session_id,
@@ -408,8 +401,6 @@ begin
 end
 $$;
 
--- Learner-facing legacy mastery calls are harmless, and direct aggregate/event
--- ledger mutation is denied even though learners may still SELECT their rows.
 do $$
 declare
   before_events integer;
@@ -467,7 +458,6 @@ begin
 end
 $$;
 
--- Resume after Story + Vocabulary + Grammar commits must start Reading at 0.
 select set_config(
   'aiko.resume_result',
   public.reset_incomplete_lesson_phase(
@@ -490,9 +480,6 @@ $$;
 
 reset role;
 
--- Simulate the old Production client: its mastery RPC is now a no-op, but after
--- answers/events finish it saves completedPhaseIds including Vocabulary. The
--- compatibility trigger must create the canonical commit and preserve mastery.
 insert into public.lesson_activity_answers (
   user_id,
   lesson_session_id,
