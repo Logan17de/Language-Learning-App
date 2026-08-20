@@ -15,8 +15,8 @@ drop function if exists public.begin_custom_lesson_generation_v2(text, public.jl
 drop function if exists public.store_generated_lesson_package(uuid, jsonb, integer);
 
 -- Remove the stale assignment field from the sole learner-facing generation
--- RPC. Support both the current live v1 marker and the immediately preceding
--- staging v2 marker so clean replay and current-schema migration converge.
+-- RPC. pg_get_functiondef() is free to reformat function SQL, so use
+-- whitespace-insensitive replacements instead of depending on line layout.
 do $$
 declare
   v_definition text;
@@ -33,20 +33,17 @@ begin
     raise exception 'begin_custom_lesson_generation_v5(text,jlpt_level) is required';
   end if;
 
-  v_definition := replace(
+  v_definition := regexp_replace(
     v_definition,
-    E'      algorithm_version,\n      interest_matches\n    ) values (',
-    E'      algorithm_version\n    ) values ('
+    'algorithm_version[[:space:]]*,[[:space:]]*interest_matches[[:space:]]*\)[[:space:]]*values[[:space:]]*\(',
+    E'algorithm_version\n    ) values (',
+    'i'
   );
-  v_definition := replace(
+  v_definition := regexp_replace(
     v_definition,
-    E'      ''custom-exact-reuse-v1'',\n      ''{}''\n    )',
-    E'      ''custom-exact-reuse-v3''\n    )'
-  );
-  v_definition := replace(
-    v_definition,
-    E'      ''custom-exact-reuse-v2'',\n      ''{}''\n    )',
-    E'      ''custom-exact-reuse-v3''\n    )'
+    '''custom-exact-reuse-v[12]''[[:space:]]*,[[:space:]]*''\{\}''[[:space:]]*\)',
+    E'''custom-exact-reuse-v3''\n    )',
+    'i'
   );
 
   if v_definition ilike '%interest_matches%'
@@ -80,25 +77,23 @@ begin
     raise exception 'store_generated_lesson_package_v2(uuid,jsonb,integer) is required';
   end if;
 
-  v_definition := replace(
+  v_definition := regexp_replace(
     v_definition,
-    E'      algorithm_version,\n      interest_matches\n    ) values (',
-    E'      algorithm_version\n    ) values ('
+    'algorithm_version[[:space:]]*,[[:space:]]*interest_matches[[:space:]]*\)[[:space:]]*values[[:space:]]*\(',
+    E'algorithm_version\n    ) values (',
+    'gi'
   );
-  v_definition := replace(
+  v_definition := regexp_replace(
     v_definition,
-    E'    algorithm_version,\n    interest_matches\n  ) values (',
-    E'    algorithm_version\n  ) values ('
+    '''custom-signature-reuse-v2''[[:space:]]*,[[:space:]]*''\{\}''[[:space:]]*\)',
+    E'''custom-signature-reuse-v3''\n    )',
+    'i'
   );
-  v_definition := replace(
+  v_definition := regexp_replace(
     v_definition,
-    E'      ''custom-signature-reuse-v2'',\n      ''{}''\n    )',
-    E'      ''custom-signature-reuse-v3''\n    )'
-  );
-  v_definition := replace(
-    v_definition,
-    E'    ''custom-playable-v2'',\n    ''{}''\n  )',
-    E'    ''custom-playable-v3''\n  )'
+    '''custom-playable-v2''[[:space:]]*,[[:space:]]*''\{\}''[[:space:]]*\)',
+    E'''custom-playable-v3''\n  )',
+    'i'
   );
   v_definition := replace(v_definition, '''pro_custom''', '''custom_topic''');
 
