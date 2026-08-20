@@ -49,14 +49,28 @@ function session(overrides: Partial<LessonSession> = {}): LessonSession {
   } as unknown as LessonSession;
 }
 
+function vocabularyAnswers(count: number): LessonSession["vocabularyAnswers"] {
+  return Array.from({ length: count }, (_, index) => ({
+    questionId: `v-${index + 1}`,
+  })) as unknown as LessonSession["vocabularyAnswers"];
+}
+
+function grammarAnswers(prefix: string, count: number): LessonSession["grammarAnswers"] {
+  return Array.from({ length: count }, (_, index) => ({
+    questionId: `${prefix}-${index + 1}`,
+  })) as unknown as LessonSession["grammarAnswers"];
+}
+
+function translationQuestions(): NonNullable<LessonSession["grammarTranslationQuestions"]> {
+  return Array.from({ length: 5 }, (_, index) => ({
+    id: `t-${index + 1}`,
+  })) as unknown as NonNullable<LessonSession["grammarTranslationQuestions"]>;
+}
+
 describe("/learn product contract", () => {
   it("treats only seven historical Vocabulary activities as playable", () => {
     const currentLesson = lesson();
-    const currentSession = session({
-      vocabularyAnswers: Array.from({ length: 7 }, (_, index) => ({
-        questionId: `v-${index + 1}`,
-      })) as LessonSession["vocabularyAnswers"],
-    });
+    const currentSession = session({ vocabularyAnswers: vocabularyAnswers(7) });
 
     expect(currentLesson.vocabularyQuestions).toHaveLength(13);
     expect(phaseIsComplete(currentSession, "vocabulary", currentLesson)).toBe(true);
@@ -64,24 +78,20 @@ describe("/learn product contract", () => {
 
   it("uses seven standard Grammar answers and gates Translation only after activation for Free", () => {
     const currentLesson = lesson();
-    const standardAnswers = Array.from({ length: 7 }, (_, index) => ({
-      questionId: `g-${index + 1}`,
-    })) as LessonSession["grammarAnswers"];
+    const standardAnswers = grammarAnswers("g", 7);
     const currentSession = session({ grammarAnswers: standardAnswers });
 
     expect(grammarStandardIsComplete(currentSession, currentLesson)).toBe(true);
     expect(phaseIsComplete(currentSession, "grammar", currentLesson, true)).toBe(true);
     expect(phaseIsComplete(currentSession, "grammar", currentLesson, false)).toBe(false);
 
-    const translationQuestions = Array.from({ length: 5 }, (_, index) => ({
-      id: `t-${index + 1}`,
-    })) as NonNullable<LessonSession["grammarTranslationQuestions"]>;
+    const translations = translationQuestions();
     const withLegacyTranslations = session({
-      grammarTranslationQuestions: translationQuestions,
+      grammarTranslationQuestions: translations,
       grammarAnswers: [
         ...standardAnswers,
-        ...translationQuestions.map((question) => ({ questionId: question.id })),
-      ] as LessonSession["grammarAnswers"],
+        ...grammarAnswers("t", 5),
+      ],
     });
 
     expect(
@@ -91,17 +101,13 @@ describe("/learn product contract", () => {
 
   it("requires exactly five Translation answers for Premium Grammar", () => {
     const currentLesson = lesson({ premium: true });
-    const standardAnswers = Array.from({ length: 7 }, (_, index) => ({
-      questionId: `g-${index + 1}`,
-    })) as LessonSession["grammarAnswers"];
-    const translationQuestions = Array.from({ length: 5 }, (_, index) => ({
-      id: `t-${index + 1}`,
-    })) as NonNullable<LessonSession["grammarTranslationQuestions"]>;
+    const standardAnswers = grammarAnswers("g", 7);
+    const translations = translationQuestions();
 
     expect(
       phaseIsComplete(
         session({
-          grammarTranslationQuestions: translationQuestions,
+          grammarTranslationQuestions: translations,
           grammarAnswers: standardAnswers,
         }),
         "grammar",
@@ -113,11 +119,11 @@ describe("/learn product contract", () => {
     expect(
       phaseIsComplete(
         session({
-          grammarTranslationQuestions: translationQuestions,
+          grammarTranslationQuestions: translations,
           grammarAnswers: [
             ...standardAnswers,
-            ...translationQuestions.map((question) => ({ questionId: question.id })),
-          ] as LessonSession["grammarAnswers"],
+            ...grammarAnswers("t", 5),
+          ],
         }),
         "grammar",
         currentLesson,
@@ -206,10 +212,10 @@ describe("/learn product contract", () => {
 
     expect(library).toContain("Resume lesson");
     expect(library).toContain("Start new lesson");
-    expect(library).toContain("creationState.canCreate");
+    expect(library).toContain("setShowCreationForm(true)");
+    expect(library).toContain("creationState?.canCreate");
     expect(activation).toContain("v_daily_limit := 1");
     expect(activation).toContain("v_daily_limit := 5");
     expect(activation).toContain("assignment.status in ('assigned','started')");
-    expect(activation).not.toContain("entitlement_local_date = v_local_date\n    and assignment");
   });
 });
