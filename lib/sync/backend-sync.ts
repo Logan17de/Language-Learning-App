@@ -1,7 +1,11 @@
 "use client";
 
 import type { LessonPackage } from "@/types/lesson";
-import type { LessonPhaseId, LessonSession } from "@/types/lesson-session";
+import type {
+  LessonCompletionResult,
+  LessonPhaseId,
+  LessonSession,
+} from "@/types/lesson-session";
 import type { Json } from "@/types/database";
 import { getBackendMode } from "@/lib/supabase/config";
 import { lessonRepository } from "@/lib/repositories/lesson-repository";
@@ -28,6 +32,36 @@ type MasterySignal =
   | "incorrect"
   | "pronunciation_correct"
   | "pronunciation_incorrect";
+
+type PersistLessonResult = {
+  synced: boolean;
+  canonicalCompletion?: LessonCompletionResult;
+};
+
+function canonicalCompletionResult(
+  value: Json,
+  fallback: LessonCompletionResult,
+): LessonCompletionResult | undefined {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const record = value as Record<string, Json | undefined>;
+  if (record.canonical !== true) return undefined;
+  const score = Number(record.score);
+  const xpGained = Number(record.xp_awarded);
+  const durationMinutes = Number(record.duration_minutes);
+  if (
+    !Number.isFinite(score) ||
+    !Number.isFinite(xpGained) ||
+    !Number.isFinite(durationMinutes)
+  ) {
+    return undefined;
+  }
+  return {
+    ...fallback,
+    score: Math.max(0, Math.min(100, Math.round(score))),
+    xpGained: Math.max(0, Math.round(xpGained)),
+    durationMinutes: Math.max(1, Math.round(durationMinutes)),
+  };
+}
 
 function masteryItemType(
   lesson: LessonPackage,
@@ -305,14 +339,14 @@ async function persistLesson(
   session: LessonSession,
   complete: boolean,
   masteryPhase?: LessonPhaseId,
-): Promise<boolean> {
+): Promise<PersistLessonResult> {
   const canonical = await lessonRepository.getPlayable(lesson.id);
-  if (!canonical.ok) return false;
+  if (!canonical.ok) return { synced: false };
   const backendSession = await lessonSessionRepository.startOrResume(
     canonical.data.lesson.id,
     canonical.data.version.id,
   );
-  if (!backendSession.ok) return false;
+  if (!backendSession.ok) return { synced: false };
   const answers = [
     ...session.vocabularyAnswers.map((answer) => ({
       lesson_session_id: backendSession.data.id,
@@ -375,7 +409,9 @@ async function persistLesson(
       masteryPhase ? buildMasteryEvidence(lesson, session, masteryPhase) : [],
     ),
   ]);
-  if (!answersResult.ok || !eventsResult.ok || !masteryResult.ok) return false;
+  if (!answersResult.ok || !eventsResult.ok || !masteryResult.ok) {
+    return { synced: false };
+  }
   const phase = lesson.phases[session.currentPhaseIndex]?.id ?? "story";
   const checkpoint = await lessonSessionRepository.saveCheckpoint(
     backendSession.data.id,
@@ -387,7 +423,7 @@ async function persistLesson(
       checkpoint: json({ session }),
     },
   );
-  if (!checkpoint.ok) return false;
+  if (!checkpoint.ok) return { synced: false };
   if (complete && session.completionResult) {
     const result = await lessonSessionRepository.complete({
       sessionId: backendSession.data.id,
@@ -408,31 +444,43 @@ async function persistLesson(
         },
       }),
     });
-    return result.ok;
+    if (!result.ok) return { synced: false };
+    return {
+      synced: true,
+      canonicalCompletion: canonicalCompletionResult(
+        result.data,
+        session.completionResult,
+      ),
+    };
   }
-  return true;
+  return { synced: true };
 }
 
-export async function syncLessonProgress(
+async function syncLesson(
   lesson: LessonPackage,
   session: LessonSession,
   masteryPhase?: LessonPhaseId,
-): Promise<boolean> {
-  if (getBackendMode() !== "supabase") return true;
+): Promise<PersistLessonResult> {
+  if (getBackendMode() !== "supabase") {
+    return {
+      synced: true,
+      canonicalCompletion: session.completionResult ?? undefined,
+    };
+  }
   const complete = Boolean(session.completed && session.completionResult);
   const kind = complete ? "lesson_completion" : "lesson_checkpoint";
   const key = `${kind}:${lesson.id}:${masteryPhase ?? "checkpoint"}`;
   if (!navigator.onLine) {
     enqueueSync(kind, key, json({ lesson, session, masteryPhase }), "Offline");
-    return false;
+    return { synced: false };
   }
-  const synced = await persistLesson(
+  const result = await persistLesson(
     lesson,
     session,
     complete,
     masteryPhase,
   );
-  if (!synced) {
+  if (!result.synced) {
     enqueueSync(
       kind,
       key,
@@ -440,7 +488,24 @@ export async function syncLessonProgress(
       "Database request failed.",
     );
   }
-  return synced;
+  return result;
+}
+
+export async function syncLessonProgress(
+  lesson: LessonPackage,
+  session: LessonSession,
+  masteryPhase?: LessonPhaseId,
+): Promise<boolean> {
+  return (await syncLesson(lesson, session, masteryPhase)).synced;
+}
+
+export async function syncLessonCompletion(
+  lesson: LessonPackage,
+  session: LessonSession,
+  masteryPhase?: LessonPhaseId,
+): Promise<LessonCompletionResult | null> {
+  const result = await syncLesson(lesson, session, masteryPhase);
+  return result.canonicalCompletion ?? null;
 }
 
 export async function restoreLessonProgress(
@@ -506,13 +571,13 @@ export async function retryPendingSync(): Promise<void> {
       removeSyncOperation(operation.id);
       continue;
     }
-    const synced = await persistLesson(
+    const result = await persistLesson(
       payload.lesson,
       payload.session,
       operation.kind === "lesson_completion",
       payload.masteryPhase,
     );
-    if (synced) removeSyncOperation(operation.id);
+    if (result.synced) removeSyncOperation(operation.id);
     else markSyncAttempt(operation.id, "Retry failed.");
   }
 }
