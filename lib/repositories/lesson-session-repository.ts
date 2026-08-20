@@ -1,9 +1,11 @@
 import { createClient } from "@/lib/supabase/client";
 import { failure, notConfigured, success, type RepositoryResult } from "@/lib/repositories/result";
 import type { Database, Json } from "@/types/database";
+import type { LessonPhaseId } from "@/types/lesson-session";
 
 type LessonSession = Database["public"]["Tables"]["lesson_sessions"]["Row"];
 type LessonAnswer = Database["public"]["Tables"]["lesson_activity_answers"]["Insert"];
+type LessonCompletion = Database["public"]["Tables"]["lesson_completions"]["Row"];
 
 export interface LessonCompletionInput {
   sessionId: string;
@@ -121,20 +123,45 @@ export const lessonSessionRepository = {
     return error ? failure(error, "Your learning events are waiting to sync.") : success(events.length);
   },
 
-  async recordMasteryEvidence(
+  async commitPhase(
     sessionId: string,
-    events: Json[],
+    phase: LessonPhaseId,
   ): Promise<RepositoryResult<Json>> {
     const client = createClient();
     if (!client) return notConfigured();
-    if (!events.length) return success({ processed: 0 });
-    const { data, error } = await client.rpc("record_mastery_evidence", {
+    const { data, error } = await client.rpc("commit_lesson_phase", {
       p_session_id: sessionId,
-      p_events: events,
+      p_phase: phase,
     });
     return error
-      ? failure(error, "Your learning scores are waiting to sync.")
+      ? failure(error, "This phase could not be committed. Please try again.")
       : success(data);
+  },
+
+  async resetIncompletePhase(sessionId: string): Promise<RepositoryResult<Json>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { data, error } = await client.rpc("reset_incomplete_lesson_phase", {
+      p_session_id: sessionId,
+    });
+    return error
+      ? failure(error, "Your saved lesson could not be restored safely.")
+      : success(data);
+  },
+
+  async latestCompletion(lessonId: string): Promise<RepositoryResult<LessonCompletion | null>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { data, error } = await client
+      .from("lesson_completions")
+      .select("*")
+      .eq("lesson_id", lessonId)
+      .order("completed_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return error
+      ? failure(error, "Your lesson result could not be loaded.")
+      : success(data ?? null);
   },
 
   async complete(input: LessonCompletionInput): Promise<RepositoryResult<Json>> {
