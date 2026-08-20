@@ -278,8 +278,10 @@ export function LessonPlayer({
     void syncLessonCompletion(lesson, saved, currentPhaseId)
       .then((canonicalResult) => {
         if (!canonicalResult) return;
+        const latest =
+          useAppStore.getState().lessonSessions[lesson.id] ?? saved;
         saveLessonSession({
-          ...saved,
+          ...latest,
           completionResult: canonicalResult,
         });
       })
