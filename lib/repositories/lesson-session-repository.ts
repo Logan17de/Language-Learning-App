@@ -7,6 +7,23 @@ type LessonSession = Database["public"]["Tables"]["lesson_sessions"]["Row"];
 type LessonAnswer = Database["public"]["Tables"]["lesson_activity_answers"]["Insert"];
 type LessonCompletion = Database["public"]["Tables"]["lesson_completions"]["Row"];
 
+type RpcErrorLike = {
+  code?: string;
+  message?: string;
+};
+
+function isMissingPhaseRpc(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const value = error as RpcErrorLike;
+  const message = value.message ?? "";
+  return (
+    value.code === "PGRST202" ||
+    value.code === "42883" ||
+    message.includes("Could not find the function") ||
+    message.includes("does not exist")
+  );
+}
+
 export interface LessonCompletionInput {
   sessionId: string;
   score: number;
@@ -123,27 +140,51 @@ export const lessonSessionRepository = {
     return error ? failure(error, "Your learning events are waiting to sync.") : success(events.length);
   },
 
+  /**
+   * Returns null only when the phase-atomic RPC is absent from the pre-migration
+   * database. Validation/auth failures remain hard failures and never fall back.
+   */
   async commitPhase(
     sessionId: string,
     phase: LessonPhaseId,
-  ): Promise<RepositoryResult<Json>> {
+  ): Promise<RepositoryResult<Json | null>> {
     const client = createClient();
     if (!client) return notConfigured();
     const { data, error } = await client.rpc("commit_lesson_phase", {
       p_session_id: sessionId,
       p_phase: phase,
     });
+    if (error && isMissingPhaseRpc(error)) return success(null);
     return error
       ? failure(error, "This phase could not be committed. Please try again.")
       : success(data);
   },
 
-  async resetIncompletePhase(sessionId: string): Promise<RepositoryResult<Json>> {
+  async recordLegacyMasteryEvidence(
+    sessionId: string,
+    events: Json[],
+  ): Promise<RepositoryResult<Json>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    if (!events.length) return success({ processed: 0 });
+    const { data, error } = await client.rpc("record_mastery_evidence", {
+      p_session_id: sessionId,
+      p_events: events,
+    });
+    return error
+      ? failure(error, "Your learning scores are waiting to sync.")
+      : success(data);
+  },
+
+  /** Null means the DB predates phase-atomic resume and the caller should use
+   * the persisted checkpoint plus the same client-side restart sanitizer. */
+  async resetIncompletePhase(sessionId: string): Promise<RepositoryResult<Json | null>> {
     const client = createClient();
     if (!client) return notConfigured();
     const { data, error } = await client.rpc("reset_incomplete_lesson_phase", {
       p_session_id: sessionId,
     });
+    if (error && isMissingPhaseRpc(error)) return success(null);
     return error
       ? failure(error, "Your saved lesson could not be restored safely.")
       : success(data);
