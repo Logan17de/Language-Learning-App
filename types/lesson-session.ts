@@ -146,8 +146,8 @@ export interface LessonSession {
   speakingEvents: SpeakingEvent[];
   speakingComplete: boolean;
   completionResult: LessonCompletionResult | null;
-  /** Supabase-backed lessons are not completed until canonical completion succeeds. */
-  completionState: LessonCompletionState;
+  /** Missing only on sessions persisted before the canonical-completion rollout. */
+  completionState?: LessonCompletionState;
   completed: boolean;
   rewarded: boolean;
 }
