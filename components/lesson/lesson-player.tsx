@@ -88,9 +88,11 @@ function isPremiumPhase(
 export function LessonPlayer({
   lesson,
   routeLessonId = lesson.id,
+  translationPremiumContractActive = true,
 }: {
   lesson: LessonPackage;
   routeLessonId?: string;
+  translationPremiumContractActive?: boolean;
 }) {
   const router = useRouter();
   const hasHydrated = useAppStore((state) => state.hasHydrated);
@@ -206,7 +208,8 @@ export function LessonPlayer({
   const premiumPhase =
     !premiumPhasesAccessible && isPremiumPhase(phase.id) ? phase.id : null;
   const translationGate = Boolean(
-    session &&
+    translationPremiumContractActive &&
+      session &&
       !premiumPhasesAccessible &&
       phase.id === "grammar" &&
       grammarStandardIsComplete(session, lesson),
@@ -217,9 +220,20 @@ export function LessonPlayer({
   const canContinue = useMemo(
     () =>
       session && !protectedPractice
-        ? phaseIsComplete(session, phase.id, lesson)
+        ? phaseIsComplete(
+            session,
+            phase.id,
+            lesson,
+            translationPremiumContractActive,
+          )
         : false,
-    [lesson, phase.id, protectedPractice, session],
+    [
+      lesson,
+      phase.id,
+      protectedPractice,
+      session,
+      translationPremiumContractActive,
+    ],
   );
   const isLastPhase = session
     ? session.currentPhaseIndex === lesson.phases.length - 1
