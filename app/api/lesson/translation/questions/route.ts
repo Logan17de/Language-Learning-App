@@ -1,7 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
 import { hasPremiumLessonPhaseAccess } from "@/lib/auth/lesson-phase-access";
+import { learnProductContractIsActive } from "@/lib/learn-product-contract";
 import { generateGrammarTranslationPractice } from "@/lib/lesson/translation-practice";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   const auth = await authorize("learn");
@@ -9,7 +12,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
   }
 
-  if (!(await hasPremiumLessonPhaseAccess(auth.userId))) {
+  const client = await createClient();
+  let contractActive = true;
+  try {
+    contractActive = client
+      ? await learnProductContractIsActive(client as unknown as SupabaseClient)
+      : true;
+  } catch {
+    return NextResponse.json(
+      { error: "Translation access could not be verified." },
+      { status: 503 },
+    );
+  }
+
+  if (contractActive && !(await hasPremiumLessonPhaseAccess(auth.userId))) {
     return NextResponse.json(
       { error: "Translation practice is a Premium feature." },
       { status: 403 },
