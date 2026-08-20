@@ -1,6 +1,11 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { isMissingPhaseAtomicRpc } from "@/lib/sync/phase-rpc-compatibility";
+
+const atomicMigrationPath =
+  "supabase/migrations/20260820021500_phase_atomic_mastery_resume.sql";
+const retiredSplitMigrationPath =
+  "supabase/migrations/20260820021600_phase_mastery_rollout_compatibility.sql";
 
 describe("phase-atomic rollout compatibility", () => {
   it("falls back only when the requested phase RPC itself is missing", () => {
@@ -65,7 +70,9 @@ describe("phase-atomic rollout compatibility", () => {
   it("keeps the old-DB bridge behind a missing-RPC sentinel", () => {
     const source = readFileSync("lib/sync/backend-sync.ts", "utf8");
     const canonicalSuccess = source.indexOf("if (committed.data !== null) return true;");
-    const legacyBuilder = source.indexOf("buildLegacyMasteryEvidence(lesson, session, phase)");
+    const legacyBuilder = source.indexOf(
+      "buildLegacyMasteryEvidence(lesson, session, phase)",
+    );
     const legacyRpc = source.indexOf("recordLegacyMasteryEvidence(");
 
     expect(canonicalSuccess).toBeGreaterThan(-1);
@@ -74,22 +81,24 @@ describe("phase-atomic rollout compatibility", () => {
     expect(source).toContain("if (!committed.ok) return false;");
   });
 
-  it("supports frontend-first rollout while preserving canonical authority after migration", () => {
+  it("keeps the canonical engine and rollout bridge in one migration unit", () => {
     const repository = readFileSync(
       "lib/repositories/lesson-session-repository.ts",
       "utf8",
     );
-    const migration = readFileSync(
-      "supabase/migrations/20260820021600_phase_mastery_rollout_compatibility.sql",
-      "utf8",
-    );
+    const migration = readFileSync(atomicMigrationPath, "utf8");
 
+    expect(existsSync(retiredSplitMigrationPath)).toBe(false);
     expect(repository).toContain(
       'isMissingPhaseAtomicRpc(error, "commit_lesson_phase")',
     );
     expect(repository).toContain(
       'isMissingPhaseAtomicRpc(error, "reset_incomplete_lesson_phase")',
     );
+
+    // These must ship in the same migration so db push cannot record the
+    // mastery no-op/strict engine without also installing rollout safety.
+    expect(migration).toContain("rename to apply_canonical_mastery_evidence");
     expect(migration).toContain("lesson_sessions_legacy_phase_commit");
     expect(migration).toContain("commit_legacy_checkpoint_phases");
     expect(migration).toContain("count(distinct activity.id)::integer");
