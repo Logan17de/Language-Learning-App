@@ -30,6 +30,7 @@ import {
   speakingReadAloudPrompt,
   speakingReadAloudSchema,
 } from "@/lib/gemini/speaking-question-contract";
+import { translationQuestionPrompt } from "@/lib/gemini/translation-question-contract";
 
 describe("custom lesson generation prompt contracts", () => {
   it("keeps the first call limited to a continuous story", () => {
@@ -44,7 +45,6 @@ describe("custom lesson generation prompt contracts", () => {
     expect(prompt).toContain("Naturally use every provided target grammar pattern at least once.");
     expect(prompt).toContain("Naturally use every provided target kanji at least once.");
     expect(prompt).toContain("one continuous string, not an array");
-    expect(prompt.toLowerCase()).not.toContain("interest");
     expect(storyGenerationSchema).toMatchObject({
       type: "object",
       additionalProperties: false,
@@ -69,6 +69,7 @@ describe("custom lesson generation prompt contracts", () => {
       }],
     });
     expect(prompt).toContain("Create AIko's vocabulary and kanji lesson from this fixed Japanese story.");
+    expect(prompt).toContain("学校へ行きました。友達と昼ご飯を食べました。");
     expect(prompt).toContain("kanjiTeaching must contain exactly one entry for requestIndex 0 through 4");
     expect(prompt).toContain("not a question whitelist");
     expect(prompt).toContain("Create exactly 7 questions: 3 easy, 2 medium, and 2 hard.");
@@ -106,6 +107,7 @@ describe("custom lesson generation prompt contracts", () => {
       }],
     });
     expect(prompt).toContain("Create AIko's grammar lesson from this fixed Japanese story.");
+    expect(prompt).toContain("音楽を聞きながら、学校へ行きます。");
     expect(prompt).toContain("grammarTeaching must contain exactly one entry for requestIndex 0 through 2");
     expect(prompt).toContain("meaning, formation, usage");
     expect(prompt).toContain("Create exactly 7 questions: 3 easy, 2 medium, and 2 hard.");
@@ -138,13 +140,14 @@ describe("custom lesson generation prompt contracts", () => {
     });
     expect(passagePrompt).toContain("Generate a Japanese language-learning story.");
     expect(passagePrompt).toContain("Write one coherent story containing 10–15 natural Japanese sentences.");
-    expect(passagePrompt.toLowerCase()).not.toContain("interest");
+    expect(passagePrompt).toContain("A day at school");
     expect(readingPassageSchema).toBe(storyGenerationSchema);
 
     const questionsPrompt = readingQuestionsPrompt({
       languageLevel: "JLPT N5",
       japaneseStory: "太郎は学校へ行きました。",
     });
+    expect(questionsPrompt).toContain("太郎は学校へ行きました。");
     expect(questionsPrompt).toContain("Create exactly 5 questions: 2 easy, 2 medium, and 1 hard.");
     expect(questionsPrompt).toContain("multiple choice with exactly four distinct choices");
     expect(questionsPrompt).toContain("Base every question only on the passage.");
@@ -163,14 +166,20 @@ describe("custom lesson generation prompt contracts", () => {
     });
   });
 
-  it("keeps listening at five comprehension exercises", () => {
+  it("keeps listening at five comprehension exercises grounded in lesson context", () => {
     const prompt = listeningQuestionsPrompt({
       languageLevel: "JLPT N5",
+      topic: "Job interview",
+      japaneseStory: "ゆきさんは会社で面接を受けました。",
       knownPatterns: ["～たい"],
     });
     expect(prompt).toContain("Create exactly 5 listening-comprehension questions");
     expect(prompt).toContain("2 easy, 2 medium, and 1 hard");
     expect(prompt).toContain("natural Japanese conversation of 5–10 lines");
+    expect(prompt).toContain("Job interview");
+    expect(prompt).toContain("ゆきさんは会社で面接を受けました。");
+    expect(prompt).toContain("recognizably connected to the lesson topic or story context");
+    expect(prompt).toContain("extend naturally with related people, places, situations, or new details");
     expect(listeningQuestionsSchema).toMatchObject({
       type: "object",
       required: ["questions"],
@@ -178,7 +187,7 @@ describe("custom lesson generation prompt contracts", () => {
     });
   });
 
-  it("keeps speaking as five read-aloud sentences", () => {
+  it("keeps speaking as five read-aloud sentences grounded in the lesson story", () => {
     const prompt = speakingReadAloudPrompt({
       languageLevel: "JLPT N4",
       japaneseStory: "ゆきさんは駅へ行きました。それから友達に会いました。",
@@ -187,6 +196,7 @@ describe("custom lesson generation prompt contracts", () => {
     expect(prompt).toContain("Create exactly 5 Japanese sentences for read-aloud speaking practice");
     expect(prompt).toContain("2 easy, 2 medium, and 1 hard");
     expect(prompt).toContain("Do not ask the learner a question");
+    expect(prompt).toContain("ゆきさんは駅へ行きました。それから友達に会いました。");
     expect(speakingReadAloudSchema).toMatchObject({
       type: "object",
       required: ["sentences"],
@@ -201,5 +211,24 @@ describe("custom lesson generation prompt contracts", () => {
         { difficulty: "hard", sentence: "話しながら歩いていると、二人は新しい店を見つけました。" },
       ],
     })).toEqual([]);
+  });
+
+  it("keeps Translation tied to lesson topic and grammar while allowing natural extensions", () => {
+    const prompt = translationQuestionPrompt({
+      level: "N4",
+      topic: "Job interview",
+      targets: [
+        { libraryId: "g1", pattern: "～ながら", meaning: "while", role: "lesson_target" },
+        { libraryId: "g2", pattern: "～たい", meaning: "want to", role: "lesson_target" },
+        { libraryId: "g3", pattern: "～てから", meaning: "after", role: "lesson_target" },
+        { libraryId: "g4", pattern: "～ので", meaning: "because", role: "reinforcement" },
+        { libraryId: "g5", pattern: "～と思う", meaning: "think", role: "reinforcement" },
+      ],
+    });
+
+    expect(prompt).toContain("Job interview");
+    expect(prompt).toContain("～ながら");
+    expect(prompt).toContain("recognizably connected to the lesson topic/context");
+    expect(prompt).toContain("extend naturally with related people, places, situations, or new details");
   });
 });

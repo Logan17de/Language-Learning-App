@@ -17,6 +17,7 @@ describe("adaptive grammar translation practice", () => {
     expect(contract).toContain("final two normally reinforce previously practised grammar");
     expect(contract).toContain("genuinely natural translation choice");
     expect(contract).toContain("Never force a pattern");
+    expect(contract).toContain("recognizably connected to the lesson topic/context");
     expect(contract).toContain("Do not put Japanese, a grammar hint, the target pattern, or the target meaning inside the English question");
   });
 
@@ -32,9 +33,10 @@ describe("adaptive grammar translation practice", () => {
     expect(practice).not.toContain("unseen eligible grammar");
   });
 
-  it("keeps targets and model answers on the server", () => {
+  it("keeps targets and model answers on the server until validation", () => {
     const practice = source("lib/lesson/translation-practice.ts");
     const publicTypes = source("types/lesson-session.ts");
+    const questionsRoute = source("app/api/lesson/translation/questions/route.ts");
     const validator = source("app/api/lesson/translation/validate/route.ts");
     const migration = source(
       "supabase/migrations/20260817160000_server_owned_translation_questions.sql",
@@ -46,6 +48,8 @@ describe("adaptive grammar translation practice", () => {
     expect(publicTypes).not.toContain("targetItemId:");
     expect(practice).toContain('.from("lesson_translation_questions")');
     expect(practice).toContain("model_answer");
+    expect(questionsRoute).not.toContain("model_answer");
+    expect(validator).toContain("model_answer");
     expect(validator).toContain("questionId");
     expect(validator).not.toContain('field(body, "targetPattern"');
     expect(validator).not.toContain('field(body, "targetMeaning"');
@@ -54,20 +58,35 @@ describe("adaptive grammar translation practice", () => {
     expect(migration).toContain("grant all on table public.lesson_translation_questions to service_role");
   });
 
-  it("uses AI semantic validation instead of exact-string grading", () => {
+  it("uses a server exact-match fast path before AI semantic validation and reveals the stored answer", () => {
     const contract = source("lib/gemini/translation-question-contract.ts");
     const grammarUi = source("components/lesson/grammar-phase.tsx");
     const validator = source("app/api/lesson/translation/validate/route.ts");
+    const validation = source("lib/lesson/translation-validation.ts");
 
     expect(contract).toContain("Judge meaning and natural Japanese, not exact string matching");
     expect(contract).toContain("Accept normal Japanese variation");
     expect(contract).toContain("hidden reference answer is an example");
     expect(grammarUi).toContain('fetch("/api/lesson/translation/validate"');
     expect(grammarUi).toContain("Check with AIko");
-    expect(grammarUi).toContain("One natural answer");
+    expect(grammarUi).toContain("Reveal answer");
+    expect(grammarUi).not.toContain("One natural answer");
     expect(grammarUi).not.toContain("Target pattern");
     expect(grammarUi).not.toContain("targetMeaning");
-    expect(validator).toContain("evaluateGrammarTranslation");
+    expect(validator).toContain("validateTranslationAttempt");
+    expect(validation).toContain("normalizeTranslationForExactMatch");
+    expect(validation).toContain('validationSource: "exact_match"');
+    expect(validation).toContain("revealAnswer: input.modelAnswer");
+  });
+
+  it("persists final trusted Translation evidence without per-answer mastery writes", () => {
+    const validator = source("app/api/lesson/translation/validate/route.ts");
+
+    expect(validator).toContain("serverValidated");
+    expect(validator).toContain("attempts: 1");
+    expect(validator).toContain("alreadyFinalized");
+    expect(validator).not.toContain("learner_mastery");
+    expect(validator).not.toContain("commit_lesson_phase(");
   });
 
   it("keeps Grammar incomplete until all five translations are answered", () => {
@@ -95,9 +114,9 @@ describe("adaptive grammar translation practice", () => {
         correct: true,
         skill: "production" as const,
         attempts: 1,
-        feedback: "Correct and natural.",
-        suggestion: "Another natural wording is possible.",
-        suggestedAnswer: "日本語の答えです。",
+        feedback: "Correct.",
+        revealAnswer: "日本語の答えです。",
+        validationSource: "exact_match" as const,
       })),
     );
 

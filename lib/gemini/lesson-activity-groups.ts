@@ -603,10 +603,13 @@ export async function generateListeningAndSpeakingActivities(input: {
   draft: StoryDraft;
   library: ResolvedLessonLibrary;
 }): Promise<ActivityGroupResult<CommunicationGroup>> {
+  const japaneseStory = input.draft.lines.map((line) => line.japanese).join("");
   const [listening, speaking] = await Promise.all([
     generateListeningRegion({
       requestId: input.requestId,
       admin: input.admin,
+      topic: input.topic,
+      japaneseStory,
       level: input.level,
       library: input.library,
     }),

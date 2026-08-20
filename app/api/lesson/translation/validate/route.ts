@@ -3,7 +3,18 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
 import { hasPremiumLessonPhaseAccess } from "@/lib/auth/lesson-phase-access";
 import { learnProductContractIsActive } from "@/lib/learn-product-contract";
-import { evaluateGrammarTranslation } from "@/lib/lesson/translation-practice";
+import {
+  translationEvaluationOutputIssues,
+  translationEvaluationPrompt,
+  translationEvaluationSchema,
+  type TranslationEvaluation,
+} from "@/lib/gemini/translation-question-contract";
+import { generateStructured } from "@/lib/gemini/structured-output";
+import {
+  persistedTranslationResult,
+  translationAnswerData,
+  validateTranslationAttempt,
+} from "@/lib/lesson/translation-validation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -12,6 +23,15 @@ function field(body: Record<string, unknown>, key: string, maximum: number): str
   return typeof value === "string"
     ? value.normalize("NFKC").trim().slice(0, maximum)
     : "";
+}
+
+function finalizedEvidence(row: { correct?: boolean | null; answer_data?: unknown } | null) {
+  return row
+    ? {
+        correct: Boolean(row.correct),
+        answerData: row.answer_data,
+      }
+    : null;
 }
 
 export async function POST(request: NextRequest) {
@@ -55,43 +75,127 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const checked = await evaluateGrammarTranslation({
-      userId: auth.userId,
-      questionId,
-      learnerAnswer: answer,
-    });
-
     const admin = createAdminClient() as unknown as SupabaseClient;
+    const question = await admin
+      .from("lesson_translation_questions")
+      .select(
+        "id,lesson_session_id,lesson_id,lesson_version_id,english_prompt,target_item_id,target_pattern,target_meaning,model_answer",
+      )
+      .eq("id", questionId)
+      .eq("user_id", auth.userId)
+      .maybeSingle();
+    if (question.error) {
+      throw new Error(`Translation question could not be loaded: ${question.error.message}`);
+    }
+    if (!question.data) {
+      throw new Error("This translation question is unavailable.");
+    }
+
+    const active = await admin
+      .from("lesson_sessions")
+      .select("id")
+      .eq("id", question.data.lesson_session_id)
+      .eq("user_id", auth.userId)
+      .eq("lesson_id", question.data.lesson_id)
+      .eq("lesson_version_id", question.data.lesson_version_id)
+      .eq("status", "active")
+      .maybeSingle();
+    if (active.error) {
+      throw new Error(`Lesson session could not be verified: ${active.error.message}`);
+    }
+    if (!active.data) {
+      throw new Error("This translation question no longer belongs to an active lesson.");
+    }
+
     const prior = await admin
       .from("lesson_activity_answers")
-      .select("attempts")
-      .eq("lesson_session_id", checked.lessonSessionId)
+      .select("correct,answer_data")
+      .eq("user_id", auth.userId)
+      .eq("lesson_session_id", question.data.lesson_session_id)
       .eq("phase", "grammar_translation")
       .eq("activity_id", questionId)
       .maybeSingle();
     if (prior.error) throw new Error(prior.error.message);
 
-    const savedAnswer = await admin.from("lesson_activity_answers").upsert(
-      {
-        user_id: auth.userId,
-        lesson_session_id: checked.lessonSessionId,
-        phase: "grammar_translation",
-        activity_id: questionId,
-        selected_answer: answer,
-        correct: checked.evaluation.correct,
-        attempts: (prior.data?.attempts ?? 0) + 1,
-        answer_data: {
-          serverValidated: true,
-          targetItemId: checked.targetItemId,
-        },
+    const modelAnswer = String(question.data.model_answer ?? "");
+    const result = await validateTranslationAttempt({
+      learnerAnswer: answer,
+      modelAnswer,
+      existing: finalizedEvidence(prior.data),
+      evaluateWithAi: async () => {
+        const generated = await generateStructured<TranslationEvaluation>({
+          name: "grammar_translation_validation",
+          prompt: translationEvaluationPrompt({
+            english: String(question.data.english_prompt ?? ""),
+            targetPattern: String(question.data.target_pattern ?? ""),
+            targetMeaning: String(question.data.target_meaning ?? ""),
+            modelAnswer,
+            learnerAnswer: answer,
+          }),
+          schema: translationEvaluationSchema,
+          strictSchema: true,
+          exactSchemaName: true,
+          validate: translationEvaluationOutputIssues,
+          trace: { stage: "grammar_translation_validation" },
+        });
+        return generated.value;
       },
-      { onConflict: "lesson_session_id,phase,activity_id" },
-    );
-    if (savedAnswer.error) throw new Error(savedAnswer.error.message);
+    });
+
+    const alreadyFinalized = persistedTranslationResult({
+      existing: finalizedEvidence(prior.data),
+      modelAnswer,
+    });
+    if (alreadyFinalized) {
+      return NextResponse.json(alreadyFinalized);
+    }
+
+    const payload = {
+      user_id: auth.userId,
+      lesson_session_id: String(question.data.lesson_session_id),
+      phase: "grammar_translation",
+      activity_id: questionId,
+      selected_answer: answer,
+      correct: result.correct,
+      attempts: 1,
+      answer_data: translationAnswerData(
+        result,
+        String(question.data.target_item_id ?? ""),
+      ),
+    };
+
+    const savedAnswer = prior.data
+      ? await admin
+          .from("lesson_activity_answers")
+          .update(payload)
+          .eq("user_id", auth.userId)
+          .eq("lesson_session_id", question.data.lesson_session_id)
+          .eq("phase", "grammar_translation")
+          .eq("activity_id", questionId)
+      : await admin.from("lesson_activity_answers").insert(payload);
+
+    if (savedAnswer.error) {
+      const raced = await admin
+        .from("lesson_activity_answers")
+        .select("correct,answer_data")
+        .eq("user_id", auth.userId)
+        .eq("lesson_session_id", question.data.lesson_session_id)
+        .eq("phase", "grammar_translation")
+        .eq("activity_id", questionId)
+        .maybeSingle();
+      if (!raced.error) {
+        const racedResult = persistedTranslationResult({
+          existing: finalizedEvidence(raced.data),
+          modelAnswer,
+        });
+        if (racedResult) return NextResponse.json(racedResult);
+      }
+      throw new Error(savedAnswer.error.message);
+    }
 
     // Translation answers are trusted evidence only. Mastery is awarded once,
     // after the complete Grammar phase passes commit_lesson_phase().
-    return NextResponse.json(checked.evaluation);
+    return NextResponse.json(result);
   } catch (error) {
     const message =
       error instanceof Error

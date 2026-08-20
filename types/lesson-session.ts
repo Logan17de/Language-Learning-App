@@ -37,6 +37,8 @@ export interface GrammarAnswer {
   feedback?: string;
   suggestion?: string;
   suggestedAnswer?: string;
+  revealAnswer?: string;
+  validationSource?: "exact_match" | "ai";
 }
 
 export type ReadingEventType =

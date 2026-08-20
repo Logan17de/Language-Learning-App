@@ -82,6 +82,7 @@ RULES
 - Return one question for every supplied target, preserving requestIndex exactly once from 0 through 4.
 - The first three targets are the lesson's current grammar targets.
 - The final two normally reinforce previously practised grammar in the learner's 60-80 mastery band. If learner history is still sparse, a lesson target may intentionally appear again as extra production practice.
+- Keep every prompt recognizably connected to the lesson topic/context above. You may extend naturally with related people, places, situations, or new details, but do not jump to unrelated practice.
 - Write the QUESTION itself in natural English. Do not put Japanese, a grammar hint, the target pattern, or the target meaning inside the English question.
 - Most importantly: create an English sentence whose meaning makes the supplied Japanese target grammar pattern a genuinely natural translation choice. Never force a pattern into a context where a Japanese speaker would normally choose something else.
 - modelAnswer must be a natural Japanese translation of english and must use the corresponding target grammar pattern correctly.

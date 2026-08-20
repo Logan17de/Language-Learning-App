@@ -18,7 +18,7 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     env:
       NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
@@ -39,8 +39,22 @@ jobs:
       - name: Type-check
         run: npm run typecheck
 
+      - name: Lint
+        run: npm run lint
+
       - name: Run tests
         run: npm test
+
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start local Supabase and apply migrations
+        run: supabase start
+
+      - name: Run rollback database behavior tests
+        run: supabase test db
 
       - name: Build
         run: npm run build

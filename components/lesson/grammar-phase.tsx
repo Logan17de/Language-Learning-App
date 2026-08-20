@@ -35,7 +35,8 @@ type TranslationValidation = {
   correct?: boolean;
   feedback?: string;
   suggestion?: string;
-  suggestedAnswer?: string;
+  revealAnswer?: string;
+  validationSource?: "exact_match" | "ai";
   error?: string;
 };
 
@@ -68,6 +69,7 @@ export function GrammarPhase({
   const [translationLoading, setTranslationLoading] = useState(false);
   const [translationChecking, setTranslationChecking] = useState(false);
   const [translationError, setTranslationError] = useState("");
+  const [revealedTranslationId, setRevealedTranslationId] = useState<string | null>(null);
 
   const standardAnsweredCount = session.grammarAnswers.filter((answer) =>
     standardQuestions.some((question) => question.id === answer.questionId),
@@ -173,6 +175,7 @@ export function GrammarPhase({
       }
       setTranslationIndex(0);
       setTypedAnswer("");
+      setRevealedTranslationId(null);
       onChange({
         ...session,
         grammarTranslationQuestions: result.questions,
@@ -222,8 +225,9 @@ export function GrammarPhase({
         !result ||
         typeof result.correct !== "boolean" ||
         typeof result.feedback !== "string" ||
-        typeof result.suggestion !== "string" ||
-        typeof result.suggestedAnswer !== "string"
+        typeof result.revealAnswer !== "string" ||
+        (result.validationSource !== "exact_match" && result.validationSource !== "ai") ||
+        (result.suggestion !== undefined && typeof result.suggestion !== "string")
       ) {
         setTranslationError(
           result?.error || "AIko could not check this translation.",
@@ -240,7 +244,8 @@ export function GrammarPhase({
           skill: "production",
           feedback: result.feedback,
           suggestion: result.suggestion,
-          suggestedAnswer: result.suggestedAnswer,
+          revealAnswer: result.revealAnswer,
+          validationSource: result.validationSource,
         }),
       });
     } catch {
@@ -259,6 +264,7 @@ export function GrammarPhase({
     );
     setTypedAnswer("");
     setTranslationError("");
+    setRevealedTranslationId(null);
   }
 
   if (showLesson) {
@@ -365,6 +371,7 @@ export function GrammarPhase({
 
     if (!translationQuestion) return null;
     const currentNumber = translationIndex + 1;
+    const revealOpen = revealedTranslationId === translationQuestion.id;
     return (
       <div className="mx-auto max-w-3xl">
         <div className="flex items-end justify-between gap-4">
@@ -463,12 +470,26 @@ export function GrammarPhase({
                   <p className="mt-1">{translationAnswer.suggestion}</p>
                 </div>
               )}
-              {translationAnswer.suggestedAnswer && (
-                <div className="mt-3 rounded-2xl bg-stone-50 p-4 text-sm text-stone-600">
-                  <p className="font-semibold text-ink">One natural answer</p>
-                  <p className="mt-2 font-serif text-lg leading-7">
-                    {translationAnswer.suggestedAnswer}
-                  </p>
+              {translationAnswer.revealAnswer && (
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    aria-expanded={revealOpen}
+                    className="rounded-xl border border-stone-200 bg-white px-4 py-2 text-sm font-semibold text-ink transition hover:bg-stone-50"
+                    onClick={() =>
+                      setRevealedTranslationId(revealOpen ? null : translationQuestion.id)
+                    }
+                  >
+                    {revealOpen ? "Hide answer" : "Reveal answer"}
+                  </button>
+                  {revealOpen && (
+                    <div className="mt-3 rounded-2xl bg-stone-50 p-4 text-sm text-stone-600">
+                      <p className="font-semibold text-ink">Generated answer</p>
+                      <p className="mt-2 font-serif text-lg leading-7">
+                        {translationAnswer.revealAnswer}
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 

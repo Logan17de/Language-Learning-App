@@ -42,6 +42,8 @@ function difficulty(value: RawListeningDifficulty): GeneratedListeningExercise["
 export async function generateListeningRegion(input: {
   requestId?: string;
   admin?: SupabaseClient;
+  topic: string;
+  japaneseStory: string;
   level: JLPTLevel;
   library: ResolvedLessonLibrary;
 }): Promise<GeneratedListeningRegion> {
@@ -49,6 +51,8 @@ export async function generateListeningRegion(input: {
     name: "listening_questions",
     prompt: listeningQuestionsPrompt({
       languageLevel: `JLPT ${input.level}`,
+      topic: input.topic,
+      japaneseStory: input.japaneseStory,
       knownPatterns:
         input.library.generationContext?.targetGrammar ??
         input.library.grammar.map((item) => item.pattern),

@@ -65,9 +65,17 @@ function pythonStringList(values: string[]): string {
 export function listeningQuestionsPrompt(input: {
   languageLevel: string;
   knownPatterns: string[];
+  topic: string;
+  japaneseStory: string;
 }): string {
   return `
 Create exactly 5 listening-comprehension questions for ${input.languageLevel} learners.
+
+Lesson topic:
+${input.topic}
+
+Lesson story context:
+${input.japaneseStory}
 
 grammar patterns:
 ${pythonStringList(input.knownPatterns)}
@@ -76,6 +84,7 @@ Requirements:
 - Create exactly 5 listening questions: 2 easy, 2 medium, and 1 hard.
 - Each question must include a natural Japanese conversation of 5–10 lines.
 - The conversation should be between 2 or more speakers.
+- Keep every conversation recognizably connected to the lesson topic or story context. You may extend naturally with related people, places, situations, or new details, but do not jump to unrelated practice.
 - The learner should answer only after listening to the entire conversation.
 - The question should test understanding of the conversation, not memorization.
 - Include a mix of direct information, speaker intention, sequence of events, reason or purpose, and simple inference.
