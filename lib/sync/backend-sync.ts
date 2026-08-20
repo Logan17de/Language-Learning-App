@@ -11,6 +11,7 @@ import { restartIncompleteLessonPhase } from "@/lib/lesson-resume";
 import { getBackendMode } from "@/lib/supabase/config";
 import { lessonRepository } from "@/lib/repositories/lesson-repository";
 import { lessonSessionRepository } from "@/lib/repositories/lesson-session-repository";
+import { buildLegacyMasteryEvidence } from "@/lib/sync/legacy-mastery-evidence";
 import {
   enqueueSync,
   markSyncAttempt,
@@ -210,6 +211,33 @@ async function persistCheckpointOnly(
   return saveCheckpoint(lesson, session, context.backendSession.id, false);
 }
 
+function legacyPhaseBoundary(
+  lesson: LessonPackage,
+  session: LessonSession,
+  phase: LessonPhaseId,
+): LessonSession {
+  const completedPhaseIds = Array.from(
+    new Set([...session.completedPhaseIds, phase]),
+  );
+  const currentIndex = lesson.phases.findIndex((item) => item.id === phase);
+  const lastIndex = lesson.phases.length - 1;
+  const nextIndex = currentIndex >= 0 && currentIndex < lastIndex
+    ? currentIndex + 1
+    : lastIndex;
+  return {
+    ...session,
+    completedPhaseIds,
+    currentPhaseIndex: nextIndex,
+    activityIndex: 0,
+    completionState:
+      completedPhaseIds.length === lesson.phases.length
+        ? "completion_pending"
+        : "active",
+    completionResult: null,
+    completed: false,
+  };
+}
+
 async function persistPhaseCompletion(
   lesson: LessonPackage,
   session: LessonSession,
@@ -237,7 +265,27 @@ async function persistPhaseCompletion(
   if (!(await saveCheckpoint(lesson, session, sessionId, true))) return false;
 
   const committed = await lessonSessionRepository.commitPhase(sessionId, phase);
-  return committed.ok;
+  if (!committed.ok) return false;
+  if (committed.data !== null) return true;
+
+  // Rollout bridge only: the frontend may be promoted while the shared DB still
+  // predates commit_lesson_phase(). Reuse the historical mastery RPC, then save
+  // the completed phase boundary in the old checkpoint format. Once the new RPC
+  // exists this branch is unreachable, so validation failures cannot bypass the
+  // canonical engine.
+  const legacyEvidence = buildLegacyMasteryEvidence(lesson, session, phase);
+  const legacyMastery = await lessonSessionRepository.recordLegacyMasteryEvidence(
+    sessionId,
+    legacyEvidence,
+  );
+  if (!legacyMastery.ok) return false;
+
+  return saveCheckpoint(
+    lesson,
+    legacyPhaseBoundary(lesson, session, phase),
+    sessionId,
+    true,
+  );
 }
 
 async function persistCanonicalCompletion(
@@ -370,7 +418,11 @@ export async function restoreLessonProgress(
     backendSession.data.id,
   );
   if (!reset.ok) return safeFallback;
-  const restored = checkpointSession(reset.data);
+
+  const resetPayload = reset.data ?? json({
+    checkpoint: backendSession.data.checkpoint,
+  });
+  const restored = checkpointSession(resetPayload);
   if (!restored || restored.lessonId !== lesson.id) return safeFallback;
   return restartIncompleteLessonPhase(restored);
 }
