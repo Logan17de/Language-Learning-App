@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Crown,
   Headphones,
+  Languages,
   LoaderCircle,
   Mic2,
   Sparkles,
@@ -128,6 +129,7 @@ export function LessonLibrary() {
 
   const busy = state === "generating";
   const isFree = creationState?.plan === "free";
+  const resumableLesson = resumeLessonAction(creationState);
   const currentLesson = currentLessonAction(creationState);
 
   return (
@@ -148,7 +150,7 @@ export function LessonLibrary() {
         <Card className="p-6 sm:p-7">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="section-kicker">Create your lesson</p>
+              <p className="section-kicker">Start new lesson</p>
               <h2 className="mt-2 text-2xl font-semibold">
                 What do you want to learn through?
               </h2>
@@ -179,17 +181,16 @@ export function LessonLibrary() {
                   {isFree ? (
                     creationState.canCreate ? (
                       <>
-                        <strong>1 free lesson available today.</strong> AIko
-                        reserves the slot when creation starts. It becomes used
-                        as soon as your first usable Story is opened.
+                        <strong>1 free lesson available today.</strong> Resume is
+                        separate from today&apos;s allowance, so an unfinished older
+                        lesson never blocks this new slot.
                       </>
                     ) : (
                       <>
                         <strong>
                           Today&apos;s free lesson is already reserved or used.
                         </strong>{" "}
-                        You can keep returning to the same lesson without using
-                        another daily lesson.
+                        Resume remains available without consuming another lesson.
                       </>
                     )
                   ) : (
@@ -206,8 +207,8 @@ export function LessonLibrary() {
                           : "s"}{" "}
                         remaining today.
                       </strong>{" "}
-                      Premium can create additional lessons and use all six
-                      phases.
+                      Premium can create up to five new lessons per day while
+                      keeping unfinished lessons resumable.
                     </>
                   )}
                   {creationState.timezone && (
@@ -216,6 +217,27 @@ export function LessonLibrary() {
                       {creationState.timezone}.
                     </span>
                   )}
+                </div>
+              )}
+
+              {resumableLesson && (
+                <div className="mt-5 rounded-2xl border border-moss-300 bg-moss-50/40 p-4">
+                  <p className="text-xs font-bold uppercase tracking-[.14em] text-moss-700">
+                    Resume lesson
+                  </p>
+                  <p className="mt-2 font-semibold">
+                    {creationState?.resumeTopic ?? "Your unfinished lesson"}
+                    {creationState?.resumeLevel
+                      ? ` · ${creationState.resumeLevel}`
+                      : ""}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-muted">
+                    Completed phases stay saved. Your first unfinished phase
+                    restarts from question 1, with partial answers discarded.
+                  </p>
+                  <ButtonLink href={resumableLesson.href} className="mt-4">
+                    Resume lesson
+                  </ButtonLink>
                 </div>
               )}
 
@@ -305,8 +327,13 @@ export function LessonLibrary() {
                   ) : (
                     <WandSparkles className="size-4" />
                   )}
-                  {busy ? "Starting your lesson…" : "Create my lesson"}
+                  {busy ? "Starting your lesson…" : "Start new lesson"}
                 </Button>
+                {creationState && !creationState.canCreate ? (
+                  <p className="text-center text-xs font-semibold text-muted">
+                    Daily creation limit reached. Resume remains available above.
+                  </p>
+                ) : null}
               </form>
             </>
           )}
@@ -335,9 +362,9 @@ export function LessonLibrary() {
               </h2>
               <p className="mt-3 text-sm leading-6 text-muted">
                 AIko generates all six phases for every lesson. Free learners
-                can complete Story, Vocabulary, Grammar, and Reading, then
-                choose whether to upgrade or skip the Premium listening and
-                speaking phases.
+                complete Story, Vocabulary, seven Grammar questions, and Reading.
+                Translation, Listening, and Speaking are Premium practice and can
+                be skipped without blocking completion.
               </p>
 
               <div className="mt-7 space-y-5">
@@ -347,19 +374,24 @@ export function LessonLibrary() {
                   detail="The same language keeps returning in new contexts instead of jumping to a different predefined lesson."
                 />
                 <Feature
+                  icon={Languages}
+                  title="Translation follows Grammar for Premium"
+                  detail="Premium learners get five server-validated translations after the seven Grammar questions. Free learners see Subscribe or Skip instead."
+                />
+                <Feature
                   icon={Headphones}
-                  title="Listening is always generated"
-                  detail="Premium learners can practice it immediately. Free learners receive no protected activity payload and see a Subscribe or Skip choice at runtime."
+                  title="Listening is Premium practice"
+                  detail="Free learners receive no protected activity payload and can subscribe or skip without blocking the lesson."
                 />
                 <Feature
                   icon={Mic2}
-                  title="Speaking is always generated"
-                  detail="Skipping a Premium phase never prevents the rest of the lesson from completing."
+                  title="Speaking is Premium practice"
+                  detail="Skipping protected practice awards no protected mastery and never consumes another lesson generation."
                 />
                 <Feature
                   icon={CheckCircle2}
-                  title="Resume the lesson you created"
-                  detail="Leaving a lesson saves the checkpoint. Returning does not consume another free daily lesson."
+                  title="Resume is independent of today&apos;s allowance"
+                  detail="Completed phases survive. The unfinished phase restarts from its first question, and resuming never consumes a new lesson."
                 />
               </div>
 
@@ -369,11 +401,11 @@ export function LessonLibrary() {
                     <Crown className="mt-0.5 size-5 shrink-0 text-persimmon-600" />
                     <div>
                       <p className="font-semibold text-persimmon-900">
-                        Want every phase and more lessons?
+                        Want protected practice and more lessons?
                       </p>
                       <p className="mt-1 text-sm leading-6 text-persimmon-800">
-                        Premium unlocks Listening and Speaking and lets you
-                        create additional lessons.
+                        Premium unlocks Translation, Listening, and Speaking and
+                        raises the daily creation limit to five.
                       </p>
                       <ButtonLink
                         href="/subscription"
@@ -394,6 +426,13 @@ export function LessonLibrary() {
   );
 }
 
+function resumeLessonAction(state: LessonCreationState | null): {
+  href: string;
+} | null {
+  if (!state?.resumeLessonId || !state.resumeLessonState) return null;
+  return { href: `/lesson/${state.resumeLessonId}/play` };
+}
+
 function currentLessonAction(state: LessonCreationState | null): {
   href: string;
   label: string;
@@ -405,25 +444,22 @@ function currentLessonAction(state: LessonCreationState | null): {
     return {
       href: `/lesson/building/${encodeURIComponent(state.requestId)}`,
       label: "Continue building",
-      kicker: "Lesson in progress",
+      kicker: "Today&apos;s lesson is building",
       detail: "AIko is still building this lesson. Return to its progress screen anytime.",
     };
   }
   if (!state.lessonId) return null;
   if (state.lessonState === "active") {
-    return {
-      href: `/lesson/${state.lessonId}/play`,
-      label: "Resume lesson",
-      kicker: "Your current lesson",
-      detail: "Your checkpoint is saved. Continue from where you left off.",
-    };
+    // Active lessons are rendered by the separate Resume card. This fallback is
+    // intentionally suppressed so Resume and today's allowance never collapse.
+    return null;
   }
   if (state.lessonState === "ready") {
     return {
       href: `/lesson/${state.lessonId}/play`,
       label: "Start lesson",
-      kicker: "Lesson ready",
-      detail: "Your lesson is ready to start.",
+      kicker: "Today&apos;s lesson is ready",
+      detail: "Your newly created lesson is ready to start.",
     };
   }
   if (state.lessonState === "completed") {
