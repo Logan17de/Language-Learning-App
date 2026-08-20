@@ -35,7 +35,7 @@ export interface LessonCreationState {
   resumeTopic: string | null;
   resumeLevel: JLPTLevel | null;
   resumeLessonId: string | null;
-  resumeLessonState: Extract<CurrentLessonState, "ready" | "active">;
+  resumeLessonState: Extract<CurrentLessonState, "ready" | "active"> | null;
 }
 
 function text(value: unknown): string | null {
