@@ -22,9 +22,10 @@ const modeMigration = source(
 );
 
 describe("learn custom-topic product direction", () => {
-  it("makes /learn the lesson creation surface and retires the legacy route", () => {
+  it("makes /learn the lesson creation and Resume surface and retires the legacy route", () => {
     expect(learnPage).toContain("Choose the topic. AIko builds the lesson.");
-    expect(learnPage).toContain("Create my lesson");
+    expect(learnPage).toContain("Resume lesson");
+    expect(learnPage).toContain("Start new lesson");
     expect(legacyRoute).toContain('redirect("/learn")');
     expect(learnPage).not.toContain("AIko picks the next lesson");
     expect(learnPage).not.toContain("Your next N5 lesson");
@@ -51,17 +52,19 @@ describe("learn custom-topic product direction", () => {
     );
   });
 
-  it("keeps all six generated phases but gates premium runtime phases for free learners", () => {
+  it("keeps all six generated phases while gating protected runtime practice for Free", () => {
     expect(jobRunner).toContain("generateListeningAndSpeakingActivities");
-    expect(player).toContain("PremiumPhaseGate");
+    expect(player).toContain("PremiumPracticeGate");
+    expect(player).toContain('practice === "translation"');
     expect(player).toContain("Subscribe");
     expect(player).toContain("Skip");
-    expect(player).toContain("Skipping does not block");
+    expect(player).toContain("awards no protected mastery");
   });
 
-  it("preserves lesson resume instead of abandoning on normal exit", () => {
-    expect(player).toContain("Your checkpoint stays saved");
+  it("preserves phase-atomic Resume instead of abandoning on normal exit", () => {
+    expect(player).toContain("restartIncompleteLessonPhase");
     expect(player).toContain("syncLessonProgress(lesson, checkpoint)");
+    expect(player).toContain("restart from its first activity");
     expect(player).not.toContain("abandonActive");
     expect(player).not.toContain("resetLessonSession");
   });
