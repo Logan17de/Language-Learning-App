@@ -1,9 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
+import { hasPremiumLessonPhaseAccess } from "@/lib/auth/lesson-phase-access";
 import { evaluateGrammarTranslation } from "@/lib/lesson/translation-practice";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 
 function field(body: Record<string, unknown>, key: string, maximum: number): string {
   const value = body[key];
@@ -16,6 +16,13 @@ export async function POST(request: NextRequest) {
   const auth = await authorize("learn");
   if (!auth.ok) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
+  }
+
+  if (!(await hasPremiumLessonPhaseAccess(auth.userId))) {
+    return NextResponse.json(
+      { error: "Translation practice is a Premium feature." },
+      { status: 403 },
+    );
   }
 
   const raw: unknown = await request.json().catch(() => null);
@@ -48,6 +55,7 @@ export async function POST(request: NextRequest) {
       .eq("activity_id", questionId)
       .maybeSingle();
     if (prior.error) throw new Error(prior.error.message);
+
     const savedAnswer = await admin.from("lesson_activity_answers").upsert(
       {
         user_id: auth.userId,
@@ -66,33 +74,9 @@ export async function POST(request: NextRequest) {
     );
     if (savedAnswer.error) throw new Error(savedAnswer.error.message);
 
-    // The question id resolves to the authoritative session and grammar target on
-    // the server. A learner cannot redirect mastery by changing request metadata.
-    let masterySaved = false;
-    const client = await createClient();
-    if (client) {
-      const rawClient = client as unknown as SupabaseClient;
-      const evidence = await rawClient.rpc("record_mastery_evidence", {
-        p_session_id: checked.lessonSessionId,
-        p_events: [
-          {
-            clientEventId: `translation:${questionId}`,
-            itemType: "grammar",
-            itemKey: checked.targetItemId,
-            dimension: "meaning",
-            signal: checked.evaluation.correct ? "correct" : "incorrect",
-            data: {
-              source: "translation",
-              selectedAnswer: answer,
-              questionId,
-            },
-          },
-        ],
-      });
-      masterySaved = !evidence.error;
-    }
-
-    return NextResponse.json({ ...checked.evaluation, masterySaved });
+    // Translation answers are trusted evidence only. Mastery is awarded once,
+    // after the complete Grammar phase passes commit_lesson_phase().
+    return NextResponse.json(checked.evaluation);
   } catch (error) {
     const message =
       error instanceof Error
