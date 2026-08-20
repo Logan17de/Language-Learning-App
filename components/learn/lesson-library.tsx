@@ -47,6 +47,7 @@ export function LessonLibrary() {
   );
   const [creationState, setCreationState] =
     useState<LessonCreationState | null>(null);
+  const [showCreationForm, setShowCreationForm] = useState(false);
   const [loadingState, setLoadingState] = useState(true);
   const [state, setState] = useState<GenerationState>("idle");
   const [error, setError] = useState("");
@@ -61,6 +62,7 @@ export function LessonLibrary() {
         return;
       }
       setCreationState(result.data);
+      setShowCreationForm(!result.data.resumeLessonId);
       if (result.data.level) setLevel(result.data.level);
     });
     return () => {
@@ -77,6 +79,7 @@ export function LessonLibrary() {
       return;
     }
     setCreationState(result.data);
+    setShowCreationForm((shown) => shown || !result.data.resumeLessonId);
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -131,6 +134,7 @@ export function LessonLibrary() {
   const isFree = creationState?.plan === "free";
   const resumableLesson = resumeLessonAction(creationState);
   const currentLesson = currentLessonAction(creationState);
+  const creationFormVisible = !resumableLesson || showCreationForm;
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
@@ -150,9 +154,9 @@ export function LessonLibrary() {
         <Card className="p-6 sm:p-7">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="section-kicker">Start new lesson</p>
+              <p className="section-kicker">Learn</p>
               <h2 className="mt-2 text-2xl font-semibold">
-                What do you want to learn through?
+                Resume or start something new.
               </h2>
             </div>
             {creationState && (
@@ -223,7 +227,7 @@ export function LessonLibrary() {
               {resumableLesson && (
                 <div className="mt-5 rounded-2xl border border-moss-300 bg-moss-50/40 p-4">
                   <p className="text-xs font-bold uppercase tracking-[.14em] text-moss-700">
-                    Resume lesson
+                    Unfinished lesson
                   </p>
                   <p className="mt-2 font-semibold">
                     {creationState?.resumeTopic ?? "Your unfinished lesson"}
@@ -235,9 +239,25 @@ export function LessonLibrary() {
                     Completed phases stay saved. Your first unfinished phase
                     restarts from question 1, with partial answers discarded.
                   </p>
-                  <ButtonLink href={resumableLesson.href} className="mt-4">
-                    Resume lesson
-                  </ButtonLink>
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                    <ButtonLink href={resumableLesson.href} className="sm:flex-1">
+                      Resume lesson
+                    </ButtonLink>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="sm:flex-1"
+                      disabled={!creationState?.canCreate}
+                      onClick={() => setShowCreationForm(true)}
+                    >
+                      Start new lesson
+                    </Button>
+                  </div>
+                  {!creationState?.canCreate ? (
+                    <p className="mt-3 text-xs font-semibold text-muted">
+                      Today&apos;s creation limit is reached. Resume is still available.
+                    </p>
+                  ) : null}
                 </div>
               )}
 
@@ -263,78 +283,86 @@ export function LessonLibrary() {
                 </div>
               )}
 
-              <form className="mt-6 space-y-5" onSubmit={submit}>
-                <Field label="Topic">
-                  <input
-                    required
-                    minLength={2}
-                    maxLength={120}
-                    value={topic}
-                    onChange={(event) => setTopic(event.target.value)}
-                    disabled={busy || creationState?.canCreate === false}
-                    className="form-input disabled:cursor-not-allowed disabled:opacity-60"
-                    placeholder="Ordering at an izakaya, my first day at work…"
-                  />
-                </Field>
-                <Field label="Japanese level">
-                  <select
-                    value={level}
-                    onChange={(event) =>
-                      setLevel(event.target.value as JLPTLevel)
-                    }
-                    disabled={busy || creationState?.canCreate === false}
-                    className="form-input disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {(["N5", "N4", "N3", "N2", "N1"] as JLPTLevel[]).map(
-                      (item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ),
-                    )}
-                  </select>
-                </Field>
-
-                {error && (
-                  <div
-                    role="alert"
-                    className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800"
-                  >
-                    <p>{error}</p>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="mt-2 h-auto px-0 py-1 text-amber-900"
-                      onClick={() => void reloadState()}
-                    >
-                      Retry allowance check
-                    </Button>
+              {creationFormVisible ? (
+                <form className="mt-6 space-y-5" onSubmit={submit}>
+                  <div>
+                    <p className="section-kicker">Start new lesson</p>
+                    <h3 className="mt-2 text-lg font-semibold">
+                      What do you want to learn through?
+                    </h3>
                   </div>
-                )}
+                  <Field label="Topic">
+                    <input
+                      required
+                      minLength={2}
+                      maxLength={120}
+                      value={topic}
+                      onChange={(event) => setTopic(event.target.value)}
+                      disabled={busy || creationState?.canCreate === false}
+                      className="form-input disabled:cursor-not-allowed disabled:opacity-60"
+                      placeholder="Ordering at an izakaya, my first day at work…"
+                    />
+                  </Field>
+                  <Field label="Japanese level">
+                    <select
+                      value={level}
+                      onChange={(event) =>
+                        setLevel(event.target.value as JLPTLevel)
+                      }
+                      disabled={busy || creationState?.canCreate === false}
+                      className="form-input disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {(["N5", "N4", "N3", "N2", "N1"] as JLPTLevel[]).map(
+                        (item) => (
+                          <option key={item} value={item}>
+                            {item}
+                          </option>
+                        ),
+                      )}
+                    </select>
+                  </Field>
 
-                <Button
-                  type="submit"
-                  disabled={
-                    busy ||
-                    loadingState ||
-                    !creationState?.canCreate ||
-                    topic.trim().length < 2
-                  }
-                  className="w-full"
-                >
-                  {busy ? (
-                    <LoaderCircle className="size-4 animate-spin" />
-                  ) : (
-                    <WandSparkles className="size-4" />
+                  {error && (
+                    <div
+                      role="alert"
+                      className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800"
+                    >
+                      <p>{error}</p>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="mt-2 h-auto px-0 py-1 text-amber-900"
+                        onClick={() => void reloadState()}
+                      >
+                        Retry allowance check
+                      </Button>
+                    </div>
                   )}
-                  {busy ? "Starting your lesson…" : "Start new lesson"}
-                </Button>
-                {creationState && !creationState.canCreate ? (
-                  <p className="text-center text-xs font-semibold text-muted">
-                    Daily creation limit reached. Resume remains available above.
-                  </p>
-                ) : null}
-              </form>
+
+                  <Button
+                    type="submit"
+                    disabled={
+                      busy ||
+                      loadingState ||
+                      !creationState?.canCreate ||
+                      topic.trim().length < 2
+                    }
+                    className="w-full"
+                  >
+                    {busy ? (
+                      <LoaderCircle className="size-4 animate-spin" />
+                    ) : (
+                      <WandSparkles className="size-4" />
+                    )}
+                    {busy ? "Starting your lesson…" : "Start new lesson"}
+                  </Button>
+                  {creationState && !creationState.canCreate ? (
+                    <p className="text-center text-xs font-semibold text-muted">
+                      Daily creation limit reached. Resume remains available above.
+                    </p>
+                  ) : null}
+                </form>
+              ) : null}
             </>
           )}
         </Card>
@@ -440,6 +468,13 @@ function currentLessonAction(state: LessonCreationState | null): {
   detail: string;
 } | null {
   if (!state?.lessonState) return null;
+  if (
+    state.lessonId &&
+    state.lessonId === state.resumeLessonId &&
+    (state.lessonState === "ready" || state.lessonState === "active")
+  ) {
+    return null;
+  }
   if (state.lessonState === "building" && state.requestId) {
     return {
       href: `/lesson/building/${encodeURIComponent(state.requestId)}`,
@@ -449,11 +484,7 @@ function currentLessonAction(state: LessonCreationState | null): {
     };
   }
   if (!state.lessonId) return null;
-  if (state.lessonState === "active") {
-    // Active lessons are rendered by the separate Resume card. This fallback is
-    // intentionally suppressed so Resume and today's allowance never collapse.
-    return null;
-  }
+  if (state.lessonState === "active") return null;
   if (state.lessonState === "ready") {
     return {
       href: `/lesson/${state.lessonId}/play`,
