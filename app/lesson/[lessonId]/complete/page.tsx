@@ -4,15 +4,22 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { LessonResult } from "@/components/lesson/lesson-result";
 import { ButtonLink } from "@/components/ui/button";
-import { useAppStore } from "@/store/app-store";
+import { getBackendMode } from "@/lib/supabase/config";
+import { loadCanonicalLessonCompletion } from "@/lib/sync/backend-sync";
+import {
+  createEmptyLessonSession,
+  useAppStore,
+} from "@/store/app-store";
 import { useBackendLessonStore } from "@/store/backend-lesson-store";
 import type { LessonPackage } from "@/types/lesson";
+import type { LessonCompletionResult } from "@/types/lesson-session";
 
 export default function LessonCompletePage() {
   const params = useParams<{ lessonId: string }>();
   const lessonId = params?.lessonId ?? "";
   const hasHydrated = useAppStore((state) => state.hasHydrated);
   const session = useAppStore((state) => state.lessonSessions[lessonId]);
+  const saveLessonSession = useAppStore((state) => state.saveLessonSession);
   const cachedBackendLesson = useBackendLessonStore((state) =>
     state.lessons.find((item) => item.id === lessonId),
   );
@@ -21,6 +28,11 @@ export default function LessonCompletePage() {
     useState<LessonPackage | undefined>();
   const [backendResolved, setBackendResolved] = useState(
     Boolean(cachedBackendLesson),
+  );
+  const [canonicalResult, setCanonicalResult] =
+    useState<LessonCompletionResult | null>(null);
+  const [completionResolved, setCompletionResolved] = useState(
+    getBackendMode() !== "supabase",
   );
 
   useEffect(() => {
@@ -41,7 +53,35 @@ export default function LessonCompletePage() {
 
   const lesson = cachedBackendLesson ?? requestedBackendLesson;
 
-  if (!hasHydrated || !backendResolved) {
+  useEffect(() => {
+    if (getBackendMode() !== "supabase" || !lesson) return;
+    let active = true;
+    setCompletionResolved(false);
+    void loadCanonicalLessonCompletion(lesson)
+      .then((result) => {
+        if (!active) return;
+        setCanonicalResult(result);
+        if (result) {
+          const latest =
+            useAppStore.getState().lessonSessions[lesson.id] ??
+            createEmptyLessonSession(lesson.id);
+          saveLessonSession({
+            ...latest,
+            completionResult: result,
+            completionState: "completed",
+            completed: true,
+          });
+        }
+      })
+      .finally(() => {
+        if (active) setCompletionResolved(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [lesson, saveLessonSession]);
+
+  if (!hasHydrated || !backendResolved || !completionResolved) {
     return (
       <main className="grid min-h-screen place-items-center bg-paper">
         <span className="size-10 animate-spin rounded-full border-4 border-moss-100 border-t-moss-600" />
@@ -60,7 +100,13 @@ export default function LessonCompletePage() {
       </main>
     );
   }
-  if (!session?.completionResult) {
+
+  const result =
+    getBackendMode() === "supabase"
+      ? canonicalResult
+      : session?.completionResult ?? null;
+
+  if (!result) {
     return (
       <main className="grid min-h-screen place-items-center bg-paper p-6 text-center">
         <div>
@@ -75,5 +121,5 @@ export default function LessonCompletePage() {
       </main>
     );
   }
-  return <LessonResult lesson={lesson} result={session.completionResult} />;
+  return <LessonResult lesson={lesson} result={result} />;
 }
