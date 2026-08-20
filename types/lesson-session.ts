@@ -4,6 +4,7 @@ export type LessonPhaseId = LessonPhase["id"];
 export type ConfidenceLevel = "low" | "medium" | "high";
 export type VocabularyMode = "kanji-reading" | "reading-meaning" | "meaning-japanese" | "mixed";
 export type GrammarExerciseType = "multiple-choice" | "fill-blank" | "sentence-order" | "natural-sentence";
+export type LessonCompletionState = "active" | "completion_pending" | "completed";
 
 export interface LessonActivityProgress {
   phaseId: LessonPhaseId;
@@ -145,6 +146,8 @@ export interface LessonSession {
   speakingEvents: SpeakingEvent[];
   speakingComplete: boolean;
   completionResult: LessonCompletionResult | null;
+  /** Supabase-backed lessons are not completed until canonical completion succeeds. */
+  completionState: LessonCompletionState;
   completed: boolean;
   rewarded: boolean;
 }
