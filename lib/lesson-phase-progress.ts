@@ -45,6 +45,7 @@ export function phaseIsComplete(
   session: LessonSession,
   phaseId: LessonPhaseId,
   lesson: LessonPackage,
+  translationPremiumContractActive = true,
 ): boolean {
   switch (phaseId) {
     case "story":
@@ -64,7 +65,12 @@ export function phaseIsComplete(
     }
     case "grammar": {
       if (!grammarStandardIsComplete(session, lesson)) return false;
-      if (lesson.premiumPhaseAccess === "locked") return true;
+      if (
+        lesson.premiumPhaseAccess === "locked" &&
+        translationPremiumContractActive
+      ) {
+        return true;
+      }
 
       const answerIds = session.grammarAnswers.map((answer) => answer.questionId);
       const translationQuestions = (session.grammarTranslationQuestions ?? []).slice(
