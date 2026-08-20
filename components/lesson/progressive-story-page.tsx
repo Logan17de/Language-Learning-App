@@ -20,6 +20,7 @@ import { InspectableText } from "@/components/exercises/inspectable-text";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { customLessonRetryAction } from "@/lib/custom-lesson-retry";
 
 const TOTAL_PHASES = 6;
 const ACTIVITY_GROUP_COUNT = 3;
@@ -554,19 +555,23 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
     [lines],
   );
   const canContinue = storyComplete && lessonReady && Boolean(lessonId);
-  const canRetryAudio = !retrying && lessonReady && audioStatus === "failed";
-  const canRetryActivities =
-    !retrying &&
-    !lessonReady &&
-    !permanentFailure &&
-    (retryableFailure || failedGroups.length > 0);
-  const canRetry = canRetryAudio || canRetryActivities;
+  const retryAction = customLessonRetryAction({
+    retrying,
+    lessonReady,
+    audioStatus,
+    permanentFailure,
+    retryableFailure,
+    failedGroupCount: failedGroups.length,
+  });
+  const canRetryAudio = retryAction === "audio";
+  const canRetryActivities = retryAction === "activities";
+  const canRetry = retryAction !== null;
 
   async function retryRemaining() {
-    if (!canRetry) return;
+    if (!retryAction) return;
+    const action = retryAction;
     setRetrying(true);
     setError("");
-    const action = canRetryAudio ? "audio" : "activities";
     try {
       const response = await fetch("/api/custom-lessons/complete", {
         method: "POST",
