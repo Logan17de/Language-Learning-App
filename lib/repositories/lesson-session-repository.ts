@@ -1,3 +1,4 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { failure, notConfigured, success, type RepositoryResult } from "@/lib/repositories/result";
 import { isMissingPhaseAtomicRpc } from "@/lib/sync/phase-rpc-compatibility";
@@ -134,7 +135,10 @@ export const lessonSessionRepository = {
   ): Promise<RepositoryResult<Json | null>> {
     const client = createClient();
     if (!client) return notConfigured();
-    const { data, error } = await client.rpc("commit_lesson_phase", {
+    // These RPCs intentionally lead the generated Database type during the
+    // coordinated rollout. Keep the escape hatch scoped to the pending calls.
+    const rawClient = client as unknown as SupabaseClient;
+    const { data, error } = await rawClient.rpc("commit_lesson_phase", {
       p_session_id: sessionId,
       p_phase: phase,
     });
@@ -143,7 +147,7 @@ export const lessonSessionRepository = {
     }
     return error
       ? failure(error, "This phase could not be committed. Please try again.")
-      : success(data);
+      : success((data ?? null) as Json | null);
   },
 
   async recordLegacyMasteryEvidence(
@@ -166,7 +170,8 @@ export const lessonSessionRepository = {
   async resetIncompletePhase(sessionId: string): Promise<RepositoryResult<Json | null>> {
     const client = createClient();
     if (!client) return notConfigured();
-    const { data, error } = await client.rpc("reset_incomplete_lesson_phase", {
+    const rawClient = client as unknown as SupabaseClient;
+    const { data, error } = await rawClient.rpc("reset_incomplete_lesson_phase", {
       p_session_id: sessionId,
     });
     if (error && isMissingPhaseAtomicRpc(error, "reset_incomplete_lesson_phase")) {
@@ -174,7 +179,7 @@ export const lessonSessionRepository = {
     }
     return error
       ? failure(error, "Your saved lesson could not be restored safely.")
-      : success(data);
+      : success((data ?? null) as Json | null);
   },
 
   async latestCompletion(lessonId: string): Promise<RepositoryResult<LessonCompletion | null>> {
