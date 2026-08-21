@@ -92,14 +92,18 @@ describe("learner interests never personalize lessons", () => {
     expect(interestContractMigration).toContain(
       "column_name ilike '%interest%'",
     );
+    // The replay guard inspects public normal functions behind an OFFSET 0
+    // fence, so pg_get_functiondef() can never reach a pg_catalog aggregate.
+    expect(interestContractMigration).toContain("and p.prokind = 'f'");
+    expect(interestContractMigration).toContain("offset 0");
     expect(interestContractMigration).toContain(
-      "pg_get_functiondef(p.oid) ilike '%interest_matches%'",
+      "pg_get_functiondef(public_function.oid) ilike '%interest_matches%'",
     );
     expect(interestContractMigration).toContain(
-      "pg_get_functiondef(p.oid) ilike '%profiles.interests%'",
+      "pg_get_functiondef(public_function.oid) ilike '%profiles.interests%'",
     );
     expect(interestContractMigration).toContain(
-      "pg_get_functiondef(p.oid) ilike '%pro_interest%'",
+      "pg_get_functiondef(public_function.oid) ilike '%pro_interest%'",
     );
   });
 

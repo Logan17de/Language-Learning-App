@@ -23,15 +23,18 @@ values
    array['Use it for a change over time, not a one-time decision.'], 'N4')
 on conflict (id) do update set pattern = excluded.pattern, meaning = excluded.meaning, updated_at = now();
 
+-- dictionary_form has been NOT NULL since 20260730060000_japanese_lexicon_v6.
+-- Every seed entry is already a canonical dictionary form, which matches the
+-- dictionary_form = written_form backfill that migration performs.
 insert into public.vocabulary_records
-  (id, legacy_id, written_form, reading, meaning, part_of_speech, jlpt_level, example_sentence)
+  (id, legacy_id, written_form, dictionary_form, reading, meaning, part_of_speech, jlpt_level, example_sentence)
 values
-  ('12000000-0000-4000-8000-000000000001', 'vocab_station', '駅', 'えき', 'station', 'noun', 'N5', '駅まで歩きます。'),
-  ('12000000-0000-4000-8000-000000000002', 'vocab_work', '働く', 'はたらく', 'to work', 'verb', 'N4', '会社で働いています。'),
-  ('12000000-0000-4000-8000-000000000003', 'vocab_company', '会社', 'かいしゃ', 'company', 'noun', 'N5', '会社は駅から十分です。'),
-  ('12000000-0000-4000-8000-000000000004', 'vocab_together', '一緒に', 'いっしょに', 'together', 'adverb', 'N5', '一緒に電車に乗ります。'),
-  ('12000000-0000-4000-8000-000000000005', 'vocab_gate', '改札', 'かいさつ', 'ticket gate', 'noun', 'N4', '改札で会います。')
-on conflict (id) do update set written_form = excluded.written_form, meaning = excluded.meaning, updated_at = now();
+  ('12000000-0000-4000-8000-000000000001', 'vocab_station', '駅', '駅', 'えき', 'station', 'noun', 'N5', '駅まで歩きます。'),
+  ('12000000-0000-4000-8000-000000000002', 'vocab_work', '働く', '働く', 'はたらく', 'to work', 'verb', 'N4', '会社で働いています。'),
+  ('12000000-0000-4000-8000-000000000003', 'vocab_company', '会社', '会社', 'かいしゃ', 'company', 'noun', 'N5', '会社は駅から十分です。'),
+  ('12000000-0000-4000-8000-000000000004', 'vocab_together', '一緒に', '一緒に', 'いっしょに', 'together', 'adverb', 'N5', '一緒に電車に乗ります。'),
+  ('12000000-0000-4000-8000-000000000005', 'vocab_gate', '改札', '改札', 'かいさつ', 'ticket gate', 'noun', 'N4', '改札で会います。')
+on conflict (id) do update set written_form = excluded.written_form, dictionary_form = excluded.dictionary_form, meaning = excluded.meaning, updated_at = now();
 
 insert into public.kanji_records
   (id, character, readings, meanings, jlpt_level, stroke_count)
