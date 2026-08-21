@@ -300,6 +300,9 @@ select set_config('aiko.paid_session',
 select pg_temp.answer_grammar(
   current_setting('aiko.paid')::uuid, current_setting('aiko.paid_session')::uuid);
 
+-- throws_ok runs raw SQL, so the Premium learner's identity must be current.
+select set_config('request.jwt.claim.sub', current_setting('aiko.paid'), true);
+
 select throws_ok(
   format('select public.commit_lesson_phase(%L::uuid, %L)',
          current_setting('aiko.paid_session'), 'grammar'),
@@ -312,6 +315,8 @@ select throws_ok(
 select pg_temp.add_translations(
   current_setting('aiko.paid')::uuid, current_setting('aiko.paid_session')::uuid,
   current_setting('aiko.item')::uuid, 4);
+
+select set_config('request.jwt.claim.sub', current_setting('aiko.paid'), true);
 
 select throws_ok(
   format('select public.commit_lesson_phase(%L::uuid, %L)',
