@@ -8,7 +8,7 @@ import {
 const aiResult = (correct: boolean) => ({
   correct,
   feedback: correct ? "Natural and correct." : "The required grammar is missing.",
-  ...(correct ? {} : { suggestion: "Use the required grammar pattern." }),
+  suggestion: correct ? null : "Use the required grammar pattern.",
 });
 
 describe("Translation validation fast path", () => {
@@ -40,7 +40,7 @@ describe("Translation validation fast path", () => {
     });
   });
 
-  it("calls AI for a different answer and accepts a valid natural alternative without a suggestion", async () => {
+  it("omits the provider's null suggestion for an AI-accepted natural alternative", async () => {
     const evaluateWithAi = vi.fn(async () => aiResult(true));
     const storedModelAnswer = "面接のあとで会社について話しました。";
 

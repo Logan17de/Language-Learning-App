@@ -21,7 +21,7 @@ export interface RawTranslationQuestions {
 export interface TranslationEvaluation {
   correct: boolean;
   feedback: string;
-  suggestion?: string;
+  suggestion: string | null;
 }
 
 export const translationQuestionSchema: JsonSchema = {
@@ -50,11 +50,11 @@ export const translationQuestionSchema: JsonSchema = {
 export const translationEvaluationSchema: JsonSchema = {
   type: "object",
   additionalProperties: false,
-  required: ["correct", "feedback"],
+  required: ["correct", "feedback", "suggestion"],
   properties: {
     correct: { type: "boolean" },
     feedback: { type: "string", minLength: 1, maxLength: 500 },
-    suggestion: { type: "string", minLength: 1, maxLength: 500 },
+    suggestion: { type: ["string", "null"], minLength: 1, maxLength: 500 },
   },
 };
 
@@ -123,8 +123,8 @@ EVALUATION RULES
 - A grammatically valid Japanese sentence that avoids the required target pattern is incorrect for this exercise.
 - A sentence that contains the pattern mechanically but uses it with the wrong meaning, formation, tense, polarity, or nuance is incorrect.
 - feedback is always required and should briefly explain the verdict.
-- If correct: return a brief correctness explanation. Do not generate a correction, refinement, alternative answer, or suggestion. Omit suggestion.
-- If incorrect: explain the specific problem and provide one concise, learner-friendly improvement suggestion.
+- If correct: return a brief correctness explanation and set suggestion to null. Do not generate a correction, refinement, alternative answer, or suggestion.
+- If incorrect: explain the specific problem and set suggestion to one concise, learner-friendly improvement suggestion.
 - Do not generate a second Japanese answer. The hidden reference answer is the canonical answer used separately by the application.
 
 Return only the requested structured object.`;
@@ -193,8 +193,8 @@ export function translationEvaluationOutputIssues(value: unknown): string[] {
     issues.push("Translation validation needs feedback.");
   }
 
-  if (evaluation.correct === true && evaluation.suggestion !== undefined) {
-    issues.push("Translation validation must omit suggestion when the answer is correct.");
+  if (evaluation.correct === true && evaluation.suggestion !== null) {
+    issues.push("Translation validation needs null suggestion when the answer is correct.");
   }
   if (
     evaluation.correct === false &&
