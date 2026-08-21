@@ -43,12 +43,28 @@ function requestAudioUrl(text?: string, audioAssetId?: string): Promise<string> 
   return pending;
 }
 
+/**
+ * Some environments never fire canplay OR error for a media element: the
+ * element simply sits at readyState 0 and networkState 2 forever. Without a
+ * deadline this promise never settles, the control stays on "Loading audio…"
+ * with the answers locked, and because the pending promise is cached every
+ * retry rejoins the same dead wait. Time out instead, so the learner gets a
+ * real error and the cache entry is evicted for a genuine retry.
+ */
+const AUDIO_LOAD_TIMEOUT_MS = 12_000;
+
 function createPreloadedAudio(url: string): Promise<HTMLAudioElement> {
   return new Promise((resolve, reject) => {
     const audio = new Audio(url);
     audio.preload = "auto";
 
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error("Audio could not be loaded."));
+    }, AUDIO_LOAD_TIMEOUT_MS);
+
     const cleanup = () => {
+      clearTimeout(timer);
       audio.removeEventListener("canplay", handleReady);
       audio.removeEventListener("canplaythrough", handleReady);
       audio.removeEventListener("error", handleError);

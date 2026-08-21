@@ -107,16 +107,33 @@ export function LessonPlayer({
   const editedDuringRestoreRef = useRef(false);
   const premiumPhasesAccessible = lesson.premiumPhaseAccess !== "locked";
 
+  // Warm the first Listening clip while the learner is finishing the phase
+  // before it, so the first play feels instant. Only the first clip is primed
+  // here; ListeningPhase then keeps exactly one clip ahead as the learner
+  // moves. Fetching all five up front would put five downloads in flight at
+  // once, competing with the lesson content the learner is actually reading.
+  const listeningPhaseIndex = lesson.phases.findIndex(
+    (phase) => phase.id === "listening",
+  );
+  const currentPhaseIndex = session?.currentPhaseIndex ?? 0;
+  const readingActivityIndex = session?.activityIndex ?? 0;
+  const readingTotal = lesson.readingQuestions?.length ?? 0;
+  const nearListening =
+    listeningPhaseIndex >= 0 &&
+    (currentPhaseIndex >= listeningPhaseIndex ||
+      (currentPhaseIndex === listeningPhaseIndex - 1 &&
+        (readingTotal === 0 || readingActivityIndex >= readingTotal - 1)));
+
   useEffect(() => {
-    if (!premiumPhasesAccessible) return;
-    for (const exercise of lesson.listeningExercises) {
-      void preloadListeningAudio({
-        text: exercise.transcript,
-        audioAssetId: exercise.audioAssetId,
-        browserTts: lesson.runtimeAudio === "browser_tts",
-      }).catch(() => undefined);
-    }
-  }, [lesson, premiumPhasesAccessible]);
+    if (!premiumPhasesAccessible || !nearListening) return;
+    const first = lesson.listeningExercises[0];
+    if (!first) return;
+    void preloadListeningAudio({
+      text: first.transcript,
+      audioAssetId: first.audioAssetId,
+      browserTts: lesson.runtimeAudio === "browser_tts",
+    }).catch(() => undefined);
+  }, [lesson, premiumPhasesAccessible, nearListening]);
 
   useEffect(() => {
     if (!hasHydrated || restoredLessonRef.current === lesson.id) return;

@@ -1,11 +1,15 @@
 "use client";
 
+import { useEffect } from "react";
 import { ArrowRight, Check, Headphones, MessageSquareText } from "lucide-react";
 import { appendInspectableInteraction } from "@/lib/lesson-support";
 import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession, ListeningEvent } from "@/types/lesson-session";
 import { evaluateAnswer } from "@/lib/scoring-utils";
-import { AudioControl } from "@/components/exercises/audio-control";
+import {
+  AudioControl,
+  preloadListeningAudio,
+} from "@/components/exercises/audio-control";
 import { MultipleChoiceCard } from "@/components/exercises/multiple-choice-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -58,6 +62,18 @@ export function ListeningPhase({
       ? initialIndex
       : Math.min(session.activityIndex, exercises.length - 1);
   const exercise = exercises[currentIndex];
+
+  // Roll one clip ahead: while this question is on screen, the next one is
+  // already downloading, so moving on never waits for the network.
+  const nextExercise = exercises[currentIndex + 1];
+  useEffect(() => {
+    if (!nextExercise) return;
+    void preloadListeningAudio({
+      text: nextExercise.transcript,
+      audioAssetId: nextExercise.audioAssetId,
+      browserTts: lesson.runtimeAudio === "browser_tts",
+    }).catch(() => undefined);
+  }, [nextExercise, lesson.runtimeAudio]);
   const difficulty = adaptiveExercises[currentIndex].difficulty;
   const priorAnswer = session.listeningEvents.findLast(
     (event) => event.type === "answer" && event.questionId === exercise.id,

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 const source = readFileSync("components/exercises/audio-control.tsx", "utf8");
 const player = readFileSync("components/lesson/lesson-player.tsx", "utf8");
+const listening = readFileSync("components/lesson/listening-phase.tsx", "utf8");
 
 describe("listening audio preload contract", () => {
   it("requests and buffers audio when the control mounts", () => {
@@ -31,11 +32,30 @@ describe("listening audio preload contract", () => {
     expect(source).not.toContain('fetch("/api/audio/tts", {\n          method');
   });
 
-  it("starts preloading listening-only audio when the lesson player mounts", () => {
+  it("gives up on audio that never becomes playable", () => {
+    // Some environments leave a media element at readyState 0 forever without
+    // ever firing error. Without a deadline the promise never settles, the
+    // control stays on "Loading audio..." with the answers locked, and every
+    // retry rejoins the same cached dead wait.
+    expect(source).toContain("const AUDIO_LOAD_TIMEOUT_MS");
+    expect(source).toContain("clearTimeout(timer)");
+    expect(source).toContain("preloadedAudioCache.delete(key)");
+  });
+
+  it("warms the first listening clip before the learner reaches the phase", () => {
     expect(source).toContain("export function preloadListeningAudio");
-    expect(player).toContain("for (const exercise of lesson.listeningExercises)");
     expect(player).toContain("void preloadListeningAudio({");
-    expect(player).toContain("text: exercise.transcript");
-    expect(player).not.toContain("lesson.speakingExercises) {\n      void preloadListeningAudio");
+    expect(player).toContain("const first = lesson.listeningExercises[0]");
+    expect(player).toContain("text: first.transcript");
+    // Not all five at once: that would put five downloads in flight against
+    // the lesson content the learner is still reading.
+    expect(player).not.toContain("for (const exercise of lesson.listeningExercises)");
+  });
+
+  it("keeps exactly one listening clip ahead of the learner", () => {
+    expect(listening).toContain("const nextExercise = exercises[currentIndex + 1]");
+    expect(listening).toContain("void preloadListeningAudio({");
+    expect(listening).toContain("text: nextExercise.transcript");
+    expect(listening).toContain("audioAssetId: nextExercise.audioAssetId");
   });
 });
