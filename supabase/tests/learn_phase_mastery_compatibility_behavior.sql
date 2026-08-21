@@ -10,7 +10,7 @@
 begin;
 create extension if not exists pgtap;
 
-select plan(17);
+select plan(25);
 
 -- ---------------------------------------------------------------------------
 -- Fixture helpers
@@ -291,6 +291,113 @@ select throws_ok(
   'learner cannot inflate a recorded phase commit');
 
 reset role;
+
+-- ---------------------------------------------------------------------------
+-- EXPLOIT REGRESSION: an answered question cannot be upgraded before commit.
+--
+-- Before answers were made insert-once, a learner could answer a canonical
+-- question wrongly, overwrite the persisted row with the correct answer, and
+-- then commit the phase - so canonical mastery and the final score reflected
+-- an answer they never actually gave. This proves that path is closed.
+--
+--   1. answer a canonical Grammar question INCORRECTLY
+--   2. attempt to overwrite it with the correct answer
+--   3. commit the phase
+--   4. canonical mastery must still record 'incorrect'
+-- ---------------------------------------------------------------------------
+select set_config('aiko.x_user', pg_temp.make_learner()::text, true);
+select set_config('aiko.x_lesson',
+  pg_temp.make_historical_lesson(current_setting('aiko.x_user')::uuid,
+                                 current_setting('aiko.item')::uuid)::text, true);
+select set_config('aiko.x_session',
+  pg_temp.start_session(current_setting('aiko.x_user')::uuid,
+                        current_setting('aiko.x_lesson')::uuid)::text, true);
+
+-- Vocabulary must be committed before Grammar is reachable.
+select pg_temp.answer_phase(
+  current_setting('aiko.x_user')::uuid, current_setting('aiko.x_session')::uuid, 'vocabulary', 7);
+select pg_temp.commit_phase(
+  current_setting('aiko.x_user')::uuid, current_setting('aiko.x_session')::uuid, 'vocabulary');
+
+-- Step 1: answer all seven canonical Grammar questions with a WRONG answer.
+insert into public.lesson_activity_answers (
+  user_id, lesson_session_id, phase, activity_id, selected_answer, correct, attempts
+)
+select current_setting('aiko.x_user')::uuid, current_setting('aiko.x_session')::uuid,
+       'grammar', activity.id::text, 'WRONG-ANSWER', false, 1
+from (
+  select activity.id
+  from public.lesson_practice_activities activity
+  join public.lesson_sessions session on session.id = current_setting('aiko.x_session')::uuid
+  where activity.lesson_version_id = session.lesson_version_id
+    and activity.phase = 'grammar'
+  order by activity.position, activity.id
+  limit 7
+) activity;
+
+select is(
+  (select count(*)::int from public.lesson_activity_answers
+   where lesson_session_id = current_setting('aiko.x_session')::uuid
+     and phase = 'grammar' and selected_answer = 'WRONG-ANSWER'),
+  7, 'the learner has answered all seven Grammar questions incorrectly');
+
+-- Step 2: attempt the upgrade, exactly as a compromised client would.
+set local role authenticated;
+select set_config('request.jwt.claim.sub', current_setting('aiko.x_user'), true);
+
+select throws_ok(
+  format(
+    $q$update public.lesson_activity_answers
+       set selected_answer = 'correct', correct = true
+       where lesson_session_id = %L::uuid and phase = 'grammar'$q$,
+    current_setting('aiko.x_session')),
+  '42501', NULL,
+  'the learner cannot upgrade their wrong Grammar answers');
+
+-- The conflict-ignore client path must not smuggle the upgrade through either.
+select lives_ok(
+  format(
+    $q$insert into public.lesson_activity_answers
+       (user_id, lesson_session_id, phase, activity_id, selected_answer, correct, attempts)
+       select %L::uuid, %L::uuid, 'grammar', answer.activity_id, 'correct', true, 2
+       from public.lesson_activity_answers answer
+       where answer.lesson_session_id = %L::uuid and answer.phase = 'grammar'
+       on conflict (lesson_session_id, phase, activity_id) do nothing$q$,
+    current_setting('aiko.x_user'), current_setting('aiko.x_session'),
+    current_setting('aiko.x_session')),
+  'the conflict-ignore path absorbs the upgrade attempt without error');
+
+reset role;
+
+select is(
+  (select count(*)::int from public.lesson_activity_answers
+   where lesson_session_id = current_setting('aiko.x_session')::uuid
+     and phase = 'grammar' and selected_answer = 'WRONG-ANSWER'),
+  7, 'all seven Grammar answers are still the original incorrect ones');
+select is(
+  (select count(*)::int from public.lesson_activity_answers
+   where lesson_session_id = current_setting('aiko.x_session')::uuid
+     and phase = 'grammar'),
+  7, 'the upgrade attempt created no extra answer rows');
+
+-- Step 3 and 4: commit the phase, and check what canonical mastery recorded.
+select is(
+  (pg_temp.commit_phase(current_setting('aiko.x_user')::uuid,
+                        current_setting('aiko.x_session')::uuid, 'grammar') ->> 'committed'),
+  'true', 'the Grammar phase still commits normally');
+
+select is(
+  (select count(*)::int from public.learner_mastery_events
+   where user_id = current_setting('aiko.x_user')::uuid
+     and event_data -> 'data' ->> 'phase' = 'grammar'
+     and signal = 'correct'),
+  0, 'canonical mastery recorded no correct Grammar signal');
+select ok(
+  (select count(*)::int from public.learner_mastery_events
+   where user_id = current_setting('aiko.x_user')::uuid
+     and event_data -> 'data' ->> 'phase' = 'grammar'
+     and signal = 'incorrect') > 0,
+  'canonical mastery still reflects the original incorrect answers');
 
 select * from finish();
 rollback;

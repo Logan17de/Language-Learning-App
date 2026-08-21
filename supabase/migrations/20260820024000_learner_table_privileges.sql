@@ -75,17 +75,44 @@ grant select, insert, update on public.user_preferences to authenticated;
 grant select, insert, update on public.user_settings to authenticated;
 
 -- ---------------------------------------------------------------------------
--- The learner write path. lesson_sessions is inserted and updated directly;
--- answers and events are upserted. No DELETE is required anywhere: progress
--- reset is a SECURITY DEFINER operation.
+-- The learner write path.
+--
+-- lesson_sessions is genuinely inserted and updated by the browser: the
+-- checkpoint, phase index and elapsed time all move as the lesson proceeds.
+--
+-- Answers and events are INSERT-ONLY. The product contract is that once a
+-- question is answered, that answer is final: the learner cannot go back and
+-- change it. Leaving UPDATE open let a persisted selected_answer be replaced
+-- before the phase was committed, which would then feed canonical mastery and
+-- the final score. The browser therefore gets INSERT without UPDATE, and the
+-- persistence path uses conflict-ignore semantics so an identical retry is a
+-- harmless no-op while a different second answer cannot replace the first.
+--
+-- Call-graph audit behind this decision:
+--   lesson_activity_answers  browser writes only at
+--     lib/repositories/lesson-session-repository.ts saveAnswers()
+--   lesson_events            browser writes only at
+--     lib/repositories/lesson-session-repository.ts saveEvents(), which
+--     already used ignoreDuplicates and never needed UPDATE
+--   Trusted server validation for Translation and Speaking runs through
+--     createAdminClient() on the service role, which is unaffected by these
+--     grants and keeps its insert/update path.
+--
+-- No DELETE is required anywhere: progress reset is a SECURITY DEFINER
+-- operation.
 -- ---------------------------------------------------------------------------
 grant select, insert, update on public.lesson_sessions to authenticated;
-grant select, insert, update on public.lesson_activity_answers to authenticated;
-grant select, insert, update on public.lesson_events to authenticated;
+grant select, insert on public.lesson_activity_answers to authenticated;
+grant select, insert on public.lesson_events to authenticated;
 
 revoke delete, truncate on public.lesson_sessions from authenticated;
-revoke delete, truncate on public.lesson_activity_answers from authenticated;
-revoke delete, truncate on public.lesson_events from authenticated;
+revoke update, delete, truncate on public.lesson_activity_answers from authenticated;
+revoke update, delete, truncate on public.lesson_events from authenticated;
+
+-- Defence in depth: drop the learner UPDATE policies as well, so answer
+-- finality does not silently depend on the table privilege alone.
+drop policy if exists lesson_activity_answers_own_update on public.lesson_activity_answers;
+drop policy if exists lesson_events_own_update on public.lesson_events;
 revoke delete, truncate on public.lesson_assignments from authenticated;
 revoke delete, truncate on public.lesson_completions from authenticated;
 revoke insert, update, delete, truncate on public.lesson_assignments from authenticated;
@@ -123,13 +150,22 @@ declare
 begin
   foreach v_table in array v_write_tables loop
     if not has_table_privilege('authenticated', 'public.' || v_table, 'SELECT')
-       or not has_table_privilege('authenticated', 'public.' || v_table, 'INSERT')
-       or not has_table_privilege('authenticated', 'public.' || v_table, 'UPDATE') then
+       or not has_table_privilege('authenticated', 'public.' || v_table, 'INSERT') then
       raise exception 'authenticated is missing required privileges on public.%', v_table;
     end if;
     if has_table_privilege('authenticated', 'public.' || v_table, 'DELETE')
        or has_table_privilege('authenticated', 'public.' || v_table, 'TRUNCATE') then
       raise exception 'authenticated must not delete or truncate public.%', v_table;
+    end if;
+  end loop;
+
+  -- lesson_sessions still needs UPDATE; the answer and event ledgers must not.
+  if not has_table_privilege('authenticated', 'public.lesson_sessions', 'UPDATE') then
+    raise exception 'authenticated must be able to update its own lesson session';
+  end if;
+  foreach v_table in array array['lesson_activity_answers', 'lesson_events'] loop
+    if has_table_privilege('authenticated', 'public.' || v_table, 'UPDATE') then
+      raise exception 'answered learner records must be immutable: public.%', v_table;
     end if;
   end loop;
 

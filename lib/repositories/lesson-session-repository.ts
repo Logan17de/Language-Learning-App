@@ -110,7 +110,12 @@ export const lessonSessionRepository = {
     const { data: auth } = await client.auth.getUser();
     if (!auth.user) return failure({ code: "AUTH" }, "Your session has expired.");
     const records = answers.map((answer) => ({ ...answer, user_id: auth.user!.id }));
-    const { error } = await client.from("lesson_activity_answers").upsert(records, { onConflict: "lesson_session_id,phase,activity_id" });
+    // Answers are insert-once. An answered question is final, so a repeated
+    // sync of the same answer must be a harmless no-op and a different second
+    // answer must never replace the first. ignoreDuplicates resolves the
+    // conflict with DO NOTHING rather than DO UPDATE, which also means this
+    // path needs no UPDATE privilege on the table.
+    const { error } = await client.from("lesson_activity_answers").upsert(records, { onConflict: "lesson_session_id,phase,activity_id", ignoreDuplicates: true });
     return error ? failure(error, "Your answers are waiting to sync.") : success(answers.length);
   },
 
