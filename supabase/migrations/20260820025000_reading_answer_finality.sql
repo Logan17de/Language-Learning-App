@@ -37,6 +37,30 @@
 -- browser ever holding UPDATE or DELETE.
 
 -- ---------------------------------------------------------------------------
+-- Legacy checkpoint eligibility is a one-time, server-owned rollout snapshot.
+-- Only sessions already active when this migration installs may use the old
+-- checkpoint Reading bridge. Sessions created after activation can never become
+-- eligible by changing checkpoint JSON or any other learner-controlled field.
+-- ---------------------------------------------------------------------------
+create table public.lesson_legacy_checkpoint_sessions (
+  lesson_session_id uuid primary key references public.lesson_sessions(id) on delete cascade,
+  marked_at timestamptz not null default now()
+);
+
+insert into public.lesson_legacy_checkpoint_sessions (lesson_session_id)
+select id
+from public.lesson_sessions
+where status = 'active'
+on conflict (lesson_session_id) do nothing;
+
+alter table public.lesson_legacy_checkpoint_sessions enable row level security;
+revoke all on table public.lesson_legacy_checkpoint_sessions
+  from public, anon, authenticated, service_role;
+
+comment on table public.lesson_legacy_checkpoint_sessions is
+  'Server-owned one-time snapshot of sessions active before canonical Reading finality activation. No learner-controlled field can grant membership.';
+
+-- ---------------------------------------------------------------------------
 -- Canonical Reading scoreboard. Immutable rows first; checkpoint only when the
 -- caller is the trusted legacy bridge and no rows exist at all.
 -- ---------------------------------------------------------------------------
@@ -307,7 +331,8 @@ revoke all on function public.commit_lesson_phase(uuid, text) from public, anon;
 grant execute on function public.commit_lesson_phase(uuid, text) to authenticated;
 
 -- ---------------------------------------------------------------------------
--- The legacy checkpoint bridge keeps working for in-flight old-client lessons.
+-- The legacy checkpoint bridge keeps working only for sessions that were
+-- server-marked as active when this migration installed.
 -- ---------------------------------------------------------------------------
 create or replace function public.commit_legacy_checkpoint_phases()
 returns trigger
@@ -345,8 +370,15 @@ begin
            and commit.phase = v_phase
        ) then
       if v_phase = 'reading' then
-        -- Only this trusted path may fall back to checkpoint Reading evidence.
-        perform public.commit_reading_phase(new.id, true);
+        -- Mutable checkpoint Reading evidence is trusted only for the one-time
+        -- server-owned rollout snapshot. Checkpoint shape never grants access.
+        if exists (
+          select 1
+          from public.lesson_legacy_checkpoint_sessions legacy
+          where legacy.lesson_session_id = new.id
+        ) then
+          perform public.commit_reading_phase(new.id, true);
+        end if;
       else
         perform public.commit_lesson_phase(new.id, v_phase);
       end if;
