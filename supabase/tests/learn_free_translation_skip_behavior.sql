@@ -59,6 +59,15 @@ begin
   values (v_version, v_lesson, 1, 'published');
   update public.lessons set current_version_id = v_version where id = v_lesson;
 
+  -- Canonical mastery only accepts items that belong to the lesson.
+  insert into public.lesson_grammar (
+    lesson_version_id, position, grammar_id, pattern, meaning, structure,
+    usage_notes, example, translation, common_mistake
+  ) values (
+    v_version, 1, p_item, 'fixture pattern', 'fixture meaning', 'fixture structure',
+    'fixture usage', '駅に行きます。', 'I go to the station.', 'fixture mistake'
+  );
+
   insert into public.lesson_practice_activities (
     lesson_version_id, position, phase, activity_type, difficulty, mode, skill,
     prompt, correct_answer, accepted_answers, target_item_ids

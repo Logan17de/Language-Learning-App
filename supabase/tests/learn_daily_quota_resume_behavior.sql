@@ -9,7 +9,7 @@
 begin;
 create extension if not exists pgtap;
 
-select plan(18);
+select plan(19);
 
 -- ---------------------------------------------------------------------------
 -- Fixture helpers. Each learner gets an isolated lesson so Resume discovery
