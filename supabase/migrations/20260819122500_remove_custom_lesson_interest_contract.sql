@@ -165,16 +165,25 @@ begin
     raise exception 'lesson_assignments must not contain interest fields';
   end if;
 
+  -- pg_get_functiondef() raises 42809 on aggregate/window entries, and the
+  -- planner is free to evaluate it before the namespace filter, so an
+  -- unfenced scan can reach pg_catalog aggregates such as array_agg(). Select
+  -- the public normal-function OIDs first behind an OFFSET 0 optimization
+  -- fence, then inspect only those definitions. The interest contract check
+  -- itself is unchanged: aggregates cannot carry lesson behavior.
   if exists (
     select 1
-    from pg_proc p
-    join pg_namespace n on n.oid = p.pronamespace
-    where n.nspname = 'public'
-      and (
-        pg_get_functiondef(p.oid) ilike '%interest_matches%'
-        or pg_get_functiondef(p.oid) ilike '%profiles.interests%'
-        or pg_get_functiondef(p.oid) ilike '%pro_interest%'
-      )
+    from (
+      select p.oid
+      from pg_proc p
+      join pg_namespace n on n.oid = p.pronamespace
+      where n.nspname = 'public'
+        and p.prokind = 'f'
+      offset 0
+    ) public_function
+    where pg_get_functiondef(public_function.oid) ilike '%interest_matches%'
+       or pg_get_functiondef(public_function.oid) ilike '%profiles.interests%'
+       or pg_get_functiondef(public_function.oid) ilike '%pro_interest%'
   ) then
     raise exception 'Active database functions still contain interest-based lesson behavior';
   end if;
