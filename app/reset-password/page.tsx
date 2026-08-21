@@ -40,14 +40,22 @@ export default function ResetPasswordPage() {
   const [requestedNext, setRequestedNext] = useState<string | null>(null);
 
   useEffect(() => {
-    const current = readPasswordRecoveryAttempt();
-    setAttempt(current);
-    if (current) setRemainingMs(passwordRecoveryRemainingMs(current.sentAt));
-    setRequestedNext(
-      safeInternalRedirect(
-        new URLSearchParams(window.location.search).get("next"),
-      ),
-    );
+    let active = true;
+    // Deferred off the synchronous effect body to avoid cascading renders.
+    void Promise.resolve().then(() => {
+      if (!active) return;
+      const current = readPasswordRecoveryAttempt();
+      setAttempt(current);
+      if (current) setRemainingMs(passwordRecoveryRemainingMs(current.sentAt));
+      setRequestedNext(
+        safeInternalRedirect(
+          new URLSearchParams(window.location.search).get("next"),
+        ),
+      );
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {

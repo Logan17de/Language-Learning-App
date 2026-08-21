@@ -36,6 +36,9 @@ describe("AIko product positioning", () => {
     expect(login).not.toContain("Continue your Japanese path");
     expect(signup).not.toContain("Build Japanese that lasts");
     expect(home).not.toContain("make the Japanese stick");
-    expect(home).toContain("make the language stick");
+    // Topic-first framing replaced the old "make the language stick" line.
+    // The product leads with what the learner wants to learn through, not
+    // with a single language.
+    expect(home).toContain("Pick something you want to learn through today");
   });
 });

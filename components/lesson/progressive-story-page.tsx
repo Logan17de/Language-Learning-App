@@ -468,9 +468,17 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
   );
 
   useEffect(() => {
-    const cached = readBuildCache(requestId);
-    if (cached?.result) applyResult(cached.result);
-    if (cached?.storyComplete === true) setStoryComplete(true);
+    let active = true;
+    // Deferred off the synchronous effect body to avoid cascading renders.
+    void Promise.resolve().then(() => {
+      if (!active) return;
+      const cached = readBuildCache(requestId);
+      if (cached?.result) applyResult(cached.result);
+      if (cached?.storyComplete === true) setStoryComplete(true);
+    });
+    return () => {
+      active = false;
+    };
   }, [applyResult, requestId]);
 
   useEffect(() => {

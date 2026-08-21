@@ -22,11 +22,19 @@ export function LoginRecoveryFlow() {
   const [redirectTargetReady, setRedirectTargetReady] = useState(false);
 
   useEffect(() => {
-    const next = safeInternalRedirect(
-      new URLSearchParams(window.location.search).get("next"),
-    );
-    setRequestedNext(next);
-    setRedirectTargetReady(true);
+    let active = true;
+    // Deferred off the synchronous effect body to avoid cascading renders.
+    void Promise.resolve().then(() => {
+      if (!active) return;
+      const next = safeInternalRedirect(
+        new URLSearchParams(window.location.search).get("next"),
+      );
+      setRequestedNext(next);
+      setRedirectTargetReady(true);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {

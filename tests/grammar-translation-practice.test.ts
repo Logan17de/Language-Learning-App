@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { commuteLesson } from "@/data/mock-lessons";
 import { phaseIsComplete } from "@/lib/lesson-phase-progress";
+import { translationAnswerData } from "@/lib/lesson/translation-validation";
 import { createEmptyLessonSession } from "@/store/app-store";
 
 function source(path: string): string {
@@ -79,14 +80,51 @@ describe("adaptive grammar translation practice", () => {
     expect(validation).toContain("revealAnswer: input.modelAnswer");
   });
 
-  it("persists final trusted Translation evidence without per-answer mastery writes", () => {
+  it("stamps trusted Translation evidence so a finalized answer cannot be regraded", () => {
+    // The serverValidated marker is produced by the validation module, not
+    // spelled out in the route. Test the contract that actually guarantees it.
+    const correct = translationAnswerData(
+      {
+        correct: true,
+        feedback: "Correct.",
+        revealAnswer: "駅に行きます。",
+        validationSource: "exact_match",
+      },
+      "grammar-target-1",
+    );
+    expect(correct.serverValidated).toBe(true);
+    expect(correct.validationSource).toBe("exact_match");
+    expect(correct.targetItemId).toBe("grammar-target-1");
+    // A correct answer carries no correction suggestion.
+    expect(correct).not.toHaveProperty("suggestion");
+
+    const incorrect = translationAnswerData(
+      {
+        correct: false,
+        feedback: "The particle is wrong.",
+        suggestion: "Use に for the destination.",
+        revealAnswer: "駅に行きます。",
+        validationSource: "ai",
+      },
+      "grammar-target-2",
+    );
+    expect(incorrect.serverValidated).toBe(true);
+    expect(incorrect.validationSource).toBe("ai");
+    expect(incorrect.suggestion).toBe("Use に for the destination.");
+    // Retired in favour of revealing only the stored model answer.
+    expect(incorrect).not.toHaveProperty("suggestedAnswer");
+  });
+
+  it("writes no mastery from a single Translation answer", () => {
     const validator = source("app/api/lesson/translation/validate/route.ts");
 
-    expect(validator).toContain("serverValidated");
-    expect(validator).toContain("attempts: 1");
+    expect(validator).toContain("translationAnswerData");
     expect(validator).toContain("alreadyFinalized");
+    expect(validator).toContain("attempts: 1");
+    // Mastery is committed once, at the completed Grammar phase boundary.
+    // The route persists evidence only - it invokes no mastery RPC at all.
     expect(validator).not.toContain("learner_mastery");
-    expect(validator).not.toContain("commit_lesson_phase(");
+    expect(validator).not.toContain(".rpc(");
   });
 
   it("keeps Grammar incomplete until all five translations are answered", () => {

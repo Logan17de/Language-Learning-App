@@ -8,7 +8,8 @@ const completePage = source("app/lesson/[lessonId]/complete/page.tsx");
 const lessonStore = source("store/backend-lesson-store.ts");
 const appStore = source("store/app-store.ts");
 const settingsPage = source("components/settings/settings-page.tsx");
-const sessionHydrator = source("components/backend/backend-session-hydrator.tsx");
+// Session hydration moved out of the component into the shared module.
+const sessionHydrator = source("lib/auth/client-session.ts");
 const authForm = source("components/auth/auth-form.tsx");
 const lessonPlayer = source("components/lesson/lesson-player.tsx");
 const lessonResult = source("components/lesson/lesson-result.tsx");

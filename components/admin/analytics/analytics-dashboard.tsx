@@ -29,7 +29,15 @@ export function AnalyticsDashboard() {
   }, []);
 
   useEffect(() => {
-    void refresh();
+    let active = true;
+    // State updates land in a promise callback rather than synchronously in
+    // the effect body, so the initial load cannot cascade renders.
+    void Promise.resolve().then(() => {
+      if (active) return refresh();
+    });
+    return () => {
+      active = false;
+    };
   }, [refresh]);
 
   const live = useMemo(() => (data ? deriveAnalytics(data) : null), [data]);

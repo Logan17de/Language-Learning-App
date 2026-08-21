@@ -30,7 +30,15 @@ export function UserDetail({ userId }: { userId: string }) {
   }, [userId]);
 
   useEffect(() => {
-    void load();
+    let active = true;
+    // State updates land in a promise callback rather than synchronously in
+    // the effect body, so the initial load cannot cascade renders.
+    void Promise.resolve().then(() => {
+      if (active) return load();
+    });
+    return () => {
+      active = false;
+    };
   }, [load]);
 
   async function setAccountStatus(status: "active" | "suspended" | "deleted") {

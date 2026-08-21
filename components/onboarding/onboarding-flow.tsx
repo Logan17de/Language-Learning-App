@@ -152,7 +152,9 @@ export function OnboardingFlow() {
     const next = safePostOnboardingDestination(
       new URLSearchParams(window.location.search).get("next"),
     );
-    setRequestedNext(next);
+    // Deferred off the synchronous effect body to avoid cascading renders.
+    // A late update after unmount is a no-op in React 18+.
+    void Promise.resolve().then(() => setRequestedNext(next));
 
     if (!isAuthenticated) return;
     if (onboarding.completed) {

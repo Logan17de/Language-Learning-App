@@ -1,7 +1,9 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-const form = readFileSync("components/custom-topic/custom-topic-page.tsx", "utf8");
+// The lesson-creation form moved to /learn, the single learner creation
+// surface. components/custom-topic/custom-topic-page.tsx was deleted.
+const form = readFileSync("components/learn/lesson-library.tsx", "utf8");
 const progressiveReader = readFileSync(
   "components/lesson/progressive-story-page.tsx",
   "utf8",
@@ -59,22 +61,25 @@ const catalog = JSON.parse(readFileSync("data/jlpt-catalog.json", "utf8")) as {
 
 describe("custom lesson engine contract", () => {
   it("asks the learner for only topic and level", () => {
-    expect(form).toContain('<Field label="What do you want to learn through?">');
+    expect(form).toContain('<Field label="Topic">');
     expect(form).toContain('<Field label="Japanese level">');
+    expect(form).toContain("What do you want to learn through?");
     expect(form).not.toContain('<Field label="Lesson length">');
     expect(form).not.toContain('<Field label="Preferred focus">');
     expect(form).not.toContain('<Field label="Speaking difficulty">');
     expect(form).not.toContain('<Field label="Optional note">');
     expect(form).toContain("JSON.stringify({ topic, level })");
-    expect(route).toContain("begin_custom_lesson_generation_v4");
+    expect(route).toContain("begin_custom_lesson_generation_v5");
     expect(route).toContain("p_topic: topic");
     expect(route).toContain("p_level: level");
   });
 
   it("opens the resolved story in the real reader and polls durable backend progress", () => {
     expect(form).toContain('role="status"');
-    expect(form).toContain("AIko writes the story first.");
-    expect(form).toContain('"Opening your lesson"');
+    // Story-first messaging, same guarantee under the /learn copy.
+    expect(form).toContain("The story is prepared first");
+    expect(form).toContain('"Writing your story"');
+    expect(form).toContain("<GenerationProgress");
     expect(form).toContain(
       "router.replace(`/lesson/building/${encodeURIComponent(result.requestId)}`)",
     );

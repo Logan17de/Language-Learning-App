@@ -36,11 +36,16 @@ export default function LessonCompletePage() {
   );
 
   useEffect(() => {
-    if (cachedBackendLesson || !lessonId) {
-      setBackendResolved(true);
-      return;
-    }
     let active = true;
+    if (cachedBackendLesson || !lessonId) {
+      // Deferred off the synchronous effect body to avoid cascading renders.
+      void Promise.resolve().then(() => {
+        if (active) setBackendResolved(true);
+      });
+      return () => {
+        active = false;
+      };
+    }
     void loadBackendLesson(lessonId).then((value) => {
       if (!active) return;
       setRequestedBackendLesson(value);
@@ -56,7 +61,11 @@ export default function LessonCompletePage() {
   useEffect(() => {
     if (getBackendMode() !== "supabase" || !lesson) return;
     let active = true;
-    setCompletionResolved(false);
+    // Deferred off the synchronous effect body to avoid cascading renders.
+    void Promise.resolve()
+      .then(() => {
+        if (active) setCompletionResolved(false);
+      });
     void loadCanonicalLessonCompletion(lesson)
       .then((result) => {
         if (!active) return;

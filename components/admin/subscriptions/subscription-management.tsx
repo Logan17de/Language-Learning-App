@@ -43,24 +43,37 @@ export function SubscriptionManagement() {
   }, []);
 
   useEffect(() => {
-    void load();
+    let active = true;
+    // State updates land in a promise callback rather than synchronously in
+    // the effect body, so the initial load cannot cascade renders.
+    void Promise.resolve().then(() => {
+      if (active) return load();
+    });
+    return () => {
+      active = false;
+    };
   }, [load]);
 
   const profileById = useMemo(
     () => new Map(profiles.map((profile) => [profile.id, profile])),
     [profiles],
   );
-  const records: VisibleSubscription[] = backendRows.map((row) => ({
-    id: row.id,
-    userId: row.user_id,
-    userName: profileById.get(row.user_id)?.display_name ?? row.user_id,
-    plan: row.plan === "free" ? "free" : "premium",
-    billingInterval: row.billing_interval === "annual" ? "annual" : "monthly",
-    status: row.status === "past_due" ? "failed" : row.status,
-    startDate: row.starts_at.slice(0, 10),
-    renewalDate: row.renews_at?.slice(0, 10),
-    cancellationDate: row.cancelled_at?.slice(0, 10),
-  }));
+  // Memoized so downstream useMemo dependencies stay referentially stable.
+  const records: VisibleSubscription[] = useMemo(
+    () =>
+      backendRows.map((row) => ({
+        id: row.id,
+        userId: row.user_id,
+        userName: profileById.get(row.user_id)?.display_name ?? row.user_id,
+        plan: row.plan === "free" ? "free" : "premium",
+        billingInterval: row.billing_interval === "annual" ? "annual" : "monthly",
+        status: row.status === "past_due" ? "failed" : row.status,
+        startDate: row.starts_at.slice(0, 10),
+        renewalDate: row.renews_at?.slice(0, 10),
+        cancellationDate: row.cancelled_at?.slice(0, 10),
+      })),
+    [backendRows, profileById],
+  );
 
   async function update(
     recordId: string,

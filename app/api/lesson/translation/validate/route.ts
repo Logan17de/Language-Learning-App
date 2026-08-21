@@ -90,14 +90,15 @@ export async function POST(request: NextRequest) {
     if (!question.data) {
       throw new Error("This translation question is unavailable.");
     }
+    const translationQuestion = question.data;
 
     const active = await admin
       .from("lesson_sessions")
       .select("id")
-      .eq("id", question.data.lesson_session_id)
+      .eq("id", translationQuestion.lesson_session_id)
       .eq("user_id", auth.userId)
-      .eq("lesson_id", question.data.lesson_id)
-      .eq("lesson_version_id", question.data.lesson_version_id)
+      .eq("lesson_id", translationQuestion.lesson_id)
+      .eq("lesson_version_id", translationQuestion.lesson_version_id)
       .eq("status", "active")
       .maybeSingle();
     if (active.error) {
@@ -111,13 +112,13 @@ export async function POST(request: NextRequest) {
       .from("lesson_activity_answers")
       .select("correct,answer_data")
       .eq("user_id", auth.userId)
-      .eq("lesson_session_id", question.data.lesson_session_id)
+      .eq("lesson_session_id", translationQuestion.lesson_session_id)
       .eq("phase", "grammar_translation")
       .eq("activity_id", questionId)
       .maybeSingle();
     if (prior.error) throw new Error(prior.error.message);
 
-    const modelAnswer = String(question.data.model_answer ?? "");
+    const modelAnswer = String(translationQuestion.model_answer ?? "");
     const result = await validateTranslationAttempt({
       learnerAnswer: answer,
       modelAnswer,
@@ -126,9 +127,9 @@ export async function POST(request: NextRequest) {
         const generated = await generateStructured<TranslationEvaluation>({
           name: "grammar_translation_validation",
           prompt: translationEvaluationPrompt({
-            english: String(question.data.english_prompt ?? ""),
-            targetPattern: String(question.data.target_pattern ?? ""),
-            targetMeaning: String(question.data.target_meaning ?? ""),
+            english: String(translationQuestion.english_prompt ?? ""),
+            targetPattern: String(translationQuestion.target_pattern ?? ""),
+            targetMeaning: String(translationQuestion.target_meaning ?? ""),
             modelAnswer,
             learnerAnswer: answer,
           }),
@@ -152,7 +153,7 @@ export async function POST(request: NextRequest) {
 
     const payload = {
       user_id: auth.userId,
-      lesson_session_id: String(question.data.lesson_session_id),
+      lesson_session_id: String(translationQuestion.lesson_session_id),
       phase: "grammar_translation",
       activity_id: questionId,
       selected_answer: answer,
@@ -160,7 +161,7 @@ export async function POST(request: NextRequest) {
       attempts: 1,
       answer_data: translationAnswerData(
         result,
-        String(question.data.target_item_id ?? ""),
+        String(translationQuestion.target_item_id ?? ""),
       ),
     };
 
@@ -169,7 +170,7 @@ export async function POST(request: NextRequest) {
           .from("lesson_activity_answers")
           .update(payload)
           .eq("user_id", auth.userId)
-          .eq("lesson_session_id", question.data.lesson_session_id)
+          .eq("lesson_session_id", translationQuestion.lesson_session_id)
           .eq("phase", "grammar_translation")
           .eq("activity_id", questionId)
       : await admin.from("lesson_activity_answers").insert(payload);
@@ -179,7 +180,7 @@ export async function POST(request: NextRequest) {
         .from("lesson_activity_answers")
         .select("correct,answer_data")
         .eq("user_id", auth.userId)
-        .eq("lesson_session_id", question.data.lesson_session_id)
+        .eq("lesson_session_id", translationQuestion.lesson_session_id)
         .eq("phase", "grammar_translation")
         .eq("activity_id", questionId)
         .maybeSingle();

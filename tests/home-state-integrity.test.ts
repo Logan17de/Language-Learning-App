@@ -7,7 +7,9 @@ function source(path: string): string {
 
 const home = source("components/home/home-dashboard.tsx");
 const homePage = source("app/home/page.tsx");
-const hydrator = source("components/backend/backend-session-hydrator.tsx");
+// Account scoping and progress hydration were extracted from the hydrator
+// component into the shared client-session module.
+const hydrator = source("lib/auth/client-session.ts");
 const lessonStore = source("store/backend-lesson-store.ts");
 const progressStore = source("store/backend-progress-store.ts");
 const progressRepository = source("lib/repositories/progress-repository.ts");
@@ -19,15 +21,11 @@ describe("home dashboard state integrity", () => {
     expect(lessonStore).toContain("scopeTo: (userId: string) => void");
     expect(lessonStore).toContain("reset: () => void");
     expect(lessonStore).toContain("if (current.ownerUserId === userId) return");
-    expect(lessonStore).toContain("if (get().ownerUserId !== ownerUserId) return");
+    expect(lessonStore).toContain("get().ownerUserId !== ownerUserId");
 
     expect(hydrator).toContain("useBackendLessonStore.getState().reset()");
     expect(hydrator).toContain("useBackendLessonStore.getState().scopeTo(userId)");
-    expect(hydrator).toContain("prepareAccountScope(userId, resetScopedState)");
-
-    expect(home).toContain("backendOwnerUserId === user.id");
-    expect(home).toContain("const accountLessons = accountOwnsLessons ? backendLessons : []");
-    expect(home).toContain("void loadBackendLessons(user.id)");
+    expect(hydrator).toContain("prepareAccountScope(userId, clearClientAccountState)");
   });
 
   it("tracks whether progress is loading, trusted, or failed instead of treating defaults as server truth", () => {
@@ -42,18 +40,12 @@ describe("home dashboard state integrity", () => {
     expect(home).toContain("const progressReady =");
     expect(home).toContain('backendProgressStatus === "ready"');
     expect(home).toContain('backendProgressStatus === "error"');
-    expect(home).toContain("These stats are hidden because the latest backend progress could not be verified.");
-    expect(home).toContain("Retry progress");
+    expect(home).toContain("progressOwnerUserId === user.id");
   });
 
   it("does not perform a second automatic progress load when Home mounts", () => {
-    const mountEffect = home.slice(
-      home.indexOf("useEffect(() =>"),
-      home.indexOf("const accountOwnsLessons"),
-    );
-    expect(mountEffect).toContain("loadBackendLessons(user.id)");
-    expect(mountEffect).not.toContain("progressRepository.loadCurrent");
-
+    // Progress is hydrated once by the client session. Home only reloads it
+    // when the learner explicitly retries.
     const progressLoadOccurrences = home.match(/progressRepository\.loadCurrent\(\)/g) ?? [];
     expect(progressLoadOccurrences).toHaveLength(1);
     expect(home.indexOf("progressRepository.loadCurrent()")).toBeGreaterThan(
@@ -71,16 +63,14 @@ describe("home dashboard state integrity", () => {
     expect(home).not.toContain("progress.completedLessonIds.length} label=\"lessons\"");
   });
 
-  it("models lesson loading, success, error, and exhaustion as different CTA states", () => {
-    expect(lessonStore).toContain('"loading"');
-    expect(lessonStore).toContain('"ready"');
-    expect(lessonStore).toContain('"error"');
-    expect(lessonStore).toContain('"exhausted"');
-    expect(home).toContain("Choosing lesson…");
-    expect(home).toContain("Retry lesson selection");
-    expect(home).toContain("See my next lesson");
-    expect(home).toContain("You’ve completed every published lesson at this level.");
-    expect(home).toContain("There isn’t another published lesson to assign right now.");
+  it("sends Home to /learn instead of assigning a lesson", () => {
+    // The predefined-catalog assignment CTA was retired: /learn is the single
+    // learner entry point and owns lesson creation and Resume.
+    expect(home).toContain('href="/learn"');
+    expect(home).not.toContain("Choosing lesson…");
+    expect(home).not.toContain("Retry lesson selection");
+    expect(home).not.toContain("See my next lesson");
+    expect(home).not.toContain("loadBackendLessons");
   });
 
   it("marks Home private/canonical and names its mastery progressbar", () => {

@@ -31,11 +31,16 @@ export function LessonRouteResolver({
     useState(false);
 
   useEffect(() => {
-    if (cachedBackendLesson || !lessonId) {
-      setBackendResolved(true);
-      return;
-    }
     let active = true;
+    if (cachedBackendLesson || !lessonId) {
+      // Deferred off the synchronous effect body to avoid cascading renders.
+      void Promise.resolve().then(() => {
+        if (active) setBackendResolved(true);
+      });
+      return () => {
+        active = false;
+      };
+    }
     void loadBackendLesson(lessonId).then((value) => {
       if (!active) return;
       setRequestedBackendLesson(value);
@@ -47,18 +52,29 @@ export function LessonRouteResolver({
   }, [cachedBackendLesson, lessonId, loadBackendLesson]);
 
   useEffect(() => {
+    let active = true;
     if (mode !== "play") {
-      setContractResolved(true);
-      return;
+      // Deferred off the synchronous effect body to avoid cascading renders.
+      void Promise.resolve().then(() => {
+        if (active) setContractResolved(true);
+      });
+      return () => {
+        active = false;
+      };
     }
 
-    let active = true;
     const client = createClient();
     if (!client) {
       // A configuration failure must not accidentally open protected practice.
-      setTranslationPremiumContractActive(true);
-      setContractResolved(true);
-      return;
+      // Deferred off the synchronous effect body to avoid cascading renders.
+      void Promise.resolve().then(() => {
+        if (!active) return;
+        setTranslationPremiumContractActive(true);
+        setContractResolved(true);
+      });
+      return () => {
+        active = false;
+      };
     }
 
     void learnProductContractIsActive(client)

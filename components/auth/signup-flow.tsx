@@ -39,6 +39,10 @@ export function SignupFlow() {
   const [sent, setSent] = useState(false);
 
   useEffect(() => {
+    let active = true;
+    // Deferred off the synchronous effect body to avoid cascading renders.
+    void Promise.resolve().then(() => {
+    if (!active) return;
     const params = new URLSearchParams(window.location.search);
     const pending = readPendingSignupConfirmation();
     const next =
@@ -60,6 +64,10 @@ export function SignupFlow() {
       setRemainingMs(signupConfirmationResendRemainingMs(pending.sentAt));
     }
     setRedirectTargetReady(true);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {

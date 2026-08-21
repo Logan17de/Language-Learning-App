@@ -31,7 +31,10 @@ describe("language-neutral learner home", () => {
     expect(home).not.toContain("user.level");
 
     expect(home).toContain("Welcome back");
-    expect(home).toContain("make the language stick");
+    // Topic-first framing replaced the old "make the language stick" line.
+    // The product leads with what the learner wants to learn through, not
+    // with a single language.
+    expect(home).toContain("Pick something you want to learn through today");
     expect(home).toContain("total XP");
     expect(home).toContain("day streak");
   });

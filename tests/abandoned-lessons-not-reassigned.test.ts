@@ -1,5 +1,7 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+import { useBackendLessonStore } from "@/store/backend-lesson-store";
+import type { LessonPackage } from "@/types/lesson";
 
 function source(path: string): string {
   return readFileSync(path, "utf8");
@@ -11,6 +13,10 @@ const migration = source(
 const backendStore = source("store/backend-lesson-store.ts");
 
 describe("abandoned lessons are never shown as the next lesson", () => {
+  beforeEach(() => {
+    useBackendLessonStore.getState().reset();
+  });
+
   it("retires an assignment when its active lesson session is abandoned", () => {
     expect(migration).toContain(
       "check (status in ('assigned', 'started', 'completed', 'abandoned'))",
@@ -37,17 +43,50 @@ describe("abandoned lessons are never shown as the next lesson", () => {
   });
 
   it("revalidates a trusted same-account assignment without flashing a loader", () => {
-    expect(backendStore).not.toContain("get().loaded) return");
-    expect(backendStore).toContain("const blocking =");
-    expect(backendStore).toContain('current.status === "idle"');
-    expect(backendStore).toContain('current.status === "error"');
-    expect(backendStore).toContain("if (blocking) {");
-    expect(backendStore).toContain('status: "loading"');
-    expect(backendStore).toContain(
-      "const hasTrustedLesson = !blocking && get().lessons.length > 0",
-    );
-    expect(backendStore).toContain(
-      'status: hasTrustedLesson ? "ready" : "error"',
-    );
+    const trusted = [{ id: "lesson-1" } as unknown as LessonPackage];
+    useBackendLessonStore.setState({
+      ownerUserId: "user-a",
+      lessons: trusted,
+      status: "ready",
+      loading: false,
+      loaded: true,
+      error: "",
+    });
+
+    // Re-scoping to the same account is a no-op: trusted lessons stay in
+    // place and the UI is never pushed back through a loading state.
+    useBackendLessonStore.getState().scopeTo("user-a");
+
+    const after = useBackendLessonStore.getState();
+    expect(after.lessons).toBe(trusted);
+    expect(after.status).toBe("ready");
+    expect(after.loading).toBe(false);
+    expect(after.loaded).toBe(true);
+  });
+
+  it("drops another account's lessons when the owner changes", () => {
+    useBackendLessonStore.setState({
+      ownerUserId: "user-a",
+      lessons: [{ id: "lesson-1" } as unknown as LessonPackage],
+      status: "ready",
+      loading: false,
+      loaded: true,
+      error: "",
+    });
+
+    useBackendLessonStore.getState().scopeTo("user-b");
+
+    const after = useBackendLessonStore.getState();
+    expect(after.ownerUserId).toBe("user-b");
+    expect(after.lessons).toEqual([]);
+    expect(after.status).toBe("idle");
+    expect(after.loaded).toBe(false);
+  });
+
+  it("no longer auto-assigns a published lesson to the learner", () => {
+    // /learn creates lessons on demand; the legacy assignment loader is inert
+    // rather than silently selecting a catalog lesson.
+    expect(backendStore).toContain('status: "exhausted"');
+    expect(backendStore).toContain("no longer auto-assigns");
   });
 });

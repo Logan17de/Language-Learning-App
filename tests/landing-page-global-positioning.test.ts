@@ -38,8 +38,8 @@ describe("global landing page positioning", () => {
   });
 
   it("preserves Premium intent through email or Google signup and onboarding", () => {
-    expect(authForm).toContain('`/onboarding?next=${encodeURIComponent(next)}`');
-    expect(authForm).toContain('withSafeNext("/signup?confirmation=required", next)');
+    expect(authForm).toContain('`/onboarding?next=${encodeURIComponent(requestedNext)}`');
+    expect(authForm).toContain('withSafeNext("/signup?confirmation=required", requestedNext)');
     expect(signupFlow).toContain('withSafeNext("/login", requestedNext)');
     expect(oauthCallback).toContain('`/onboarding?next=${encodeURIComponent(explicitNext)}`');
     expect(onboarding).toContain('new URLSearchParams(window.location.search).get("next")');

@@ -120,9 +120,10 @@ describe("custom lesson retry reliability", () => {
       "await getCustomLessonSchedulerDiagnostics()",
     );
     const beginCall = generateRoute.indexOf(
-      'client.rpc("begin_custom_lesson_generation_v4"',
+      'rawClient.rpc("begin_custom_lesson_generation_v5"',
     );
     expect(diagnosticsCall).toBeGreaterThan(-1);
+    expect(beginCall).toBeGreaterThan(-1);
     expect(diagnosticsCall).toBeLessThan(beginCall);
     expect(generateRoute).toContain("CUSTOM_LESSON_SCHEDULER_UNAVAILABLE");
     expect(workerRoute).toContain('searchParams.get("diagnostics") === "1"');

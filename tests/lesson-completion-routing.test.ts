@@ -23,7 +23,12 @@ describe("lesson completion routing", () => {
     expect(player).toContain(
       "session.currentPhaseIndex === lesson.phases.length - 1",
     );
-    expect(player).toContain('continueLabel={isLastPhase ? "See results"');
+    // The final phase offers results rather than a next-phase label. The
+    // ternary also carries the committing and completion_pending states.
+    expect(player).toContain("isLastPhase");
+    expect(player).toContain('"See results"');
+    expect(player).toContain('"Retry completion"');
+    expect(player).toContain("nextLabel(phase.id)");
     expect(player).not.toContain('if (currentPhase.id === "review")');
   });
 });

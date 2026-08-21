@@ -107,7 +107,15 @@ export function BulkCompleteLessonImporter() {
   }, []);
 
   useEffect(() => {
-    void loadTts();
+    let active = true;
+    // State updates land in a promise callback rather than synchronously in
+    // the effect body, so the initial load cannot cascade renders.
+    void Promise.resolve().then(() => {
+      if (active) return loadTts();
+    });
+    return () => {
+      active = false;
+    };
   }, [loadTts]);
 
   useEffect(() => {

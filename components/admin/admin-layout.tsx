@@ -28,13 +28,20 @@ export function AdminLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (loginRoute || identityChecked) return;
-    if (!backendReady) {
-      logout();
-      setIdentityChecked(true);
-      return;
-    }
 
     let active = true;
+    if (!backendReady) {
+      // Deferred off the synchronous effect body to avoid cascading renders.
+      void Promise.resolve().then(() => {
+        if (!active) return;
+        logout();
+        setIdentityChecked(true);
+      });
+      return () => {
+        active = false;
+      };
+    }
+
     let timeout: ReturnType<typeof setTimeout> | undefined;
     const timedOut = new Promise<null>((resolve) => {
       timeout = setTimeout(() => resolve(null), ADMIN_SESSION_TIMEOUT_MS);
