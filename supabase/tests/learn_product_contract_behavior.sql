@@ -10,7 +10,7 @@
 begin;
 create extension if not exists pgtap;
 
-select plan(16);
+select plan(15);
 
 -- ---------------------------------------------------------------------------
 -- Fixture helpers
