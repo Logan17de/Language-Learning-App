@@ -8,12 +8,17 @@
 -- column becomes server-owned here and moves only through claim_level_promotion().
 --
 -- PROMOTION RULE
--- A learner earns the next level when every item AT their current level has
--- reached the learned threshold. Deliberately scoped to the current level
--- only: a lapse on an earlier level must not block progress, because those
--- items are already handled by target selection, which draws from the current
--- level plus every level below it and picks the weakest first. So a mistake on
--- an N5 item simply makes that item a likely target again for an N3 learner.
+-- A learner earns the next level when every item at their current level AND at
+-- every level below it has reached the learned threshold.
+--
+-- Earlier levels are included deliberately. If an N3 learner slips on an N5
+-- kanji, that item drops below the threshold and promotion pauses until it is
+-- back. It does resurface on its own: target selection draws from the current
+-- level plus every level below and picks the weakest first, so the lapsed N5
+-- kanji becomes a target in the next lesson. Clearing it resumes progress.
+--
+-- Pausing is not demotion. The learner's level never falls; only the next
+-- award waits.
 --
 -- ONCE PER LEVEL, NEVER BACKWARDS
 -- Each attained level is recorded once in learner_level_promotions. A level
@@ -88,8 +93,8 @@ begin
                               'level', v_current);
   end if;
 
-  -- Only items at the CURRENT level count. Earlier levels are handled by
-  -- target selection, not by blocking progress.
+  -- Every item at the current level and at every level below it. The jlpt_level
+  -- enum is declared easiest-first, so <= v_current is "at or below".
   select count(*)::integer,
          count(*) filter (
            where mastery.mastery >= 80
@@ -101,15 +106,15 @@ begin
       (mastery.item_type = 'kanji' and exists (
         select 1 from public.kanji_records record
         where record.id::text = mastery.item_key
-          and record.jlpt_level = v_current))
+          and record.jlpt_level <= v_current))
       or (mastery.item_type = 'vocabulary' and exists (
         select 1 from public.vocabulary_records record
         where record.id::text = mastery.item_key
-          and record.jlpt_level = v_current))
+          and record.jlpt_level <= v_current))
       or (mastery.item_type = 'grammar' and exists (
         select 1 from public.grammar_records record
         where record.id::text = mastery.item_key
-          and record.jlpt_level = v_current))
+          and record.jlpt_level <= v_current))
     );
 
   if v_tracked = 0 or v_mastered < v_tracked then

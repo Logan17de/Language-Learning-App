@@ -39,9 +39,11 @@ function asLevel(value: unknown): JLPTLevel | null {
  * never moves a learner backwards. The browser cannot write
  * profiles.current_jlpt_level at all.
  *
- * A lapse on an earlier level does not block promotion. Those items are
- * handled by target selection, which draws from the current level plus every
- * level below it and picks the weakest first.
+ * The rule is mastery of the current level AND every level below it, so a
+ * lapse on an earlier item pauses the next award until it is cleared. It
+ * resurfaces on its own: target selection draws from the current level plus
+ * every level below and picks the weakest first. Pausing is not demotion - the
+ * learner's level never falls.
  */
 export async function claimLevelPromotion(
   client: SupabaseClient,

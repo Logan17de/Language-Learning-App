@@ -5,7 +5,7 @@
 begin;
 create extension if not exists pgtap;
 
-select plan(19);
+select plan(22);
 
 -- ---------------------------------------------------------------------------
 -- Fixtures
@@ -129,24 +129,46 @@ select is(
   1, 'no duplicate award row is written');
 
 -- ---------------------------------------------------------------------------
--- A lapse on an EARLIER level must not block or reverse progress. Those items
--- are handled by target selection, which draws from the current level plus
--- every level below it and picks the weakest first.
+-- A lapse on an EARLIER level pauses the next promotion until it is cleared.
+-- The rule is mastery of the current level AND every level below it.
+--
+-- This walks the real case: an N3 learner slips on one N5 kanji. Everything
+-- else is mastered, so only that item stands between them and N2. Target
+-- selection draws from the current level plus every level below and picks the
+-- weakest first, so the lapsed item resurfaces in the next lesson; clearing it
+-- resumes progress. Pausing is not demotion - the level never falls.
 -- ---------------------------------------------------------------------------
-select set_config('aiko.lapsed', pg_temp.make_learner('N4')::text, true);
-select pg_temp.track_item(current_setting('aiko.lapsed')::uuid, 'N4', 100);
-select pg_temp.track_item(current_setting('aiko.lapsed')::uuid, 'N5', 40);
+select set_config('aiko.lapsed', pg_temp.make_learner('N3')::text, true);
+select set_config('aiko.lapsed_n3', pg_temp.track_item(current_setting('aiko.lapsed')::uuid, 'N3', 100)::text, true);
+select set_config('aiko.lapsed_n4', pg_temp.track_item(current_setting('aiko.lapsed')::uuid, 'N4', 100)::text, true);
+select set_config('aiko.lapsed_n5', pg_temp.track_item(current_setting('aiko.lapsed')::uuid, 'N5', 45)::text, true);
 
 select is(
   (pg_temp.claim(current_setting('aiko.lapsed')::uuid) ->> 'promoted'),
-  'true', 'an earlier-level lapse does not block the next promotion');
+  'false', 'one lapsed earlier-level item pauses the next promotion');
+select is(
+  (pg_temp.claim(current_setting('aiko.lapsed')::uuid) ->> 'masteredItems'),
+  '2', 'the two mastered items are counted across the current and earlier levels');
 select is(
   pg_temp.level_of(current_setting('aiko.lapsed')::uuid),
-  'N3', 'the learner still advances');
+  'N3', 'pausing is not demotion: the level does not fall');
 select ok(
   (select mastery from public.learner_mastery
-   where user_id = current_setting('aiko.lapsed')::uuid and mastery = 40) < 80,
-  'the lapsed earlier item stays below the threshold, so it remains a target');
+   where user_id = current_setting('aiko.lapsed')::uuid
+     and item_key = current_setting('aiko.lapsed_n5')) < 80,
+  'the lapsed N5 item is below the threshold, so it remains a target');
+
+-- Clearing the lapsed item resumes progress.
+update public.learner_mastery set recognition_score = 90
+where user_id = current_setting('aiko.lapsed')::uuid
+  and item_key = current_setting('aiko.lapsed_n5');
+
+select is(
+  (pg_temp.claim(current_setting('aiko.lapsed')::uuid) ->> 'promoted'),
+  'true', 'clearing the lapsed earlier item promotes the learner');
+select is(
+  pg_temp.level_of(current_setting('aiko.lapsed')::uuid),
+  'N2', 'the learner advances to the next level');
 
 -- ---------------------------------------------------------------------------
 -- Nothing tracked, and the top of the ladder.
