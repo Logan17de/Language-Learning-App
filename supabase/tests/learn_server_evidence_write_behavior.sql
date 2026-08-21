@@ -6,7 +6,7 @@
 begin;
 create extension if not exists pgtap;
 
-select plan(12);
+select plan(13);
 
 -- ---------------------------------------------------------------------------
 -- Fixtures
@@ -134,11 +134,14 @@ select is(
   0,
   'the retired RPC wrote no mastery events'
 );
+-- profiles_sync_mastery_ceiling seeds level-scoped baseline rows at zero for
+-- every learner, so the contract is that no mastery was *earned*.
 select is(
   (select count(*)::int from public.learner_mastery
-   where user_id = current_setting('aiko.user')::uuid),
+   where user_id = current_setting('aiko.user')::uuid
+     and (mastery > 0 or evidence_count > 0)),
   0,
-  'the retired RPC wrote no mastery aggregate'
+  'the retired RPC earned no mastery'
 );
 
 -- ---------------------------------------------------------------------------

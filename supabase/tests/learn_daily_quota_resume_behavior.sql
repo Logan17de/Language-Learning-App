@@ -125,7 +125,7 @@ select is(
 -- ---------------------------------------------------------------------------
 -- Paid learner limits: 4 today still allows a fifth, 5 today does not.
 -- ---------------------------------------------------------------------------
-select set_config('aiko.paid_four', pg_temp.make_learner('premium')::text, true);
+select set_config('aiko.paid_four', pg_temp.make_learner('premium_monthly')::text, true);
 select pg_temp.add_request(
     current_setting('aiko.paid_four')::uuid,
     pg_temp.make_lesson(current_setting('aiko.paid_four')::uuid),
@@ -145,7 +145,7 @@ select is(
   (pg_temp.creation_state(current_setting('aiko.paid_four')::uuid) ->> 'can_create'),
   'true', 'Paid learner may still create a fifth lesson');
 
-select set_config('aiko.paid_five', pg_temp.make_learner('premium')::text, true);
+select set_config('aiko.paid_five', pg_temp.make_learner('premium_monthly')::text, true);
 select pg_temp.add_request(
     current_setting('aiko.paid_five')::uuid,
     pg_temp.make_lesson(current_setting('aiko.paid_five')::uuid),
