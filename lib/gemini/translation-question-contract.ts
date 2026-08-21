@@ -21,8 +21,7 @@ export interface RawTranslationQuestions {
 export interface TranslationEvaluation {
   correct: boolean;
   feedback: string;
-  suggestion: string;
-  suggestedAnswer: string;
+  suggestion?: string;
 }
 
 export const translationQuestionSchema: JsonSchema = {
@@ -51,12 +50,11 @@ export const translationQuestionSchema: JsonSchema = {
 export const translationEvaluationSchema: JsonSchema = {
   type: "object",
   additionalProperties: false,
-  required: ["correct", "feedback", "suggestion", "suggestedAnswer"],
+  required: ["correct", "feedback"],
   properties: {
     correct: { type: "boolean" },
     feedback: { type: "string", minLength: 1, maxLength: 500 },
     suggestion: { type: "string", minLength: 1, maxLength: 500 },
-    suggestedAnswer: { type: "string", minLength: 1, maxLength: 240 },
   },
 };
 
@@ -124,10 +122,10 @@ EVALUATION RULES
 - Do not mark an answer wrong for harmless punctuation or spacing differences.
 - A grammatically valid Japanese sentence that avoids the required target pattern is incorrect for this exercise.
 - A sentence that contains the pattern mechanically but uses it with the wrong meaning, formation, tense, polarity, or nuance is incorrect.
-- feedback: briefly say why the answer is correct or what specifically is wrong.
-- suggestion: give one concrete improvement or natural alternative. Even when correct, give a useful refinement rather than empty praise.
-- suggestedAnswer: provide one natural Japanese answer that preserves the English meaning and uses the required target pattern.
-- Keep feedback and suggestion concise and learner-friendly.
+- feedback is always required and should briefly explain the verdict.
+- If correct: return a brief correctness explanation. Do not generate a correction, refinement, alternative answer, or suggestion. Omit suggestion.
+- If incorrect: explain the specific problem and provide one concise, learner-friendly improvement suggestion.
+- Do not generate a second Japanese answer. The hidden reference answer is the canonical answer used separately by the application.
 
 Return only the requested structured object.`;
 }
@@ -191,10 +189,19 @@ export function translationEvaluationOutputIssues(value: unknown): string[] {
   if (typeof evaluation.correct !== "boolean") {
     issues.push("Translation validation needs a boolean correct verdict.");
   }
-  for (const field of ["feedback", "suggestion", "suggestedAnswer"] as const) {
-    if (typeof evaluation[field] !== "string" || !evaluation[field].trim()) {
-      issues.push(`Translation validation needs ${field}.`);
-    }
+  if (typeof evaluation.feedback !== "string" || !evaluation.feedback.trim()) {
+    issues.push("Translation validation needs feedback.");
   }
+
+  if (evaluation.correct === true && evaluation.suggestion !== undefined) {
+    issues.push("Translation validation must omit suggestion when the answer is correct.");
+  }
+  if (
+    evaluation.correct === false &&
+    (typeof evaluation.suggestion !== "string" || !evaluation.suggestion.trim())
+  ) {
+    issues.push("Translation validation needs suggestion when the answer is incorrect.");
+  }
+
   return issues;
 }

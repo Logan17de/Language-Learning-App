@@ -8,8 +8,7 @@ import {
 const aiResult = (correct: boolean) => ({
   correct,
   feedback: correct ? "Natural and correct." : "The required grammar is missing.",
-  suggestion: correct ? "No change needed." : "Use the required grammar pattern.",
-  suggestedAnswer: "AIが作った別の答えです。",
+  ...(correct ? {} : { suggestion: "Use the required grammar pattern." }),
 });
 
 describe("Translation validation fast path", () => {
@@ -41,7 +40,7 @@ describe("Translation validation fast path", () => {
     });
   });
 
-  it("calls AI for a different answer and accepts a valid natural alternative", async () => {
+  it("calls AI for a different answer and accepts a valid natural alternative without a suggestion", async () => {
     const evaluateWithAi = vi.fn(async () => aiResult(true));
     const storedModelAnswer = "面接のあとで会社について話しました。";
 
@@ -52,10 +51,13 @@ describe("Translation validation fast path", () => {
     });
 
     expect(evaluateWithAi).toHaveBeenCalledTimes(1);
-    expect(result.correct).toBe(true);
-    expect(result.validationSource).toBe("ai");
+    expect(result).toEqual({
+      correct: true,
+      feedback: "Natural and correct.",
+      revealAnswer: storedModelAnswer,
+      validationSource: "ai",
+    });
     expect(result.suggestion).toBeUndefined();
-    expect(result.revealAnswer).toBe(storedModelAnswer);
   });
 
   it("returns concise AI correction guidance while revealing only the original stored answer", async () => {
@@ -73,10 +75,9 @@ describe("Translation validation fast path", () => {
     expect(result.feedback).toContain("required grammar");
     expect(result.suggestion).toBe("Use the required grammar pattern.");
     expect(result.revealAnswer).toBe(storedModelAnswer);
-    expect(result.revealAnswer).not.toBe(aiResult(false).suggestedAnswer);
   });
 
-  it("returns a finalized persisted result without re-evaluating the answer", async () => {
+  it("returns a finalized persisted result without re-evaluating or changing the verdict", async () => {
     const evaluateWithAi = vi.fn(async () => aiResult(true));
     const storedModelAnswer = "駅へ行きたいです。";
 
