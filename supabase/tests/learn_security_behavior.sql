@@ -1,745 +1,243 @@
--- Behavioral regression suite for the /learn security and entitlement contract.
--- Run against a database with all repository migrations applied. Every fixture
--- is transaction-local and rolled back, so this is safe against a linked test
--- database when executed as a privileged migration/test connection.
+-- The /learn security boundary, table by table.
+--
+-- Two different mechanisms are deliberately in play, and this suite proves
+-- each one where it belongs rather than forcing a single denial style:
+--
+--   * lesson_translation_questions is a HARD privilege denial. The browser
+--     role has no table privilege at all, because model_answer is server-owned.
+--   * Protected Listening and Speaking are an RLS decision. The browser role
+--     holds base SELECT so the policy can run, and the policy is what separates
+--     Free from Paid.
+--   * lesson_sessions and the answer/event tables carry base privileges with
+--     own-row RLS, because the browser reads and writes them directly.
+--
+-- Hermetic: every fixture is built inside this transaction and rolled back.
 
 begin;
+create extension if not exists pgtap;
+
+select plan(24);
 
 -- ---------------------------------------------------------------------------
--- Test identities. auth.users creation exercises the real profile trigger.
+-- Fixture helpers
 -- ---------------------------------------------------------------------------
-select set_config('aiko.test_quota_user', gen_random_uuid()::text, true);
-select set_config('aiko.test_private_owner', gen_random_uuid()::text, true);
-select set_config('aiko.test_private_requester', gen_random_uuid()::text, true);
-select set_config('aiko.test_score_user', gen_random_uuid()::text, true);
-
-insert into auth.users (
-  id,
-  aud,
-  role,
-  email,
-  raw_user_meta_data,
-  created_at,
-  updated_at
-) values
-  (
-    current_setting('aiko.test_quota_user')::uuid,
-    'authenticated',
-    'authenticated',
-    'learn-quota-' || replace(current_setting('aiko.test_quota_user'), '-', '') || '@invalid.local',
-    '{"timezone":"Pacific/Kiritimati"}'::jsonb,
-    now(),
-    now()
-  ),
-  (
-    current_setting('aiko.test_private_owner')::uuid,
-    'authenticated',
-    'authenticated',
-    'learn-owner-' || replace(current_setting('aiko.test_private_owner'), '-', '') || '@invalid.local',
-    '{}'::jsonb,
-    now(),
-    now()
-  ),
-  (
-    current_setting('aiko.test_private_requester')::uuid,
-    'authenticated',
-    'authenticated',
-    'learn-requester-' || replace(current_setting('aiko.test_private_requester'), '-', '') || '@invalid.local',
-    '{}'::jsonb,
-    now(),
-    now()
-  ),
-  (
-    current_setting('aiko.test_score_user')::uuid,
-    'authenticated',
-    'authenticated',
-    'learn-score-' || replace(current_setting('aiko.test_score_user'), '-', '') || '@invalid.local',
-    '{}'::jsonb,
-    now(),
-    now()
-  );
-
--- ---------------------------------------------------------------------------
--- Profile privilege boundary + protected Premium data + retired assignment RPC.
--- ---------------------------------------------------------------------------
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.test_quota_user'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
-
-do $$
+create or replace function pg_temp.make_learner(p_plan text)
+returns uuid language plpgsql as $$
+declare v_user uuid := gen_random_uuid();
 begin
-  begin
-    execute $sql$
-      update public.profiles
-      set subscription_plan = 'premium_monthly'
-      where id = auth.uid()
-    $sql$;
-    raise exception 'authenticated learner changed subscription_plan directly';
-  exception
-    when insufficient_privilege then null;
-  end;
+  insert into auth.users (id, aud, role, email, raw_user_meta_data, created_at, updated_at)
+  values (v_user, 'authenticated', 'authenticated',
+          'sec-' || replace(v_user::text, '-', '') || '@invalid.local',
+          '{}'::jsonb, now(), now());
+  update public.profiles
+  set subscription_plan = p_plan::public.subscription_plan, status = 'active', timezone = 'UTC'
+  where id = v_user;
+  return v_user;
+end $$;
 
-  begin
-    execute $sql$
-      update public.profiles
-      set xp = xp + 999
-      where id = auth.uid()
-    $sql$;
-    raise exception 'authenticated learner changed xp directly';
-  exception
-    when insufficient_privilege then null;
-  end;
-
-  begin
-    execute $sql$
-      update public.profiles
-      set streak_days = streak_days + 50
-      where id = auth.uid()
-    $sql$;
-    raise exception 'authenticated learner changed streak_days directly';
-  exception
-    when insufficient_privilege then null;
-  end;
-
-  if has_function_privilege(current_user, 'public.assign_next_lesson()', 'EXECUTE') then
-    raise exception 'authenticated learner can still execute assign_next_lesson()';
-  end if;
-
-  if (select count(*) from public.lesson_listening_activities) <> 0 then
-    raise exception 'free learner can SELECT protected listening activities';
-  end if;
-
-  if (select count(*) from public.lesson_speaking_activities) <> 0 then
-    raise exception 'free learner can SELECT protected speaking activities';
-  end if;
-
-  if (select count(*) from public.audio_assets) <> 0 then
-    raise exception 'free learner can SELECT protected audio assets';
-  end if;
-
-  if (select count(*) from storage.objects where bucket_id = 'lesson-audio') <> 0 then
-    raise exception 'free learner can SELECT lesson-audio storage objects';
-  end if;
-end
-$$;
-
--- User-editable profile fields must remain editable.
-update public.profiles
-set timezone = 'Pacific/Kiritimati'
-where id = auth.uid();
-
-do $$
+-- A published lesson carrying protected Listening and Speaking content.
+create or replace function pg_temp.make_lesson(p_user uuid)
+returns uuid language plpgsql as $$
+declare v_lesson uuid := gen_random_uuid(); v_version uuid := gen_random_uuid();
 begin
-  if (select timezone from public.profiles where id = auth.uid()) <> 'Pacific/Kiritimati' then
-    raise exception 'timezone is no longer user-editable';
-  end if;
-end
-$$;
-
--- ---------------------------------------------------------------------------
--- Daily entitlement: first request freezes reset timezone; changing profile
--- timezone across an actual date boundary must resume the same free request.
--- ---------------------------------------------------------------------------
-select set_config(
-  'aiko.test_first_begin',
-  public.begin_custom_lesson_generation_v5(
-    'aiko quota behavior ' || current_setting('aiko.test_quota_user'),
-    'N5'
-  )::text,
-  true
-);
-select set_config(
-  'aiko.test_first_request',
-  current_setting('aiko.test_first_begin')::jsonb ->> 'request_id',
-  true
-);
-
-update public.profiles
-set timezone = 'Pacific/Honolulu'
-where id = auth.uid();
-
-select set_config(
-  'aiko.test_second_begin',
-  public.begin_custom_lesson_generation_v5(
-    'a completely different topic ' || current_setting('aiko.test_quota_user'),
-    'N5'
-  )::text,
-  true
-);
-
-do $$
-declare
-  request_row public.custom_lesson_requests%rowtype;
-begin
-  if current_setting('aiko.test_first_request')
-     <> current_setting('aiko.test_second_begin')::jsonb ->> 'request_id' then
-    raise exception 'timezone change created a second free lesson request';
-  end if;
-
-  select *
-  into request_row
-  from public.custom_lesson_requests
-  where id = current_setting('aiko.test_first_request')::uuid;
-
-  if request_row.entitlement_timezone <> 'Pacific/Kiritimati' then
-    raise exception 'daily entitlement timezone moved to %', request_row.entitlement_timezone;
-  end if;
-
-  if request_row.entitlement_local_date
-     <> (now() at time zone 'Pacific/Kiritimati')::date then
-    raise exception 'daily entitlement date no longer follows frozen timezone';
-  end if;
-
-  -- These zones straddle the date boundary for the regression scenario. If the
-  -- wall clock changes enough for them to match, the stable-timezone assertions
-  -- above still prove the quota behavior without making the test time-sensitive.
-end
-$$;
-
-reset role;
-
--- The partial unique index is the final concurrency backstop even if two
--- transactions race around application code. A second live free entitlement
--- for the same learner/local date must be rejected by PostgreSQL itself.
-do $$
-declare
-  request_row public.custom_lesson_requests%rowtype;
-begin
-  select *
-  into request_row
-  from public.custom_lesson_requests
-  where id = current_setting('aiko.test_first_request')::uuid;
-
-  begin
-    insert into public.custom_lesson_requests (
-      user_id,
-      topic,
-      jlpt_level,
-      duration_minutes,
-      focus,
-      speaking_difficulty,
-      note,
-      status,
-      entitlement_local_date,
-      entitlement_timezone,
-      uses_free_daily_entitlement
-    ) values (
-      request_row.user_id,
-      'concurrent duplicate should fail',
-      request_row.jlpt_level,
-      30,
-      'balanced',
-      'medium',
-      '',
-      'requested',
-      request_row.entitlement_local_date,
-      request_row.entitlement_timezone,
-      true
-    );
-    raise exception 'database accepted two live free entitlements for one local day';
-  exception
-    when unique_violation then null;
-  end;
-end
-$$;
-
--- ---------------------------------------------------------------------------
--- Story boundary acknowledgement: a malformed/misflagged free request must
--- return false; a valid free request must return true only after consumption is
--- actually persisted.
--- ---------------------------------------------------------------------------
-update public.custom_lesson_requests
-set uses_free_daily_entitlement = false,
-    entitlement_consumed_at = null
-where id = current_setting('aiko.test_first_request')::uuid;
-
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.test_quota_user'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
-
-do $$
-begin
-  if public.consume_custom_lesson_story_entitlement(
-    current_setting('aiko.test_first_request')::uuid
-  ) then
-    raise exception 'misflagged free request received Story entitlement acknowledgement';
-  end if;
-end
-$$;
-
-reset role;
-
-update public.custom_lesson_requests
-set uses_free_daily_entitlement = true,
-    entitlement_consumed_at = null
-where id = current_setting('aiko.test_first_request')::uuid;
-
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.test_quota_user'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
-
-do $$
-begin
-  if not public.consume_custom_lesson_story_entitlement(
-    current_setting('aiko.test_first_request')::uuid
-  ) then
-    raise exception 'valid free Story entitlement was not acknowledged';
-  end if;
-
-  if not exists (
-    select 1
-    from public.custom_lesson_requests
-    where id = current_setting('aiko.test_first_request')::uuid
-      and entitlement_consumed_at is not null
-  ) then
-    raise exception 'Story acknowledgement returned before entitlement consumption persisted';
-  end if;
-end
-$$;
-
-reset role;
-
--- ---------------------------------------------------------------------------
--- Legacy assignment retirement: active standard assignments are invalid even
--- if somebody attempts to recreate one outside the old RPC.
--- ---------------------------------------------------------------------------
-do $$
-begin
-  begin
-    insert into public.lesson_assignments (
-      user_id,
-      lesson_id,
-      lesson_version_id,
-      selection_mode,
-      status,
-      algorithm_version
-    )
-    select
-      current_setting('aiko.test_quota_user')::uuid,
-      lesson.id,
-      lesson.current_version_id,
-      'standard',
-      'assigned',
-      'behavior-regression'
-    from public.lessons lesson
-    where lesson.current_version_id is not null
-    limit 1;
-    raise exception 'active standard assignment was accepted';
-  exception
-    when check_violation then null;
-  end;
-end
-$$;
-
--- ---------------------------------------------------------------------------
--- Exact reuse ownership: another learner's private reusable lesson must never
--- be selected for the requesting learner.
--- ---------------------------------------------------------------------------
-select set_config('aiko.test_private_lesson', gen_random_uuid()::text, true);
-select set_config('aiko.test_private_version', gen_random_uuid()::text, true);
-select set_config(
-  'aiko.test_private_topic',
-  'aiko-private-reuse-' || replace(gen_random_uuid()::text, '-', ''),
-  true
-);
-
-insert into public.lessons (
-  id,
-  slug,
-  title,
-  japanese_title,
-  summary,
-  topic,
-  jlpt_level,
-  duration_minutes,
-  status,
-  source,
-  tags,
-  published_at,
-  generated_for_user_id,
-  normalized_topic,
-  content_signature,
-  reusable
-) values (
-  current_setting('aiko.test_private_lesson')::uuid,
-  'behavior-' || replace(current_setting('aiko.test_private_lesson'), '-', ''),
-  'Private behavior lesson',
-  'テスト',
-  'Ownership regression fixture',
-  current_setting('aiko.test_private_topic'),
-  'N5',
-  30,
-  'published',
-  'generated',
-  '{}',
-  now(),
-  current_setting('aiko.test_private_owner')::uuid,
-  public.normalize_lesson_topic(current_setting('aiko.test_private_topic')),
-  'private-behavior-' || current_setting('aiko.test_private_lesson'),
-  true
-);
-
-insert into public.lesson_versions (
-  id,
-  lesson_id,
-  version_number,
-  status,
-  phases,
-  published_at
-) values (
-  current_setting('aiko.test_private_version')::uuid,
-  current_setting('aiko.test_private_lesson')::uuid,
-  1,
-  'published',
-  '[]'::jsonb,
-  now()
-);
-
-update public.lessons
-set current_version_id = current_setting('aiko.test_private_version')::uuid
-where id = current_setting('aiko.test_private_lesson')::uuid;
-
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.test_private_requester'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
-select set_config(
-  'aiko.test_private_reuse_result',
-  public.begin_custom_lesson_generation_v5(
-    current_setting('aiko.test_private_topic'),
-    'N5'
-  )::text,
-  true
-);
-
-do $$
-declare
-  result jsonb := current_setting('aiko.test_private_reuse_result')::jsonb;
-begin
-  if coalesce((result ->> 'reused')::boolean, false) then
-    raise exception 'another learner private lesson was reused';
-  end if;
-
-  if result ->> 'lesson_id' is not null then
-    raise exception 'another learner private lesson leaked into generation result: %', result;
-  end if;
-end
-$$;
-
-reset role;
-
--- ---------------------------------------------------------------------------
--- Canonical scoring/reward behavior. Deliberately persist wrong answers while
--- forging correct=true, p_score=100, p_xp=999 and p_duration=1440. The database
--- must recompute score/XP/duration from canonical lesson evidence.
--- ---------------------------------------------------------------------------
-do $$
-declare
-  test_user uuid := current_setting('aiko.test_score_user')::uuid;
-  lesson_id uuid;
-  version_id uuid;
-  lesson_duration integer;
-  session_id uuid := gen_random_uuid();
-  grammar_id uuid;
-  grammar_pattern text;
-  grammar_meaning text;
-  reading_answers jsonb;
-begin
-  select
-    lesson.id,
-    lesson.current_version_id,
-    lesson.duration_minutes
-  into lesson_id, version_id, lesson_duration
-  from public.lessons lesson
-  where lesson.status = 'published'
-    and lesson.current_version_id is not null
-    and (select count(*) from public.lesson_practice_activities p where p.lesson_version_id = lesson.current_version_id and p.phase = 'vocabulary') = 7
-    and (select count(*) from public.lesson_practice_activities p where p.lesson_version_id = lesson.current_version_id and p.phase = 'grammar') = 7
-    and (select count(*) from public.lesson_reading_questions q where q.lesson_version_id = lesson.current_version_id) = 5
-    and (select count(*) from public.lesson_listening_activities q where q.lesson_version_id = lesson.current_version_id) = 5
-    and (select count(*) from public.lesson_speaking_activities q where q.lesson_version_id = lesson.current_version_id) = 5
-    and exists (
-      select 1
-      from public.lesson_story_words word
-      where word.lesson_version_id = lesson.current_version_id
-    )
-  order by lesson.published_at desc nulls last
-  limit 1;
-
-  if lesson_id is null or version_id is null then
-    raise exception 'canonical 7/7/5/5/5 lesson fixture is required';
-  end if;
-
-  select grammar.id, grammar.pattern, grammar.meaning
-  into grammar_id, grammar_pattern, grammar_meaning
-  from public.grammar_records grammar
-  where grammar.archived_at is null
-    and btrim(grammar.pattern) <> ''
-    and btrim(grammar.meaning) <> ''
-  limit 1;
-
-  if grammar_id is null then
-    raise exception 'grammar fixture is required';
-  end if;
-
-  select jsonb_agg(
-    jsonb_build_object(
-      'questionId', question.id::text,
-      'response', '__aiko_definitely_wrong__'
-    )
-    order by question.position
-  )
-  into reading_answers
-  from public.lesson_reading_questions question
-  where question.lesson_version_id = version_id;
-
-  insert into public.lesson_assignments (
-    user_id,
-    lesson_id,
-    lesson_version_id,
-    selection_mode,
-    status,
-    algorithm_version
+  insert into public.lessons (
+    id, slug, title, japanese_title, summary, topic, jlpt_level,
+    duration_minutes, status, source, generated_for_user_id
   ) values (
-    test_user,
-    lesson_id,
-    version_id,
-    'custom_topic',
-    'started',
-    'canonical-score-behavior-test'
+    v_lesson, 'sec-' || replace(v_lesson::text, '-', ''),
+    'Security fixture', '保護', 'Hermetic fixture lesson.',
+    'security fixture', 'N5', 30, 'published', 'user_generated', p_user
   );
+  insert into public.lesson_versions (id, lesson_id, version_number, status)
+  values (v_version, v_lesson, 1, 'published');
+  update public.lessons set current_version_id = v_version where id = v_lesson;
 
-  insert into public.lesson_sessions (
-    id,
-    user_id,
-    lesson_id,
-    lesson_version_id,
-    status,
-    current_phase,
-    current_phase_index,
-    activity_index,
-    elapsed_seconds,
-    checkpoint,
-    started_at,
-    last_saved_at
-  ) values (
-    session_id,
-    test_user,
-    lesson_id,
-    version_id,
-    'active',
-    'speaking',
-    5,
-    0,
-    999999,
-    jsonb_build_object(
-      'session',
-      jsonb_build_object(
-        'storyComplete', true,
-        'readingAnswers', reading_answers,
-        'completed', true
-      )
-    ),
-    now() - interval '7 minutes',
-    now()
-  );
-
-  insert into public.lesson_activity_answers (
-    user_id,
-    lesson_session_id,
-    phase,
-    activity_id,
-    selected_answer,
-    correct,
-    attempts,
-    answer_data
+  insert into public.lesson_listening_activities (
+    lesson_version_id, position, prompt, transcript, choices, correct_answer,
+    explanation, difficulty
   )
-  select
-    test_user,
-    session_id,
-    'vocabulary',
-    activity.id::text,
-    '__aiko_definitely_wrong__',
-    true,
-    1,
-    '{}'::jsonb
-  from public.lesson_practice_activities activity
-  where activity.lesson_version_id = version_id
-    and activity.phase = 'vocabulary';
+  select v_version, i, 'Listening prompt ' || i, 'transcript',
+         array['correct', 'wrong'], 'correct', 'explanation', 'easy'
+  from generate_series(1, 5) i;
 
-  insert into public.lesson_activity_answers (
-    user_id,
-    lesson_session_id,
-    phase,
-    activity_id,
-    selected_answer,
-    correct,
-    attempts,
-    answer_data
+  insert into public.lesson_speaking_activities (
+    lesson_version_id, position, mode, prompt, model_answer, question_type
   )
-  select
-    test_user,
-    session_id,
-    'grammar',
-    activity.id::text,
-    '__aiko_definitely_wrong__',
-    true,
-    1,
-    '{}'::jsonb
-  from public.lesson_practice_activities activity
-  where activity.lesson_version_id = version_id
-    and activity.phase = 'grammar';
+  select v_version, i, 'easy', 'Speaking prompt ' || i, '駅に行きます。', 'read_aloud'
+  from generate_series(1, 5) i;
 
-  insert into public.lesson_translation_questions (
-    user_id,
-    lesson_session_id,
-    lesson_id,
-    lesson_version_id,
-    position,
-    english_prompt,
-    target_item_id,
-    target_pattern,
-    target_meaning,
-    target_role,
-    model_answer
-  )
-  select
-    test_user,
-    session_id,
-    lesson_id,
-    version_id,
-    position,
-    'Behavior test translation ' || position,
-    grammar_id,
-    grammar_pattern,
-    grammar_meaning,
-    'lesson_fallback',
-    'テストです。'
-  from generate_series(1, 5) position;
+  return v_lesson;
+end $$;
 
-  insert into public.lesson_activity_answers (
-    user_id,
-    lesson_session_id,
-    phase,
-    activity_id,
-    selected_answer,
-    correct,
-    attempts,
-    answer_data
-  )
-  select
-    test_user,
-    session_id,
-    'grammar_translation',
-    question.id::text,
-    '__aiko_definitely_wrong__',
-    false,
-    1,
-    jsonb_build_object(
-      'serverValidated', true,
-      'targetItemId', grammar_id
-    )
-  from public.lesson_translation_questions question
-  where question.lesson_session_id = session_id;
-
-  perform set_config('aiko.test_score_session', session_id::text, true);
-  perform set_config('aiko.test_score_lesson', lesson_id::text, true);
-  perform set_config('aiko.test_score_duration_cap', least(120, greatest(1, lesson_duration * 2))::text, true);
-end
-$$;
-
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.test_score_user'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
-select set_config(
-  'aiko.test_score_result',
-  public.complete_lesson_session(
-    current_setting('aiko.test_score_session')::uuid,
-    100,
-    999,
-    1440,
-    jsonb_build_object(
-      'result',
-      jsonb_build_object(
-        'score', 100,
-        'xpGained', 999,
-        'durationMinutes', 1440
-      )
-    )
-  )::text,
-  true
-);
-
-do $$
-declare
-  result jsonb := current_setting('aiko.test_score_result')::jsonb;
-  repeat_result jsonb;
-  canonical_score integer := (result ->> 'score')::integer;
-  canonical_xp integer := (result ->> 'xp_awarded')::integer;
-  canonical_duration integer := (result ->> 'duration_minutes')::integer;
+create or replace function pg_temp.visible_listening(p_user uuid, p_version uuid)
+returns integer language plpgsql as $$
+declare v_count integer;
 begin
-  if result ->> 'canonical' <> 'true' then
-    raise exception 'completion RPC did not return canonical result marker: %', result;
-  end if;
+  perform set_config('request.jwt.claim.sub', p_user::text, true);
+  select count(*)::integer into v_count
+  from public.lesson_listening_activities where lesson_version_id = p_version;
+  return v_count;
+end $$;
 
-  if canonical_score = 100 then
-    raise exception 'forged p_score=100 was trusted despite deliberately wrong answers';
-  end if;
+create or replace function pg_temp.visible_speaking(p_user uuid, p_version uuid)
+returns integer language plpgsql as $$
+declare v_count integer;
+begin
+  perform set_config('request.jwt.claim.sub', p_user::text, true);
+  select count(*)::integer into v_count
+  from public.lesson_speaking_activities where lesson_version_id = p_version;
+  return v_count;
+end $$;
 
-  if canonical_xp <> public.calculate_lesson_xp(canonical_score) then
-    raise exception 'XP was not derived from canonical score';
-  end if;
+select set_config('aiko.free', pg_temp.make_learner('free')::text, true);
+select set_config('aiko.paid', pg_temp.make_learner('premium_monthly')::text, true);
+select set_config('aiko.paid_lesson',
+  pg_temp.make_lesson(current_setting('aiko.paid')::uuid)::text, true);
+select set_config('aiko.paid_version',
+  (select current_version_id::text from public.lessons
+   where id = current_setting('aiko.paid_lesson')::uuid), true);
 
-  if canonical_xp = 999 then
-    raise exception 'forged p_xp=999 was trusted';
-  end if;
+-- ---------------------------------------------------------------------------
+-- ACL matrix. These assertions pin the intended privilege surface so a future
+-- migration cannot silently widen or narrow it.
+-- ---------------------------------------------------------------------------
+select ok(
+  has_table_privilege('authenticated', 'public.lesson_sessions', 'SELECT')
+  and has_table_privilege('authenticated', 'public.lesson_sessions', 'INSERT')
+  and has_table_privilege('authenticated', 'public.lesson_sessions', 'UPDATE'),
+  'lesson_sessions carries the base privileges the browser needs');
+select ok(
+  not has_table_privilege('authenticated', 'public.lesson_sessions', 'DELETE')
+  and not has_table_privilege('authenticated', 'public.lesson_sessions', 'TRUNCATE'),
+  'lesson_sessions cannot be deleted or truncated by the browser role');
 
-  if canonical_duration = 1440
-     or canonical_duration > current_setting('aiko.test_score_duration_cap')::integer then
-    raise exception 'forged duration was trusted: %', canonical_duration;
-  end if;
+select ok(
+  has_table_privilege('authenticated', 'public.lesson_activity_answers', 'SELECT')
+  and has_table_privilege('authenticated', 'public.lesson_activity_answers', 'INSERT')
+  and has_table_privilege('authenticated', 'public.lesson_activity_answers', 'UPDATE'),
+  'lesson_activity_answers supports the answer upsert');
+select ok(
+  not has_table_privilege('authenticated', 'public.lesson_activity_answers', 'DELETE'),
+  'answers cannot be deleted by the browser role');
 
-  if coalesce((result ->> 'premium_phases_included')::boolean, true) then
-    raise exception 'free learner completion included Premium phase weights';
-  end if;
+select ok(
+  has_table_privilege('authenticated', 'public.lesson_events', 'SELECT')
+  and has_table_privilege('authenticated', 'public.lesson_events', 'INSERT')
+  and has_table_privilege('authenticated', 'public.lesson_events', 'UPDATE'),
+  'lesson_events supports the event upsert');
+select ok(
+  not has_table_privilege('authenticated', 'public.lesson_events', 'DELETE'),
+  'events cannot be deleted by the browser role');
 
-  if (select xp from public.profiles where id = auth.uid()) <> canonical_xp then
-    raise exception 'profile XP delta does not match canonical reward';
-  end if;
+-- Protected content: base SELECT is REQUIRED so that RLS is what decides.
+select ok(
+  has_table_privilege('authenticated', 'public.lesson_listening_activities', 'SELECT'),
+  'Listening carries base SELECT so the Premium policy can be evaluated');
+select ok(
+  has_table_privilege('authenticated', 'public.lesson_speaking_activities', 'SELECT'),
+  'Speaking carries base SELECT so the Premium policy can be evaluated');
+select ok(
+  not has_table_privilege('authenticated', 'public.lesson_listening_activities', 'INSERT')
+  and not has_table_privilege('authenticated', 'public.lesson_listening_activities', 'UPDATE')
+  and not has_table_privilege('authenticated', 'public.lesson_listening_activities', 'DELETE'),
+  'Listening content is not writable by the browser role');
+select ok(
+  not has_table_privilege('authenticated', 'public.lesson_speaking_activities', 'INSERT')
+  and not has_table_privilege('authenticated', 'public.lesson_speaking_activities', 'UPDATE')
+  and not has_table_privilege('authenticated', 'public.lesson_speaking_activities', 'DELETE'),
+  'Speaking content is not writable by the browser role');
 
-  if (select total_study_minutes from public.profiles where id = auth.uid()) <> canonical_duration then
-    raise exception 'profile study minutes do not match canonical duration';
-  end if;
+-- Translation is the hard denial.
+select ok(
+  not has_table_privilege('authenticated', 'public.lesson_translation_questions', 'SELECT'),
+  'Translation questions are unreadable by the browser role');
+select ok(
+  not has_table_privilege('authenticated', 'public.lesson_translation_questions', 'INSERT')
+  and not has_table_privilege('authenticated', 'public.lesson_translation_questions', 'UPDATE')
+  and not has_table_privilege('authenticated', 'public.lesson_translation_questions', 'DELETE'),
+  'Translation questions are unwritable by the browser role');
+select ok(
+  not has_table_privilege('anon', 'public.lesson_translation_questions', 'SELECT'),
+  'Translation questions are unreadable by the anonymous role');
 
-  if not exists (
-    select 1
-    from public.lesson_completions completion
-    where completion.lesson_session_id = current_setting('aiko.test_score_session')::uuid
-      and completion.score = canonical_score
-      and completion.xp_awarded = canonical_xp
-      and completion.duration_minutes = canonical_duration
-  ) then
-    raise exception 'canonical lesson completion row was not persisted';
-  end if;
+-- Mastery ledger.
+select ok(
+  has_table_privilege('authenticated', 'public.learner_mastery', 'SELECT')
+  and not has_table_privilege('authenticated', 'public.learner_mastery', 'INSERT')
+  and not has_table_privilege('authenticated', 'public.learner_mastery', 'UPDATE')
+  and not has_table_privilege('authenticated', 'public.learner_mastery', 'DELETE')
+  and not has_table_privilege('authenticated', 'public.learner_mastery', 'TRUNCATE'),
+  'learner_mastery is readable but never writable by the browser role');
+select ok(
+  has_table_privilege('authenticated', 'public.learner_mastery_events', 'SELECT')
+  and not has_table_privilege('authenticated', 'public.learner_mastery_events', 'INSERT')
+  and not has_table_privilege('authenticated', 'public.learner_mastery_events', 'UPDATE')
+  and not has_table_privilege('authenticated', 'public.learner_mastery_events', 'DELETE')
+  and not has_table_privilege('authenticated', 'public.learner_mastery_events', 'TRUNCATE'),
+  'learner_mastery_events is readable but never writable by the browser role');
 
-  repeat_result := public.complete_lesson_session(
-    current_setting('aiko.test_score_session')::uuid,
-    0,
-    0,
-    0,
-    '{}'::jsonb
-  );
+-- Column-level profile contract: the learner edits preferences, not rewards.
+select ok(
+  has_column_privilege('authenticated', 'public.profiles', 'timezone', 'UPDATE')
+  and has_column_privilege('authenticated', 'public.profiles', 'display_name', 'UPDATE'),
+  'learner may edit their own preference columns');
+select ok(
+  not has_column_privilege('authenticated', 'public.profiles', 'xp', 'UPDATE')
+  and not has_column_privilege('authenticated', 'public.profiles', 'streak_days', 'UPDATE')
+  and not has_column_privilege('authenticated', 'public.profiles', 'subscription_plan', 'UPDATE')
+  and not has_column_privilege('authenticated', 'public.profiles', 'role', 'UPDATE'),
+  'learner cannot edit XP, streak, plan or role');
 
-  if repeat_result <> result then
-    raise exception 'idempotent completion retry changed canonical result';
-  end if;
+-- ---------------------------------------------------------------------------
+-- RLS decides Free vs Paid for protected practice.
+-- ---------------------------------------------------------------------------
+set local role authenticated;
 
-  if (select xp from public.profiles where id = auth.uid()) <> canonical_xp then
-    raise exception 'idempotent completion retry awarded XP twice';
-  end if;
-end
-$$;
+select is(
+  pg_temp.visible_speaking(current_setting('aiko.paid')::uuid,
+                           current_setting('aiko.paid_version')::uuid),
+  5, 'a Paid learner sees all five Speaking activities');
+select is(
+  pg_temp.visible_listening(current_setting('aiko.paid')::uuid,
+                            current_setting('aiko.paid_version')::uuid),
+  5, 'a Paid learner sees all five Listening activities');
+select is(
+  pg_temp.visible_listening(current_setting('aiko.free')::uuid,
+                            current_setting('aiko.paid_version')::uuid),
+  0, 'a Free learner sees no Listening activities');
+select is(
+  pg_temp.visible_speaking(current_setting('aiko.free')::uuid,
+                           current_setting('aiko.paid_version')::uuid),
+  0, 'a Free learner sees no Speaking activities');
+
+-- Another learner's session is invisible, and the Translation table is a hard
+-- privilege error rather than an empty result.
+select set_config('request.jwt.claim.sub', current_setting('aiko.free'), true);
+
+select throws_ok(
+  'select count(*) from public.lesson_translation_questions',
+  '42501', NULL,
+  'reading Translation questions is a privilege error, not an empty result');
+
+select is(
+  (select count(*)::int from public.lessons
+   where id = current_setting('aiko.paid_lesson')::uuid),
+  0, 'a Free learner cannot see another learner''s generated lesson');
 
 reset role;
 
-select 'learn security behavior passed' as result;
+-- ---------------------------------------------------------------------------
+-- The retired assignment RPC is no longer reachable by learners.
+-- ---------------------------------------------------------------------------
+select ok(
+  not has_function_privilege('authenticated', 'public.assign_next_lesson()', 'EXECUTE'),
+  'the retired predefined-assignment RPC is not executable by learners');
+select ok(
+  has_function_privilege('authenticated', 'public.get_lesson_creation_state()', 'EXECUTE'),
+  'the /learn creation-state RPC is executable by learners');
+select ok(
+  has_function_privilege('authenticated', 'public.commit_lesson_phase(uuid, text)', 'EXECUTE'),
+  'the canonical phase commit RPC is executable by learners');
+
+select * from finish();
 rollback;

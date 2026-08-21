@@ -1,570 +1,296 @@
--- Behavioral regression suite for phase-atomic mastery rollout compatibility.
--- Requires the consolidated 20260820021500_phase_atomic_mastery_resume.sql.
--- All fixtures are transaction-local and rolled back.
+-- Phase-atomic mastery, historical 10/13 compatibility, and idempotency.
+--
+-- Historical lesson versions may still hold 13 Vocabulary and 10-13 Grammar
+-- physical rows. Only the canonical playable seven of each may influence phase
+-- completion, mastery or reward. A partially answered phase commits nothing,
+-- and committing the same phase twice must not pay out twice.
+--
+-- Hermetic: every fixture is built inside this transaction and rolled back.
 
 begin;
+create extension if not exists pgtap;
 
-select set_config('aiko.phase_user', gen_random_uuid()::text, true);
-select set_config('aiko.legacy_user', gen_random_uuid()::text, true);
-select set_config('aiko.phase_session', gen_random_uuid()::text, true);
-select set_config('aiko.legacy_session', gen_random_uuid()::text, true);
+select plan(17);
 
--- Use the exact historical storage shape from the regression: 13 Vocabulary
--- rows and 10-13 Grammar rows, while the playable UI completes seven of each.
-select set_config(
-  'aiko.phase_lesson',
-  fixture.lesson_id::text,
-  true
-), set_config(
-  'aiko.phase_version',
-  fixture.lesson_version_id::text,
-  true
-)
-from (
-  select assignment.lesson_id, assignment.lesson_version_id
-  from public.lesson_assignments assignment
-  where assignment.selection_mode = 'custom_topic'
-    and (
-      select count(*)
-      from public.lesson_practice_activities activity
-      where activity.lesson_version_id = assignment.lesson_version_id
-        and activity.phase = 'vocabulary'
-    ) = 13
-    and (
-      select count(*)
-      from public.lesson_practice_activities activity
-      where activity.lesson_version_id = assignment.lesson_version_id
-        and activity.phase = 'grammar'
-    ) between 10 and 13
-    and exists (
-      select 1
-      from public.lesson_grammar grammar
-      where grammar.lesson_version_id = assignment.lesson_version_id
-        and grammar.grammar_id is not null
-    )
-  order by assignment.created_at desc
-  limit 1
-) fixture;
-
-do $$
+-- ---------------------------------------------------------------------------
+-- Fixture helpers
+-- ---------------------------------------------------------------------------
+create or replace function pg_temp.make_learner()
+returns uuid language plpgsql as $$
+declare v_user uuid := gen_random_uuid();
 begin
-  if current_setting('aiko.phase_lesson', true) is null
-     or current_setting('aiko.phase_version', true) is null then
-    raise exception 'Historical 13 Vocabulary / 10-13 Grammar lesson fixture is required';
-  end if;
-end
-$$;
+  insert into auth.users (id, aud, role, email, raw_user_meta_data, created_at, updated_at)
+  values (v_user, 'authenticated', 'authenticated',
+          'compat-' || replace(v_user::text, '-', '') || '@invalid.local',
+          '{}'::jsonb, now(), now());
+  update public.profiles
+  set subscription_plan = 'free', status = 'active', timezone = 'UTC'
+  where id = v_user;
+  return v_user;
+end $$;
 
-insert into auth.users (
-  id, aud, role, email, raw_user_meta_data, created_at, updated_at
-) values
-  (
-    current_setting('aiko.phase_user')::uuid,
-    'authenticated',
-    'authenticated',
-    'phase-history-' || replace(current_setting('aiko.phase_user'), '-', '') || '@invalid.local',
-    '{}'::jsonb,
-    now(),
-    now()
-  ),
-  (
-    current_setting('aiko.legacy_user')::uuid,
-    'authenticated',
-    'authenticated',
-    'phase-legacy-' || replace(current_setting('aiko.legacy_user'), '-', '') || '@invalid.local',
-    '{}'::jsonb,
-    now(),
-    now()
-  );
+create or replace function pg_temp.make_item()
+returns uuid language plpgsql as $$
+declare v_id uuid := gen_random_uuid();
+begin
+  insert into public.grammar_records (id, pattern, meaning, formation, usage_notes, jlpt_level)
+  values (v_id, 'compat-' || replace(v_id::text, '-', ''), 'fixture meaning',
+          'fixture formation', 'fixture usage', 'N5');
+  return v_id;
+end $$;
 
-insert into public.lesson_assignments (
-  user_id, lesson_id, lesson_version_id, selection_mode, status, algorithm_version
-) values
-  (
-    current_setting('aiko.phase_user')::uuid,
-    current_setting('aiko.phase_lesson')::uuid,
-    current_setting('aiko.phase_version')::uuid,
-    'custom_topic',
-    'started',
-    'phase-history-behavior-test'
-  ),
-  (
-    current_setting('aiko.legacy_user')::uuid,
-    current_setting('aiko.phase_lesson')::uuid,
-    current_setting('aiko.phase_version')::uuid,
-    'custom_topic',
-    'started',
-    'phase-legacy-behavior-test'
-  );
-
-insert into public.lesson_sessions (
-  id,
-  user_id,
-  lesson_id,
-  lesson_version_id,
-  status,
-  current_phase,
-  current_phase_index,
-  activity_index,
-  elapsed_seconds,
-  checkpoint,
-  started_at,
-  last_saved_at
-) values
-  (
-    current_setting('aiko.phase_session')::uuid,
-    current_setting('aiko.phase_user')::uuid,
-    current_setting('aiko.phase_lesson')::uuid,
-    current_setting('aiko.phase_version')::uuid,
-    'active',
-    'vocabulary',
-    1,
-    0,
-    0,
-    jsonb_build_object(
-      'session',
-      jsonb_build_object(
-        'lessonId', current_setting('aiko.phase_lesson'),
-        'currentPhaseIndex', 1,
-        'activityIndex', 0,
-        'completedPhaseIds', jsonb_build_array('story'),
-        'storyComplete', true,
-        'vocabularyAnswers', '[]'::jsonb,
-        'grammarAnswers', '[]'::jsonb,
-        'readingAnswers', '[]'::jsonb,
-        'readingEvents', '[]'::jsonb,
-        'readingComplete', false,
-        'listeningEvents', '[]'::jsonb,
-        'listeningComplete', false,
-        'speakingEvents', '[]'::jsonb,
-        'speakingComplete', false,
-        'completed', false
-      )
-    ),
-    now() - interval '5 minutes',
-    now()
-  ),
-  (
-    current_setting('aiko.legacy_session')::uuid,
-    current_setting('aiko.legacy_user')::uuid,
-    current_setting('aiko.phase_lesson')::uuid,
-    current_setting('aiko.phase_version')::uuid,
-    'active',
-    'vocabulary',
-    1,
-    0,
-    0,
-    jsonb_build_object(
-      'session',
-      jsonb_build_object(
-        'lessonId', current_setting('aiko.phase_lesson'),
-        'currentPhaseIndex', 1,
-        'activityIndex', 0,
-        'completedPhaseIds', jsonb_build_array('story'),
-        'storyComplete', true,
-        'completed', false
-      )
-    ),
-    now() - interval '5 minutes',
-    now()
-  );
-
-insert into public.lesson_phase_mastery_commits (
-  lesson_session_id, user_id, phase, mastery_event_count, commit_source
-) values
-  (
-    current_setting('aiko.phase_session')::uuid,
-    current_setting('aiko.phase_user')::uuid,
-    'story', 0, 'legacy_checkpoint'
-  ),
-  (
-    current_setting('aiko.legacy_session')::uuid,
-    current_setting('aiko.legacy_user')::uuid,
-    'story', 0, 'legacy_checkpoint'
-  );
-
-insert into public.lesson_activity_answers (
-  user_id,
-  lesson_session_id,
-  phase,
-  activity_id,
-  selected_answer,
-  correct,
-  attempts,
-  answer_data
-)
-select
-  current_setting('aiko.phase_user')::uuid,
-  current_setting('aiko.phase_session')::uuid,
-  'vocabulary',
-  activity.id::text,
-  activity.correct_answer,
-  false,
-  1,
-  '{}'::jsonb
-from (
-  select activity.*
-  from public.lesson_practice_activities activity
-  where activity.lesson_version_id = current_setting('aiko.phase_version')::uuid
-    and activity.phase = 'vocabulary'
-  order by activity.position, activity.id
-  limit 7
-) activity;
-
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.phase_user'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
-
-select set_config(
-  'aiko.vocab_commit',
-  public.commit_lesson_phase(
-    current_setting('aiko.phase_session')::uuid,
-    'vocabulary'
-  )::text,
-  true
-);
-
-do $$
+-- A historical lesson: 13 physical Vocabulary rows and 13 physical Grammar
+-- rows, well beyond the canonical playable seven of each.
+create or replace function pg_temp.make_historical_lesson(p_user uuid, p_item uuid)
+returns uuid language plpgsql as $$
 declare
-  first_result jsonb := current_setting('aiko.vocab_commit')::jsonb;
-  before_events integer;
-  after_events integer;
-  duplicate_result jsonb;
+  v_lesson uuid := gen_random_uuid();
+  v_version uuid := gen_random_uuid();
 begin
-  if first_result ->> 'committed' <> 'true'
-     or first_result ->> 'nextPhase' <> 'grammar' then
-    raise exception 'Historical seven-answer Vocabulary commit failed: %', first_result;
-  end if;
+  insert into public.lessons (
+    id, slug, title, japanese_title, summary, topic, jlpt_level,
+    duration_minutes, status, source, generated_for_user_id
+  ) values (
+    v_lesson, 'compat-' || replace(v_lesson::text, '-', ''),
+    'Historical fixture', '互換', 'Hermetic historical fixture lesson.',
+    'compat fixture', 'N5', 30, 'published', 'user_generated', p_user
+  );
+  insert into public.lesson_versions (id, lesson_id, version_number, status)
+  values (v_version, v_lesson, 1, 'published');
+  update public.lessons set current_version_id = v_version where id = v_lesson;
 
-  select count(*)::integer into before_events
-  from public.learner_mastery_events
-  where lesson_session_id = current_setting('aiko.phase_session')::uuid;
-
-  duplicate_result := public.commit_lesson_phase(
-    current_setting('aiko.phase_session')::uuid,
-    'vocabulary'
+  insert into public.lesson_grammar (
+    lesson_version_id, position, grammar_id, pattern, meaning, structure,
+    usage_notes, example, translation, common_mistake
+  ) values (
+    v_version, 1, p_item, 'fixture pattern', 'fixture meaning', 'fixture structure',
+    'fixture usage', '駅に行きます。', 'I go to the station.', 'fixture mistake'
   );
 
-  select count(*)::integer into after_events
-  from public.learner_mastery_events
-  where lesson_session_id = current_setting('aiko.phase_session')::uuid;
-
-  if coalesce((duplicate_result ->> 'duplicate')::boolean, false) is not true then
-    raise exception 'Duplicate Vocabulary phase commit was not idempotent';
-  end if;
-  if after_events <> before_events then
-    raise exception 'Duplicate Vocabulary commit wrote mastery twice';
-  end if;
-end
-$$;
-
-reset role;
-
-do $$
-begin
-  if exists (
-    select 1
-    from public.learner_mastery_events event
-    where event.lesson_session_id = current_setting('aiko.phase_session')::uuid
-      and event.event_data ->> 'phase' = 'vocabulary'
-      and event.event_data ? 'activityId'
-      and not exists (
-        select 1
-        from public.lesson_activity_answers answer
-        where answer.lesson_session_id = current_setting('aiko.phase_session')::uuid
-          and answer.phase = 'vocabulary'
-          and answer.activity_id = event.event_data ->> 'activityId'
-      )
-  ) then
-    raise exception 'Unanswered historical Vocabulary row influenced mastery';
-  end if;
-end
-$$;
-
-insert into public.lesson_activity_answers (
-  user_id,
-  lesson_session_id,
-  phase,
-  activity_id,
-  selected_answer,
-  correct,
-  attempts,
-  answer_data
-)
-select
-  current_setting('aiko.phase_user')::uuid,
-  current_setting('aiko.phase_session')::uuid,
-  'grammar',
-  activity.id::text,
-  activity.correct_answer,
-  false,
-  1,
-  '{}'::jsonb
-from (
-  select activity.*
-  from public.lesson_practice_activities activity
-  where activity.lesson_version_id = current_setting('aiko.phase_version')::uuid
-    and activity.phase = 'grammar'
-  order by activity.position, activity.id
-  limit 7
-) activity;
-
-select set_config(
-  'aiko.phase_grammar_item',
-  grammar.grammar_id::text,
-  true
-), set_config(
-  'aiko.phase_grammar_pattern',
-  grammar_record.pattern,
-  true
-), set_config(
-  'aiko.phase_grammar_meaning',
-  grammar_record.meaning,
-  true
-)
-from public.lesson_grammar grammar
-join public.grammar_records grammar_record on grammar_record.id = grammar.grammar_id
-where grammar.lesson_version_id = current_setting('aiko.phase_version')::uuid
-  and grammar.grammar_id is not null
-limit 1;
-
-insert into public.lesson_translation_questions (
-  user_id,
-  lesson_session_id,
-  lesson_id,
-  lesson_version_id,
-  position,
-  english_prompt,
-  target_item_id,
-  target_pattern,
-  target_meaning,
-  target_role,
-  model_answer
-)
-select
-  current_setting('aiko.phase_user')::uuid,
-  current_setting('aiko.phase_session')::uuid,
-  current_setting('aiko.phase_lesson')::uuid,
-  current_setting('aiko.phase_version')::uuid,
-  position,
-  'Historical grammar behavior ' || position,
-  current_setting('aiko.phase_grammar_item')::uuid,
-  current_setting('aiko.phase_grammar_pattern'),
-  current_setting('aiko.phase_grammar_meaning'),
-  'lesson_fallback',
-  'テストです。'
-from generate_series(1, 5) position;
-
-insert into public.lesson_activity_answers (
-  user_id,
-  lesson_session_id,
-  phase,
-  activity_id,
-  selected_answer,
-  correct,
-  attempts,
-  answer_data
-)
-select
-  current_setting('aiko.phase_user')::uuid,
-  current_setting('aiko.phase_session')::uuid,
-  'grammar_translation',
-  question.id::text,
-  question.model_answer,
-  true,
-  1,
-  jsonb_build_object('serverValidated', true)
-from public.lesson_translation_questions question
-where question.lesson_session_id = current_setting('aiko.phase_session')::uuid;
-
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.phase_user'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
-
-select set_config(
-  'aiko.grammar_commit',
-  public.commit_lesson_phase(
-    current_setting('aiko.phase_session')::uuid,
-    'grammar'
-  )::text,
-  true
-);
-
-do $$
-declare
-  result jsonb := current_setting('aiko.grammar_commit')::jsonb;
-begin
-  if result ->> 'committed' <> 'true'
-     or result ->> 'nextPhase' <> 'reading' then
-    raise exception 'Historical seven-answer Grammar commit failed: %', result;
-  end if;
-end
-$$;
-
-do $$
-declare
-  before_events integer;
-  after_events integer;
-  retired_result jsonb;
-begin
-  select count(*)::integer into before_events
-  from public.learner_mastery_events
-  where user_id = auth.uid();
-
-  retired_result := public.record_mastery_evidence(
-    current_setting('aiko.phase_session')::uuid,
-    jsonb_build_array(
-      jsonb_build_object(
-        'clientEventId', 'forged-mastered-everything',
-        'itemType', 'grammar',
-        'itemKey', current_setting('aiko.phase_grammar_item'),
-        'dimension', 'recognition',
-        'signal', 'correct',
-        'data', jsonb_build_object('answeredCorrectly', true)
-      )
-    )
-  );
-
-  select count(*)::integer into after_events
-  from public.learner_mastery_events
-  where user_id = auth.uid();
-
-  if retired_result ->> 'retired' <> 'true' or after_events <> before_events then
-    raise exception 'Retired mastery RPC still changes canonical mastery evidence';
-  end if;
-
-  begin
-    update public.learner_mastery
-    set mastery = 100
-    where user_id = auth.uid();
-    raise exception 'authenticated learner can update learner_mastery';
-  exception
-    when insufficient_privilege then null;
-  end;
-
-  begin
-    delete from public.learner_mastery_events where user_id = auth.uid();
-    raise exception 'authenticated learner can delete mastery event ledger';
-  exception
-    when insufficient_privilege then null;
-  end;
-
-  begin
-    execute 'truncate table public.learner_mastery_events';
-    raise exception 'authenticated learner can truncate mastery event ledger';
-  exception
-    when insufficient_privilege then null;
-  end;
-end
-$$;
-
-select set_config(
-  'aiko.resume_result',
-  public.reset_incomplete_lesson_phase(
-    current_setting('aiko.phase_session')::uuid
-  )::text,
-  true
-);
-
-do $$
-declare
-  result jsonb := current_setting('aiko.resume_result')::jsonb;
-begin
-  if result ->> 'currentPhase' <> 'reading'
-     or (result ->> 'currentPhaseIndex')::integer <> 3
-     or (result ->> 'activityIndex')::integer <> 0 then
-    raise exception 'Resume did not move to Reading activity 0: %', result;
-  end if;
-end
-$$;
-
-reset role;
-
-insert into public.lesson_activity_answers (
-  user_id,
-  lesson_session_id,
-  phase,
-  activity_id,
-  selected_answer,
-  correct,
-  attempts,
-  answer_data
-)
-select
-  current_setting('aiko.legacy_user')::uuid,
-  current_setting('aiko.legacy_session')::uuid,
-  'vocabulary',
-  activity.id::text,
-  activity.correct_answer,
-  true,
-  1,
-  '{}'::jsonb
-from (
-  select activity.*
-  from public.lesson_practice_activities activity
-  where activity.lesson_version_id = current_setting('aiko.phase_version')::uuid
-    and activity.phase = 'vocabulary'
-  order by activity.position, activity.id
-  limit 7
-) activity;
-
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.legacy_user'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
-
-select public.record_mastery_evidence(
-  current_setting('aiko.legacy_session')::uuid,
-  jsonb_build_array(
-    jsonb_build_object(
-      'clientEventId', 'legacy-client-payload',
-      'itemType', 'grammar',
-      'itemKey', current_setting('aiko.phase_grammar_item'),
-      'dimension', 'recognition',
-      'signal', 'correct'
-    )
+  insert into public.lesson_practice_activities (
+    lesson_version_id, position, phase, activity_type, difficulty, mode, skill,
+    prompt, correct_answer, accepted_answers, target_item_ids
   )
-);
+  select v_version, i, phase.name, 'multiple_choice', 'Easy', 'multiple-choice',
+         'understanding', phase.name || ' prompt ' || i, 'correct',
+         array['correct'], array[p_item]
+  from generate_series(1, 13) i
+  cross join (values ('vocabulary'), ('grammar')) phase(name);
 
-update public.lesson_sessions
-set current_phase = 'grammar',
-    current_phase_index = 2,
-    activity_index = 0,
-    checkpoint = jsonb_build_object(
-      'session',
-      jsonb_build_object(
-        'lessonId', current_setting('aiko.phase_lesson'),
-        'currentPhaseIndex', 2,
-        'activityIndex', 0,
-        'completedPhaseIds', jsonb_build_array('story','vocabulary'),
-        'storyComplete', true,
-        'completed', false
-      )
-    )
-where id = current_setting('aiko.legacy_session')::uuid;
+  return v_lesson;
+end $$;
 
-do $$
+create or replace function pg_temp.start_session(p_user uuid, p_lesson uuid)
+returns uuid language plpgsql as $$
+declare v_session uuid := gen_random_uuid(); v_version uuid;
 begin
-  if not exists (
-    select 1
-    from public.lesson_phase_mastery_commits commit
-    where commit.lesson_session_id = current_setting('aiko.legacy_session')::uuid
-      and commit.phase = 'vocabulary'
-      and commit.commit_source = 'canonical'
-  ) then
-    raise exception 'Old Production checkpoint did not create canonical Vocabulary commit';
-  end if;
+  select current_version_id into v_version from public.lessons where id = p_lesson;
+  insert into public.lesson_assignments (
+    user_id, lesson_id, lesson_version_id, selection_mode, status, algorithm_version
+  ) values (p_user, p_lesson, v_version, 'custom_topic', 'started', 'compat-behavior-test');
+  insert into public.lesson_sessions (
+    id, user_id, lesson_id, lesson_version_id, status, current_phase,
+    current_phase_index, activity_index, elapsed_seconds, checkpoint
+  ) values (v_session, p_user, p_lesson, v_version, 'active', 'vocabulary', 1, 0, 0, '{}'::jsonb);
+  insert into public.lesson_phase_mastery_commits (lesson_session_id, user_id, phase, commit_source)
+  values (v_session, p_user, 'story', 'canonical');
+  return v_session;
+end $$;
 
-  if not exists (
-    select 1
-    from public.learner_mastery_events event
-    where event.lesson_session_id = current_setting('aiko.legacy_session')::uuid
-      and event.event_data ->> 'phase' = 'vocabulary'
-  ) then
-    raise exception 'Old Production checkpoint bridge stopped mastery earning';
-  end if;
-end
+-- Answer the first p_count canonical playable activities of a phase.
+create or replace function pg_temp.answer_phase(
+  p_user uuid, p_session uuid, p_phase text, p_count integer
+) returns void language sql as $$
+  insert into public.lesson_activity_answers (
+    user_id, lesson_session_id, phase, activity_id, selected_answer, correct, attempts
+  )
+  select p_user, p_session, p_phase, activity.id::text, 'correct', true, 1
+  from (
+    select activity.id
+    from public.lesson_practice_activities activity
+    join public.lesson_sessions session on session.id = p_session
+    where activity.lesson_version_id = session.lesson_version_id
+      and activity.phase = p_phase
+    order by activity.position, activity.id
+    limit p_count
+  ) activity
+  on conflict (lesson_session_id, phase, activity_id) do nothing;
 $$;
 
+-- Answer the historical rows that sit *beyond* the canonical playable seven.
+create or replace function pg_temp.answer_historical_overflow(
+  p_user uuid, p_session uuid, p_phase text
+) returns void language sql as $$
+  insert into public.lesson_activity_answers (
+    user_id, lesson_session_id, phase, activity_id, selected_answer, correct, attempts
+  )
+  select p_user, p_session, p_phase, activity.id::text, 'correct', true, 1
+  from (
+    select activity.id
+    from public.lesson_practice_activities activity
+    join public.lesson_sessions session on session.id = p_session
+    where activity.lesson_version_id = session.lesson_version_id
+      and activity.phase = p_phase
+    order by activity.position, activity.id
+    offset 7
+  ) activity
+  on conflict (lesson_session_id, phase, activity_id) do nothing;
+$$;
+
+create or replace function pg_temp.commit_phase(p_user uuid, p_session uuid, p_phase text)
+returns jsonb language plpgsql as $$
+declare v_result jsonb;
+begin
+  perform set_config('request.jwt.claim.sub', p_user::text, true);
+  select public.commit_lesson_phase(p_session, p_phase) into v_result;
+  return v_result;
+end $$;
+
+create or replace function pg_temp.evidence_total(p_user uuid)
+returns integer language sql as $$
+  select coalesce(sum(evidence_count), 0)::integer
+  from public.learner_mastery where user_id = p_user;
+$$;
+
+-- ---------------------------------------------------------------------------
+-- Historical rows exist but never become playable.
+-- ---------------------------------------------------------------------------
+select set_config('aiko.item', pg_temp.make_item()::text, true);
+select set_config('aiko.user', pg_temp.make_learner()::text, true);
+select set_config('aiko.lesson',
+  pg_temp.make_historical_lesson(current_setting('aiko.user')::uuid,
+                                 current_setting('aiko.item')::uuid)::text, true);
+select set_config('aiko.session',
+  pg_temp.start_session(current_setting('aiko.user')::uuid,
+                        current_setting('aiko.lesson')::uuid)::text, true);
+
+select is(
+  (select count(*)::int from public.lesson_practice_activities activity
+   join public.lesson_sessions s on s.id = current_setting('aiko.session')::uuid
+   where activity.lesson_version_id = s.lesson_version_id and activity.phase = 'vocabulary'),
+  13, 'the fixture carries 13 physical Vocabulary rows');
+select is(
+  (select count(*)::int from public.lesson_practice_activities activity
+   join public.lesson_sessions s on s.id = current_setting('aiko.session')::uuid
+   where activity.lesson_version_id = s.lesson_version_id and activity.phase = 'grammar'),
+  13, 'the fixture carries 13 physical Grammar rows');
+
+-- ---------------------------------------------------------------------------
+-- A partially answered phase commits nothing and earns nothing.
+-- ---------------------------------------------------------------------------
+select pg_temp.answer_phase(
+  current_setting('aiko.user')::uuid, current_setting('aiko.session')::uuid, 'vocabulary', 6);
+select set_config('request.jwt.claim.sub', current_setting('aiko.user'), true);
+
+select throws_ok(
+  format('select public.commit_lesson_phase(%L::uuid, %L)',
+         current_setting('aiko.session'), 'vocabulary'),
+  '55000', NULL,
+  'six of seven Vocabulary answers will not commit the phase');
+
+select is(
+  (select count(*)::int from public.lesson_phase_mastery_commits
+   where lesson_session_id = current_setting('aiko.session')::uuid and phase = 'vocabulary'),
+  0, 'an incomplete phase records no commit');
+select is(
+  pg_temp.evidence_total(current_setting('aiko.user')::uuid),
+  0, 'an incomplete phase earns no mastery');
+
+-- ---------------------------------------------------------------------------
+-- Answering the historical overflow rows does not complete the phase either:
+-- only the canonical playable seven count.
+-- ---------------------------------------------------------------------------
+select pg_temp.answer_historical_overflow(
+  current_setting('aiko.user')::uuid, current_setting('aiko.session')::uuid, 'vocabulary');
+
+select ok(
+  (select count(*)::int from public.lesson_activity_answers
+   where lesson_session_id = current_setting('aiko.session')::uuid
+     and phase = 'vocabulary') > 7,
+  'the learner has answered more physical rows than the playable contract');
+
+select throws_ok(
+  format('select public.commit_lesson_phase(%L::uuid, %L)',
+         current_setting('aiko.session'), 'vocabulary'),
+  '55000', NULL,
+  'historical overflow answers cannot substitute for the canonical seventh');
+
+-- ---------------------------------------------------------------------------
+-- Completing the canonical seven commits exactly once.
+-- ---------------------------------------------------------------------------
+select pg_temp.answer_phase(
+  current_setting('aiko.user')::uuid, current_setting('aiko.session')::uuid, 'vocabulary', 7);
+
+select is(
+  (pg_temp.commit_phase(current_setting('aiko.user')::uuid,
+                        current_setting('aiko.session')::uuid, 'vocabulary') ->> 'committed'),
+  'true', 'the canonical seven Vocabulary answers commit the phase');
+select is(
+  (select count(*)::int from public.lesson_phase_mastery_commits
+   where lesson_session_id = current_setting('aiko.session')::uuid and phase = 'vocabulary'),
+  1, 'the completed phase records exactly one commit');
+select ok(
+  pg_temp.evidence_total(current_setting('aiko.user')::uuid) > 0,
+  'the completed phase earned canonical mastery');
+
+select set_config('aiko.evidence_after_first',
+  pg_temp.evidence_total(current_setting('aiko.user')::uuid)::text, true);
+
+-- ---------------------------------------------------------------------------
+-- Duplicate commit is idempotent: reported, recorded and rewarded only once.
+-- ---------------------------------------------------------------------------
+select is(
+  (pg_temp.commit_phase(current_setting('aiko.user')::uuid,
+                        current_setting('aiko.session')::uuid, 'vocabulary') ->> 'duplicate'),
+  'true', 'a repeated phase commit reports itself as a duplicate');
+select is(
+  (select count(*)::int from public.lesson_phase_mastery_commits
+   where lesson_session_id = current_setting('aiko.session')::uuid and phase = 'vocabulary'),
+  1, 'a repeated phase commit does not record a second commit');
+select is(
+  pg_temp.evidence_total(current_setting('aiko.user')::uuid),
+  current_setting('aiko.evidence_after_first')::integer,
+  'a repeated phase commit awards no additional mastery');
+
+-- ---------------------------------------------------------------------------
+-- Phase order is enforced, so a learner cannot jump straight to a later phase.
+-- ---------------------------------------------------------------------------
+select throws_ok(
+  format('select public.commit_lesson_phase(%L::uuid, %L)',
+         current_setting('aiko.session'), 'reading'),
+  '55000', NULL,
+  'a later phase cannot commit while an earlier one is open');
+
+-- ---------------------------------------------------------------------------
+-- The commit ledger itself is server-owned.
+-- ---------------------------------------------------------------------------
+select ok(
+  not has_table_privilege('authenticated', 'public.lesson_phase_mastery_commits', 'INSERT')
+  and not has_table_privilege('authenticated', 'public.lesson_phase_mastery_commits', 'UPDATE')
+  and not has_table_privilege('authenticated', 'public.lesson_phase_mastery_commits', 'DELETE'),
+  'the phase commit ledger is read-only to the browser role');
+
+set local role authenticated;
+select set_config('request.jwt.claim.sub', current_setting('aiko.user'), true);
+
+select throws_ok(
+  format(
+    $q$insert into public.lesson_phase_mastery_commits
+       (lesson_session_id, user_id, phase, mastery_event_count, commit_source)
+       values (%L::uuid, %L::uuid, 'speaking', 99, 'canonical')$q$,
+    current_setting('aiko.session'), current_setting('aiko.user')),
+  '42501', NULL,
+  'learner cannot forge a phase commit');
+
+select throws_ok(
+  format(
+    $q$update public.lesson_phase_mastery_commits set mastery_event_count = 99
+       where lesson_session_id = %L::uuid$q$,
+    current_setting('aiko.session')),
+  '42501', NULL,
+  'learner cannot inflate a recorded phase commit');
+
 reset role;
-select 'phase mastery compatibility behavior passed' as result;
+
+select * from finish();
 rollback;

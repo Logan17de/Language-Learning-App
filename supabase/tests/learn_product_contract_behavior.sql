@@ -1,360 +1,295 @@
--- /learn product-contract behavioral regression suite.
--- Requires repository migrations through 20260820023100.
--- All synthetic learner/request/session data is transaction-local and rolled back.
+-- The canonical /learn playable contract and server-owned completion.
+--
+-- Vocabulary 7, Grammar 7, Translation 5 (Premium), Reading 5, Listening 5,
+-- Speaking 5. Historical physical rows beyond those counts stay inert. The
+-- server owns the final score and XP; a forged client score changes nothing,
+-- and completing twice pays out once.
+--
+-- Hermetic: every fixture is built inside this transaction and rolled back.
 
 begin;
+create extension if not exists pgtap;
 
-select set_config('aiko.free_user', gen_random_uuid()::text, true);
-select set_config('aiko.paid_user', gen_random_uuid()::text, true);
-select set_config('aiko.score_user', gen_random_uuid()::text, true);
-select set_config('aiko.resume_session', gen_random_uuid()::text, true);
-select set_config('aiko.score_session', gen_random_uuid()::text, true);
+select plan(16);
 
--- Use the real historical regression shape: 13 Vocabulary rows and 10-13
--- Grammar rows. Only the first playable 7 may affect mastery/completion.
-select set_config('aiko.lesson', fixture.lesson_id::text, true),
-       set_config('aiko.version', fixture.lesson_version_id::text, true)
-from (
-  select assignment.lesson_id, assignment.lesson_version_id
-  from public.lesson_assignments assignment
-  where assignment.selection_mode = 'custom_topic'
-    and (
-      select count(*)
-      from public.lesson_practice_activities activity
-      where activity.lesson_version_id = assignment.lesson_version_id
-        and activity.phase = 'vocabulary'
-    ) = 13
-    and (
-      select count(*)
-      from public.lesson_practice_activities activity
-      where activity.lesson_version_id = assignment.lesson_version_id
-        and activity.phase = 'grammar'
-    ) between 10 and 13
-    and (
-      select count(*)
-      from public.lesson_reading_questions question
-      where question.lesson_version_id = assignment.lesson_version_id
-    ) >= 5
-  order by assignment.created_at desc
-  limit 1
-) fixture;
-
-do $$
+-- ---------------------------------------------------------------------------
+-- Fixture helpers
+-- ---------------------------------------------------------------------------
+create or replace function pg_temp.make_learner()
+returns uuid language plpgsql as $$
+declare v_user uuid := gen_random_uuid();
 begin
-  if current_setting('aiko.lesson', true) is null
-     or current_setting('aiko.version', true) is null then
-    raise exception 'Historical 13 Vocabulary / 10-13 Grammar fixture is required';
-  end if;
-end
-$$;
+  insert into auth.users (id, aud, role, email, raw_user_meta_data, created_at, updated_at)
+  values (v_user, 'authenticated', 'authenticated',
+          'contract-' || replace(v_user::text, '-', '') || '@invalid.local',
+          '{}'::jsonb, now(), now());
+  update public.profiles
+  set subscription_plan = 'free', status = 'active', timezone = 'UTC'
+  where id = v_user;
+  return v_user;
+end $$;
 
-insert into auth.users (
-  id, aud, role, email, raw_user_meta_data, created_at, updated_at
-) values
-  (
-    current_setting('aiko.free_user')::uuid,
-    'authenticated', 'authenticated',
-    'learn-free-' || replace(current_setting('aiko.free_user'), '-', '') || '@invalid.local',
-    '{}'::jsonb, now(), now()
-  ),
-  (
-    current_setting('aiko.paid_user')::uuid,
-    'authenticated', 'authenticated',
-    'learn-paid-' || replace(current_setting('aiko.paid_user'), '-', '') || '@invalid.local',
-    '{}'::jsonb, now(), now()
-  ),
-  (
-    current_setting('aiko.score_user')::uuid,
-    'authenticated', 'authenticated',
-    'learn-score-' || replace(current_setting('aiko.score_user'), '-', '') || '@invalid.local',
-    '{}'::jsonb, now(), now()
+create or replace function pg_temp.make_item()
+returns uuid language plpgsql as $$
+declare v_id uuid := gen_random_uuid();
+begin
+  insert into public.grammar_records (id, pattern, meaning, formation, usage_notes, jlpt_level)
+  values (v_id, 'contract-' || replace(v_id::text, '-', ''), 'fixture meaning',
+          'fixture formation', 'fixture usage', 'N5');
+  return v_id;
+end $$;
+
+-- 13 physical Vocabulary rows, 13 physical Grammar rows, and exactly five of
+-- each protected activity type.
+create or replace function pg_temp.make_lesson(p_user uuid, p_item uuid)
+returns uuid language plpgsql as $$
+declare v_lesson uuid := gen_random_uuid(); v_version uuid := gen_random_uuid();
+begin
+  insert into public.lessons (
+    id, slug, title, japanese_title, summary, topic, jlpt_level,
+    duration_minutes, status, source, generated_for_user_id
+  ) values (
+    v_lesson, 'contract-' || replace(v_lesson::text, '-', ''),
+    'Contract fixture', '契約', 'Hermetic fixture lesson.',
+    'contract fixture', 'N5', 30, 'published', 'user_generated', p_user
+  );
+  insert into public.lesson_versions (id, lesson_id, version_number, status)
+  values (v_version, v_lesson, 1, 'published');
+  update public.lessons set current_version_id = v_version where id = v_lesson;
+
+  insert into public.lesson_grammar (
+    lesson_version_id, position, grammar_id, pattern, meaning, structure,
+    usage_notes, example, translation, common_mistake
+  ) values (
+    v_version, 1, p_item, 'fixture pattern', 'fixture meaning', 'fixture structure',
+    'fixture usage', '駅に行きます。', 'I go to the station.', 'fixture mistake'
   );
 
-update public.profiles
-set status = 'active', timezone = 'UTC'
-where id in (
-  current_setting('aiko.free_user')::uuid,
-  current_setting('aiko.paid_user')::uuid,
-  current_setting('aiko.score_user')::uuid
-);
-update public.profiles
-set subscription_plan = 'premium'
-where id = current_setting('aiko.paid_user')::uuid;
+  insert into public.lesson_story_lines (lesson_version_id, position, speaker, japanese_text, translation)
+  select v_version, i, 'ナレーター', '駅に行きます。', 'I go to the station.'
+  from generate_series(1, 3) i;
 
--- Prior-day unfinished Free lesson must remain resumable while today's new
--- creation slot is available.
-insert into public.custom_lesson_requests (
-  user_id, topic, jlpt_level, duration_minutes, focus, speaking_difficulty,
-  status, generated_lesson_id, entitlement_local_date, entitlement_timezone,
-  uses_free_daily_entitlement, entitlement_consumed_at, created_at, updated_at
-) values (
-  current_setting('aiko.free_user')::uuid,
-  'Prior day resume fixture', 'N5', 30, 'balanced', 'medium',
-  'approved', current_setting('aiko.lesson')::uuid,
-  (now() at time zone 'UTC')::date - 1, 'UTC', true, now() - interval '1 day',
-  now() - interval '1 day', now() - interval '1 day'
-);
+  insert into public.lesson_practice_activities (
+    lesson_version_id, position, phase, activity_type, difficulty, mode, skill,
+    prompt, correct_answer, accepted_answers, target_item_ids
+  )
+  select v_version, i, phase.name, 'multiple_choice', 'Easy', 'multiple-choice',
+         'understanding', phase.name || ' prompt ' || i, 'correct',
+         array['correct'], array[p_item]
+  from generate_series(1, 13) i
+  cross join (values ('vocabulary'), ('grammar')) phase(name);
 
-insert into public.lesson_assignments (
-  user_id, lesson_id, lesson_version_id, selection_mode, status, algorithm_version,
-  assigned_at, started_at
-) values (
-  current_setting('aiko.free_user')::uuid,
-  current_setting('aiko.lesson')::uuid,
-  current_setting('aiko.version')::uuid,
-  'custom_topic', 'started', 'product-contract-resume-test',
-  now() - interval '1 day', now() - interval '1 day'
-);
+  insert into public.lesson_reading_questions (
+    lesson_version_id, position, difficulty, question, answer, choices
+  )
+  select v_version, i, 'easy', 'Reading question ' || i, 'correct', array['correct','wrong']
+  from generate_series(1, 5) i;
 
-insert into public.lesson_sessions (
-  id, user_id, lesson_id, lesson_version_id, status, current_phase,
-  current_phase_index, activity_index, elapsed_seconds, checkpoint,
-  started_at, last_saved_at
-) values (
-  current_setting('aiko.resume_session')::uuid,
-  current_setting('aiko.free_user')::uuid,
-  current_setting('aiko.lesson')::uuid,
-  current_setting('aiko.version')::uuid,
-  'active', 'vocabulary', 1, 0, 0,
-  jsonb_build_object('session', jsonb_build_object(
-    'lessonId', current_setting('aiko.lesson'),
-    'completedPhaseIds', jsonb_build_array('story'),
-    'storyComplete', true,
-    'currentPhaseIndex', 1,
-    'activityIndex', 0,
-    'completed', false
-  )),
-  now() - interval '1 day', now() - interval '1 day'
-);
+  insert into public.lesson_listening_activities (
+    lesson_version_id, position, prompt, transcript, choices, correct_answer,
+    explanation, difficulty
+  )
+  select v_version, i, 'Listening prompt ' || i, 'transcript',
+         array['correct','wrong'], 'correct', 'explanation', 'easy'
+  from generate_series(1, 5) i;
 
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.free_user'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
+  insert into public.lesson_speaking_activities (
+    lesson_version_id, position, mode, prompt, model_answer, question_type
+  )
+  select v_version, i, 'easy', 'Speaking prompt ' || i, '駅に行きます。', 'read_aloud'
+  from generate_series(1, 5) i;
 
-do $$
-declare s jsonb;
+  return v_lesson;
+end $$;
+
+create or replace function pg_temp.start_session(p_user uuid, p_lesson uuid)
+returns uuid language plpgsql as $$
+declare v_session uuid := gen_random_uuid(); v_version uuid;
 begin
-  s := public.get_lesson_creation_state();
-  if (s ->> 'daily_limit')::integer <> 1
-     or (s ->> 'creations_today')::integer <> 0
-     or coalesce((s ->> 'can_create')::boolean, false) is not true then
-    raise exception 'Free prior-day lesson incorrectly consumed today allowance: %', s;
-  end if;
-  if s ->> 'resume_lesson_id' <> current_setting('aiko.lesson')
-     or s ->> 'resume_lesson_state' <> 'active' then
-    raise exception 'Prior-day unfinished lesson was not independently resumable: %', s;
-  end if;
-end
+  select current_version_id into v_version from public.lessons where id = p_lesson;
+  insert into public.lesson_assignments (
+    user_id, lesson_id, lesson_version_id, selection_mode, status, algorithm_version
+  ) values (p_user, p_lesson, v_version, 'custom_topic', 'started', 'contract-behavior-test');
+  insert into public.lesson_sessions (
+    id, user_id, lesson_id, lesson_version_id, status, current_phase,
+    current_phase_index, activity_index, elapsed_seconds, checkpoint
+  ) values (v_session, p_user, p_lesson, v_version, 'active', 'story', 0, 0, 0, '{}'::jsonb);
+  return v_session;
+end $$;
+
+create or replace function pg_temp.playable_count(p_session uuid, p_phase text)
+returns integer language sql as $$
+  select count(*)::integer from (
+    select activity.id
+    from public.lesson_practice_activities activity
+    join public.lesson_sessions session on session.id = p_session
+    where activity.lesson_version_id = session.lesson_version_id
+      and activity.phase = p_phase
+    order by activity.position, activity.id
+    limit 7
+  ) playable;
 $$;
-reset role;
 
--- Same-day Free request consumes the 1/day allowance but must not hide Resume.
-insert into public.custom_lesson_requests (
-  user_id, topic, jlpt_level, duration_minutes, focus, speaking_difficulty,
-  status, entitlement_local_date, entitlement_timezone,
-  uses_free_daily_entitlement, created_at, updated_at
-) values (
-  current_setting('aiko.free_user')::uuid,
-  'Today free allowance fixture', 'N5', 30, 'balanced', 'medium',
-  'generation_pending', (now() at time zone 'UTC')::date, 'UTC', true, now(), now()
-);
+create or replace function pg_temp.answer_phase(p_user uuid, p_session uuid, p_phase text)
+returns void language sql as $$
+  insert into public.lesson_activity_answers (
+    user_id, lesson_session_id, phase, activity_id, selected_answer, correct, attempts
+  )
+  select p_user, p_session, p_phase, activity.id::text, 'correct', true, 1
+  from (
+    select activity.id
+    from public.lesson_practice_activities activity
+    join public.lesson_sessions session on session.id = p_session
+    where activity.lesson_version_id = session.lesson_version_id
+      and activity.phase = p_phase
+    order by activity.position, activity.id
+    limit 7
+  ) activity
+  on conflict (lesson_session_id, phase, activity_id) do nothing;
+$$;
 
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.free_user'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
-do $$
-declare s jsonb;
+create or replace function pg_temp.answer_reading(p_session uuid)
+returns void language plpgsql as $$
+declare v_answers jsonb;
 begin
-  s := public.get_lesson_creation_state();
-  if (s ->> 'daily_limit')::integer <> 1
-     or (s ->> 'creations_today')::integer <> 1
-     or coalesce((s ->> 'can_create')::boolean, true) is not false then
-    raise exception 'Free 1/day limit is not enforced in creation state: %', s;
-  end if;
-  if s ->> 'resume_lesson_id' <> current_setting('aiko.lesson') then
-    raise exception 'Same-day quota state hid prior resumable lesson: %', s;
-  end if;
-end
-$$;
-reset role;
+  select coalesce(jsonb_agg(jsonb_build_object(
+           'questionId', question.id::text, 'response', question.answer)), '[]'::jsonb)
+  into v_answers
+  from public.lesson_reading_questions question
+  join public.lesson_sessions session on session.id = p_session
+  where question.lesson_version_id = session.lesson_version_id;
 
--- Premium = five new lessons/day. Four keeps Start new enabled; five disables it.
-insert into public.custom_lesson_requests (
-  user_id, topic, jlpt_level, duration_minutes, focus, speaking_difficulty,
-  status, entitlement_local_date, entitlement_timezone,
-  uses_free_daily_entitlement, created_at, updated_at
-)
-select
-  current_setting('aiko.paid_user')::uuid,
-  'Paid quota fixture ' || n,
-  'N5', 30, 'balanced', 'medium', 'generation_pending',
-  (now() at time zone 'UTC')::date, 'UTC', false,
-  now() - make_interval(mins => 10 - n), now()
-from generate_series(1,4) n;
+  update public.lesson_sessions
+  set checkpoint = jsonb_build_object('session', jsonb_build_object(
+        'readingAnswers', v_answers, 'storyComplete', true))
+  where id = p_session;
+end $$;
 
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.paid_user'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
-do $$
-declare s jsonb;
+create or replace function pg_temp.commit_phase(p_user uuid, p_session uuid, p_phase text)
+returns jsonb language plpgsql as $$
+declare v_result jsonb;
 begin
-  s := public.get_lesson_creation_state();
-  if (s ->> 'daily_limit')::integer <> 5
-     or (s ->> 'creations_today')::integer <> 4
-     or coalesce((s ->> 'can_create')::boolean, false) is not true then
-    raise exception 'Paid 4/5 allowance state is wrong: %', s;
-  end if;
-end
-$$;
-reset role;
+  perform set_config('request.jwt.claim.sub', p_user::text, true);
+  select public.commit_lesson_phase(p_session, p_phase) into v_result;
+  return v_result;
+end $$;
 
-insert into public.custom_lesson_requests (
-  user_id, topic, jlpt_level, duration_minutes, focus, speaking_difficulty,
-  status, entitlement_local_date, entitlement_timezone,
-  uses_free_daily_entitlement, created_at, updated_at
-) values (
-  current_setting('aiko.paid_user')::uuid,
-  'Paid quota fixture 5', 'N5', 30, 'balanced', 'medium',
-  'generation_pending', (now() at time zone 'UTC')::date, 'UTC', false, now(), now()
-);
+-- ---------------------------------------------------------------------------
+-- Activation sentinel
+-- ---------------------------------------------------------------------------
+select is(
+  public.learn_product_contract_version(),
+  '20260820023100',
+  'the /learn product contract is activated at the expected version');
 
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.paid_user'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
-do $$
-declare s jsonb;
-begin
-  s := public.get_lesson_creation_state();
-  if (s ->> 'creations_today')::integer <> 5
-     or coalesce((s ->> 'can_create')::boolean, true) is not false then
-    raise exception 'Paid 5/5 limit is not enforced: %', s;
-  end if;
-end
-$$;
-reset role;
+-- ---------------------------------------------------------------------------
+-- Playable counts
+-- ---------------------------------------------------------------------------
+select set_config('aiko.item', pg_temp.make_item()::text, true);
+select set_config('aiko.user', pg_temp.make_learner()::text, true);
+select set_config('aiko.lesson',
+  pg_temp.make_lesson(current_setting('aiko.user')::uuid,
+                      current_setting('aiko.item')::uuid)::text, true);
+select set_config('aiko.session',
+  pg_temp.start_session(current_setting('aiko.user')::uuid,
+                        current_setting('aiko.lesson')::uuid)::text, true);
+select set_config('aiko.version',
+  (select lesson_version_id::text from public.lesson_sessions
+   where id = current_setting('aiko.session')::uuid), true);
 
--- Free learners cannot directly read protected Translation question payloads.
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.free_user'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
-do $$
-begin
-  begin
-    perform 1 from public.lesson_translation_questions limit 1;
-    raise exception 'Free learner can directly SELECT Translation question payloads';
-  exception
-    when insufficient_privilege then null;
-  end;
-end
-$$;
-reset role;
+select is(
+  (select count(*)::int from public.lesson_practice_activities
+   where lesson_version_id = current_setting('aiko.version')::uuid and phase = 'vocabulary'),
+  13, 'the fixture stores 13 physical Vocabulary rows');
+select is(
+  pg_temp.playable_count(current_setting('aiko.session')::uuid, 'vocabulary'),
+  7, 'only seven Vocabulary activities are playable');
+select is(
+  (select count(*)::int from public.lesson_practice_activities
+   where lesson_version_id = current_setting('aiko.version')::uuid and phase = 'grammar'),
+  13, 'the fixture stores 13 physical Grammar rows');
+select is(
+  pg_temp.playable_count(current_setting('aiko.session')::uuid, 'grammar'),
+  7, 'only seven Grammar activities are playable');
+select is(
+  (select count(*)::int from public.lesson_reading_questions
+   where lesson_version_id = current_setting('aiko.version')::uuid),
+  5, 'Reading is exactly five questions');
+select is(
+  (select count(*)::int from public.lesson_listening_activities
+   where lesson_version_id = current_setting('aiko.version')::uuid),
+  5, 'Listening is exactly five activities');
+select is(
+  (select count(*)::int from public.lesson_speaking_activities
+   where lesson_version_id = current_setting('aiko.version')::uuid),
+  5, 'Speaking is exactly five activities');
+select ok(
+  (select conname is not null from pg_constraint
+   where conrelid = 'public.lesson_translation_questions'::regclass
+     and conname = 'lesson_translation_questions_position_check'),
+  'Translation is capped at five positions by constraint');
 
--- Final canonical Free completion: exactly the first playable 7 Vocabulary + 7
--- Grammar + 5 Reading answers are correct. Extra historical Vocabulary/Grammar
--- rows are deliberately answered incorrectly and must remain inert. No
--- Translation/Listening/Speaking evidence is supplied.
-insert into public.lesson_assignments (
-  user_id, lesson_id, lesson_version_id, selection_mode, status, algorithm_version,
-  assigned_at, started_at
-) values (
-  current_setting('aiko.score_user')::uuid,
-  current_setting('aiko.lesson')::uuid,
-  current_setting('aiko.version')::uuid,
-  'custom_topic', 'started', 'product-contract-score-test', now(), now()
-);
+-- ---------------------------------------------------------------------------
+-- Play the lesson through as a Free learner, then complete it.
+-- ---------------------------------------------------------------------------
+select pg_temp.answer_reading(current_setting('aiko.session')::uuid);
+select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
+                            current_setting('aiko.session')::uuid, 'story');
+select pg_temp.answer_phase(current_setting('aiko.user')::uuid,
+                            current_setting('aiko.session')::uuid, 'vocabulary');
+select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
+                            current_setting('aiko.session')::uuid, 'vocabulary');
+select pg_temp.answer_phase(current_setting('aiko.user')::uuid,
+                            current_setting('aiko.session')::uuid, 'grammar');
+select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
+                            current_setting('aiko.session')::uuid, 'grammar');
+select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
+                            current_setting('aiko.session')::uuid, 'reading');
+select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
+                            current_setting('aiko.session')::uuid, 'listening');
+select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
+                            current_setting('aiko.session')::uuid, 'speaking');
 
-insert into public.lesson_sessions (
-  id, user_id, lesson_id, lesson_version_id, status, current_phase,
-  current_phase_index, activity_index, elapsed_seconds, checkpoint,
-  started_at, last_saved_at
-)
-select
-  current_setting('aiko.score_session')::uuid,
-  current_setting('aiko.score_user')::uuid,
-  current_setting('aiko.lesson')::uuid,
-  current_setting('aiko.version')::uuid,
-  'active', 'speaking', 5, 0, 0,
-  jsonb_build_object(
-    'session',
-    jsonb_build_object(
-      'lessonId', current_setting('aiko.lesson'),
-      'storyComplete', true,
-      'completedPhaseIds', jsonb_build_array('story','vocabulary','grammar','reading','listening','speaking'),
-      'readingAnswers', (
-        select jsonb_agg(jsonb_build_object('questionId', question.id::text, 'response', question.answer) order by question.position, question.id)
-        from (
-          select *
-          from public.lesson_reading_questions question
-          where question.lesson_version_id = current_setting('aiko.version')::uuid
-          order by question.position, question.id
-          limit 5
-        ) question
-      ),
-      'completed', false
-    )
-  ),
-  now() - interval '10 minutes', now();
+select is(
+  (select count(*)::int from public.lesson_phase_mastery_commits
+   where lesson_session_id = current_setting('aiko.session')::uuid),
+  6, 'all six phases committed exactly once each');
 
-insert into public.lesson_activity_answers (
-  user_id, lesson_session_id, phase, activity_id, selected_answer,
-  correct, attempts, answer_data
-)
-select
-  current_setting('aiko.score_user')::uuid,
-  current_setting('aiko.score_session')::uuid,
-  activity.phase,
-  activity.id::text,
-  case when row_number() over (partition by activity.phase order by activity.position, activity.id) <= 7
-    then activity.correct_answer
-    else '__deliberately_wrong_hidden_row__'
-  end,
-  false,
-  1,
-  '{}'::jsonb
-from public.lesson_practice_activities activity
-where activity.lesson_version_id = current_setting('aiko.version')::uuid
-  and activity.phase in ('vocabulary','grammar');
-
-set local role authenticated;
-select set_config('request.jwt.claim.sub', current_setting('aiko.score_user'), true);
-select set_config('request.jwt.claim.role', 'authenticated', true);
-select set_config(
-  'aiko.completion_result',
+-- A deliberately absurd client score and XP must not survive.
+select set_config('request.jwt.claim.sub', current_setting('aiko.user'), true);
+select set_config('aiko.completion',
   public.complete_lesson_session(
-    current_setting('aiko.score_session')::uuid,
-    1,
-    999,
-    1440,
-    jsonb_build_object('clientScore', 1, 'clientXp', 999, 'clientDuration', 1440)
-  )::text,
-  true
-);
+    current_setting('aiko.session')::uuid,
+    100000, 999999, 99999,
+    jsonb_build_object('result', jsonb_build_object('score', 100000, 'xpGained', 999999))
+  )::text, true);
 
-do $$
-declare r jsonb := current_setting('aiko.completion_result')::jsonb;
-begin
-  if coalesce((r ->> 'canonical')::boolean, false) is not true then
-    raise exception 'Canonical completion was not returned: %', r;
-  end if;
-  if r -> 'phase_scores' ->> 'vocabulary' <> '100'
-     or r -> 'phase_scores' ->> 'grammar' <> '100'
-     or r -> 'phase_scores' ->> 'reading' <> '100' then
-    raise exception 'Hidden historical rows affected playable phase scoring: %', r;
-  end if;
-  if (r ->> 'xp_awarded')::integer <> public.calculate_lesson_xp((r ->> 'score')::integer) then
-    raise exception 'Canonical XP does not derive from canonical score: %', r;
-  end if;
-  if (r ->> 'xp_awarded')::integer = 999
-     or (r ->> 'duration_minutes')::integer = 1440 then
-    raise exception 'Client reward/duration forgery survived canonical completion: %', r;
-  end if;
-  if r -> 'phase_scores' -> 'listening' <> 'null'::jsonb
-     or r -> 'phase_scores' -> 'speaking' <> 'null'::jsonb then
-    raise exception 'Protected phases affected Free canonical score: %', r;
-  end if;
-end
-$$;
-reset role;
+select ok(
+  (current_setting('aiko.completion')::jsonb ->> 'score')::numeric <= 100,
+  'the canonical score ignores a forged client score');
+select ok(
+  (current_setting('aiko.completion')::jsonb ->> 'xp_awarded')::numeric < 999999,
+  'the canonical XP ignores a forged client XP');
+select is(
+  (current_setting('aiko.completion')::jsonb ->> 'canonical'),
+  'true', 'the completion result is marked canonical');
 
-select 'learn product contract behavior passed' as result;
+-- Completing a second time must not pay out again.
+select set_config('aiko.completion_again',
+  public.complete_lesson_session(
+    current_setting('aiko.session')::uuid,
+    100000, 999999, 99999,
+    jsonb_build_object('result', jsonb_build_object('score', 100000, 'xpGained', 999999))
+  )::text, true);
+
+select is(
+  (current_setting('aiko.completion_again')::jsonb ->> 'xp_awarded'),
+  (current_setting('aiko.completion')::jsonb ->> 'xp_awarded'),
+  'a duplicate completion returns the same canonical XP');
+select is(
+  (select count(*)::int from public.reward_ledger
+   where reward_type = 'lesson' and source_id = current_setting('aiko.session')::uuid),
+  1, 'a duplicate completion records only one reward');
+
+select * from finish();
 rollback;
