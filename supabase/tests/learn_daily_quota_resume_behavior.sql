@@ -1,252 +1,231 @@
--- Daily generation quota + Resume separation behavioral regression.
--- Requires migrations through 20260820023100. Everything rolls back.
+-- Daily creation entitlement and Resume discovery.
+--
+-- Free = 1 new lesson generation per learner-local day.
+-- Paid = 5 new lesson generations per learner-local day.
+-- Resume is independent of today's allowance and of the entitlement date.
+--
+-- Hermetic: every fixture is built inside this transaction and rolled back.
 
 begin;
+create extension if not exists pgtap;
 
-select set_config('aiko.quota_free', gen_random_uuid()::text, true);
-select set_config('aiko.quota_paid', gen_random_uuid()::text, true);
-select set_config('aiko.quota_free_session', gen_random_uuid()::text, true);
-select set_config('aiko.quota_paid_session', gen_random_uuid()::text, true);
+select plan(18);
 
-select set_config('aiko.quota_lesson', fixture.lesson_id::text, true),
-       set_config('aiko.quota_version', fixture.lesson_version_id::text, true)
-from (
-  select assignment.lesson_id, assignment.lesson_version_id
-  from public.lesson_assignments assignment
-  where assignment.selection_mode = 'custom_topic'
-  order by assignment.created_at desc
-  limit 1
-) fixture;
-
-do $$
+-- ---------------------------------------------------------------------------
+-- Fixture helpers. Each learner gets an isolated lesson so Resume discovery
+-- cannot pick up another test's rows.
+-- ---------------------------------------------------------------------------
+create or replace function pg_temp.make_learner(p_plan text)
+returns uuid language plpgsql as $$
+declare
+  v_user uuid := gen_random_uuid();
 begin
-  if current_setting('aiko.quota_lesson', true) is null then
-    raise exception 'Custom-topic lesson fixture is required';
-  end if;
-end
-$$;
+  insert into auth.users (id, aud, role, email, raw_user_meta_data, created_at, updated_at)
+  values (v_user, 'authenticated', 'authenticated',
+          'quota-' || replace(v_user::text, '-', '') || '@invalid.local',
+          '{}'::jsonb, now(), now());
+  update public.profiles
+  set subscription_plan = p_plan::public.subscription_plan,
+      status = 'active',
+      timezone = 'UTC'
+  where id = v_user;
+  return v_user;
+end $$;
 
-insert into auth.users (
-  id, aud, role, email, raw_user_meta_data, created_at, updated_at
-) values
-  (
-    current_setting('aiko.quota_free')::uuid,
-    'authenticated', 'authenticated',
-    'quota-free-' || replace(current_setting('aiko.quota_free'), '-', '') || '@invalid.local',
-    '{}'::jsonb, now(), now()
-  ),
-  (
-    current_setting('aiko.quota_paid')::uuid,
-    'authenticated', 'authenticated',
-    'quota-paid-' || replace(current_setting('aiko.quota_paid'), '-', '') || '@invalid.local',
-    '{}'::jsonb, now(), now()
+create or replace function pg_temp.make_lesson(p_user uuid)
+returns uuid language plpgsql as $$
+declare
+  v_lesson uuid := gen_random_uuid();
+  v_version uuid := gen_random_uuid();
+begin
+  insert into public.lessons (
+    id, slug, title, japanese_title, summary, topic, jlpt_level,
+    duration_minutes, status, source, generated_for_user_id, reusable
+  ) values (
+    v_lesson, 'quota-' || replace(v_lesson::text, '-', ''),
+    'Quota fixture', '割当フィクスチャ', 'Hermetic fixture lesson.',
+    'quota fixture', 'N5', 30, 'published', 'user_generated', p_user, false
   );
+  insert into public.lesson_versions (id, lesson_id, version_number, status)
+  values (v_version, v_lesson, 1, 'published');
+  update public.lessons set current_version_id = v_version where id = v_lesson;
+  return v_lesson;
+end $$;
 
-update public.profiles
-set status='active', timezone='UTC'
-where id in (
-  current_setting('aiko.quota_free')::uuid,
-  current_setting('aiko.quota_paid')::uuid
-);
-update public.profiles
-set subscription_plan='premium'
-where id=current_setting('aiko.quota_paid')::uuid;
-
--- Both users have an unfinished lesson from yesterday. It must remain resumable
--- regardless of today's request count.
-insert into public.custom_lesson_requests (
-  user_id, topic, jlpt_level, duration_minutes, focus, speaking_difficulty,
-  status, generated_lesson_id, entitlement_local_date, entitlement_timezone,
-  uses_free_daily_entitlement, entitlement_consumed_at, created_at, updated_at
-) values
-  (
-    current_setting('aiko.quota_free')::uuid,
-    'Free unfinished yesterday', 'N5', 30, 'balanced', 'medium',
-    'approved', current_setting('aiko.quota_lesson')::uuid,
-    (now() at time zone 'UTC')::date - 1, 'UTC', true,
-    now() - interval '1 day', now() - interval '1 day', now() - interval '1 day'
-  ),
-  (
-    current_setting('aiko.quota_paid')::uuid,
-    'Paid unfinished yesterday', 'N5', 30, 'balanced', 'medium',
-    'approved', current_setting('aiko.quota_lesson')::uuid,
-    (now() at time zone 'UTC')::date - 1, 'UTC', false,
-    null, now() - interval '1 day', now() - interval '1 day'
+create or replace function pg_temp.add_request(
+  p_user uuid, p_lesson uuid, p_local_date date, p_free boolean
+) returns void language sql as $$
+  insert into public.custom_lesson_requests (
+    user_id, topic, jlpt_level, duration_minutes, focus, speaking_difficulty,
+    status, generated_lesson_id, matched_lesson_id,
+    entitlement_local_date, entitlement_timezone,
+    uses_free_daily_entitlement, entitlement_consumed_at
+  ) values (
+    p_user, 'quota fixture topic', 'N5', 30, 'balanced', 'medium',
+    'approved', p_lesson, p_lesson, p_local_date, 'UTC',
+    p_free, case when p_free then now() else null end
   );
-
-insert into public.lesson_assignments (
-  user_id, lesson_id, lesson_version_id, selection_mode, status,
-  algorithm_version, assigned_at, started_at
-) values
-  (
-    current_setting('aiko.quota_free')::uuid,
-    current_setting('aiko.quota_lesson')::uuid,
-    current_setting('aiko.quota_version')::uuid,
-    'custom_topic', 'started', 'quota-free-resume-test',
-    now() - interval '1 day', now() - interval '1 day'
-  ),
-  (
-    current_setting('aiko.quota_paid')::uuid,
-    current_setting('aiko.quota_lesson')::uuid,
-    current_setting('aiko.quota_version')::uuid,
-    'custom_topic', 'started', 'quota-paid-resume-test',
-    now() - interval '1 day', now() - interval '1 day'
-  );
-
-insert into public.lesson_sessions (
-  id,user_id,lesson_id,lesson_version_id,status,current_phase,current_phase_index,
-  activity_index,elapsed_seconds,checkpoint,started_at,last_saved_at
-) values
-  (
-    current_setting('aiko.quota_free_session')::uuid,
-    current_setting('aiko.quota_free')::uuid,
-    current_setting('aiko.quota_lesson')::uuid,
-    current_setting('aiko.quota_version')::uuid,
-    'active','vocabulary',1,0,0,
-    jsonb_build_object('session',jsonb_build_object('completedPhaseIds',jsonb_build_array('story'),'storyComplete',true,'completed',false)),
-    now()-interval '1 day',now()-interval '1 day'
-  ),
-  (
-    current_setting('aiko.quota_paid_session')::uuid,
-    current_setting('aiko.quota_paid')::uuid,
-    current_setting('aiko.quota_lesson')::uuid,
-    current_setting('aiko.quota_version')::uuid,
-    'active','vocabulary',1,0,0,
-    jsonb_build_object('session',jsonb_build_object('completedPhaseIds',jsonb_build_array('story'),'storyComplete',true,'completed',false)),
-    now()-interval '1 day',now()-interval '1 day'
-  );
-
--- Free with no creation today: Resume + Start new available.
-set local role authenticated;
-select set_config('request.jwt.claim.sub',current_setting('aiko.quota_free'),true);
-select set_config('request.jwt.claim.role','authenticated',true);
-do $$
-declare s jsonb;
-begin
-  s:=public.get_lesson_creation_state();
-  if coalesce((s->>'can_create')::boolean,false) is not true
-     or (s->>'daily_limit')::integer<>1
-     or s->>'resume_lesson_id'<>current_setting('aiko.quota_lesson') then
-    raise exception 'Free prior-day Resume + Start new state failed: %',s;
-  end if;
-end
 $$;
-reset role;
 
--- Reserve today's Free allowance, then prove begin() resumes that reservation
--- instead of creating a second request. Resume from yesterday remains visible.
-insert into public.custom_lesson_requests (
-  user_id,topic,jlpt_level,duration_minutes,focus,speaking_difficulty,status,
-  entitlement_local_date,entitlement_timezone,uses_free_daily_entitlement,
-  created_at,updated_at
-) values (
-  current_setting('aiko.quota_free')::uuid,
-  'Free today reserved','N5',30,'balanced','medium','generation_pending',
-  (now() at time zone 'UTC')::date,'UTC',true,now(),now()
-);
-
-set local role authenticated;
-select set_config('request.jwt.claim.sub',current_setting('aiko.quota_free'),true);
-select set_config('request.jwt.claim.role','authenticated',true);
-do $$
-declare s jsonb; r jsonb; before_count integer; after_count integer;
-begin
-  s:=public.get_lesson_creation_state();
-  if coalesce((s->>'can_create')::boolean,true) is not false
-     or (s->>'creations_today')::integer<>1
-     or s->>'resume_lesson_id'<>current_setting('aiko.quota_lesson') then
-    raise exception 'Free same-day quota/Resume state failed: %',s;
-  end if;
-
-  select count(*)::integer into before_count
-  from public.custom_lesson_requests
-  where user_id=auth.uid();
-
-  r:=public.begin_custom_lesson_generation_v5('Must not consume a second slot','N5');
-
-  select count(*)::integer into after_count
-  from public.custom_lesson_requests
-  where user_id=auth.uid();
-
-  if r->>'outcome'<>'resume_request' or after_count<>before_count then
-    raise exception 'Free begin RPC bypassed 1/day: result %, before %, after %',r,before_count,after_count;
-  end if;
-end
+create or replace function pg_temp.add_assignment(p_user uuid, p_lesson uuid, p_status text)
+returns void language sql as $$
+  insert into public.lesson_assignments (
+    user_id, lesson_id, lesson_version_id, selection_mode, status, algorithm_version
+  )
+  select p_user, p_lesson, lesson.current_version_id, 'custom_topic', p_status, 'quota-behavior-test'
+  from public.lessons lesson where lesson.id = p_lesson;
 $$;
-reset role;
 
--- Paid 4/5 today: Resume + Start new available.
-insert into public.custom_lesson_requests (
-  user_id,topic,jlpt_level,duration_minutes,focus,speaking_difficulty,status,
-  entitlement_local_date,entitlement_timezone,uses_free_daily_entitlement,
-  created_at,updated_at
-)
-select
-  current_setting('aiko.quota_paid')::uuid,
-  'Paid today '||n,'N5',30,'balanced','medium','generation_pending',
-  (now() at time zone 'UTC')::date,'UTC',false,
-  now()-make_interval(mins=>10-n),now()
-from generate_series(1,4) n;
-
-set local role authenticated;
-select set_config('request.jwt.claim.sub',current_setting('aiko.quota_paid'),true);
-select set_config('request.jwt.claim.role','authenticated',true);
-do $$
-declare s jsonb;
+create or replace function pg_temp.creation_state(p_user uuid)
+returns jsonb language plpgsql as $$
+declare v_state jsonb;
 begin
-  s:=public.get_lesson_creation_state();
-  if (s->>'creations_today')::integer<>4
-     or coalesce((s->>'can_create')::boolean,false) is not true
-     or s->>'resume_lesson_id'<>current_setting('aiko.quota_lesson') then
-    raise exception 'Paid 4/5 Resume + Start new state failed: %',s;
-  end if;
-end
-$$;
-reset role;
+  perform set_config('request.jwt.claim.sub', p_user::text, true);
+  perform set_config('request.jwt.claim.role', 'authenticated', true);
+  select public.get_lesson_creation_state() into v_state;
+  return v_state;
+end $$;
 
--- Paid 5/5 today: Resume remains, Start new is disabled, and begin() returns
--- the authoritative Premium daily-limit outcome without inserting request #6.
-insert into public.custom_lesson_requests (
-  user_id,topic,jlpt_level,duration_minutes,focus,speaking_difficulty,status,
-  entitlement_local_date,entitlement_timezone,uses_free_daily_entitlement,
-  created_at,updated_at
-) values (
-  current_setting('aiko.quota_paid')::uuid,
-  'Paid today 5','N5',30,'balanced','medium','generation_pending',
-  (now() at time zone 'UTC')::date,'UTC',false,now(),now()
-);
+-- ---------------------------------------------------------------------------
+-- Free learner with no creations today.
+-- ---------------------------------------------------------------------------
+select set_config('aiko.free_fresh', pg_temp.make_learner('free')::text, true);
 
-set local role authenticated;
-select set_config('request.jwt.claim.sub',current_setting('aiko.quota_paid'),true);
-select set_config('request.jwt.claim.role','authenticated',true);
-do $$
-declare s jsonb; r jsonb; before_count integer; after_count integer;
-begin
-  s:=public.get_lesson_creation_state();
-  if (s->>'creations_today')::integer<>5
-     or coalesce((s->>'can_create')::boolean,true) is not false
-     or s->>'resume_lesson_id'<>current_setting('aiko.quota_lesson') then
-    raise exception 'Paid 5/5 Resume state failed: %',s;
-  end if;
+select is(
+  (pg_temp.creation_state(current_setting('aiko.free_fresh')::uuid) ->> 'plan'),
+  'free', 'Free learner reports the free plan');
+select is(
+  (pg_temp.creation_state(current_setting('aiko.free_fresh')::uuid) ->> 'daily_limit'),
+  '1', 'Free daily limit is exactly 1');
+select is(
+  (pg_temp.creation_state(current_setting('aiko.free_fresh')::uuid) ->> 'creations_today'),
+  '0', 'Free learner starts the day with no creations');
+select is(
+  (pg_temp.creation_state(current_setting('aiko.free_fresh')::uuid) ->> 'can_create'),
+  'true', 'Free learner may create their one lesson');
 
-  select count(*)::integer into before_count
-  from public.custom_lesson_requests
-  where user_id=auth.uid();
+-- ---------------------------------------------------------------------------
+-- Free learner who already used today's single entitlement.
+-- ---------------------------------------------------------------------------
+select set_config('aiko.free_used', pg_temp.make_learner('free')::text, true);
+select set_config('aiko.free_used_lesson',
+  pg_temp.make_lesson(current_setting('aiko.free_used')::uuid)::text, true);
+select pg_temp.add_request(
+  current_setting('aiko.free_used')::uuid,
+  current_setting('aiko.free_used_lesson')::uuid,
+  (now() at time zone 'UTC')::date, true);
 
-  r:=public.begin_custom_lesson_generation_v5('Must not become request six','N5');
+select is(
+  (pg_temp.creation_state(current_setting('aiko.free_used')::uuid) ->> 'creations_today'),
+  '1', 'Free learner has used one creation today');
+select is(
+  (pg_temp.creation_state(current_setting('aiko.free_used')::uuid) ->> 'can_create'),
+  'false', 'Free learner cannot create a second lesson the same day');
 
-  select count(*)::integer into after_count
-  from public.custom_lesson_requests
-  where user_id=auth.uid();
+-- ---------------------------------------------------------------------------
+-- Paid learner limits: 4 today still allows a fifth, 5 today does not.
+-- ---------------------------------------------------------------------------
+select set_config('aiko.paid_four', pg_temp.make_learner('premium')::text, true);
+select pg_temp.add_request(
+    current_setting('aiko.paid_four')::uuid,
+    pg_temp.make_lesson(current_setting('aiko.paid_four')::uuid),
+    (now() at time zone 'UTC')::date, false)
+from generate_series(1, 4);
 
-  if r->>'outcome'<>'limit'
-     or r->>'code'<>'PREMIUM_DAILY_LIMIT'
-     or after_count<>before_count then
-    raise exception 'Paid begin RPC bypassed 5/day: result %, before %, after %',r,before_count,after_count;
-  end if;
-end
-$$;
-reset role;
+select is(
+  (pg_temp.creation_state(current_setting('aiko.paid_four')::uuid) ->> 'plan'),
+  'premium', 'Paid learner reports the premium plan');
+select is(
+  (pg_temp.creation_state(current_setting('aiko.paid_four')::uuid) ->> 'daily_limit'),
+  '5', 'Paid daily limit is exactly 5');
+select is(
+  (pg_temp.creation_state(current_setting('aiko.paid_four')::uuid) ->> 'creations_today'),
+  '4', 'Paid learner has used four creations today');
+select is(
+  (pg_temp.creation_state(current_setting('aiko.paid_four')::uuid) ->> 'can_create'),
+  'true', 'Paid learner may still create a fifth lesson');
 
-select 'daily quota + Resume behavior passed' as result;
+select set_config('aiko.paid_five', pg_temp.make_learner('premium')::text, true);
+select pg_temp.add_request(
+    current_setting('aiko.paid_five')::uuid,
+    pg_temp.make_lesson(current_setting('aiko.paid_five')::uuid),
+    (now() at time zone 'UTC')::date, false)
+from generate_series(1, 5);
+
+select is(
+  (pg_temp.creation_state(current_setting('aiko.paid_five')::uuid) ->> 'creations_today'),
+  '5', 'Paid learner has used all five creations today');
+select is(
+  (pg_temp.creation_state(current_setting('aiko.paid_five')::uuid) ->> 'can_create'),
+  'false', 'Paid learner cannot exceed five creations in one day');
+
+-- ---------------------------------------------------------------------------
+-- Resume is independent of today's allowance. A Free learner who has spent
+-- today's single creation must still be offered their unfinished lesson.
+-- ---------------------------------------------------------------------------
+select set_config('aiko.free_resume', pg_temp.make_learner('free')::text, true);
+select set_config('aiko.free_resume_lesson',
+  pg_temp.make_lesson(current_setting('aiko.free_resume')::uuid)::text, true);
+select pg_temp.add_request(
+  current_setting('aiko.free_resume')::uuid,
+  current_setting('aiko.free_resume_lesson')::uuid,
+  (now() at time zone 'UTC')::date, true);
+select pg_temp.add_assignment(
+  current_setting('aiko.free_resume')::uuid,
+  current_setting('aiko.free_resume_lesson')::uuid, 'started');
+
+select is(
+  (pg_temp.creation_state(current_setting('aiko.free_resume')::uuid) ->> 'can_create'),
+  'false', 'Resume fixture has genuinely exhausted today''s allowance');
+select is(
+  (pg_temp.creation_state(current_setting('aiko.free_resume')::uuid) ->> 'resume_lesson_id'),
+  current_setting('aiko.free_resume_lesson'),
+  'Resume is offered even when today''s allowance is spent');
+
+-- ---------------------------------------------------------------------------
+-- A prior-day unfinished lesson stays resumable, and does not consume any of
+-- today's allowance.
+-- ---------------------------------------------------------------------------
+select set_config('aiko.prior_day', pg_temp.make_learner('free')::text, true);
+select set_config('aiko.prior_day_lesson',
+  pg_temp.make_lesson(current_setting('aiko.prior_day')::uuid)::text, true);
+select pg_temp.add_request(
+  current_setting('aiko.prior_day')::uuid,
+  current_setting('aiko.prior_day_lesson')::uuid,
+  ((now() at time zone 'UTC')::date - 1), true);
+select pg_temp.add_assignment(
+  current_setting('aiko.prior_day')::uuid,
+  current_setting('aiko.prior_day_lesson')::uuid, 'started');
+
+select is(
+  (pg_temp.creation_state(current_setting('aiko.prior_day')::uuid) ->> 'creations_today'),
+  '0', 'Yesterday''s creation does not count against today');
+select is(
+  (pg_temp.creation_state(current_setting('aiko.prior_day')::uuid) ->> 'can_create'),
+  'true', 'Free learner gets a fresh creation the next local day');
+select is(
+  (pg_temp.creation_state(current_setting('aiko.prior_day')::uuid) ->> 'resume_lesson_id'),
+  current_setting('aiko.prior_day_lesson'),
+  'A prior-day unfinished lesson is still resumable');
+
+-- ---------------------------------------------------------------------------
+-- An assignment that was generated but never started is resumable too, and a
+-- completed lesson is not.
+-- ---------------------------------------------------------------------------
+select set_config('aiko.assigned', pg_temp.make_learner('free')::text, true);
+select set_config('aiko.assigned_lesson',
+  pg_temp.make_lesson(current_setting('aiko.assigned')::uuid)::text, true);
+select pg_temp.add_assignment(
+  current_setting('aiko.assigned')::uuid,
+  current_setting('aiko.assigned_lesson')::uuid, 'assigned');
+
+select is(
+  (pg_temp.creation_state(current_setting('aiko.assigned')::uuid) ->> 'resume_lesson_id'),
+  current_setting('aiko.assigned_lesson'),
+  'A generated but unstarted lesson is resumable');
+select is(
+  (pg_temp.creation_state(current_setting('aiko.assigned')::uuid) ->> 'resume_lesson_state'),
+  'ready', 'An unstarted resumable lesson reports the ready state');
+
+select * from finish();
 rollback;

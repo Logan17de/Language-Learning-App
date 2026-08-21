@@ -30,7 +30,7 @@ insert into public.lessons (
   current_setting('aiko.lesson')::uuid,
   'evidence-fixture-' || replace(current_setting('aiko.lesson'), '-', ''),
   'Evidence fixture', '証拠フィクスチャ', 'Hermetic fixture lesson.',
-  'evidence fixture', 'N5', 30, 'published', 'custom',
+  'evidence fixture', 'N5', 30, 'published', 'user_generated',
   current_setting('aiko.user')::uuid
 );
 
