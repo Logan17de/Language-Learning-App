@@ -150,18 +150,20 @@ $$;
 
 create or replace function pg_temp.answer_reading(p_session uuid)
 returns void language plpgsql as $$
-declare v_answers jsonb;
 begin
-  select coalesce(jsonb_agg(jsonb_build_object(
-           'questionId', question.id::text, 'response', question.answer)), '[]'::jsonb)
-  into v_answers
+  -- Reading responses are immutable evidence rows now. The checkpoint keeps
+  -- only the Story flag it still legitimately carries.
+  insert into public.lesson_activity_answers (
+    user_id, lesson_session_id, phase, activity_id, selected_answer, correct, attempts
+  )
+  select session.user_id, p_session, 'reading', question.id::text, question.answer, true, 1
   from public.lesson_reading_questions question
   join public.lesson_sessions session on session.id = p_session
-  where question.lesson_version_id = session.lesson_version_id;
+  where question.lesson_version_id = session.lesson_version_id
+  on conflict (lesson_session_id, phase, activity_id) do nothing;
 
   update public.lesson_sessions
-  set checkpoint = jsonb_build_object('session', jsonb_build_object(
-        'readingAnswers', v_answers, 'storyComplete', true))
+  set checkpoint = jsonb_build_object('session', jsonb_build_object('storyComplete', true))
   where id = p_session;
 end $$;
 
