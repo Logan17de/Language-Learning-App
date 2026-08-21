@@ -37,10 +37,14 @@ begin
   insert into public.grammar_records (id, pattern, meaning, formation, usage_notes, jlpt_level)
   values (v_id, 'promo-' || replace(v_id::text, '-', ''), 'fixture', 'fixture',
           'fixture', p_level::public.jlpt_level);
-  insert into public.learner_mastery (user_id, item_type, item_key, mastery, evidence_count)
+  -- enforce_weighted_learner_mastery() derives mastery, so writing the column
+  -- directly is silently discarded. Grammar mastery is recognition_score.
+  insert into public.learner_mastery (
+    user_id, item_type, item_key, recognition_score, evidence_count
+  )
   values (p_user, 'grammar', v_id::text, p_mastery, 1)
   on conflict (user_id, item_type, item_key) do update
-    set mastery = excluded.mastery, evidence_count = 1;
+    set recognition_score = excluded.recognition_score, evidence_count = 1;
   return v_id;
 end $$;
 
@@ -94,7 +98,7 @@ select is(
   'N5', 'their level is unchanged');
 
 -- One more point of mastery is enough.
-update public.learner_mastery set mastery = 80
+update public.learner_mastery set recognition_score = 80
 where user_id = current_setting('aiko.partial')::uuid and mastery = 79;
 
 select is(
