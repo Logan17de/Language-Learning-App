@@ -154,9 +154,10 @@ export function LessonLibrary() {
           Choose the topic. AIko builds the lesson.
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-muted">
-          Tell AIko what you want to learn through and choose your Japanese
-          level. Every lesson is built as one connected story plus vocabulary,
-          grammar, reading, listening, and speaking.
+          Tell AIko what you want to learn through. Your level comes from your
+          profile and rises as you master it, so every lesson is built as one
+          connected story plus vocabulary, grammar, reading, listening, and
+          speaking at the right difficulty.
         </p>
       </header>
 
