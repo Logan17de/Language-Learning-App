@@ -9,7 +9,7 @@
 begin;
 create extension if not exists pgtap;
 
-select plan(16);
+select plan(17);
 
 -- ---------------------------------------------------------------------------
 -- Fixture helpers
@@ -76,6 +76,14 @@ begin
          'understanding', 'Grammar prompt ' || i, 'correct',
          array['correct'], array[p_item]
   from generate_series(1, p_grammar_rows) i;
+
+  -- Reading is exactly five questions in the playable contract.
+  insert into public.lesson_reading_questions (
+    lesson_version_id, position, difficulty, question, answer, choices
+  )
+  select v_version, i, 'easy', 'Reading question ' || i, 'correct',
+         array['correct', 'wrong']
+  from generate_series(1, 5) i;
 
   return v_lesson;
 end $$;
@@ -146,6 +154,24 @@ begin
       );
     end if;
   end loop;
+end $$;
+
+-- Reading answers live in the session checkpoint, not in
+-- lesson_activity_answers, so the Reading commit reads them from there.
+create or replace function pg_temp.answer_reading(p_session uuid)
+returns void language plpgsql as $$
+declare v_answers jsonb;
+begin
+  select coalesce(jsonb_agg(jsonb_build_object(
+           'questionId', question.id::text, 'response', question.answer)), '[]'::jsonb)
+  into v_answers
+  from public.lesson_reading_questions question
+  join public.lesson_sessions session on session.id = p_session
+  where question.lesson_version_id = session.lesson_version_id;
+
+  update public.lesson_sessions
+  set checkpoint = jsonb_build_object('session', jsonb_build_object('readingAnswers', v_answers))
+  where id = p_session;
 end $$;
 
 create or replace function pg_temp.commit_phase(p_user uuid, p_session uuid, p_phase text)
@@ -222,6 +248,16 @@ select is(
 );
 
 -- Reading is reachable straight after Grammar for a Free learner.
+select is(
+  (select count(*)::int from public.lesson_reading_questions question
+   join public.lesson_sessions s on s.id = current_setting('aiko.free_session')::uuid
+   where question.lesson_version_id = s.lesson_version_id),
+  5,
+  'Reading is exactly five questions'
+);
+
+select pg_temp.answer_reading(current_setting('aiko.free_session')::uuid);
+
 select is(
   (pg_temp.commit_phase(current_setting('aiko.free')::uuid,
                         current_setting('aiko.free_session')::uuid, 'reading') ->> 'committed'),
