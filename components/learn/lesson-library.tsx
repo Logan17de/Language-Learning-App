@@ -12,12 +12,14 @@ import {
   Mic2,
   Sparkles,
   WandSparkles,
+  AlertTriangle,
 } from "lucide-react";
 import type { JLPTLevel } from "@/types/lesson";
 import { useAppStore } from "@/store/app-store";
 import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Select } from "@/components/ui/select";
 import { GenerationProgress } from "@/components/custom-topic/generation-progress";
 import {
   lessonCreationRepository,
@@ -42,9 +44,15 @@ export function LessonLibrary() {
   const onboarding = useAppStore((state) => state.onboarding);
   const user = useAppStore((state) => state.user);
   const [topic, setTopic] = useState("");
-  const [level, setLevel] = useState<JLPTLevel>(
-    learnerLevel(onboarding.level ?? user.level),
+  // The learner's level comes from their profile and is earned, not chosen.
+  // Manual selection is a per-lesson override only: it never rewrites the
+  // profile level, which advances solely through earned promotion.
+  const profileLevel = learnerLevel(onboarding.level ?? user.level);
+  const [levelMode, setLevelMode] = useState<"automatic" | "manual">(
+    "automatic",
   );
+  const [manualLevel, setManualLevel] = useState<JLPTLevel>(profileLevel);
+  const level = levelMode === "automatic" ? profileLevel : manualLevel;
   const [creationState, setCreationState] =
     useState<LessonCreationState | null>(null);
   const [showCreationForm, setShowCreationForm] = useState(false);
@@ -63,7 +71,9 @@ export function LessonLibrary() {
       }
       setCreationState(result.data);
       setShowCreationForm(!result.data.resumeLessonId);
-      if (result.data.level) setLevel(result.data.level);
+      // Only seeds the manual override default. Automatic mode always
+      // follows the profile level, which is earned rather than chosen.
+      if (result.data.level) setManualLevel(result.data.level);
     });
     return () => {
       active = false;
@@ -211,8 +221,8 @@ export function LessonLibrary() {
                           : "s"}{" "}
                         remaining today.
                       </strong>{" "}
-                      Premium can create up to five new lessons per day while
-                      keeping unfinished lessons resumable.
+                      Unfinished lessons stay resumable and never use one of
+                      these.
                     </>
                   )}
                   {creationState.timezone && (
@@ -304,23 +314,55 @@ export function LessonLibrary() {
                     />
                   </Field>
                   <Field label="Japanese level">
-                    <select
-                      value={level}
+                    <Select
+                      value={levelMode}
                       onChange={(event) =>
-                        setLevel(event.target.value as JLPTLevel)
+                        setLevelMode(
+                          event.target.value as "automatic" | "manual",
+                        )
                       }
                       disabled={busy || creationState?.canCreate === false}
-                      className="form-input disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      {(["N5", "N4", "N3", "N2", "N1"] as JLPTLevel[]).map(
-                        (item) => (
-                          <option key={item} value={item}>
-                            {item}
-                          </option>
-                        ),
-                      )}
-                    </select>
+                      <option value="automatic">
+                        Automatic — your level ({profileLevel})
+                      </option>
+                      <option value="manual">Choose a different level</option>
+                    </Select>
                   </Field>
+
+                  {levelMode === "manual" && (
+                    <Field label="Lesson level">
+                      <Select
+                        value={manualLevel}
+                        onChange={(event) =>
+                          setManualLevel(event.target.value as JLPTLevel)
+                        }
+                        disabled={busy || creationState?.canCreate === false}
+                      >
+                        {(["N5", "N4", "N3", "N2", "N1"] as JLPTLevel[]).map(
+                          (item) => (
+                            <option key={item} value={item}>
+                              {item}
+                            </option>
+                          ),
+                        )}
+                      </Select>
+                      {levelDifficultyNote(profileLevel, manualLevel) && (
+                        <p
+                          role="status"
+                          className="mt-2 flex gap-2 text-xs leading-5 text-amber-800"
+                        >
+                          <AlertTriangle
+                            aria-hidden="true"
+                            className="mt-0.5 size-3.5 shrink-0"
+                          />
+                          <span>
+                            {levelDifficultyNote(profileLevel, manualLevel)}
+                          </span>
+                        </p>
+                      )}
+                    </Field>
+                  )}
 
                   {error && (
                     <div
@@ -389,37 +431,36 @@ export function LessonLibrary() {
                 The lesson stays focused on the topic you asked for.
               </h2>
               <p className="mt-3 text-sm leading-6 text-muted">
-                AIko generates all six phases for every lesson. Free learners
-                complete Story, Vocabulary, seven Grammar questions, and Reading.
-                Translation, Listening, and Speaking are Premium practice and can
-                be skipped without blocking completion.
+                Every lesson is built from one topic and runs as six connected
+                phases, so the same language keeps coming back instead of
+                jumping to something unrelated.
               </p>
 
               <div className="mt-7 space-y-5">
                 <Feature
                   icon={BookOpen}
-                  title="Story → vocabulary → grammar → reading"
-                  detail="The same language keeps returning in new contexts instead of jumping to a different predefined lesson."
+                  title="Story, then vocabulary and grammar"
+                  detail="You read the story first, then practise the words and patterns it introduced."
                 />
                 <Feature
                   icon={Languages}
-                  title="Translation follows Grammar for Premium"
-                  detail="Premium learners get five server-validated translations after the seven Grammar questions. Free learners see Subscribe or Skip instead."
+                  title="Translation"
+                  detail="Turn English back into natural Japanese using the grammar the lesson just taught."
                 />
                 <Feature
                   icon={Headphones}
-                  title="Listening is Premium practice"
-                  detail="Free learners receive no protected activity payload and can subscribe or skip without blocking the lesson."
+                  title="Reading and listening"
+                  detail="Meet the same language again in a passage and in spoken conversation."
                 />
                 <Feature
                   icon={Mic2}
-                  title="Speaking is Premium practice"
-                  detail="Skipping protected practice awards no protected mastery and never consumes another lesson generation."
+                  title="Speaking"
+                  detail="Finish by saying it yourself, so the lesson ends in production rather than recognition."
                 />
                 <Feature
                   icon={CheckCircle2}
-                  title="Resume is independent of today&apos;s allowance"
-                  detail="Completed phases survive. The unfinished phase restarts from its first question, and resuming never consumes a new lesson."
+                  title="Pick up where you left off"
+                  detail="Finished phases stay finished, and coming back to an unfinished lesson never costs you a new one."
                 />
               </div>
 
@@ -429,11 +470,11 @@ export function LessonLibrary() {
                     <Crown className="mt-0.5 size-5 shrink-0 text-persimmon-600" />
                     <div>
                       <p className="font-semibold text-persimmon-900">
-                        Want protected practice and more lessons?
+                        Want more practice and more lessons?
                       </p>
                       <p className="mt-1 text-sm leading-6 text-persimmon-800">
-                        Premium unlocks Translation, Listening, and Speaking and
-                        raises the daily creation limit to five.
+                        Compare what each plan includes on the subscription
+                        page.
                       </p>
                       <ButtonLink
                         href="/subscription"
@@ -539,6 +580,28 @@ function Feature({
       </div>
     </div>
   );
+}
+
+const LEVEL_ORDER: readonly JLPTLevel[] = ["N5", "N4", "N3", "N2", "N1"];
+
+/**
+ * Warns when a per-lesson override differs from the learner's earned level.
+ * Choosing above it is genuinely harder; choosing below it is easier, and the
+ * generator picks those targets at random because the learner has usually
+ * already mastered that level.
+ */
+function levelDifficultyNote(
+  profile: JLPTLevel,
+  chosen: JLPTLevel,
+): string | null {
+  const profileIndex = LEVEL_ORDER.indexOf(profile);
+  const chosenIndex = LEVEL_ORDER.indexOf(chosen);
+  if (profileIndex < 0 || chosenIndex < 0 || profileIndex === chosenIndex) {
+    return null;
+  }
+  return chosenIndex > profileIndex
+    ? `${chosen} is above your current level, so this lesson will be tougher than usual.`
+    : `${chosen} is below your current level, so this lesson will be much easier and its practice is chosen at random.`;
 }
 
 function learnerLevel(level: string | null): JLPTLevel {

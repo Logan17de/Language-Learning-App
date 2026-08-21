@@ -9,6 +9,7 @@ import type { LessonPlanV3 } from "@/lib/gemini/story-pipeline-v3";
 import {
   LEARNED_MASTERY_THRESHOLD,
   selectFromLowestMasteryPool,
+  selectRandomLevelTargets,
 } from "@/lib/mastery-target-selection";
 
 const LEVELS: JLPTLevel[] = ["N5", "N4", "N3", "N2", "N1"];
@@ -106,13 +107,18 @@ export async function selectLessonPlanV3(
   level: JLPTLevel,
 ): Promise<LessonPlanV3> {
   const levels = allowedLevels(level);
-  const [catalog, masteryResult] = await Promise.all([
+  const [catalog, masteryResult, profileResult] = await Promise.all([
     cachedCatalogSnapshot(levels.join(",")),
     client
       .from("learner_mastery")
       .select("item_type,item_key,mastery")
       .eq("user_id", userId)
       .in("item_type", ["kanji", "grammar"]),
+    client
+      .from("profiles")
+      .select("current_jlpt_level")
+      .eq("id", userId)
+      .maybeSingle(),
   ]);
 
   if (masteryResult.error) {
@@ -143,7 +149,18 @@ export async function selectLessonPlanV3(
     target.set(key, { mastery: row.mastery });
   }
 
-  const kanji = selectFromLowestMasteryPool(
+  // A lesson deliberately requested below the learner's own level is revision:
+  // those items are usually already at or above the learned threshold, so the
+  // unlearned-pool rule would find nothing. Pick across the level at random
+  // instead. At or above their level, the normal weakest-first rule applies.
+  const learnerLevel = (profileResult.data?.current_jlpt_level ??
+    level) as JLPTLevel;
+  const isRevisionLevel = LEVELS.indexOf(level) < LEVELS.indexOf(learnerLevel);
+  const selectTargets = isRevisionLevel
+    ? selectRandomLevelTargets
+    : selectFromLowestMasteryPool;
+
+  const kanji = selectTargets(
     catalog.kanjiCatalog.map((row) => ({
       value: { character: row.character, level: row.jlpt_level },
       mastery: kanjiMastery.get(row.character)?.mastery ?? 0,
@@ -154,7 +171,7 @@ export async function selectLessonPlanV3(
     5,
   );
 
-  const grammar = selectFromLowestMasteryPool(
+  const grammar = selectTargets(
     catalog.grammarCatalog.map((row) => ({
       value: { pattern: row.pattern, level: row.jlpt_level },
       mastery: grammarMastery.get(row.pattern)?.mastery ?? 0,
@@ -167,7 +184,9 @@ export async function selectLessonPlanV3(
 
   if (kanji.length !== 5 || grammar.length !== 3) {
     throw new Error(
-      `Not enough unlearned ${level} lesson targets remain below ${LEARNED_MASTERY_THRESHOLD}% mastery.`,
+      isRevisionLevel
+        ? `The ${level} catalog does not have enough targets to build a revision lesson.`
+        : `Not enough unlearned ${level} lesson targets remain below ${LEARNED_MASTERY_THRESHOLD}% mastery.`,
     );
   }
 

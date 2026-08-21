@@ -18,6 +18,7 @@ import type { DailyMinutes, LearnerLevel } from "@/types/learner";
 import { useAppStore } from "@/store/app-store";
 import { SettingsSection } from "@/components/settings/settings-section";
 import { Button } from "@/components/ui/button";
+import { Select as FormSelect } from "@/components/ui/select";
 import { getBackendMode } from "@/lib/supabase/config";
 import { profileRepository } from "@/lib/repositories/profile-repository";
 
@@ -304,11 +305,11 @@ function Select({
   return (
     <label>
       <span className="mb-2 block text-sm font-semibold">{label}</span>
-      <select
+      <FormSelect
         value={value}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
-        className="form-input capitalize disabled:cursor-wait disabled:opacity-60"
+        className="capitalize disabled:cursor-wait"
       >
         {options.map((option) => (
           <option key={option} value={option}>
@@ -316,7 +317,7 @@ function Select({
             {suffix}
           </option>
         ))}
-      </select>
+      </FormSelect>
     </label>
   );
 }

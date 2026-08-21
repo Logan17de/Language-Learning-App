@@ -53,7 +53,13 @@ describe("leaving and resuming a lesson", () => {
     expect(learn).toContain(
       "Resume remains available without consuming another lesson.",
     );
-    expect(learn).toContain("Resume is independent of today&apos;s allowance");
+    // /learn now describes the flow without teaching the Free/Premium split -
+    // that comparison lives on the subscription page. The Resume promise is
+    // still stated, in learner-facing wording.
+    expect(learn).toContain("Pick up where you left off");
+    expect(learn).toContain(
+      "coming back to an unfinished lesson never costs you a new one",
+    );
   });
 
   it("keeps Home pointing at /learn without its own resume surface", () => {

@@ -30,7 +30,13 @@ describe("weighted mastery contract", () => {
   });
 
   it("selects five kanji and three grammar from mastery pools", () => {
-    expect(lessonPlan).toContain("selectFromLowestMasteryPool(");
+    // The planner chooses its selector by level: the weakest-first pool at or
+    // above the learner's level, and random selection for a revision lesson
+    // below it, where everything is already mastered.
+    expect(lessonPlan).toContain("selectFromLowestMasteryPool");
+    expect(lessonPlan).toContain("selectRandomLevelTargets");
+    expect(lessonPlan).toContain("const selectTargets = isRevisionLevel");
+    expect(lessonPlan).toContain("selectTargets(");
     expect(lessonPlan).toMatch(/\n    5,\n  \);/);
     expect(lessonPlan).toMatch(/\n    3,\n  \);/);
   });

@@ -52,3 +52,30 @@ export function selectFromLowestMasteryPool<T>(
     .slice(0, count)
     .map(({ candidate }) => candidate.value);
 }
+
+/**
+ * Select lesson targets at random from one level, ignoring mastery.
+ *
+ * Used when a learner deliberately asks for a level BELOW their own. There the
+ * normal rule cannot work: they have usually already mastered that level, so
+ * filtering to mastery < 80 empties the pool and generation fails with
+ * "Not enough unlearned targets". A revision lesson is not meant to hunt for
+ * weak spots anyway, so every item at that level is a fair candidate.
+ *
+ * Selection stays deterministic through the same per-lesson seed, so one topic
+ * reliably produces one lesson while different topics vary.
+ */
+export function selectRandomLevelTargets<T>(
+  candidates: MasteryTargetCandidate<T>[],
+  count: number,
+): T[] {
+  return candidates
+    .filter((candidate) => candidate.requestedLevel)
+    .map((candidate) => ({
+      candidate,
+      hash: stableHash(candidate.selectionSeed),
+    }))
+    .sort((left, right) => left.hash - right.hash)
+    .slice(0, count)
+    .map(({ candidate }) => candidate.value);
+}

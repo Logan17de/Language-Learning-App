@@ -5,6 +5,7 @@ import { Check, Pencil } from "lucide-react";
 import type { DailyMinutes, LearnerLevel, LearningGoal } from "@/types/learner";
 import { useAppStore } from "@/store/app-store";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { profileRepository } from "@/lib/repositories/profile-repository";
 
 const goals: LearningGoal[] = [
@@ -185,10 +186,9 @@ function SelectField({
   return (
     <label>
       <span className="mb-2 block text-sm font-semibold">{label}</span>
-      <select
+      <Select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="form-input"
       >
         {options.map((option) => (
           <option key={option} value={option}>
@@ -196,7 +196,7 @@ function SelectField({
             {suffix}
           </option>
         ))}
-      </select>
+      </Select>
     </label>
   );
 }

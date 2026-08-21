@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { LessonResult } from "@/components/lesson/lesson-result";
+import { LevelPromotionCelebration } from "@/components/lesson/level-promotion-celebration";
 import { ButtonLink } from "@/components/ui/button";
 import { getBackendMode } from "@/lib/supabase/config";
 import { loadCanonicalLessonCompletion } from "@/lib/sync/backend-sync";
@@ -130,5 +131,10 @@ export default function LessonCompletePage() {
       </main>
     );
   }
-  return <LessonResult lesson={lesson} result={result} />;
+  return (
+    <>
+      <LessonResult lesson={lesson} result={result} />
+      <LevelPromotionCelebration />
+    </>
+  );
 }

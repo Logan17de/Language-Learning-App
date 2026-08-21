@@ -5,6 +5,7 @@ import { Check, Send } from "lucide-react";
 import type { SupportRequest } from "@/types/app-preferences";
 import { useAppStore } from "@/store/app-store";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { supportRepository } from "@/lib/repositories/support-repository";
 import { getBackendMode } from "@/lib/supabase/config";
 
@@ -51,7 +52,7 @@ export function SupportForm({
 
   return (
     <form className="space-y-4" onSubmit={submit}>
-      <label className="block"><span className="mb-2 block text-sm font-semibold">Request type</span><select value={type} onChange={(event) => onTypeChange(event.target.value as SupportRequest["type"])} className="form-input"><option value="contact">Contact Support</option><option value="technical">Technical Issue</option><option value="lesson">Lesson Issue</option><option value="billing">Billing Help</option></select></label>
+      <label className="block"><span className="mb-2 block text-sm font-semibold">Request type</span><Select value={type} onChange={(event) => onTypeChange(event.target.value as SupportRequest["type"])}><option value="contact">Contact Support</option><option value="technical">Technical Issue</option><option value="lesson">Lesson Issue</option><option value="billing">Billing Help</option></Select></label>
       <label className="block"><span className="mb-2 block text-sm font-semibold">Email</span><input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="form-input" placeholder="you@example.com" /></label>
       <label className="block"><span className="mb-2 block text-sm font-semibold">Subject</span><input required minLength={3} value={subject} onChange={(event) => setSubject(event.target.value)} className="form-input" placeholder="What can we help with?" /></label>
       <label className="block"><span className="mb-2 block text-sm font-semibold">Message</span><textarea required minLength={10} value={message} onChange={(event) => setMessage(event.target.value)} className="form-input min-h-32 resize-none py-3" placeholder="Include what you expected and what happened." /></label>
