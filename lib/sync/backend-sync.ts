@@ -124,6 +124,29 @@ function phaseAnswers(
         answer_data: json({ type: answer.type, skill: answer.skill }),
       }));
   }
+  if (phase === "reading") {
+    const questions = lesson.readingQuestions ?? [];
+    return session.readingAnswers
+      .filter((answer) =>
+        questions.some((question) => question.id === answer.questionId),
+      )
+      .map((answer) => {
+        const question = questions.find((item) => item.id === answer.questionId);
+        return {
+          lesson_session_id: backendSessionId,
+          phase: "reading",
+          activity_id: answer.questionId,
+          selected_answer: answer.response,
+          // Display value only. The database never trusts this flag: the
+          // Reading commit and final score both re-derive correctness by
+          // comparing the immutable selected_answer against the canonical
+          // lesson_reading_questions.answer.
+          correct: (question?.answer ?? "").trim() === answer.response.trim(),
+          attempts: 1,
+          answer_data: json({ source: "reading" }),
+        };
+      });
+  }
   return [];
 }
 

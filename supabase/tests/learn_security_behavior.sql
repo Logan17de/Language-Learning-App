@@ -114,8 +114,8 @@ select ok(
 select ok(
   has_table_privilege('authenticated', 'public.lesson_activity_answers', 'SELECT')
   and has_table_privilege('authenticated', 'public.lesson_activity_answers', 'INSERT')
-  and has_table_privilege('authenticated', 'public.lesson_activity_answers', 'UPDATE'),
-  'lesson_activity_answers supports the answer upsert');
+  and not has_table_privilege('authenticated', 'public.lesson_activity_answers', 'UPDATE'),
+  'lesson_activity_answers is insert-once: answered questions are final');
 select ok(
   not has_table_privilege('authenticated', 'public.lesson_activity_answers', 'DELETE'),
   'answers cannot be deleted by the browser role');
@@ -123,8 +123,8 @@ select ok(
 select ok(
   has_table_privilege('authenticated', 'public.lesson_events', 'SELECT')
   and has_table_privilege('authenticated', 'public.lesson_events', 'INSERT')
-  and has_table_privilege('authenticated', 'public.lesson_events', 'UPDATE'),
-  'lesson_events supports the event upsert');
+  and not has_table_privilege('authenticated', 'public.lesson_events', 'UPDATE'),
+  'lesson_events is insert-once: recorded events are final');
 select ok(
   not has_table_privilege('authenticated', 'public.lesson_events', 'DELETE'),
   'events cannot be deleted by the browser role');

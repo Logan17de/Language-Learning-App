@@ -23,6 +23,12 @@ values (
   '{}'::jsonb, now(), now()
 );
 
+-- Premium, so the protected Listening event below is a legitimate write and
+-- the immutability assertions prove finality rather than a plan gate.
+update public.profiles
+set subscription_plan = 'premium_monthly', status = 'active', timezone = 'UTC'
+where id = current_setting('aiko.user')::uuid;
+
 insert into public.lessons (
   id, slug, title, japanese_title, summary, topic, jlpt_level,
   duration_minutes, status, source, generated_for_user_id

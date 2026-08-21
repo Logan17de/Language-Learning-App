@@ -119,6 +119,20 @@ revoke insert, update, delete, truncate on public.lesson_assignments from authen
 revoke insert, update, delete, truncate on public.lesson_completions from authenticated;
 
 -- ---------------------------------------------------------------------------
+-- The trusted server role.
+--
+-- service_role gets its table privileges from hosted Supabase platform
+-- defaults too, so a clean replay left it unable to write the tables the
+-- trusted routes depend on: Translation validation and Speaking transcription
+-- both use createAdminClient() and insert into lesson_activity_answers. That
+-- is a reproducibility gap, not a policy decision, so restate the platform
+-- posture explicitly for the trusted role only. The browser role stays
+-- minimal and insert-once regardless.
+-- ---------------------------------------------------------------------------
+grant all on all tables in schema public to service_role;
+alter default privileges in schema public grant all on tables to service_role;
+
+-- ---------------------------------------------------------------------------
 -- Server-owned Translation targets stay unreachable from the browser role.
 -- ---------------------------------------------------------------------------
 revoke all on public.lesson_translation_questions from authenticated, anon;
@@ -178,6 +192,14 @@ begin
   if has_table_privilege('authenticated', 'public.lesson_translation_questions', 'SELECT') then
     raise exception 'Translation model answers must stay server-owned';
   end if;
+
+  -- Trusted server validation must keep working on a clean replay.
+  foreach v_table in array array['lesson_activity_answers', 'lesson_translation_questions'] loop
+    if not has_table_privilege('service_role', 'public.' || v_table, 'INSERT')
+       or not has_table_privilege('service_role', 'public.' || v_table, 'UPDATE') then
+      raise exception 'the trusted server role lost write access to public.%', v_table;
+    end if;
+  end loop;
 
   foreach v_table in array array['learner_mastery', 'learner_mastery_events'] loop
     if has_table_privilege('authenticated', 'public.' || v_table, 'INSERT')
