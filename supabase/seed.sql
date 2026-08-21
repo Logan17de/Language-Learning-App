@@ -36,6 +36,21 @@ values
   ('12000000-0000-4000-8000-000000000005', 'vocab_gate', '改札', '改札', 'かいさつ', 'ticket gate', 'noun', 'N4', '改札で会います。')
 on conflict (id) do update set written_form = excluded.written_form, dictionary_form = excluded.dictionary_form, meaning = excluded.meaning, updated_at = now();
 
+-- kanji_records.character is unique, and the JLPT reference catalog import
+-- (20260808113000) inserts catalog-only placeholders with generated ids for
+-- any character it does not already find. On a fresh replay those rows exist
+-- before seeding, so the deterministic seed ids below would collide. No
+-- foreign key references kanji_records, so clear the placeholders first and
+-- let the deterministic seed identities win.
+delete from public.kanji_records
+where character in ('働', '場', '駅', '改札')
+  and id not in (
+    '13000000-0000-4000-8000-000000000001'::uuid,
+    '13000000-0000-4000-8000-000000000002'::uuid,
+    '13000000-0000-4000-8000-000000000003'::uuid,
+    '13000000-0000-4000-8000-000000000004'::uuid
+  );
+
 insert into public.kanji_records
   (id, character, readings, meanings, jlpt_level, stroke_count)
 values
