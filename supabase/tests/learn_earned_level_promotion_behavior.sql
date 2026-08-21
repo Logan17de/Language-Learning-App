@@ -18,10 +18,13 @@ begin
   values (v_user, 'authenticated', 'authenticated',
           'promo-' || replace(v_user::text, '-', '') || '@invalid.local',
           '{}'::jsonb, now(), now());
-  -- Setting the level seeds level-scoped mastery through the profile trigger.
   update public.profiles
   set current_jlpt_level = p_level::public.jlpt_level, status = 'active'
   where id = v_user;
+  -- Setting the level fires sync_level_scoped_mastery_profile(), which seeds a
+  -- row for every catalogued item up to that level. Clear those so each test
+  -- controls exactly which items are tracked.
+  delete from public.learner_mastery where user_id = v_user;
   return v_user;
 end $$;
 
@@ -145,7 +148,6 @@ select ok(
 -- Nothing tracked, and the top of the ladder.
 -- ---------------------------------------------------------------------------
 select set_config('aiko.fresh', pg_temp.make_learner('N5')::text, true);
-delete from public.learner_mastery where user_id = current_setting('aiko.fresh')::uuid;
 select is(
   (pg_temp.claim(current_setting('aiko.fresh')::uuid) ->> 'promoted'),
   'false', 'a learner with nothing tracked is not promoted');
