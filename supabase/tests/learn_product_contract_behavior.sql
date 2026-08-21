@@ -65,8 +65,8 @@ begin
     'fixture usage', '駅に行きます。', 'I go to the station.', 'fixture mistake'
   );
 
-  insert into public.lesson_story_lines (lesson_version_id, position, speaker, japanese_text, translation)
-  select v_version, i, 'ナレーター', '駅に行きます。', 'I go to the station.'
+  insert into public.lesson_story_lines (lesson_version_id, position, japanese_text, translation)
+  select v_version, i, '駅に行きます。', 'I go to the station.'
   from generate_series(1, 3) i;
 
   insert into public.lesson_practice_activities (
