@@ -80,10 +80,16 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      # Pinned so the database gate is reproducible. `latest` also performs a
+      # GitHub release lookup that can hit anonymous rate limits and fail the
+      # gate for reasons unrelated to this repository.
       - name: Set up Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.115.0
+
+      - name: Report Supabase CLI version
+        run: supabase --version
 
       - name: Start local Supabase and apply migrations
         id: start
