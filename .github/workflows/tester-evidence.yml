@@ -1,6 +1,7 @@
 name: Tester evidence
 
 on:
+  pull_request:
   push:
     branches:
       - validation/translation-evaluation-contract
