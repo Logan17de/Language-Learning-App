@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { LEARNED_MASTERY_THRESHOLD } from "@/lib/mastery-target-selection";
 import type { JLPTLevel } from "@/types/lesson";
 
 export const LEVEL_SEQUENCE: readonly JLPTLevel[] = [
@@ -17,60 +16,48 @@ export function nextLearnerLevel(level: JLPTLevel): JLPTLevel | null {
   return LEVEL_SEQUENCE[index + 1];
 }
 
-export interface LevelProgress {
+export interface LevelPromotion {
+  promoted: boolean;
   level: JLPTLevel;
-  nextLevel: JLPTLevel | null;
+  fromLevel: JLPTLevel | null;
   trackedItems: number;
   masteredItems: number;
-  remainingItems: number;
-  eligible: boolean;
+}
+
+function asLevel(value: unknown): JLPTLevel | null {
+  return LEVEL_SEQUENCE.includes(value as JLPTLevel)
+    ? (value as JLPTLevel)
+    : null;
 }
 
 /**
- * Decide whether a learner has earned the next JLPT level.
+ * Ask the server whether a promotion has been earned, and claim it if so.
  *
- * A level is complete when every tracked item at that level has reached the
- * learned threshold. That reduces to a single counted query because
- * sync_level_scoped_mastery_profile() already seeds one learner_mastery row per
- * item for every level up to the learner's own, scoring items BELOW their level
- * as 100 and items AT their level as 0. So any row still under the threshold is
- * an item at the current level they have not mastered yet, and "no rows under
- * the threshold" is exactly the promotion condition.
+ * The decision is deliberately not made in the browser. The level is earned,
+ * so it is server-owned: claim_level_promotion() checks that every item at the
+ * learner's current level is mastered, awards each level at most once, and
+ * never moves a learner backwards. The browser cannot write
+ * profiles.current_jlpt_level at all.
  *
- * Counting rather than fetching also keeps this correct for the larger levels:
- * N1 alone tracks well over a thousand kanji, which a row fetch would truncate
- * against the API row limit.
+ * A lapse on an earlier level does not block promotion. Those items are
+ * handled by target selection, which draws from the current level plus every
+ * level below it and picks the weakest first.
  */
-export async function evaluateLevelProgress(
+export async function claimLevelPromotion(
   client: SupabaseClient,
-  userId: string,
-  level: JLPTLevel,
-): Promise<LevelProgress | null> {
-  const [tracked, remaining] = await Promise.all([
-    client
-      .from("learner_mastery")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId),
-    client
-      .from("learner_mastery")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .lt("mastery", LEARNED_MASTERY_THRESHOLD),
-  ]);
+): Promise<LevelPromotion | null> {
+  const { data, error } = await client.rpc("claim_level_promotion");
+  if (error || !data || typeof data !== "object") return null;
 
-  if (tracked.error || remaining.error) return null;
-
-  const trackedItems = tracked.count ?? 0;
-  const remainingItems = remaining.count ?? 0;
-  const upcoming = nextLearnerLevel(level);
+  const row = data as Record<string, unknown>;
+  const level = asLevel(row.level);
+  if (!level) return null;
 
   return {
+    promoted: row.promoted === true,
     level,
-    nextLevel: upcoming,
-    trackedItems,
-    masteredItems: Math.max(0, trackedItems - remainingItems),
-    remainingItems,
-    // A learner with nothing tracked yet has not earned anything.
-    eligible: trackedItems > 0 && remainingItems === 0 && upcoming !== null,
+    fromLevel: asLevel(row.fromLevel),
+    trackedItems: Number(row.trackedItems ?? 0),
+    masteredItems: Number(row.masteredItems ?? 0),
   };
 }

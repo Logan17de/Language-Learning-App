@@ -49,8 +49,8 @@ export function ProfileForm() {
     setLoading(true);
     const result = await profileRepository.updateCurrent({
       display_name: name,
-      current_jlpt_level:
-        level === "Beginner" || level === "Not sure" ? "N5" : level,
+      // JLPT level is earned through mastery and is server-owned, so the
+      // profile form no longer submits it.
       learning_goal: goal,
       daily_study_minutes: minutes,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,

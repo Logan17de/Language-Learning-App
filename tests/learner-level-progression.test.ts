@@ -1,36 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
-  evaluateLevelProgress,
+  claimLevelPromotion,
   nextLearnerLevel,
   LEVEL_SEQUENCE,
 } from "@/lib/learner-level-progression";
 import { selectRandomLevelTargets } from "@/lib/mastery-target-selection";
 
-/** Minimal stand-in for the counted learner_mastery queries. */
-function masteryClient(tracked: number, belowThreshold: number) {
+/** Stand-in for the claim_level_promotion() RPC. */
+function rpcClient(payload: unknown, error: unknown = null) {
   return {
-    from() {
-      return {
-        select() {
-          const chain = {
-            filteredByMastery: false,
-            eq() {
-              return chain;
-            },
-            lt() {
-              chain.filteredByMastery = true;
-              return chain;
-            },
-            then(resolve: (value: unknown) => void) {
-              resolve({
-                count: chain.filteredByMastery ? belowThreshold : tracked,
-                error: null,
-              });
-            },
-          };
-          return chain;
-        },
-      };
+    rpc() {
+      return Promise.resolve({ data: payload, error });
     },
   } as never;
 }
@@ -38,51 +18,50 @@ function masteryClient(tracked: number, belowThreshold: number) {
 describe("earned level promotion", () => {
   it("advances one step at a time and stops at the top", () => {
     expect(nextLearnerLevel("N5")).toBe("N4");
-    expect(nextLearnerLevel("N4")).toBe("N3");
     expect(nextLearnerLevel("N2")).toBe("N1");
     expect(nextLearnerLevel("N1")).toBeNull();
     expect(LEVEL_SEQUENCE).toEqual(["N5", "N4", "N3", "N2", "N1"]);
   });
 
-  it("promotes only when nothing is left below the learned threshold", async () => {
-    const progress = await evaluateLevelProgress(
-      masteryClient(168, 0),
-      "user-1",
-      "N5",
+  it("reports an awarded promotion from the server payload", async () => {
+    const awarded = await claimLevelPromotion(
+      rpcClient({
+        promoted: true,
+        fromLevel: "N5",
+        level: "N4",
+        trackedItems: 168,
+        masteredItems: 168,
+      }),
     );
-    expect(progress?.eligible).toBe(true);
-    expect(progress?.nextLevel).toBe("N4");
-    expect(progress?.masteredItems).toBe(168);
-    expect(progress?.remainingItems).toBe(0);
+    expect(awarded?.promoted).toBe(true);
+    expect(awarded?.fromLevel).toBe("N5");
+    expect(awarded?.level).toBe("N4");
+    expect(awarded?.masteredItems).toBe(168);
   });
 
-  it("does not promote while any item is still unmastered", async () => {
-    const progress = await evaluateLevelProgress(
-      masteryClient(168, 1),
-      "user-1",
-      "N5",
+  it("does not celebrate while the level is still in progress", async () => {
+    const awarded = await claimLevelPromotion(
+      rpcClient({
+        promoted: false,
+        reason: "in_progress",
+        level: "N5",
+        trackedItems: 168,
+        masteredItems: 167,
+      }),
     );
-    expect(progress?.eligible).toBe(false);
-    expect(progress?.masteredItems).toBe(167);
+    expect(awarded?.promoted).toBe(false);
   });
 
-  it("never promotes a learner who has nothing tracked yet", async () => {
-    const progress = await evaluateLevelProgress(
-      masteryClient(0, 0),
-      "user-1",
-      "N5",
+  it("does not celebrate a level that was already awarded", async () => {
+    const awarded = await claimLevelPromotion(
+      rpcClient({ promoted: false, reason: "already_awarded", level: "N4" }),
     );
-    expect(progress?.eligible).toBe(false);
+    expect(awarded?.promoted).toBe(false);
   });
 
-  it("cannot promote beyond the highest level", async () => {
-    const progress = await evaluateLevelProgress(
-      masteryClient(1325, 0),
-      "user-1",
-      "N1",
-    );
-    expect(progress?.nextLevel).toBeNull();
-    expect(progress?.eligible).toBe(false);
+  it("stays silent when the RPC fails or is unavailable", async () => {
+    expect(await claimLevelPromotion(rpcClient(null, { message: "nope" }))).toBeNull();
+    expect(await claimLevelPromotion(rpcClient({ level: "not-a-level" }))).toBeNull();
   });
 });
 

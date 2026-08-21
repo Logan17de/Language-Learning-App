@@ -37,10 +37,12 @@ describe("authenticated learner state regressions", () => {
     expect(lessonResult).toContain("progressRepository.loadCurrent()");
   });
 
-  it("syncs level and daily-goal changes to the account", () => {
+  it("syncs daily-goal changes to the account but never the earned level", () => {
     expect(settingsPage).toContain("profileRepository.updateLearningPreferences");
     expect(settingsPage).toContain("dailyMinutes,");
-    expect(settingsPage).toContain("{ level }");
+    // JLPT level is awarded by claim_level_promotion() and the browser has no
+    // write privilege on the column, so Settings must not try to set it.
+    expect(settingsPage).not.toContain("{ level }");
   });
 
   it("rehydrates server-backed user settings after authentication", () => {

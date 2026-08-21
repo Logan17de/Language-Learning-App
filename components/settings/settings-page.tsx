@@ -14,7 +14,7 @@ import type {
   ThemePreference,
   UserSettings,
 } from "@/types/app-preferences";
-import type { DailyMinutes, LearnerLevel } from "@/types/learner";
+import type { DailyMinutes } from "@/types/learner";
 import { useAppStore } from "@/store/app-store";
 import { SettingsSection } from "@/components/settings/settings-section";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,6 @@ export function SettingsPage() {
   const user = useAppStore((state) => state.user);
   const progress = useAppStore((state) => state.progress);
   const update = useAppStore((state) => state.updateSettings);
-  const setLevel = useAppStore((state) => state.setLevel);
   const setDailyMinutes = useAppStore((state) => state.setDailyMinutes);
   const resetProgress = useAppStore((state) => state.resetProgress);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -75,20 +74,6 @@ export function SettingsPage() {
     setDailyMinutes(dailyMinutes);
   }
 
-  async function changeLevel(value: string) {
-    const level = value as LearnerLevel;
-    setPreferenceError("");
-    if (backendMode === "supabase") {
-      setSavingPreference("level");
-      const result = await profileRepository.updateLearningPreferences({ level });
-      setSavingPreference(null);
-      if (!result.ok) {
-        setPreferenceError(result.error.message);
-        return;
-      }
-    }
-    setLevel(level);
-  }
 
   async function confirmProgressReset() {
     if (backendMode === "supabase") {
@@ -126,13 +111,18 @@ export function SettingsPage() {
               suffix=" minutes"
               disabled={savingPreference !== null}
             />
-            <Select
-              label="Current level"
-              value={String(user.level)}
-              options={["Beginner", "N5", "N4", "N3", "N2", "N1", "Not sure"]}
-              onChange={(value) => void changeLevel(value)}
-              disabled={savingPreference !== null}
-            />
+            <div>
+              <span className="mb-2 block text-sm font-semibold">
+                Current level
+              </span>
+              <p className="flex min-h-12 items-center rounded-2xl border border-border bg-paper px-4 text-base font-semibold text-ink">
+                {String(user.level)}
+              </p>
+              <p className="mt-2 text-xs leading-5 text-muted">
+                Your level is earned. It moves up on its own once you have
+                mastered everything at your current level.
+              </p>
+            </div>
             <Select
               label="Preferred lesson length"
               value={String(settings.lessonLength)}
