@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { commuteLesson } from "@/data/mock-lessons";
-import { buildMasteryEvidence } from "@/lib/sync/backend-sync";
+import { buildLegacyMasteryEvidence } from "@/lib/sync/legacy-mastery-evidence";
 import { createEmptyLessonSession } from "@/store/app-store";
 import type { LessonPackage, StoryWord } from "@/types/lesson";
 import type { Json } from "@/types/database";
@@ -50,11 +50,12 @@ function evidenceRecords(events: Json[]): Array<Record<string, unknown>> {
 }
 
 describe("section-batched kanji mastery", () => {
-  it("keeps a new kanji at zero until its section is completed", () => {
+  it("keeps incomplete-phase mastery gated behind phase completion", () => {
     const storageMigration = readFileSync(
       "supabase/migrations/20260727100000_adaptive_question_banks.sql",
       "utf8",
     );
+    const backendSync = readFileSync("lib/sync/backend-sync.ts", "utf8");
     expect(storageMigration).toContain(
       "select auth.uid(), 'kanji', value->>'libraryId', 0, 0, 0, 0, 0, 0",
     );
@@ -70,7 +71,11 @@ describe("section-batched kanji mastery", () => {
       },
     ];
 
-    expect(buildMasteryEvidence(lesson, session, "vocabulary")).toEqual([]);
+    expect(session.completedPhaseIds).not.toContain("vocabulary");
+    expect(backendSync).toContain("async function persistPhaseCompletion");
+    expect(backendSync).toContain(
+      "const legacyEvidence = buildLegacyMasteryEvidence(lesson, session, phase)",
+    );
   });
 
   it("adds recognition evidence after an answer completed without kanji help", () => {
@@ -87,7 +92,7 @@ describe("section-batched kanji mastery", () => {
     ];
 
     const evidence = evidenceRecords(
-      buildMasteryEvidence(lesson, session, "vocabulary"),
+      buildLegacyMasteryEvidence(lesson, session, "vocabulary"),
     );
     expect(evidence).toContainEqual(
       expect.objectContaining({
@@ -123,7 +128,7 @@ describe("section-batched kanji mastery", () => {
     ];
 
     const evidence = evidenceRecords(
-      buildMasteryEvidence(lesson, session, "vocabulary"),
+      buildLegacyMasteryEvidence(lesson, session, "vocabulary"),
     );
     expect(
       evidence.some(
@@ -172,7 +177,7 @@ describe("section-batched kanji mastery", () => {
     );
 
     const evidence = evidenceRecords(
-      buildMasteryEvidence(repeatedLesson, session, "vocabulary"),
+      buildLegacyMasteryEvidence(repeatedLesson, session, "vocabulary"),
     );
     expect(
       evidence.filter(
