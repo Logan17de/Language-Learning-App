@@ -100,39 +100,6 @@ jobs:
         if: always()
         run: supabase test db
 
-      # Publishes the learner privilege surface a clean replay actually produces,
-      # so ACL drift is visible in the run itself and not only in assertions.
-      - name: Report learner table privileges
-        if: always()
-        run: |
-          supabase db query --linked=false "$(cat <<'SQL'
-          select c.relname as table_name,
-                 has_table_privilege('authenticated', c.oid, 'SELECT') as sel,
-                 has_table_privilege('authenticated', c.oid, 'INSERT') as ins,
-                 has_table_privilege('authenticated', c.oid, 'UPDATE') as upd,
-                 has_table_privilege('authenticated', c.oid, 'DELETE') as del,
-                 has_table_privilege('authenticated', c.oid, 'TRUNCATE') as trunc
-          from pg_class c join pg_namespace n on n.oid = c.relnamespace
-          where n.nspname = 'public' and c.relkind = 'r'
-            and c.relname in ('lesson_sessions','lesson_activity_answers','lesson_events',
-                              'lesson_listening_activities','lesson_speaking_activities',
-                              'lesson_translation_questions','learner_mastery','learner_mastery_events')
-          order by c.relname;
-          SQL
-          )" || psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -c "
-          select c.relname as table_name,
-                 has_table_privilege('authenticated', c.oid, 'SELECT') as sel,
-                 has_table_privilege('authenticated', c.oid, 'INSERT') as ins,
-                 has_table_privilege('authenticated', c.oid, 'UPDATE') as upd,
-                 has_table_privilege('authenticated', c.oid, 'DELETE') as del,
-                 has_table_privilege('authenticated', c.oid, 'TRUNCATE') as trunc
-          from pg_class c join pg_namespace n on n.oid = c.relnamespace
-          where n.nspname = 'public' and c.relkind = 'r'
-            and c.relname in ('lesson_sessions','lesson_activity_answers','lesson_events',
-                              'lesson_listening_activities','lesson_speaking_activities',
-                              'lesson_translation_questions','learner_mastery','learner_mastery_events')
-          order by c.relname;"
-
       - name: Database summary
         if: always()
         run: |
