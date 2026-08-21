@@ -21,8 +21,7 @@ export interface RawTranslationQuestions {
 export interface TranslationEvaluation {
   correct: boolean;
   feedback: string;
-  suggestion: string;
-  suggestedAnswer: string;
+  suggestion?: string;
 }
 
 export const translationQuestionSchema: JsonSchema = {
@@ -51,12 +50,11 @@ export const translationQuestionSchema: JsonSchema = {
 export const translationEvaluationSchema: JsonSchema = {
   type: "object",
   additionalProperties: false,
-  required: ["correct", "feedback", "suggestion", "suggestedAnswer"],
+  required: ["correct", "feedback"],
   properties: {
     correct: { type: "boolean" },
     feedback: { type: "string", minLength: 1, maxLength: 500 },
     suggestion: { type: "string", minLength: 1, maxLength: 500 },
-    suggestedAnswer: { type: "string", minLength: 1, maxLength: 240 },
   },
 };
 
@@ -124,10 +122,11 @@ EVALUATION RULES
 - Do not mark an answer wrong for harmless punctuation or spacing differences.
 - A grammatically valid Japanese sentence that avoids the required target pattern is incorrect for this exercise.
 - A sentence that contains the pattern mechanically but uses it with the wrong meaning, formation, tense, polarity, or nuance is incorrect.
-- feedback: briefly say why the answer is correct or what specifically is wrong.
-- suggestion: give one concrete improvement or natural alternative. Even when correct, give a useful refinement rather than empty praise.
-- suggestedAnswer: provide one natural Japanese answer that preserves the English meaning and uses the required target pattern.
-- Keep feedback and suggestion concise and learner-friendly.
+- feedback is always required and should briefly explain why the answer is correct or what specifically is wrong.
+- If correct: return a brief correctness explanation in feedback. Omit suggestion. Do not generate a correction, refinement, alternative answer, or suggestion.
+- If incorrect: explain the specific problem in feedback and include one concise, useful improvement suggestion.
+- Do not generate a second Japanese answer. The hidden reference answer already serves as the learner's Reveal Answer after submission.
+- Keep feedback and any incorrect-answer suggestion concise and learner-friendly.
 
 Return only the requested structured object.`;
 }
@@ -188,13 +187,26 @@ export function translationEvaluationOutputIssues(value: unknown): string[] {
   if (!evaluation) return ["Translation validation must return one result object."];
 
   const issues: string[] = [];
-  if (typeof evaluation.correct !== "boolean") {
+  const correct = evaluation.correct;
+  if (typeof correct !== "boolean") {
     issues.push("Translation validation needs a boolean correct verdict.");
   }
-  for (const field of ["feedback", "suggestion", "suggestedAnswer"] as const) {
-    if (typeof evaluation[field] !== "string" || !evaluation[field].trim()) {
-      issues.push(`Translation validation needs ${field}.`);
-    }
+  if (typeof evaluation.feedback !== "string" || !evaluation.feedback.trim()) {
+    issues.push("Translation validation needs feedback.");
   }
+
+  if (correct === true && evaluation.suggestion !== undefined) {
+    issues.push("Correct translation validation must not include a suggestion.");
+  }
+  if (
+    correct === false &&
+    (typeof evaluation.suggestion !== "string" || !evaluation.suggestion.trim())
+  ) {
+    issues.push("Incorrect translation validation needs a non-empty suggestion.");
+  }
+  if ("suggestedAnswer" in evaluation) {
+    issues.push("Translation validation must not generate suggestedAnswer.");
+  }
+
   return issues;
 }

@@ -133,7 +133,9 @@ export async function POST(request: NextRequest) {
             learnerAnswer: answer,
           }),
           schema: translationEvaluationSchema,
-          strictSchema: true,
+          // suggestion is conditionally allowed only for incorrect answers, so
+          // runtime validation enforces the branch instead of strict JSON-schema mode.
+          strictSchema: false,
           exactSchemaName: true,
           validate: translationEvaluationOutputIssues,
           trace: { stage: "grammar_translation_validation" },
