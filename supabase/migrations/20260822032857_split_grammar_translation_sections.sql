@@ -2,6 +2,20 @@
 -- boundaries. A learner who leaves Translation resumes at Translation without
 -- losing the already committed Grammar section.
 
+-- Translation becomes a section in its own right, so the phase vocabulary has
+-- to admit it before any row can claim it. lesson_phase_mastery_commits was
+-- created with a six-phase CHECK, which rejected every write below: the
+-- backfill that splits old Grammar commits, the canonical commit, and the skip
+-- marker alike.
+alter table public.lesson_phase_mastery_commits
+  drop constraint if exists lesson_phase_mastery_commits_phase_check;
+
+alter table public.lesson_phase_mastery_commits
+  add constraint lesson_phase_mastery_commits_phase_check
+  check (phase in (
+    'story','vocabulary','grammar','translation','reading','listening','speaking'
+  ));
+
 alter function public.commit_lesson_phase(uuid, text)
   rename to commit_lesson_phase_six_phase_v1;
 revoke all on function public.commit_lesson_phase_six_phase_v1(uuid, text)
