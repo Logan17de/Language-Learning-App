@@ -429,6 +429,15 @@ begin
 end $$;
 
 -- Drive a session to the Reading boundary: Story, Vocabulary, Grammar committed.
+create or replace function pg_temp.skip_phase(p_user uuid, p_session uuid, p_phase text)
+returns jsonb language plpgsql as $$
+declare v_result jsonb;
+begin
+  perform set_config('request.jwt.claim.sub', p_user::text, true);
+  select public.skip_lesson_phase(p_session, p_phase) into v_result;
+  return v_result;
+end $$;
+
 create or replace function pg_temp.reading_ready_session(p_user uuid, p_lesson uuid)
 returns uuid language plpgsql as $$
 declare v_session uuid;
@@ -438,6 +447,9 @@ begin
   perform pg_temp.commit_phase(p_user, v_session, 'vocabulary');
   perform pg_temp.answer_phase(p_user, v_session, 'grammar', 7);
   perform pg_temp.commit_phase(p_user, v_session, 'grammar');
+  -- Translation sits between Grammar and Reading now. These fixtures are about
+  -- Reading, so they pass it the cheap way rather than staging translations.
+  perform pg_temp.skip_phase(p_user, v_session, 'translation');
   return v_session;
 end $$;
 

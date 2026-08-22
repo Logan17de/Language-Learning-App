@@ -235,6 +235,15 @@ select ok(
 -- Play the lesson through as a Free learner, then complete it.
 -- ---------------------------------------------------------------------------
 select pg_temp.answer_reading(current_setting('aiko.session')::uuid);
+create or replace function pg_temp.skip_phase(p_user uuid, p_session uuid, p_phase text)
+returns jsonb language plpgsql as $$
+declare v_result jsonb;
+begin
+  perform set_config('request.jwt.claim.sub', p_user::text, true);
+  select public.skip_lesson_phase(p_session, p_phase) into v_result;
+  return v_result;
+end $$;
+
 select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
                             current_setting('aiko.session')::uuid, 'story');
 select pg_temp.answer_phase(current_setting('aiko.user')::uuid,
@@ -245,6 +254,8 @@ select pg_temp.answer_phase(current_setting('aiko.user')::uuid,
                             current_setting('aiko.session')::uuid, 'grammar');
 select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
                             current_setting('aiko.session')::uuid, 'grammar');
+select pg_temp.skip_phase(current_setting('aiko.user')::uuid,
+                          current_setting('aiko.session')::uuid, 'translation');
 select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
                             current_setting('aiko.session')::uuid, 'reading');
 select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
@@ -255,7 +266,7 @@ select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
 select is(
   (select count(*)::int from public.lesson_phase_mastery_commits
    where lesson_session_id = current_setting('aiko.session')::uuid),
-  6, 'all six phases committed exactly once each');
+  7, 'all seven sections committed exactly once each');
 
 -- A deliberately absurd client score and XP must not survive.
 select set_config('request.jwt.claim.sub', current_setting('aiko.user'), true);

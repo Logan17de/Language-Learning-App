@@ -9,7 +9,7 @@
 begin;
 create extension if not exists pgtap;
 
-select plan(17);
+select plan(21);
 
 -- ---------------------------------------------------------------------------
 -- Fixture helpers
@@ -182,6 +182,15 @@ begin
   return v_result;
 end $$;
 
+create or replace function pg_temp.skip_phase(p_user uuid, p_session uuid, p_phase text)
+returns jsonb language plpgsql as $$
+declare v_result jsonb;
+begin
+  perform set_config('request.jwt.claim.sub', p_user::text, true);
+  select public.skip_lesson_phase(p_session, p_phase) into v_result;
+  return v_result;
+end $$;
+
 create or replace function pg_temp.earned_mastery(p_user uuid)
 returns integer language sql as $$
   select count(*)::integer from public.learner_mastery
@@ -246,7 +255,23 @@ select is(
   'a Free Skip awards no Translation mastery'
 );
 
--- Reading is reachable straight after Grammar for a Free learner.
+-- Translation is a section of its own, so a Free learner passes it with an
+-- explicit skip rather than by Grammar implicitly covering both.
+select is(
+  (pg_temp.skip_phase(current_setting('aiko.free')::uuid,
+                      current_setting('aiko.free_session')::uuid, 'translation') ->> 'skipped'),
+  'true',
+  'a Free learner skips Translation as its own section'
+);
+select is(
+  (select commit_source from public.lesson_phase_mastery_commits
+   where lesson_session_id = current_setting('aiko.free_session')::uuid
+     and phase = 'translation'),
+  'skipped',
+  'the Free Translation row is recorded as a skip, not a canonical commit'
+);
+
+-- Reading is reachable straight after the Translation skip for a Free learner.
 select is(
   (select count(*)::int from public.lesson_reading_questions question
    join public.lesson_sessions s on s.id = current_setting('aiko.free_session')::uuid
@@ -359,7 +384,22 @@ select is(
   (pg_temp.commit_phase(current_setting('aiko.paid')::uuid,
                         current_setting('aiko.paid_session')::uuid, 'grammar') ->> 'committed'),
   'true',
-  'Premium Grammar commits with seven answers plus five validated Translations'
+  'Premium Grammar commits on its seven answers alone'
+);
+
+-- Translation is now committed on its own evidence, after Grammar.
+select is(
+  (pg_temp.commit_phase(current_setting('aiko.paid')::uuid,
+                        current_setting('aiko.paid_session')::uuid, 'translation') ->> 'committed'),
+  'true',
+  'Premium Translation commits separately on its five validated answers'
+);
+select is(
+  (select commit_source from public.lesson_phase_mastery_commits
+   where lesson_session_id = current_setting('aiko.paid_session')::uuid
+     and phase = 'translation'),
+  'canonical',
+  'the Premium Translation commit is canonical'
 );
 
 select ok(
