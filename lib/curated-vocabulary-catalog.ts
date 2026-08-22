@@ -7,10 +7,34 @@ import type { JLPTLevel } from "@/types/lesson";
 export interface CuratedVocabularyEntry {
   id: string;
   word: string;
+  /** The primary reading. Always a single run of kana. */
   reading: string;
+  /** Every curated reading, primary first. Compounds have exactly one. */
+  readings: string[];
   meaning: string;
   studyLevel: JLPTLevel;
   sourceFile: string;
+}
+
+/**
+ * A stored reading must be one unbroken run of kana - vocabulary_records links
+ * each reading to a kana_records row and rejects anything else.
+ */
+const KANA_ONLY = /^[ぁ-ゖゝゞァ-ヺヽヾー]+$/u;
+
+/**
+ * The solo-kanji catalog lists every curated reading for a kanji in one field,
+ * separated by pipes ("じん | にん | ひと"), which is why it also carries a
+ * reading_count column. Splitting it is not optional: the whole string was
+ * being stored as if it were a single reading, and the database rejected it,
+ * failing vocabulary enrichment for any story containing such a kanji - 1296
+ * of the 2136 curated kanji.
+ */
+function parseCuratedReadings(value: string): string[] {
+  return value
+    .split("|")
+    .map((reading) => reading.normalize("NFKC").trim())
+    .filter((reading) => KANA_ONLY.test(reading));
 }
 
 export interface CuratedVocabularyMatch extends CuratedVocabularyEntry {
@@ -94,8 +118,13 @@ function loadCompoundCatalogFile(sourceFile: string): CuratedVocabularyEntry[] {
     const reading = row[readingIndex]?.normalize("NFKC").trim() ?? "";
     const meaning = row[meaningIndex]?.trim() ?? "";
     const studyLevel = row[levelIndex]?.trim() ?? "";
-    if (!id || !word || !reading || !meaning || !isJlptLevel(studyLevel)) return [];
-    return [{ id, word, reading, meaning, studyLevel, sourceFile }];
+    const readings = parseCuratedReadings(reading);
+    if (!id || !word || readings.length === 0 || !meaning || !isJlptLevel(studyLevel)) {
+      return [];
+    }
+    return [
+      { id, word, reading: readings[0], readings, meaning, studyLevel, sourceFile },
+    ];
   });
 }
 
@@ -117,16 +146,19 @@ function loadSoloKanjiCatalogFile(sourceFile: string): CuratedVocabularyEntry[] 
     const reading = row[readingIndex]?.normalize("NFKC").trim() ?? "";
     const meaning = row[meaningIndex]?.trim() ?? "";
     const studyLevel = row[levelIndex]?.trim() ?? "";
+    const readings = parseCuratedReadings(reading);
     if (
       !id ||
       Array.from(word).length !== 1 ||
-      !reading ||
+      readings.length === 0 ||
       !meaning ||
       !isJlptLevel(studyLevel)
     ) {
       return [];
     }
-    return [{ id, word, reading, meaning, studyLevel, sourceFile }];
+    return [
+      { id, word, reading: readings[0], readings, meaning, studyLevel, sourceFile },
+    ];
   });
 }
 
