@@ -44,14 +44,41 @@ function requestAudioUrl(text?: string, audioAssetId?: string): Promise<string> 
 }
 
 /**
- * Some environments never fire canplay OR error for a media element: the
- * element simply sits at readyState 0 and networkState 2 forever. Without a
- * deadline this promise never settles, the control stays on "Loading audio…"
- * with the answers locked, and because the pending promise is cached every
- * retry rejoins the same dead wait. Time out instead, so the learner gets a
- * real error and the cache entry is evicted for a genuine retry.
+ * A media element that never becomes playable must be torn down, not just
+ * abandoned.
+ *
+ * Chrome caps how many media players a renderer may hold. An element left
+ * loading keeps its slot forever, and the renderer outlives the page: it is
+ * shared across same-site navigations and tabs. So every abandoned element is
+ * permanent. Once enough pile up the cap is reached and *every* later load in
+ * that renderer stalls at readyState 0 - including audio that had worked
+ * moments before, and including a local data: URI that touches no network. The
+ * page then looks broken in a way reloading cannot fix, because the reload
+ * lands in the same exhausted renderer.
+ *
+ * That is what made this fail. The old code resolved on canplay and rejected
+ * on error, but a stalled element fires neither, so the promise never settled,
+ * the control sat on "Loading audio..." with the answers locked, and the
+ * element was never released. Each visit leaked a few more until nothing could
+ * play at all.
+ *
+ * So a load that misses its deadline is aborted explicitly - clear the source
+ * and re-load, which frees the player - and its cache entry is dropped so a
+ * retry starts clean.
  */
 const AUDIO_LOAD_TIMEOUT_MS = 12_000;
+
+/** Free a media element's decoder slot. Without this the slot leaks. */
+function releaseAudio(audio: HTMLAudioElement) {
+  try {
+    audio.pause();
+    audio.removeAttribute("src");
+    audio.srcObject = null;
+    audio.load();
+  } catch {
+    // An element already torn down by the browser is fine to ignore.
+  }
+}
 
 function createPreloadedAudio(url: string): Promise<HTMLAudioElement> {
   return new Promise((resolve, reject) => {
@@ -60,6 +87,7 @@ function createPreloadedAudio(url: string): Promise<HTMLAudioElement> {
 
     const timer = setTimeout(() => {
       cleanup();
+      releaseAudio(audio);
       reject(new Error("Audio could not be loaded."));
     }, AUDIO_LOAD_TIMEOUT_MS);
 
@@ -75,6 +103,7 @@ function createPreloadedAudio(url: string): Promise<HTMLAudioElement> {
     };
     const handleError = () => {
       cleanup();
+      releaseAudio(audio);
       reject(new Error("Audio could not be loaded."));
     };
 
@@ -87,6 +116,29 @@ function createPreloadedAudio(url: string): Promise<HTMLAudioElement> {
       handleReady();
     }
   });
+}
+
+/**
+ * Successful loads are kept so replaying a clip is instant, but they cannot be
+ * kept forever: a retained element holds a player slot just as a stalled one
+ * does, and the renderer survives navigation, so a learner working through
+ * several lessons would drift toward the same cap. Hold the few clips in play
+ * and release the rest. A clip that is still sounding is left alone and
+ * reconsidered on the next insertion.
+ */
+const MAX_CACHED_AUDIO = 8;
+
+function evictStaleAudio() {
+  for (const key of preloadedAudioCache.keys()) {
+    if (preloadedAudioCache.size <= MAX_CACHED_AUDIO) return;
+    const entry = preloadedAudioCache.get(key);
+    if (!entry) continue;
+    void entry.then((audio) => {
+      if (!audio.paused) return;
+      preloadedAudioCache.delete(key);
+      releaseAudio(audio);
+    }, () => undefined);
+  }
 }
 
 function requestPreloadedAudio(
@@ -104,6 +156,7 @@ function requestPreloadedAudio(
       throw error;
     });
   preloadedAudioCache.set(key, pending);
+  evictStaleAudio();
   return pending;
 }
 

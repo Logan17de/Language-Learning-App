@@ -32,6 +32,28 @@ describe("listening audio preload contract", () => {
     expect(source).not.toContain('fetch("/api/audio/tts", {\n          method');
   });
 
+  it("releases media elements that never became playable", () => {
+    // The real defect behind the stuck "Loading audio..." control. Chrome caps
+    // how many media players a renderer holds, and the renderer outlives the
+    // page, so an element abandoned mid-load leaks its slot permanently. Once
+    // enough leak, every later load stalls at readyState 0 -- even a local
+    // data: URI -- and reloading cannot recover, because the reload lands in
+    // the same renderer. Failed loads must be torn down, not just dropped.
+    expect(source).toContain("function releaseAudio");
+    expect(source).toContain('audio.removeAttribute("src")');
+    // Both failure paths release, not just the error one.
+    const timeoutRelease = source.indexOf("releaseAudio(audio)");
+    expect(timeoutRelease).toBeGreaterThanOrEqual(0);
+    expect(source.indexOf("releaseAudio(audio)", timeoutRelease + 1)).toBeGreaterThan(timeoutRelease);
+  });
+
+  it("bounds the preloaded audio cache so retained clips cannot pile up", () => {
+    expect(source).toContain("const MAX_CACHED_AUDIO");
+    expect(source).toContain("evictStaleAudio()");
+    // Never yank a clip out from under a learner who is listening to it.
+    expect(source).toContain("if (!audio.paused) return;");
+  });
+
   it("gives up on audio that never becomes playable", () => {
     // Some environments leave a media element at readyState 0 forever without
     // ever firing error. Without a deadline the promise never settles, the
