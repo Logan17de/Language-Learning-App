@@ -40,11 +40,12 @@ function sessionFor(lesson: LessonPackage): LessonSession {
 }
 
 describe("canonical lesson contract", () => {
-  it("uses the six-phase learner order", () => {
+  it("uses separate Grammar and Translation learner sections", () => {
     expect(CANONICAL_LESSON_PHASES.map((phase) => phase.id)).toEqual([
       "story",
       "vocabulary",
       "grammar",
+      "translation",
       "reading",
       "listening",
       "speaking",
@@ -60,6 +61,7 @@ describe("canonical lesson contract", () => {
       "story",
       "vocabulary",
       "grammar",
+      "translation",
       "reading",
       "listening",
       "speaking",
@@ -71,10 +73,11 @@ describe("canonical lesson contract", () => {
     expect(isCanonicalPlayableLesson(commuteLesson)).toBe(true);
   });
 
-  it("uses 7-7-5-5-5 for generated practice", () => {
+  it("uses 7 Grammar and 5 Translation activities", () => {
     expect(CANONICAL_LESSON_ACTIVITY_COUNTS).toEqual({
       vocabulary: 7,
       grammar: 7,
+      translation: 5,
       reading: 5,
       listening: 5,
       speaking: 5,

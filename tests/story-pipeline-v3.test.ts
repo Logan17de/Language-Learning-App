@@ -140,11 +140,12 @@ describe("custom lesson story pipeline v3", () => {
     expect(exposureMigration).toContain("appearance_count >= 10");
   });
 
-  it("uses the six-phase learner order with no final review", () => {
+  it("uses separate Grammar and Translation sections with no final review", () => {
     expect(CANONICAL_LESSON_PHASES.map((phase) => phase.id)).toEqual([
       "story",
       "vocabulary",
       "grammar",
+      "translation",
       "reading",
       "listening",
       "speaking",

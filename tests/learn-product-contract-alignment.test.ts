@@ -76,14 +76,16 @@ describe("/learn product contract", () => {
     expect(phaseIsComplete(currentSession, "vocabulary", currentLesson)).toBe(true);
   });
 
-  it("uses seven standard Grammar answers and gates Translation only after activation for Free", () => {
+  it("completes Grammar after seven answers and gates Translation independently for Free", () => {
     const currentLesson = lesson();
     const standardAnswers = grammarAnswers("g", 7);
     const currentSession = session({ grammarAnswers: standardAnswers });
 
     expect(grammarStandardIsComplete(currentSession, currentLesson)).toBe(true);
     expect(phaseIsComplete(currentSession, "grammar", currentLesson, true)).toBe(true);
-    expect(phaseIsComplete(currentSession, "grammar", currentLesson, false)).toBe(false);
+    expect(phaseIsComplete(currentSession, "grammar", currentLesson, false)).toBe(true);
+    expect(phaseIsComplete(currentSession, "translation", currentLesson, true)).toBe(true);
+    expect(phaseIsComplete(currentSession, "translation", currentLesson, false)).toBe(false);
 
     const translations = translationQuestions();
     const withLegacyTranslations = session({
@@ -95,11 +97,11 @@ describe("/learn product contract", () => {
     });
 
     expect(
-      phaseIsComplete(withLegacyTranslations, "grammar", currentLesson, false),
+      phaseIsComplete(withLegacyTranslations, "translation", currentLesson, false),
     ).toBe(true);
   });
 
-  it("requires exactly five Translation answers for Premium Grammar", () => {
+  it("requires exactly five Translation answers in the Premium Translation section", () => {
     const currentLesson = lesson({ premium: true });
     const standardAnswers = grammarAnswers("g", 7);
     const translations = translationQuestions();
@@ -110,7 +112,7 @@ describe("/learn product contract", () => {
           grammarTranslationQuestions: translations,
           grammarAnswers: standardAnswers,
         }),
-        "grammar",
+        "translation",
         currentLesson,
         true,
       ),
@@ -125,7 +127,7 @@ describe("/learn product contract", () => {
             ...grammarAnswers("t", 5),
           ],
         }),
-        "grammar",
+        "translation",
         currentLesson,
         true,
       ),

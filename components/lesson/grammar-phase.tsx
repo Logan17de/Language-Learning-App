@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { appendInspectableInteraction } from "@/lib/lesson-support";
 import {
   ArrowRight,
@@ -44,14 +44,34 @@ type TranslationValidation = {
   error?: string;
 };
 
-export function GrammarPhase({
+type GrammarSection = "grammar" | "translation";
+
+export function GrammarPhase(props: {
+  lesson: LessonPackage;
+  session: LessonSession;
+  onChange: (session: LessonSession) => void;
+}) {
+  return <LessonGrammarPhase {...props} section="grammar" />;
+}
+
+export function TranslationPhase(props: {
+  lesson: LessonPackage;
+  session: LessonSession;
+  onChange: (session: LessonSession) => void;
+}) {
+  return <LessonGrammarPhase {...props} section="translation" />;
+}
+
+function LessonGrammarPhase({
   lesson,
   session,
   onChange,
+  section,
 }: {
   lesson: LessonPackage;
   session: LessonSession;
   onChange: (session: LessonSession) => void;
+  section: GrammarSection;
 }) {
   const standardQuestions = lesson.grammarQuestions;
   const translationQuestions = session.grammarTranslationQuestions ?? [];
@@ -59,10 +79,10 @@ export function GrammarPhase({
     translationQuestions.some((question) => question.id === answer.questionId),
   ).length;
   const [showLesson, setShowLesson] = useState(
-    session.grammarAnswers.length === 0 && translationQuestions.length === 0,
+    section === "grammar" && session.grammarAnswers.length === 0,
   );
   const [translationStarted, setTranslationStarted] = useState(
-    translationQuestions.length === TRANSLATION_TARGET,
+    section === "translation" || translationQuestions.length === TRANSLATION_TARGET,
   );
   const [translationIndex, setTranslationIndex] = useState(() =>
     translationQuestions.length > 0
@@ -74,6 +94,7 @@ export function GrammarPhase({
   const [translationChecking, setTranslationChecking] = useState(false);
   const [translationError, setTranslationError] = useState("");
   const [revealedTranslationId, setRevealedTranslationId] = useState<string | null>(null);
+  const translationRequestedRef = useRef(false);
 
   const standardAnsweredCount = session.grammarAnswers.filter((answer) =>
     standardQuestions.some((question) => question.id === answer.questionId),
@@ -201,6 +222,21 @@ export function GrammarPhase({
       setTranslationLoading(false);
     }
   }
+
+  useEffect(() => {
+    if (
+      section !== "translation" ||
+      translationQuestions.length === TRANSLATION_TARGET ||
+      translationRequestedRef.current
+    ) {
+      return;
+    }
+    translationRequestedRef.current = true;
+    void beginTranslation();
+    // Translation generation is intentionally requested once when this saved
+    // section is entered. Retry remains an explicit learner action.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section]);
 
   const translationQuestion = translationQuestions[translationIndex];
   const translationAnswer = translationQuestion
@@ -339,7 +375,7 @@ export function GrammarPhase({
     );
   }
 
-  if (standardComplete && translationStarted) {
+  if (section === "translation" && translationStarted) {
     if (translationLoading || translationQuestions.length !== TRANSLATION_TARGET) {
       return (
         <div className="mx-auto max-w-3xl">
@@ -704,9 +740,9 @@ export function GrammarPhase({
                   translations.
                 </p>
               </div>
-              <Button type="button" onClick={() => void beginTranslation()}>
-                Start translation <ArrowRight className="size-4" />
-              </Button>
+              <p className="text-sm font-semibold text-moss-800">
+                Continue to Translation when you’re ready.
+              </p>
             </div>
           </div>
         )}

@@ -121,13 +121,28 @@ describe("phase-atomic lesson resume", () => {
     expect(restored.vocabularyAnswers).toEqual([]);
   });
 
-  it("clears partial Grammar attempts without discarding generated translation questions", () => {
+  it("clears partial Grammar attempts and its not-yet-reached Translation prompts", () => {
     const original = {
       ...partialSession("grammar"),
       grammarTranslationQuestions: [{ id: "translation-1", english: "Hello" }],
     };
     const restored = restartIncompleteLessonPhase(original);
     expect(restored.grammarAnswers).toEqual([]);
+    expect(restored.grammarTranslationQuestions).toBeUndefined();
+  });
+
+  it("resumes at Translation without discarding completed Grammar", () => {
+    const original = {
+      ...partialSession("translation"),
+      grammarTranslationQuestions: [{ id: "translation-1", english: "Hello" }],
+    };
+    const standardAnswers = original.grammarAnswers.filter(
+      (answer) => !answer.validationSource,
+    );
+    const restored = restartIncompleteLessonPhase(original);
+    expect(restored.currentPhaseIndex).toBe(3);
+    expect(restored.completedPhaseIds).toContain("grammar");
+    expect(restored.grammarAnswers).toEqual(standardAnswers);
     expect(restored.grammarTranslationQuestions).toEqual(
       original.grammarTranslationQuestions,
     );
@@ -161,7 +176,7 @@ describe("phase-atomic lesson resume", () => {
     };
     const restored = restartIncompleteLessonPhase(original);
     expect(restored.completedPhaseIds).toEqual(LESSON_PHASE_ORDER);
-    expect(restored.currentPhaseIndex).toBe(5);
+    expect(restored.currentPhaseIndex).toBe(6);
     expect(restored.activityIndex).toBe(0);
     expect(restored.completionState).toBe("completion_pending");
     expect(restored.completionResult).toBeNull();

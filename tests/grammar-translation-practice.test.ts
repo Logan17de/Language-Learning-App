@@ -131,13 +131,13 @@ describe("adaptive grammar translation practice", () => {
     expect(validator).toContain("translationAnswerData");
     expect(validator).toContain("alreadyFinalized");
     expect(validator).toContain("attempts: 1");
-    // Mastery is committed once, at the completed Grammar phase boundary.
+    // Mastery is committed once, at the completed Translation phase boundary.
     // The route persists evidence only - it invokes no mastery RPC at all.
     expect(validator).not.toContain("learner_mastery");
     expect(validator).not.toContain(".rpc(");
   });
 
-  it("keeps Grammar incomplete until all five translations are answered", () => {
+  it("completes Grammar separately and requires five answers for Translation", () => {
     const session = createEmptyLessonSession(commuteLesson.id);
     session.grammarAnswers = commuteLesson.grammarQuestions.map((question) => ({
       questionId: question.id,
@@ -148,7 +148,8 @@ describe("adaptive grammar translation practice", () => {
       attempts: 1,
     }));
 
-    expect(phaseIsComplete(session, "grammar", commuteLesson)).toBe(false);
+    expect(phaseIsComplete(session, "grammar", commuteLesson)).toBe(true);
+    expect(phaseIsComplete(session, "translation", commuteLesson)).toBe(false);
 
     session.grammarTranslationQuestions = Array.from({ length: 5 }, (_, index) => ({
       id: `translation:${index}:grammar-${index}`,
@@ -168,6 +169,6 @@ describe("adaptive grammar translation practice", () => {
       })),
     );
 
-    expect(phaseIsComplete(session, "grammar", commuteLesson)).toBe(true);
+    expect(phaseIsComplete(session, "translation", commuteLesson)).toBe(true);
   });
 });

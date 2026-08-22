@@ -64,14 +64,13 @@ export function phaseIsComplete(
       );
     }
     case "grammar": {
-      if (!grammarStandardIsComplete(session, lesson)) return false;
+      return grammarStandardIsComplete(session, lesson);
+    }
+    case "translation": {
       if (
         lesson.premiumPhaseAccess === "locked" &&
         translationPremiumContractActive
-      ) {
-        return true;
-      }
-
+      ) return true;
       const answerIds = session.grammarAnswers.map((answer) => answer.questionId);
       const translationQuestions = (session.grammarTranslationQuestions ?? []).slice(
         0,
