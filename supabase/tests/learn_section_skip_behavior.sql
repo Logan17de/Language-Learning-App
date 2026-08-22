@@ -149,7 +149,7 @@ select is(
   (select jsonb_array_length(checkpoint -> 'session' -> 'skippedPhaseIds')
    from public.lesson_sessions
    where id = current_setting('aiko.session')::uuid),
-  6,
+  7,
   'the checkpoint restores all skip markers'
 );
 

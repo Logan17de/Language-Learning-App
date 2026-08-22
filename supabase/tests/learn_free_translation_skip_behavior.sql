@@ -324,15 +324,25 @@ select set_config('aiko.paid_session',
 select pg_temp.answer_grammar(
   current_setting('aiko.paid')::uuid, current_setting('aiko.paid_session')::uuid);
 
+-- Grammar answers for its own seven and nothing else now: the Translation
+-- requirement moved to the Translation section, so Grammar no longer waits on
+-- it. Commit Grammar first, then hold Translation to that requirement.
+select is(
+  (pg_temp.commit_phase(current_setting('aiko.paid')::uuid,
+                        current_setting('aiko.paid_session')::uuid, 'grammar') ->> 'committed'),
+  'true',
+  'Premium Grammar commits on its seven answers alone'
+);
+
 -- throws_ok runs raw SQL, so the Premium learner's identity must be current.
 select set_config('request.jwt.claim.sub', current_setting('aiko.paid'), true);
 
 select throws_ok(
   format('select public.commit_lesson_phase(%L::uuid, %L)',
-         current_setting('aiko.paid_session'), 'grammar'),
+         current_setting('aiko.paid_session'), 'translation'),
   '55000',
   NULL,
-  'Premium Grammar will not commit on the seven standard answers alone'
+  'Premium Translation will not commit with no validated answers'
 );
 
 -- Four of five validated is still not enough.
@@ -344,10 +354,10 @@ select set_config('request.jwt.claim.sub', current_setting('aiko.paid'), true);
 
 select throws_ok(
   format('select public.commit_lesson_phase(%L::uuid, %L)',
-         current_setting('aiko.paid_session'), 'grammar'),
+         current_setting('aiko.paid_session'), 'translation'),
   '55000',
   NULL,
-  'Premium Grammar will not commit with four of five Translations validated'
+  'Premium Translation will not commit with four of five validated'
 );
 
 -- Validate the fifth.
@@ -378,13 +388,6 @@ select is(
      and (answer_data ->> 'serverValidated')::boolean),
   5,
   'the Premium fixture now carries five serverValidated Translations'
-);
-
-select is(
-  (pg_temp.commit_phase(current_setting('aiko.paid')::uuid,
-                        current_setting('aiko.paid_session')::uuid, 'grammar') ->> 'committed'),
-  'true',
-  'Premium Grammar commits on its seven answers alone'
 );
 
 -- Translation is now committed on its own evidence, after Grammar.
