@@ -6,6 +6,7 @@ import type {
   StoryWord,
   VocabularyQuestion,
 } from "@/types/lesson";
+import { questionAllowsTappableWords } from "@/lib/lesson-question-inspection";
 import type { Json } from "@/types/database";
 import { normalizeLessonPhases } from "@/lib/lesson-contract";
 
@@ -138,6 +139,7 @@ function practiceQuestions(
         explanation: item.explanation,
         targetItemIds: item.target_item_ids,
         inspectableTerms: inspectableTerms(item.inspectable_terms),
+        tappableWords: questionAllowsTappableWords(item.cue),
       };
     });
   const grammar = value
@@ -166,6 +168,7 @@ function practiceQuestions(
       hintBack: item.hint_back,
       targetItemIds: item.target_item_ids,
       inspectableTerms: inspectableTerms(item.inspectable_terms),
+      tappableWords: questionAllowsTappableWords(item.cue),
     }));
   return { vocabulary, grammar };
 }

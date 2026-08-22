@@ -7,6 +7,7 @@ import {
   type RepositoryResult,
 } from "@/lib/repositories/result";
 import type { Database } from "@/types/database";
+import { isUuid } from "@/lib/identifiers";
 
 type Lesson = Database["public"]["Tables"]["lessons"]["Row"];
 type Version = Database["public"]["Tables"]["lesson_versions"]["Row"];
@@ -198,13 +199,15 @@ export const lessonRepository = {
   ): Promise<RepositoryResult<CanonicalLesson>> {
     const client = createClient();
     if (!client) return notConfigured();
-    const byId = await client
-      .from("lessons")
-      .select("*")
-      .eq("id", idOrLegacyId)
-      .eq("status", "published")
-      .maybeSingle();
-    const lessonResult = byId.data
+    const byId = isUuid(idOrLegacyId)
+      ? await client
+          .from("lessons")
+          .select("*")
+          .eq("id", idOrLegacyId)
+          .eq("status", "published")
+          .maybeSingle()
+      : null;
+    const lessonResult = byId?.data
       ? byId
       : await client
           .from("lessons")
@@ -237,12 +240,14 @@ export const lessonRepository = {
   ): Promise<RepositoryResult<CanonicalLesson>> {
     const client = createClient();
     if (!client) return notConfigured();
-    const byId = await client
-      .from("lessons")
-      .select("*")
-      .eq("id", idOrLegacyId)
-      .maybeSingle();
-    const lessonResult = byId.data
+    const byId = isUuid(idOrLegacyId)
+      ? await client
+          .from("lessons")
+          .select("*")
+          .eq("id", idOrLegacyId)
+          .maybeSingle()
+      : null;
+    const lessonResult = byId?.data
       ? byId
       : await client
           .from("lessons")

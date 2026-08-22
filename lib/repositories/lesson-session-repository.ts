@@ -4,6 +4,7 @@ import { failure, notConfigured, success, type RepositoryResult } from "@/lib/re
 import { isMissingPhaseAtomicRpc } from "@/lib/sync/phase-rpc-compatibility";
 import type { Database, Json } from "@/types/database";
 import type { LessonPhaseId } from "@/types/lesson-session";
+import { isUuid } from "@/lib/identifiers";
 
 type LessonSession = Database["public"]["Tables"]["lesson_sessions"]["Row"];
 type LessonAnswer = Database["public"]["Tables"]["lesson_activity_answers"]["Insert"];
@@ -96,15 +97,17 @@ export const lessonSessionRepository = {
     const { data: auth } = await client.auth.getUser();
     if (!auth.user) return failure({ code: "AUTH" }, "Your session has expired.");
 
-    const byId = await client
-      .from("lessons")
-      .select("id")
-      .eq("id", lessonReference)
-      .maybeSingle();
-    if (byId.error) {
+    const byId = isUuid(lessonReference)
+      ? await client
+          .from("lessons")
+          .select("id")
+          .eq("id", lessonReference)
+          .maybeSingle()
+      : null;
+    if (byId?.error) {
       return failure(byId.error, "The lesson could not be identified.");
     }
-    const lessonResult = byId.data
+    const lessonResult = byId?.data
       ? byId
       : await client
           .from("lessons")

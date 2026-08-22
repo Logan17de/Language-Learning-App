@@ -14,6 +14,7 @@ import { lessonSessionRepository } from "@/lib/repositories/lesson-session-repos
 import { buildLegacyMasteryEvidence } from "@/lib/sync/legacy-mastery-evidence";
 import {
   enqueueSync,
+  hasPendingLessonPhaseCommit,
   markSyncAttempt,
   readSyncQueue,
   removeSyncOperation,
@@ -381,6 +382,17 @@ export async function syncLessonProgress(
 
   const key = `lesson_checkpoint:${lesson.id}`;
   const safeSession = restartIncompleteLessonPhase(session);
+  // Never race an optimistic phase commit with a later checkpoint. The phase
+  // queue owns ordering; its evidence must reach the server first.
+  if (hasPendingLessonPhaseCommit(lesson.id)) {
+    enqueueSync(
+      "lesson_checkpoint",
+      key,
+      json({ lesson, session: safeSession }),
+      "Waiting for the previous section to save.",
+    );
+    return false;
+  }
   if (!navigator.onLine) {
     enqueueSync(
       "lesson_checkpoint",
@@ -402,10 +414,7 @@ export async function syncLessonProgress(
   return synced;
 }
 
-/**
- * Commit one fully finished phase. In Supabase mode the UI must wait for true
- * before advancing locally; an offline or failed request leaves the phase open.
- */
+/** Commit one fully finished phase immediately. Prefer the durable queue from UI. */
 export async function syncLessonPhaseCompletion(
   lesson: LessonPackage,
   session: LessonSession,
@@ -414,6 +423,45 @@ export async function syncLessonPhaseCompletion(
   if (getBackendMode() !== "supabase") return true;
   if (!navigator.onLine) return false;
   return persistPhaseCompletion(lesson, session, phase);
+}
+
+export function queueLessonPhaseCompletion(
+  lesson: LessonPackage,
+  session: LessonSession,
+  phase: LessonPhaseId,
+): { queued: boolean; completion: Promise<boolean> } {
+  if (getBackendMode() !== "supabase") {
+    return { queued: true, completion: Promise.resolve(true) };
+  }
+  const dedupeKey = `lesson_phase_commit:${lesson.id}:${phase}`;
+  const alreadyQueued = readSyncQueue().some(
+    (item) => item.dedupeKey === dedupeKey,
+  );
+  const queued = alreadyQueued ||
+    enqueueSync(
+      "lesson_phase_commit",
+      dedupeKey,
+      json({ lesson, session, phase }),
+      navigator.onLine ? undefined : "Offline",
+    );
+  if (!queued) {
+    return { queued: false, completion: Promise.resolve(false) };
+  }
+  const completion = navigator.onLine
+    ? retryPendingSync().then(
+        () => !readSyncQueue().some((item) => item.dedupeKey === dedupeKey),
+      )
+    : Promise.resolve(false);
+  return { queued: true, completion };
+}
+
+export async function flushPendingLessonPhaseCommits(
+  lessonId: string,
+): Promise<boolean> {
+  if (getBackendMode() !== "supabase") return true;
+  if (!navigator.onLine) return false;
+  await retryPendingSync();
+  return !hasPendingLessonPhaseCommit(lessonId);
 }
 
 /** Skip one whole section. The database records an explicit zero-score commit. */
@@ -471,6 +519,13 @@ export async function restoreLessonProgress(
 ): Promise<LessonSession> {
   const safeFallback = restartIncompleteLessonPhase(fallback);
   if (getBackendMode() !== "supabase") return safeFallback;
+  if (hasPendingLessonPhaseCommit(lesson.id)) {
+    await retryPendingSync();
+    // Do not let reset_incomplete_lesson_phase erase evidence that is still in
+    // the durable client queue. The local boundary remains the restore source
+    // until every pending phase has reached the canonical server.
+    if (hasPendingLessonPhaseCommit(lesson.id)) return safeFallback;
+  }
   const canonical = await lessonRepository.getPlayable(lesson.id);
   if (!canonical.ok) return safeFallback;
   const backendSession = await lessonSessionRepository.startOrResume(
@@ -495,6 +550,7 @@ export async function restoreLessonProgress(
 function operationPayload(operation: SyncOperation): {
   lesson?: LessonPackage;
   session?: LessonSession;
+  phase?: LessonPhaseId;
 } {
   return typeof operation.payload === "object" &&
     operation.payload !== null &&
@@ -502,14 +558,44 @@ function operationPayload(operation: SyncOperation): {
     ? (operation.payload as unknown as {
         lesson?: LessonPackage;
         session?: LessonSession;
+        phase?: LessonPhaseId;
       })
     : {};
 }
 
-export async function retryPendingSync(): Promise<void> {
+let retryInFlight: Promise<void> | null = null;
+
+async function runPendingSync(): Promise<void> {
   if (getBackendMode() !== "supabase" || !navigator.onLine) return;
   for (const operation of readSyncQueue()) {
     const payload = operationPayload(operation);
+    if (
+      operation.kind === "lesson_phase_commit" &&
+      payload.lesson &&
+      payload.session &&
+      payload.phase
+    ) {
+      try {
+        const synced = await persistPhaseCompletion(
+          payload.lesson,
+          payload.session,
+          payload.phase,
+        );
+        if (synced) {
+          removeSyncOperation(operation.id);
+          continue;
+        }
+        markSyncAttempt(operation.id, "Retry failed.");
+      } catch (error) {
+        markSyncAttempt(
+          operation.id,
+          error instanceof Error ? error.message : "Retry failed.",
+        );
+      }
+      // Preserve phase ordering. A later checkpoint or phase must never pass a
+      // failed mastery boundary.
+      break;
+    }
     if (
       operation.kind !== "lesson_checkpoint" ||
       !payload.lesson ||
@@ -525,4 +611,12 @@ export async function retryPendingSync(): Promise<void> {
     if (synced) removeSyncOperation(operation.id);
     else markSyncAttempt(operation.id, "Retry failed.");
   }
+}
+
+export function retryPendingSync(): Promise<void> {
+  if (retryInFlight) return retryInFlight;
+  retryInFlight = runPendingSync().finally(() => {
+    retryInFlight = null;
+  });
+  return retryInFlight;
 }

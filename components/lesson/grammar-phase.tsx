@@ -27,6 +27,10 @@ import {
   safeProductionPrompt,
 } from "@/lib/japanese-input";
 import { selectNextAdaptiveQuestionIndex } from "@/lib/adaptive-difficulty";
+import {
+  answerSafeInspectableTerms,
+  questionAllowsTappableWords,
+} from "@/lib/lesson-question-inspection";
 
 const QUESTION_TARGET = 7;
 const TRANSLATION_TARGET = 5;
@@ -111,9 +115,18 @@ export function GrammarPhase({
     ? session.grammarAnswers.find((item) => item.questionId === question.id)
     : undefined;
   const convertedAnswer = japaneseInputPreview(typedAnswer);
-  const inspectableTerms = question?.inspectableTerms.length
-    ? question.inspectableTerms
-    : lesson.story.flatMap((line) => line.words);
+  const inspectableTerms = question
+    ? answerSafeInspectableTerms({
+        enabled:
+          question.tappableWords ?? questionAllowsTappableWords(question.cue),
+        prompt: question.prompt,
+        correctAnswer: question.correctAnswer,
+        targetItemIds: question.targetItemIds,
+        terms: question.inspectableTerms.length
+          ? question.inspectableTerms
+          : lesson.story.flatMap((line) => line.words),
+      })
+    : [];
 
   function submitStandardAnswer(selectedAnswer: string) {
     if (!question || answer || !selectedAnswer.trim()) return;

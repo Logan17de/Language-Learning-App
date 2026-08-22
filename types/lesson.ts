@@ -109,6 +109,8 @@ export interface VocabularyQuestion {
   explanation: string;
   targetItemIds: string[];
   inspectableTerms: StoryWord[];
+  /** Whether Japanese context words may reveal reading/meaning help. */
+  tappableWords?: boolean;
 }
 
 export interface GrammarQuestion {
@@ -127,6 +129,8 @@ export interface GrammarQuestion {
   hintBack: string;
   targetItemIds: string[];
   inspectableTerms: StoryWord[];
+  /** Whether Japanese context words may reveal reading/meaning help. */
+  tappableWords?: boolean;
 }
 
 export interface SpeakingExercise {

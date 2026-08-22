@@ -11,6 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { selectNextAdaptiveQuestionIndex } from "@/lib/adaptive-difficulty";
 import { CANONICAL_LESSON_ACTIVITY_COUNTS } from "@/lib/lesson-contract";
+import {
+  answerSafeInspectableTerms,
+  questionAllowsTappableWords,
+} from "@/lib/lesson-question-inspection";
 
 const QUESTION_TARGET = CANONICAL_LESSON_ACTIVITY_COUNTS.vocabulary;
 
@@ -43,6 +47,16 @@ export function VocabularyPhase({
   const question = vocabularyQuestions[currentIndex];
   const answer = session.vocabularyAnswers.find((item) => item.questionId === question.id);
   const roundComplete = answeredCount >= QUESTION_TARGET;
+  const inspectableTerms = answerSafeInspectableTerms({
+    enabled:
+      question.tappableWords ?? questionAllowsTappableWords(question.cue),
+    prompt: question.prompt,
+    correctAnswer: question.correctAnswer,
+    targetItemIds: question.targetItemIds,
+    terms: question.inspectableTerms.length
+      ? question.inspectableTerms
+      : lesson.story.flatMap((line) => line.words),
+  });
 
   function select(selectedAnswer: string) {
     if (answer) return;
@@ -101,7 +115,7 @@ export function VocabularyPhase({
           answerCorrect={answer?.correct}
           lockAfterAnswer
           inspectChoices={false}
-          inspectableTerms={question.inspectableTerms.length ? question.inspectableTerms : lesson.story.flatMap((line) => line.words)}
+          inspectableTerms={inspectableTerms}
           onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
           onSelect={select}
           answerAction={

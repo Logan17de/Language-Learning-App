@@ -2,7 +2,10 @@
 
 import type { Json } from "@/types/database";
 
-export type SyncOperationKind = "lesson_checkpoint" | "lesson_completion";
+export type SyncOperationKind =
+  | "lesson_checkpoint"
+  | "lesson_phase_commit"
+  | "lesson_completion";
 
 export interface SyncOperation {
   id: string;
@@ -31,6 +34,7 @@ export function readSyncQueue(): SyncOperation[] {
             "id" in item &&
             "kind" in item &&
             (item.kind === "lesson_checkpoint" ||
+              item.kind === "lesson_phase_commit" ||
               item.kind === "lesson_completion") &&
             "payload" in item,
         )
@@ -40,10 +44,15 @@ export function readSyncQueue(): SyncOperation[] {
   }
 }
 
-function write(items: SyncOperation[]): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(storageKey, JSON.stringify(items.slice(-100)));
-  window.dispatchEvent(new CustomEvent(eventName, { detail: items.length }));
+function write(items: SyncOperation[]): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    window.localStorage.setItem(storageKey, JSON.stringify(items.slice(-100)));
+    window.dispatchEvent(new CustomEvent(eventName, { detail: items.length }));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function enqueueSync(
@@ -51,11 +60,11 @@ export function enqueueSync(
   dedupeKey: string,
   payload: Json,
   error?: string,
-): void {
+): boolean {
   const current = readSyncQueue().filter(
     (item) => item.dedupeKey !== dedupeKey,
   );
-  write([
+  return write([
     ...current,
     {
       id: crypto.randomUUID(),
@@ -74,15 +83,28 @@ export function removeSyncOperation(id: string): void {
 }
 
 export function discardLessonSyncOperations(lessonId: string): void {
-  const checkpointPrefix = `lesson_checkpoint:${lessonId}:`;
-  const completionPrefix = `lesson_completion:${lessonId}:`;
+  const checkpointPrefix = `lesson_checkpoint:${lessonId}`;
+  const phasePrefix = `lesson_phase_commit:${lessonId}:`;
+  const completionPrefix = `lesson_completion:${lessonId}`;
   write(
     readSyncQueue().filter(
       (item) =>
         !item.dedupeKey.startsWith(checkpointPrefix) &&
+        !item.dedupeKey.startsWith(phasePrefix) &&
         !item.dedupeKey.startsWith(completionPrefix),
     ),
   );
+}
+
+export function hasPendingLessonPhaseCommit(lessonId: string): boolean {
+  const prefix = `lesson_phase_commit:${lessonId}:`;
+  return readSyncQueue().some((item) => item.dedupeKey.startsWith(prefix));
+}
+
+export function pendingLessonPhaseError(lessonId: string): string | undefined {
+  const prefix = `lesson_phase_commit:${lessonId}:`;
+  return readSyncQueue().find((item) => item.dedupeKey.startsWith(prefix))
+    ?.lastError;
 }
 
 export function markSyncAttempt(id: string, error: string): void {

@@ -6,7 +6,7 @@ import { translationAnswerData } from "@/lib/lesson/translation-validation";
 import { createEmptyLessonSession } from "@/store/app-store";
 
 function source(path: string): string {
-  return readFileSync(path, "utf8");
+  return readFileSync(path, "utf8").replace(/\r\n/gu, "\n");
 }
 
 describe("adaptive grammar translation practice", () => {
@@ -32,6 +32,16 @@ describe("adaptive grammar translation practice", () => {
     expect(practice).toContain('role: "lesson_fallback"');
     expect(practice).toContain("Do not silently test unseen grammar");
     expect(practice).not.toContain("unseen eligible grammar");
+  });
+
+  it("resolves generated lesson references without casting them to uuid", () => {
+    const practice = source("lib/lesson/translation-practice.ts");
+
+    expect(practice).toContain("isUuid(lessonReference)");
+    expect(practice).toContain('.eq("legacy_id", lessonReference)');
+    expect(practice.indexOf("isUuid(lessonReference)")).toBeLessThan(
+      practice.indexOf('.eq("id", lessonReference)'),
+    );
   });
 
   it("keeps targets and model answers on the server until validation", () => {

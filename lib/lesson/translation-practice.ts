@@ -17,6 +17,7 @@ import {
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { JLPTLevel } from "@/types/lesson";
 import type { GrammarTranslationQuestion } from "@/types/lesson-session";
+import { isUuid } from "@/lib/identifiers";
 
 const LEVELS: JLPTLevel[] = ["N5", "N4", "N3", "N2", "N1"];
 const REINFORCEMENT_MIN = 60;
@@ -65,16 +66,18 @@ async function resolveLesson(
   admin: SupabaseClient,
   lessonReference: string,
 ): Promise<LessonIdentity> {
-  const byId = await admin
-    .from("lessons")
-    .select("id,jlpt_level,topic")
-    .eq("id", lessonReference)
-    .maybeSingle();
-  if (byId.error) {
+  const byId = isUuid(lessonReference)
+    ? await admin
+        .from("lessons")
+        .select("id,jlpt_level,topic")
+        .eq("id", lessonReference)
+        .maybeSingle()
+    : null;
+  if (byId?.error) {
     throw new Error(`Lesson could not be loaded: ${byId.error.message}`);
   }
 
-  const byLegacy = byId.data
+  const byLegacy = byId?.data
     ? null
     : await admin
         .from("lessons")
@@ -85,7 +88,7 @@ async function resolveLesson(
     throw new Error(`Lesson could not be loaded: ${byLegacy.error.message}`);
   }
 
-  const result = byId.data ?? byLegacy?.data ?? null;
+  const result = byId?.data ?? byLegacy?.data ?? null;
   if (!result || typeof result.id !== "string") {
     throw new Error("This lesson is unavailable for translation practice.");
   }

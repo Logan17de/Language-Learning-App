@@ -35,12 +35,14 @@ import { SpeakingPhase } from "@/components/lesson/speaking-phase";
 import { LessonReportDialog } from "@/components/support/lesson-report-dialog";
 import { preloadListeningAudio } from "@/components/exercises/audio-control";
 import {
+  flushPendingLessonPhaseCommits,
+  queueLessonPhaseCompletion,
   restoreLessonProgress,
   syncLessonCompletion,
-  syncLessonPhaseCompletion,
   syncLessonProgress,
   syncLessonSectionSkip,
 } from "@/lib/sync/backend-sync";
+import { pendingLessonPhaseError } from "@/lib/sync/offline-queue";
 
 type ProtectedPractice = "translation" | "listening" | "speaking";
 
@@ -105,8 +107,11 @@ export function LessonPlayer({
   const [isLeaving, setIsLeaving] = useState(false);
   const [isCommitting, setIsCommitting] = useState(false);
   const [commitError, setCommitError] = useState<string | null>(null);
+  const [backgroundSaveError, setBackgroundSaveError] = useState<string | null>(null);
+  const [isRetryingBackgroundSave, setIsRetryingBackgroundSave] = useState(false);
   const restoredLessonRef = useRef<string | null>(null);
   const editedDuringRestoreRef = useRef(false);
+  const advancingRef = useRef(false);
   const premiumPhasesAccessible = lesson.premiumPhaseAccess !== "locked";
 
   // Warm the first Listening clip while the learner is finishing the phase
@@ -173,9 +178,10 @@ export function LessonPlayer({
           router.replace(`/lesson/${lesson.id}/complete`);
           return;
         }
-        setSession(restored);
-        setElapsedSeconds(restored.elapsedSeconds);
-        saveLessonSession(restored);
+        const durable = preferDurableSession(fallback, restored);
+        setSession(durable);
+        setElapsedSeconds(durable.elapsedSeconds);
+        saveLessonSession(durable);
       })
       .catch(() => undefined);
     return () => {
@@ -286,8 +292,8 @@ export function LessonPlayer({
     base: LessonSession,
     skipped = false,
   ) {
-    if (isCommitting) return;
-    setIsCommitting(true);
+    if (isCommitting || advancingRef.current) return;
+    advancingRef.current = true;
     setCommitError(null);
 
     const phaseSnapshot = {
@@ -297,28 +303,6 @@ export function LessonPlayer({
         ? Array.from(new Set([...(base.skippedPhaseIds ?? []), currentPhaseId]))
         : (base.skippedPhaseIds ?? []),
     };
-    let committed = false;
-    try {
-      committed = await (skipped
-        ? syncLessonSectionSkip(lesson, phaseSnapshot, currentPhaseId)
-        : syncLessonPhaseCompletion(lesson, phaseSnapshot, currentPhaseId));
-    } catch (error) {
-      setCommitError(
-        error instanceof Error
-          ? error.message
-          : "This section could not be saved. Please try again.",
-      );
-      setIsCommitting(false);
-      return;
-    }
-    if (!committed) {
-      setCommitError(
-        "We couldn't safely save this phase yet. Your lesson is still open — try again when you're ready.",
-      );
-      setIsCommitting(false);
-      return;
-    }
-
     const completedPhaseIds = Array.from(
       new Set([...phaseSnapshot.completedPhaseIds, currentPhaseId]),
     );
@@ -332,16 +316,129 @@ export function LessonPlayer({
       },
     };
 
-    if (phaseSnapshot.currentPhaseIndex === lesson.phases.length - 1) {
-      const pending = updateSession({
+    const lastPhase = phaseSnapshot.currentPhaseIndex === lesson.phases.length - 1;
+
+    if (!skipped && !lastPhase) {
+      // The phase snapshot is queued before the optimistic transition. It is
+      // durable in local storage and retries in phase order if the network or
+      // canonical mastery commit fails.
+      const backgroundCommit = queueLessonPhaseCompletion(
+        lesson,
+        phaseSnapshot,
+        currentPhaseId,
+      );
+      if (!backgroundCommit.queued) {
+        setCommitError(
+          "AIko could not safely queue this section on your device. Free some browser storage, then try again.",
+        );
+        advancingRef.current = false;
+        return;
+      }
+      const nextIndex = phaseSnapshot.currentPhaseIndex + 1;
+      updateSession({
         ...phaseSnapshot,
         completedPhaseIds,
         activities: completedActivity,
+        currentPhaseIndex: nextIndex,
         activityIndex: 0,
-        completionResult: null,
-        completionState: "completion_pending",
+        completionState: "active",
         completed: false,
+        completionResult: null,
       });
+      advancingRef.current = false;
+      void backgroundCommit.completion
+        .then((synced) => {
+          if (synced) {
+            setBackgroundSaveError(null);
+            return;
+          }
+          setBackgroundSaveError(
+            "Your previous section is safe on this device, but it has not reached AIko yet.",
+          );
+        })
+        .catch(() => {
+          setBackgroundSaveError(
+            "Your previous section is safe on this device, but it has not reached AIko yet.",
+          );
+        });
+      return;
+    }
+
+    setIsCommitting(true);
+    let committed = false;
+    try {
+      if (skipped) {
+        const previousSaved = await flushPendingLessonPhaseCommits(lesson.id);
+        if (!previousSaved) {
+          throw new Error(
+            "The previous section is still waiting to save. Retry that save before skipping this section.",
+          );
+        }
+        committed = await syncLessonSectionSkip(
+          lesson,
+          phaseSnapshot,
+          currentPhaseId,
+        );
+      } else if (base.completionState === "completion_pending") {
+        committed = await flushPendingLessonPhaseCommits(lesson.id);
+      } else {
+        const queuedCommit = queueLessonPhaseCompletion(
+          lesson,
+          phaseSnapshot,
+          currentPhaseId,
+        );
+        if (!queuedCommit.queued) {
+          throw new Error(
+            "AIko could not safely queue this section on your device. Free some browser storage, then try again.",
+          );
+        }
+        committed = await queuedCommit.completion;
+      }
+    } catch (error) {
+      setCommitError(
+        error instanceof Error
+          ? error.message
+          : "This section could not be saved. Please try again.",
+      );
+      setIsCommitting(false);
+      advancingRef.current = false;
+      return;
+    }
+    if (!committed) {
+      setCommitError(
+        lastPhase
+          ? pendingLessonPhaseError(lesson.id) ??
+              "Your answers are safe on this device, but AIko still needs to save them before showing results."
+          : "We couldn't safely save this section yet. Please try again.",
+      );
+      if (!skipped && lastPhase && base.completionState !== "completion_pending") {
+        updateSession({
+          ...phaseSnapshot,
+          completedPhaseIds,
+          activities: completedActivity,
+          activityIndex: 0,
+          completionResult: null,
+          completionState: "completion_pending",
+          completed: false,
+        });
+      }
+      setIsCommitting(false);
+      advancingRef.current = false;
+      return;
+    }
+
+    if (lastPhase) {
+      const pending = base.completionState === "completion_pending"
+        ? base
+        : updateSession({
+            ...phaseSnapshot,
+            completedPhaseIds,
+            activities: completedActivity,
+            activityIndex: 0,
+            completionResult: null,
+            completionState: "completion_pending",
+            completed: false,
+          });
       const fallbackResult = completionForAccess(
         lesson,
         pending,
@@ -361,6 +458,7 @@ export function LessonPlayer({
             : "Lesson completion could not be confirmed. Please try again.",
         );
         setIsCommitting(false);
+        advancingRef.current = false;
         return;
       }
 
@@ -369,6 +467,7 @@ export function LessonPlayer({
           "The phase is saved, but lesson completion wasn't confirmed. Retry to finish — no XP or mastery will be duplicated.",
         );
         setIsCommitting(false);
+        advancingRef.current = false;
         return;
       }
 
@@ -385,6 +484,7 @@ export function LessonPlayer({
       setSession(completedSession);
       saveLessonSession(completedSession);
       setIsCommitting(false);
+      advancingRef.current = false;
       router.push(`/lesson/${lesson.id}/complete`);
       return;
     }
@@ -401,6 +501,21 @@ export function LessonPlayer({
       completionResult: null,
     });
     setIsCommitting(false);
+    advancingRef.current = false;
+  }
+
+  async function retryBackgroundSaves() {
+    if (isRetryingBackgroundSave) return;
+    setIsRetryingBackgroundSave(true);
+    const synced = await flushPendingLessonPhaseCommits(lesson.id).catch(
+      () => false,
+    );
+    setBackgroundSaveError(
+      synced
+        ? null
+        : "Your previous section is still safe here. Check your connection and retry the save.",
+    );
+    setIsRetryingBackgroundSave(false);
   }
 
   function skipSection() {
@@ -480,6 +595,30 @@ export function LessonPlayer({
           >
             <AlertTriangle className="mt-0.5 size-5 shrink-0" />
             <p>{commitError}</p>
+          </div>
+        ) : null}
+
+        {backgroundSaveError ? (
+          <div
+            className="mb-6 flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950 sm:flex-row sm:items-center sm:justify-between"
+            role="status"
+          >
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 size-5 shrink-0" />
+              <p>{backgroundSaveError} You can keep learning while it retries.</p>
+            </div>
+            <Button
+              type="button"
+              variant="secondary"
+              className="shrink-0"
+              disabled={isRetryingBackgroundSave}
+              onClick={() => void retryBackgroundSaves()}
+            >
+              {isRetryingBackgroundSave ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : null}
+              Retry save
+            </Button>
           </div>
         ) : null}
 
