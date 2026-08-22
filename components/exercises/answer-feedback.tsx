@@ -19,14 +19,19 @@ export function AnswerFeedback({
       role="status"
       className={cn(
         "rounded-2xl border p-4",
-        correct ? "border-moss-200 bg-moss-50 text-moss-900" : "border-persimmon-100 bg-persimmon-50 text-persimmon-600",
+        correct
+          ? "border-correct-border bg-correct-surface text-correct-ink"
+          : "border-wrong-border bg-wrong-surface text-wrong-ink",
       )}
     >
       <div className="flex items-start gap-3">
         <Icon className="mt-0.5 size-5 shrink-0" />
         <div>
           <p className="text-sm font-semibold">{correct ? "Correct." : "Not correct yet."}</p>
-          {!compact && <p className="mt-1 text-sm leading-6 opacity-75">{detail}</p>}
+          {/* No opacity here: fading this line put the light "not correct"
+              state at 3.4:1, under the 4.5 body-text floor. The heading is
+              already semibold, so weight carries the hierarchy instead. */}
+          {!compact && <p className="mt-1 text-sm leading-6">{detail}</p>}
         </div>
       </div>
     </div>

@@ -38,6 +38,12 @@ const config: Config = {
           700: "#ab4726",
         },
         sand: "rgb(var(--aiko-sand) / <alpha-value>)",
+        "correct-surface": "rgb(var(--aiko-correct-surface) / <alpha-value>)",
+        "correct-border": "rgb(var(--aiko-correct-border) / <alpha-value>)",
+        "correct-ink": "rgb(var(--aiko-correct-ink) / <alpha-value>)",
+        "wrong-surface": "rgb(var(--aiko-wrong-surface) / <alpha-value>)",
+        "wrong-border": "rgb(var(--aiko-wrong-border) / <alpha-value>)",
+        "wrong-ink": "rgb(var(--aiko-wrong-ink) / <alpha-value>)",
       },
       fontFamily: {
         sans: [

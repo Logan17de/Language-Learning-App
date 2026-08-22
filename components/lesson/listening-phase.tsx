@@ -146,7 +146,7 @@ export function ListeningPhase({
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-5xl">
       <div className="text-center">
         <span className="mx-auto grid size-20 place-items-center rounded-4xl bg-moss-900 text-white"><Headphones className="size-8" /></span>
         <div className="mt-6 flex justify-center gap-2">

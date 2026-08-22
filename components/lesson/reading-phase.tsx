@@ -94,7 +94,7 @@ export function ReadingPhase({
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-5xl">
       <div className="max-w-2xl">
         <Badge tone="orange">Reading comprehension</Badge>
         <h2 className="mt-4 text-3xl font-semibold tracking-tight">

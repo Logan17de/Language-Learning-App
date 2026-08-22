@@ -13,6 +13,15 @@
   --aiko-sand: 238 233 223;
   --aiko-progress-track: 226 238 231;
   --aiko-progress-fill: 79 128 104;
+  /* Right and wrong are the only colours in the app that must read as verdicts.
+     They are tokens because moss and persimmon are fixed hex: used raw, a
+     "correct" chip stayed a near-white block on a dark card. */
+  --aiko-correct-surface: 242 247 244;
+  --aiko-correct-border: 197 221 207;
+  --aiko-correct-ink: 32 56 46;
+  --aiko-wrong-surface: 255 245 238;
+  --aiko-wrong-border: 251 203 176;
+  --aiko-wrong-ink: 171 71 38;
 }
 
 .dark {
@@ -26,6 +35,12 @@
   --aiko-sand: 45 57 50;
   --aiko-progress-track: 52 75 64;
   --aiko-progress-fill: 117 170 142;
+  --aiko-correct-surface: 34 58 46;
+  --aiko-correct-border: 79 128 104;
+  --aiko-correct-ink: 199 228 211;
+  --aiko-wrong-surface: 63 40 32;
+  --aiko-wrong-border: 171 71 38;
+  --aiko-wrong-ink: 245 169 126;
 }
 
 * {
@@ -146,6 +161,20 @@ button:not(:disabled),
   animation: aiko-answer-result-in 220ms ease-out both;
 }
 
+/* Each question arrives as a short list, so the choices land in sequence
+   rather than all at once. The delay is set per option and capped, so a long
+   set never keeps the learner waiting to answer. */
+.choice-option {
+  animation: aiko-choice-in 260ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+/* Once an answer is locked in, the options that were not taken step back so
+   the outcome is the only thing with weight left on the row. */
+.choice-receded {
+  opacity: 0.5;
+  transform: scale(0.99);
+}
+
 .answer-choice-correct {
   animation: aiko-answer-pop 360ms cubic-bezier(.2,.8,.2,1) both;
 }
@@ -166,6 +195,22 @@ button:not(:disabled),
   background: #e57748;
   box-shadow: 0 0 0 4px rgb(229 119 72 / 0.12);
   animation: aiko-celebration-spark 620ms cubic-bezier(.2,.9,.2,1) both;
+}
+
+@keyframes aiko-choice-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aiko-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes aiko-answer-result-in {
@@ -250,5 +295,24 @@ button:not(:disabled),
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* Reduced motion means less travel, not less feedback. Answering is the one
+     moment the learner needs acknowledged, so the choices and the result still
+     arrive - by fading in place, with no movement and no delay. */
+  .choice-option,
+  .answer-result-row {
+    animation: aiko-fade-in 140ms ease-out both !important;
+    animation-delay: 0ms !important;
+  }
+
+  .answer-choice-correct,
+  .answer-choice-wrong,
+  .answer-celebration {
+    animation: none !important;
+  }
+
+  .choice-receded {
+    transform: none;
   }
 }

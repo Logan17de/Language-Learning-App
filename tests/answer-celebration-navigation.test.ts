@@ -31,10 +31,18 @@ describe("answer feedback interaction", () => {
     expect(globals).toContain("@keyframes aiko-celebration-spark");
   });
 
-  it("keeps the next action beside answer feedback", () => {
+  it("keeps the next action with the answer feedback", () => {
     expect(multipleChoice).toContain("data-answer-result-row");
     expect(multipleChoice).toContain("answerAction?: ReactNode");
-    expect(multipleChoice).toContain("sm:flex-row");
+    // Feedback and the action that follows it both sit in the answer column,
+    // directly under the choice the learner just made, rather than across the
+    // full width away from it.
+    const resultRow = multipleChoice.slice(
+      multipleChoice.indexOf("data-answer-result-row"),
+    );
+    expect(resultRow.indexOf("AnswerFeedback")).toBeLessThan(
+      resultRow.indexOf("answerAction"),
+    );
     expect(vocabulary).toContain("answerAction={");
     expect(grammar).toContain("answerAction={nextAction}");
     expect(reading).toContain("answerAction={");

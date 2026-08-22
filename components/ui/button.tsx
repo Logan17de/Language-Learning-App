@@ -4,13 +4,16 @@ import { cn } from "@/lib/utils";
 
 type Variant = "primary" | "secondary" | "ghost" | "dark";
 
+/* Every variant lifts on hover and presses back down on click, so the whole
+   control set answers a pointer the same way. Disabled keeps its footing:
+   nothing that cannot be used should appear to respond. */
 const variants: Record<Variant, string> = {
   primary:
-    "bg-moss-600 text-white shadow-soft hover:bg-moss-700 active:scale-[0.98]",
+    "bg-moss-600 text-white shadow-soft hover:-translate-y-0.5 hover:bg-moss-700 hover:shadow-card active:translate-y-0 active:scale-[0.98]",
   secondary:
-    "border border-border bg-surface text-moss-700 hover:border-moss-200 hover:bg-moss-50 active:scale-[0.98]",
+    "border border-border bg-surface text-moss-700 hover:-translate-y-0.5 hover:border-moss-300 hover:bg-moss-50 hover:shadow-soft active:translate-y-0 active:scale-[0.98]",
   ghost: "text-ink hover:bg-surface-muted active:scale-[0.98]",
-  dark: "bg-moss-900 text-white shadow-soft hover:bg-moss-800 active:scale-[0.98]",
+  dark: "bg-moss-900 text-white shadow-soft hover:-translate-y-0.5 hover:bg-moss-800 hover:shadow-card active:translate-y-0 active:scale-[0.98]",
 };
 
 interface SharedProps {
@@ -20,7 +23,7 @@ interface SharedProps {
 }
 
 const baseClass =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition duration-180 focus:outline-none focus-visible:ring-4 focus-visible:ring-moss-200 focus-visible:ring-offset-2 focus-visible:ring-offset-paper disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100";
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition-[transform,background-color,border-color,box-shadow,opacity] duration-200 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-moss-200 focus-visible:ring-offset-2 focus-visible:ring-offset-paper disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none disabled:hover:translate-y-0 disabled:active:scale-100 [&>svg]:transition-transform [&>svg]:duration-200 hover:[&>svg:last-child]:translate-x-0.5";
 
 export function Button({
   children,

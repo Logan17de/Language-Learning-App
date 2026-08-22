@@ -88,7 +88,7 @@ export function VocabularyPhase({
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-5xl">
       <div className="flex items-end justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-2">
