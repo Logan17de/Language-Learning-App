@@ -116,6 +116,7 @@ export function LessonPlayer({
   const restoredLessonRef = useRef<string | null>(null);
   const editedDuringRestoreRef = useRef(false);
   const advancingRef = useRef(false);
+  const storyCommitRef = useRef(false);
   const premiumPhasesAccessible = lesson.premiumPhaseAccess !== "locked";
 
   // Warm the first Listening clip while the learner is finishing the phase
@@ -186,6 +187,34 @@ export function LessonPlayer({
         setSession(durable);
         setElapsedSeconds(durable.elapsedSeconds);
         saveLessonSession(durable);
+
+        // The Story page finishes Story and hands the player a session that
+        // already lists it as complete, but that claim only ever existed in
+        // this browser -- it never reached the database. Trusting it meant
+        // Story was never committed, so every later section failed the
+        // ordering gate with "Previous lesson phase is not committed" and
+        // retried forever behind a banner blaming the connection.
+        //
+        // Committing Story here closes that gap and repairs sessions already
+        // stuck in it: the commit writes the checkpoint first, and that is what
+        // carries storyComplete to the server. Repeating it is safe -- an
+        // already-committed section comes back as a duplicate, not a second
+        // award.
+        if (durable.storyComplete && !durable.completed && !storyCommitRef.current) {
+          storyCommitRef.current = true;
+          const queued = queueLessonPhaseCompletion(lesson, durable, "story");
+          if (queued.queued) {
+            void queued.completion
+              .then((ok) => {
+                if (!ok) storyCommitRef.current = false;
+              })
+              .catch(() => {
+                storyCommitRef.current = false;
+              });
+          } else {
+            storyCommitRef.current = false;
+          }
+        }
       })
       .catch(() => undefined);
     return () => {
@@ -509,10 +538,15 @@ export function LessonPlayer({
     const synced = await flushPendingLessonPhaseCommits(lesson.id).catch(
       () => false,
     );
+    // The queue records why each attempt failed, and the repository maps the
+    // server's phase rules to something a learner can act on. Blaming the
+    // connection for a rule failure sent them round a retry that could not
+    // succeed, with nothing on screen naming the real problem.
     setBackgroundSaveError(
       synced
         ? null
-        : "Your previous section is still safe here. Check your connection and retry the save.",
+        : pendingLessonPhaseError(lesson.id) ??
+            "Your previous section is still safe here. Check your connection and retry the save.",
     );
     setIsRetryingBackgroundSave(false);
   }
