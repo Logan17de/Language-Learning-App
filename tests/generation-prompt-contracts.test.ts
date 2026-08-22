@@ -176,6 +176,9 @@ describe("custom lesson generation prompt contracts", () => {
     expect(prompt).toContain("Create exactly 5 listening-comprehension questions");
     expect(prompt).toContain("2 easy, 2 medium, and 1 hard");
     expect(prompt).toContain("natural Japanese conversation of 5–10 lines");
+    expect(prompt).toContain("2 or more named speakers");
+    expect(prompt).toContain("田中：おはようございます。");
+    expect(prompt).toContain("Never use generic labels");
     expect(prompt).toContain("Job interview");
     expect(prompt).toContain("ゆきさんは会社で面接を受けました。");
     expect(prompt).toContain("recognizably connected to the lesson topic or story context");

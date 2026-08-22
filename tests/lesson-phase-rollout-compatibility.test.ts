@@ -78,7 +78,9 @@ describe("phase-atomic rollout compatibility", () => {
     expect(canonicalSuccess).toBeGreaterThan(-1);
     expect(legacyBuilder).toBeGreaterThan(canonicalSuccess);
     expect(legacyRpc).toBeGreaterThan(legacyBuilder);
-    expect(source).toContain("if (!committed.ok) return false;");
+    expect(source).toContain(
+      "if (!committed.ok) throw new Error(committed.error.message);",
+    );
   });
 
   it("keeps the canonical engine and rollout bridge in one migration unit", () => {

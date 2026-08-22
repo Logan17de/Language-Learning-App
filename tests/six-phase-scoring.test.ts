@@ -66,4 +66,18 @@ describe("six-phase lesson scoring", () => {
     expect(lesson.reviewQuestions).toEqual([]);
     expect(result.score).toBe(100);
   });
+
+  it("scores explicitly skipped sections as zero even after partial answers", () => {
+    const { lesson, session } = perfectSession();
+    session.skippedPhaseIds = [
+      "story",
+      "vocabulary",
+      "grammar",
+      "reading",
+      "listening",
+      "speaking",
+    ];
+
+    expect(calculateLessonCompletion(lesson, session).score).toBe(0);
+  });
 });

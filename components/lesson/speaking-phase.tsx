@@ -12,7 +12,7 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { InspectableText } from "@/components/exercises/inspectable-text";
 import { appendInspectableInteraction } from "@/lib/lesson-support";
 
-const RECORDING_LIMIT_SECONDS = 10;
+const RECORDING_LIMIT_SECONDS = 20;
 const LIVE_TRANSCRIPTION_INTERVAL_MS = 2_000;
 const VOICE_RMS_THRESHOLD = 0.018;
 const REQUIRED_VOICE_FRAMES = 6;
@@ -33,7 +33,14 @@ export function SpeakingPhase({
 }) {
   const exercises = lesson.speakingExercises;
   const completedIds = new Set(
-    session.speakingEvents.map((event) => event.exerciseId).filter(Boolean),
+    session.speakingEvents
+      .filter(
+        (event) =>
+          event.evaluationAvailable === true &&
+          event.pronunciationConfidence >= 70,
+      )
+      .map((event) => event.exerciseId)
+      .filter(Boolean),
   );
   const currentIndex = Math.min(session.activityIndex, exercises.length - 1);
   const exercise = exercises[currentIndex];
@@ -44,6 +51,11 @@ export function SpeakingPhase({
   const [transcribing, setTranscribing] = useState(false);
   const [secondsRemaining, setSecondsRemaining] = useState(RECORDING_LIMIT_SECONDS);
   const [liveTranscript, setLiveTranscript] = useState("");
+  const [readingHint, setReadingHint] = useState<{
+    exerciseId: string;
+    romaji: string;
+  } | null>(null);
+  const [readingHintLoading, setReadingHintLoading] = useState(false);
   const [error, setError] = useState("");
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -204,7 +216,10 @@ export function SpeakingPhase({
         missedWords: [],
         successfulRetry: retry && sentenceMatch >= 70,
       };
-      const completedAfter = new Set([...completedIds, exercise.id]);
+      const completedAfter =
+        sentenceMatch >= 70
+          ? new Set([...completedIds, exercise.id])
+          : completedIds;
       onChange({
         ...session,
         activityIndex: currentIndex,
@@ -317,6 +332,38 @@ export function SpeakingPhase({
     onChange({ ...session, activityIndex: currentIndex + 1 });
   }
 
+  async function showReading() {
+    if (readingHintLoading) return;
+    setReadingHintLoading(true);
+    setError("");
+    try {
+      const response = await fetch(
+        `/api/audio/reading?exerciseId=${encodeURIComponent(exercise.id)}`,
+      );
+      const result: unknown = await response.json().catch(() => null);
+      const record =
+        result && typeof result === "object" && !Array.isArray(result)
+          ? (result as Record<string, unknown>)
+          : null;
+      if (!response.ok || typeof record?.romaji !== "string") {
+        throw new Error(
+          typeof record?.error === "string"
+            ? record.error
+            : "The reading hint could not be prepared.",
+        );
+      }
+      setReadingHint({ exerciseId: exercise.id, romaji: record.romaji });
+    } catch (hintError) {
+      setError(
+        hintError instanceof Error
+          ? hintError.message
+          : "The reading hint could not be prepared.",
+      );
+    } finally {
+      setReadingHintLoading(false);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-3xl">
       <div className="text-center">
@@ -325,7 +372,7 @@ export function SpeakingPhase({
           <Badge>{exercise.mode}</Badge>
         </div>
         <h2 className="mt-4 text-3xl font-semibold">Read the sentence aloud.</h2>
-        <p className="mt-3 text-stone-500">You have up to 10 seconds. AIko shows the live transcript and compares only the sentence.</p>
+        <p className="mt-3 text-stone-500">You have up to 20 seconds. A 70% match in Japanese or romaji moves you forward.</p>
         <p className="mt-3 text-sm font-semibold text-stone-400">{currentIndex + 1} / {exercises.length}</p>
       </div>
       <ProgressBar value={(completedIds.size / exercises.length) * 100} className="mt-6" />
@@ -340,6 +387,21 @@ export function SpeakingPhase({
               }
             />
           </p>
+          {readingHint?.exerciseId === exercise.id ? (
+            <p className="mt-3 text-sm font-semibold tracking-wide text-moss-700">
+              {readingHint.romaji}
+            </p>
+          ) : null}
+          <Button
+            type="button"
+            variant="ghost"
+            className="mt-3"
+            disabled={readingHintLoading}
+            onClick={() => void showReading()}
+          >
+            {readingHintLoading ? <LoaderCircle className="size-4 animate-spin" /> : null}
+            {readingHintLoading ? "Preparing reading…" : "Show reading"}
+          </Button>
         </div>
 
         <div className="mt-6 flex flex-wrap justify-center gap-3">
@@ -368,7 +430,7 @@ export function SpeakingPhase({
           <div className="mt-7">
             <SpeakingFeedback event={latest} />
             <Button type="button" variant="secondary" className="mt-4" disabled={speaking || transcribing} onClick={startRecording}><RotateCcw className="size-4" /> Try Again</Button>
-            {currentIndex < exercises.length - 1 && (
+            {latest.pronunciationConfidence >= 70 && currentIndex < exercises.length - 1 && (
               <Button type="button" className="mt-4 sm:ml-3" disabled={speaking || transcribing} onClick={nextExercise}>
                 Next sentence <ArrowRight className="size-4" />
               </Button>

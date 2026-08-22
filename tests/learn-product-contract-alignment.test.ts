@@ -194,13 +194,16 @@ describe("/learn product contract", () => {
 
   it("never uses the lesson Back control to rewind a completed phase", () => {
     const player = readFileSync("components/lesson/lesson-player.tsx", "utf8");
-    const backStart = player.indexOf("function back()");
-    const commitStart = player.indexOf("async function commitAndAdvance", backStart);
-    const backBody = player.slice(backStart, commitStart);
+    const shell = readFileSync(
+      "components/lesson/lesson-player-shell.tsx",
+      "utf8",
+    );
 
-    expect(backBody).toContain("setShowExit(true)");
-    expect(backBody).not.toContain("currentPhaseIndex - 1");
-    expect(backBody).not.toContain("previousPhase");
+    expect(shell).not.toContain("onBack");
+    expect(shell).not.toContain("ArrowLeft");
+    expect(shell).toContain('aria-label="Exit lesson"');
+    expect(player).not.toContain("currentPhaseIndex - 1");
+    expect(player).not.toContain("previousPhase");
   });
 
   it("keeps daily allowance and Resume as separate UI actions", () => {

@@ -24,13 +24,18 @@ const curatedMigration = readFileSync(
 describe("generated lesson validation", () => {
   it("uses curated story vocabulary while keeping learner activity validation structural", () => {
     expect(listeningQuestionIssues({
-      questions: [
-        { difficulty: "easy" },
-        { difficulty: "easy" },
-        { difficulty: "medium" },
-        { difficulty: "medium" },
-        { difficulty: "hard" },
-      ],
+      questions: ["easy", "easy", "medium", "medium", "hard"].map(
+        (difficulty) => ({
+          difficulty,
+          conversation: [
+            "田中：おはようございます。",
+            "ゆき：おはようございます。",
+            "田中：駅へ行きます。",
+            "ゆき：私も行きます。",
+            "田中：一緒に行きましょう。",
+          ],
+        }),
+      ),
     })).toEqual([]);
     expect(speakingReadAloudIssues({
       sentences: [

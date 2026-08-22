@@ -7,12 +7,14 @@ const transcriptionRoute = readFileSync("app/api/audio/transcribe/route.ts", "ut
 const audioLibrary = readFileSync("lib/audio/audio-library.ts", "utf8");
 
 describe("live speaking transcription", () => {
-  it("streams interim transcripts for at most ten seconds", () => {
-    expect(speaking).toContain("RECORDING_LIMIT_SECONDS = 10");
+  it("streams interim transcripts for at most twenty seconds", () => {
+    expect(speaking).toContain("RECORDING_LIMIT_SECONDS = 20");
     expect(speaking).toContain("LIVE_TRANSCRIPTION_INTERVAL_MS = 2_000");
     expect(speaking).toContain("void updateLiveTranscript");
     expect(speaking).toContain("Your words will appear here.");
     expect(speaking).toContain("window.setTimeout(stopRecording");
+    expect(speaking).toContain("Show reading");
+    expect(speaking).toContain("pronunciationConfidence >= 70");
   });
 
   it("does not save silence or failed transcription as a completed attempt", () => {

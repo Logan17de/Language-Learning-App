@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createSign } from "node:crypto";
+import { dialogueSsml } from "@/lib/audio/dialogue-speech";
 
 interface GoogleServiceAccount {
   client_email: string;
@@ -130,6 +131,7 @@ export async function synthesizeGoogleSpeech(
   japaneseText: string,
 ): Promise<GoogleSpeechResult> {
   const config = googleSpeechConfig();
+  const ssml = dialogueSsml(japaneseText);
   const response = await fetch(
     "https://texttospeech.googleapis.com/v1/text:synthesize",
     {
@@ -139,7 +141,7 @@ export async function synthesizeGoogleSpeech(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        input: { text: japaneseText },
+        input: ssml ? { ssml } : { text: japaneseText },
         voice: {
           languageCode: config.languageCode,
           name: config.voiceName,

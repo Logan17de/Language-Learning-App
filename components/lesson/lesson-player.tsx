@@ -39,6 +39,7 @@ import {
   syncLessonCompletion,
   syncLessonPhaseCompletion,
   syncLessonProgress,
+  syncLessonSectionSkip,
 } from "@/lib/sync/backend-sync";
 
 type ProtectedPractice = "translation" | "listening" | "speaking";
@@ -100,6 +101,7 @@ export function LessonPlayer({
   const [session, setSession] = useState<LessonSession | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [showExit, setShowExit] = useState(false);
+  const [showSkip, setShowSkip] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [isCommitting, setIsCommitting] = useState(false);
   const [commitError, setCommitError] = useState<string | null>(null);
@@ -279,26 +281,36 @@ export function LessonPlayer({
     );
   }
 
-  function back() {
-    if (isCommitting) return;
-    setCommitError(null);
-    setShowExit(true);
-  }
-
   async function commitAndAdvance(
     currentPhaseId: LessonPhaseId,
     base: LessonSession,
+    skipped = false,
   ) {
     if (isCommitting) return;
     setIsCommitting(true);
     setCommitError(null);
 
-    const phaseSnapshot = { ...base, elapsedSeconds };
-    const committed = await syncLessonPhaseCompletion(
-      lesson,
-      phaseSnapshot,
-      currentPhaseId,
-    ).catch(() => false);
+    const phaseSnapshot = {
+      ...base,
+      elapsedSeconds,
+      skippedPhaseIds: skipped
+        ? Array.from(new Set([...(base.skippedPhaseIds ?? []), currentPhaseId]))
+        : (base.skippedPhaseIds ?? []),
+    };
+    let committed = false;
+    try {
+      committed = await (skipped
+        ? syncLessonSectionSkip(lesson, phaseSnapshot, currentPhaseId)
+        : syncLessonPhaseCompletion(lesson, phaseSnapshot, currentPhaseId));
+    } catch (error) {
+      setCommitError(
+        error instanceof Error
+          ? error.message
+          : "This section could not be saved. Please try again.",
+      );
+      setIsCommitting(false);
+      return;
+    }
     if (!committed) {
       setCommitError(
         "We couldn't safely save this phase yet. Your lesson is still open — try again when you're ready.",
@@ -335,11 +347,22 @@ export function LessonPlayer({
         pending,
         premiumPhasesAccessible,
       );
-      const canonicalResult = await syncLessonCompletion(
-        lesson,
-        pending,
-        fallbackResult,
-      ).catch(() => null);
+      let canonicalResult = null;
+      try {
+        canonicalResult = await syncLessonCompletion(
+          lesson,
+          pending,
+          fallbackResult,
+        );
+      } catch (error) {
+        setCommitError(
+          error instanceof Error
+            ? error.message
+            : "Lesson completion could not be confirmed. Please try again.",
+        );
+        setIsCommitting(false);
+        return;
+      }
 
       if (!canonicalResult) {
         setCommitError(
@@ -378,6 +401,13 @@ export function LessonPlayer({
       completionResult: null,
     });
     setIsCommitting(false);
+  }
+
+  function skipSection() {
+    if (!session || isCommitting) return;
+    setShowSkip(false);
+    const currentPhase = lesson.phases[session.currentPhaseIndex];
+    void commitAndAdvance(currentPhase.id, session, true);
   }
 
   function continueLesson() {
@@ -419,6 +449,7 @@ export function LessonPlayer({
         totalPhases={lesson.phases.length}
         progress={progress}
         canContinue={canContinue && !isCommitting}
+        skipDisabled={isCommitting}
         continueLabel={
           isCommitting
             ? "Saving…"
@@ -428,7 +459,7 @@ export function LessonPlayer({
                 : "See results"
               : nextLabel(phase.id)
         }
-        onBack={back}
+        onSkip={() => setShowSkip(true)}
         onContinue={continueLesson}
         onExit={() => setShowExit(true)}
       >
@@ -505,6 +536,45 @@ export function LessonPlayer({
           </>
         )}
       </LessonPlayerShell>
+
+      {showSkip && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-5 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="skip-title"
+        >
+          <div className="w-full max-w-md rounded-4xl bg-white p-7 shadow-float">
+            <span className="grid size-12 place-items-center rounded-2xl bg-sand text-persimmon-700">
+              <AlertTriangle className="size-5" />
+            </span>
+            <h2 id="skip-title" className="mt-6 text-2xl font-semibold">
+              Skip {phase.label}?
+            </h2>
+            <p className="mt-3 leading-7 text-stone-500">
+              This whole section will count as zero and cannot be reopened in
+              this lesson. You will move straight to the next section.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                className="flex-1"
+                onClick={() => setShowSkip(false)}
+              >
+                Keep learning
+              </Button>
+              <Button
+                type="button"
+                className="flex-1 bg-persimmon-500 hover:bg-persimmon-600"
+                onClick={skipSection}
+              >
+                Skip {phase.label}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showExit && (
         <div

@@ -276,19 +276,21 @@ async function persistPhaseCompletion(
   const answers = await lessonSessionRepository.saveAnswers(
     phaseAnswers(lesson, session, phase, sessionId),
   );
-  if (!answers.ok) return false;
+  if (!answers.ok) throw new Error(answers.error.message);
 
   const events = await lessonSessionRepository.saveEvents(
     phaseEvents(session, phase, sessionId),
   );
-  if (!events.ok) return false;
+  if (!events.ok) throw new Error(events.error.message);
 
   // Reading answers and Story completion live in the checkpoint, so the
   // completed phase snapshot must be saved before canonical validation.
-  if (!(await saveCheckpoint(lesson, session, sessionId, true))) return false;
+  if (!(await saveCheckpoint(lesson, session, sessionId, true))) {
+    throw new Error("This phase checkpoint could not be saved. Please try again.");
+  }
 
   const committed = await lessonSessionRepository.commitPhase(sessionId, phase);
-  if (!committed.ok) return false;
+  if (!committed.ok) throw new Error(committed.error.message);
   if (committed.data !== null) return true;
 
   // Rollout bridge only: the frontend may be promoted while the shared DB still
@@ -309,6 +311,33 @@ async function persistPhaseCompletion(
     sessionId,
     true,
   );
+}
+
+async function persistPhaseSkip(
+  lesson: LessonPackage,
+  session: LessonSession,
+  phase: LessonPhaseId,
+): Promise<boolean> {
+  const context = await backendContext(lesson);
+  if (!context) {
+    throw new Error("This lesson session could not be loaded. Please try again.");
+  }
+  const sessionId = context.backendSession.id;
+  // The RPC is the skip authority. Do not checkpoint the optimistic marker
+  // before it succeeds, or a failed request could restore as zero-scored even
+  // though no durable skipped commit exists.
+  const preSkipSession = {
+    ...session,
+    skippedPhaseIds: (session.skippedPhaseIds ?? []).filter(
+      (phaseId) => phaseId !== phase,
+    ),
+  };
+  if (!(await saveCheckpoint(lesson, preSkipSession, sessionId, false))) {
+    throw new Error("This section checkpoint could not be saved. Please try again.");
+  }
+  const skipped = await lessonSessionRepository.skipPhase(sessionId, phase);
+  if (!skipped.ok) throw new Error(skipped.error.message);
+  return true;
 }
 
 async function persistCanonicalCompletion(
@@ -337,7 +366,7 @@ async function persistCanonicalCompletion(
       },
     }),
   });
-  if (!result.ok) return { synced: false };
+  if (!result.ok) throw new Error(result.error.message);
   const canonical = canonicalCompletionResult(result.data, fallback);
   return canonical
     ? { synced: true, canonicalCompletion: canonical }
@@ -385,6 +414,19 @@ export async function syncLessonPhaseCompletion(
   if (getBackendMode() !== "supabase") return true;
   if (!navigator.onLine) return false;
   return persistPhaseCompletion(lesson, session, phase);
+}
+
+/** Skip one whole section. The database records an explicit zero-score commit. */
+export async function syncLessonSectionSkip(
+  lesson: LessonPackage,
+  session: LessonSession,
+  phase: LessonPhaseId,
+): Promise<boolean> {
+  if (getBackendMode() !== "supabase") return true;
+  if (!navigator.onLine) {
+    throw new Error("Connect to the internet before skipping a section.");
+  }
+  return persistPhaseSkip(lesson, session, phase);
 }
 
 /** Canonical lesson completion is never queued as an optimistic success. */

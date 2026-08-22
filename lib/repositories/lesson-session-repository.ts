@@ -18,6 +18,36 @@ export interface LessonCompletionInput {
   completionData: Json;
 }
 
+function lessonProgressError(error: unknown, fallback: string): string {
+  const message =
+    error && typeof error === "object" && "message" in error &&
+    typeof error.message === "string"
+      ? error.message
+      : "";
+  if (message.includes("Premium Grammar requires exactly 5 validated translations")) {
+    return "Grammar is missing its 5 validated translations. Restart the Grammar section, then complete it again.";
+  }
+  if (message.includes("Vocabulary") && message.includes("7")) {
+    return "Vocabulary is missing one or more of its 7 answers. Finish the section or skip it.";
+  }
+  if (message.includes("Grammar") && message.includes("7")) {
+    return "Grammar is missing one or more of its 7 answers. Finish the section or skip it.";
+  }
+  if (message.includes("Reading") && message.includes("5")) {
+    return "Reading is missing one or more of its 5 answers. Finish the section or skip it.";
+  }
+  if (message.includes("Listening") && message.includes("5")) {
+    return "Listening is missing one or more of its 5 answers. Finish the section or skip it.";
+  }
+  if (message.includes("Speaking") && message.includes("5")) {
+    return "Speaking is missing one or more of its 5 checked recordings. Finish the section or skip it.";
+  }
+  if (message.includes("Previous lesson phase is not committed")) {
+    return "The previous section has not been saved yet. Return to it and try again.";
+  }
+  return fallback;
+}
+
 export const lessonSessionRepository = {
   async startOrResume(lessonId: string, lessonVersionId: string): Promise<RepositoryResult<LessonSession>> {
     const client = createClient();
@@ -151,8 +181,30 @@ export const lessonSessionRepository = {
       return success(null);
     }
     return error
-      ? failure(error, "This phase could not be committed. Please try again.")
+      ? failure(
+          error,
+          lessonProgressError(error, "This phase could not be committed. Please try again."),
+        )
       : success((data ?? null) as Json | null);
+  },
+
+  async skipPhase(
+    sessionId: string,
+    phase: LessonPhaseId,
+  ): Promise<RepositoryResult<Json>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const rawClient = client as unknown as SupabaseClient;
+    const { data, error } = await rawClient.rpc("skip_lesson_phase", {
+      p_session_id: sessionId,
+      p_phase: phase,
+    });
+    return error
+      ? failure(
+          error,
+          lessonProgressError(error, "This section could not be skipped. Please try again."),
+        )
+      : success((data ?? {}) as Json);
   },
 
   async recordLegacyMasteryEvidence(
@@ -214,6 +266,11 @@ export const lessonSessionRepository = {
       p_duration_minutes: input.durationMinutes,
       p_completion_data: input.completionData,
     });
-    return error ? failure(error, "Lesson completion is waiting to sync.") : success(data);
+    return error
+      ? failure(
+          error,
+          lessonProgressError(error, "Lesson completion is waiting to sync."),
+        )
+      : success(data);
   },
 };

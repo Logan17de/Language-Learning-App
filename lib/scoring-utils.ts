@@ -41,7 +41,8 @@ export function calculateLessonCompletion(
   lesson: LessonPackage,
   session: LessonSession,
 ): LessonCompletionResult {
-  const vocabularyAccuracy = ratio(
+  const skippedPhases = new Set(session.skippedPhaseIds ?? []);
+  const vocabularyAccuracy = skippedPhases.has("vocabulary") ? 0 : ratio(
     session.vocabularyAnswers.filter((answer) => answer.correct).length,
     Math.max(1, lesson.vocabularyQuestions.length),
   );
@@ -51,7 +52,7 @@ export function calculateLessonCompletion(
   const relevantGrammarAnswers = session.grammarAnswers.filter(
     (answer) => staticGrammarIds.has(answer.questionId) || translationIds.has(answer.questionId),
   );
-  const grammarAccuracy = ratio(
+  const grammarAccuracy = skippedPhases.has("grammar") ? 0 : ratio(
     relevantGrammarAnswers.filter((answer) => answer.correct).length,
     Math.max(1, lesson.grammarQuestions.length + translationQuestions.length),
   );
@@ -61,11 +62,11 @@ export function calculateLessonCompletion(
   const grammarProductionAnswers = relevantGrammarAnswers.filter((answer) =>
     translationIds.has(answer.questionId),
   );
-  const grammarUnderstandingAccuracy = ratio(
+  const grammarUnderstandingAccuracy = skippedPhases.has("grammar") ? 0 : ratio(
     grammarUnderstandingAnswers.filter((answer) => answer.correct).length,
     Math.max(1, lesson.grammarQuestions.length),
   );
-  const grammarProductionAccuracy = ratio(
+  const grammarProductionAccuracy = skippedPhases.has("grammar") ? 0 : ratio(
     grammarProductionAnswers.filter((answer) => answer.correct).length,
     Math.max(1, translationQuestions.length),
   );
@@ -76,21 +77,23 @@ export function calculateLessonCompletion(
     );
     return question ? evaluateAnswer(answer.response, question.answer) : false;
   }).length;
-  const readingAccuracy = ratio(
+  const readingAccuracy = skippedPhases.has("reading") ? 0 : ratio(
     readingCorrect,
     Math.max(1, readingQuestions.length),
   );
   const listeningAnswers = session.listeningEvents.filter(
     (event) => event.type === "answer",
   );
-  const listeningAccuracy = ratio(
+  const listeningAccuracy = skippedPhases.has("listening") ? 0 : ratio(
     listeningAnswers.filter((event) => event.correct === true).length,
     Math.max(1, lesson.listeningExercises.length),
   );
   const evaluatedSpeaking = session.speakingEvents.filter(
     (event) => event.evaluationAvailable,
   );
-  const speakingAccuracy = evaluatedSpeaking.length > 0
+  const speakingAccuracy = skippedPhases.has("speaking")
+    ? 0
+    : evaluatedSpeaking.length > 0
     ? evaluatedSpeaking.reduce(
         (total, event) =>
           total +
@@ -107,7 +110,9 @@ export function calculateLessonCompletion(
   const storyWords = lesson.story.flatMap((line) =>
     line.words.map((word) => ({ lineId: line.id, word })),
   );
-  const storyIndependence = storyWords.length
+  const storyIndependence = skippedPhases.has("story")
+    ? 0
+    : storyWords.length
     ? storyWords.reduce(
         (total, item) =>
           total +

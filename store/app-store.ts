@@ -236,6 +236,7 @@ export function createEmptyLessonSession(lessonId: string): LessonSession {
     startedAt: timestamp,
     updatedAt: timestamp,
     completedPhaseIds: [],
+    skippedPhaseIds: [],
     activities: {},
     storyInteractions: [],
     storyComplete: false,
@@ -265,6 +266,7 @@ export function normalizeLessonSession(
 
   const session = value as Partial<LessonSession> & {
     completedPhaseIds?: unknown;
+    skippedPhaseIds?: unknown;
   };
   const integer = (candidate: unknown, fallback: number) =>
     typeof candidate === "number" && Number.isInteger(candidate)
@@ -276,6 +278,13 @@ export function normalizeLessonSession(
       : fallback;
   const completedPhaseIds = Array.isArray(session.completedPhaseIds)
     ? session.completedPhaseIds.filter(
+        (phaseId): phaseId is LessonPhaseId =>
+          typeof phaseId === "string" &&
+          canonicalPhaseIds.has(phaseId as LessonPhaseId),
+      )
+    : [];
+  const skippedPhaseIds = Array.isArray(session.skippedPhaseIds)
+    ? session.skippedPhaseIds.filter(
         (phaseId): phaseId is LessonPhaseId =>
           typeof phaseId === "string" &&
           canonicalPhaseIds.has(phaseId as LessonPhaseId),
@@ -298,6 +307,7 @@ export function normalizeLessonSession(
     startedAt: timestamp(session.startedAt, empty.startedAt),
     updatedAt: timestamp(session.updatedAt, empty.updatedAt),
     completedPhaseIds,
+    skippedPhaseIds,
     activities:
       typeof session.activities === "object" &&
       session.activities !== null &&

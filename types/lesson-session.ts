@@ -134,6 +134,8 @@ export interface LessonSession {
   startedAt: string;
   updatedAt: string;
   completedPhaseIds: LessonPhaseId[];
+  /** Phases deliberately skipped by the learner. Each contributes zero score. */
+  skippedPhaseIds?: LessonPhaseId[];
   activities: Record<string, LessonActivityProgress>;
   storyInteractions: StoryInteraction[];
   storyComplete: boolean;

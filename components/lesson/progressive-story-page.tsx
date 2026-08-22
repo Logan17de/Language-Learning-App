@@ -571,7 +571,6 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
     retryableFailure,
     failedGroupCount: failedGroups.length,
   });
-  const canRetryAudio = retryAction === "audio";
   const canRetryActivities = retryAction === "activities";
   const canRetry = retryAction !== null;
 
@@ -706,7 +705,6 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
       progress={storyComplete ? 17 : 6}
       canContinue={canContinue}
       continueLabel={lessonReady ? "Vocabulary" : "Preparing vocabulary…"}
-      onBack={() => router.push("/learn")}
       onContinue={continueToLesson}
       onExit={() => router.push("/learn")}
     >

@@ -3,6 +3,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
 import { hasPremiumLessonPhaseAccess } from "@/lib/auth/lesson-phase-access";
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  japaneseToRomaji,
+  textSimilarity,
+} from "@/lib/japanese-romaji";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -145,7 +149,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const score = similarity(normalizedTranscript, exercise.data.model_answer);
+    const writtenScore = similarity(normalizedTranscript, exercise.data.model_answer);
+    let romajiScore = 0;
+    try {
+      const [transcriptRomaji, answerRomaji] = await Promise.all([
+        japaneseToRomaji(normalizedTranscript),
+        japaneseToRomaji(exercise.data.model_answer),
+      ]);
+      romajiScore = textSimilarity(transcriptRomaji, answerRomaji);
+    } catch {
+      // Written-script comparison remains a safe fallback if the dictionary
+      // cannot be loaded in this request.
+    }
+    const score = Math.max(writtenScore, romajiScore);
     const prior = await admin
       .from("lesson_activity_answers")
       .select("attempts")
@@ -167,6 +183,8 @@ export async function POST(request: NextRequest) {
         answer_data: {
           serverValidated: true,
           score,
+          writtenScore,
+          romajiScore,
         },
       },
       { onConflict: "lesson_session_id,phase,activity_id" },

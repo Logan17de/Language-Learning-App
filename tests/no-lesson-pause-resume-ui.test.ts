@@ -37,11 +37,11 @@ describe("phase-atomic lesson Resume UX", () => {
   });
 
   it("keeps lesson playback one-way instead of using Back as phase rewind", () => {
-    const backStart = player.indexOf("function back()");
-    const commitStart = player.indexOf("async function commitAndAdvance", backStart);
-    const backBody = player.slice(backStart, commitStart);
-    expect(backBody).toContain("setShowExit(true)");
-    expect(backBody).not.toContain("currentPhaseIndex - 1");
-    expect(backBody).not.toContain("previousPhase");
+    const shell = source("components/lesson/lesson-player-shell.tsx");
+    expect(shell).not.toContain("onBack");
+    expect(shell).not.toContain("ArrowLeft");
+    expect(shell).toContain('aria-label="Exit lesson"');
+    expect(player).not.toContain("currentPhaseIndex - 1");
+    expect(player).not.toContain("previousPhase");
   });
 });
