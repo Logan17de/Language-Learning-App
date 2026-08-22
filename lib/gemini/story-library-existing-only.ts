@@ -237,6 +237,43 @@ function resolveLine(
       }
     }
     if (!found) {
+      // Intl.Segmenter keeps a kanji together with its okurigana, so a piece
+      // like 考える, 強い or 近く never matches the library, which holds the
+      // bare 考, 強, 近. Whole pieces alone therefore lost most single kanji
+      // in the story: they were visible in the text but never tappable.
+      //
+      // Nothing matched this piece, so look inside it, longest span first, and
+      // take the curated entries it contains. Running only on the no-match path
+      // means a genuine multi-piece word is still preferred over its parts.
+      const piece = pieces[cursor]!;
+      let offset = 0;
+      while (offset < piece.text.length) {
+        let inner: { surface: string; row: VocabularyRow } | null = null;
+        for (let size = piece.text.length - offset; size > 0; size -= 1) {
+          const surface = piece.text.slice(offset, offset + size);
+          const row = uniqueVocabularyMatch(index, surface);
+          if (row) {
+            inner = { surface, row };
+            break;
+          }
+        }
+        if (!inner) {
+          offset += 1;
+          continue;
+        }
+        terms.push({
+          surface: inner.surface,
+          readingHint: inner.row.reading,
+          scriptType: storyWordScript(inner.surface),
+          dictionaryForm: inner.row.dictionary_form || inner.row.written_form,
+          dictionaryReading: inner.row.reading,
+          partOfSpeech: inner.row.part_of_speech,
+          conjugationType: inner.row.conjugation_type ?? "",
+          dictionaryAlias: "",
+        } as StoryDraft["lines"][number]["terms"][number]);
+        vocabulary.push(canonicalVocabulary(inner.row, inner.surface));
+        offset += inner.surface.length;
+      }
       cursor += 1;
       continue;
     }

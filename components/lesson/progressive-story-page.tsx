@@ -562,7 +562,9 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
     () => lines.flatMap((line) => line.words),
     [lines],
   );
-  const canContinue = storyComplete && lessonReady && Boolean(lessonId);
+  // Reaching Vocabulary is the act of finishing Story. There is no separate
+  // confirmation to give first, so this waits only on the lesson being built.
+  const canContinue = lessonReady && Boolean(lessonId);
   const retryAction = customLessonRetryAction({
     retrying,
     lessonReady,
@@ -705,7 +707,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
       progress={storyComplete ? 17 : 6}
       canContinue={canContinue}
       continueLabel={lessonReady ? "Vocabulary" : "Preparing vocabulary…"}
-      onContinue={continueToLesson}
+      onContinue={finishStory}
       onExit={() => router.push("/learn")}
     >
       <div>
@@ -763,18 +765,14 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
                 <p className="font-semibold">
                   {storyComplete
                     ? "Opening vocabulary…"
-                    : "Finished reading the story?"}
+                    : "Read the story, then continue."}
                 </p>
                 <p className="mt-1 text-xs text-stone-500">
-                  One click finishes Story. Vocabulary opens automatically as
-                  soon as the rest of your lesson is ready.
+                  {lessonReady
+                    ? "Tap any underlined word for its reading and meaning. Vocabulary opens when you continue."
+                    : "Tap any underlined word for its reading and meaning. The rest of your lesson is still being built."}
                 </p>
               </div>
-              {!storyComplete && (
-                <Button type="button" onClick={finishStory}>
-                  Finish story
-                </Button>
-              )}
             </div>
           </div>
         </section>
