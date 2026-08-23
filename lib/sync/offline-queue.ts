@@ -96,6 +96,27 @@ export function discardLessonSyncOperations(lessonId: string): void {
   );
 }
 
+/**
+ * Drop everything queued for lessons other than the one now being learned.
+ *
+ * Starting a new lesson abandons the one before it, and its queued work can no
+ * longer succeed: commit_lesson_phase validates against the server checkpoint,
+ * which the abandoned session has already had reset, so the commit is refused
+ * with "phase is incomplete" on every retry. Left in place it retries forever
+ * and shows the learner a save warning about a lesson they have moved on from.
+ */
+export function discardSyncOperationsForOtherLessons(keepLessonId: string): void {
+  const kept = `:${keepLessonId}`;
+  write(
+    readSyncQueue().filter((item) => {
+      const separator = item.dedupeKey.indexOf(":");
+      if (separator < 0) return true;
+      const scope = item.dedupeKey.slice(separator);
+      return scope.startsWith(`${kept}:`) || scope === kept;
+    }),
+  );
+}
+
 export function hasPendingLessonPhaseCommit(lessonId: string): boolean {
   const prefix = `lesson_phase_commit:${lessonId}:`;
   return readSyncQueue().some((item) => item.dedupeKey.startsWith(prefix));

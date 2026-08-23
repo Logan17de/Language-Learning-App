@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { customLessonRetryAction } from "@/lib/custom-lesson-retry";
+import { retirePreviousLessons } from "@/lib/sync/retire-previous-lessons";
 
 const TOTAL_PHASES = 6;
 const ACTIVITY_GROUP_COUNT = 3;
@@ -440,7 +441,13 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
       }
       const nextLessonId =
         typeof result.lessonId === "string" ? result.lessonId : null;
-      if (nextLessonId) setLessonId(nextLessonId);
+      if (nextLessonId) {
+        setLessonId(nextLessonId);
+        // The story exists, so this lesson has replaced whatever came before
+        // it. Retire the previous lesson now: its queued saves can never land
+        // and would otherwise keep warning about a lesson already left behind.
+        retirePreviousLessons(nextLessonId);
+      }
       setLessonReady(result.lessonReady === true || Boolean(nextLessonId));
       const nextPermanentFailure =
         result.permanentFailure === true || result.status === "permanent_failure";

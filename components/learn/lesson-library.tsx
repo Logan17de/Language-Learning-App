@@ -25,6 +25,7 @@ import {
   lessonCreationRepository,
   type LessonCreationState,
 } from "@/lib/repositories/lesson-creation-repository";
+import { retirePreviousLessons } from "@/lib/sync/retire-previous-lessons";
 
 type GenerationState = "idle" | "generating" | "error";
 
@@ -119,6 +120,7 @@ export function LessonLibrary() {
       }
 
       if (result?.lesson_id) {
+        retirePreviousLessons(result.lesson_id);
         router.replace(`/lesson/${result.lesson_id}/play`);
         return;
       }

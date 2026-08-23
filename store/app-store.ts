@@ -91,6 +91,7 @@ interface AppState {
   ) => boolean;
   completeLesson: (lesson: RecentLesson) => void;
   resetLessonSession: (lessonId: string) => void;
+  keepOnlyLessonSession: (lessonId: string) => void;
   resetProgress: () => void;
 }
 
@@ -680,6 +681,18 @@ export const useAppStore = create<AppState>()(
             },
           },
         })),
+      /**
+       * A new lesson replaces the one before it, so the sessions it leaves
+       * behind are dropped rather than kept as checkpoints the learner can no
+       * longer return to.
+       */
+      keepOnlyLessonSession: (lessonId) =>
+        set((state) => {
+          const lessonSessions = state.lessonSessions[lessonId]
+            ? { [lessonId]: state.lessonSessions[lessonId] }
+            : {};
+          return { lessonSessions };
+        }),
       resetLessonSession: (lessonId) =>
         set((state) => {
           const lessonSessions = { ...state.lessonSessions };
