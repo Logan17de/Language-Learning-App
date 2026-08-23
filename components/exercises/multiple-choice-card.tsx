@@ -63,10 +63,15 @@ export function MultipleChoiceCard({
 }) {
   const isCorrect = answerCorrect ?? selectedAnswer === correctAnswer;
   const locked = disabled || (answered && lockAfterAnswer);
-  // Questions that carry no separate cue (listening) would otherwise lead with
-  // label-sized text, so the prompt takes the lead voice instead.
-  const leadText = cue ?? prompt;
-  const supportText = cue ? prompt : null;
+  // A question with no cue stores an empty string, not null, so these must be
+  // tested for content rather than for being present. Falling back with `??`
+  // let "" through as the lead and left the whole ask column blank.
+  const cueText = cue?.trim() ? cue : "";
+  const promptText = prompt?.trim() ? prompt : "";
+  // Questions that carry no separate cue would otherwise lead with label-sized
+  // text, so the prompt takes the lead voice instead.
+  const leadText = cueText || promptText;
+  const supportText = cueText ? promptText : "";
 
   return (
     <section
@@ -99,20 +104,22 @@ export function MultipleChoiceCard({
             />
           </p>
         )}
-        <p
-          id="question-prompt"
-          className={cn(
-            "font-serif font-semibold leading-relaxed text-ink",
-            supportText ? "mt-4" : "",
-            cue ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl",
-          )}
-        >
-          <InspectableText
-            text={leadText}
-            terms={inspectableTerms}
-            onReveal={onInspect}
-          />
-        </p>
+        {leadText && (
+          <p
+            id="question-prompt"
+            className={cn(
+              "font-serif font-semibold leading-relaxed text-ink",
+              supportText ? "mt-4" : "",
+              cueText ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl",
+            )}
+          >
+            <InspectableText
+              text={leadText}
+              terms={inspectableTerms}
+              onReveal={onInspect}
+            />
+          </p>
+        )}
         {aside && <div className="mt-6">{aside}</div>}
       </div>
 
@@ -121,7 +128,7 @@ export function MultipleChoiceCard({
         <div
           className="flex flex-col gap-2.5"
           role="radiogroup"
-          aria-label={supportText ?? leadText}
+          aria-label={leadText || supportText}
         >
           {choices.map((choice, index) => {
             const selected = selectedAnswer === choice;
