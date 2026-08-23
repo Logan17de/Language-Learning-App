@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   ACTIVITY_GROUPS,
@@ -139,8 +140,33 @@ describe("custom lesson checkpoint validation", () => {
       }],
     };
     expect(storyCheckpointIssues(story)).toEqual([]);
-    story.lines[0].japanese = "One sentence!";
-    expect(storyCheckpointIssues(story).join(" ")).toContain("10 to 15 Japanese sentences");
+
+    // Structure still has to hold: a story with nothing in it cannot be played.
+    expect(storyCheckpointIssues({ ...story, lines: [] }).join(" ")).toContain(
+      "Story lines must not be empty",
+    );
+    expect(
+      storyCheckpointIssues({ ...story, japaneseTitle: "" }).join(" "),
+    ).toContain("japaneseTitle");
+  });
+
+  it("does not throw away a finished story over its length", () => {
+    // Length is asked for in the generation prompt. Rejecting a 16-sentence
+    // story discarded a completed generation to buy one fewer sentence, and
+    // nothing downstream depends on the count.
+    const sentences = (count: number) =>
+      Array.from({ length: count }, (_, index) => `文${index + 1}。`).join("");
+    const story = (count: number) => ({
+      title: "Lesson",
+      japaneseTitle: "Japanese lesson",
+      summary: "Summary",
+      storyPreview: "Preview",
+      lines: [{ japanese: sentences(count), english: "English." }],
+    });
+
+    expect(storyCheckpointIssues(story(16))).toEqual([]);
+    expect(storyCheckpointIssues(story(8))).toEqual([]);
+    expect(storyCheckpointIssues(story(1))).toEqual([]);
   });
 
   it("validates question structure without enforcing target-library content", () => {
@@ -254,5 +280,41 @@ describe("custom lesson checkpoint validation", () => {
     expect(groupForPackageIssue("vocabularyQuestions must contain 7 items.")).toBe("vocabulary_and_kanji");
     expect(groupForPackageIssue("kanji lesson metadata is incomplete.")).toBe("vocabulary_and_kanji");
     expect(groupForPackageIssue("Story line 1 is not playable.")).toBeNull();
+  });
+});
+
+describe("generation rejects only what cannot be played", () => {
+  const source = readFileSync(
+    "lib/custom-lessons/checkpoint-validation.ts",
+    "utf8",
+  );
+
+  it("no longer regenerates over a difficulty mix", () => {
+    // The prompt asks for the mix. Rejecting 3 easy / 1 medium / 1 hard threw
+    // away a whole region for a preference nothing downstream reads.
+    expect(source).not.toContain("difficultyDistributionIssues");
+    expect(source).not.toContain("2 easy, 2 medium, and 1 hard");
+    expect(source).not.toContain("3 Easy, 2 Medium, and 2 Hard");
+  });
+
+  it("no longer regenerates over story length", () => {
+    expect(source).not.toContain("10 to 15 Japanese sentences");
+  });
+
+  it("still holds the counts the database requires to finish a lesson", () => {
+    // commit_lesson_phase and complete_lesson_session refuse anything else, so
+    // a lesson generated short of these could never be completed.
+    expect(source).toContain('questionArrayIssues(payload.vocabularyQuestions, 7');
+    expect(source).toContain('questionArrayIssues(payload.grammarQuestions, 7');
+    expect(source).toContain("Reading questions must contain exactly 5 questions.");
+    expect(source).toContain("Listening region must contain exactly 5 exercises.");
+    expect(source).toContain("Speaking region must contain exactly 5 exercises.");
+    expect(source).toContain("exactly 3 grammar target identities");
+  });
+
+  it("still rejects a question that cannot be answered", () => {
+    expect(source).toContain("must contain exactly four non-empty choices");
+    expect(source).toContain("choices must be distinct");
+    expect(source).toContain("correctAnswer must occur in choices");
   });
 });

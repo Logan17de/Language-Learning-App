@@ -90,24 +90,6 @@ function questionArrayIssues(value: unknown, expected: number, label: string): s
   return issues;
 }
 
-function difficultyDistributionIssues(
-  value: unknown,
-  field: string,
-  expected: Record<string, number>,
-  label: string,
-  description: string,
-): string[] {
-  const counts = new Map<string, number>();
-  for (const item of array(value)) {
-    const raw = record(item)?.[field];
-    if (typeof raw === "string") counts.set(raw, (counts.get(raw) ?? 0) + 1);
-  }
-  const matches = Object.entries(expected).every(
-    ([key, count]) => (counts.get(key) ?? 0) === count,
-  );
-  return matches ? [] : [`${label} must contain ${description}.`];
-}
-
 function readingQuestionArrayIssues(value: unknown): string[] {
   const questions = array(value);
   const issues = questions.length === 5
@@ -138,13 +120,6 @@ function readingQuestionArrayIssues(value: unknown): string[] {
     }
   });
 
-  issues.push(...difficultyDistributionIssues(
-    questions,
-    "difficulty",
-    { easy: 2, medium: 2, hard: 1 },
-    "Reading questions",
-    "2 easy, 2 medium, and 1 hard question",
-  ));
   return issues;
 }
 
@@ -187,13 +162,6 @@ export function activityGroupCheckpointIssues(
       ["character", "reading", "meaning"],
     ));
     issues.push(...questionArrayIssues(payload.vocabularyQuestions, 7, "Vocabulary question"));
-    issues.push(...difficultyDistributionIssues(
-      payload.vocabularyQuestions,
-      "difficulty",
-      { Easy: 3, Medium: 2, Hard: 2 },
-      "Vocabulary questions",
-      "3 Easy, 2 Medium, and 2 Hard questions",
-    ));
     return issues;
   }
 
@@ -205,13 +173,6 @@ export function activityGroupCheckpointIssues(
       ["pattern", "meaning", "formation", "usage", "example", "translation"],
     ));
     issues.push(...questionArrayIssues(payload.grammarQuestions, 7, "Grammar question"));
-    issues.push(...difficultyDistributionIssues(
-      payload.grammarQuestions,
-      "difficulty",
-      { Easy: 3, Medium: 2, Hard: 2 },
-      "Grammar questions",
-      "3 Easy, 2 Medium, and 2 Hard questions",
-    ));
 
     issues.push(...requiredTextIssues(
       payload,
@@ -236,20 +197,6 @@ export function activityGroupCheckpointIssues(
   const speaking = array(payload.speakingExercises);
   if (listening.length !== 5) issues.push("Listening region must contain exactly 5 exercises.");
   if (speaking.length !== 5) issues.push("Speaking region must contain exactly 5 exercises.");
-  issues.push(...difficultyDistributionIssues(
-    listening,
-    "difficulty",
-    { Easy: 2, Medium: 2, Hard: 1 },
-    "Listening exercises",
-    "2 Easy, 2 Medium, and 1 Hard exercise",
-  ));
-  issues.push(...difficultyDistributionIssues(
-    speaking,
-    "mode",
-    { easy: 2, medium: 2, hard: 1 },
-    "Speaking exercises",
-    "2 easy, 2 medium, and 1 hard exercise",
-  ));
 
   listening.forEach((exercise, index) => {
     const item = record(exercise);
@@ -360,16 +307,10 @@ export function storyCheckpointIssues(value: unknown): string[] {
     if (!item) issues.push(`Story line ${index + 1} must be an object.`);
     else issues.push(...requiredTextIssues(item, ["japanese", "english"], `Story line ${index + 1}`));
   });
-  const japanese = lines.flatMap((line) => {
-    const item = record(line);
-    return text(item?.japanese) ? [text(item?.japanese)!] : [];
-  }).join("");
-  const sentenceCount = (japanese.match(/[^。！？!?]+[。！？!?]?/gu) ?? [])
-    .map((item) => item.trim())
-    .filter(Boolean).length;
-  if (sentenceCount < 10 || sentenceCount > 15) {
-    issues.push(`Story must contain 10 to 15 Japanese sentences; received ${sentenceCount}.`);
-  }
+  // Story length is asked for in the generation prompt, not enforced here. A
+  // sixteen-sentence story is a perfectly good story, and rejecting it threw
+  // away a finished generation to buy one fewer sentence. Nothing downstream
+  // depends on the count either: the playable package accepts up to 20 lines.
   return issues;
 }
 
