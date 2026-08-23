@@ -374,21 +374,26 @@ export function LessonPlayer({
         completionResult: null,
       });
       advancingRef.current = false;
+      // Say what actually went wrong. A save that can never succeed looked
+      // exactly like one waiting on a slow network, so the learner kept
+      // pressing Retry against a failure that had a specific, fixable cause.
+      const describeFailure = () => {
+        const reason = pendingLessonPhaseError(lesson.id);
+        setBackgroundSaveError(
+          reason
+            ? `Your previous section is safe on this device, but AIko refused it: ${reason}`
+            : "Your previous section is safe on this device, but it has not reached AIko yet.",
+        );
+      };
       void backgroundCommit.completion
         .then((synced) => {
           if (synced) {
             setBackgroundSaveError(null);
             return;
           }
-          setBackgroundSaveError(
-            "Your previous section is safe on this device, but it has not reached AIko yet.",
-          );
+          describeFailure();
         })
-        .catch(() => {
-          setBackgroundSaveError(
-            "Your previous section is safe on this device, but it has not reached AIko yet.",
-          );
-        });
+        .catch(describeFailure);
       return;
     }
 

@@ -89,6 +89,29 @@ async function backendContext(lesson: LessonPackage) {
   return { canonical: canonical.data, backendSession: backendSession.data };
 }
 
+/**
+ * The same lookup, but it says what went wrong.
+ *
+ * A phase commit that cannot reach its session used to return a bare false,
+ * which the retry loop recorded as "Retry failed." — so a section that would
+ * never save looked identical to one waiting on a slow network, and the reason
+ * was discarded at the one point where it was known.
+ */
+async function requireBackendContext(lesson: LessonPackage) {
+  const canonical = await lessonRepository.getPlayable(lesson.id);
+  if (!canonical.ok) {
+    throw new Error(canonical.error.message);
+  }
+  const backendSession = await lessonSessionRepository.startOrResume(
+    canonical.data.lesson.id,
+    canonical.data.version.id,
+  );
+  if (!backendSession.ok) {
+    throw new Error(backendSession.error.message);
+  }
+  return { canonical: canonical.data, backendSession: backendSession.data };
+}
+
 function phaseAnswers(
   lesson: LessonPackage,
   session: LessonSession,
@@ -267,8 +290,7 @@ async function persistPhaseCompletion(
   session: LessonSession,
   phase: LessonPhaseId,
 ): Promise<boolean> {
-  const context = await backendContext(lesson);
-  if (!context) return false;
+  const context = await requireBackendContext(lesson);
   const sessionId = context.backendSession.id;
 
   // Persist canonical evidence before asking the database to commit mastery.
@@ -585,7 +607,7 @@ async function runPendingSync(): Promise<void> {
           removeSyncOperation(operation.id);
           continue;
         }
-        markSyncAttempt(operation.id, "Retry failed.");
+        markSyncAttempt(operation.id, "This section was refused without a reason.");
       } catch (error) {
         markSyncAttempt(
           operation.id,
