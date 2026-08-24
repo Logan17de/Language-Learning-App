@@ -42,15 +42,22 @@ function isJlptLevel(value: string): value is JLPTLevel {
 
 /**
  * Pattern names are written inconsistently across sources: 〜ながら, ～ながら and
- * ながら are the same pattern, and the bank writes alternatives as "だ / です".
- * Compare on a stripped form so a lesson target still finds its entry.
+ * ながら are all the same pattern. Matching therefore has to tolerate the
+ * placeholder mark -- but only as a last resort, because dropping it merges
+ * patterns that are genuinely different. しか～ない ("only") and しかない ("have
+ * no choice but") collapse onto the same string, as do つ～つ and つつ. Stripping
+ * first would have taught one of each pair under the other's explanation.
+ *
+ * So there are two forms: the exact name, which is always tried first, and the
+ * stripped name, which is only ever used when it identifies exactly one pattern
+ * in the whole catalog.
  */
-function normalizePattern(value: string): string {
-  return value
-    .normalize("NFKC")
-    .replace(/[〜～~・]/gu, "")
-    .replace(/\s+/gu, "")
-    .toLowerCase();
+function exactForm(value: string): string {
+  return value.normalize("NFKC").replace(/\s+/gu, "").toLowerCase();
+}
+
+function strippedForm(value: string): string {
+  return exactForm(value).replace(/[〜～~・]/gu, "");
 }
 
 function parseCatalog(source: string): CuratedGrammarPattern[] {
@@ -81,7 +88,8 @@ function parseCatalog(source: string): CuratedGrammarPattern[] {
 }
 
 let catalogCache: CuratedGrammarPattern[] | null = null;
-let indexCache: Map<string, CuratedGrammarPattern> | null = null;
+let exactIndexCache: Map<string, CuratedGrammarPattern> | null = null;
+let strippedIndexCache: Map<string, CuratedGrammarPattern | null> | null = null;
 
 export function loadCuratedGrammarCatalog(): CuratedGrammarPattern[] {
   if (catalogCache) return catalogCache;
@@ -91,21 +99,41 @@ export function loadCuratedGrammarCatalog(): CuratedGrammarPattern[] {
   return catalogCache;
 }
 
-function catalogIndex(): Map<string, CuratedGrammarPattern> {
-  if (indexCache) return indexCache;
-  const index = new Map<string, CuratedGrammarPattern>();
-  for (const entry of loadCuratedGrammarCatalog()) {
-    // The whole name, then each alternative it lists, so "だ / です" is found by
-    // either half. First writer wins, so a bare name never loses to an
-    // alternative belonging to some other entry.
-    const keys = [entry.pattern, ...entry.pattern.split("/")];
-    for (const key of keys) {
-      const normalized = normalizePattern(key);
-      if (normalized && !index.has(normalized)) index.set(normalized, entry);
-    }
+function buildIndexes(): void {
+  if (exactIndexCache && strippedIndexCache) return;
+  const exact = new Map<string, CuratedGrammarPattern>();
+  // null marks a stripped form that more than one pattern answers to, so it is
+  // never used to pick between them.
+  const stripped = new Map<string, CuratedGrammarPattern | null>();
+
+  const catalog = loadCuratedGrammarCatalog();
+
+  // Two passes, and the order matters. A pattern's own name always wins over an
+  // alternative some other entry happens to list: じゃない is N3_G031's own name
+  // and also half of N5_G002's "じゃない / ではない", and indexing in one pass let
+  // the N5 alternative claim it, so the N3 pattern was taught as the N5 one.
+  const record = (key: string, entry: CuratedGrammarPattern) => {
+    const name = exactForm(key);
+    if (!name) return;
+    if (!exact.has(name)) exact.set(name, entry);
+
+    const loose = strippedForm(key);
+    if (!loose) return;
+    const seen = stripped.get(loose);
+    if (seen === undefined) stripped.set(loose, entry);
+    else if (seen && seen.id !== entry.id) stripped.set(loose, null);
+  };
+
+  for (const entry of catalog) record(entry.pattern, entry);
+  for (const entry of catalog) {
+    // "だ / です" should still be found by either half.
+    const alternatives = entry.pattern.split("/");
+    if (alternatives.length < 2) continue;
+    for (const alternative of alternatives) record(alternative, entry);
   }
-  indexCache = index;
-  return index;
+
+  exactIndexCache = exact;
+  strippedIndexCache = stripped;
 }
 
 /** The curated entry for a lesson's grammar target, when the bank has one. */
@@ -113,5 +141,9 @@ export function curatedGrammarPattern(
   pattern: string,
 ): CuratedGrammarPattern | null {
   if (!pattern.trim()) return null;
-  return catalogIndex().get(normalizePattern(pattern)) ?? null;
+  buildIndexes();
+  const exact = exactIndexCache!.get(exactForm(pattern));
+  if (exact) return exact;
+  // Only when the stripped name belongs to exactly one pattern.
+  return strippedIndexCache!.get(strippedForm(pattern)) ?? null;
 }

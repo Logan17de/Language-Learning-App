@@ -47,6 +47,13 @@ describe("the curated grammar bank", () => {
     expect(curatedGrammarPattern("だ")?.id).toBe("N5_G001");
   });
 
+  it("lets a pattern's own name beat another entry's alternative", () => {
+    // じゃない is N3_G031's own name and also half of N5_G002's
+    // "じゃない / ではない". The pattern that is named that must win.
+    expect(curatedGrammarPattern("じゃない")?.id).toBe("N3_G031");
+    expect(curatedGrammarPattern("ではない")?.id).toBe("N5_G002");
+  });
+
   it("returns nothing rather than guessing", () => {
     expect(curatedGrammarPattern("")).toBeNull();
     expect(curatedGrammarPattern("   ")).toBeNull();
