@@ -25,6 +25,16 @@ function lessonProgressError(error: unknown, fallback: string): string {
     typeof error.message === "string"
       ? error.message
       : "";
+  // Only one lesson is open at a time, so starting another closes this one and
+  // its sections stop committing. Reopening the lesson makes it current again
+  // and the queued section goes through, so this is a "come back" rather than
+  // the "try again" it used to read as.
+  if (
+    message.includes("Active lesson session unavailable") ||
+    message.includes("Only the current lesson section can be committed")
+  ) {
+    return "You moved on to another lesson, so this section is waiting. Reopen this lesson and it will save itself.";
+  }
   if (message.includes("Premium Grammar requires exactly 5 validated translations")) {
     return "Grammar is missing its 5 validated translations. Restart the Grammar section, then complete it again.";
   }
@@ -79,7 +89,14 @@ export const lessonSessionRepository = {
     const { data, error } = await client.from("lesson_sessions").update({
       ...checkpoint,
       last_saved_at: new Date().toISOString(),
-    }).eq("id", sessionId).eq("status", "active").select("*").single();
+      // Not `status = 'active'`. Opening another lesson closes this one, and a
+      // browser still sitting on it could then save nothing at all — every
+      // attempt matched zero rows and the learner was told to retry something
+      // that could never succeed. A checkpoint is only the learner's place in
+      // their own lesson, so writing it to a closed session is harmless and
+      // keeps that place for when they come back to it. A finished lesson is
+      // still off limits.
+    }).eq("id", sessionId).neq("status", "completed").select("*").single();
     return error ? failure(error, "Your lesson checkpoint is waiting to sync.") : success(data);
   },
 
