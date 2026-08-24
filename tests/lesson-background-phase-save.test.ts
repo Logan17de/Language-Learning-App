@@ -22,8 +22,13 @@ describe("non-blocking phase mastery persistence", () => {
   it("keeps failed commits durable and prevents later checkpoints overtaking them", () => {
     expect(queue).toContain('"lesson_phase_commit"');
     expect(sync).toContain("hasPendingLessonPhaseCommit(lesson.id)");
-    expect(sync).toContain("Preserve phase ordering");
-    expect(sync).toContain("break;");
+    // Ordering is now held per lesson rather than by stopping the whole queue,
+    // so one stuck section cannot strand a different lesson's saves.
+    expect(sync).toContain("const blocked = new Set<string>()");
+    expect(sync).toContain("if (blocked.has(lessonId)) continue;");
+    expect(sync).toContain(
+      "if (blocked.has(queuedLessonId(operation.dedupeKey))) continue;",
+    );
     expect(player).toContain("Retry save");
     expect(player).toContain("safe on this device");
   });

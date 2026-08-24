@@ -596,8 +596,19 @@ function operationPayload(operation: SyncOperation): {
 
 let retryInFlight: Promise<void> | null = null;
 
+/** `lesson_phase_commit:<lessonId>:<phase>` — the lesson a queued item belongs to. */
+function queuedLessonId(dedupeKey: string): string {
+  return dedupeKey.split(":")[1] ?? "";
+}
+
 async function runPendingSync(): Promise<void> {
   if (getBackendMode() !== "supabase" || !navigator.onLine) return;
+  // A section that will not commit must hold back the sections behind it, or a
+  // later phase would pass a mastery boundary the earlier one never crossed.
+  // It must not hold back a different lesson: one unfixable section used to
+  // stop the queue outright, so every save for every lesson stayed unsent
+  // behind it, for as long as it sat there.
+  const blocked = new Set<string>();
   for (const operation of readSyncQueue()) {
     const payload = operationPayload(operation);
     if (
@@ -606,6 +617,8 @@ async function runPendingSync(): Promise<void> {
       payload.session &&
       payload.phase
     ) {
+      const lessonId = queuedLessonId(operation.dedupeKey);
+      if (blocked.has(lessonId)) continue;
       try {
         const synced = await persistPhaseCompletion(
           payload.lesson,
@@ -623,9 +636,8 @@ async function runPendingSync(): Promise<void> {
           error instanceof Error ? error.message : "Retry failed.",
         );
       }
-      // Preserve phase ordering. A later checkpoint or phase must never pass a
-      // failed mastery boundary.
-      break;
+      blocked.add(lessonId);
+      continue;
     }
     if (
       operation.kind !== "lesson_checkpoint" ||
@@ -635,6 +647,7 @@ async function runPendingSync(): Promise<void> {
       removeSyncOperation(operation.id);
       continue;
     }
+    if (blocked.has(queuedLessonId(operation.dedupeKey))) continue;
     const synced = await persistCheckpointOnly(
       payload.lesson,
       restartIncompleteLessonPhase(payload.session),
