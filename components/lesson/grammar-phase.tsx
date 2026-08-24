@@ -137,15 +137,16 @@ export function GrammarPhase({
             Notice the pattern, then use it.
           </h2>
           <p className="mt-3 leading-7 text-stone-500">
-            Review the structure and story example first. After recognition
-            practice, you’ll translate five English sentences into Japanese.
+            Read how each pattern is built and when it is used, then practise
+            recognising it.
           </p>
         </div>
         <div className="mt-8 grid gap-5 lg:grid-cols-2">
           {lesson.grammar.map((point) => (
             <Card key={point.id} className="p-7">
-              <p className="font-serif text-3xl font-semibold">{point.pattern}</p>
-              <p className="mt-2 font-semibold text-moss-700">{point.meaning}</p>
+              <p className="font-serif text-3xl font-semibold" lang="ja">
+                {point.pattern}
+              </p>
               <dl className="mt-6 space-y-4 text-sm">
                 <div>
                   <dt className="text-xs font-bold uppercase tracking-wide text-stone-400">
@@ -163,9 +164,9 @@ export function GrammarPhase({
                 </div>
                 <div>
                   <dt className="text-xs font-bold uppercase tracking-wide text-stone-400">
-                    From the story
+                    Example
                   </dt>
-                  <dd className="mt-1 font-serif text-lg leading-7">
+                  <dd className="mt-1 font-serif text-lg leading-7" lang="ja">
                     {point.example}
                   </dd>
                   <dd className="mt-1 text-xs text-stone-400">
@@ -351,13 +352,11 @@ export function GrammarPhase({
               <div className="flex-1">
                 <p className="font-semibold">Recognition practice complete</p>
                 <p className="mt-1 text-sm text-moss-700">
-                  {standardCorrectCount} of {standardAnsweredCount} correct. Next,
-                  use the patterns yourself in five English-to-Japanese
-                  translations.
+                  {standardCorrectCount} of {standardAnsweredCount} correct.
                 </p>
               </div>
               <p className="text-sm font-semibold text-moss-800">
-                Continue to Translation when you’re ready.
+                Continue to Reading when you’re ready.
               </p>
             </div>
           </div>

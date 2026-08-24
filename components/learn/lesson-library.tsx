@@ -446,11 +446,6 @@ export function LessonLibrary() {
                   detail="You read the story first, then practise the words and patterns it introduced."
                 />
                 <Feature
-                  icon={Languages}
-                  title="Translation"
-                  detail="Turn English back into natural Japanese using the grammar the lesson just taught."
-                />
-                <Feature
                   icon={Headphones}
                   title="Reading and listening"
                   detail="Meet the same language again in a passage and in spoken conversation."
