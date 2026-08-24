@@ -2,6 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { prepareStoredLessonAudio } from "@/lib/audio/audio-library";
+import { mapStoredLessonTerms } from "@/lib/gemini/inspectable-term-mapping";
 import {
   ACTIVITY_GROUPS,
   activityGroupCheckpointIssues,
@@ -958,6 +959,32 @@ async function processAudio(
   const startedAt = Date.now();
   const attempt = numericAttempt(job.stage_attempts, "audio");
   try {
+    // Reading and Listening exist by now and their Japanese is final, so this
+    // is where their words become tappable — alongside audio, where nothing
+    // downstream is waiting on either.
+    //
+    // A lesson is still perfectly playable with untapped words, so a failure
+    // here is recorded and stepped over rather than allowed to fail the audio
+    // stage and with it the lesson.
+    try {
+      const mapped = await mapStoredLessonTerms(job.lesson_version_id, admin);
+      if (mapped.listeningUpdated || mapped.readingUpdated) {
+        console.info("Custom lesson tappable terms mapped.", {
+          requestId: job.request_id,
+          stage: "audio",
+          listeningUpdated: mapped.listeningUpdated,
+          readingUpdated: mapped.readingUpdated,
+        });
+      }
+    } catch (termError) {
+      console.error("Custom lesson tappable terms could not be mapped.", {
+        requestId: job.request_id,
+        stage: "audio",
+        message:
+          termError instanceof Error ? termError.message : "Unknown term mapping error",
+      });
+    }
+
     await prepareStoredLessonAudio(job.lesson_version_id, admin);
     return finishStage(admin, job, "completed", 100, {
       audio_status: "ready",
