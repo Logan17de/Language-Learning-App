@@ -469,10 +469,19 @@ export function queueLessonPhaseCompletion(
   if (!queued) {
     return { queued: false, completion: Promise.resolve(false) };
   }
+  const stillQueued = () =>
+    readSyncQueue().some((item) => item.dedupeKey === dedupeKey);
+
+  // retryPendingSync joins a pass already running, and a pass only ever attempts
+  // the first queued phase before stopping to preserve order. Either way the
+  // pass that this call joins may have started before this section was queued,
+  // or may have spent itself on an earlier one -- so the section would be
+  // reported as failed without anything having been tried. Run a second pass in
+  // that case, and only then believe it.
   const completion = navigator.onLine
-    ? retryPendingSync().then(
-        () => !readSyncQueue().some((item) => item.dedupeKey === dedupeKey),
-      )
+    ? retryPendingSync()
+        .then(() => (stillQueued() ? retryPendingSync() : undefined))
+        .then(() => !stillQueued())
     : Promise.resolve(false);
   return { queued: true, completion };
 }
