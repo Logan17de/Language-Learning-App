@@ -1,7 +1,11 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { Subscription } from "dodopayments/resources/subscriptions";
-import { deriveDodoSubscriptionState } from "@/lib/billing/dodo-subscription";
+import type { Product } from "dodopayments/resources/products/products";
+import {
+  assertTenDollarMonthlyProduct,
+  deriveDodoSubscriptionState,
+} from "@/lib/billing/dodo-subscription";
 
 const checkoutRoute = readFileSync("app/api/billing/checkout/route.ts", "utf8");
 const webhookRoute = readFileSync("app/api/webhooks/dodo/route.ts", "utf8");
@@ -22,6 +26,24 @@ function subscription(status: Subscription["status"]): Subscription {
 }
 
 describe("Dodo Payments subscription state", () => {
+  it("requires the checkout product to be recurring $10 USD per month", () => {
+    const product = {
+      is_recurring: true,
+      price: {
+        type: "recurring_price",
+        currency: "USD",
+        price: 1_000,
+        payment_frequency_count: 1,
+        payment_frequency_interval: "Month",
+      },
+    } as unknown as Product;
+    expect(() => assertTenDollarMonthlyProduct(product)).not.toThrow();
+    expect(() => assertTenDollarMonthlyProduct({
+      ...product,
+      price: { ...product.price, price: 1_500 },
+    } as Product)).toThrow("$10 USD monthly product");
+  });
+
   it("grants the matching premium entitlement only for an active subscription", () => {
     expect(deriveDodoSubscriptionState(subscription("active"), "monthly")).toMatchObject({
       plan: "premium_monthly",
@@ -50,6 +72,7 @@ describe("Dodo Payments server boundary", () => {
   it("selects product ids and customer identity on the authenticated server", () => {
     expect(checkoutRoute).toContain('authorize("learn")');
     expect(checkoutRoute).toContain("dodoProductId(period, config)");
+    expect(checkoutRoute).toContain("assertTenDollarMonthlyProduct(product)");
     expect(checkoutRoute).toContain("identity.data.user.email");
     expect(checkoutRoute).not.toContain("record?.productId");
     expect(checkoutRoute).not.toContain("record?.email");
@@ -70,5 +93,7 @@ describe("Dodo Payments server boundary", () => {
     expect(subscriptionPage).toContain("<ManageBillingButton");
     expect(subscriptionPage).not.toContain("Premium checkout is coming soon");
     expect(subscriptionPage).not.toContain("Billing checkout is not connected yet");
+    expect(subscriptionPage).toContain('$10 USD');
+    expect(subscriptionPage).toContain('billingPeriod="monthly"');
   });
 });

@@ -11,7 +11,7 @@ export interface DodoBillingConfig {
   webhookKey: string;
   environment: DodoEnvironment;
   monthlyProductId: string;
-  annualProductId: string;
+  annualProductId: string | null;
 }
 
 function required(name: string): string {
@@ -30,7 +30,7 @@ export function getDodoBillingConfig(): DodoBillingConfig {
     webhookKey: required("DODO_PAYMENTS_WEBHOOK_KEY"),
     environment,
     monthlyProductId: required("DODO_PAYMENTS_PRODUCT_ID_MONTHLY"),
-    annualProductId: required("DODO_PAYMENTS_PRODUCT_ID_ANNUAL"),
+    annualProductId: process.env.DODO_PAYMENTS_PRODUCT_ID_ANNUAL?.trim() || null,
   };
 }
 
@@ -48,9 +48,13 @@ export function dodoProductId(
   billingPeriod: BillingPeriod,
   config = getDodoBillingConfig(),
 ): string {
-  return billingPeriod === "annual"
-    ? config.annualProductId
-    : config.monthlyProductId;
+  if (billingPeriod === "annual") {
+    if (!config.annualProductId) {
+      throw new Error("DODO_PAYMENTS_PRODUCT_ID_ANNUAL is not configured.");
+    }
+    return config.annualProductId;
+  }
+  return config.monthlyProductId;
 }
 
 export function billingPeriodForProduct(
@@ -58,7 +62,7 @@ export function billingPeriodForProduct(
   config = getDodoBillingConfig(),
 ): BillingPeriod | null {
   if (productId === config.monthlyProductId) return "monthly";
-  if (productId === config.annualProductId) return "annual";
+  if (config.annualProductId && productId === config.annualProductId) return "annual";
   return null;
 }
 

@@ -1,4 +1,5 @@
 import type { Subscription } from "dodopayments/resources/subscriptions";
+import type { Product } from "dodopayments/resources/products/products";
 import type { Database, Json } from "@/types/database";
 import type { BillingPeriod } from "@/types/app-preferences";
 
@@ -24,6 +25,22 @@ export interface DodoSubscriptionState {
   startsAt: string;
   renewsAt: string | null;
   cancelledAt: string | null;
+}
+
+export function assertTenDollarMonthlyProduct(product: Product): void {
+  const price = product.price;
+  if (
+    !product.is_recurring ||
+    price.type !== "recurring_price" ||
+    price.currency !== "USD" ||
+    price.price !== 1_000 ||
+    price.payment_frequency_count !== 1 ||
+    price.payment_frequency_interval !== "Month"
+  ) {
+    throw new Error(
+      "The Dodo monthly product must be a recurring $10 USD monthly product.",
+    );
+  }
 }
 
 export function dodoMetadataValue(

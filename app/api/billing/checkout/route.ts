@@ -7,6 +7,7 @@ import {
   dodoProductId,
   getDodoBillingConfig,
 } from "@/lib/billing/dodo";
+import { assertTenDollarMonthlyProduct } from "@/lib/billing/dodo-subscription";
 import { createClient } from "@/lib/supabase/server";
 import type { BillingPeriod } from "@/types/app-preferences";
 
@@ -27,8 +28,8 @@ export async function POST(request: NextRequest) {
       ? (input as Record<string, unknown>)
       : null;
   const billingPeriod = record?.billingPeriod;
-  if (billingPeriod !== "monthly" && billingPeriod !== "annual") {
-    return NextResponse.json({ error: "Choose monthly or annual billing." }, { status: 400 });
+  if (billingPeriod !== "monthly") {
+    return NextResponse.json({ error: "AIko Premium is billed monthly." }, { status: 400 });
   }
   const checkoutAttempt =
     typeof record?.checkoutAttempt === "string" &&
@@ -88,9 +89,13 @@ export async function POST(request: NextRequest) {
       };
 
   try {
-    const checkout = await createDodoClient(config).checkoutSessions.create(
+    const dodo = createDodoClient(config);
+    const productId = dodoProductId(period, config);
+    const product = await dodo.products.retrieve(productId);
+    assertTenDollarMonthlyProduct(product);
+    const checkout = await dodo.checkoutSessions.create(
       {
-        product_cart: [{ product_id: dodoProductId(period, config), quantity: 1 }],
+        product_cart: [{ product_id: productId, quantity: 1 }],
         customer,
         metadata: {
           aiko_user_id: auth.userId,
