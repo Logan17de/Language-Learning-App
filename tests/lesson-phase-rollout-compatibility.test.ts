@@ -79,7 +79,7 @@ describe("phase-atomic rollout compatibility", () => {
     expect(legacyBuilder).toBeGreaterThan(canonicalSuccess);
     expect(legacyRpc).toBeGreaterThan(legacyBuilder);
     expect(source).toContain(
-      "if (!committed.ok) throw new Error(committed.error.message);",
+      "throwLessonPersistenceError(lesson, committed.error.message)",
     );
   });
 
