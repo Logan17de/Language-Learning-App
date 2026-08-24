@@ -226,9 +226,22 @@ export function LessonPlayer({
 
   useEffect(() => {
     if (!session) return;
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+    /**
+     * Leaving saves; it does not argue.
+     *
+     * This used to call preventDefault, which is what raised the browser's
+     * "Changes you made may not be saved" prompt — including on the way to the
+     * results screen, so finishing a lesson ended in a warning that the work
+     * might be lost at the exact moment it had just been committed.
+     *
+     * The prompt protected nothing. The line above it writes the session to
+     * local storage synchronously, before the browser could show anything, and
+     * an unsent section is already durable in the sync queue and retries on the
+     * next visit. So the only thing the prompt could change was whether the
+     * learner had to click twice.
+     */
+    const handleBeforeUnload = () => {
       saveLessonSession({ ...session, elapsedSeconds });
-      event.preventDefault();
     };
     const handleVisibility = () => {
       if (document.visibilityState !== "hidden") return;
