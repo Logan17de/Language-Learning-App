@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
       // Written-script comparison remains a safe fallback if the dictionary
       // cannot be loaded in this request.
     }
-    const score = Math.max(writtenScore, romajiScore);
+    const score = reportableScore(Math.max(writtenScore, romajiScore));
     const prior = await admin
       .from("lesson_activity_answers")
       .select("attempts")
@@ -202,6 +202,24 @@ export async function POST(request: NextRequest) {
       { status: 502 },
     );
   }
+}
+
+/**
+ * Below this, a score is coincidence rather than credit.
+ *
+ * Romaji comparison has a high noise floor: the alphabet is tiny and Japanese
+ * repeats its vowels, so two utterances with nothing in common still overlap.
+ * Measured against a real sentence, "ハローハローハロー" scores 12, plain English
+ * 11, and an unrelated Japanese sentence 13 — while genuinely reading half the
+ * sentence scores 46. Reporting 9% for a wrong answer reads as partial credit
+ * for something that did not happen, so anything inside the noise band is
+ * reported as the zero it really is. Scores above it are left alone, and the
+ * pass threshold is unaffected.
+ */
+const SCORE_NOISE_FLOOR = 25;
+
+function reportableScore(score: number): number {
+  return score < SCORE_NOISE_FLOOR ? 0 : score;
 }
 
 function normalized(value: string): string {

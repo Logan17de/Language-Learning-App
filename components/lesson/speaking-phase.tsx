@@ -56,6 +56,7 @@ export function SpeakingPhase({
     romaji: string;
   } | null>(null);
   const [readingHintLoading, setReadingHintLoading] = useState(false);
+  const [readingRevealed, setReadingRevealed] = useState(false);
   const [error, setError] = useState("");
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -332,10 +333,31 @@ export function SpeakingPhase({
     onChange({ ...session, activityIndex: currentIndex + 1 });
   }
 
-  async function showReading() {
+  /**
+   * Fetch the reading as soon as the sentence is on screen, so pressing
+   * Show reading reveals it rather than starting a request. Converting kanji
+   * needs a dictionary, and waiting on it after the click made the hint feel
+   * like it was thinking about whether to help.
+   */
+  useEffect(() => {
+    let active = true;
+    // Deferred off the effect body so hiding the previous sentence's reading
+    // does not cascade a render.
+    void Promise.resolve().then(() => {
+      if (!active) return;
+      setReadingRevealed(false);
+      if (readingHint?.exerciseId !== exercise.id) void fetchReading();
+    });
+    return () => {
+      active = false;
+    };
+    // Prefetching is keyed to the sentence, not to the fetch identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exercise.id]);
+
+  async function fetchReading() {
     if (readingHintLoading) return;
     setReadingHintLoading(true);
-    setError("");
     try {
       const response = await fetch(
         `/api/audio/reading?exerciseId=${encodeURIComponent(exercise.id)}`,
@@ -353,12 +375,9 @@ export function SpeakingPhase({
         );
       }
       setReadingHint({ exerciseId: exercise.id, romaji: record.romaji });
-    } catch (hintError) {
-      setError(
-        hintError instanceof Error
-          ? hintError.message
-          : "The reading hint could not be prepared.",
-      );
+    } catch {
+      // A reading that could not be prepared is not worth interrupting the
+      // learner over; the button reports it if they ask for it.
     } finally {
       setReadingHintLoading(false);
     }
@@ -372,7 +391,6 @@ export function SpeakingPhase({
           <Badge>{exercise.mode}</Badge>
         </div>
         <h2 className="mt-4 text-3xl font-semibold">Read the sentence aloud.</h2>
-        <p className="mt-3 text-stone-500">You have up to 20 seconds. A 70% match in Japanese or romaji moves you forward.</p>
         <p className="mt-3 text-sm font-semibold text-stone-400">{currentIndex + 1} / {exercises.length}</p>
       </div>
       <ProgressBar value={(completedIds.size / exercises.length) * 100} className="mt-6" />
@@ -387,21 +405,28 @@ export function SpeakingPhase({
               }
             />
           </p>
-          {readingHint?.exerciseId === exercise.id ? (
+          {readingRevealed && readingHint?.exerciseId === exercise.id ? (
             <p className="mt-3 text-sm font-semibold tracking-wide text-moss-700">
               {readingHint.romaji}
             </p>
-          ) : null}
-          <Button
-            type="button"
-            variant="ghost"
-            className="mt-3"
-            disabled={readingHintLoading}
-            onClick={() => void showReading()}
-          >
-            {readingHintLoading ? <LoaderCircle className="size-4 animate-spin" /> : null}
-            {readingHintLoading ? "Preparing reading…" : "Show reading"}
-          </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="ghost"
+              className="mt-3"
+              disabled={readingHintLoading}
+              onClick={() => {
+                if (readingHint?.exerciseId === exercise.id) {
+                  setReadingRevealed(true);
+                  return;
+                }
+                void fetchReading().then(() => setReadingRevealed(true));
+              }}
+            >
+              {readingHintLoading ? <LoaderCircle className="size-4 animate-spin" /> : null}
+              {readingHintLoading ? "Preparing reading…" : "Show reading"}
+            </Button>
+          )}
         </div>
 
         <div className="mt-6 flex flex-wrap justify-center gap-3">
