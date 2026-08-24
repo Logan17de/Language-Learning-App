@@ -33,6 +33,7 @@ import {
   type RawVocabularyQuestions,
 } from "@/lib/gemini/vocabulary-question-contract";
 import type { JLPTLevel } from "@/types/lesson";
+import { curatedGrammarPattern } from "@/lib/curated-grammar-catalog";
 
 export type ActivityGroupName =
   | "vocabulary_and_kanji"
@@ -445,6 +446,16 @@ function rawGrammarQuestionIssues(value: unknown): string[] {
   return issues;
 }
 
+/**
+ * How a pattern is built, when to reach for it, and one example come from the
+ * curated bank rather than from this lesson's generation. The same pattern was
+ * otherwise explained differently every time it appeared, and each explanation
+ * was only as good as that one call.
+ *
+ * The model still supplies the short meaning gloss, which the bank does not
+ * carry, and still supplies everything for a pattern the bank has never heard
+ * of — a lesson is never blocked on the catalog being complete.
+ */
 function adaptGrammarTeaching(
   items: RawGrammarTeaching[],
   targets: ResolvedLessonLibrary["grammar"],
@@ -456,14 +467,15 @@ function adaptGrammarTeaching(
   return targets.map((target, index) => {
     const item = byIndex.get(index);
     if (!item) throw new Error(`Grammar teaching entry ${index} is missing.`);
+    const curated = curatedGrammarPattern(target.pattern);
     return {
       libraryId: target.libraryId,
       pattern: target.pattern,
       meaning: item.meaning,
-      formation: item.formation,
-      usage: item.usage,
-      example: item.example,
-      translation: item.translation,
+      formation: curated?.structure || item.formation,
+      usage: curated?.usage || item.usage,
+      example: curated?.exampleJapanese || item.example,
+      translation: curated?.exampleEnglish || item.translation,
     };
   });
 }
