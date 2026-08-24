@@ -12,6 +12,9 @@ const callback = source("components/auth/oauth-callback.tsx");
 const callbackPage = source("app/auth/callback/page.tsx");
 // Identity application was extracted into the shared client-session module.
 const clientSession = source("lib/auth/client-session.ts");
+const backendSessionHydrator = source(
+  "components/backend/backend-session-hydrator.tsx",
+);
 
 describe("signup security regressions", () => {
   it("blocks account creation until the signed-in guard resolves", () => {
@@ -65,6 +68,17 @@ describe("signup security regressions", () => {
     expect(authForm).toContain("applyClientIdentity(result.data.identity)");
     expect(clientSession).toContain("prepareAccountScope(");
     expect(clientSession).toContain("syncBackendIdentity(");
+  });
+
+  it("releases account-status gates before secondary learner data hydrates", () => {
+    const sessionReady = clientSession.indexOf("setBackendSessionChecked(true)");
+    const learnerData = clientSession.indexOf("const [progress, settings]");
+
+    expect(sessionReady).toBeGreaterThan(-1);
+    expect(learnerData).toBeGreaterThan(-1);
+    expect(sessionReady).toBeLessThan(learnerData);
+    expect(backendSessionHydrator).toContain("finally {");
+    expect(backendSessionHydrator).toContain("setBackendSessionChecked(true)");
   });
 
   it("keeps signup and callback routes private from search indexing", () => {
