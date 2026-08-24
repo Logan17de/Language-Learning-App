@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import type { LucideIcon } from "lucide-react";
 import {
-  ArrowRight,
   BookOpenText,
   BrainCircuit,
   Check,
@@ -12,7 +11,6 @@ import {
   Lightbulb,
   Mic,
   Sparkles,
-  UserRound,
 } from "lucide-react";
 import { PublicAuthProvider } from "@/components/auth/public-auth-provider";
 import { PublicPrimaryAction } from "@/components/auth/public-auth-actions";
@@ -59,7 +57,7 @@ const learningFlow: Array<{
   {
     number: "04",
     title: "Move from recognition to production",
-    copy: "The lesson gradually shifts from understanding language to producing it through grammar, translation, and speaking activities.",
+    copy: "The lesson gradually shifts from understanding language to producing it through grammar and speaking activities.",
     icon: Lightbulb,
   },
   {
@@ -123,7 +121,7 @@ const lessonStages: Array<{
 const learningSignals = [
   "Vocabulary answers",
   "Grammar practice",
-  "Translation responses",
+  "Story word support",
   "Reading responses",
   "Listening activity",
   "Speaking attempts",
@@ -447,76 +445,6 @@ export default function LandingPage() {
                 Premium checkout is not connected yet. Beta Premium access may be enabled
                 administratively while billing is being prepared.
               </p>
-            </div>
-          </section>
-
-          <section id="founder" className="scroll-mt-20 bg-white py-16 sm:py-20">
-            <div className="mx-auto grid w-full max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center">
-              <div>
-                <p className="section-kicker">Our story</p>
-                <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-                  Built from a simple learning frustration.
-                </h2>
-                <div className="mt-6 max-w-2xl space-y-4 text-lg leading-8 text-stone-500">
-                  <p>
-                    AIko began with a problem its founder kept experiencing as a language learner:
-                    lessons, weak points, and progress were scattered, while general-purpose AI
-                    tools did not reliably carry learning evidence from one session to the next.
-                  </p>
-                  <p>
-                    That became the idea behind AIko: keep one lesson context connected across
-                    several skills, record what the learner actually does, and use that evidence to
-                    make the next lesson more useful.
-                  </p>
-                  <p>
-                    The product is independently built and human-led. AI helps explore, code, test,
-                    and refine the system, while product direction and learning decisions remain
-                    deliberate human choices.
-                  </p>
-                </div>
-                <p className="mt-6 font-serif text-xl italic text-moss-700">
-                  One connected lesson at a time, with progress that carries forward.
-                </p>
-              </div>
-              <div className="rounded-4xl bg-paper p-6 sm:p-9">
-                <div className="flex flex-col gap-4" aria-label="How AIko is being built">
-                  {[
-                    {
-                      label: "Built around real learning problems",
-                      copy: "The product starts from the friction learners actually feel between lessons, practice, and progress.",
-                      icon: UserRound,
-                    },
-                    {
-                      label: "Informed by independent AI research",
-                      copy: "The work explores adaptation, memory, model behavior, and how learning systems can respond to evidence.",
-                      icon: BrainCircuit,
-                    },
-                    {
-                      label: "Human-led, AI-assisted",
-                      copy: "AI accelerates implementation and experimentation; the product vision and decisions stay human.",
-                      icon: Sparkles,
-                    },
-                  ].map(({ label, copy, icon: Icon }, index) => (
-                    <div key={label}>
-                      <div className="flex gap-4 rounded-3xl border border-black/[.06] bg-white p-5 shadow-card">
-                        <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-moss-100 text-moss-700">
-                          <Icon className="size-5" aria-hidden="true" />
-                        </span>
-                        <div>
-                          <h3 className="font-semibold">{label}</h3>
-                          <p className="mt-1 text-sm leading-6 text-stone-500">{copy}</p>
-                        </div>
-                      </div>
-                      {index < 2 && (
-                        <ArrowRight
-                          className="mx-auto my-2 size-5 rotate-90 text-persimmon-500"
-                          aria-hidden="true"
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </section>
 

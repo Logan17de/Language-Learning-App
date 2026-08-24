@@ -25,7 +25,7 @@ export default function TermsPage() {
               <h2 className="text-xl font-semibold">Learning guidance</h2>
               <p className="mt-3 leading-7 text-stone-500">
                 Lessons and feedback are educational aids, not a guarantee of fluency,
-                certification, examination results, or professional translation accuracy.
+                certification or examination results.
               </p>
             </section>
             <section>

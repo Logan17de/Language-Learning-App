@@ -6,7 +6,6 @@ import {
   AlertTriangle,
   Crown,
   Headphones,
-  Languages,
   LoaderCircle,
   Mic2,
 } from "lucide-react";
@@ -71,7 +70,7 @@ function completionForAccess(
   if (premiumPhasesAccessible) return result;
 
   // This remains only an offline/display fallback. The server is reward
-  // authority. Free learners skip protected Translation/Listening/Speaking.
+  // authority. Free learners skip protected Listening/Speaking practice.
   const score = Math.min(100, Math.round(result.score / 0.8));
   return {
     ...result,
