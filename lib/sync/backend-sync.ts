@@ -16,6 +16,7 @@ import {
 import { lessonSessionRepository } from "@/lib/repositories/lesson-session-repository";
 import { buildLegacyMasteryEvidence } from "@/lib/sync/legacy-mastery-evidence";
 import {
+  announceActiveLesson,
   describesSupersededLesson,
   isLessonSupersededError,
   LessonSupersededError,
@@ -100,6 +101,29 @@ function persistedCompletionResult(
 function retireSupersededLesson(lessonId: string): void {
   discardLessonSyncOperations(lessonId);
   markLessonSuperseded(lessonId);
+}
+
+/**
+ * A takeover can happen after the initial standing read but before any one of
+ * the answer, event, phase, skip, or completion writes. Those APIs do not all
+ * return the same message. Re-read standing only on failure so that a genuine
+ * race becomes one final takeover verdict, while an ordinary validation or
+ * network error remains retryable.
+ */
+async function throwLessonPersistenceError(
+  lesson: LessonPackage,
+  message: string,
+): Promise<never> {
+  if (describesSupersededLesson(message)) {
+    retireSupersededLesson(lesson.id);
+    throw new LessonSupersededError(lesson.id);
+  }
+  try {
+    await lessonSessionId(lesson);
+  } catch (error) {
+    if (isLessonSupersededError(error)) throw error;
+  }
+  throw new Error(message);
 }
 
 /**
@@ -296,7 +320,8 @@ async function persistCheckpointOnly(
   let sessionId: string;
   try {
     sessionId = await lessonSessionId(lesson);
-  } catch {
+  } catch (error) {
+    if (isLessonSupersededError(error)) throw error;
     return false;
   }
   return saveCheckpoint(lesson, session, sessionId, false);
@@ -342,12 +367,16 @@ async function persistPhaseCompletion(
   const answers = await lessonSessionRepository.saveAnswers(
     phaseAnswers(lesson, session, phase, sessionId),
   );
-  if (!answers.ok) throw new Error(answers.error.message);
+  if (!answers.ok) {
+    return throwLessonPersistenceError(lesson, answers.error.message);
+  }
 
   const events = await lessonSessionRepository.saveEvents(
     phaseEvents(session, phase, sessionId),
   );
-  if (!events.ok) throw new Error(events.error.message);
+  if (!events.ok) {
+    return throwLessonPersistenceError(lesson, events.error.message);
+  }
 
   // Reading answers and Story completion live in the checkpoint, so the
   // completed phase snapshot must be saved before canonical validation.
@@ -356,7 +385,9 @@ async function persistPhaseCompletion(
   }
 
   const committed = await lessonSessionRepository.commitPhase(sessionId, phase);
-  if (!committed.ok) throw new Error(committed.error.message);
+  if (!committed.ok) {
+    return throwLessonPersistenceError(lesson, committed.error.message);
+  }
   if (committed.data !== null) return true;
 
   // Rollout bridge only: the frontend may be promoted while the shared DB still
@@ -398,7 +429,9 @@ async function persistPhaseSkip(
     throw new Error("This section checkpoint could not be saved. Please try again.");
   }
   const skipped = await lessonSessionRepository.skipPhase(sessionId, phase);
-  if (!skipped.ok) throw new Error(skipped.error.message);
+  if (!skipped.ok) {
+    return throwLessonPersistenceError(lesson, skipped.error.message);
+  }
   return true;
 }
 
@@ -427,7 +460,9 @@ async function persistCanonicalCompletion(
       },
     }),
   });
-  if (!result.ok) throw new Error(result.error.message);
+  if (!result.ok) {
+    return throwLessonPersistenceError(lesson, result.error.message);
+  }
   const canonical = canonicalCompletionResult(result.data, fallback);
   return canonical
     ? { synced: true, canonicalCompletion: canonical }
@@ -466,6 +501,7 @@ export async function syncLessonProgress(
     return false;
   }
   const synced = await persistCheckpointOnly(lesson, safeSession);
+  if (lessonWasSuperseded(lesson.id)) return false;
   if (!synced) {
     enqueueSync(
       "lesson_checkpoint",
@@ -539,7 +575,7 @@ export function queueLessonPhaseCompletion(
   const completion = navigator.onLine
     ? retryPendingSync()
         .then(() => (stillQueued() ? retryPendingSync() : undefined))
-        .then(() => !stillQueued())
+        .then(() => !stillQueued() && !lessonWasSuperseded(lesson.id))
     : Promise.resolve(false);
   return { queued: true, completion };
 }
@@ -550,7 +586,10 @@ export async function flushPendingLessonPhaseCommits(
   if (getBackendMode() !== "supabase") return true;
   if (!navigator.onLine) return false;
   await retryPendingSync();
-  return !hasPendingLessonPhaseCommit(lessonId);
+  return (
+    !lessonWasSuperseded(lessonId) &&
+    !hasPendingLessonPhaseCommit(lessonId)
+  );
 }
 
 /** Skip one whole section. The database records an explicit zero-score commit. */
@@ -631,6 +670,7 @@ export async function restoreLessonProgress(
     }
     return safeFallback;
   }
+  announceActiveLesson(lesson.id);
 
   const reset = await lessonSessionRepository.resetIncompletePhase(
     backendSession.data.id,
@@ -722,12 +762,23 @@ async function runPendingSync(): Promise<void> {
       continue;
     }
     if (blocked.has(queuedLessonId(operation.dedupeKey))) continue;
-    const synced = await persistCheckpointOnly(
-      payload.lesson,
-      restartIncompleteLessonPhase(payload.session),
-    );
-    if (synced) removeSyncOperation(operation.id);
-    else markSyncAttempt(operation.id, "Retry failed.");
+    try {
+      const synced = await persistCheckpointOnly(
+        payload.lesson,
+        restartIncompleteLessonPhase(payload.session),
+      );
+      if (synced) removeSyncOperation(operation.id);
+      else markSyncAttempt(operation.id, "Retry failed.");
+    } catch (error) {
+      if (isLessonSupersededError(error)) {
+        blocked.add(queuedLessonId(operation.dedupeKey));
+        continue;
+      }
+      markSyncAttempt(
+        operation.id,
+        error instanceof Error ? error.message : "Retry failed.",
+      );
+    }
   }
 }
 

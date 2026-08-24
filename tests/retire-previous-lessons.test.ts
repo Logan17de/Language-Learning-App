@@ -84,5 +84,6 @@ describe("retirement runs when the new lesson exists", () => {
     const helper = readFileSync("lib/sync/retire-previous-lessons.ts", "utf8");
     expect(helper).toContain("discardSyncOperationsForOtherLessons(lessonId)");
     expect(helper).toContain("keepOnlyLessonSession(lessonId)");
+    expect(helper).toContain("announceActiveLesson(lessonId)");
   });
 });

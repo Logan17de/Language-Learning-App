@@ -18,7 +18,9 @@ describe("the save verdict reflects an actual attempt", () => {
   });
 
   it("only reports success when the section has left the queue", () => {
-    expect(sync).toContain(".then(() => !stillQueued())");
+    expect(sync).toContain(
+      ".then(() => !stillQueued() && !lessonWasSuperseded(lesson.id))",
+    );
   });
 
   it("holds back later sections of the same lesson, and only that lesson", () => {
