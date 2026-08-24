@@ -89,14 +89,12 @@ export const lessonSessionRepository = {
     const { data, error } = await client.from("lesson_sessions").update({
       ...checkpoint,
       last_saved_at: new Date().toISOString(),
-      // Not `status = 'active'`. Opening another lesson closes this one, and a
-      // browser still sitting on it could then save nothing at all — every
-      // attempt matched zero rows and the learner was told to retry something
-      // that could never succeed. A checkpoint is only the learner's place in
-      // their own lesson, so writing it to a closed session is harmless and
-      // keeps that place for when they come back to it. A finished lesson is
-      // still off limits.
-    }).eq("id", sessionId).neq("status", "completed").select("*").single();
+      // This must stay `status = 'active'`: the active_session_update_only RLS
+      // policy is RESTRICTIVE, so the database refuses any write to a session
+      // that is not open, whatever this query asks for. Widening the filter
+      // here only hides that. A browser sitting on a lesson the learner has
+      // moved off recovers by reopening it, which makes it current again.
+    }).eq("id", sessionId).eq("status", "active").select("*").single();
     return error ? failure(error, "Your lesson checkpoint is waiting to sync.") : success(data);
   },
 
