@@ -44,6 +44,13 @@ export async function applyClientIdentity(
     },
   );
 
+  // Account-status gates only need the verified backend identity. Do not keep
+  // signup, login, or route guards blocked while the larger learner dashboard
+  // payload (progress, mastery, achievements, and settings) hydrates.
+  if (useAppStore.getState().user.id === userId) {
+    useAppStore.getState().setBackendSessionChecked(true);
+  }
+
   const [progress, settings] = await Promise.all([
     progressRepository.loadCurrent(),
     settingsRepository.loadCurrent(),
@@ -70,9 +77,6 @@ export async function applyClientIdentity(
     useAppStore.setState({ settings: settings.data });
   }
 
-  if (accountStillCurrent) {
-    useAppStore.getState().setBackendSessionChecked(true);
-  }
 }
 
 export async function hydrateClientSession(

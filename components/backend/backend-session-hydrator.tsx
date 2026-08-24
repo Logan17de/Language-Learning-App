@@ -26,8 +26,18 @@ export function BackendSessionHydrator() {
 
     async function restoreSession() {
       if (active) setLoading(true);
-      await hydrateClientSession(true);
-      if (active) setLoading(false);
+      try {
+        await hydrateClientSession(true);
+      } catch (error) {
+        console.error("Backend session hydration failed.", error);
+      } finally {
+        if (active) {
+          // A thrown network/client error must never leave public auth screens
+          // trapped behind an account-status spinner.
+          setBackendSessionChecked(true);
+          setLoading(false);
+        }
+      }
     }
 
     void restoreSession();
