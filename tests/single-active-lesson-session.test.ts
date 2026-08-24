@@ -6,6 +6,10 @@ const migration = readFileSync(
   "supabase/migrations/20260824054338_single_active_lesson_session.sql",
   "utf8",
 );
+const checkpointMigration = readFileSync(
+  "supabase/migrations/20260824081141_newest_lesson_checkpoint_wins.sql",
+  "utf8",
+);
 
 describe("opening a lesson is decided by the server", () => {
   it("no longer reads then writes from the browser", () => {
@@ -24,6 +28,36 @@ describe("opening a lesson is decided by the server", () => {
     expect(migration).toContain("for update");
     expect(migration).toContain("set status = 'abandoned'");
     expect(migration).toContain("and id <> v_session.id");
+  });
+});
+
+describe("saving a lesson is decided by the server", () => {
+  it("uses the atomic newest-session checkpoint RPC", () => {
+    const save = repo.slice(
+      repo.indexOf("async saveCheckpoint"),
+      repo.indexOf("async abandonActive"),
+    );
+    expect(save).toContain('"save_authoritative_lesson_checkpoint"');
+    expect(save).not.toContain('.from("lesson_sessions").update');
+  });
+
+  it("lets the newest session retire an older active row", () => {
+    expect(checkpointMigration).toContain("pg_advisory_xact_lock");
+    expect(checkpointMigration).toContain(
+      "order by started_at desc, created_at desc, id desc",
+    );
+    expect(checkpointMigration).toContain("A newer lesson owns this checkpoint");
+    expect(checkpointMigration).toContain("and id <> v_target.id");
+    expect(checkpointMigration).toContain("set status = 'active'");
+  });
+
+  it("runs the old checkpoint trigger only for its rollout cohort", () => {
+    expect(checkpointMigration).toContain(
+      "from public.lesson_legacy_checkpoint_sessions legacy",
+    );
+    expect(checkpointMigration).toContain(
+      "where legacy.lesson_session_id = new.id",
+    );
   });
 });
 
