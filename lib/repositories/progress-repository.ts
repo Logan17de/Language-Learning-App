@@ -89,7 +89,32 @@ function dailyMinutes(value: number): DailyMinutes {
   return value === 15 || value === 45 || value === 60 ? value : 30;
 }
 
+export interface LevelMastery {
+  level: string;
+  averageMastery: number;
+  trackedItems: number;
+  masteredItems: number;
+}
+
 export const progressRepository = {
+  /**
+   * Average mastery across the learner's level and every level below it — the
+   * scope promotion is judged on.
+   */
+  async levelMastery(): Promise<RepositoryResult<LevelMastery>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { data, error } = await client.rpc("learner_level_mastery");
+    if (error) return failure(error, "Your level progress could not be loaded.");
+    const row = (data ?? {}) as Record<string, unknown>;
+    return success({
+      level: typeof row.level === "string" ? row.level : "",
+      averageMastery: Number(row.averageMastery ?? 0),
+      trackedItems: Number(row.trackedItems ?? 0),
+      masteredItems: Number(row.masteredItems ?? 0),
+    });
+  },
+
   async loadCurrent(): Promise<RepositoryResult<BackendProgressSnapshot>> {
     const client = createClient();
     if (!client) return notConfigured();

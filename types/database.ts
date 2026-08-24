@@ -267,6 +267,10 @@ export interface Database {
         Args: Record<string, never>;
         Returns: Json;
       };
+      learner_level_mastery: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
       record_mastery_evidence: {
         Args: { p_session_id: string; p_events: Json };
         Returns: Json;

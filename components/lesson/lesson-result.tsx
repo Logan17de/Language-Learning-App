@@ -6,7 +6,7 @@ import {
   BookOpenCheck,
   Check,
   ChevronDown,
-  Clock3,
+  GraduationCap,
   Flame,
   PartyPopper,
   RotateCcw,
@@ -24,7 +24,10 @@ import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { LessonReportDialog } from "@/components/support/lesson-report-dialog";
-import { progressRepository } from "@/lib/repositories/progress-repository";
+import {
+  progressRepository,
+  type LevelMastery,
+} from "@/lib/repositories/progress-repository";
 import { getBackendMode } from "@/lib/supabase/config";
 
 export function LessonResult({
@@ -34,6 +37,19 @@ export function LessonResult({
   lesson: LessonPackage;
   result: LessonCompletionResult;
 }) {
+  const [levelMastery, setLevelMastery] = useState<LevelMastery | null>(null);
+
+  useEffect(() => {
+    if (getBackendMode() !== "supabase") return;
+    let cancelled = false;
+    void progressRepository.levelMastery().then((result) => {
+      if (!cancelled && result.ok) setLevelMastery(result.data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const rewardLessonCompletion = useAppStore(
     (state) => state.rewardLessonCompletion,
   );
@@ -136,10 +152,17 @@ export function LessonResult({
             value={`${streak} ${streak === 1 ? "day" : "days"}`}
             label="Current streak"
           />
+          {/* How the learner stands overall, not how long they sat here. The
+              scope is their level and every level below it, which is what
+              promotion is judged on. */}
           <ResultStat
-            icon={Clock3}
-            value={`${result.durationMinutes} min`}
-            label="Lesson duration"
+            icon={GraduationCap}
+            value={levelMastery ? `${levelMastery.averageMastery}%` : "—"}
+            label={
+              levelMastery?.level
+                ? `${levelMastery.level} and below mastered`
+                : "Level mastery"
+            }
           />
         </div>
 
