@@ -36,6 +36,12 @@ export async function applyClientIdentity(
   state.setSubscription(
     identity.subscriptionPlan === "free" ? "free" : "premium",
     identity.subscriptionPlan === "premium_annual" ? "annual" : "monthly",
+    {
+      status: identity.subscriptionStatus,
+      renewsAt: identity.subscriptionRenewsAt ?? undefined,
+      billingProvider: identity.billingProvider,
+      cancelAtPeriodEnd: identity.cancelAtPeriodEnd,
+    },
   );
 
   const [progress, settings] = await Promise.all([
