@@ -61,11 +61,6 @@ function grammarAnswers(prefix: string, count: number): LessonSession["grammarAn
   })) as unknown as LessonSession["grammarAnswers"];
 }
 
-function translationQuestions(): NonNullable<LessonSession["grammarTranslationQuestions"]> {
-  return Array.from({ length: 5 }, (_, index) => ({
-    id: `t-${index + 1}`,
-  })) as unknown as NonNullable<LessonSession["grammarTranslationQuestions"]>;
-}
 
 describe("/learn product contract", () => {
   it("treats only seven historical Vocabulary activities as playable", () => {
@@ -76,62 +71,22 @@ describe("/learn product contract", () => {
     expect(phaseIsComplete(currentSession, "vocabulary", currentLesson)).toBe(true);
   });
 
-  it("completes Grammar after seven answers and gates Translation independently for Free", () => {
+  it("completes Grammar after its seven answers, with nothing else to satisfy", () => {
     const currentLesson = lesson();
     const standardAnswers = grammarAnswers("g", 7);
     const currentSession = session({ grammarAnswers: standardAnswers });
 
     expect(grammarStandardIsComplete(currentSession, currentLesson)).toBe(true);
-    expect(phaseIsComplete(currentSession, "grammar", currentLesson, true)).toBe(true);
-    expect(phaseIsComplete(currentSession, "grammar", currentLesson, false)).toBe(true);
-    expect(phaseIsComplete(currentSession, "translation", currentLesson, true)).toBe(true);
-    expect(phaseIsComplete(currentSession, "translation", currentLesson, false)).toBe(false);
+    expect(phaseIsComplete(currentSession, "grammar", currentLesson)).toBe(true);
 
-    const translations = translationQuestions();
-    const withLegacyTranslations = session({
-      grammarTranslationQuestions: translations,
-      grammarAnswers: [
-        ...standardAnswers,
-        ...grammarAnswers("t", 5),
-      ],
-    });
-
-    expect(
-      phaseIsComplete(withLegacyTranslations, "translation", currentLesson, false),
-    ).toBe(true);
-  });
-
-  it("requires exactly five Translation answers in the Premium Translation section", () => {
-    const currentLesson = lesson({ premium: true });
-    const standardAnswers = grammarAnswers("g", 7);
-    const translations = translationQuestions();
-
+    // Six answers is not seven.
     expect(
       phaseIsComplete(
-        session({
-          grammarTranslationQuestions: translations,
-          grammarAnswers: standardAnswers,
-        }),
-        "translation",
+        session({ grammarAnswers: grammarAnswers("g", 6) }),
+        "grammar",
         currentLesson,
-        true,
       ),
     ).toBe(false);
-
-    expect(
-      phaseIsComplete(
-        session({
-          grammarTranslationQuestions: translations,
-          grammarAnswers: [
-            ...standardAnswers,
-            ...grammarAnswers("t", 5),
-          ],
-        }),
-        "translation",
-        currentLesson,
-        true,
-      ),
-    ).toBe(true);
   });
 
   it("activates only on the exact final DB sentinel and fails closed on unknown errors", async () => {
@@ -159,28 +114,6 @@ describe("/learn product contract", () => {
         client({ data: null, error: { code: "42501", message: "denied" } }),
       ),
     ).rejects.toMatchObject({ code: "42501" });
-  });
-
-  it("keeps protected Translation server-owned and phase-atomic", () => {
-    const questions = readFileSync(
-      "app/api/lesson/translation/questions/route.ts",
-      "utf8",
-    );
-    const validate = readFileSync(
-      "app/api/lesson/translation/validate/route.ts",
-      "utf8",
-    );
-    const migration = readFileSync(
-      "supabase/migrations/20260820023000_learn_product_contract_alignment.sql",
-      "utf8",
-    );
-
-    expect(questions).toContain("learnProductContractIsActive");
-    expect(questions).toContain("hasPremiumLessonPhaseAccess");
-    expect(questions).toContain("status: 403");
-    expect(validate).toContain("learnProductContractIsActive");
-    expect(validate).not.toContain("record_mastery_evidence");
-    expect(migration).toContain("revoke select, insert, update, delete on table public.lesson_translation_questions");
   });
 
   it("maps no historical 10/13 practice rows into the playable learner package", () => {

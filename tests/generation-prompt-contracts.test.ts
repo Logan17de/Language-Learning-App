@@ -30,7 +30,6 @@ import {
   speakingReadAloudPrompt,
   speakingReadAloudSchema,
 } from "@/lib/gemini/speaking-question-contract";
-import { translationQuestionPrompt } from "@/lib/gemini/translation-question-contract";
 
 describe("custom lesson generation prompt contracts", () => {
   it("keeps the first call limited to a continuous story", () => {
@@ -216,22 +215,4 @@ describe("custom lesson generation prompt contracts", () => {
     })).toEqual([]);
   });
 
-  it("keeps Translation tied to lesson topic and grammar while allowing natural extensions", () => {
-    const prompt = translationQuestionPrompt({
-      level: "N4",
-      topic: "Job interview",
-      targets: [
-        { libraryId: "g1", pattern: "～ながら", meaning: "while", role: "lesson_target" },
-        { libraryId: "g2", pattern: "～たい", meaning: "want to", role: "lesson_target" },
-        { libraryId: "g3", pattern: "～てから", meaning: "after", role: "lesson_target" },
-        { libraryId: "g4", pattern: "～ので", meaning: "because", role: "reinforcement" },
-        { libraryId: "g5", pattern: "～と思う", meaning: "think", role: "reinforcement" },
-      ],
-    });
-
-    expect(prompt).toContain("Job interview");
-    expect(prompt).toContain("～ながら");
-    expect(prompt).toContain("recognizably connected to the lesson topic/context");
-    expect(prompt).toContain("extend naturally with related people, places, situations, or new details");
-  });
 });

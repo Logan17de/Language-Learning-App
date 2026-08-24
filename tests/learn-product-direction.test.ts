@@ -55,7 +55,6 @@ describe("learn custom-topic product direction", () => {
   it("keeps all six generated phases while gating protected runtime practice for Free", () => {
     expect(jobRunner).toContain("generateListeningAndSpeakingActivities");
     expect(player).toContain("PremiumPracticeGate");
-    expect(player).toContain('practice === "translation"');
     expect(player).toContain("Subscribe");
     expect(player).toContain("Skip");
     expect(player).toContain("awards no protected mastery");

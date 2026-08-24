@@ -17,11 +17,6 @@ export const CANONICAL_LESSON_PHASES = [
     description: "Use the selected patterns.",
   },
   {
-    id: "translation",
-    label: "Translation",
-    description: "Turn familiar meanings into natural Japanese.",
-  },
-  {
     id: "reading",
     label: "Reading",
     description: "Read closely and answer comprehension questions.",
@@ -41,7 +36,6 @@ export const CANONICAL_LESSON_PHASES = [
 export const CANONICAL_LESSON_ACTIVITY_COUNTS = {
   vocabulary: 7,
   grammar: 7,
-  translation: 5,
   reading: 5,
   listening: 5,
   speaking: 5,

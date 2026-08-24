@@ -254,8 +254,6 @@ select pg_temp.answer_phase(current_setting('aiko.user')::uuid,
                             current_setting('aiko.session')::uuid, 'grammar');
 select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
                             current_setting('aiko.session')::uuid, 'grammar');
-select pg_temp.skip_phase(current_setting('aiko.user')::uuid,
-                          current_setting('aiko.session')::uuid, 'translation');
 select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
                             current_setting('aiko.session')::uuid, 'reading');
 select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
@@ -266,7 +264,7 @@ select pg_temp.commit_phase(current_setting('aiko.user')::uuid,
 select is(
   (select count(*)::int from public.lesson_phase_mastery_commits
    where lesson_session_id = current_setting('aiko.session')::uuid),
-  7, 'all seven sections committed exactly once each');
+  6, 'all six sections committed exactly once each');
 
 -- A deliberately absurd client score and XP must not survive.
 select set_config('request.jwt.claim.sub', current_setting('aiko.user'), true);

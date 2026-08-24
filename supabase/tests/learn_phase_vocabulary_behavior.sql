@@ -62,7 +62,7 @@ select ok(
   'the ledger accepts grammar');
 select ok(
   pg_temp.phase_accepted('translation'),
-  'the ledger accepts translation, the section that broke this');
+  'the ledger still accepts the retired section, so its history stays valid');
 select ok(
   pg_temp.phase_accepted('reading'),
   'the ledger accepts reading');
@@ -89,8 +89,8 @@ select ok(
      join pg_namespace n on n.oid = p.pronamespace
      where n.nspname = 'public' and p.proname = 'commit_lesson_phase'
      limit 1)
-  ) like '%''translation''%',
-  'the commit RPC knows Translation is a section');
+  ) not like '%''translation''%',
+  'the commit RPC no longer treats Translation as a section');
 
 select ok(
   (select count(*)::int

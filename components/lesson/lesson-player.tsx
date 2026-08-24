@@ -27,7 +27,6 @@ import { StoryPhase } from "@/components/lesson/story-phase";
 import { VocabularyPhase } from "@/components/lesson/vocabulary-phase";
 import {
   GrammarPhase,
-  TranslationPhase,
 } from "@/components/lesson/grammar-phase";
 import { ReadingPhase } from "@/components/lesson/reading-phase";
 import { ListeningPhase } from "@/components/lesson/listening-phase";
@@ -44,7 +43,7 @@ import {
 } from "@/lib/sync/backend-sync";
 import { pendingLessonPhaseError } from "@/lib/sync/offline-queue";
 
-type ProtectedPractice = "translation" | "listening" | "speaking";
+type ProtectedPractice = "listening" | "speaking";
 
 function preferDurableSession(
   local: LessonSession,
@@ -84,22 +83,16 @@ function completionForAccess(
 
 function isPremiumPhase(
   phaseId: LessonPhaseId,
-): phaseId is "translation" | "listening" | "speaking" {
-  return (
-    phaseId === "translation" ||
-    phaseId === "listening" ||
-    phaseId === "speaking"
-  );
+): phaseId is "listening" | "speaking" {
+  return phaseId === "listening" || phaseId === "speaking";
 }
 
 export function LessonPlayer({
   lesson,
   routeLessonId = lesson.id,
-  translationPremiumContractActive = true,
 }: {
   lesson: LessonPackage;
   routeLessonId?: string;
-  translationPremiumContractActive?: boolean;
 }) {
   const router = useRouter();
   const hasHydrated = useAppStore((state) => state.hasHydrated);
@@ -264,29 +257,14 @@ export function LessonPlayer({
 
   const phase = lesson.phases[session?.currentPhaseIndex ?? 0];
   const premiumPhase =
-    !premiumPhasesAccessible &&
-    isPremiumPhase(phase.id) &&
-    (phase.id !== "translation" || translationPremiumContractActive)
-      ? phase.id
-      : null;
+    !premiumPhasesAccessible && isPremiumPhase(phase.id) ? phase.id : null;
   const protectedPractice: ProtectedPractice | null = premiumPhase;
   const canContinue = useMemo(
     () =>
       session && !protectedPractice
-        ? phaseIsComplete(
-            session,
-            phase.id,
-            lesson,
-            translationPremiumContractActive,
-          )
+        ? phaseIsComplete(session, phase.id, lesson)
         : false,
-    [
-      lesson,
-      phase.id,
-      protectedPractice,
-      session,
-      translationPremiumContractActive,
-    ],
+    [lesson, phase.id, protectedPractice, session],
   );
   const isLastPhase = session
     ? session.currentPhaseIndex === lesson.phases.length - 1
@@ -685,13 +663,6 @@ export function LessonPlayer({
                 onChange={updateSession}
               />
             )}
-            {phase.id === "translation" && (
-              <TranslationPhase
-                lesson={lesson}
-                session={session}
-                onChange={updateSession}
-              />
-            )}
             {phase.id === "reading" && (
               <ReadingPhase
                 lesson={lesson}
@@ -813,18 +784,8 @@ function PremiumPracticeGate({
   busy: boolean;
   onSkip: () => void;
 }) {
-  const Icon =
-    practice === "translation"
-      ? Languages
-      : practice === "listening"
-        ? Headphones
-        : Mic2;
-  const label =
-    practice === "translation"
-      ? "Translation"
-      : practice === "listening"
-        ? "Listening"
-        : "Speaking";
+  const Icon = practice === "listening" ? Headphones : Mic2;
+  const label = practice === "listening" ? "Listening" : "Speaking";
 
   return (
     <div className="mx-auto max-w-2xl rounded-4xl border border-persimmon-200 bg-white p-7 text-center shadow-card sm:p-10">
@@ -866,8 +827,7 @@ function nextLabel(phaseId: LessonPhaseId): string {
   const labels: Record<LessonPhaseId, string> = {
     story: "Vocabulary",
     vocabulary: "Grammar",
-    grammar: "Translation",
-    translation: "Reading",
+    grammar: "Reading",
     reading: "Listening",
     listening: "Speaking",
     speaking: "Results",

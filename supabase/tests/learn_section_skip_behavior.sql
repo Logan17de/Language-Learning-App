@@ -110,8 +110,6 @@ select pg_temp.skip_phase(current_setting('aiko.user')::uuid,
 select pg_temp.skip_phase(current_setting('aiko.user')::uuid,
                           current_setting('aiko.session')::uuid, 'grammar');
 select pg_temp.skip_phase(current_setting('aiko.user')::uuid,
-                          current_setting('aiko.session')::uuid, 'translation');
-select pg_temp.skip_phase(current_setting('aiko.user')::uuid,
                           current_setting('aiko.session')::uuid, 'reading');
 select pg_temp.skip_phase(current_setting('aiko.user')::uuid,
                           current_setting('aiko.session')::uuid, 'listening');
@@ -121,14 +119,14 @@ select pg_temp.skip_phase(current_setting('aiko.user')::uuid,
 select is(
   (select count(*)::integer from public.lesson_phase_mastery_commits
    where lesson_session_id = current_setting('aiko.session')::uuid),
-  7,
-  'all seven sections receive one durable commit'
+  6,
+  'all six sections receive one durable commit'
 );
 select is(
   (select count(*)::integer from public.lesson_phase_mastery_commits
    where lesson_session_id = current_setting('aiko.session')::uuid
      and commit_source = 'skipped'),
-  7,
+  6,
   'every skipped section is explicitly marked'
 );
 select is(

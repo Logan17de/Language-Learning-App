@@ -447,9 +447,6 @@ begin
   perform pg_temp.commit_phase(p_user, v_session, 'vocabulary');
   perform pg_temp.answer_phase(p_user, v_session, 'grammar', 7);
   perform pg_temp.commit_phase(p_user, v_session, 'grammar');
-  -- Translation sits between Grammar and Reading now. These fixtures are about
-  -- Reading, so they pass it the cheap way rather than staging translations.
-  perform pg_temp.skip_phase(p_user, v_session, 'translation');
   return v_session;
 end $$;
 

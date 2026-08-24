@@ -131,7 +131,6 @@ export function LessonRouteResolver({
     <LessonPlayer
       lesson={lesson}
       routeLessonId={lessonId}
-      translationPremiumContractActive={translationPremiumContractActive}
     />
   );
 }

@@ -9,7 +9,6 @@ export const LESSON_PHASE_ORDER: readonly LessonPhaseId[] = [
   "story",
   "vocabulary",
   "grammar",
-  "translation",
   "reading",
   "listening",
   "speaking",
