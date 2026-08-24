@@ -8,6 +8,7 @@ import {
   curatedGrammarPattern,
   loadCuratedGrammarCatalog,
 } from "@/lib/curated-grammar-catalog";
+import { authoritativeGrammarTeaching } from "@/lib/gemini/lesson-activity-groups";
 
 describe("the curated grammar bank", () => {
   it("loads every pattern the file declares", () => {
@@ -77,11 +78,32 @@ describe("grammar teaching prefers the bank over the model", () => {
   const groups = readFileSync("lib/gemini/lesson-activity-groups.ts", "utf8");
 
   it("takes structure, usage and the example from the catalog", () => {
-    expect(groups).toContain("const curated = curatedGrammarPattern(target.pattern)");
+    expect(groups).toContain("const curated = curatedGrammarPattern(item.pattern)");
     expect(groups).toContain("formation: curated?.structure || item.formation");
     expect(groups).toContain("usage: curated?.usage || item.usage");
     expect(groups).toContain("example: curated?.exampleJapanese || item.example");
     expect(groups).toContain("translation: curated?.exampleEnglish || item.translation");
+  });
+
+  it("reapplies the bank when a durable activity checkpoint is assembled", () => {
+    const teaching = authoritativeGrammarTeaching({
+      libraryId: "grammar-library-id",
+      pattern: "あとで",
+      meaning: "model meaning",
+      formation: "model structure",
+      usage: "model usage",
+      example: "model example",
+      translation: "model translation",
+    });
+
+    expect(teaching).toMatchObject({
+      meaning: "model meaning",
+      formation: "Verb た-form + あとで\nNoun + のあとで",
+      usage:
+        "Means “after/later,” showing that one action occurs following another.",
+      example: "映画を見たあとで、晩ご飯を食べました。",
+      translation: "After watching the movie, we ate dinner.",
+    });
   });
 
   it("still lets the model supply what the bank does not carry", () => {
