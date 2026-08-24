@@ -43,8 +43,13 @@ import {
 } from "@/lib/sync/backend-sync";
 import { pendingLessonPhaseError } from "@/lib/sync/offline-queue";
 import {
+  activeLessonChangedEvent,
+  activeLessonFromStorage,
+  activeLessonStorageKey,
+  isLessonSupersededError,
   lessonSupersededEvent,
   lessonWasSuperseded,
+  markLessonSuperseded,
 } from "@/lib/sync/lesson-standing";
 
 type ProtectedPractice = "listening" | "speaking";
@@ -117,6 +122,12 @@ export function LessonPlayer({
   const advancingRef = useRef(false);
   const storyCommitRef = useRef(false);
   const premiumPhasesAccessible = lesson.premiumPhaseAccess !== "locked";
+  const showTakenOver = useCallback(() => {
+    markLessonSuperseded(lesson.id);
+    setCommitError(null);
+    setBackgroundSaveError(null);
+    setTakenOver(true);
+  }, [lesson.id]);
 
   // Warm the first Listening clip while the learner is finishing the phase
   // before it, so the first play feels instant. Only the first clip is primed
@@ -157,14 +168,34 @@ export function LessonPlayer({
    * that was earned section by section and never depended on this browser.
    */
   useEffect(() => {
-    const takeOver = () => setTakenOver(true);
-    if (lessonWasSuperseded(lesson.id)) takeOver();
+    let active = true;
+    if (lessonWasSuperseded(lesson.id)) {
+      queueMicrotask(() => {
+        if (active) showTakenOver();
+      });
+    }
     const handle = (event: Event) => {
-      if ((event as CustomEvent<string>).detail === lesson.id) takeOver();
+      if ((event as CustomEvent<string>).detail === lesson.id) showTakenOver();
+    };
+    const handleActiveLesson = (event: Event) => {
+      const activeLessonId = (event as CustomEvent<string>).detail;
+      if (activeLessonId && activeLessonId !== lesson.id) showTakenOver();
+    };
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== activeLessonStorageKey) return;
+      const activeLessonId = activeLessonFromStorage(event.newValue);
+      if (activeLessonId && activeLessonId !== lesson.id) showTakenOver();
     };
     window.addEventListener(lessonSupersededEvent, handle);
-    return () => window.removeEventListener(lessonSupersededEvent, handle);
-  }, [lesson.id]);
+    window.addEventListener(activeLessonChangedEvent, handleActiveLesson);
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      active = false;
+      window.removeEventListener(lessonSupersededEvent, handle);
+      window.removeEventListener(activeLessonChangedEvent, handleActiveLesson);
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, [lesson.id, showTakenOver]);
 
   useEffect(() => {
     if (!takenOver) return;
@@ -412,6 +443,10 @@ export function LessonPlayer({
       // exactly like one waiting on a slow network, so the learner kept
       // pressing Retry against a failure that had a specific, fixable cause.
       const describeFailure = () => {
+        if (lessonWasSuperseded(lesson.id)) {
+          showTakenOver();
+          return;
+        }
         const reason = pendingLessonPhaseError(lesson.id);
         setBackgroundSaveError(
           reason
@@ -462,6 +497,12 @@ export function LessonPlayer({
         committed = await queuedCommit.completion;
       }
     } catch (error) {
+      if (isLessonSupersededError(error) || lessonWasSuperseded(lesson.id)) {
+        showTakenOver();
+        setIsCommitting(false);
+        advancingRef.current = false;
+        return;
+      }
       setCommitError(
         error instanceof Error
           ? error.message
@@ -519,6 +560,12 @@ export function LessonPlayer({
           fallbackResult,
         );
       } catch (error) {
+        if (isLessonSupersededError(error) || lessonWasSuperseded(lesson.id)) {
+          showTakenOver();
+          setIsCommitting(false);
+          advancingRef.current = false;
+          return;
+        }
         setCommitError(
           error instanceof Error
             ? error.message
@@ -577,6 +624,11 @@ export function LessonPlayer({
     const synced = await flushPendingLessonPhaseCommits(lesson.id).catch(
       () => false,
     );
+    if (lessonWasSuperseded(lesson.id)) {
+      showTakenOver();
+      setIsRetryingBackgroundSave(false);
+      return;
+    }
     // The queue records why each attempt failed, and the repository maps the
     // server's phase rules to something a learner can act on. Blaming the
     // connection for a rule failure sent them round a retry that could not

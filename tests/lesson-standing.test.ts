@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+  activeLessonFromStorage,
   describesSupersededLesson,
   forgetSupersededLessons,
   isLessonSupersededError,
@@ -49,6 +50,36 @@ describe("remembering which lesson this browser is out of", () => {
     const error = new LessonSupersededError("lesson-a");
     expect(isLessonSupersededError(error)).toBe(true);
     expect(error.lessonId).toBe("lesson-a");
-    expect(isLessonSupersededError(new Error(error.message))).toBe(false);
+    expect(isLessonSupersededError(new Error(error.message))).toBe(true);
+  });
+
+  it("recognises takeover errors after a repository has wrapped them", () => {
+    expect(
+      isLessonSupersededError(
+        new Error(
+          "You have a newer lesson open, so this one was set aside. Everything you finished here is already counted.",
+        ),
+      ),
+    ).toBe(true);
+    // A phase-order bug can produce this while the lesson is still active. It
+    // must remain actionable rather than incorrectly closing the lesson.
+    expect(
+      isLessonSupersededError(
+        new Error("Only the current lesson section can be committed"),
+      ),
+    ).toBe(false);
+    expect(isLessonSupersededError(new Error("Network request failed"))).toBe(
+      false,
+    );
+  });
+
+  it("reads only valid cross-tab active lesson announcements", () => {
+    expect(
+      activeLessonFromStorage(
+        JSON.stringify({ lessonId: "lesson-b", nonce: "one" }),
+      ),
+    ).toBe("lesson-b");
+    expect(activeLessonFromStorage("not-json")).toBeNull();
+    expect(activeLessonFromStorage(JSON.stringify({ lessonId: 42 }))).toBeNull();
   });
 });

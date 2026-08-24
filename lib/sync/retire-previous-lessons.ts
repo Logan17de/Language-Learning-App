@@ -1,6 +1,7 @@
 "use client";
 
 import { discardSyncOperationsForOtherLessons } from "@/lib/sync/offline-queue";
+import { announceActiveLesson } from "@/lib/sync/lesson-standing";
 import { useAppStore } from "@/store/app-store";
 
 /**
@@ -22,4 +23,5 @@ export function retirePreviousLessons(currentLessonId: string): void {
   if (!lessonId) return;
   discardSyncOperationsForOtherLessons(lessonId);
   useAppStore.getState().keepOnlyLessonSession(lessonId);
+  announceActiveLesson(lessonId);
 }

@@ -33,7 +33,6 @@ function lessonProgressError(error: unknown, fallback: string): string {
   // the "try again" it used to read as.
   if (
     message.includes("Active lesson session unavailable") ||
-    message.includes("Only the current lesson section can be committed") ||
     describesSupersededLesson(message)
   ) {
     return "You have a newer lesson open, so this one was set aside. Everything you finished here is already counted.";

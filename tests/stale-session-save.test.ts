@@ -49,11 +49,62 @@ describe("a lesson taken over by a newer one is over here", () => {
 
   it("stops the lesson in the browser that was left behind", () => {
     expect(player).toContain("lessonSupersededEvent");
+    expect(player).toContain("activeLessonChangedEvent");
+    expect(player).toContain('window.addEventListener("storage", handleStorage)');
+    expect(player).toContain("isLessonSupersededError(error)");
     expect(player).toContain("You have a newer lesson open");
     expect(player).toContain("still counts");
     // No Retry: there is nothing to retry against, and the button used to
     // reopen this lesson and close the one the learner had moved to.
     const screen = player.slice(player.indexOf("function LessonTakenOver"));
     expect(screen).not.toContain("Retry");
+  });
+
+  it("does not report a retired queued operation as a successful save", () => {
+    expect(sync).toContain(
+      "!stillQueued() && !lessonWasSuperseded(lesson.id)",
+    );
+    expect(sync).toContain("!lessonWasSuperseded(lessonId)");
+  });
+
+  it("never turns a definitive takeover back into a retryable checkpoint", () => {
+    const checkpointOnly = sync.slice(
+      sync.indexOf("async function persistCheckpointOnly"),
+      sync.indexOf("function legacyPhaseBoundary"),
+    );
+    expect(checkpointOnly).toContain(
+      "if (isLessonSupersededError(error)) throw error",
+    );
+
+    const progress = sync.slice(
+      sync.indexOf("export async function syncLessonProgress"),
+      sync.indexOf("export async function confirmLessonStanding"),
+    );
+    const afterPersist = progress.slice(
+      progress.indexOf("const synced = await persistCheckpointOnly"),
+    );
+    expect(afterPersist.indexOf("lessonWasSuperseded(lesson.id)")).toBeLessThan(
+      afterPersist.indexOf("enqueueSync("),
+    );
+  });
+
+  it("rechecks ownership when a takeover races any phase write", () => {
+    expect(sync).toContain("async function throwLessonPersistenceError");
+    expect(sync).toContain("await lessonSessionId(lesson)");
+    expect(sync).toContain(
+      "throwLessonPersistenceError(lesson, answers.error.message)",
+    );
+    expect(sync).toContain(
+      "throwLessonPersistenceError(lesson, events.error.message)",
+    );
+    expect(sync).toContain(
+      "throwLessonPersistenceError(lesson, committed.error.message)",
+    );
+    expect(sync).toContain(
+      "throwLessonPersistenceError(lesson, skipped.error.message)",
+    );
+    expect(sync).toContain(
+      "throwLessonPersistenceError(lesson, result.error.message)",
+    );
   });
 });

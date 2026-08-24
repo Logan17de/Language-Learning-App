@@ -20,6 +20,7 @@
 const SUPERSEDED_MESSAGES = [
   "This lesson was set aside when another lesson was opened",
   "A newer lesson owns this checkpoint",
+  "You have a newer lesson open, so this one was set aside",
 ] as const;
 
 export class LessonSupersededError extends Error {
@@ -34,8 +35,9 @@ export class LessonSupersededError extends Error {
 
 export function isLessonSupersededError(
   value: unknown,
-): value is LessonSupersededError {
-  return value instanceof LessonSupersededError;
+): boolean {
+  if (value instanceof LessonSupersededError) return true;
+  return value instanceof Error && describesSupersededLesson(value.message);
 }
 
 /**
@@ -47,6 +49,8 @@ export function describesSupersededLesson(message: string): boolean {
 }
 
 export const lessonSupersededEvent = "aiko-lesson-superseded";
+export const activeLessonChangedEvent = "aiko-active-lesson-changed";
+export const activeLessonStorageKey = "aiko-active-lesson-v1";
 
 const supersededLessons = new Set<string>();
 
@@ -68,6 +72,45 @@ export function markLessonSuperseded(lessonId: string): void {
 /** For a player that mounts after the announcement has already gone out. */
 export function lessonWasSuperseded(lessonId: string): boolean {
   return supersededLessons.has(lessonId.trim());
+}
+
+/**
+ * Tell every tab on this device which lesson just acquired the server slot.
+ *
+ * The custom event covers a route change in this tab. Updating localStorage
+ * produces a native `storage` event in the other tabs. This is only an early
+ * UX signal; the database remains the authority for another browser/device.
+ */
+export function announceActiveLesson(lessonId: string): void {
+  const id = lessonId.trim();
+  if (!id || typeof window === "undefined") return;
+  const announcement = JSON.stringify({ lessonId: id, nonce: crypto.randomUUID() });
+  window.dispatchEvent(
+    new CustomEvent(activeLessonChangedEvent, { detail: id }),
+  );
+  try {
+    window.localStorage.setItem(activeLessonStorageKey, announcement);
+  } catch {
+    // Storage can be disabled. The server refusal still closes the old lesson.
+  }
+}
+
+export function activeLessonFromStorage(value: string | null): string | null {
+  if (!value) return null;
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      "lessonId" in parsed &&
+      typeof parsed.lessonId === "string"
+    ) {
+      return parsed.lessonId.trim() || null;
+    }
+  } catch {
+    return null;
+  }
+  return null;
 }
 
 /** Test seam. Nothing in the product forgets a lesson it has been shut out of. */
