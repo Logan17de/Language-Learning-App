@@ -42,10 +42,10 @@ describe("reading comprehension contract", () => {
     expect(reading).toContain("readingComplete: nextAnswers.length >= questions.length");
   });
 
-  it("keeps the reading passage inspectable and reveals English after completion", () => {
+  it("keeps the reading passage inspectable without a retired English reveal", () => {
     expect(reading).toContain("<InspectableText");
     expect(reading).toContain("inspectableTerms");
-    expect(reading).toContain("View English translation");
-    expect(reading).toContain("complete || session.readingComplete");
+    expect(reading).not.toContain("View English translation");
+    expect(reading).not.toContain("line.english");
   });
 });

@@ -9,7 +9,6 @@ const navigation = [
   { href: "#learning-system", label: "Method" },
   { href: "#lesson-journey", label: "How lessons work" },
   { href: "#pricing", label: "Premium" },
-  { href: "#founder", label: "Our story" },
 ] as const;
 
 const navigationLinkClass =

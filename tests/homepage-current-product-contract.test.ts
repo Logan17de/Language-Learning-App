@@ -28,10 +28,19 @@ describe("homepage reflects the current AIko product", () => {
   });
 
   it("explains adaptation without language-specific mechanics", () => {
-    expect(homepage).toContain("Translation responses");
+    expect(homepage).toContain("Story word support");
     expect(homepage).toContain("Progress works quietly in the background");
     expect(homepage).not.toContain("English-to-Japanese");
+    expect(homepage).not.toContain("translation");
     expect(homepage).not.toContain("Review performance");
+  });
+
+  it("does not publish the founder story section", () => {
+    const header = source("components/layout/public-header.tsx");
+    expect(homepage).not.toContain("Our story");
+    expect(homepage).not.toContain('id="founder"');
+    expect(header).not.toContain("Our story");
+    expect(header).not.toContain("#founder");
   });
 
   it("does not advertise retired or unsupported Premium features as current", () => {

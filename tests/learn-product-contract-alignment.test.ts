@@ -1,16 +1,11 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import type { LessonPackage } from "@/types/lesson";
 import type { LessonSession } from "@/types/lesson-session";
 import {
   grammarStandardIsComplete,
   phaseIsComplete,
 } from "@/lib/lesson-phase-progress";
-import {
-  LEARN_PRODUCT_CONTRACT_VERSION,
-  learnProductContractIsActive,
-} from "@/lib/learn-product-contract";
 
 function lesson(options: { premium?: boolean } = {}): LessonPackage {
   const question = (prefix: string, index: number) => ({ id: `${prefix}-${index}` });
@@ -87,33 +82,6 @@ describe("/learn product contract", () => {
         currentLesson,
       ),
     ).toBe(false);
-  });
-
-  it("activates only on the exact final DB sentinel and fails closed on unknown errors", async () => {
-    const client = (result: unknown) =>
-      ({ rpc: async () => result }) as unknown as SupabaseClient;
-
-    await expect(
-      learnProductContractIsActive(
-        client({ data: LEARN_PRODUCT_CONTRACT_VERSION, error: null }),
-      ),
-    ).resolves.toBe(true);
-    await expect(
-      learnProductContractIsActive(
-        client({
-          data: null,
-          error: {
-            code: "PGRST202",
-            message: "Could not find public.learn_product_contract_version()",
-          },
-        }),
-      ),
-    ).resolves.toBe(false);
-    await expect(
-      learnProductContractIsActive(
-        client({ data: null, error: { code: "42501", message: "denied" } }),
-      ),
-    ).rejects.toMatchObject({ code: "42501" });
   });
 
   it("maps no historical 10/13 practice rows into the playable learner package", () => {

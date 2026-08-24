@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import type { LessonPackage } from "@/types/lesson";
 import { isPlayableLesson } from "@/lib/lesson-search-utils";
-import { learnProductContractIsActive } from "@/lib/learn-product-contract";
-import { createClient } from "@/lib/supabase/client";
 import { LessonPreview } from "@/components/lesson/lesson-preview";
 import { LessonPlayer } from "@/components/lesson/lesson-player";
 import { ButtonLink } from "@/components/ui/button";
@@ -26,9 +24,6 @@ export function LessonRouteResolver({
   const [backendResolved, setBackendResolved] = useState(
     Boolean(cachedBackendLesson),
   );
-  const [contractResolved, setContractResolved] = useState(mode === "preview");
-  const [translationPremiumContractActive, setTranslationPremiumContractActive] =
-    useState(false);
 
   useEffect(() => {
     let active = true;
@@ -51,55 +46,9 @@ export function LessonRouteResolver({
     };
   }, [cachedBackendLesson, lessonId, loadBackendLesson]);
 
-  useEffect(() => {
-    let active = true;
-    if (mode !== "play") {
-      // Deferred off the synchronous effect body to avoid cascading renders.
-      void Promise.resolve().then(() => {
-        if (active) setContractResolved(true);
-      });
-      return () => {
-        active = false;
-      };
-    }
-
-    const client = createClient();
-    if (!client) {
-      // A configuration failure must not accidentally open protected practice.
-      // Deferred off the synchronous effect body to avoid cascading renders.
-      void Promise.resolve().then(() => {
-        if (!active) return;
-        setTranslationPremiumContractActive(true);
-        setContractResolved(true);
-      });
-      return () => {
-        active = false;
-      };
-    }
-
-    void learnProductContractIsActive(client)
-      .then((enabled) => {
-        if (!active) return;
-        setTranslationPremiumContractActive(enabled);
-      })
-      .catch(() => {
-        if (!active) return;
-        // Unknown DB failures fail closed. Only a genuinely missing activation
-        // RPC is treated as the legacy rollout state by the helper.
-        setTranslationPremiumContractActive(true);
-      })
-      .finally(() => {
-        if (active) setContractResolved(true);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [mode]);
-
   const lesson = cachedBackendLesson ?? requestedBackendLesson;
 
-  if (!backendResolved || (mode === "play" && !contractResolved)) {
+  if (!backendResolved) {
     return (
       <main className="grid min-h-screen place-items-center bg-paper">
         <span className="size-10 animate-spin rounded-full border-4 border-moss-100 border-t-moss-600" />

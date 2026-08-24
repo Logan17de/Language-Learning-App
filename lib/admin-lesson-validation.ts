@@ -13,7 +13,7 @@ export function validateAdminLesson(lesson: LessonPackage): AdminLessonDraft {
   if (!lesson.kanji.length) errors.kanji = "At least one kanji item is required.";
   if (!lesson.vocabulary.length) errors.vocabulary = "At least one vocabulary item is required.";
   if (!lesson.story.length) errors.story = "The story phase cannot be empty.";
-  if (lesson.story.some((line) => !line.japanese.trim() || !line.english.trim())) errors.storyLines = "Every story line needs Japanese and a translation.";
+  if (lesson.story.some((line) => !line.japanese.trim() || !line.english.trim())) errors.storyLines = "Every story line needs Japanese and English text.";
   if (!lesson.vocabularyQuestions.length) errors.vocabularyQuestions = "Vocabulary practice is required.";
   if (!lesson.grammarQuestions.length) errors.grammarQuestions = "Grammar practice is required.";
   if (!lesson.readingConversation.length) errors.reading = "Reading dialogue is required.";

@@ -34,6 +34,8 @@ describe("nothing offers a section that was removed", () => {
   it("does not send the learner on to Translation", () => {
     expect(grammar).not.toContain("Continue to Translation");
     expect(grammar).not.toContain("English-to-Japanese");
+    expect(grammar).not.toContain("point.translation");
+    expect(grammar).not.toContain("in translation");
     expect(grammar).toContain("Continue to Reading");
   });
 

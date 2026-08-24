@@ -1,19 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { appendInspectableInteraction } from "@/lib/lesson-support";
 import {
   ArrowRight,
   CheckCircle2,
   Languages,
-  LoaderCircle,
-  Sparkles,
 } from "lucide-react";
 import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
-import type {
-  GrammarTranslationQuestion,
-  LessonSession,
-} from "@/types/lesson-session";
+import type { LessonSession } from "@/types/lesson-session";
 import { upsertGrammarAnswer } from "@/lib/scoring-utils";
 import { MultipleChoiceCard } from "@/components/exercises/multiple-choice-card";
 import { InspectableText } from "@/components/exercises/inspectable-text";
@@ -169,9 +164,6 @@ export function GrammarPhase({
                   <dd className="mt-1 font-serif text-lg leading-7" lang="ja">
                     {point.example}
                   </dd>
-                  <dd className="mt-1 text-xs text-stone-400">
-                    {point.translation}
-                  </dd>
                 </div>
               </dl>
             </Card>
@@ -211,8 +203,8 @@ export function GrammarPhase({
           </div>
           <h2 className="mt-4 text-3xl font-semibold">Grammar practice</h2>
           <p className="mt-2 text-sm leading-6 text-stone-500">
-            First recognize how the lesson patterns work. Then you’ll produce
-            them yourself in translation.
+            First recognise how the lesson patterns work. Then use them in
+            progressively harder questions.
           </p>
         </div>
         <p className="shrink-0 text-sm font-semibold text-stone-500">
