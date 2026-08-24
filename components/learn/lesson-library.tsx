@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   Crown,
   Headphones,
-  Languages,
   LoaderCircle,
   Mic2,
   Sparkles,
@@ -145,7 +144,13 @@ export function LessonLibrary() {
   const busy = state === "generating";
   const isFree = creationState?.plan === "free";
   const resumableLesson = resumeLessonAction(creationState);
-  const currentLesson = currentLessonAction(creationState);
+  // Resume is the single lesson surface. A stale "today's lesson" record can
+  // refer to a different generated lesson after a takeover, but showing both
+  // makes Learn look as though the learner owns two active paths. Keep the
+  // secondary status card only when there is no resumable lesson.
+  const currentLesson = resumableLesson
+    ? null
+    : currentLessonAction(creationState);
   const creationFormVisible = !resumableLesson || showCreationForm;
 
   return (
