@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Check, Sparkles, X } from "lucide-react";
 import type { StoryWord } from "@/types/lesson";
 import { cn } from "@/lib/utils";
+import { japaneseLang } from "@/lib/japanese-input";
 import { InspectableText } from "@/components/exercises/inspectable-text";
 import { AnswerFeedback } from "@/components/exercises/answer-feedback";
 
@@ -180,7 +181,7 @@ export function MultipleChoiceCard({
                     String.fromCharCode(65 + index)
                   )}
                 </span>
-                <span className="min-w-0 flex-1">
+                <span className="min-w-0 flex-1" lang={japaneseLang(choice)}>
                   {inspectChoices ? (
                     <InspectableText
                       text={choice}

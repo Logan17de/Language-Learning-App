@@ -182,7 +182,15 @@ export function ListeningPhase({
             answerCorrect={priorAnswer?.correct}
             disabled={!heardEntireConversation}
             lockAfterAnswer
-            inspectableTerms={exercise.inspectableTerms ?? lesson.story.flatMap((line) => line.words)}
+            // Listening exercises are generated with an empty term list, and
+            // `??` keeps an empty array, so nothing was ever tappable. The
+            // lesson's own story words are the right fallback: the listening
+            // draws on the same language.
+            inspectableTerms={
+              exercise.inspectableTerms?.length
+                ? exercise.inspectableTerms
+                : lesson.story.flatMap((line) => line.words)
+            }
             onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, exercise.id, word, reveal))}
             onSelect={answer}
             answerAction={

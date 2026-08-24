@@ -1,3 +1,19 @@
+const JAPANESE_SCRIPT = /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/u;
+
+/**
+ * `"ja"` when the text contains Japanese, otherwise nothing.
+ *
+ * The stylesheet gives `:lang(ja)` the Japanese face. Text that never declares
+ * its language falls to the Latin stack instead, and since Inter carries no
+ * Japanese glyphs the browser substitutes a face of its own — which is why the
+ * same sentence looked thinner and smaller in a choice than in the question
+ * above it. Marking the language fixes the face, and helps line breaking and
+ * screen readers at the same time.
+ */
+export function japaneseLang(value: string): "ja" | undefined {
+  return JAPANESE_SCRIPT.test(value) ? "ja" : undefined;
+}
+
 const ROMAJI_TO_HIRAGANA: Record<string, string> = {
   kya: "きゃ", kyu: "きゅ", kyo: "きょ",
   gya: "ぎゃ", gyu: "ぎゅ", gyo: "ぎょ",
