@@ -282,6 +282,10 @@ async function saveCheckpoint(
       checkpoint: json({ session: checkpointSession }),
     },
   );
+  if (!checkpoint.ok && describesSupersededLesson(checkpoint.error.message)) {
+    retireSupersededLesson(lesson.id);
+    throw new LessonSupersededError(lesson.id);
+  }
   return checkpoint.ok;
 }
 

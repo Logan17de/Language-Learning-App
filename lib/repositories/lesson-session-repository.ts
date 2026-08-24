@@ -34,7 +34,7 @@ function lessonProgressError(error: unknown, fallback: string): string {
   if (
     message.includes("Active lesson session unavailable") ||
     message.includes("Only the current lesson section can be committed") ||
-    message.includes("This lesson was set aside when another lesson was opened")
+    describesSupersededLesson(message)
   ) {
     return "You have a newer lesson open, so this one was set aside. Everything you finished here is already counted.";
   }
@@ -128,16 +128,27 @@ export const lessonSessionRepository = {
   async saveCheckpoint(sessionId: string, checkpoint: Pick<LessonSession, "current_phase" | "current_phase_index" | "activity_index" | "elapsed_seconds" | "checkpoint">): Promise<RepositoryResult<LessonSession>> {
     const client = createClient();
     if (!client) return notConfigured();
-    const { data, error } = await client.from("lesson_sessions").update({
-      ...checkpoint,
-      last_saved_at: new Date().toISOString(),
-      // This must stay `status = 'active'`: the active_session_update_only RLS
-      // policy is RESTRICTIVE, so the database refuses any write to a session
-      // that is not open, whatever this query asks for. Widening the filter
-      // here only hides that. A browser sitting on a lesson the learner has
-      // moved off recovers by reopening it, which makes it current again.
-    }).eq("id", sessionId).eq("status", "active").select("*").single();
-    return error ? failure(error, "Your lesson checkpoint is waiting to sync.") : success(data);
+    const rawClient = client as unknown as SupabaseClient;
+    const { data, error } = await rawClient.rpc(
+      "save_authoritative_lesson_checkpoint",
+      {
+        p_session_id: sessionId,
+        p_current_phase: checkpoint.current_phase,
+        p_current_phase_index: checkpoint.current_phase_index,
+        p_activity_index: checkpoint.activity_index,
+        p_elapsed_seconds: checkpoint.elapsed_seconds,
+        p_checkpoint: checkpoint.checkpoint,
+      },
+    );
+    if (error) {
+      const raw = typeof error.message === "string" ? error.message : "";
+      if (describesSupersededLesson(raw)) return failure({}, raw);
+      return failure(error, "Your lesson checkpoint is waiting to sync.");
+    }
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
+      return failure({}, "Your lesson checkpoint is waiting to sync.");
+    }
+    return success(data as unknown as LessonSession);
   },
 
   async abandonActive(lessonReference: string): Promise<RepositoryResult<number>> {

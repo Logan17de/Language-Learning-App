@@ -4,25 +4,24 @@ import { describe, expect, it } from "vitest";
 const repo = readFileSync("lib/repositories/lesson-session-repository.ts", "utf8");
 const sync = readFileSync("lib/sync/backend-sync.ts", "utf8");
 const player = readFileSync("components/lesson/lesson-player.tsx", "utf8");
+const standing = readFileSync("lib/sync/lesson-standing.ts", "utf8");
 
 describe("a lesson the learner moved off cannot be written to", () => {
-  it("keeps the active filter, because the database enforces it anyway", () => {
-    // active_session_update_only is a RESTRICTIVE policy, so it ANDs with the
-    // permissive ones: the database refuses any write to a session that is not
-    // open, whatever the query asks for. Widening the filter only hides that.
+  it("lets the atomic server RPC decide which session owns the save", () => {
     const save = repo.slice(
       repo.indexOf("async saveCheckpoint"),
       repo.indexOf("async abandonActive"),
     );
-    expect(save).toContain('.eq("status", "active")');
-    expect(save).toContain("RESTRICTIVE");
+    expect(save).toContain('"save_authoritative_lesson_checkpoint"');
+    expect(save).not.toContain('.from("lesson_sessions").update');
   });
 });
 
 describe("a lesson taken over by a newer one is over here", () => {
   it("says the lesson was set aside rather than asking for a retry", () => {
-    expect(repo).toContain("This lesson was set aside when another lesson was opened");
-    expect(repo).toContain("You have a newer lesson open, so this one was set aside.");
+    expect(standing).toContain("This lesson was set aside when another lesson was opened");
+    expect(standing).toContain("A newer lesson owns this checkpoint");
+    expect(standing).toContain("You have a newer lesson open, so this one was set aside.");
     // The old advice. Reopening is exactly what let two browsers take the open
     // slot from each other, so it must not come back.
     expect(repo).not.toContain("Reopen this lesson and it will save itself.");

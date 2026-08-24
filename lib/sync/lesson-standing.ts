@@ -17,7 +17,10 @@
  */
 
 /** The server's own words, so a plain message is recognised wherever it lands. */
-const SET_ASIDE = "This lesson was set aside when another lesson was opened";
+const SUPERSEDED_MESSAGES = [
+  "This lesson was set aside when another lesson was opened",
+  "A newer lesson owns this checkpoint",
+] as const;
 
 export class LessonSupersededError extends Error {
   readonly lessonId: string;
@@ -40,7 +43,7 @@ export function isLessonSupersededError(
  * message arrives as plain text through PostgREST, so this is the seam.
  */
 export function describesSupersededLesson(message: string): boolean {
-  return message.includes(SET_ASIDE);
+  return SUPERSEDED_MESSAGES.some((candidate) => message.includes(candidate));
 }
 
 export const lessonSupersededEvent = "aiko-lesson-superseded";
