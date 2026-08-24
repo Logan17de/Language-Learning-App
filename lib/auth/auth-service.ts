@@ -21,8 +21,26 @@ export interface AuthIdentity {
   displayName: string;
   role: AppRole;
   subscriptionPlan: "free" | "premium_monthly" | "premium_annual";
+  subscriptionStatus: "active" | "trial" | "cancelled" | "past_due";
+  subscriptionRenewsAt: string | null;
+  billingProvider: "manual" | "dodo";
+  cancelAtPeriodEnd: boolean;
   onboardingComplete: boolean;
 }
+
+type SubscriptionIdentity = {
+  status: AuthIdentity["subscriptionStatus"];
+  renews_at: string | null;
+  billing_provider: AuthIdentity["billingProvider"];
+  cancel_at_period_end: boolean;
+};
+
+const defaultSubscriptionIdentity: SubscriptionIdentity = {
+  status: "active",
+  renews_at: null,
+  billing_provider: "manual",
+  cancel_at_period_end: false,
+};
 
 function friendlyAuthMessage(message: string, code?: string): string {
   const lower = message.toLowerCase();
@@ -126,7 +144,7 @@ async function loadActiveIdentity(
   userId: string,
   fallbackEmail: string,
 ): Promise<RepositoryResult<AuthIdentity>> {
-  const [profile, preferences] = await Promise.all([
+  const [profile, preferences, subscription] = await Promise.all([
     client
       .from("profiles")
       .select("display_name,role,status,subscription_plan")
@@ -135,6 +153,11 @@ async function loadActiveIdentity(
     client
       .from("user_preferences")
       .select("onboarding_complete")
+      .eq("user_id", userId)
+      .maybeSingle(),
+    client
+      .from("user_subscriptions")
+      .select("status,renews_at,billing_provider,cancel_at_period_end")
       .eq("user_id", userId)
       .maybeSingle(),
   ]);
@@ -149,6 +172,10 @@ async function loadActiveIdentity(
       "Your onboarding status could not be loaded.",
     );
   }
+  if (subscription.error) {
+    await client.auth.signOut({ scope: "local" });
+    return failure(subscription.error, "Your subscription could not be loaded.");
+  }
   if (profile.data.status !== "active") {
     await client.auth.signOut({ scope: "local" });
     return failure(
@@ -156,12 +183,17 @@ async function loadActiveIdentity(
       "This account is not active. Contact support.",
     );
   }
+  const billing = subscription.data ?? defaultSubscriptionIdentity;
   return success({
     id: userId,
     email: fallbackEmail,
     displayName: profile.data.display_name,
     role: profile.data.role,
     subscriptionPlan: profile.data.subscription_plan,
+    subscriptionStatus: billing.status,
+    subscriptionRenewsAt: billing.renews_at,
+    billingProvider: billing.billing_provider,
+    cancelAtPeriodEnd: billing.cancel_at_period_end,
     onboardingComplete: preferences.data?.onboarding_complete ?? false,
   });
 }
@@ -189,7 +221,7 @@ export const authService = {
     const { data, error } = await client.auth.getUser();
     if (error) return failure(error, "Your session could not be restored.");
     if (!data.user) return success(null);
-    const [profile, preferences] = await Promise.all([
+    const [profile, preferences, subscription] = await Promise.all([
       client
         .from("profiles")
         .select("display_name,role,status,subscription_plan")
@@ -200,6 +232,11 @@ export const authService = {
         .select("onboarding_complete")
         .eq("user_id", data.user.id)
         .maybeSingle(),
+      client
+        .from("user_subscriptions")
+        .select("status,renews_at,billing_provider,cancel_at_period_end")
+        .eq("user_id", data.user.id)
+        .maybeSingle(),
     ]);
     if (profile.error)
       return failure(profile.error, "Your profile could not be loaded.");
@@ -208,16 +245,23 @@ export const authService = {
         preferences.error,
         "Your onboarding status could not be loaded.",
       );
+    if (subscription.error)
+      return failure(subscription.error, "Your subscription could not be loaded.");
     if (!profile.data || profile.data.status !== "active") {
       await client.auth.signOut({ scope: "local" });
       return success(null);
     }
+    const billing = subscription.data ?? defaultSubscriptionIdentity;
     return success({
       id: data.user.id,
       email: data.user.email ?? "",
       displayName: profile.data.display_name,
       role: profile.data.role,
       subscriptionPlan: profile.data.subscription_plan,
+      subscriptionStatus: billing.status,
+      subscriptionRenewsAt: billing.renews_at,
+      billingProvider: billing.billing_provider,
+      cancelAtPeriodEnd: billing.cancel_at_period_end,
       onboardingComplete: preferences.data?.onboarding_complete ?? false,
     });
   },
