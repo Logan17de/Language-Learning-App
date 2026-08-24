@@ -49,6 +49,9 @@ describe("leaving and resuming a lesson", () => {
   it("offers Resume and Start new as separate actions on /learn", () => {
     expect(learn).toContain("Resume lesson");
     expect(learn).toContain("Start new lesson");
+    expect(learn).toContain(
+      "const currentLesson = resumableLesson\n    ? null\n    : currentLessonAction(creationState)",
+    );
     // Resume never spends today's allowance.
     expect(learn).toContain(
       "Resume remains available without consuming another lesson.",
