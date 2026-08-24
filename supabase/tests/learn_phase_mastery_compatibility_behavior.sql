@@ -221,6 +221,13 @@ select throws_ok(
 select pg_temp.answer_phase(
   current_setting('aiko.user')::uuid, current_setting('aiko.session')::uuid, 'vocabulary', 7);
 
+-- The production client saves the completed checkpoint first. That checkpoint
+-- advances the active section to Grammar before the Vocabulary mastery commit
+-- arrives, so the commit contract must accept the immediately preceding phase.
+update public.lesson_sessions
+set current_phase = 'grammar', current_phase_index = 2
+where id = current_setting('aiko.session')::uuid;
+
 select is(
   (pg_temp.commit_phase(current_setting('aiko.user')::uuid,
                         current_setting('aiko.session')::uuid, 'vocabulary') ->> 'committed'),
