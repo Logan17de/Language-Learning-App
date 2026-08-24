@@ -355,6 +355,21 @@ export function StoryPhase({
           ))}
         </p>
 
+        <div className="mt-10 border-t border-stone-200 pt-8">
+          <p className="section-kicker">English translation</p>
+          <p
+            lang="en"
+            className="mt-4 hyphens-auto text-base leading-7 text-justify text-stone-600 sm:text-lg"
+            style={{ textJustify: "inter-word" }}
+          >
+            {lesson.story.map((line, lineIndex) => (
+              <span key={`${line.id}_english`}>
+                {lineIndex > 0 ? " " : ""}
+                {line.english}
+              </span>
+            ))}
+          </p>
+        </div>
       </Card>
 
       {activeSupport && activeDetails && (

@@ -23,6 +23,7 @@ describe("the grammar card shows the curated bank", () => {
   it("calls the example an example, since it comes from the bank", () => {
     expect(grammar).not.toContain("From the story");
     expect(grammar).toContain("Example");
+    expect(grammar).toContain("{point.translation}");
   });
 
   it("marks the Japanese it renders", () => {
@@ -34,7 +35,6 @@ describe("nothing offers a section that was removed", () => {
   it("does not send the learner on to Translation", () => {
     expect(grammar).not.toContain("Continue to Translation");
     expect(grammar).not.toContain("English-to-Japanese");
-    expect(grammar).not.toContain("point.translation");
     expect(grammar).not.toContain("in translation");
     expect(grammar).toContain("Continue to Reading");
   });

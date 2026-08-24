@@ -36,6 +36,7 @@ export function ReadingPhase({
   const answerCorrect = Boolean(
     submitted && question && normalizeAnswer(submitted.response) === normalizeAnswer(question.answer),
   );
+  const complete = questions.length > 0 && answers.length >= questions.length;
   const terms = useMemo(
     () => uniqueTerms(
       lesson.readingConversation.flatMap((line) => line.inspectableTerms ?? []),
@@ -225,6 +226,20 @@ export function ReadingPhase({
         </Button>
       )}
 
+      {(complete || session.readingComplete) && (
+        <details className="mt-8 rounded-3xl border border-stone-200 bg-white p-6">
+          <summary className="cursor-pointer font-semibold text-moss-800">
+            View English translation
+          </summary>
+          <div className="mt-5 space-y-4 text-justify leading-8 text-stone-600">
+            {lesson.readingConversation.map((line, index) => (
+              <p key={`translation-${index}`} lang="en">
+                {line.english}
+              </p>
+            ))}
+          </div>
+        </details>
+      )}
     </div>
   );
 }
