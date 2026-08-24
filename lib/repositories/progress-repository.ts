@@ -89,6 +89,20 @@ function dailyMinutes(value: number): DailyMinutes {
   return value === 15 || value === 45 || value === 60 ? value : 30;
 }
 
+export interface MasteryBandRow {
+  key: string;
+  label: string;
+  before: number;
+  after: number;
+}
+
+export interface LessonMasteryProgress {
+  level: string;
+  hasBaseline: boolean;
+  categories: MasteryBandRow[];
+  overall: MasteryBandRow;
+}
+
 export interface LevelMastery {
   level: string;
   averageMastery: number;
@@ -101,6 +115,36 @@ export const progressRepository = {
    * Average mastery across the learner's level and every level below it — the
    * scope promotion is judged on.
    */
+  /** What the lesson just finished moved, by category and overall. */
+  async lessonMasteryProgress(): Promise<RepositoryResult<LessonMasteryProgress>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { data, error } = await client.rpc("lesson_mastery_progress");
+    if (error) return failure(error, "Your mastery change could not be loaded.");
+    const row = (data ?? {}) as Record<string, unknown>;
+    const band = (value: unknown): MasteryBandRow | null => {
+      if (!value || typeof value !== "object") return null;
+      const item = value as Record<string, unknown>;
+      if (typeof item.key !== "string" || typeof item.label !== "string") return null;
+      return {
+        key: item.key,
+        label: item.label,
+        before: Number(item.before ?? 0),
+        after: Number(item.after ?? 0),
+      };
+    };
+    const overall = band(row.overall);
+    if (!overall) return failure({}, "Your mastery change could not be loaded.");
+    return success({
+      level: typeof row.level === "string" ? row.level : "",
+      hasBaseline: row.hasBaseline === true,
+      categories: (Array.isArray(row.categories) ? row.categories : [])
+        .map(band)
+        .filter((item): item is MasteryBandRow => item !== null),
+      overall,
+    });
+  },
+
   async levelMastery(): Promise<RepositoryResult<LevelMastery>> {
     const client = createClient();
     if (!client) return notConfigured();

@@ -25,6 +25,10 @@ import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { LessonReportDialog } from "@/components/support/lesson-report-dialog";
 import {
+  MasteryProgress,
+  type MasteryBand,
+} from "@/components/lesson/mastery-progress";
+import {
   progressRepository,
   type LevelMastery,
 } from "@/lib/repositories/progress-repository";
@@ -38,6 +42,22 @@ export function LessonResult({
   result: LessonCompletionResult;
 }) {
   const [levelMastery, setLevelMastery] = useState<LevelMastery | null>(null);
+  const [masteryBands, setMasteryBands] = useState<MasteryBand[]>([]);
+
+  // What this lesson moved, by category and then overall. The overall band is
+  // last so the sequence ends on the figure that summarises the rest.
+  useEffect(() => {
+    if (getBackendMode() !== "supabase") return;
+    let cancelled = false;
+    void progressRepository.lessonMasteryProgress().then((result) => {
+      if (cancelled || !result.ok) return;
+      setMasteryBands([...result.data.categories, result.data.overall]);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
 
   useEffect(() => {
     if (getBackendMode() !== "supabase") return;
@@ -196,92 +216,22 @@ export function LessonResult({
                 ))}
               </div>
             </div>
-            <div className="mt-6">
-              <p className="text-xs font-bold uppercase tracking-wide text-stone-400">
-                Needs attention
-              </p>
-              <p className="mt-2 text-sm leading-6 text-stone-500">
-                {result.weakItems.length
-                  ? `Strengthen ${result.weakItems.join(" and ")} in future practice.`
-                  : "No weak items were detected in this lesson."}
-              </p>
-            </div>
           </Card>
           <Card className="p-7">
             <h2 className="flex items-center gap-2 font-semibold">
-              <Volume2 className="size-5 text-persimmon-500" /> Skill changes
+              <Sparkles className="size-5 text-persimmon-500" /> Mastery
             </h2>
-            <div className="mt-6 space-y-5">
-              <SkillChange
-                label="Kanji recognition"
-                value={72}
-                change={result.recognitionChange}
-              />
-              <SkillChange
-                label="Pronunciation confidence"
-                value={66}
-                change={result.pronunciationChange}
-              />
-              <SkillChange
-                label="Grammar understanding"
-                value={74}
-                change={result.grammarUnderstandingChange}
-              />
-              <SkillChange
-                label="Grammar production"
-                value={59}
-                change={result.grammarProductionChange}
-              />
-            </div>
+            {masteryBands.length ? (
+              <MasteryProgress bands={masteryBands} className="mt-6" />
+            ) : (
+              <p className="mt-6 text-sm leading-6 text-muted">
+                Your mastery for this level is being brought up to date.
+              </p>
+            )}
           </Card>
         </div>
 
-        <Card className="mt-6 p-6">
-          <button
-            type="button"
-            onClick={() => setShowMistakes((value) => !value)}
-            className="flex min-h-12 w-full items-center gap-3 text-left focus:outline-none focus:ring-4 focus:ring-moss-100"
-          >
-            <RotateCcw className="size-5 text-persimmon-500" />
-            <div className="flex-1">
-              <p className="font-semibold">Items to strengthen</p>
-              <p className="text-xs text-stone-400">
-                {result.weakItems.length} item
-                {result.weakItems.length === 1 ? "" : "s"}
-              </p>
-            </div>
-            <ChevronDown
-              className={`size-5 text-stone-400 transition ${showMistakes ? "rotate-180" : ""}`}
-            />
-          </button>
-          {showMistakes && (
-            <div className="mt-4 border-t border-stone-100 pt-4">
-              {result.weakItems.length ? (
-                <div className="flex flex-wrap gap-2">
-                  {result.weakItems.map((item) => (
-                    <Badge key={item} tone="orange">
-                      {item}
-                    </Badge>
-                  ))}
-                </div>
-              ) : (
-                <p className="flex items-center gap-2 text-sm text-moss-700">
-                  <Check className="size-4" /> No weak items detected in this
-                  lesson.
-                </p>
-              )}
-            </div>
-          )}
-        </Card>
-
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => setShowMistakes(true)}
-          >
-            <RotateCcw className="size-4" /> See weak items
-          </Button>
           <ButtonLink href="/home" variant="dark">
             Return Home
           </ButtonLink>
@@ -325,22 +275,3 @@ function ResultStat({
   );
 }
 
-function SkillChange({
-  label,
-  value,
-  change,
-}: {
-  label: string;
-  value: number;
-  change: number;
-}) {
-  return (
-    <div>
-      <div className="mb-2 flex items-center justify-between text-sm">
-        <span className="font-medium">{label}</span>
-        <span className="font-semibold text-moss-700">+{change}</span>
-      </div>
-      <ProgressBar value={value + change} />
-    </div>
-  );
-}
