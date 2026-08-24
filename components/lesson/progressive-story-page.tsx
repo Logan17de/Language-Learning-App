@@ -583,6 +583,10 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
     () => lines.map((line) => line.japanese.trim()).filter(Boolean).join(""),
     [lines],
   );
+  const englishPassage = useMemo(
+    () => lines.map((line) => line.english.trim()).filter(Boolean).join(" "),
+    [lines],
+  );
   const passageWords = useMemo(
     () => lines.flatMap((line) => line.words),
     [lines],
@@ -767,6 +771,16 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
               <InspectableText text={japanesePassage} terms={passageWords} />
             </p>
 
+            <div className="mt-10 border-t border-stone-200 pt-8">
+              <p className="section-kicker">English translation</p>
+              <p
+                lang="en"
+                className="mt-4 hyphens-auto text-base leading-7 text-justify text-stone-600 sm:text-lg"
+                style={{ textJustify: "inter-word" }}
+              >
+                {englishPassage}
+              </p>
+            </div>
           </Card>
 
           <div className="mt-7 rounded-3xl border border-moss-200 bg-moss-50 p-5">

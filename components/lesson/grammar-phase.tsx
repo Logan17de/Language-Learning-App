@@ -164,6 +164,9 @@ export function GrammarPhase({
                   <dd className="mt-1 font-serif text-lg leading-7" lang="ja">
                     {point.example}
                   </dd>
+                  <dd className="mt-1 text-sm leading-6 text-stone-500" lang="en">
+                    {point.translation}
+                  </dd>
                 </div>
               </dl>
             </Card>

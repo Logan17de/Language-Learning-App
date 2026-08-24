@@ -150,7 +150,9 @@ describe("custom lesson story pipeline v3", () => {
       "speaking",
     ]);
     expect(progressiveStory).toContain("japanesePassage");
-    expect(storyPhase).not.toContain("English story");
+    expect(progressiveStory).toContain("englishPassage");
+    expect(progressiveStory).toContain("English translation");
+    expect(storyPhase).toContain("English translation");
     expect(listening).toContain("<AudioControl");
     expect(speaking).toContain("Read the sentence aloud");
   });
