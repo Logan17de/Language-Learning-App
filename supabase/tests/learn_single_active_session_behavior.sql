@@ -19,6 +19,28 @@ begin
   return v_user;
 end $$;
 
+-- Own fixtures rather than borrowed seed rows: the seeded database has only
+-- one lesson with a version, so the second lesson has to be made here.
+create or replace function pg_temp.make_lesson(p_user uuid)
+returns uuid language plpgsql as $$
+declare
+  v_lesson uuid := gen_random_uuid();
+  v_version uuid := gen_random_uuid();
+begin
+  insert into public.lessons (
+    id, slug, title, japanese_title, summary, topic, jlpt_level,
+    duration_minutes, status, source, generated_for_user_id
+  ) values (
+    v_lesson, 'session-' || replace(v_lesson::text, '-', ''),
+    'Session fixture', '課', 'Hermetic fixture lesson.',
+    'session fixture', 'N5', 30, 'published', 'user_generated', p_user
+  );
+  insert into public.lesson_versions (id, lesson_id, version_number, status)
+  values (v_version, v_lesson, 1, 'published');
+  update public.lessons set current_version_id = v_version where id = v_lesson;
+  return v_lesson;
+end $$;
+
 create or replace function pg_temp.open_lesson(p_user uuid, p_lesson uuid)
 returns uuid language plpgsql as $$
 declare
@@ -39,12 +61,9 @@ $$;
 
 select set_config('aiko.learner', pg_temp.make_learner()::text, true);
 select set_config('aiko.lesson_a',
-  (select l.id from public.lessons l join public.lesson_versions v on v.lesson_id = l.id
-   order by l.created_at limit 1)::text, true);
+  pg_temp.make_lesson(current_setting('aiko.learner')::uuid)::text, true);
 select set_config('aiko.lesson_b',
-  (select l.id from public.lessons l join public.lesson_versions v on v.lesson_id = l.id
-   where l.id <> current_setting('aiko.lesson_a')::uuid
-   order by l.created_at limit 1)::text, true);
+  pg_temp.make_lesson(current_setting('aiko.learner')::uuid)::text, true);
 
 -- ---------------------------------------------------------------------------
 -- Opening a lesson twice reuses one session rather than making a second.
