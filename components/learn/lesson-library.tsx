@@ -518,7 +518,7 @@ function currentLessonAction(state: LessonCreationState | null): {
     return {
       href: `/lesson/building/${encodeURIComponent(state.requestId)}`,
       label: "Continue building",
-      kicker: "Today&apos;s lesson is building",
+      kicker: "Today’s lesson is building",
       detail: "AIko is still building this lesson. Return to its progress screen anytime.",
     };
   }
@@ -528,7 +528,7 @@ function currentLessonAction(state: LessonCreationState | null): {
     return {
       href: `/lesson/${state.lessonId}/play`,
       label: "Start lesson",
-      kicker: "Today&apos;s lesson is ready",
+      kicker: "Today’s lesson is ready",
       detail: "Your newly created lesson is ready to start.",
     };
   }
