@@ -113,7 +113,8 @@ export interface Database {
       profiles: TableDef<ProfileRow>;
       user_preferences: TableDef<OwnedRow & { learning_goal: string | null; daily_study_minutes: number; interests: string[]; onboarding_complete: boolean }>;
       user_settings: TableDef<OwnedRow & { settings: Json }>;
-      user_subscriptions: TableDef<OwnedRow & { plan: Database["public"]["Enums"]["subscription_plan"]; status: Database["public"]["Enums"]["subscription_status"]; billing_interval: string | null; starts_at: string; renews_at: string | null; cancelled_at: string | null; mock_payment_status: string }>;
+      user_subscriptions: TableDef<OwnedRow & { plan: Database["public"]["Enums"]["subscription_plan"]; status: Database["public"]["Enums"]["subscription_status"]; billing_interval: string | null; starts_at: string; renews_at: string | null; cancelled_at: string | null; mock_payment_status: string; billing_provider: "manual" | "dodo"; provider_customer_id: string | null; provider_subscription_id: string | null; provider_product_id: string | null; provider_status: string | null; cancel_at_period_end: boolean; last_provider_event_at: string | null }>;
+      billing_webhook_events: TableDef<{ webhook_id: string; provider: "dodo"; event_type: string; event_at: string; user_id: string | null; provider_subscription_id: string | null; payload: Json; processed_at: string }>;
       curriculum_levels: TableDef<Timestamps & { id: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; title: string; description: string; sequence_order: number }>;
       curriculum_items: TableDef<Timestamps & { id: string; curriculum_level_id: string; item_type: string; label: string; sequence_order: number; required: boolean; prerequisite_ids: string[]; archived_at: string | null }>;
       grammar_catalog: TableDef<Timestamps & { id: string; pattern: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; source_order: number; active: boolean; accepted_patterns: string[] }>;
@@ -188,6 +189,28 @@ export interface Database {
       };
     };
     Functions: {
+      apply_dodo_subscription_event: {
+        Args: {
+          p_webhook_id: string;
+          p_event_type: string;
+          p_event_at: string;
+          p_payload: Json;
+          p_user_id: string;
+          p_plan: Database["public"]["Enums"]["subscription_plan"];
+          p_status: Database["public"]["Enums"]["subscription_status"];
+          p_billing_interval: string;
+          p_provider_customer_id: string;
+          p_provider_subscription_id: string;
+          p_provider_product_id: string;
+          p_provider_status: string;
+          p_starts_at: string;
+          p_renews_at: string | null;
+          p_cancelled_at: string | null;
+          p_cancel_at_period_end: boolean;
+          p_entitled: boolean;
+        };
+        Returns: Json;
+      };
       complete_lesson_session: {
         Args: { p_session_id: string; p_score: number; p_xp: number; p_duration_minutes: number; p_completion_data: Json };
         Returns: Json;

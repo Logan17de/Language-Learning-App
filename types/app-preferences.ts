@@ -7,8 +7,10 @@ export type BillingPeriod = "monthly" | "annual";
 export interface UserSubscription {
   plan: SubscriptionPlan;
   billingPeriod: BillingPeriod;
-  status: "active" | "cancelled";
+  status: "active" | "trial" | "cancelled" | "past_due";
   renewsAt?: string;
+  billingProvider?: "manual" | "dodo";
+  cancelAtPeriodEnd?: boolean;
 }
 
 export type ThemePreference = "light" | "dark" | "system";

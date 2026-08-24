@@ -14,9 +14,14 @@ import {
 import { useAppStore } from "@/store/app-store";
 import type { BillingPeriod } from "@/types/app-preferences";
 import { Badge } from "@/components/ui/badge";
-import { Button, ButtonLink } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import {
+  BillingReturnNotice,
+  CheckoutButton,
+  ManageBillingButton,
+} from "@/components/subscription/billing-actions";
 
 const premiumFeatures = [
   {
@@ -51,13 +56,25 @@ const proFeatureNames = [
 
 export function SubscriptionPage() {
   const subscription = useAppStore((state) => state.subscription);
-  return subscription.plan === "premium"
-    ? <PremiumSubscriptionPage />
-    : <FreeSubscriptionPage />;
+  return (
+    <>
+      <BillingReturnNotice />
+      {subscription.plan === "premium" ? <PremiumSubscriptionPage /> : <FreeSubscriptionPage />}
+    </>
+  );
+}
+
+function readableBillingDate(value?: string): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat("en", { dateStyle: "long" }).format(date);
 }
 
 function PremiumSubscriptionPage() {
   const subscription = useAppStore((state) => state.subscription);
+  const renewalDate = readableBillingDate(subscription.renewsAt);
+  const managedByDodo = subscription.billingProvider === "dodo";
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-7 sm:px-8 sm:py-9">
@@ -111,11 +128,19 @@ function PremiumSubscriptionPage() {
           <p className="text-xs font-semibold uppercase tracking-[.18em] text-stone-400">Plan management</p>
           <h2 className="mt-3 text-xl font-semibold capitalize">{subscription.billingPeriod} premium</h2>
           <p className="mt-2 text-sm leading-6 text-stone-500">
-            Billing checkout is not connected yet, so this account will not be automatically charged, renewed, or downgraded here.
+            {managedByDodo
+              ? subscription.cancelAtPeriodEnd
+                ? `Cancellation is scheduled${renewalDate ? ` for ${renewalDate}` : " at the end of this billing period"}. Your access remains active until then.`
+                : renewalDate
+                  ? `Your membership renews on ${renewalDate}. Manage payment methods, invoices, or cancellation securely.`
+                  : "Manage payment methods, invoices, renewal, or cancellation securely."
+              : "This Premium access was assigned by AIko and is managed by support."}
           </p>
-          <ButtonLink href="/support" variant="ghost" className="mt-4 px-0 text-moss-700">
-            Contact support about this plan
-          </ButtonLink>
+          <div className="mt-5">
+            {managedByDodo
+              ? <ManageBillingButton />
+              : <ButtonLink href="/support" variant="secondary" className="w-full">Contact support about this plan</ButtonLink>}
+          </div>
         </Card>
       </section>
     </div>
@@ -125,7 +150,6 @@ function PremiumSubscriptionPage() {
 function FreeSubscriptionPage() {
   const subscription = useAppStore((state) => state.subscription);
   const [billing, setBilling] = useState<BillingPeriod>(subscription.billingPeriod);
-  const [showCheckoutNotice, setShowCheckoutNotice] = useState(false);
   const price = billing === "annual" ? "¥20,000" : "¥2,000";
   const priceSuffix = billing === "annual" ? "/ year" : "/ month";
 
@@ -178,31 +202,29 @@ function FreeSubscriptionPage() {
               </li>
             ))}
           </ul>
-          <Button
-            type="button"
-            onClick={() => setShowCheckoutNotice(true)}
+          <CheckoutButton
+            billingPeriod={billing}
+            label={`Get Premium · ${price} ${priceSuffix}`}
             className="mt-8 w-full bg-persimmon-500 hover:bg-persimmon-600"
-          >
-            Get Premium · {price} {priceSuffix}
-          </Button>
+          />
           <p className="mt-4 text-center text-xs leading-5 text-white/45">
-            Checkout is not connected yet. You will not be charged from this page.
+            Secure checkout by Dodo Payments. Your Premium access starts only after payment is confirmed.
           </p>
         </div>
       </section>
 
-      {showCheckoutNotice && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-5" role="dialog" aria-modal="true" aria-labelledby="checkout-notice">
-          <div className="w-full max-w-md rounded-4xl bg-white p-7 shadow-float">
-            <Sparkles className="size-8 text-persimmon-500" />
-            <h2 id="checkout-notice" className="mt-5 text-2xl font-semibold">Premium checkout is coming soon.</h2>
-            <p className="mt-3 text-sm leading-6 text-stone-500">
-              Payment is not connected, so AIko will not charge you or silently change this account. An administrator can assign beta premium access.
-            </p>
-            <Button className="mt-6 w-full" onClick={() => setShowCheckoutNotice(false)}>Got it</Button>
+      {subscription.billingProvider === "dodo" ? (
+        <Card className="mx-auto mt-5 max-w-2xl p-6 sm:flex sm:items-center sm:justify-between sm:gap-6">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[.18em] text-stone-400">Billing account</p>
+            <h2 className="mt-2 text-lg font-semibold">
+              {subscription.status === "past_due" ? "Payment needs attention" : "Previous Premium membership"}
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-stone-500">View invoices, payment methods, and past membership details.</p>
           </div>
-        </div>
-      )}
+          <div className="mt-4 shrink-0 sm:mt-0 sm:w-48"><ManageBillingButton /></div>
+        </Card>
+      ) : null}
     </div>
   );
 }

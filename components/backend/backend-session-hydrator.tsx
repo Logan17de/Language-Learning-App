@@ -28,6 +28,12 @@ export function BackendSessionHydrator() {
       setSubscription(
         result.data.subscriptionPlan === "free" ? "free" : "premium",
         result.data.subscriptionPlan === "premium_annual" ? "annual" : "monthly",
+        {
+          status: result.data.subscriptionStatus,
+          renewsAt: result.data.subscriptionRenewsAt ?? undefined,
+          billingProvider: result.data.billingProvider,
+          cancelAtPeriodEnd: result.data.cancelAtPeriodEnd,
+        },
       );
       const progress = await progressRepository.loadCurrent();
       if (progress.ok) hydrateBackendProgress(progress.data);

@@ -54,7 +54,11 @@ interface AppState {
   completeOnboarding: () => void;
   updateProfile: (edits: ProfileEdits) => void;
   updateSettings: (settings: Partial<UserSettings>) => void;
-  setSubscription: (plan: SubscriptionPlan, billingPeriod?: UserSubscription["billingPeriod"]) => void;
+  setSubscription: (
+    plan: SubscriptionPlan,
+    billingPeriod?: UserSubscription["billingPeriod"],
+    details?: Partial<Pick<UserSubscription, "status" | "renewsAt" | "billingProvider" | "cancelAtPeriodEnd">>,
+  ) => void;
   cancelSubscription: () => void;
   toggleSavedLesson: (lessonId: string) => void;
   addGeneratedLesson: (lesson: LessonPackage) => void;
@@ -333,13 +337,15 @@ export const useAppStore = create<AppState>()(
         set({ settings });
         if (getBackendMode() === "supabase") void settingsRepository.save(settings);
       },
-      setSubscription: (plan, billingPeriod) =>
+      setSubscription: (plan, billingPeriod, details) =>
         set((state) => ({
           subscription: {
             plan,
             billingPeriod: billingPeriod ?? state.subscription.billingPeriod,
-            status: "active",
-            renewsAt: plan === "premium" ? "2026-08-24" : undefined,
+            status: details?.status ?? "active",
+            renewsAt: details?.renewsAt,
+            billingProvider: details?.billingProvider ?? "manual",
+            cancelAtPeriodEnd: details?.cancelAtPeriodEnd ?? false,
           },
         })),
       cancelSubscription: () =>
