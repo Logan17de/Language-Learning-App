@@ -50,35 +50,27 @@ function lessonProgressError(error: unknown, fallback: string): string {
 }
 
 export const lessonSessionRepository = {
+  /**
+   * Open this lesson, and only this lesson.
+   *
+   * Resolved in one server statement rather than a read-then-write from the
+   * browser: two browsers doing select-then-insert both saw no active session
+   * and both made one, which is how a learner ended up holding thirteen. The
+   * server resumes the session this lesson already has and closes any other, so
+   * every browser gets the same answer.
+   */
   async startOrResume(lessonId: string, lessonVersionId: string): Promise<RepositoryResult<LessonSession>> {
     const client = createClient();
     if (!client) return notConfigured();
-    const { data: auth } = await client.auth.getUser();
-    if (!auth.user) return failure({ code: "AUTH" }, "Please sign in to start this lesson.");
-    const existing = await client.from("lesson_sessions").select("*")
-      .eq("user_id", auth.user.id).eq("lesson_id", lessonId).eq("status", "active")
-      .order("started_at", { ascending: false }).limit(1).maybeSingle();
-    if (existing.error) return failure(existing.error, "Your saved lesson could not be loaded.");
-    if (existing.data) return success(existing.data);
-    const { data, error } = await client.from("lesson_sessions").insert({
-      user_id: auth.user.id,
-      lesson_id: lessonId,
-      lesson_version_id: lessonVersionId,
-      status: "active",
-      current_phase: "story",
-      current_phase_index: 0,
-      activity_index: 0,
-      elapsed_seconds: 0,
-      checkpoint: {},
-      started_at: new Date().toISOString(),
-      last_saved_at: new Date().toISOString(),
-    }).select("*").single();
-    if (error?.code === "23505") {
-      const resumed = await client.from("lesson_sessions").select("*")
-        .eq("user_id", auth.user.id).eq("lesson_version_id", lessonVersionId).eq("status", "active").single();
-      if (!resumed.error) return success(resumed.data);
+    const { data, error } = await client.rpc("start_or_resume_lesson_session", {
+      p_lesson_id: lessonId,
+      p_lesson_version_id: lessonVersionId,
+    });
+    if (error) return failure(error, "Your saved lesson could not be loaded.");
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
+      return failure({}, "Your saved lesson could not be loaded.");
     }
-    return error ? failure(error, "The lesson could not be started.") : success(data);
+    return success(data as unknown as LessonSession);
   },
 
   async saveCheckpoint(sessionId: string, checkpoint: Pick<LessonSession, "current_phase" | "current_phase_index" | "activity_index" | "elapsed_seconds" | "checkpoint">): Promise<RepositoryResult<LessonSession>> {

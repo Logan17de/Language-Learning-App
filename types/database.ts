@@ -298,6 +298,10 @@ export interface Database {
         Args: Record<string, never>;
         Returns: Json;
       };
+      start_or_resume_lesson_session: {
+        Args: { p_lesson_id: string; p_lesson_version_id: string };
+        Returns: Json;
+      };
       record_mastery_evidence: {
         Args: { p_session_id: string; p_events: Json };
         Returns: Json;
