@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { customLessonRetryAction } from "@/lib/custom-lesson-retry";
 import { retirePreviousLessons } from "@/lib/sync/retire-previous-lessons";
+import { useBackendLessonStore } from "@/store/backend-lesson-store";
 
 const TOTAL_PHASES = 6;
 const ACTIVITY_GROUP_COUNT = 3;
@@ -552,6 +553,28 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
     if (!lessonId) return;
     router.prefetch(`/lesson/${lessonId}/play`);
   }, [lessonId, router]);
+
+  /**
+   * Fetch the lesson while the learner is still reading, not after they ask.
+   *
+   * prefetch above brings the player's code; it does not bring the lesson. That
+   * is fifteen queries behind three sequential lookups, and it only started
+   * once the story handed over — so the pause between finishing the story and
+   * seeing the first vocabulary question was the whole of it, spent staring at
+   * a spinner. Reading takes minutes; this takes one of those seconds.
+   *
+   * It waits for the build to settle. Warming earlier would put a half-built
+   * lesson in the cache the player then reads from.
+   */
+  const generationSettled =
+    lessonReady && (audioStatus === "ready" || audioStatus === "failed");
+  useEffect(() => {
+    if (!lessonId || !generationSettled) return;
+    void useBackendLessonStore
+      .getState()
+      .loadOne(lessonId)
+      .catch(() => undefined);
+  }, [generationSettled, lessonId]);
 
   const supportedWordCount = useMemo(
     () => lines.reduce((total, line) => total + line.words.length, 0),

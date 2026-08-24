@@ -1,7 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import { currentUserId } from "@/lib/supabase/current-user";
 import { failure, notConfigured, success, type RepositoryResult } from "@/lib/repositories/result";
 import { isMissingPhaseAtomicRpc } from "@/lib/sync/phase-rpc-compatibility";
+import { describesSupersededLesson } from "@/lib/sync/lesson-standing";
 import type { Database, Json } from "@/types/database";
 import type { LessonPhaseId } from "@/types/lesson-session";
 import { isUuid } from "@/lib/identifiers";
@@ -31,9 +33,10 @@ function lessonProgressError(error: unknown, fallback: string): string {
   // the "try again" it used to read as.
   if (
     message.includes("Active lesson session unavailable") ||
-    message.includes("Only the current lesson section can be committed")
+    message.includes("Only the current lesson section can be committed") ||
+    message.includes("This lesson was set aside when another lesson was opened")
   ) {
-    return "You moved on to another lesson, so this section is waiting. Reopen this lesson and it will save itself.";
+    return "You have a newer lesson open, so this one was set aside. Everything you finished here is already counted.";
   }
   if (message.includes("Premium Grammar requires exactly 5 validated translations")) {
     return "Grammar is missing its 5 validated translations. Restart the Grammar section, then complete it again.";
@@ -76,11 +79,50 @@ export const lessonSessionRepository = {
       p_lesson_id: lessonId,
       p_lesson_version_id: lessonVersionId,
     });
-    if (error) return failure(error, "Your saved lesson could not be loaded.");
+    if (error) {
+      // A refusal to reopen a set-aside lesson has to reach the caller in the
+      // server's own words. It is raised as 42501, which failure() flattens
+      // into "You do not have permission to do that." -- true of a locked
+      // lesson and useless here, where the reason is specific and the player
+      // needs to recognise it.
+      const raw = typeof error.message === "string" ? error.message : "";
+      if (describesSupersededLesson(raw)) return failure({}, raw);
+      return failure(error, "Your saved lesson could not be loaded.");
+    }
     if (!data || typeof data !== "object" || Array.isArray(data)) {
       return failure({}, "Your saved lesson could not be loaded.");
     }
     return success(data as unknown as LessonSession);
+  },
+
+  /**
+   * The session this lesson already has, without opening anything.
+   *
+   * startOrResume is how a learner enters a lesson, and it moves the open slot
+   * to whatever it is asked about. That is right when they click into a lesson
+   * and wrong everywhere else: the sync queue called it before every retry, so
+   * a browser left on a set-aside lesson kept pulling the slot back off the
+   * lesson the learner was actually in, and the two took turns. Reading the
+   * session instead answers the only question the queue has — is this still my
+   * lesson — and changes nothing by asking.
+   *
+   * Null means the lesson has never been opened on any device.
+   */
+  async resolveSession(
+    lessonId: string,
+  ): Promise<RepositoryResult<Pick<LessonSession, "id" | "status" | "lesson_version_id"> | null>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { data, error } = await client
+      .from("lesson_sessions")
+      .select("id,status,lesson_version_id")
+      .eq("lesson_id", lessonId)
+      .order("started_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return error
+      ? failure(error, "Your lesson could not be located.")
+      : success(data ?? null);
   },
 
   async saveCheckpoint(sessionId: string, checkpoint: Pick<LessonSession, "current_phase" | "current_phase_index" | "activity_index" | "elapsed_seconds" | "checkpoint">): Promise<RepositoryResult<LessonSession>> {
@@ -147,9 +189,9 @@ export const lessonSessionRepository = {
     const client = createClient();
     if (!client) return notConfigured();
     if (!answers.length) return success(0);
-    const { data: auth } = await client.auth.getUser();
-    if (!auth.user) return failure({ code: "AUTH" }, "Your session has expired.");
-    const records = answers.map((answer) => ({ ...answer, user_id: auth.user!.id }));
+    const userId = await currentUserId(client);
+    if (!userId) return failure({ code: "AUTH" }, "Your session has expired.");
+    const records = answers.map((answer) => ({ ...answer, user_id: userId }));
     // Answers are insert-once. An answered question is final, so a repeated
     // sync of the same answer must be a harmless no-op and a different second
     // answer must never replace the first. ignoreDuplicates resolves the
@@ -163,9 +205,9 @@ export const lessonSessionRepository = {
     const client = createClient();
     if (!client) return notConfigured();
     if (!events.length) return success(0);
-    const { data: auth } = await client.auth.getUser();
-    if (!auth.user) return failure({ code: "AUTH" }, "Your session has expired.");
-    const records = events.map((event) => ({ ...event, user_id: auth.user!.id }));
+    const userId = await currentUserId(client);
+    if (!userId) return failure({ code: "AUTH" }, "Your session has expired.");
+    const records = events.map((event) => ({ ...event, user_id: userId }));
     const { error } = await client.from("lesson_events").upsert(records, { onConflict: "lesson_session_id,client_event_id", ignoreDuplicates: true });
     return error ? failure(error, "Your learning events are waiting to sync.") : success(events.length);
   },

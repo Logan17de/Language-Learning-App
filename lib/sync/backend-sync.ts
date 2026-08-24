@@ -9,10 +9,21 @@ import type {
 import type { Json } from "@/types/database";
 import { restartIncompleteLessonPhase } from "@/lib/lesson-resume";
 import { getBackendMode } from "@/lib/supabase/config";
-import { lessonRepository } from "@/lib/repositories/lesson-repository";
+import {
+  canonicalLessonId,
+  lessonRepository,
+} from "@/lib/repositories/lesson-repository";
 import { lessonSessionRepository } from "@/lib/repositories/lesson-session-repository";
 import { buildLegacyMasteryEvidence } from "@/lib/sync/legacy-mastery-evidence";
 import {
+  describesSupersededLesson,
+  isLessonSupersededError,
+  LessonSupersededError,
+  lessonWasSuperseded,
+  markLessonSuperseded,
+} from "@/lib/sync/lesson-standing";
+import {
+  discardLessonSyncOperations,
   enqueueSync,
   hasPendingLessonPhaseCommit,
   markSyncAttempt,
@@ -78,38 +89,63 @@ function persistedCompletionResult(
   };
 }
 
-async function backendContext(lesson: LessonPackage) {
-  const canonical = await lessonRepository.getPlayable(lesson.id);
-  if (!canonical.ok) return null;
-  const backendSession = await lessonSessionRepository.startOrResume(
-    canonical.data.lesson.id,
-    canonical.data.version.id,
-  );
-  if (!backendSession.ok) return null;
-  return { canonical: canonical.data, backendSession: backendSession.data };
+/**
+ * Stop trying to save a lesson this browser is no longer in.
+ *
+ * Nothing queued for it can be accepted, and the retries were the mechanism by
+ * which the two browsers fought: each one reopened its own lesson and closed
+ * the other's. Dropping the queue first means a listener woken by the
+ * announcement finds it already clear.
+ */
+function retireSupersededLesson(lessonId: string): void {
+  discardLessonSyncOperations(lessonId);
+  markLessonSuperseded(lessonId);
 }
 
 /**
- * The same lookup, but it says what went wrong.
+ * The id of this lesson's session on the server.
  *
- * A phase commit that cannot reach its session used to return a bare false,
- * which the retry loop recorded as "Retry failed." — so a section that would
- * never save looked identical to one waiting on a slow network, and the reason
- * was discarded at the one point where it was known.
+ * This deliberately reads rather than opens. Opening is what a learner does by
+ * clicking into a lesson, and it moves their one open slot; doing it here meant
+ * every background retry moved the slot too, so a browser left behind on a
+ * set-aside lesson kept pulling it back and the two never settled.
+ *
+ * A lesson with no session at all is the exception. That is work finished
+ * before the browser ever reached the server — offline, or straight out of the
+ * story — and there is no other lesson's slot to take, so it opens.
  */
-async function requireBackendContext(lesson: LessonPackage) {
-  const canonical = await lessonRepository.getPlayable(lesson.id);
-  if (!canonical.ok) {
-    throw new Error(canonical.error.message);
+async function lessonSessionId(lesson: LessonPackage): Promise<string> {
+  // Raised from here rather than at each call site, so that whichever of them
+  // discovers the takeover -- a queued section, a skip, the final commit -- the
+  // lesson is retired exactly once and none of them can miss it.
+  const givenUp = (): never => {
+    retireSupersededLesson(lesson.id);
+    throw new LessonSupersededError(lesson.id);
+  };
+
+  if (lessonWasSuperseded(lesson.id)) throw new LessonSupersededError(lesson.id);
+
+  const lessonId = await canonicalLessonId(lesson.id);
+  if (!lessonId.ok) throw new Error(lessonId.error.message);
+
+  const existing = await lessonSessionRepository.resolveSession(lessonId.data);
+  if (!existing.ok) throw new Error(existing.error.message);
+  if (existing.data) {
+    if (existing.data.status !== "active") givenUp();
+    return existing.data.id;
   }
-  const backendSession = await lessonSessionRepository.startOrResume(
+
+  const canonical = await lessonRepository.getPlayable(lesson.id);
+  if (!canonical.ok) throw new Error(canonical.error.message);
+  const opened = await lessonSessionRepository.startOrResume(
     canonical.data.lesson.id,
     canonical.data.version.id,
   );
-  if (!backendSession.ok) {
-    throw new Error(backendSession.error.message);
+  if (!opened.ok) {
+    if (describesSupersededLesson(opened.error.message)) givenUp();
+    throw new Error(opened.error.message);
   }
-  return { canonical: canonical.data, backendSession: backendSession.data };
+  return opened.data.id;
 }
 
 function phaseAnswers(
@@ -253,9 +289,13 @@ async function persistCheckpointOnly(
   lesson: LessonPackage,
   session: LessonSession,
 ): Promise<boolean> {
-  const context = await backendContext(lesson);
-  if (!context) return false;
-  return saveCheckpoint(lesson, session, context.backendSession.id, false);
+  let sessionId: string;
+  try {
+    sessionId = await lessonSessionId(lesson);
+  } catch {
+    return false;
+  }
+  return saveCheckpoint(lesson, session, sessionId, false);
 }
 
 function legacyPhaseBoundary(
@@ -290,8 +330,7 @@ async function persistPhaseCompletion(
   session: LessonSession,
   phase: LessonPhaseId,
 ): Promise<boolean> {
-  const context = await requireBackendContext(lesson);
-  const sessionId = context.backendSession.id;
+  const sessionId = await lessonSessionId(lesson);
 
   // Persist canonical evidence before asking the database to commit mastery.
   // These writes are deliberately sequential: a checkpoint/mastery boundary is
@@ -341,11 +380,7 @@ async function persistPhaseSkip(
   session: LessonSession,
   phase: LessonPhaseId,
 ): Promise<boolean> {
-  const context = await backendContext(lesson);
-  if (!context) {
-    throw new Error("This lesson session could not be loaded. Please try again.");
-  }
-  const sessionId = context.backendSession.id;
+  const sessionId = await lessonSessionId(lesson);
   // The RPC is the skip authority. Do not checkpoint the optimistic marker
   // before it succeeds, or a failed request could restore as zero-scored even
   // though no durable skipped commit exists.
@@ -368,10 +403,9 @@ async function persistCanonicalCompletion(
   session: LessonSession,
   fallback: LessonCompletionResult,
 ): Promise<PersistLessonResult> {
-  const context = await backendContext(lesson);
-  if (!context) return { synced: false };
+  const sessionId = await lessonSessionId(lesson);
   const result = await lessonSessionRepository.complete({
-    sessionId: context.backendSession.id,
+    sessionId,
     score: fallback.score,
     xp: fallback.xpGained,
     durationMinutes: fallback.durationMinutes,
@@ -401,6 +435,9 @@ export async function syncLessonProgress(
   session: LessonSession,
 ): Promise<boolean> {
   if (getBackendMode() !== "supabase") return true;
+  // Nothing to hold on to: this lesson belongs to whichever browser has it open
+  // now, and queueing a checkpoint here would only be refused later.
+  if (lessonWasSuperseded(lesson.id)) return false;
 
   const key = `lesson_checkpoint:${lesson.id}`;
   const safeSession = restartIncompleteLessonPhase(session);
@@ -434,6 +471,23 @@ export async function syncLessonProgress(
     );
   }
   return synced;
+}
+
+/**
+ * Ask whether this browser is still in this lesson, and change nothing else.
+ *
+ * Without this a browser that has been taken over carries on looking normal
+ * until the learner finishes a whole section, and only then finds out that
+ * none of it counted. One cheap read when they come back to the tab spends the
+ * question at the moment it can still save them the work.
+ */
+export async function confirmLessonStanding(lesson: LessonPackage): Promise<void> {
+  if (getBackendMode() !== "supabase") return;
+  if (typeof navigator !== "undefined" && !navigator.onLine) return;
+  // lessonSessionId retires the lesson itself when the answer is no. Anything
+  // else -- a dropped connection, a slow reply -- is not evidence of a takeover
+  // and is deliberately left alone.
+  await lessonSessionId(lesson).catch(() => undefined);
 }
 
 /** Commit one fully finished phase immediately. Prefer the durable queue from UI. */
@@ -559,11 +613,20 @@ export async function restoreLessonProgress(
   }
   const canonical = await lessonRepository.getPlayable(lesson.id);
   if (!canonical.ok) return safeFallback;
+  // Opening the player is the act of claiming the one open lesson, so this is
+  // the one place that still asks the server to move it. A browser returning to
+  // a lesson that was set aside is refused here, and says so rather than
+  // quietly starting the lesson over.
   const backendSession = await lessonSessionRepository.startOrResume(
     canonical.data.lesson.id,
     canonical.data.version.id,
   );
-  if (!backendSession.ok) return safeFallback;
+  if (!backendSession.ok) {
+    if (describesSupersededLesson(backendSession.error.message)) {
+      retireSupersededLesson(lesson.id);
+    }
+    return safeFallback;
+  }
 
   const reset = await lessonSessionRepository.resetIncompletePhase(
     backendSession.data.id,
@@ -631,6 +694,13 @@ async function runPendingSync(): Promise<void> {
         }
         markSyncAttempt(operation.id, "This section was refused without a reason.");
       } catch (error) {
+        // A lesson the learner has moved off cannot take this section, now or
+        // ever. The lookup has already dropped what was queued for it; there is
+        // nothing here to record a failed attempt against.
+        if (isLessonSupersededError(error)) {
+          blocked.add(lessonId);
+          continue;
+        }
         markSyncAttempt(
           operation.id,
           error instanceof Error ? error.message : "Retry failed.",

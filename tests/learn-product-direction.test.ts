@@ -65,7 +65,11 @@ describe("learn custom-topic product direction", () => {
     expect(player).toContain("syncLessonProgress(lesson, checkpoint)");
     expect(player).toContain("restart from its first activity");
     expect(player).not.toContain("abandonActive");
-    expect(player).not.toContain("resetLessonSession");
+    // Leaving keeps the session. Only a lesson taken over by a newer one drops
+    // it, and that is a different exit: nothing here is worth coming back to.
+    const start = player.indexOf("async function leaveLesson");
+    const leaving = player.slice(start, player.indexOf("return (", start));
+    expect(leaving).not.toContain("resetLessonSession");
   });
 
   it("sends Home to /learn without assigning a predefined lesson", () => {

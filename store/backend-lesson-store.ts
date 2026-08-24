@@ -2,7 +2,10 @@
 
 import { create } from "zustand";
 import { getBackendMode } from "@/lib/supabase/config";
-import { lessonRepository } from "@/lib/repositories/lesson-repository";
+import {
+  forgetCachedLessons,
+  lessonRepository,
+} from "@/lib/repositories/lesson-repository";
 import { mapCanonicalLesson } from "@/lib/repositories/lesson-mapper-v3";
 import type { LessonPackage } from "@/types/lesson";
 
@@ -41,6 +44,10 @@ export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
     if (!userId) return;
     const current = get();
     if (current.ownerUserId === userId) return;
+    // A playable payload carries who it was loaded for -- their plan decides
+    // whether Listening and Speaking are in it, and their kanji history is
+    // baked in. It must not outlive the account that fetched it.
+    forgetCachedLessons();
     set({
       ownerUserId: userId,
       lessons: [],
@@ -50,7 +57,10 @@ export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
       error: "",
     });
   },
-  reset: () => set(emptyState),
+  reset: () => {
+    forgetCachedLessons();
+    set(emptyState);
+  },
   // The custom-topic product no longer auto-assigns a published lesson. Keep
   // this legacy store method inert for callers that still revalidate the store;
   // specific created/resumable lessons are loaded through loadOne().

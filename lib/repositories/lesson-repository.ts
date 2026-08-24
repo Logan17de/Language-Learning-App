@@ -179,6 +179,84 @@ async function loadContent(
   });
 }
 
+/**
+ * A lesson's canonical id, remembered.
+ *
+ * A LessonPackage carries `legacy_id ?? id`, so anything holding one has to ask
+ * the database which row it means before it can touch that lesson's session.
+ * The answer never changes, and the whole of it is one small row, so asking
+ * twice is waste — and it was being asked on every section the learner
+ * finished, behind the full playable payload.
+ */
+const canonicalIds = new Map<string, string>();
+
+export async function canonicalLessonId(
+  idOrLegacyId: string,
+): Promise<RepositoryResult<string>> {
+  const cached = canonicalIds.get(idOrLegacyId);
+  if (cached) return success(cached);
+  const client = createClient();
+  if (!client) return notConfigured();
+  const byId = isUuid(idOrLegacyId)
+    ? await client.from("lessons").select("id").eq("id", idOrLegacyId).maybeSingle()
+    : null;
+  const result = byId?.data
+    ? byId
+    : await client
+        .from("lessons")
+        .select("id")
+        .eq("legacy_id", idOrLegacyId)
+        .maybeSingle();
+  if (result.error) {
+    return failure(result.error, "The lesson could not be identified.");
+  }
+  if (!result.data) {
+    return failure({ code: "PGRST116" }, "The lesson could not be identified.");
+  }
+  canonicalIds.set(idOrLegacyId, result.data.id);
+  return success(result.data.id);
+}
+
+/**
+ * The playable payload, fetched once for as long as it is being played.
+ *
+ * Opening a lesson used to fetch it three times over: once for the player,
+ * once to restore where the learner had got to, once more to commit the
+ * section they had just finished — each of them fifteen queries deep, and all
+ * three in the same second, in front of the learner. A version's content does
+ * not change while it is being played, so the second and third callers can have
+ * the first one's answer.
+ *
+ * The window is deliberately short. It exists to collapse a burst, not to hold
+ * a lesson in memory for the session.
+ */
+const PLAYABLE_CACHE_MS = 60_000;
+
+interface CachedPlayable {
+  at: number;
+  value: Promise<RepositoryResult<CanonicalLesson>>;
+}
+
+const playableCache = new Map<string, CachedPlayable>();
+
+function readPlayableCache(
+  key: string,
+): Promise<RepositoryResult<CanonicalLesson>> | null {
+  const cached = playableCache.get(key);
+  if (!cached) return null;
+  if (Date.now() - cached.at > PLAYABLE_CACHE_MS) {
+    playableCache.delete(key);
+    return null;
+  }
+  return cached.value;
+}
+
+/** Anything that changes what a lesson contains drops what was remembered. */
+export function forgetCachedLessons(): void {
+  playableCache.clear();
+  canonicalIds.clear();
+}
+
 export const lessonRepository = {
   async listPublished(): Promise<RepositoryResult<Lesson[]>> {
     const client = createClient();
@@ -238,56 +316,15 @@ export const lessonRepository = {
   async getPlayable(
     idOrLegacyId: string,
   ): Promise<RepositoryResult<CanonicalLesson>> {
-    const client = createClient();
-    if (!client) return notConfigured();
-    const byId = isUuid(idOrLegacyId)
-      ? await client
-          .from("lessons")
-          .select("*")
-          .eq("id", idOrLegacyId)
-          .maybeSingle()
-      : null;
-    const lessonResult = byId?.data
-      ? byId
-      : await client
-          .from("lessons")
-          .select("*")
-          .eq("legacy_id", idOrLegacyId)
-          .maybeSingle();
-    if (lessonResult.error) {
-      return failure(lessonResult.error, "Lesson could not be loaded.");
-    }
-    if (!lessonResult.data) {
-      return failure({ code: "PGRST116" }, "This lesson is unavailable.");
-    }
-    const active = await client
-      .from("lesson_sessions")
-      .select("lesson_version_id")
-      .eq("lesson_id", lessonResult.data.id)
-      .eq("status", "active")
-      .order("started_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (active.error) {
-      return failure(active.error, "Your saved lesson could not be loaded.");
-    }
-    const versionId =
-      active.data?.lesson_version_id ??
-      (lessonResult.data.status === "published"
-        ? lessonResult.data.current_version_id
-        : null);
-    if (!versionId) {
-      return failure({ code: "PGRST116" }, "This lesson is not published.");
-    }
-    const version = await client
-      .from("lesson_versions")
-      .select("*")
-      .eq("id", versionId)
-      .single();
-    if (version.error) {
-      return failure(version.error, "The lesson version could not be loaded.");
-    }
-    return loadContent(lessonResult.data, version.data);
+    const cached = readPlayableCache(idOrLegacyId);
+    if (cached) return cached;
+    const pending = loadPlayable(idOrLegacyId);
+    playableCache.set(idOrLegacyId, { at: Date.now(), value: pending });
+    // A lesson that could not be loaded is not worth remembering: the next
+    // caller should get a real attempt, not a repeat of the failure.
+    const result = await pending;
+    if (!result.ok) playableCache.delete(idOrLegacyId);
+    return result;
   },
 
   async getVersionForSession(
@@ -314,3 +351,58 @@ export const lessonRepository = {
     return loadContent(lesson.data, version.data);
   },
 };
+
+async function loadPlayable(
+  idOrLegacyId: string,
+): Promise<RepositoryResult<CanonicalLesson>> {
+  const client = createClient();
+  if (!client) return notConfigured();
+  const byId = isUuid(idOrLegacyId)
+    ? await client
+        .from("lessons")
+        .select("*")
+        .eq("id", idOrLegacyId)
+        .maybeSingle()
+    : null;
+  const lessonResult = byId?.data
+    ? byId
+    : await client
+        .from("lessons")
+        .select("*")
+        .eq("legacy_id", idOrLegacyId)
+        .maybeSingle();
+  if (lessonResult.error) {
+    return failure(lessonResult.error, "Lesson could not be loaded.");
+  }
+  if (!lessonResult.data) {
+    return failure({ code: "PGRST116" }, "This lesson is unavailable.");
+  }
+  const active = await client
+    .from("lesson_sessions")
+    .select("lesson_version_id")
+    .eq("lesson_id", lessonResult.data.id)
+    .eq("status", "active")
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (active.error) {
+    return failure(active.error, "Your saved lesson could not be loaded.");
+  }
+  const versionId =
+    active.data?.lesson_version_id ??
+    (lessonResult.data.status === "published"
+      ? lessonResult.data.current_version_id
+      : null);
+  if (!versionId) {
+    return failure({ code: "PGRST116" }, "This lesson is not published.");
+  }
+  const version = await client
+    .from("lesson_versions")
+    .select("*")
+    .eq("id", versionId)
+    .single();
+  if (version.error) {
+    return failure(version.error, "The lesson version could not be loaded.");
+  }
+  return loadContent(lessonResult.data, version.data);
+}

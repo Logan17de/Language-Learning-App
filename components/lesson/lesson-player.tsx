@@ -33,6 +33,7 @@ import { SpeakingPhase } from "@/components/lesson/speaking-phase";
 import { LessonReportDialog } from "@/components/support/lesson-report-dialog";
 import { preloadListeningAudio } from "@/components/exercises/audio-control";
 import {
+  confirmLessonStanding,
   flushPendingLessonPhaseCommits,
   queueLessonPhaseCompletion,
   restoreLessonProgress,
@@ -41,6 +42,10 @@ import {
   syncLessonSectionSkip,
 } from "@/lib/sync/backend-sync";
 import { pendingLessonPhaseError } from "@/lib/sync/offline-queue";
+import {
+  lessonSupersededEvent,
+  lessonWasSuperseded,
+} from "@/lib/sync/lesson-standing";
 
 type ProtectedPractice = "listening" | "speaking";
 
@@ -96,6 +101,8 @@ export function LessonPlayer({
   const router = useRouter();
   const hasHydrated = useAppStore((state) => state.hasHydrated);
   const saveLessonSession = useAppStore((state) => state.saveLessonSession);
+  const resetLessonSession = useAppStore((state) => state.resetLessonSession);
+  const [takenOver, setTakenOver] = useState(false);
   const [session, setSession] = useState<LessonSession | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [showExit, setShowExit] = useState(false);
@@ -138,6 +145,31 @@ export function LessonPlayer({
       browserTts: lesson.runtimeAudio === "browser_tts",
     }).catch(() => undefined);
   }, [lesson, premiumPhasesAccessible, nearListening]);
+
+  /**
+   * The learner opened another lesson somewhere else, so this one is over here.
+   *
+   * A browser left on a set-aside lesson cannot tell from the outside: it holds
+   * a full local copy and looks perfectly healthy, while every section it
+   * finishes is refused. Saying so is the whole point — and the local copy goes
+   * with it, because the lesson has left this learner's path and there is
+   * nothing here to come back to. What was already finished keeps its mastery;
+   * that was earned section by section and never depended on this browser.
+   */
+  useEffect(() => {
+    const takeOver = () => setTakenOver(true);
+    if (lessonWasSuperseded(lesson.id)) takeOver();
+    const handle = (event: Event) => {
+      if ((event as CustomEvent<string>).detail === lesson.id) takeOver();
+    };
+    window.addEventListener(lessonSupersededEvent, handle);
+    return () => window.removeEventListener(lessonSupersededEvent, handle);
+  }, [lesson.id]);
+
+  useEffect(() => {
+    if (!takenOver) return;
+    resetLessonSession(lesson.id);
+  }, [lesson.id, resetLessonSession, takenOver]);
 
   useEffect(() => {
     if (!hasHydrated || restoredLessonRef.current === lesson.id) return;
@@ -224,7 +256,9 @@ export function LessonPlayer({
   }, [session]);
 
   useEffect(() => {
-    if (!session) return;
+    // A lesson that has been set aside must not write itself back on the way
+    // out, or leaving the page would restore what was just dropped.
+    if (!session || takenOver) return;
     /**
      * Leaving saves; it does not argue.
      *
@@ -243,7 +277,13 @@ export function LessonPlayer({
       saveLessonSession({ ...session, elapsedSeconds });
     };
     const handleVisibility = () => {
-      if (document.visibilityState !== "hidden") return;
+      if (document.visibilityState !== "hidden") {
+        // Coming back to a tab is when a learner would otherwise start a whole
+        // section they had already lost, so this is where AIko checks whether
+        // the lesson is still theirs.
+        void confirmLessonStanding(lesson);
+        return;
+      }
       const checkpoint = { ...session, elapsedSeconds };
       saveLessonSession(checkpoint);
       void syncLessonProgress(lesson, checkpoint).catch(() => false);
@@ -254,7 +294,7 @@ export function LessonPlayer({
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [elapsedSeconds, lesson, saveLessonSession, session]);
+  }, [elapsedSeconds, lesson, saveLessonSession, session, takenOver]);
 
   const updateSession = useCallback(
     (next: LessonSession) => {
@@ -288,6 +328,10 @@ export function LessonPlayer({
           100,
       )
     : 0;
+
+  if (takenOver) {
+    return <LessonTakenOver />;
+  }
 
   if (!hasHydrated || !session) {
     return (
@@ -784,6 +828,41 @@ export function LessonPlayer({
         </div>
       )}
     </>
+  );
+}
+
+/**
+ * What the browser left behind shows instead of a lesson.
+ *
+ * Deliberately a full stop rather than a banner over a playable lesson: every
+ * answer given here from now on would be thrown away, so offering to carry on
+ * would be a lie, and the Retry button that used to sit here was worse — it
+ * reopened this lesson and closed the one the learner had actually moved to.
+ */
+function LessonTakenOver() {
+  return (
+    <main className="grid min-h-screen place-items-center bg-paper p-6">
+      <div className="w-full max-w-lg rounded-4xl bg-white p-8 text-center shadow-card sm:p-10">
+        <span className="mx-auto grid size-12 place-items-center rounded-2xl bg-amber-100 text-amber-700">
+          <AlertTriangle className="size-5" />
+        </span>
+        <p className="section-kicker mt-6">Lesson set aside</p>
+        <h1 className="mt-4 text-3xl font-semibold tracking-tight">
+          You have a newer lesson open
+        </h1>
+        <p className="mt-4 leading-7 text-stone-500">
+          AIko keeps one lesson going at a time, so this one was set aside when
+          the newer one started somewhere else. It has left your path.
+        </p>
+        <p className="mt-3 leading-7 text-stone-500">
+          Every section you finished here still counts — that mastery was
+          recorded as you earned it.
+        </p>
+        <ButtonLink href="/learn" className="mt-7">
+          Go to my lesson
+        </ButtonLink>
+      </div>
+    </main>
   );
 }
 
