@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Brain,
   Check,
@@ -11,11 +10,9 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
-import type { BillingPeriod } from "@/types/app-preferences";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import {
   BillingReturnNotice,
   CheckoutButton,
@@ -142,9 +139,8 @@ function PremiumSubscriptionPage() {
 
 function FreeSubscriptionPage() {
   const subscription = useAppStore((state) => state.subscription);
-  const [billing, setBilling] = useState<BillingPeriod>(subscription.billingPeriod);
-  const price = billing === "annual" ? "¥20,000" : "¥2,000";
-  const priceSuffix = billing === "annual" ? "/ year" : "/ month";
+  const price = "$10 USD";
+  const priceSuffix = "/ month";
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-9">
@@ -158,23 +154,6 @@ function FreeSubscriptionPage() {
         </p>
       </header>
 
-      <div className="mx-auto mt-7 flex w-fit rounded-full bg-stone-100 p-1" role="group" aria-label="Premium billing period">
-        {(["monthly", "annual"] as BillingPeriod[]).map((period) => (
-          <button
-            key={period}
-            type="button"
-            onClick={() => setBilling(period)}
-            className={cn(
-              "min-h-11 rounded-full px-5 text-sm font-semibold capitalize sm:px-6",
-              billing === period ? "bg-white text-moss-700 shadow-sm" : "text-stone-500",
-            )}
-          >
-            {period}
-            {period === "annual" && <span className="ml-2 text-[10px] text-persimmon-600">save ¥4,000</span>}
-          </button>
-        ))}
-      </div>
-
       <section className="mx-auto mt-7 max-w-2xl overflow-hidden rounded-3xl border border-moss-900 bg-moss-900 text-white shadow-float">
         <div className="p-7 sm:p-9">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -187,7 +166,7 @@ function FreeSubscriptionPage() {
           <p className="mt-7 text-5xl font-semibold">
             {price}<span className="ml-2 text-sm font-normal text-white/50">{priceSuffix}</span>
           </p>
-          {billing === "annual" && <p className="mt-2 text-sm text-moss-200">Equivalent to about ¥1,667 per month.</p>}
+          <p className="mt-2 text-sm text-moss-200">One base price worldwide. Local currency and applicable tax appear at checkout.</p>
           <ul className="mt-7 grid gap-3 sm:grid-cols-2">
             {proFeatureNames.map((feature) => (
               <li key={feature} className="flex gap-3 text-sm leading-6 text-white/80">
@@ -196,12 +175,12 @@ function FreeSubscriptionPage() {
             ))}
           </ul>
           <CheckoutButton
-            billingPeriod={billing}
+            billingPeriod="monthly"
             label={`Get Premium · ${price} ${priceSuffix}`}
             className="mt-8 w-full bg-persimmon-500 hover:bg-persimmon-600"
           />
           <p className="mt-4 text-center text-xs leading-5 text-white/45">
-            Secure checkout by Dodo Payments. Your Premium access starts only after payment is confirmed.
+            Secure checkout by Dodo Payments. The final localized total is shown before you pay, and Premium starts only after payment is confirmed.
           </p>
         </div>
       </section>
