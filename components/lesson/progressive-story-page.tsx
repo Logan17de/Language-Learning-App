@@ -563,18 +563,17 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
    * seeing the first vocabulary question was the whole of it, spent staring at
    * a spinner. Reading takes minutes; this takes one of those seconds.
    *
-   * It waits for the build to settle. Warming earlier would put a half-built
-   * lesson in the cache the player then reads from.
+   * lessonReady means the validated package has already been stored. Listening
+   * audio is deliberately non-blocking, so waiting for it here only delays the
+   * first vocabulary question without making the playable lesson any safer.
    */
-  const generationSettled =
-    lessonReady && (audioStatus === "ready" || audioStatus === "failed");
   useEffect(() => {
-    if (!lessonId || !generationSettled) return;
+    if (!lessonId || !lessonReady) return;
     void useBackendLessonStore
       .getState()
       .loadOne(lessonId)
       .catch(() => undefined);
-  }, [generationSettled, lessonId]);
+  }, [lessonId, lessonReady]);
 
   const supportedWordCount = useMemo(
     () => lines.reduce((total, line) => total + line.words.length, 0),

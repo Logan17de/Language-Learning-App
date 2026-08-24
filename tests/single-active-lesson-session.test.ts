@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 const repo = readFileSync("lib/repositories/lesson-session-repository.ts", "utf8");
 const migration = readFileSync(
-  "supabase/migrations/20260824064500_single_active_lesson_session.sql",
+  "supabase/migrations/20260824054338_single_active_lesson_session.sql",
   "utf8",
 );
 

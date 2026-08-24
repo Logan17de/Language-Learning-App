@@ -6,7 +6,17 @@
 begin;
 create extension if not exists pgtap;
 
-select plan(11);
+select plan(12);
+
+select ok(
+  position(
+    'pg_advisory_xact_lock'
+    in pg_get_functiondef(
+      'public.start_or_resume_lesson_session(uuid,uuid)'::regprocedure
+    )
+  ) > 0,
+  'lesson takeover is serialized per learner'
+);
 
 create or replace function pg_temp.make_learner()
 returns uuid language plpgsql as $$

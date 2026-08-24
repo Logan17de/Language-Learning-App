@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 const result = readFileSync("components/lesson/lesson-result.tsx", "utf8");
 const repo = readFileSync("lib/repositories/progress-repository.ts", "utf8");
 const migration = readFileSync(
-  "supabase/migrations/20260824034500_learner_level_mastery_summary.sql",
+  "supabase/migrations/20260824030707_learner_level_mastery_summary.sql",
   "utf8",
 );
 

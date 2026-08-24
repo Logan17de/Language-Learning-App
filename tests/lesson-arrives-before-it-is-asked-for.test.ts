@@ -18,8 +18,13 @@ describe("the lesson is fetched while the learner is still reading", () => {
     expect(storyPage).toContain(".loadOne(lessonId)");
   });
 
-  it("waits for the build to settle, so a half-built lesson is never cached", () => {
-    expect(storyPage).toContain(
+  it("does not make vocabulary wait for non-blocking listening audio", () => {
+    const warmingEffect = storyPage.slice(
+      storyPage.indexOf("Fetch the lesson while the learner is still reading"),
+      storyPage.indexOf("const supportedWordCount"),
+    );
+    expect(warmingEffect).toContain("if (!lessonId || !lessonReady) return");
+    expect(warmingEffect).not.toContain(
       'lessonReady && (audioStatus === "ready" || audioStatus === "failed")',
     );
   });
