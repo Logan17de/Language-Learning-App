@@ -62,14 +62,19 @@ function strippedForm(value: string): string {
 
 function parseCatalog(source: string): CuratedGrammarPattern[] {
   const entries: CuratedGrammarPattern[] = [];
-  for (const block of source.split(/\n(?=## )/u)) {
-    const heading = /^## (N[1-5])_G(\d+) — (.+?)\n/u.exec(block);
+  const normalizedSource = source.replace(/\r\n?/gu, "\n");
+  for (const block of normalizedSource.split(/\n(?=## )/u)) {
+    const heading = /^## (N[1-5])_G(\d+) — (.+?)\r?\n/u.exec(block);
     if (!heading) continue;
     const [, level, ordinal, pattern] = heading;
     if (!isJlptLevel(level)) continue;
 
-    const structure = /### 1\) Structure\n```text\n([\s\S]*?)\n```/u.exec(block);
-    const usage = /### 2\) When to use it\n([\s\S]*?)\n\n### 3\)/u.exec(block);
+    const structure =
+      /### 1\) Structure\r?\n```text\r?\n([\s\S]*?)\r?\n```/u.exec(block);
+    const usage =
+      /### 2\) When to use it\r?\n([\s\S]*?)\r?\n\r?\n### 3\)/u.exec(
+        block,
+      );
     const japanese = /\*\*Japanese:\*\* (.+)/u.exec(block);
     const english = /\*\*English:\*\* (.+)/u.exec(block);
     if (!structure || !usage || !japanese || !english) continue;
