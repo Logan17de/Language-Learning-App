@@ -77,43 +77,43 @@ const learningFlow: Array<{
 const lessonStages: Array<{
   number: string;
   title: string;
-  copy: string;
+  action: string;
   icon: LucideIcon;
 }> = [
   {
     number: "01",
     title: "Story",
-    copy: "Meet the lesson language inside one clear situation.",
+    action: "Read",
     icon: BookOpenText,
   },
   {
     number: "02",
     title: "Vocabulary",
-    copy: "Practise the useful words introduced by the story.",
+    action: "Recall",
     icon: Languages,
   },
   {
     number: "03",
     title: "Grammar",
-    copy: "Understand the patterns, answer questions, and use them in production practice.",
+    action: "Apply",
     icon: Lightbulb,
   },
   {
     number: "04",
     title: "Reading",
-    copy: "Recognise the same language again in text and answer from meaning and context.",
+    action: "Understand",
     icon: Eye,
   },
   {
     number: "05",
     title: "Listening",
-    copy: "Follow familiar lesson language in audio and strengthen recognition.",
+    action: "Hear",
     icon: Ear,
   },
   {
     number: "06",
     title: "Speaking",
-    copy: "Turn familiar lesson language into something you can say yourself.",
+    action: "Say",
     icon: Mic,
   },
 ];
@@ -130,25 +130,22 @@ const learningSignals = [
 const plans = [
   {
     name: "Free",
-    copy: "The complete core AIko learning path.",
+    copy: "Build your core language skills and keep your progress moving.",
     features: [
-      "Six connected lesson phases",
-      "Level-matched lesson assignment",
-      "Automatic progress tracking",
-      "Grammar production practice",
-      "Listening and speaking activities",
+      "One lesson creation each day",
+      "Story, vocabulary, grammar, and reading",
+      "Automatic mastery and progress tracking",
     ],
     cta: "Start learning",
     primary: false,
   },
   {
     name: "Premium",
-    copy: "More control over lesson creation, speaking practice, and learning insights.",
+    copy: "Create more often and unlock the complete six-phase lesson.",
     features: [
-      "Custom-topic AI lesson generation",
-      "Unlimited adaptive lesson access",
-      "Extended speaking practice",
-      "Deeper progress analytics",
+      "Five lesson creations each day",
+      "Listening practice with lesson audio",
+      "Speaking practice with live transcription",
     ],
     cta: "Explore Premium",
     primary: true,
@@ -339,33 +336,35 @@ export default function LandingPage() {
             </div>
           </section>
 
-          <section id="lesson-journey" className="scroll-mt-20 bg-white py-16 sm:py-20">
-            <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
-              <div className="max-w-3xl">
-                <p className="section-kicker">How lessons work</p>
-                <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-                  One lesson. Six connected phases.
-                </h2>
-                <p className="mt-5 text-lg leading-8 text-stone-500">
-                  Every phase keeps the same story context, so new language is not introduced once
-                  and immediately abandoned. You keep meeting it through understanding, practice,
-                  comprehension, and production.
+          <section id="lesson-journey" className="scroll-mt-20 bg-white py-10 sm:py-12">
+            <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="section-kicker">How lessons work</p>
+                  <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+                    One story, six quick phases.
+                  </h2>
+                </div>
+                <p className="max-w-md text-sm leading-6 text-stone-500 sm:text-right">
+                  The same language moves from context to recall, understanding, and use.
                 </p>
               </div>
-              <ol className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-                {lessonStages.map(({ number, title, copy, icon: Icon }) => (
+              <ol className="mt-7 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-black/[.06] bg-black/[.06] sm:grid-cols-3 lg:grid-cols-6">
+                {lessonStages.map(({ number, title, action, icon: Icon }) => (
                   <li
                     key={title}
-                    className="relative rounded-3xl border border-black/[.06] bg-paper p-5 xl:min-h-64"
+                    className="group flex items-center gap-2 bg-paper px-3 py-3.5 sm:gap-3 sm:px-4 sm:py-4"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="grid size-10 place-items-center rounded-2xl bg-white text-moss-700 shadow-card">
-                        <Icon className="size-5" aria-hidden="true" />
+                    <span className="relative grid size-9 shrink-0 place-items-center rounded-xl bg-white text-moss-700 shadow-card sm:size-10 sm:rounded-2xl">
+                      <Icon className="size-5" aria-hidden="true" />
+                      <span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full bg-persimmon-500 text-[9px] font-bold text-white">
+                        {Number(number)}
                       </span>
-                      <span className="text-xs font-bold text-stone-500">{number}</span>
+                    </span>
+                    <div>
+                      <h3 className="text-sm font-semibold">{title}</h3>
+                      <p className="mt-0.5 text-xs text-stone-500">{action}</p>
                     </div>
-                    <h3 className="mt-6 font-semibold">{title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-stone-500">{copy}</p>
                   </li>
                 ))}
               </ol>
@@ -380,8 +379,8 @@ export default function LandingPage() {
                   Start with the core path. Add more control when you need it.
                 </h2>
                 <p className="mt-5 text-lg leading-8 text-stone-500">
-                  Free includes the connected lesson experience. Premium is being prepared for
-                  learners who want custom lesson generation, extended speaking, and deeper insights.
+                  Free includes one lesson each day and the four core practice phases. Premium adds
+                  a higher daily creation limit, Listening, and Speaking.
                 </p>
               </div>
               <div className="mt-10 grid gap-6 md:grid-cols-2">
@@ -397,7 +396,7 @@ export default function LandingPage() {
                     <div>
                       <div className="flex items-center justify-between gap-4">
                         <h3 className="text-3xl font-semibold">{plan.name}</h3>
-                        {plan.primary && <Badge tone="orange">Coming soon</Badge>}
+                        {plan.primary && <Badge tone="orange">$10 / month</Badge>}
                       </div>
                       <p
                         className={`mt-5 leading-7 ${
@@ -442,8 +441,7 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="mx-auto mt-5 max-w-2xl text-center text-sm leading-6 text-stone-500">
-                Premium checkout is not connected yet. Beta Premium access may be enabled
-                administratively while billing is being prepared.
+                Dodo Payments shows the final local currency and applicable tax before you pay.
               </p>
             </div>
           </section>

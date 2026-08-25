@@ -14,7 +14,7 @@ import {
   Mail,
   MessageCircleMore,
   Sparkles,
-  TrendingUp,
+  Volume2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/app-store";
@@ -27,37 +27,37 @@ import { authService } from "@/lib/auth/auth-service";
 const premiumFeatures = [
   {
     icon: Sparkles,
-    title: "Custom AI lessons",
-    copy: "Create complete lessons around your own topic, level, weak grammar, and unseen kanji.",
+    title: "Five lessons each day",
+    copy: "Create up to five AI lessons from the topics and Japanese levels you choose.",
     href: "/custom-topic",
     action: "Create a lesson",
   },
   {
-    icon: MessageCircleMore,
-    title: "Extended speaking",
-    copy: "Use the full speaking progression and meaning-based response evaluation.",
+    icon: Volume2,
+    title: "Listening practice",
+    copy: "Hear lesson audio and complete the connected listening activities.",
     href: "/learn",
-    action: "Practise speaking",
+    action: "Start a lesson",
   },
   {
-    icon: TrendingUp,
-    title: "Complete insights",
-    copy: "See deeper strength, weakness, mastery, and learning signals.",
-    href: "/progress",
-    action: "View insights",
+    icon: MessageCircleMore,
+    title: "Speaking practice",
+    copy: "Read lesson sentences aloud with live transcription and sentence matching.",
+    href: "/learn",
+    action: "Practise speaking",
   },
 ] as const;
 
 const freeIncluded = [
-  "Level-matched lessons selected by AIko",
-  "Core six-phase lesson flow",
-  "Basic progress and strength/weakness feedback",
+  "One lesson creation each day",
+  "Story, vocabulary, grammar, and reading",
+  "Mastery and progress tracking",
 ];
 
 const freeLocked = [
-  "Custom-topic AI lesson generation",
-  "Extended speaking and semantic evaluation",
-  "Deeper mastery analytics and adaptive insights",
+  "Five lesson creations each day",
+  "Listening practice with lesson audio",
+  "Speaking practice with live transcription",
 ];
 
 export function ProfilePage() {
@@ -71,7 +71,7 @@ function PremiumAccountPage() {
   const subscription = useAppStore((state) => state.subscription);
 
   return (
-    <AccountLayout eyebrow="Premium account" title="Your complete AIko learning system.">
+    <AccountLayout eyebrow="Premium account" title="Your complete lesson access.">
       <div className="grid gap-5 lg:grid-cols-[.78fr_1.22fr]">
         <aside className="space-y-5">
           <AccountIdentityCard premium />
@@ -80,9 +80,9 @@ function PremiumAccountPage() {
               <Badge tone="orange"><Crown className="mr-1 size-3" /> Premium active</Badge>
               <span className="text-xs capitalize text-white/55">{subscription.billingPeriod} plan</span>
             </div>
-            <h2 className="mt-5 text-2xl font-semibold">Everything is unlocked.</h2>
+            <h2 className="mt-5 text-2xl font-semibold">Premium access is active.</h2>
             <p className="mt-2 text-sm leading-6 text-white/65">
-              Custom lessons, extended speaking, and complete learning insights are available on this account.
+              Five daily lesson creations, Listening, and Speaking are available on this account.
             </p>
             <ButtonLink href="/subscription" className="mt-5 w-full bg-persimmon-500 hover:bg-persimmon-600">
               Premium account details
@@ -151,7 +151,7 @@ function FreeAccountPage() {
               <p className="text-xs font-semibold uppercase tracking-[.18em] text-persimmon-700">Unlock the full system</p>
               <h2 className="mt-2 text-2xl font-semibold">Add more control to learning.</h2>
               <p className="mt-2 max-w-xl text-sm leading-6 text-stone-600">
-                Premium adds custom AI lessons, extended speaking, and complete progress insights.
+                Premium adds five daily lesson creations, Listening, and Speaking.
               </p>
             </div>
             <ButtonLink href="/subscription" className="mt-5 shrink-0 bg-persimmon-500 hover:bg-persimmon-600 sm:mt-0">

@@ -49,25 +49,25 @@ const faqs: FaqItem[] = [
     category: "Voice and speaking",
     question: "Which voice features are available?",
     answer:
-      "Speaking and voice-based AI features are being introduced gradually. The lesson will show which controls are currently available; unavailable voice features should not be treated as active.",
+      "Premium lessons include listening audio and speaking practice with live transcription and sentence matching.",
   },
   {
-    category: "Free and Pro",
+    category: "Free and Premium",
     question: "What is included in the Free plan?",
     answer:
-      "Free is designed to include structured lessons, limited learning sessions, basic review, progress tracking, limited speaking practice, and standard lesson topics.",
+      "Free includes one lesson creation each day, Story, Vocabulary, Grammar, Reading, and mastery and progress tracking.",
   },
   {
-    category: "Free and Pro",
-    question: "What is planned for Pro?",
+    category: "Free and Premium",
+    question: "What is included in Premium?",
     answer:
-      "Pro is planned to include unlimited sessions, lessons about your own topics, voice-based practice, deeper feedback, adaptive review, fuller progress insights, and future premium language experiences.",
+      "Premium includes up to five lesson creations each day, Listening practice with lesson audio, and Speaking practice with live transcription.",
   },
   {
     category: "Billing",
     question: "Can I be charged right now?",
     answer:
-      "Paid subscriptions have not launched. Pro pricing and payment terms will be shown clearly before any real payment is accepted.",
+      "Yes. AIko Premium is $10 USD per month. Dodo Payments shows the final local currency and applicable tax before you confirm payment.",
   },
   {
     category: "Languages",

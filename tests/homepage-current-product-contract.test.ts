@@ -7,10 +7,12 @@ function source(path: string): string {
 
 const homepage = source("app/page.tsx");
 const subscription = source("components/subscription/subscription-page.tsx");
+const profile = source("components/profile/profile-page.tsx");
+const support = source("components/support/support-page.tsx");
 
 describe("homepage reflects the current AIko product", () => {
   it("describes the canonical six-phase learner journey generically", () => {
-    expect(homepage).toContain("One lesson. Six connected phases.");
+    expect(homepage).toContain("One story, six quick phases.");
     for (const phase of [
       "Story",
       "Vocabulary",
@@ -43,7 +45,7 @@ describe("homepage reflects the current AIko product", () => {
     expect(header).not.toContain("#founder");
   });
 
-  it("does not advertise retired or unsupported Premium features as current", () => {
+  it("advertises only Premium entitlements enforced by the product", () => {
     expect(homepage).not.toContain("Advanced reading and pronunciation feedback");
     expect(homepage).not.toContain("Adaptive review and learner memory");
     expect(homepage).not.toContain("Future languages and premium tutors when available");
@@ -51,18 +53,32 @@ describe("homepage reflects the current AIko product", () => {
     expect(subscription.toLowerCase()).not.toContain("interest");
 
     for (const feature of [
-      "Custom-topic AI lesson generation",
-      "Unlimited adaptive lesson access",
-      "Extended speaking practice",
+      "Five lesson creations each day",
+      "Listening practice with lesson audio",
+      "Speaking practice with live transcription",
     ]) {
       expect(subscription).toContain(feature);
       expect(homepage).toContain(feature);
     }
+    for (const unsupported of [
+      "Unlimited adaptive lesson access",
+      "Deeper progress analytics",
+      "Complete learning insights",
+    ]) {
+      expect(subscription).not.toContain(unsupported);
+      expect(homepage).not.toContain(unsupported);
+      expect(profile).not.toContain(unsupported);
+      expect(support).not.toContain(unsupported);
+    }
+    expect(support).not.toContain("Paid subscriptions have not launched");
+    expect(support).not.toContain("unlimited sessions");
   });
 
-  it("presents Premium as coming soon without public yen pricing", () => {
-    expect(homepage).toContain("Coming soon");
-    expect(homepage).toContain("Premium checkout is not connected yet");
+  it("presents live Dodo billing at the truthful base price", () => {
+    expect(homepage).toContain("$10 / month");
+    expect(homepage).toContain("Dodo Payments shows the final local currency");
+    expect(homepage).not.toContain("Coming soon");
+    expect(homepage).not.toContain("Premium checkout is not connected yet");
     expect(homepage).not.toContain("¥");
   });
 });

@@ -7,7 +7,7 @@ import {
   Crown,
   MessageCircleMore,
   Sparkles,
-  TrendingUp,
+  Volume2,
 } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import { Badge } from "@/components/ui/badge";
@@ -22,26 +22,25 @@ import {
 const premiumFeatures = [
   {
     icon: Sparkles,
-    title: "Custom-topic AI lessons",
-    copy: "Generate a complete lesson package from your topic, level, weak grammar, and unseen kanji.",
+    title: "Five lessons each day",
+    copy: "Create up to five AI lessons from the topics and Japanese levels you choose.",
+  },
+  {
+    icon: Volume2,
+    title: "Listening practice",
+    copy: "Hear the lesson audio and complete its connected listening activities.",
   },
   {
     icon: MessageCircleMore,
-    title: "Extended speaking practice",
-    copy: "Use guided-to-open speaking tasks with meaning-based answer evaluation.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Complete learning insights",
-    copy: "See deeper mastery, confidence, review priority, strengths, and weaknesses.",
+    title: "Speaking practice",
+    copy: "Read lesson sentences aloud with live transcription and sentence matching.",
   },
 ] as const;
 
 const proFeatureNames = [
-  "Custom-topic AI lesson generation",
-  "Unlimited adaptive lesson access",
-  "Extended speaking practice",
-  "Deeper progress analytics and review",
+  "Five lesson creations each day",
+  "Listening practice with lesson audio",
+  "Speaking practice with live transcription",
 ];
 
 export function SubscriptionPage() {
@@ -71,9 +70,9 @@ function PremiumSubscriptionPage() {
       <header className="flex flex-col gap-5 rounded-4xl bg-moss-900 p-7 text-white sm:flex-row sm:items-end sm:justify-between sm:p-9">
         <div>
           <Badge tone="orange"><Crown className="mr-1 size-3" /> Premium account</Badge>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">Your full AIko experience is active.</h1>
+          <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">Your complete lesson access is active.</h1>
           <p className="mt-3 max-w-2xl leading-7 text-white/65">
-            Custom generation, extended speaking, and complete learning insights are unlocked.
+            Create up to five lessons each day and use Listening and Speaking practice.
           </p>
         </div>
         <div className="shrink-0 rounded-3xl border border-white/10 bg-white/8 px-6 py-5">
@@ -147,10 +146,10 @@ function FreeSubscriptionPage() {
       <header className="text-center">
         <Badge tone="neutral">Free account</Badge>
         <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-          Unlock the complete AIko system.
+          Unlock every lesson phase.
         </h1>
         <p className="mx-auto mt-3 max-w-2xl leading-7 text-stone-500">
-          Your free account keeps the core learning path. Premium adds custom AI-generated topics, extended speaking, and deeper insights.
+          Free includes one lesson each day plus Story, Vocabulary, Grammar, and Reading. Premium adds more daily lessons, Listening, and Speaking.
         </p>
       </header>
 
@@ -159,9 +158,9 @@ function FreeSubscriptionPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[.18em] text-moss-200">AIko Premium</p>
-              <h2 className="mt-2 text-3xl font-semibold">Everything unlocked</h2>
+              <h2 className="mt-2 text-3xl font-semibold">Complete lesson access</h2>
             </div>
-            <Badge tone="orange"><Sparkles className="mr-1 size-3" /> Full experience</Badge>
+            <Badge tone="orange"><Sparkles className="mr-1 size-3" /> Listening + Speaking</Badge>
           </div>
           <p className="mt-7 text-5xl font-semibold">
             {price}<span className="ml-2 text-sm font-normal text-white/50">{priceSuffix}</span>

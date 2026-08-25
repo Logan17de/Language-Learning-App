@@ -30,10 +30,12 @@ describe("global landing page positioning", () => {
     expect(landing).not.toContain("Tokyo");
   });
 
-  it("does not present unavailable public pricing as a live paid product", () => {
+  it("presents live public billing without unsupported price claims", () => {
     expect(landing).not.toContain("¥");
-    expect(landing).toContain("Premium checkout is not connected yet");
-    expect(landing).toContain("Coming soon");
+    expect(landing).toContain("$10 / month");
+    expect(landing).toContain("Dodo Payments shows the final local currency");
+    expect(landing).not.toContain("Premium checkout is not connected yet");
+    expect(landing).not.toContain("Coming soon");
     expect(landing).toContain('signedOutHref={plan.primary ? "/signup?next=/subscription" : "/signup"}');
   });
 
