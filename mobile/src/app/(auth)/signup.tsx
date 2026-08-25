@@ -5,10 +5,13 @@ import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } fro
 import { Brand, Button, Copy, Heading, InlineNotice, Screen } from '@/components/ui';
 import { AppleAuthButton } from '@/components/apple-auth-button';
 import { palette, radius, space } from '@/constants/theme';
-import { signInWithGoogle } from '@/lib/native-auth';
+import { isGoogleSignInAvailable, signInWithGoogle } from '@/lib/native-auth';
 import { supabase } from '@/lib/supabase';
+import { useSession } from '@/providers/session-provider';
 
 export default function SignupScreen() {
+  const { configured } = useSession();
+  const googleAvailable = isGoogleSignInAvailable();
   const [name, setName] = useState(''); const [email, setEmail] = useState(''); const [password, setPassword] = useState(''); const [loading, setLoading] = useState(false); const [error, setError] = useState<string | null>(null); const [sent, setSent] = useState(false);
   const strongEnough = password.length >= 8;
   async function submit() { setError(null); setLoading(true); const result = await supabase.auth.signUp({ email: email.trim(), password, options: { data: { display_name: name.trim() }, emailRedirectTo: Linking.createURL('auth/callback') } }); if (result.error) setError(result.error.message); else if (!result.data.session) setSent(true); setLoading(false); }
@@ -17,7 +20,7 @@ export default function SignupScreen() {
     <Brand /><View style={styles.intro}><Heading>Build Japanese that lasts.</Heading><Copy>Create your account, then choose your level and learning interests.</Copy></View>
     {sent ? <InlineNotice>Check your email to confirm this AIko account, then return to the app.</InlineNotice> : <View style={styles.form}>
       <AppleAuthButton disabled={loading} onError={(message) => setError(message || null)} onLoadingChange={setLoading} />
-      <Button label="Create account with Google" icon="logo-google" variant="secondary" onPress={google} loading={loading} />
+      {googleAvailable && <Button label="Create account with Google" icon="logo-google" variant="secondary" onPress={google} disabled={!configured} loading={loading} />}
       <Text style={styles.label}>First name</Text><TextInput autoComplete="name" value={name} onChangeText={setName} placeholder="Your name" placeholderTextColor={palette.inkMuted} style={styles.input} />
       <Text style={styles.label}>Email address</Text><TextInput autoCapitalize="none" autoComplete="email" keyboardType="email-address" value={email} onChangeText={setEmail} placeholder="you@example.com" placeholderTextColor={palette.inkMuted} style={styles.input} />
       <Text style={styles.label}>Password</Text><TextInput autoCapitalize="none" autoComplete="new-password" secureTextEntry value={password} onChangeText={setPassword} placeholder="8 or more characters" placeholderTextColor={palette.inkMuted} style={styles.input} />

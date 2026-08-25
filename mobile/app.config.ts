@@ -1,11 +1,6 @@
 import type { ConfigContext, ExpoConfig } from 'expo/config';
 
 const googleIosClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID?.trim() ?? '';
-const easProjectIdFromEnvironment = (
-  process.env.EAS_PROJECT_ID?.trim()
-  || process.env.EXPO_PUBLIC_EAS_PROJECT_ID?.trim()
-  || ''
-);
 
 function googleIosUrlScheme(clientId: string) {
   const suffix = '.apps.googleusercontent.com';
@@ -16,14 +11,6 @@ function googleIosUrlScheme(clientId: string) {
 export default ({ config }: ConfigContext): ExpoConfig => {
   const iosUrlScheme = googleIosUrlScheme(googleIosClientId);
   const plugins = [...(config.plugins ?? [])];
-  const configuredProjectId = (
-    easProjectIdFromEnvironment
-    || (config.extra?.eas as { projectId?: string } | undefined)?.projectId
-    || ''
-  );
-  const updateUrl = config.updates?.url || (
-    configuredProjectId ? `https://u.expo.dev/${configuredProjectId}` : ''
-  );
 
   if (iosUrlScheme) {
     plugins.push([
@@ -37,17 +24,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     name: config.name ?? 'AIko',
     slug: config.slug ?? 'aiko',
     plugins,
-    runtimeVersion: { policy: 'fingerprint' },
+    // Native changes require an app-version bump and a new build. Updates for
+    // one app version therefore cannot be delivered to an incompatible binary.
+    runtimeVersion: { policy: 'appVersion' },
     updates: {
       ...config.updates,
-      enabled: Boolean(updateUrl),
+      enabled: Boolean(config.updates?.url),
       checkAutomatically: 'ON_LOAD',
       fallbackToCacheTimeout: 0,
-      ...(updateUrl ? { url: updateUrl } : {}),
-    },
-    extra: {
-      ...config.extra,
-      ...(configuredProjectId ? { eas: { projectId: configuredProjectId } } : {}),
     },
   };
 };

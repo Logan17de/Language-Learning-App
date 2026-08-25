@@ -53,12 +53,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
     session,
     user: session?.user ?? null,
     signOut: async () => {
-      try {
-        await signOutFromGoogle();
-      } finally {
-        const { error } = await supabase.auth.signOut();
-        if (error) throw error;
-      }
+      await signOutFromGoogle();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
     },
     refresh,
   }), [loading, refresh, session]);

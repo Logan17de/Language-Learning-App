@@ -35,6 +35,34 @@ describe('AIko native application boundary', () => {
     expect(button).not.toContain('WebBrowser');
   });
 
+  it('uses lazy native Google authentication without a browser OAuth fallback', () => {
+    const auth = source('mobile/src/lib/native-auth.ts');
+    expect(auth).toContain("provider: 'google'");
+    expect(auth).toContain('signInWithIdToken');
+    expect(auth).toContain("require('@react-native-google-signin/google-signin')");
+    expect(auth).not.toContain("from '@react-native-google-signin/google-signin'");
+    expect(auth).not.toContain('signInWithOAuth');
+    expect(auth).not.toContain('WebBrowser');
+  });
+
+  it('keeps OTA runtime matching independent from EAS environment variables', () => {
+    const config = source('mobile/app.config.ts');
+    expect(config).toContain("runtimeVersion: { policy: 'appVersion' }");
+    expect(config).not.toContain('EAS_PROJECT_ID');
+    expect(config).not.toContain('EXPO_PUBLIC_EAS_PROJECT_ID');
+  });
+
+  it('uses PKCE and handles native email confirmation failures', () => {
+    const client = source('mobile/src/lib/supabase.ts');
+    const callback = source('mobile/src/app/(auth)/auth/callback.tsx');
+    const readme = source('mobile/README.md');
+    expect(client).toContain("flowType: 'pkce'");
+    expect(callback).toContain('exchangeCodeForSession');
+    expect(callback).toContain('.catch(');
+    expect(callback).toContain('Return to sign in');
+    expect(readme).toContain('aiko://auth/callback');
+  });
+
   it('allows native bearer sessions on the APIs used by the app', () => {
     const serverClient = source('lib/supabase/server.ts');
     expect(serverClient).toContain('request?.headers.get("authorization")');

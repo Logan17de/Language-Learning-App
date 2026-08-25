@@ -15,6 +15,7 @@ export const supabase = createClient(
   {
     auth: {
       storage: Platform.OS === 'web' ? undefined : AsyncStorage,
+      flowType: 'pkce',
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: false,
