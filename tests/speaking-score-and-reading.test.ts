@@ -32,7 +32,8 @@ describe("a wrong answer scores nothing", () => {
 describe("the reading is ready before it is asked for", () => {
   it("fetches it when the sentence appears, not on the click", () => {
     expect(phase).toContain("async function fetchReading()");
-    expect(phase).toContain("}, [exercise.id]);");
+    expect(phase).toContain("preloadSpeakingReadingHint");
+    expect(phase).toContain("exercises[currentIndex + 1]");
     expect(phase).toContain("void fetchReading()");
   });
 

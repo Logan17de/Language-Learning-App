@@ -239,6 +239,45 @@ interface CachedPlayable {
 
 const playableCache = new Map<string, CachedPlayable>();
 
+function playablePayload(value: unknown): CanonicalLesson | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const row = value as Record<string, unknown>;
+  if (!row.lesson || !row.version) return null;
+  return {
+    lesson: row.lesson as CanonicalLesson["lesson"],
+    version: row.version as CanonicalLesson["version"],
+    story: Array.isArray(row.story) ? row.story as CanonicalLesson["story"] : [],
+    storyWords: Array.isArray(row.storyWords)
+      ? row.storyWords as CanonicalLesson["storyWords"]
+      : [],
+    vocabulary: Array.isArray(row.vocabulary)
+      ? row.vocabulary as CanonicalLesson["vocabulary"]
+      : [],
+    grammar: Array.isArray(row.grammar)
+      ? row.grammar as CanonicalLesson["grammar"]
+      : [],
+    practice: Array.isArray(row.practice)
+      ? row.practice as CanonicalLesson["practice"]
+      : [],
+    reading: Array.isArray(row.reading)
+      ? row.reading as CanonicalLesson["reading"]
+      : [],
+    readingQuestions: Array.isArray(row.readingQuestions)
+      ? row.readingQuestions as CanonicalLesson["readingQuestions"]
+      : [],
+    listening: Array.isArray(row.listening)
+      ? row.listening as CanonicalLesson["listening"]
+      : [],
+    speaking: Array.isArray(row.speaking)
+      ? row.speaking as CanonicalLesson["speaking"]
+      : [],
+    premiumPhaseAccess: row.premiumPhaseAccess === "full" ? "full" : "locked",
+    knownKanji: Array.isArray(row.knownKanji)
+      ? row.knownKanji.filter((item): item is string => typeof item === "string")
+      : [],
+  };
+}
+
 function readPlayableCache(
   key: string,
 ): Promise<RepositoryResult<CanonicalLesson>> | null {
@@ -357,6 +396,24 @@ async function loadPlayable(
 ): Promise<RepositoryResult<CanonicalLesson>> {
   const client = createClient();
   if (!client) return notConfigured();
+
+  if (isUuid(idOrLegacyId)) {
+    const payload = await client.rpc("get_playable_lesson_payload", {
+      p_lesson_id: idOrLegacyId,
+    });
+    if (!payload.error) {
+      const canonical = playablePayload(payload.data);
+      return canonical
+        ? success(canonical)
+        : failure({ code: "PGRST116" }, "This lesson is unavailable.");
+    }
+    // Keep the old loader as a deployment-order fallback while the migration
+    // and application release propagate. Real access/content errors still fail.
+    if (payload.error.code !== "PGRST202" && payload.error.code !== "42883") {
+      return failure(payload.error, "Lesson content could not be loaded.");
+    }
+  }
+
   const byId = isUuid(idOrLegacyId)
     ? await client
         .from("lessons")

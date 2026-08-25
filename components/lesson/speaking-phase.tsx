@@ -11,6 +11,8 @@ import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { InspectableText } from "@/components/exercises/inspectable-text";
 import { appendInspectableInteraction } from "@/lib/lesson-support";
+import { preloadSpeakingReadingHint } from "@/lib/audio/speaking-reading-preload";
+import { useBackendLessonStore } from "@/store/backend-lesson-store";
 
 const RECORDING_LIMIT_SECONDS = 20;
 const LIVE_TRANSCRIPTION_INTERVAL_MS = 2_000;
@@ -31,6 +33,7 @@ export function SpeakingPhase({
   session: LessonSession;
   onChange: (session: LessonSession) => void;
 }) {
+  const accountId = useBackendLessonStore((state) => state.ownerUserId);
   const exercises = lesson.speakingExercises;
   const completedIds = new Set(
     session.speakingEvents
@@ -347,34 +350,30 @@ export function SpeakingPhase({
       if (!active) return;
       setReadingRevealed(false);
       if (readingHint?.exerciseId !== exercise.id) void fetchReading();
+      const next = exercises[currentIndex + 1];
+      if (next) {
+        void preloadSpeakingReadingHint({
+          accountId,
+          exerciseId: next.id,
+        }).catch(() => undefined);
+      }
     });
     return () => {
       active = false;
     };
     // Prefetching is keyed to the sentence, not to the fetch identity.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exercise.id]);
+  }, [accountId, currentIndex, exercise.id, exercises]);
 
   async function fetchReading() {
     if (readingHintLoading) return;
     setReadingHintLoading(true);
     try {
-      const response = await fetch(
-        `/api/audio/reading?exerciseId=${encodeURIComponent(exercise.id)}`,
-      );
-      const result: unknown = await response.json().catch(() => null);
-      const record =
-        result && typeof result === "object" && !Array.isArray(result)
-          ? (result as Record<string, unknown>)
-          : null;
-      if (!response.ok || typeof record?.romaji !== "string") {
-        throw new Error(
-          typeof record?.error === "string"
-            ? record.error
-            : "The reading hint could not be prepared.",
-        );
-      }
-      setReadingHint({ exerciseId: exercise.id, romaji: record.romaji });
+      const romaji = await preloadSpeakingReadingHint({
+        accountId,
+        exerciseId: exercise.id,
+      });
+      setReadingHint({ exerciseId: exercise.id, romaji });
     } catch {
       // A reading that could not be prepared is not worth interrupting the
       // learner over; the button reports it if they ask for it.

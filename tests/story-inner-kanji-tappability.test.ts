@@ -5,26 +5,25 @@ const resolver = readFileSync(
   "lib/gemini/story-library-existing-only.ts",
   "utf8",
 );
+const catalog = readFileSync(
+  "lib/curated-vocabulary-catalog.ts",
+  "utf8",
+);
 
-describe("single kanji inside inflected words stay tappable", () => {
-  it("looks inside a segmenter piece when the whole piece has no entry", () => {
-    // Intl.Segmenter keeps okurigana attached, so 考える / 強い / 近く never
-    // matched a library that holds the bare 考 / 強 / 近. Whole-piece matching
-    // alone dropped most single kanji: on one real story it stored 32 of the
-    // 57 curated terms, and 24 of the 25 losses were single kanji.
-    const resolveLine = resolver.slice(resolver.indexOf("function resolveLine"));
-    const noMatch = resolveLine.slice(resolveLine.indexOf("if (!found) {"));
-
-    expect(noMatch).toContain("piece.text.slice(offset, offset + size)");
-    expect(noMatch).toContain("uniqueVocabularyMatch(index, surface)");
-    // Longest span first, so a curated compound still beats its own characters.
-    expect(noMatch).toContain("size = piece.text.length - offset; size > 0; size -= 1");
+describe("story tappability comes only from the existing library", () => {
+  it("matches every exact library occurrence without asking a model", () => {
+    expect(resolver).toContain("matchCuratedStoryVocabularyOccurrences");
+    expect(resolver).toContain("story_vocabulary_enrichments");
+    expect(resolver).toContain("vocabulary_records");
+    expect(resolver).not.toContain("generateStructured");
+    expect(resolver).not.toContain("Intl.Segmenter");
   });
 
-  it("only falls back where nothing matched, so real words still win", () => {
-    const resolveLine = resolver.slice(resolver.indexOf("function resolveLine"));
-    // The multi-piece scan runs first and the fallback sits on its failure path.
-    expect(resolveLine.indexOf("for (let end = Math.min(pieces.length, cursor + 6)"))
-      .toBeLessThan(resolveLine.indexOf("if (!found) {"));
+  it("keeps the longest non-overlapping library term", () => {
+    const matcher = catalog.slice(
+      catalog.indexOf("export function matchCuratedStoryVocabularyOccurrences"),
+    );
+    expect(matcher).toContain("(right.end - right.start) - (left.end - left.start)");
+    expect(matcher).toContain("start < occupiedUntil");
   });
 });

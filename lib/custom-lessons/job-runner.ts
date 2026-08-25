@@ -609,7 +609,7 @@ async function processLibraryResolution(
   });
   const resolved = await resolveStoryFromExistingLibrary(
     admin as unknown as SupabaseClient<Database>,
-    { level: job.jlpt_level, plan, draft },
+    { requestId: job.request_id, level: job.jlpt_level, plan, draft },
   );
   const validIds = await existingLibraryIds(admin, resolved.library);
   const issues = [

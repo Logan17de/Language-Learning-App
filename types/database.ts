@@ -290,6 +290,10 @@ export interface Database {
         Args: Record<string, never>;
         Returns: Json;
       };
+      get_playable_lesson_payload: {
+        Args: { p_lesson_id: string };
+        Returns: Json;
+      };
       learner_level_mastery: {
         Args: Record<string, never>;
         Returns: Json;

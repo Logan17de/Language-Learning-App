@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { matchCuratedStoryVocabularyOccurrences } from "@/lib/curated-vocabulary-catalog";
 import { storyWordScript } from "@/lib/story-support";
 import type {
   CanonicalGrammar,
@@ -30,21 +31,8 @@ type VocabularyRow = Database["public"]["Tables"]["vocabulary_records"]["Row"] &
   form_overrides: Json;
 };
 
-interface SegmentPart {
-  segment: string;
-  index: number;
-  isWordLike?: boolean;
-}
-
-const JAPANESE = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
-const PARTICLES = new Set([
-  "は", "が", "を", "に", "へ", "で", "と", "の", "も", "や", "か",
-  "から", "まで", "より", "しか", "だけ", "ほど", "など", "ね", "よ",
-]);
-
-function normalizeJapanese(value: string): string {
-  return value.normalize("NFKC").trim();
-}
+type EnrichmentRow =
+  Database["public"]["Tables"]["story_vocabulary_enrichments"]["Row"];
 
 function uniqueBy<T>(items: T[], key: (item: T) => string): T[] {
   const seen = new Set<string>();
@@ -56,94 +44,54 @@ function uniqueBy<T>(items: T[], key: (item: T) => string): T[] {
   });
 }
 
-function chunks<T>(items: T[], size = 80): T[][] {
-  const result: T[][] = [];
-  for (let index = 0; index < items.length; index += size) {
-    result.push(items.slice(index, index + size));
-  }
-  return result;
-}
-
-function segmenter(): { segment(value: string): Iterable<SegmentPart> } {
-  const Constructor = (Intl as unknown as {
-    Segmenter?: new (
-      locale: string,
-      options: { granularity: "word" },
-    ) => { segment(value: string): Iterable<SegmentPart> };
-  }).Segmenter;
-  if (!Constructor) throw new Error("The Japanese word segmenter is unavailable.");
-  return new Constructor("ja", { granularity: "word" });
-}
-
-function storySurfaces(draft: StoryOnlyDraft): string[] {
-  const values = new Set<string>();
-  const japaneseSegmenter = segmenter();
-  for (const line of draft.lines) {
-    const pieces = [...japaneseSegmenter.segment(line.japanese)]
-      .filter((part) => part.isWordLike && JAPANESE.test(part.segment))
-      .map((part) => part.segment);
-    for (let start = 0; start < pieces.length; start += 1) {
-      let combined = "";
-      for (let end = start; end < Math.min(pieces.length, start + 6); end += 1) {
-        combined += pieces[end]!;
-        const normalized = normalizeJapanese(combined);
-        if (normalized && normalized.length <= 32) values.add(normalized);
-      }
-    }
-  }
-  return [...values];
-}
-
 async function loadRecords(
+  requestId: string,
   draft: StoryOnlyDraft,
   plan: LessonPlanV3,
-): Promise<{ kanji: KanjiRow[]; grammar: GrammarRow[]; vocabulary: VocabularyRow[] }> {
+): Promise<{
+  kanji: KanjiRow[];
+  grammar: GrammarRow[];
+  vocabulary: VocabularyRow[];
+  enrichments: EnrichmentRow[];
+}> {
   const admin = createAdminClient() as unknown as SupabaseClient;
   const characters = [...new Set([
     ...plan.kanji.map((item) => item.character),
     ...draft.lines.flatMap((line) => line.japanese.match(/\p{Script=Han}/gu) ?? []),
   ])];
   const patterns = plan.grammar.map((item) => item.pattern);
-  const surfaces = storySurfaces(draft);
-
-  const vocabularyQueries = chunks(surfaces).flatMap((group) => [
-    admin.from("vocabulary_records").select("*")
-      .in("dictionary_form", group)
-      .eq("source_model", CURATED_SOURCE_MODEL)
-      .is("archived_at", null)
-      .neq("quality_status", "rejected"),
-    admin.from("vocabulary_records").select("*")
-      .in("written_form", group)
-      .eq("source_model", CURATED_SOURCE_MODEL)
-      .is("archived_at", null)
-      .neq("quality_status", "rejected"),
-    admin.from("vocabulary_records").select("*")
-      .overlaps("aliases", group)
-      .eq("source_model", CURATED_SOURCE_MODEL)
-      .is("archived_at", null)
-      .neq("quality_status", "rejected"),
-  ]);
-
-  const [kanjiResult, grammarResult, ...vocabularyResults] = await Promise.all([
+  const [kanjiResult, grammarResult, enrichmentResult] = await Promise.all([
     characters.length > 0
       ? admin.from("kanji_records").select("*").in("character", characters).is("archived_at", null).neq("quality_status", "rejected")
       : Promise.resolve({ data: [] as KanjiRow[], error: null }),
     patterns.length > 0
       ? admin.from("grammar_records").select("*").in("pattern", patterns).is("archived_at", null).neq("quality_status", "rejected")
       : Promise.resolve({ data: [] as GrammarRow[], error: null }),
-    ...vocabularyQueries,
+    admin.from("story_vocabulary_enrichments").select("*")
+      .eq("request_id", requestId)
+      .order("position"),
   ]);
 
-  const error = [kanjiResult, grammarResult, ...vocabularyResults].find((result) => result.error)?.error;
+  const error = [kanjiResult, grammarResult, enrichmentResult].find((result) => result.error)?.error;
   if (error) throw new Error(`Existing language library could not be loaded: ${error.message}`);
+
+  const enrichments = (enrichmentResult.data ?? []) as EnrichmentRow[];
+  const vocabularyIds = [...new Set(enrichments.map((item) => item.vocabulary_id))];
+  const vocabularyResult = vocabularyIds.length > 0
+    ? await admin.from("vocabulary_records").select("*")
+        .in("id", vocabularyIds)
+        .is("archived_at", null)
+        .neq("quality_status", "rejected")
+    : { data: [] as VocabularyRow[], error: null };
+  if (vocabularyResult.error) {
+    throw new Error(`Existing language library could not be loaded: ${vocabularyResult.error.message}`);
+  }
 
   return {
     kanji: (kanjiResult.data ?? []) as KanjiRow[],
     grammar: (grammarResult.data ?? []) as GrammarRow[],
-    vocabulary: uniqueBy(
-      vocabularyResults.flatMap((result) => (result.data ?? []) as VocabularyRow[]),
-      (row) => row.id,
-    ),
+    vocabulary: (vocabularyResult.data ?? []) as VocabularyRow[],
+    enrichments,
   };
 }
 
@@ -174,39 +122,15 @@ function canonicalGrammar(row: GrammarRow): CanonicalGrammar {
   };
 }
 
-function vocabularyIndex(rows: VocabularyRow[]): Map<string, VocabularyRow[]> {
-  const index = new Map<string, VocabularyRow[]>();
-  const add = (value: string, row: VocabularyRow) => {
-    const normalized = normalizeJapanese(value);
-    if (!normalized || PARTICLES.has(normalized)) return;
-    const current = index.get(normalized) ?? [];
-    if (!current.some((item) => item.id === row.id)) current.push(row);
-    index.set(normalized, current);
-  };
-
-  for (const row of rows) {
-    add(row.dictionary_form || row.written_form, row);
-    add(row.written_form, row);
-    for (const alias of row.aliases ?? []) add(alias, row);
-  }
-  return index;
-}
-
-function uniqueVocabularyMatch(
-  index: Map<string, VocabularyRow[]>,
-  surface: string,
-): VocabularyRow | null {
-  const rows = index.get(normalizeJapanese(surface)) ?? [];
-  const ids = [...new Set(rows.map((row) => row.id))];
-  return ids.length === 1 ? rows.find((row) => row.id === ids[0]) ?? null : null;
-}
-
-function canonicalVocabulary(row: VocabularyRow, surface: string): CanonicalVocabulary {
+function canonicalVocabulary(
+  row: VocabularyRow,
+  enrichment: EnrichmentRow,
+): CanonicalVocabulary {
   return {
     libraryId: row.id,
-    term: surface,
-    reading: row.reading,
-    meaning: row.meaning,
+    term: enrichment.word,
+    reading: enrichment.reading,
+    meaning: enrichment.meaning,
     partOfSpeech: row.part_of_speech,
     level: row.jlpt_level,
     tags: row.tags,
@@ -217,79 +141,35 @@ function canonicalVocabulary(row: VocabularyRow, surface: string): CanonicalVoca
 
 function resolveLine(
   japanese: string,
-  index: Map<string, VocabularyRow[]>,
+  records: { vocabulary: VocabularyRow[]; enrichments: EnrichmentRow[] },
 ): { terms: StoryDraft["lines"][number]["terms"]; vocabulary: CanonicalVocabulary[] } {
-  const pieces = [...segmenter().segment(japanese)]
-    .filter((part) => part.isWordLike && JAPANESE.test(part.segment))
-    .map((part) => ({ text: part.segment, start: part.index, end: part.index + part.segment.length }));
   const terms: StoryDraft["lines"][number]["terms"] = [];
   const vocabulary: CanonicalVocabulary[] = [];
+  const rowsById = new Map(records.vocabulary.map((row) => [row.id, row]));
+  const linksBySurfaceAndReading = new Map(
+    records.enrichments.map((item) => [
+      `${item.word.normalize("NFKC")}\u0000${item.reading.normalize("NFKC")}`,
+      item,
+    ]),
+  );
 
-  let cursor = 0;
-  while (cursor < pieces.length) {
-    let found: { end: number; surface: string; row: VocabularyRow } | null = null;
-    for (let end = Math.min(pieces.length, cursor + 6); end > cursor; end -= 1) {
-      const surface = pieces.slice(cursor, end).map((piece) => piece.text).join("");
-      const row = uniqueVocabularyMatch(index, surface);
-      if (row) {
-        found = { end, surface, row };
-        break;
-      }
-    }
-    if (!found) {
-      // Intl.Segmenter keeps a kanji together with its okurigana, so a piece
-      // like 考える, 強い or 近く never matches the library, which holds the
-      // bare 考, 強, 近. Whole pieces alone therefore lost most single kanji
-      // in the story: they were visible in the text but never tappable.
-      //
-      // Nothing matched this piece, so look inside it, longest span first, and
-      // take the curated entries it contains. Running only on the no-match path
-      // means a genuine multi-piece word is still preferred over its parts.
-      const piece = pieces[cursor]!;
-      let offset = 0;
-      while (offset < piece.text.length) {
-        let inner: { surface: string; row: VocabularyRow } | null = null;
-        for (let size = piece.text.length - offset; size > 0; size -= 1) {
-          const surface = piece.text.slice(offset, offset + size);
-          const row = uniqueVocabularyMatch(index, surface);
-          if (row) {
-            inner = { surface, row };
-            break;
-          }
-        }
-        if (!inner) {
-          offset += 1;
-          continue;
-        }
-        terms.push({
-          surface: inner.surface,
-          readingHint: inner.row.reading,
-          scriptType: storyWordScript(inner.surface),
-          dictionaryForm: inner.row.dictionary_form || inner.row.written_form,
-          dictionaryReading: inner.row.reading,
-          partOfSpeech: inner.row.part_of_speech,
-          conjugationType: inner.row.conjugation_type ?? "",
-          dictionaryAlias: "",
-        } as StoryDraft["lines"][number]["terms"][number]);
-        vocabulary.push(canonicalVocabulary(inner.row, inner.surface));
-        offset += inner.surface.length;
-      }
-      cursor += 1;
-      continue;
-    }
-
+  for (const match of matchCuratedStoryVocabularyOccurrences(japanese)) {
+    const enrichment = linksBySurfaceAndReading.get(
+      `${match.word.normalize("NFKC")}\u0000${match.reading.normalize("NFKC")}`,
+    );
+    const row = enrichment ? rowsById.get(enrichment.vocabulary_id) : null;
+    if (!enrichment || !row) continue;
     terms.push({
-      surface: found.surface,
-      readingHint: found.row.reading,
-      scriptType: storyWordScript(found.surface),
-      dictionaryForm: found.row.dictionary_form || found.row.written_form,
-      dictionaryReading: found.row.reading,
-      partOfSpeech: found.row.part_of_speech,
-      conjugationType: found.row.conjugation_type ?? "",
+      surface: enrichment.word,
+      readingHint: enrichment.reading,
+      scriptType: storyWordScript(enrichment.word),
+      dictionaryForm: row.dictionary_form || row.written_form,
+      dictionaryReading: row.reading,
+      partOfSpeech: row.part_of_speech,
+      conjugationType: row.conjugation_type ?? "",
       dictionaryAlias: "",
     } as StoryDraft["lines"][number]["terms"][number]);
-    vocabulary.push(canonicalVocabulary(found.row, found.surface));
-    cursor = found.end;
+    vocabulary.push(canonicalVocabulary(row, enrichment));
   }
   return { terms, vocabulary };
 }
@@ -301,6 +181,7 @@ function resolveLine(
 export async function resolveStoryFromExistingLibrary(
   _client: SupabaseClient<Database>,
   input: {
+    requestId: string;
     level: JLPTLevel;
     plan: LessonPlanV3;
     draft: StoryOnlyDraft;
@@ -310,14 +191,13 @@ export async function resolveStoryFromExistingLibrary(
   library: ResolvedLessonLibrary;
   audits: GenerationAuditEntry[];
 }> {
-  const records = await loadRecords(input.draft, input.plan);
-  const formIndex = vocabularyIndex(records.vocabulary);
+  const records = await loadRecords(input.requestId, input.draft, input.plan);
   const allVocabulary: CanonicalVocabulary[] = [];
 
   const draft: StoryDraft = {
     ...input.draft,
     lines: input.draft.lines.map((line) => {
-      const resolved = resolveLine(line.japanese, formIndex);
+      const resolved = resolveLine(line.japanese, records);
       allVocabulary.push(...resolved.vocabulary);
       return { ...line, terms: resolved.terms };
     }),

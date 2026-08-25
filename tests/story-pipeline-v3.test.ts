@@ -83,9 +83,16 @@ describe("custom lesson story pipeline v3", () => {
     expect(curatedCatalog).toContain("Vocabs/jlpt_n1_compounds.csv");
     expect(curatedCatalog).toContain("right.end - right.start");
     expect(existingLibrary).toContain('CURATED_SOURCE_MODEL = "jlpt-curated-csv"');
-    expect(existingLibrary).toContain('.eq("source_model", CURATED_SOURCE_MODEL)');
+    expect(existingLibrary).toContain('from("story_vocabulary_enrichments")');
+    expect(existingLibrary).toContain("matchCuratedStoryVocabularyOccurrences");
     expect(existingLibrary).not.toContain("composeEntryForm");
     expect(curatedMigration).toContain("drop table if exists public.jmdict_entries cascade");
+  });
+
+  it("keeps every non-overlapping library occurrence before deduplicating storage", () => {
+    expect(curatedCatalog).toContain("matchCuratedStoryVocabularyOccurrences");
+    expect(curatedCatalog).toContain("return selected;");
+    expect(existingLibrary).toContain("for (const match of matchCuratedStoryVocabularyOccurrences");
   });
 
   it("does not perform a second kanji or grammar enrichment pass", () => {

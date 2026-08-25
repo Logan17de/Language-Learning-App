@@ -41,6 +41,7 @@ describe("opening a lesson stops waiting on things it does not use", () => {
   it("fetches one playable payload for the burst that opens a lesson", () => {
     expect(lessonRepo).toContain("function readPlayableCache");
     expect(lessonRepo).toContain("playableCache.delete(idOrLegacyId)");
+    expect(lessonRepo).toContain('rpc("get_playable_lesson_payload"');
   });
 
   it("never lets one account read the payload loaded for another", () => {

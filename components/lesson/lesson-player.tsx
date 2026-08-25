@@ -32,6 +32,8 @@ import { ListeningPhase } from "@/components/lesson/listening-phase";
 import { SpeakingPhase } from "@/components/lesson/speaking-phase";
 import { LessonReportDialog } from "@/components/support/lesson-report-dialog";
 import { preloadListeningAudio } from "@/components/exercises/audio-control";
+import { preloadSpeakingReadingHint } from "@/lib/audio/speaking-reading-preload";
+import { useBackendLessonStore } from "@/store/backend-lesson-store";
 import {
   confirmLessonStanding,
   flushPendingLessonPhaseCommits,
@@ -104,6 +106,7 @@ export function LessonPlayer({
   routeLessonId?: string;
 }) {
   const router = useRouter();
+  const accountId = useBackendLessonStore((state) => state.ownerUserId);
   const hasHydrated = useAppStore((state) => state.hasHydrated);
   const saveLessonSession = useAppStore((state) => state.saveLessonSession);
   const resetLessonSession = useAppStore((state) => state.resetLessonSession);
@@ -156,6 +159,24 @@ export function LessonPlayer({
       browserTts: lesson.runtimeAudio === "browser_tts",
     }).catch(() => undefined);
   }, [lesson, premiumPhasesAccessible, nearListening]);
+
+  // Speaking question one is the only reading hint warmed during Listening.
+  // Once Speaking opens, SpeakingPhase keeps exactly one question ahead.
+  const speakingPhaseIndex = lesson.phases.findIndex(
+    (phase) => phase.id === "speaking",
+  );
+  const inListeningBeforeSpeaking =
+    speakingPhaseIndex > 0 && currentPhaseIndex === speakingPhaseIndex - 1;
+
+  useEffect(() => {
+    if (!premiumPhasesAccessible || !inListeningBeforeSpeaking) return;
+    const first = lesson.speakingExercises[0];
+    if (!first) return;
+    void preloadSpeakingReadingHint({
+      accountId,
+      exerciseId: first.id,
+    }).catch(() => undefined);
+  }, [accountId, inListeningBeforeSpeaking, lesson, premiumPhasesAccessible]);
 
   /**
    * The learner opened another lesson somewhere else, so this one is over here.

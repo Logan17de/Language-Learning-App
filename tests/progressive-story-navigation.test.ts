@@ -15,7 +15,7 @@ describe("progressive custom lesson story", () => {
     expect(progressiveStory).toContain("function finishStory()");
     expect(progressiveStory).toContain("setStoryComplete(true)");
     expect(progressiveStory).toContain(
-      "if (!storyComplete || !lessonReady || !lessonId) return;",
+      "if (!storyComplete || !lessonReady || !lessonPreloadSettled || !lessonId) return;",
     );
     expect(progressiveStory).toContain("continueToLesson();");
     expect(progressiveStory).toContain("router.replace(`/lesson/${lessonId}/play`)");

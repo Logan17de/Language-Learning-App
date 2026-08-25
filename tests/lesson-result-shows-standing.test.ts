@@ -24,6 +24,13 @@ describe("the completion screen reports standing, not stopwatch", () => {
   it("shows a placeholder rather than a wrong number while loading", () => {
     expect(result).toContain('levelMastery ? `${levelMastery.averageMastery}%` : "—"');
   });
+
+  it("ends with one home action and no redundant lesson recap", () => {
+    expect(result).toContain("Return Home");
+    expect(result).not.toContain("Continue Learning");
+    expect(result).not.toContain("Today’s language");
+    expect(result).not.toContain("Rewards saved once");
+  });
 });
 
 describe("the measure matches the rule it reports on", () => {

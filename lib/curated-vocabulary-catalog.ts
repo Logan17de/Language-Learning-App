@@ -184,7 +184,9 @@ export function loadCuratedVocabularyCatalog(): CuratedVocabularyEntry[] {
  * as a fallback only where no longer curated vocabulary match occupies that
  * character. Returned entries are unique but ordered by first occurrence.
  */
-export function matchCuratedStoryVocabulary(japanese: string): CuratedVocabularyMatch[] {
+export function matchCuratedStoryVocabularyOccurrences(
+  japanese: string,
+): CuratedVocabularyMatch[] {
   const story = japanese.normalize("NFKC");
   const byStart = new Map<number, CuratedVocabularyMatch[]>();
 
@@ -217,8 +219,12 @@ export function matchCuratedStoryVocabulary(japanese: string): CuratedVocabulary
     occupiedUntil = best.end;
   }
 
+  return selected;
+}
+
+export function matchCuratedStoryVocabulary(japanese: string): CuratedVocabularyMatch[] {
   const seen = new Set<string>();
-  return selected.filter((match) => {
+  return matchCuratedStoryVocabularyOccurrences(japanese).filter((match) => {
     if (seen.has(match.id)) return false;
     seen.add(match.id);
     return true;

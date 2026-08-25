@@ -59,7 +59,8 @@ describe("progressive custom lesson reading", () => {
     expect(progressive).not.toContain("Lesson readiness");
     expect(progressive).not.toContain("lg:sticky lg:top-28");
     expect(progressive).toContain("<InspectableText");
-    expect(progressive).toContain("Story audio is off");
+    expect(progressive).toContain("Tap a word when you need its reading or meaning");
+    expect(progressive).not.toContain("supported words");
     expect(progressive).not.toContain("<AudioControl");
   });
 
@@ -74,7 +75,8 @@ describe("progressive custom lesson reading", () => {
     expect(progressive).toContain("continueToLesson();");
     expect(progressive).toContain("window.sessionStorage");
     expect(progressive).not.toContain("document.hidden ? 10_000");
-    expect(progressive).toContain('continueLabel={lessonReady ? "Vocabulary"');
+    expect(progressive).toContain('continueLabel={canContinue ? "Vocabulary"');
+    expect(progressive).toContain("lessonPreloadSettled");
     expect(lessonPlayer).toContain(
       "const storedSessions = useAppStore.getState().lessonSessions",
     );

@@ -57,6 +57,7 @@ type GenerationResult = {
   error?: string;
   message?: string;
   story?: {
+    title?: string;
     japaneseTitle?: string;
     lines?: StoryLineResult[];
   } | null;
@@ -394,7 +395,8 @@ function BuildStatusToast({
 export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
   const router = useRouter();
   const saveLessonSession = useAppStore((state) => state.saveLessonSession);
-  const [storyTitle, setStoryTitle] = useState("Your new story");
+  const [englishStoryTitle, setEnglishStoryTitle] = useState("Your new story");
+  const [storyTitle, setStoryTitle] = useState("");
   const [lines, setLines] = useState<ReaderLine[]>([]);
   const [storyComplete, setStoryComplete] = useState(false);
   const [currentStage, setCurrentStage] = useState("queued");
@@ -403,6 +405,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
   const [failedGroups, setFailedGroups] = useState<string[]>([]);
   const [lessonId, setLessonId] = useState<string | null>(null);
   const [lessonReady, setLessonReady] = useState(false);
+  const [lessonPreloadSettled, setLessonPreloadSettled] = useState(false);
   const [audioStatus, setAudioStatus] = useState("pending");
   const [retryableFailure, setRetryableFailure] = useState(false);
   const [permanentFailure, setPermanentFailure] = useState(false);
@@ -417,7 +420,8 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
         const nextLines = readerLines(result.story.lines);
         if (nextLines.length > 0) {
           setLines(nextLines);
-          setStoryTitle(result.story.japaneseTitle || "Your new story");
+          setEnglishStoryTitle(result.story.title || "Your new story");
+          setStoryTitle(result.story.japaneseTitle || "");
         }
       }
       if (
@@ -569,16 +573,19 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
    */
   useEffect(() => {
     if (!lessonId || !lessonReady) return;
+    let active = true;
     void useBackendLessonStore
       .getState()
       .loadOne(lessonId)
-      .catch(() => undefined);
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) setLessonPreloadSettled(true);
+      });
+    return () => {
+      active = false;
+    };
   }, [lessonId, lessonReady]);
 
-  const supportedWordCount = useMemo(
-    () => lines.reduce((total, line) => total + line.words.length, 0),
-    [lines],
-  );
   const japanesePassage = useMemo(
     () => lines.map((line) => line.japanese.trim()).filter(Boolean).join(""),
     [lines],
@@ -593,7 +600,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
   );
   // Reaching Vocabulary is the act of finishing Story. There is no separate
   // confirmation to give first, so this waits only on the lesson being built.
-  const canContinue = lessonReady && Boolean(lessonId);
+  const canContinue = lessonReady && lessonPreloadSettled && Boolean(lessonId);
   const retryAction = customLessonRetryAction({
     retrying,
     lessonReady,
@@ -653,9 +660,9 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
   }, [lessonId, router, saveLessonSession, storyComplete]);
 
   useEffect(() => {
-    if (!storyComplete || !lessonReady || !lessonId) return;
+    if (!storyComplete || !lessonReady || !lessonPreloadSettled || !lessonId) return;
     continueToLesson();
-  }, [continueToLesson, lessonId, lessonReady, storyComplete]);
+  }, [continueToLesson, lessonId, lessonPreloadSettled, lessonReady, storyComplete]);
 
   function finishStory() {
     writeBuildCache(requestId, { storyComplete: true });
@@ -729,37 +736,29 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
 
   return (
     <LessonPlayerShell
-      lessonTitle={storyTitle}
+      lessonTitle={englishStoryTitle}
       phaseName="Story"
       phaseNumber={1}
       totalPhases={TOTAL_PHASES}
       progress={storyComplete ? 17 : 6}
       canContinue={canContinue}
-      continueLabel={lessonReady ? "Vocabulary" : "Preparing vocabulary…"}
+      continueLabel={canContinue ? "Vocabulary" : "Preparing vocabulary…"}
       onContinue={finishStory}
       onExit={() => router.push("/learn")}
     >
       <div>
         <section>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <Badge>Story first</Badge>
-              <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-                {storyTitle}
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-500">
-                Read naturally. Tap a supported word only when you need its
-                reading or meaning. Story audio is off.
-              </p>
-            </div>
-            <div className="rounded-2xl border border-moss-100 bg-moss-50 px-4 py-3 text-xs text-moss-800">
-              <p className="font-semibold">
-                {supportedWordCount} words with reading or meaning help
-              </p>
-              <p className="mt-1 text-moss-600">
-                Tap supported words whenever you need help
-              </p>
-            </div>
+          <div>
+            <Badge>Story first</Badge>
+            <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
+              {englishStoryTitle}
+            </h1>
+            <p lang="ja" className="mt-2 font-serif text-xl text-stone-500">
+              {storyTitle}
+            </p>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-500">
+              Read naturally. Tap a word when you need its reading or meaning.
+            </p>
           </div>
 
           <Card className="mt-8 p-6 sm:p-10">

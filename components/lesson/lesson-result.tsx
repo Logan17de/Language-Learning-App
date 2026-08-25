@@ -2,27 +2,19 @@
 
 import { useEffect, useState } from "react";
 import {
-  ArrowRight,
-  BookOpenCheck,
-  Check,
-  ChevronDown,
   GraduationCap,
   Flame,
   PartyPopper,
-  RotateCcw,
   Sparkles,
   Star,
   Trophy,
-  Volume2,
 } from "lucide-react";
 import type { LessonPackage } from "@/types/lesson";
 import type { LessonCompletionResult } from "@/types/lesson-session";
 import { useAppStore } from "@/store/app-store";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ProgressBar } from "@/components/ui/progress-bar";
 import { LessonReportDialog } from "@/components/support/lesson-report-dialog";
 import {
   MasteryProgress,
@@ -77,11 +69,6 @@ export function LessonResult({
     (state) => state.hydrateBackendProgress,
   );
   const streak = useAppStore((state) => state.user.streakDays);
-  const [showMistakes, setShowMistakes] = useState(false);
-  const [serverSynced, setServerSynced] = useState(
-    getBackendMode() !== "supabase",
-  );
-
   useEffect(() => {
     rewardLessonCompletion(lesson, result);
     if (getBackendMode() !== "supabase") return;
@@ -98,7 +85,6 @@ export function LessonResult({
         if (cancelled || !snapshot.ok) continue;
         hydrateBackendProgress(snapshot.data);
         if (snapshot.data.completedLessonIds.includes(lesson.id)) {
-          setServerSynced(true);
           return;
         }
       }
@@ -186,37 +172,7 @@ export function LessonResult({
           />
         </div>
 
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
-          <Card className="p-7">
-            <h2 className="flex items-center gap-2 font-semibold">
-              <BookOpenCheck className="size-5 text-moss-600" /> Today’s language
-            </h2>
-            <div className="mt-5">
-              <p className="text-xs font-bold uppercase tracking-wide text-stone-400">
-                Kanji practiced
-              </p>
-              <div className="mt-2 flex gap-2">
-                {lesson.kanji.map((item) => (
-                  <span
-                    key={item.character}
-                    className="grid size-12 place-items-center rounded-2xl bg-moss-50 text-xl font-semibold"
-                  >
-                    {item.character}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="mt-6">
-              <p className="text-xs font-bold uppercase tracking-wide text-stone-400">
-                Grammar practiced
-              </p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {lesson.grammar.map((item) => (
-                  <Badge key={item.id}>{item.pattern}</Badge>
-                ))}
-              </div>
-            </div>
-          </Card>
+        <div className="mx-auto mt-6 max-w-2xl">
           <Card className="p-7">
             <h2 className="flex items-center gap-2 font-semibold">
               <Sparkles className="size-5 text-persimmon-500" /> Mastery
@@ -235,9 +191,6 @@ export function LessonResult({
           <ButtonLink href="/home" variant="dark">
             Return Home
           </ButtonLink>
-          <ButtonLink href={`/lesson/${lesson.id}/preview`}>
-            Continue Learning <ArrowRight className="size-4" />
-          </ButtonLink>
         </div>
         <div className="mt-5 flex justify-center">
           <LessonReportDialog
@@ -247,11 +200,6 @@ export function LessonResult({
             compact
           />
         </div>
-        <p className="mt-5 text-center text-xs text-stone-400">
-          {serverSynced
-            ? "Rewards saved once to your AIko profile."
-            : "Saving your rewards…"}
-        </p>
       </div>
     </main>
   );
