@@ -6,7 +6,7 @@
 begin;
 create extension if not exists pgtap;
 
-select plan(12);
+select plan(14);
 
 select ok(
   position(
@@ -88,6 +88,10 @@ select set_config('aiko.lesson_b',
   pg_temp.make_lesson(current_setting('aiko.learner')::uuid)::text, true);
 select set_config('aiko.lesson_c',
   pg_temp.make_lesson(current_setting('aiko.learner')::uuid)::text, true);
+-- Built and assigned, never opened. It has no session, so nothing the session
+-- trigger does can ever reach it.
+select set_config('aiko.lesson_d',
+  pg_temp.make_lesson(current_setting('aiko.learner')::uuid)::text, true);
 
 -- ---------------------------------------------------------------------------
 -- Opening a lesson twice reuses one session rather than making a second.
@@ -97,6 +101,18 @@ select set_config('aiko.first',
                       current_setting('aiko.lesson_a')::uuid)::text, true);
 select is(pg_temp.open_count(current_setting('aiko.learner')::uuid), 1,
   'opening a lesson gives the learner one open session');
+
+-- The bug this covers: a never-opened lesson stayed on the path forever and was
+-- handed back as "resume this" the moment the lesson in front of it finished.
+select is(
+  pg_temp.path_status(current_setting('aiko.learner')::uuid,
+                      current_setting('aiko.lesson_d')::uuid),
+  'abandoned', 'a lesson that was never opened leaves the path too');
+select is(
+  (select count(*)::integer from public.lesson_assignments
+    where user_id = current_setting('aiko.learner')::uuid
+      and status in ('assigned', 'started')),
+  1, 'so exactly one lesson is waiting on the path');
 
 select is(
   pg_temp.open_lesson(current_setting('aiko.learner')::uuid,
