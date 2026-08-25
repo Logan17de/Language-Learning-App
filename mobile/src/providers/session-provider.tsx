@@ -2,6 +2,7 @@ import type { PropsWithChildren } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 
+import { signOutFromGoogle } from '@/lib/native-auth';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 
 interface SessionContextValue {
@@ -51,7 +52,14 @@ export function SessionProvider({ children }: PropsWithChildren) {
     loading,
     session,
     user: session?.user ?? null,
-    signOut: async () => { await supabase.auth.signOut(); },
+    signOut: async () => {
+      try {
+        await signOutFromGoogle();
+      } finally {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+      }
+    },
     refresh,
   }), [loading, refresh, session]);
 

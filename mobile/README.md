@@ -10,11 +10,24 @@ Copy `.env.example` to `.env.local` and add only the public mobile values:
 EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 EXPO_PUBLIC_API_URL=https://aiko.zetbros.com
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=
+EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID=
+EAS_PROJECT_ID=
 ```
 
 Never add the Supabase service-role key, OpenAI key, Dodo secret, or worker secret to this project. `EXPO_PUBLIC_*` values are included in the application bundle.
 
-For Google OAuth, add `aiko://auth/callback` to the Supabase authentication redirect allow list. Development builds may also require the redirect URI printed by Expo for the active development environment.
+Google sign-in is fully native. Android opens the Google account picker supplied by Google Play services; iOS uses Google's native sign-in SDK. AIko sends the resulting Google ID token directly to Supabase with `signInWithIdToken` and never starts its own browser OAuth flow.
+
+Create three OAuth clients in the Google Cloud project used by Supabase Auth:
+
+- Web client: place its client ID in `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` and in the Supabase Google provider configuration.
+- Android client: package name `com.zetbros.aiko`, plus the SHA-1 fingerprints of every test and production signing certificate.
+- iOS client: bundle ID `com.zetbros.aiko`; place its client ID in `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`.
+
+The current local test APK uses SHA-1 `5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25`. EAS and store builds use their own signing certificates, so register those SHA-1 values as additional Android OAuth clients rather than replacing the test client.
+
+The client IDs are public application identifiers. Never place a Google client secret in the mobile app.
 
 For native Sign in with Apple, enable the Apple provider in Supabase and add the iOS bundle identifier `com.zetbros.aiko` to its Client IDs. The matching App ID must have the Sign in with Apple capability enabled in the Apple Developer portal. AIko uses Apple's native Authentication Services sheet; it does not use a web login wrapper.
 
@@ -43,6 +56,19 @@ eas build --platform ios --profile preview
 ```
 
 Production signing and store submission require the owner's Apple Developer and Google Play Console accounts. Those credentials are intentionally not stored in this repository.
+
+## Over-the-air updates
+
+`expo-updates` is installed and the build profiles use separate `development`, `preview`, and `production` channels. Link the repository to the AIko Expo account once:
+
+```bash
+cd mobile
+eas login
+eas init
+eas update:configure
+```
+
+Keep the generated EAS project ID in the build environment as `EAS_PROJECT_ID`. Publish JavaScript, styling, assets, and business-logic fixes with `npm run update:preview -- --message "..."`, verify them, then use `npm run update:production -- --message "..."`. Native dependency, permission, SDK, or signing changes still require a new store build. An EAS-enabled replacement build will be required once after this setup; the APK created before `expo-updates` was added cannot receive OTA updates.
 
 ## Store billing
 
