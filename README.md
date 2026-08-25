@@ -9,11 +9,30 @@ The repository is production-oriented. Supabase is the source of truth for authe
 ## Stack
 
 - Next.js 16 App Router + React 19
+- Expo SDK 57 + React Native for the real Android and iOS application under `mobile/`
 - TypeScript
 - Zustand for transient client/session UI state and lesson checkpoints
 - Supabase Auth + PostgreSQL + Row Level Security + Storage
 - OpenAI Responses API for generated lesson content
 - Supabase `pg_cron` + `pg_net` + Vault for durable custom-lesson worker scheduling
+
+## Native Android and iOS application
+
+`mobile/` is an independent React Native application. It does not embed the website or use a WebView. It uses native navigation, native controls, device audio APIs, offline lesson caching, and the same Supabase accounts and learner records as the web application.
+
+The native learner flow currently includes:
+
+- Email/password and Google authentication
+- Home, Learn, Progress, and Profile tabs
+- Resumable/custom lesson state from Supabase
+- Story, vocabulary, grammar, reading, listening, and speaking screens
+- Tappable library-backed story words and English translations
+- Native listening playback and 10-second microphone recording for Speaking
+- Existing Premium entitlement recognition without embedding Dodo web checkout
+
+Native store purchases must use Apple StoreKit and Google Play Billing before public store release. Existing web Premium subscriptions remain recognized by account status.
+
+See `mobile/README.md` for local setup, EAS builds, deep links, and store prerequisites.
 
 ## Learner lesson flow
 
@@ -187,6 +206,7 @@ Core custom-lesson APIs include:
 - `store/` — transient client/session state
 - `supabase/migrations/` — forward-only database history
 - `Vocabs/` — curated JLPT vocabulary CSV sources used for story tappability
+- `mobile/` — genuine Expo/React Native Android and iOS application
 - `tests/` — current behavioral and architecture contracts
 
 Historical migration files may mention retired systems because they represent the database's forward history. They should not be treated as active application architecture and must not be removed merely as code cleanup.

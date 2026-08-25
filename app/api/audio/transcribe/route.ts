@@ -26,7 +26,7 @@ const ALLOWED_AUDIO_TYPES = new Set([
 ]);
 
 export async function POST(request: NextRequest) {
-  const auth = await authorize("learn");
+  const auth = await authorize("learn", request);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
   }

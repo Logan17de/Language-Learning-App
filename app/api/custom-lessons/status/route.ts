@@ -22,8 +22,11 @@ function stringValue(value: unknown, fallback: string): string {
   return typeof value === "string" && value.trim() ? value : fallback;
 }
 
-async function confirmStoryEntitlement(requestId: string): Promise<boolean> {
-  const client = await createClient();
+async function confirmStoryEntitlement(
+  requestId: string,
+  request: NextRequest,
+): Promise<boolean> {
+  const client = await createClient(request);
   if (!client) return false;
   const rawClient = client as unknown as SupabaseClient;
   const result = await rawClient.rpc("consume_custom_lesson_story_entitlement", {
@@ -34,7 +37,7 @@ async function confirmStoryEntitlement(requestId: string): Promise<boolean> {
 
 export async function GET(request: NextRequest) {
   const startedAt = Date.now();
-  const auth = await authorize("learn");
+  const auth = await authorize("learn", request);
   if (!auth.ok) return response({ error: auth.message }, auth.status);
   const requestId = request.nextUrl.searchParams.get("requestId")?.trim() ?? "";
   if (!UUID.test(requestId)) return response({ error: "A valid generation request is required." }, 400);
@@ -94,7 +97,7 @@ export async function GET(request: NextRequest) {
   // authenticated database function must positively acknowledge the request's
   // entitlement before Story can leave the server. A zero-row/misflagged free
   // request therefore fails closed rather than exposing learning content.
-  if (story && !(await confirmStoryEntitlement(requestId))) {
+  if (story && !(await confirmStoryEntitlement(requestId, request))) {
     console.error("Lesson entitlement could not be confirmed before Story exposure.", {
       requestId,
       userId: auth.userId,

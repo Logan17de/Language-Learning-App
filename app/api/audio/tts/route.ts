@@ -12,7 +12,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
-  const auth = await authorize("learn");
+  const auth = await authorize("learn", request);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
   }

@@ -82,7 +82,7 @@ function beginResult(value: Json): BeginResult | null {
 
 export async function POST(request: NextRequest) {
   const startedAt = Date.now();
-  const auth = await authorize("learn");
+  const auth = await authorize("learn", request);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
   }
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const client = await createClient();
+  const client = await createClient(request);
   if (!client) {
     return NextResponse.json(
       { error: "Backend is not configured." },
