@@ -37,11 +37,18 @@ export function ReadingPhase({
     submitted && question && normalizeAnswer(submitted.response) === normalizeAnswer(question.answer),
   );
   const complete = questions.length > 0 && answers.length >= questions.length;
+  // Reading sections are stored with an empty term list unless the generator
+  // resolved one, and an empty array is not null, so the passage fell through
+  // with nothing tappable. The lesson's own story words are the right stand-in:
+  // the passage is written from the same language.
   const terms = useMemo(
-    () => uniqueTerms(
-      lesson.readingConversation.flatMap((line) => line.inspectableTerms ?? []),
-    ),
-    [lesson.readingConversation],
+    () => {
+      const stored = uniqueTerms(
+        lesson.readingConversation.flatMap((line) => line.inspectableTerms ?? []),
+      );
+      return stored.length ? stored : lesson.story.flatMap((line) => line.words);
+    },
+    [lesson.readingConversation, lesson.story],
   );
 
   function reveal(
@@ -118,7 +125,7 @@ export function ReadingPhase({
             >
               <InspectableText
                 text={line.japanese}
-                terms={line.inspectableTerms ?? terms}
+                terms={line.inspectableTerms?.length ? line.inspectableTerms : terms}
                 onReveal={(word, type) =>
                   reveal(`reading-passage:${index}`, word, type)
                 }
