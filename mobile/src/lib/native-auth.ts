@@ -24,7 +24,9 @@ function loadGoogleModule(): GoogleModule | null {
 }
 
 export function isGoogleSignInAvailable() {
-  return Platform.OS !== 'web' && loadGoogleModule() !== null;
+  if (Platform.OS === 'web' || !googleWebClientId) return false;
+  if (Platform.OS === 'ios' && !googleIosClientId) return false;
+  return loadGoogleModule() !== null;
 }
 
 function configureGoogleSignIn(google: GoogleModule) {

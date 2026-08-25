@@ -32,7 +32,7 @@ The client IDs are public application identifiers. Never place a Google client s
 
 For native Sign in with Apple, enable the Apple provider in Supabase and add the iOS bundle identifier `com.zetbros.aiko` to its Client IDs. The matching App ID must have the Sign in with Apple capability enabled in the Apple Developer portal. AIko uses Apple's native Authentication Services sheet; it does not use a web login wrapper.
 
-Email confirmation uses the native PKCE callback. Add `aiko://auth/callback` to the Supabase Auth redirect allow list. For development builds, also add the `exp://` callback URL printed by Expo for the device or simulator you are testing.
+Email confirmation uses the native PKCE callback. Add `aiko://auth/callback` to the Supabase Auth redirect allow list. Development builds use that same custom-scheme callback. When testing with Expo Go, add the exact callback URL Expo prints, including its `/--/` segment, such as `exp://192.168.1.10:8081/--/auth/callback`; `exp://**` may be used for the development project only.
 
 ## Run the app
 

@@ -40,6 +40,8 @@ describe('AIko native application boundary', () => {
     expect(auth).toContain("provider: 'google'");
     expect(auth).toContain('signInWithIdToken');
     expect(auth).toContain("require('@react-native-google-signin/google-signin')");
+    expect(auth).toContain("Platform.OS === 'web' || !googleWebClientId");
+    expect(auth).toContain("Platform.OS === 'ios' && !googleIosClientId");
     expect(auth).not.toContain("from '@react-native-google-signin/google-signin'");
     expect(auth).not.toContain('signInWithOAuth');
     expect(auth).not.toContain('WebBrowser');
@@ -61,6 +63,7 @@ describe('AIko native application boundary', () => {
     expect(callback).toContain('.catch(');
     expect(callback).toContain('Return to sign in');
     expect(readme).toContain('aiko://auth/callback');
+    expect(readme).toContain('/--/auth/callback');
   });
 
   it('allows native bearer sessions on the APIs used by the app', () => {
