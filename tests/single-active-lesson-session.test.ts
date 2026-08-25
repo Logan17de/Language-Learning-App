@@ -35,10 +35,16 @@ describe("saving a lesson is decided by the server", () => {
   it("uses the atomic newest-session checkpoint RPC", () => {
     const save = repo.slice(
       repo.indexOf("async saveCheckpoint"),
-      repo.indexOf("async abandonActive"),
+      repo.indexOf("async saveAnswers"),
     );
     expect(save).toContain('"save_authoritative_lesson_checkpoint"');
     expect(save).not.toContain('.from("lesson_sessions").update');
+  });
+
+  it("has no client-side session abandonment left to call", () => {
+    // abandonActive was written for this and never called from anywhere. The
+    // server decides which session is open; a browser must not vote.
+    expect(repo).not.toContain("abandonActive");
   });
 
   it("lets the newest session retire an older active row", () => {

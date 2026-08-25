@@ -627,27 +627,6 @@ export const useAppStore = create<AppState>()(
                 state.progress.weakVocabulary,
                 result.weakItems,
               ),
-              kanjiRecognition: Math.min(
-                100,
-                state.progress.kanjiRecognition + result.recognitionChange,
-              ),
-              pronunciation: Math.min(
-                100,
-                state.progress.pronunciation + result.pronunciationChange,
-              ),
-              grammarUnderstanding: Math.min(
-                100,
-                state.progress.grammarUnderstanding +
-                  result.grammarUnderstandingChange,
-              ),
-              grammarProduction: Math.min(
-                100,
-                state.progress.grammarProduction + result.grammarProductionChange,
-              ),
-              speakingConfidence: Math.min(
-                100,
-                state.progress.speakingConfidence + result.pronunciationChange,
-              ),
             },
             lessonSessions: {
               ...state.lessonSessions,

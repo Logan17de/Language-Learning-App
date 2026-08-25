@@ -34,7 +34,6 @@ function session(overrides: Partial<LessonSession> = {}): LessonSession {
     storyComplete: true,
     vocabularyAnswers: [],
     grammarAnswers: [],
-    grammarTranslationQuestions: [],
     readingAnswers: [],
     listeningEvents: [],
     listeningComplete: false,

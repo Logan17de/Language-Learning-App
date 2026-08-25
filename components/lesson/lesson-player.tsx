@@ -88,7 +88,6 @@ function completionForAccess(
     ...result,
     score,
     xpGained: calculateLessonXp(score),
-    pronunciationChange: 0,
   };
 }
 

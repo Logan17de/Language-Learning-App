@@ -105,10 +105,6 @@ export interface LessonCompletionResult {
   score: number;
   xpGained: number;
   durationMinutes: number;
-  recognitionChange: number;
-  pronunciationChange: number;
-  grammarUnderstandingChange: number;
-  grammarProductionChange: number;
   weakItems: string[];
   completedAt: string;
 }
@@ -141,7 +137,6 @@ export interface LessonSession {
   storyComplete: boolean;
   vocabularyAnswers: VocabularyAnswer[];
   grammarAnswers: GrammarAnswer[];
-  grammarTranslationQuestions?: GrammarTranslationQuestion[];
   readingAnswers: ReadingComprehensionAnswer[];
   readingEvents: ReadingEvent[];
   readingComplete: boolean;

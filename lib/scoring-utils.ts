@@ -46,29 +46,16 @@ export function calculateLessonCompletion(
     session.vocabularyAnswers.filter((answer) => answer.correct).length,
     Math.max(1, lesson.vocabularyQuestions.length),
   );
-  const translationQuestions = session.grammarTranslationQuestions ?? [];
+  // Grammar answers are scored against this lesson's own questions. The second
+  // set used to be the Translation section's; that section is gone, so the list
+  // was always empty and every term it fed evaluated to zero.
   const staticGrammarIds = new Set(lesson.grammarQuestions.map((question) => question.id));
-  const translationIds = new Set(translationQuestions.map((question) => question.id));
-  const relevantGrammarAnswers = session.grammarAnswers.filter(
-    (answer) => staticGrammarIds.has(answer.questionId) || translationIds.has(answer.questionId),
+  const relevantGrammarAnswers = session.grammarAnswers.filter((answer) =>
+    staticGrammarIds.has(answer.questionId),
   );
   const grammarAccuracy = skippedPhases.has("grammar") ? 0 : ratio(
     relevantGrammarAnswers.filter((answer) => answer.correct).length,
-    Math.max(1, lesson.grammarQuestions.length + translationQuestions.length),
-  );
-  const grammarUnderstandingAnswers = relevantGrammarAnswers.filter((answer) =>
-    staticGrammarIds.has(answer.questionId),
-  );
-  const grammarProductionAnswers = relevantGrammarAnswers.filter((answer) =>
-    translationIds.has(answer.questionId),
-  );
-  const grammarUnderstandingAccuracy = skippedPhases.has("grammar") ? 0 : ratio(
-    grammarUnderstandingAnswers.filter((answer) => answer.correct).length,
     Math.max(1, lesson.grammarQuestions.length),
-  );
-  const grammarProductionAccuracy = skippedPhases.has("grammar") ? 0 : ratio(
-    grammarProductionAnswers.filter((answer) => answer.correct).length,
-    Math.max(1, translationQuestions.length),
   );
   const readingQuestions = lesson.readingQuestions ?? [];
   const readingCorrect = session.readingAnswers.filter((answer) => {
@@ -194,19 +181,11 @@ export function calculateLessonCompletion(
       ),
   ]).slice(0, 4);
 
-  const speaking = session.speakingEvents.at(-1);
   return {
     lessonId: lesson.id,
     score,
     xpGained: calculateLessonXp(score),
     durationMinutes: Math.max(1, Math.round(session.elapsedSeconds / 60)),
-    recognitionChange: score >= 80 ? 4 : 2,
-    pronunciationChange:
-      speaking?.evaluationAvailable
-        ? Math.max(0, Math.round((speaking.pronunciationConfidence - 60) / 8))
-        : 0,
-    grammarUnderstandingChange: Math.max(1, Math.round(grammarUnderstandingAccuracy * 4)),
-    grammarProductionChange: Math.max(1, Math.round(grammarProductionAccuracy * 4)),
     weakItems,
     completedAt: new Date().toISOString(),
   };

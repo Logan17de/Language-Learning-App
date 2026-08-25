@@ -41,13 +41,7 @@ export interface LearnerProgress {
   recentLessons: RecentLesson[];
   completedLessonIds: string[];
   lessonProgress: Record<string, number>;
-  kanjiRecognition: number;
-  pronunciation: number;
-  grammarUnderstanding: number;
-  grammarProduction: number;
   longestStreak: number;
   totalStudyMinutes: number;
-  listeningConfidence: number;
-  speakingConfidence: number;
   achievements: Achievement[];
 }

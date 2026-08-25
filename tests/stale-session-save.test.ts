@@ -10,7 +10,7 @@ describe("a lesson the learner moved off cannot be written to", () => {
   it("lets the atomic server RPC decide which session owns the save", () => {
     const save = repo.slice(
       repo.indexOf("async saveCheckpoint"),
-      repo.indexOf("async abandonActive"),
+      repo.indexOf("async saveAnswers"),
     );
     expect(save).toContain('"save_authoritative_lesson_checkpoint"');
     expect(save).not.toContain('.from("lesson_sessions").update');

@@ -106,8 +106,6 @@ export function restartIncompleteLessonPhase(session: LessonSession): LessonSess
         : resetFrom <= 3
           ? session.grammarAnswers.filter((answer) => !answer.validationSource)
           : session.grammarAnswers,
-    grammarTranslationQuestions:
-      resetFrom <= 2 ? undefined : session.grammarTranslationQuestions,
     readingAnswers: resetFrom <= 4 ? [] : session.readingAnswers,
     readingEvents: resetFrom <= 4 ? [] : session.readingEvents,
     readingComplete: resetFrom <= 4 ? false : session.readingComplete,

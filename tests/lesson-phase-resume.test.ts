@@ -121,14 +121,9 @@ describe("phase-atomic lesson resume", () => {
     expect(restored.vocabularyAnswers).toEqual([]);
   });
 
-  it("clears partial Grammar attempts and its not-yet-reached Translation prompts", () => {
-    const original = {
-      ...partialSession("grammar"),
-      grammarTranslationQuestions: [{ id: "translation-1", english: "Hello" }],
-    };
-    const restored = restartIncompleteLessonPhase(original);
+  it("clears partial Grammar attempts", () => {
+    const restored = restartIncompleteLessonPhase(partialSession("grammar"));
     expect(restored.grammarAnswers).toEqual([]);
-    expect(restored.grammarTranslationQuestions).toBeUndefined();
   });
 
   it("clears partial Reading answers and events", () => {
@@ -176,10 +171,6 @@ describe("phase-atomic lesson resume", () => {
         score: 88,
         xpGained: 138,
         durationMinutes: 22,
-        recognitionChange: 0,
-        pronunciationChange: 0,
-        grammarUnderstandingChange: 0,
-        grammarProductionChange: 0,
         weakItems: [],
         completedAt: new Date().toISOString(),
       },

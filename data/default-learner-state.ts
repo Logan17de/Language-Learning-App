@@ -33,13 +33,7 @@ export const defaultProgress: LearnerProgress = {
   recentLessons: [],
   completedLessonIds: [],
   lessonProgress: {},
-  kanjiRecognition: 0,
-  pronunciation: 0,
-  grammarUnderstanding: 0,
-  grammarProduction: 0,
   longestStreak: 0,
   totalStudyMinutes: 0,
-  listeningConfidence: 0,
-  speakingConfidence: 0,
   achievements: [],
 };

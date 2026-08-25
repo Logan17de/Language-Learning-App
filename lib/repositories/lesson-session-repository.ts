@@ -6,7 +6,6 @@ import { isMissingPhaseAtomicRpc } from "@/lib/sync/phase-rpc-compatibility";
 import { describesSupersededLesson } from "@/lib/sync/lesson-standing";
 import type { Database, Json } from "@/types/database";
 import type { LessonPhaseId } from "@/types/lesson-session";
-import { isUuid } from "@/lib/identifiers";
 
 type LessonSession = Database["public"]["Tables"]["lesson_sessions"]["Row"];
 type LessonAnswer = Database["public"]["Tables"]["lesson_activity_answers"]["Insert"];
@@ -148,51 +147,6 @@ export const lessonSessionRepository = {
       return failure({}, "Your lesson checkpoint is waiting to sync.");
     }
     return success(data as unknown as LessonSession);
-  },
-
-  async abandonActive(lessonReference: string): Promise<RepositoryResult<number>> {
-    const client = createClient();
-    if (!client) return notConfigured();
-    const { data: auth } = await client.auth.getUser();
-    if (!auth.user) return failure({ code: "AUTH" }, "Your session has expired.");
-
-    const byId = isUuid(lessonReference)
-      ? await client
-          .from("lessons")
-          .select("id")
-          .eq("id", lessonReference)
-          .maybeSingle()
-      : null;
-    if (byId?.error) {
-      return failure(byId.error, "The lesson could not be identified.");
-    }
-    const lessonResult = byId?.data
-      ? byId
-      : await client
-          .from("lessons")
-          .select("id")
-          .eq("legacy_id", lessonReference)
-          .maybeSingle();
-    if (lessonResult.error) {
-      return failure(lessonResult.error, "The lesson could not be identified.");
-    }
-    if (!lessonResult.data) {
-      return failure({ code: "PGRST116" }, "The lesson could not be identified.");
-    }
-
-    const { data, error } = await client
-      .from("lesson_sessions")
-      .update({
-        status: "abandoned",
-        last_saved_at: new Date().toISOString(),
-      })
-      .eq("user_id", auth.user.id)
-      .eq("lesson_id", lessonResult.data.id)
-      .eq("status", "active")
-      .select("id");
-    return error
-      ? failure(error, "The lesson could not be ended. Please try again.")
-      : success(data?.length ?? 0);
   },
 
   async saveAnswers(answers: LessonAnswer[]): Promise<RepositoryResult<number>> {
