@@ -5,7 +5,6 @@ import {
   BookOpen,
   ChartNoAxesColumnIncreasing,
   House,
-  LibraryBig,
   UserRound,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -16,10 +15,9 @@ const items = [
   {
     label: "Learn",
     href: "/learn",
-    icon: LibraryBig,
+    icon: BookOpen,
     matches: ["/learn", "/lesson", "/custom-topic"],
   },
-  { label: "Review", href: "/review", icon: BookOpen, matches: ["/review"] },
   {
     label: "Progress",
     href: "/progress",
@@ -42,7 +40,7 @@ export function BottomNav() {
       className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface px-2 pb-[max(.5rem,env(safe-area-inset-bottom))] pt-2 shadow-nav lg:hidden"
       aria-label="App navigation"
     >
-      <ul className="mx-auto grid max-w-lg grid-cols-5 gap-1">
+      <ul className="mx-auto grid max-w-lg grid-cols-4 gap-1">
         {items.map((item) => {
           const active = item.matches.some(
             (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
@@ -53,6 +51,7 @@ export function BottomNav() {
             <li key={item.label}>
               <Link
                 href={item.href}
+                prefetch={false}
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[11px] font-semibold transition duration-180 focus:outline-none focus-visible:ring-2 focus-visible:ring-moss-300 active:scale-[0.98]",

@@ -5,7 +5,6 @@ import {
   BookOpen,
   Check,
   Image as ImageIcon,
-  Sparkles,
 } from "lucide-react";
 import type { LessonPackage, StoryWord } from "@/types/lesson";
 import type {
@@ -232,55 +231,22 @@ export function StoryPhase({
     };
   }
 
-  const helpedWords = new Set(
-    session.storyInteractions
-      .filter(
-        (item) =>
-          item.type === "reading-revealed" ||
-          item.type === "meaning-revealed",
-      )
-      .map(
-        (item) =>
-          item.wordId ?? `${item.lineId}:${item.term ?? "unknown"}`,
-      ),
-  ).size;
-  const availableWords = lesson.story.reduce(
-    (total, line) => total + line.words.length,
-    0,
-  );
   const activeDetails = activeSupport
     ? wordSupport(activeSupport.lineId, activeSupport.word)
     : null;
 
   return (
     <div>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <Badge>Story first</Badge>
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight">
-            {lesson.japaneseTitle}
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-500">
-            Read naturally and touch a word only when you need help. Kanji
-            reveals its hiragana first and meaning on the next touch. Kana
-            reveals meaning immediately.
-          </p>
-        </div>
-        <div className="rounded-2xl border border-moss-100 bg-moss-50 px-4 py-3 text-xs text-moss-800">
-          <p className="font-semibold">{availableWords} stored words</p>
-          <p className="mt-1 text-moss-600">
-            Help used on {helpedWords} {helpedWords === 1 ? "word" : "words"}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-6 flex items-start gap-3 rounded-2xl bg-persimmon-50 p-4 text-sm text-stone-600">
-        <Sparkles className="mt-0.5 size-4 shrink-0 text-persimmon-500" />
-        <p>
-          Meaning, recognition, and pronunciation are tracked separately.
-          Reading help changes recognition; meaning help changes meaning. For
-          kana, one meaning reveal changes meaning and recognition together.
-          Pronunciation remains independent for reading and speaking practice.
+      <div>
+        <Badge>Story first</Badge>
+        <h2 className="mt-4 text-3xl font-semibold tracking-tight">
+          {lesson.title}
+        </h2>
+        <p lang="ja" className="mt-2 font-serif text-xl text-stone-500">
+          {lesson.japaneseTitle}
+        </p>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-500">
+          Tap a word when you need its reading or meaning.
         </p>
       </div>
 
@@ -356,7 +322,7 @@ export function StoryPhase({
         </p>
 
         <div className="mt-10 border-t border-stone-200 pt-8">
-          <p className="section-kicker">English story</p>
+          <p className="section-kicker">English translation</p>
           <p
             lang="en"
             className="mt-4 hyphens-auto text-base leading-7 text-justify text-stone-600 sm:text-lg"

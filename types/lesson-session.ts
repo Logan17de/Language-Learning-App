@@ -4,6 +4,7 @@ export type LessonPhaseId = LessonPhase["id"];
 export type ConfidenceLevel = "low" | "medium" | "high";
 export type VocabularyMode = "kanji-reading" | "reading-meaning" | "meaning-japanese" | "mixed";
 export type GrammarExerciseType = "multiple-choice" | "fill-blank" | "sentence-order" | "natural-sentence";
+export type LessonCompletionState = "active" | "completion_pending" | "completed";
 
 export interface LessonActivityProgress {
   phaseId: LessonPhaseId;
@@ -20,6 +21,12 @@ export interface VocabularyAnswer {
   attempts: number;
 }
 
+/** Public runtime shape. Grammar targets and model answers stay server-owned. */
+export interface GrammarTranslationQuestion {
+  id: string;
+  english: string;
+}
+
 export interface GrammarAnswer {
   questionId: string;
   type: GrammarExerciseType;
@@ -27,6 +34,11 @@ export interface GrammarAnswer {
   correct: boolean;
   skill: "understanding" | "production";
   attempts: number;
+  feedback?: string;
+  suggestion?: string;
+  suggestedAnswer?: string;
+  revealAnswer?: string;
+  validationSource?: "exact_match" | "ai";
 }
 
 export type ReadingEventType =
@@ -88,30 +100,11 @@ export interface SpeakingEvent {
   successfulRetry: boolean;
 }
 
-export interface ReviewAnswer {
-  questionId: string;
-  category: "kanji" | "vocabulary" | "grammar" | "listening" | "speaking";
-  selectedAnswer: string;
-  correct: boolean;
-}
-
-export interface ReviewResult {
-  answers: ReviewAnswer[];
-  correctCount: number;
-  totalCount: number;
-  score: number;
-}
-
 export interface LessonCompletionResult {
   lessonId: string;
   score: number;
   xpGained: number;
   durationMinutes: number;
-  recognitionChange: number;
-  pronunciationChange: number;
-  grammarUnderstandingChange: number;
-  grammarProductionChange: number;
-  wordsNeedingReview: string[];
   completedAt: string;
 }
 
@@ -136,6 +129,8 @@ export interface LessonSession {
   startedAt: string;
   updatedAt: string;
   completedPhaseIds: LessonPhaseId[];
+  /** Phases deliberately skipped by the learner. Each contributes zero score. */
+  skippedPhaseIds?: LessonPhaseId[];
   activities: Record<string, LessonActivityProgress>;
   storyInteractions: StoryInteraction[];
   storyComplete: boolean;
@@ -148,9 +143,9 @@ export interface LessonSession {
   listeningComplete: boolean;
   speakingEvents: SpeakingEvent[];
   speakingComplete: boolean;
-  reviewAnswers: ReviewAnswer[];
-  reviewResult: ReviewResult | null;
   completionResult: LessonCompletionResult | null;
+  /** Missing only on sessions persisted before the canonical-completion rollout. */
+  completionState?: LessonCompletionState;
   completed: boolean;
   rewarded: boolean;
 }

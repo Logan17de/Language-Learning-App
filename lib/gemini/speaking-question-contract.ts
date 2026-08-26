@@ -63,7 +63,8 @@ Requirements:
 - Every item must be one natural Japanese statement appropriate for ${input.languageLevel}.
 - Easy sentences should be short and use familiar story vocabulary.
 - Medium sentences should be longer and may naturally use one supplied grammar pattern.
-- The hard sentence may combine story details and a supplied grammar pattern, but it must remain one readable sentence.
+- Hard sentences may combine story details and supplied grammar patterns, but must remain readable single sentences.
+- The supplied grammar patterns are useful guidance, not a whitelist.
 - Ground every sentence in the supplied story, characters, events, or topic.
 - Do not use interrogative sentences, question marks, instructions, dialogue labels, translations, or answers.
 - Do not repeat a sentence.

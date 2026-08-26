@@ -11,11 +11,18 @@ import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { InspectableText } from "@/components/exercises/inspectable-text";
 import { appendInspectableInteraction } from "@/lib/lesson-support";
+import { preloadSpeakingReadingHint } from "@/lib/audio/speaking-reading-preload";
+import { useBackendLessonStore } from "@/store/backend-lesson-store";
 
-const RECORDING_LIMIT_SECONDS = 10;
+const RECORDING_LIMIT_SECONDS = 20;
 const LIVE_TRANSCRIPTION_INTERVAL_MS = 2_000;
 const VOICE_RMS_THRESHOLD = 0.018;
 const REQUIRED_VOICE_FRAMES = 6;
+
+type TranscriptionResult = {
+  transcript: string;
+  score?: number;
+};
 
 export function SpeakingPhase({
   lesson,
@@ -26,9 +33,17 @@ export function SpeakingPhase({
   session: LessonSession;
   onChange: (session: LessonSession) => void;
 }) {
+  const accountId = useBackendLessonStore((state) => state.ownerUserId);
   const exercises = lesson.speakingExercises;
   const completedIds = new Set(
-    session.speakingEvents.map((event) => event.exerciseId).filter(Boolean),
+    session.speakingEvents
+      .filter(
+        (event) =>
+          event.evaluationAvailable === true &&
+          event.pronunciationConfidence >= 70,
+      )
+      .map((event) => event.exerciseId)
+      .filter(Boolean),
   );
   const currentIndex = Math.min(session.activityIndex, exercises.length - 1);
   const exercise = exercises[currentIndex];
@@ -39,6 +54,12 @@ export function SpeakingPhase({
   const [transcribing, setTranscribing] = useState(false);
   const [secondsRemaining, setSecondsRemaining] = useState(RECORDING_LIMIT_SECONDS);
   const [liveTranscript, setLiveTranscript] = useState("");
+  const [readingHint, setReadingHint] = useState<{
+    exerciseId: string;
+    romaji: string;
+  } | null>(null);
+  const [readingHintLoading, setReadingHintLoading] = useState(false);
+  const [readingRevealed, setReadingRevealed] = useState(false);
   const [error, setError] = useState("");
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -163,8 +184,8 @@ export function SpeakingPhase({
     partialRequestInFlightRef.current = true;
     const audio = new Blob([...chunksRef.current], { type: mimeType });
     try {
-      const transcript = await transcribe(audio, true);
-      if (transcript) setLiveTranscript(transcript);
+      const result = await transcribe(audio, true);
+      if (result.transcript) setLiveTranscript(result.transcript);
     } catch {
       // A partial recording can be too short to transcribe. The final request
       // remains authoritative and reports any real error to the learner.
@@ -178,13 +199,14 @@ export function SpeakingPhase({
     const attempt = exerciseEvents.length + 1;
     const retry = attempt > 1;
     try {
-      const transcript = await transcribe(audio, false);
-      if (!transcript) {
+      const checked = await transcribe(audio, false);
+      const transcript = checked.transcript;
+      if (!transcript || typeof checked.score !== "number") {
         setError("No speech was detected. Read the sentence aloud and try again.");
         return;
       }
       setLiveTranscript(transcript);
-      const sentenceMatch = similarity(transcript, exercise.modelAnswer);
+      const sentenceMatch = checked.score;
       const event: SpeakingEvent = {
         id: `speaking_${exercise.id}_${attempt}`,
         exerciseId: exercise.id,
@@ -198,7 +220,10 @@ export function SpeakingPhase({
         missedWords: [],
         successfulRetry: retry && sentenceMatch >= 70,
       };
-      const completedAfter = new Set([...completedIds, exercise.id]);
+      const completedAfter =
+        sentenceMatch >= 70
+          ? new Set([...completedIds, exercise.id])
+          : completedIds;
       onChange({
         ...session,
         activityIndex: currentIndex,
@@ -216,10 +241,12 @@ export function SpeakingPhase({
     }
   }
 
-  async function transcribe(audio: Blob, partial: boolean): Promise<string> {
+  async function transcribe(audio: Blob, partial: boolean): Promise<TranscriptionResult> {
     const requestNumber = ++transcriptRequestRef.current;
     const form = new FormData();
     form.append("audio", audio, "aiko-speaking.webm");
+    form.append("partial", partial ? "true" : "false");
+    if (!partial) form.append("exerciseId", exercise.id);
     const response = await fetch("/api/audio/transcribe", {
       method: "POST",
       body: form,
@@ -230,6 +257,7 @@ export function SpeakingPhase({
         ? (result as Record<string, unknown>)
         : null;
     const transcript = typeof record?.transcript === "string" ? record.transcript.trim() : "";
+    const score = typeof record?.score === "number" ? record.score : undefined;
     if (!response.ok || !transcript) {
       const apiMessage = typeof record?.error === "string" ? record.error : "";
       throw new Error(
@@ -242,7 +270,7 @@ export function SpeakingPhase({
       appliedTranscriptRef.current = requestNumber;
       setLiveTranscript(transcript);
     }
-    return transcript;
+    return { transcript, score };
   }
 
   function startVoiceDetection(stream: MediaStream) {
@@ -308,6 +336,52 @@ export function SpeakingPhase({
     onChange({ ...session, activityIndex: currentIndex + 1 });
   }
 
+  /**
+   * Fetch the reading as soon as the sentence is on screen, so pressing
+   * Show reading reveals it rather than starting a request. Converting kanji
+   * needs a dictionary, and waiting on it after the click made the hint feel
+   * like it was thinking about whether to help.
+   */
+  useEffect(() => {
+    let active = true;
+    // Deferred off the effect body so hiding the previous sentence's reading
+    // does not cascade a render.
+    void Promise.resolve().then(() => {
+      if (!active) return;
+      setReadingRevealed(false);
+      if (readingHint?.exerciseId !== exercise.id) void fetchReading();
+      const next = exercises[currentIndex + 1];
+      if (next) {
+        void preloadSpeakingReadingHint({
+          accountId,
+          exerciseId: next.id,
+        }).catch(() => undefined);
+      }
+    });
+    return () => {
+      active = false;
+    };
+    // Prefetching is keyed to the sentence, not to the fetch identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountId, currentIndex, exercise.id, exercises]);
+
+  async function fetchReading() {
+    if (readingHintLoading) return;
+    setReadingHintLoading(true);
+    try {
+      const romaji = await preloadSpeakingReadingHint({
+        accountId,
+        exerciseId: exercise.id,
+      });
+      setReadingHint({ exerciseId: exercise.id, romaji });
+    } catch {
+      // A reading that could not be prepared is not worth interrupting the
+      // learner over; the button reports it if they ask for it.
+    } finally {
+      setReadingHintLoading(false);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-3xl">
       <div className="text-center">
@@ -316,7 +390,6 @@ export function SpeakingPhase({
           <Badge>{exercise.mode}</Badge>
         </div>
         <h2 className="mt-4 text-3xl font-semibold">Read the sentence aloud.</h2>
-        <p className="mt-3 text-stone-500">You have up to 10 seconds. AIko shows the live transcript and compares only the sentence.</p>
         <p className="mt-3 text-sm font-semibold text-stone-400">{currentIndex + 1} / {exercises.length}</p>
       </div>
       <ProgressBar value={(completedIds.size / exercises.length) * 100} className="mt-6" />
@@ -331,6 +404,28 @@ export function SpeakingPhase({
               }
             />
           </p>
+          {readingRevealed && readingHint?.exerciseId === exercise.id ? (
+            <p className="mt-3 text-sm font-semibold tracking-wide text-moss-700">
+              {readingHint.romaji}
+            </p>
+          ) : (
+            <Button
+              type="button"
+              variant="ghost"
+              className="mt-3"
+              disabled={readingHintLoading}
+              onClick={() => {
+                if (readingHint?.exerciseId === exercise.id) {
+                  setReadingRevealed(true);
+                  return;
+                }
+                void fetchReading().then(() => setReadingRevealed(true));
+              }}
+            >
+              {readingHintLoading ? <LoaderCircle className="size-4 animate-spin" /> : null}
+              {readingHintLoading ? "Preparing reading…" : "Show reading"}
+            </Button>
+          )}
         </div>
 
         <div className="mt-6 flex flex-wrap justify-center gap-3">
@@ -359,7 +454,7 @@ export function SpeakingPhase({
           <div className="mt-7">
             <SpeakingFeedback event={latest} />
             <Button type="button" variant="secondary" className="mt-4" disabled={speaking || transcribing} onClick={startRecording}><RotateCcw className="size-4" /> Try Again</Button>
-            {currentIndex < exercises.length - 1 && (
+            {latest.pronunciationConfidence >= 70 && currentIndex < exercises.length - 1 && (
               <Button type="button" className="mt-4 sm:ml-3" disabled={speaking || transcribing} onClick={nextExercise}>
                 Next sentence <ArrowRight className="size-4" />
               </Button>
@@ -369,32 +464,4 @@ export function SpeakingPhase({
       </Card>
     </div>
   );
-}
-
-function normalized(value: string): string {
-  return value
-    .normalize("NFKC")
-    .toLocaleLowerCase()
-    .replace(/[\s、。！？,.!?・「」『』（）()]/g, "");
-}
-
-function similarity(leftValue: string, rightValue: string): number {
-  const left = normalized(leftValue);
-  const right = normalized(rightValue);
-  if (!left || !right) return 0;
-  const rows = Array.from({ length: left.length + 1 }, (_, index) => index);
-  for (let column = 1; column <= right.length; column += 1) {
-    let diagonal = rows[0];
-    rows[0] = column;
-    for (let row = 1; row <= left.length; row += 1) {
-      const previous = rows[row];
-      rows[row] = Math.min(
-        rows[row] + 1,
-        rows[row - 1] + 1,
-        diagonal + (left[row - 1] === right[column - 1] ? 0 : 1),
-      );
-      diagonal = previous;
-    }
-  }
-  return Math.max(0, Math.round((1 - rows[left.length] / Math.max(left.length, right.length)) * 100));
 }

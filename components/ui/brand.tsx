@@ -12,9 +12,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
         <Sprout className="size-5" aria-hidden="true" />
       </span>
       {!compact && (
-        <span className="text-xl font-bold tracking-tight text-ink">
-          AIko <span className="font-serif font-normal text-persimmon-500">愛子</span>
-        </span>
+        <span className="text-xl font-bold tracking-tight text-ink">AIko</span>
       )}
     </Link>
   );

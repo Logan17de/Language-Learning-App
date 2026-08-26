@@ -5,14 +5,18 @@ const speaking = readFileSync("components/lesson/speaking-phase.tsx", "utf8");
 const feedback = readFileSync("components/exercises/speaking-feedback.tsx", "utf8");
 const transcriptionRoute = readFileSync("app/api/audio/transcribe/route.ts", "utf8");
 const audioLibrary = readFileSync("lib/audio/audio-library.ts", "utf8");
+const lessonPlayer = readFileSync("components/lesson/lesson-player.tsx", "utf8");
+const readingPreload = readFileSync("lib/audio/speaking-reading-preload.ts", "utf8");
 
 describe("live speaking transcription", () => {
-  it("streams interim transcripts for at most ten seconds", () => {
-    expect(speaking).toContain("RECORDING_LIMIT_SECONDS = 10");
+  it("streams interim transcripts for at most twenty seconds", () => {
+    expect(speaking).toContain("RECORDING_LIMIT_SECONDS = 20");
     expect(speaking).toContain("LIVE_TRANSCRIPTION_INTERVAL_MS = 2_000");
     expect(speaking).toContain("void updateLiveTranscript");
     expect(speaking).toContain("Your words will appear here.");
     expect(speaking).toContain("window.setTimeout(stopRecording");
+    expect(speaking).toContain("Show reading");
+    expect(speaking).toContain("pronunciationConfidence >= 70");
   });
 
   it("does not save silence or failed transcription as a completed attempt", () => {
@@ -33,5 +37,13 @@ describe("live speaking transcription", () => {
     expect(speaking).not.toContain("AudioControl");
     expect(audioLibrary).not.toContain('.from("lesson_speaking_activities")');
     expect(audioLibrary).toContain('.from("lesson_listening_activities")');
+  });
+
+  it("warms only the first speaking reading during Listening, then one ahead", () => {
+    expect(lessonPlayer).toContain("lesson.speakingExercises[0]");
+    expect(lessonPlayer).not.toContain("lesson.speakingExercises.map");
+    expect(speaking).toContain("exercises[currentIndex + 1]");
+    expect(speaking).toContain("preloadSpeakingReadingHint");
+    expect(readingPreload).toContain("const readingHints = new Map");
   });
 });

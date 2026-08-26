@@ -19,7 +19,6 @@ export interface KanjiItem {
   character: string;
   reading: string;
   meaning: string;
-  isReview?: boolean;
 }
 
 export interface VocabularyItem {
@@ -76,6 +75,7 @@ export interface ReadingComprehensionQuestion {
   id: string;
   difficulty: "easy" | "medium" | "hard";
   question: string;
+  choices?: string[];
   answer: string;
 }
 
@@ -89,7 +89,6 @@ export interface ChoiceExercise {
   conversationLines?: string[];
   audioAssetId?: string;
   questionType?: "multiple-choice" | "ordering" | "fill-blank" | "true-false";
-  category?: "kanji" | "vocabulary" | "grammar" | "listening" | "speaking";
   targetItemIds?: string[];
   inspectableTerms?: StoryWord[];
   difficulty?: ExerciseDifficulty;
@@ -110,6 +109,8 @@ export interface VocabularyQuestion {
   explanation: string;
   targetItemIds: string[];
   inspectableTerms: StoryWord[];
+  /** Whether Japanese context words may reveal reading/meaning help. */
+  tappableWords?: boolean;
 }
 
 export interface GrammarQuestion {
@@ -128,6 +129,8 @@ export interface GrammarQuestion {
   hintBack: string;
   targetItemIds: string[];
   inspectableTerms: StoryWord[];
+  /** Whether Japanese context words may reveal reading/meaning help. */
+  tappableWords?: boolean;
 }
 
 export interface SpeakingExercise {
@@ -154,7 +157,7 @@ export interface SpeakingExercise {
 }
 
 export interface LessonPhase {
-  id: "story" | "vocabulary" | "grammar" | "reading" | "listening" | "speaking" | "review";
+  id: "story" | "vocabulary" | "grammar" | "reading" | "listening" | "speaking";
   label: string;
   description: string;
 }
@@ -176,7 +179,6 @@ export interface LessonPackage {
   vocabulary: VocabularyItem[];
   vocabularyQuestions: VocabularyQuestion[];
   grammarQuestions: GrammarQuestion[];
-  reviewItems: string[];
   story: StoryLine[];
   images: LessonImage[];
   readingTitle?: string;
@@ -185,8 +187,8 @@ export interface LessonPackage {
   readingQuestions?: ReadingComprehensionQuestion[];
   listeningExercises: ChoiceExercise[];
   speakingExercises: SpeakingExercise[];
-  reviewQuestions: ChoiceExercise[];
-  answerKeys: string[];
   phases: LessonPhase[];
   runtimeAudio?: "stored_or_api" | "browser_tts";
+  /** Server-derived access marker. Locked lessons never include Premium phase payloads. */
+  premiumPhaseAccess?: "full" | "locked";
 }

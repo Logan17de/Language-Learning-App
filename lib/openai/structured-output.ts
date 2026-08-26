@@ -3,7 +3,6 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import {
   createOpenAIApiError,
-  getOpenAIApiDiagnostics,
   OpenAIApiError,
 } from "@/lib/openai/api-error";
 import {
@@ -51,6 +50,7 @@ interface ModelCallResult {
   rawOutput: string;
   model: string;
   usage: OpenAIUsage;
+  providerRequestId: string;
 }
 
 export interface StructuredGeneration<T> {
@@ -60,6 +60,7 @@ export interface StructuredGeneration<T> {
   issues: string[];
   durationMs: number;
   attempts: number;
+  providerRequestId: string;
 }
 
 export interface StructuredGenerationInput {
@@ -71,6 +72,7 @@ export interface StructuredGenerationInput {
   trace?: GenerationTraceContext;
   strictSchema?: boolean;
   exactSchemaName?: boolean;
+  timeoutMs?: number;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -142,7 +144,12 @@ function parseStructuredText(model: string, value: string): unknown {
   }
 }
 
-function requestTimeoutMs(): number {
+function responseError(message: string, providerRequestId: string): Error {
+  return Object.assign(new Error(message), { providerRequestId });
+}
+
+function requestTimeoutMs(override?: number): number {
+  if (Number.isFinite(override)) return Math.max(10_000, Math.min(Math.round(override!), 240_000));
   const configured = Number(process.env.OPENAI_REQUEST_TIMEOUT_MS);
   if (!Number.isFinite(configured)) return 120_000;
   return Math.max(10_000, Math.min(Math.round(configured), 240_000));
@@ -152,6 +159,7 @@ async function post(
   url: string,
   apiKey: string,
   body: Record<string, unknown>,
+  timeoutMs?: number,
 ): Promise<HttpResult> {
   const requestId = randomUUID();
   const response = await fetch(url, {
@@ -163,26 +171,13 @@ async function post(
     },
     body: JSON.stringify(body),
     cache: "no-store",
-    signal: AbortSignal.timeout(requestTimeoutMs()),
+    signal: AbortSignal.timeout(requestTimeoutMs(timeoutMs)),
   });
   return {
     response,
     payload: await response.json().catch(() => null),
     requestId,
   };
-}
-
-function reportRejection(model: string, result: HttpResult): void {
-  const diagnostics = getOpenAIApiDiagnostics(result.payload);
-  console.error("OpenAI structured request rejected.", {
-    model,
-    status: result.response.status,
-    requestId: result.response.headers.get("x-request-id") ?? result.requestId,
-    messages: diagnostics.messages.slice(0, 3),
-    types: diagnostics.types.slice(0, 3),
-    codes: diagnostics.codes.slice(0, 3),
-    params: diagnostics.params.slice(0, 3),
-  });
 }
 
 async function callModel(
@@ -193,7 +188,13 @@ async function callModel(
   reasoningEffort: OpenAIReasoningEffort,
   strictSchema: boolean,
   exactSchemaName: boolean,
-): Promise<{ value: unknown; rawOutput: string; usage: OpenAIUsage }> {
+  timeoutMs?: number,
+): Promise<{
+  value: unknown;
+  rawOutput: string;
+  usage: OpenAIUsage;
+  providerRequestId: string;
+}> {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) throw new Error("OPENAI_API_KEY is not configured.");
 
@@ -213,27 +214,43 @@ async function callModel(
       strictSchema,
       exactSchemaName,
     }),
+    timeoutMs,
   );
   if (!result.response.ok) {
-    reportRejection(model, result);
-    throw createOpenAIApiError(model, result.response.status, result.payload);
+    throw createOpenAIApiError(
+      model,
+      result.response.status,
+      result.payload,
+      result.response.headers.get("x-request-id") ?? result.requestId,
+    );
   }
+  const providerRequestId = result.response.headers.get("x-request-id") ?? result.requestId;
 
   const refusal = responseRefusal(result.payload);
   if (refusal) {
-    throw new Error(`${model} refused the structured request: ${refusal}`);
+    throw responseError(`${model} refused the structured request: ${refusal}`, providerRequestId);
   }
   const output = responseOutputText(result.payload);
   if (!output) {
     const status = isRecord(result.payload) && typeof result.payload.status === "string"
       ? ` (${result.payload.status})`
       : "";
-    throw new Error(`${model} did not return structured output${status}.`);
+    throw responseError(`${model} did not return structured output${status}.`, providerRequestId);
+  }
+  let value: unknown;
+  try {
+    value = parseStructuredText(model, output);
+  } catch (error) {
+    throw Object.assign(
+      error instanceof Error ? error : new Error(String(error)),
+      { providerRequestId },
+    );
   }
   return {
-    value: parseStructuredText(model, output),
+    value,
     rawOutput: output,
     usage: responseUsage(result.payload),
+    providerRequestId,
   };
 }
 
@@ -290,6 +307,7 @@ async function call(
   effort: OpenAIReasoningEffort,
   strictSchema: boolean,
   exactSchemaName: boolean,
+  timeoutMs?: number,
 ): Promise<ModelCallResult> {
   try {
     const result = await callModel(
@@ -300,6 +318,7 @@ async function call(
       effort,
       strictSchema,
       exactSchemaName,
+      timeoutMs,
     );
     return { ...result, model: preferredModel };
   } catch (primaryError) {
@@ -315,6 +334,7 @@ async function call(
       effort,
       strictSchema,
       exactSchemaName,
+      timeoutMs,
     );
     return { ...result, model: FALLBACK_MODEL };
   }
@@ -339,6 +359,7 @@ function logCompleted(input: {
     cachedInputTokens: input.result.usage.cachedInputTokens,
     outputTokens: input.result.usage.outputTokens,
     totalTokens: input.result.usage.totalTokens,
+    providerRequestId: input.result.providerRequestId,
     ...(input.initialIssueCount === undefined
       ? {}
       : { initialIssueCount: input.initialIssueCount }),
@@ -354,6 +375,12 @@ async function traceFailure(input: {
   error: unknown;
   metadata?: Record<string, unknown>;
 }): Promise<void> {
+  const details = isRecord(input.error) ? input.error : {};
+  const providerRequestId = input.error instanceof OpenAIApiError
+    ? input.error.providerRequestId
+    : typeof details.providerRequestId === "string"
+      ? details.providerRequestId
+      : null;
   await saveGenerationTrace({
     trace: input.trace,
     name: input.name,
@@ -362,7 +389,13 @@ async function traceFailure(input: {
     model: input.model,
     prompt: input.prompt,
     issues: [input.error instanceof Error ? input.error.message : String(input.error)],
-    metadata: input.metadata,
+    metadata: {
+      ...(input.metadata ?? {}),
+      errorClassification: input.error instanceof OpenAIApiError && input.error.allowFallback
+        ? "transient"
+        : "content_or_configuration",
+      providerRequestId,
+    },
   });
 }
 
@@ -382,6 +415,7 @@ export async function generateStructured<T>(
       effort,
       input.strictSchema === true,
       input.exactSchemaName === true,
+      input.timeoutMs,
     );
   } catch (error) {
     await traceFailure({
@@ -391,7 +425,7 @@ export async function generateStructured<T>(
       model: preferredModel,
       prompt: input.prompt,
       error,
-      metadata: { reasoningEffort: effort },
+      metadata: { reasoningEffort: effort, durationMs: Date.now() - startedAt },
     });
     throw error;
   }
@@ -411,6 +445,7 @@ export async function generateStructured<T>(
       reasoningEffort: effort,
       durationMs: Date.now() - startedAt,
       usage: first.usage,
+      providerRequestId: first.providerRequestId,
     },
   });
 
@@ -430,6 +465,7 @@ export async function generateStructured<T>(
       issues: [],
       durationMs,
       attempts: 1,
+      providerRequestId: first.providerRequestId,
     };
   }
 
@@ -452,6 +488,7 @@ export async function generateStructured<T>(
       effort,
       input.strictSchema === true,
       input.exactSchemaName === true,
+      input.timeoutMs,
     );
   } catch (error) {
     await traceFailure({
@@ -465,6 +502,7 @@ export async function generateStructured<T>(
         reasoningEffort: effort,
         initialIssues: issues,
         previousResponse: first.value,
+        durationMs: Date.now() - startedAt,
       },
     });
     throw error;
@@ -485,14 +523,16 @@ export async function generateStructured<T>(
       reasoningEffort: effort,
       durationMs: Date.now() - startedAt,
       usage: repaired.usage,
+      providerRequestId: repaired.providerRequestId,
       initialIssues: issues,
       previousResponse: first.value,
     },
   });
 
   if (repairedIssues.length > 0) {
-    throw new Error(
+    throw responseError(
       `${input.name} validation failed: ${repairedIssues.join(" ")}`,
+      repaired.providerRequestId,
     );
   }
   const durationMs = Date.now() - startedAt;
@@ -511,5 +551,6 @@ export async function generateStructured<T>(
     issues,
     durationMs,
     attempts: 2,
+    providerRequestId: repaired.providerRequestId,
   };
 }

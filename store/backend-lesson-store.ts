@@ -2,88 +2,91 @@
 
 import { create } from "zustand";
 import { getBackendMode } from "@/lib/supabase/config";
-import { lessonRepository } from "@/lib/repositories/lesson-repository";
+import {
+  forgetCachedLessons,
+  lessonRepository,
+} from "@/lib/repositories/lesson-repository";
 import { mapCanonicalLesson } from "@/lib/repositories/lesson-mapper-v3";
 import type { LessonPackage } from "@/types/lesson";
 
+export type BackendLessonStatus =
+  | "idle"
+  | "loading"
+  | "ready"
+  | "error"
+  | "exhausted";
+
 interface BackendLessonState {
+  ownerUserId: string | null;
   lessons: LessonPackage[];
+  status: BackendLessonStatus;
   loading: boolean;
-  assigning: boolean;
   loaded: boolean;
   error: string;
-  load: () => Promise<void>;
-  assignNew: (excludedLessonId: string) => Promise<LessonPackage | undefined>;
+  scopeTo: (userId: string) => void;
+  reset: () => void;
+  load: (userId?: string) => Promise<void>;
   loadOne: (id: string) => Promise<LessonPackage | undefined>;
 }
 
-export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
-  lessons: [],
+const emptyState = {
+  ownerUserId: null,
+  lessons: [] as LessonPackage[],
+  status: "idle" as const,
   loading: false,
-  assigning: false,
   loaded: false,
   error: "",
-  load: async () => {
-    if (getBackendMode() !== "supabase" || get().loading || get().loaded) return;
-    set({ loading: true, error: "" });
-    const result = await lessonRepository.assignNext();
-    if (!result.ok) {
-      set({ loading: false, loaded: true, error: result.error.message });
-      return;
-    }
-    const lessons = result.data
-      ? [mapCanonicalLesson(result.data.lesson)]
-      : [];
+};
+
+export const useBackendLessonStore = create<BackendLessonState>((set, get) => ({
+  ...emptyState,
+  scopeTo: (userId) => {
+    if (!userId) return;
+    const current = get();
+    if (current.ownerUserId === userId) return;
+    // A playable payload carries who it was loaded for -- their plan decides
+    // whether Listening and Speaking are in it, and their kanji history is
+    // baked in. It must not outlive the account that fetched it.
+    forgetCachedLessons();
     set({
-      lessons,
+      ownerUserId: userId,
+      lessons: [],
+      status: "idle",
       loading: false,
-      loaded: true,
-      error: result.data
-        ? ""
-        : "You have completed every available lesson at this level.",
+      loaded: false,
+      error: "",
     });
   },
-  assignNew: async (excludedLessonId) => {
-    if (getBackendMode() !== "supabase" || get().assigning) return undefined;
-    set({ assigning: true, error: "" });
-    const result = await lessonRepository.assignNext();
-    if (!result.ok || !result.data) {
-      set({
-        assigning: false,
-        error: result.ok
-          ? "No other lesson is ready at this level yet."
-          : result.error.message,
-      });
-      return undefined;
-    }
-    const lesson = mapCanonicalLesson(result.data.lesson);
-    if (lesson.id === excludedLessonId) {
-      set({
-        assigning: false,
-        error:
-          "No other lesson is ready at this level yet. Your paused lesson is still safe.",
-      });
-      return undefined;
-    }
-    set((state) => ({
-      lessons: [
-        ...state.lessons.filter((item) => item.id !== lesson.id),
-        lesson,
-      ],
-      assigning: false,
+  reset: () => {
+    forgetCachedLessons();
+    set(emptyState);
+  },
+  // The custom-topic product no longer auto-assigns a published lesson. Keep
+  // this legacy store method inert for callers that still revalidate the store;
+  // specific created/resumable lessons are loaded through loadOne().
+  load: async (userId) => {
+    if (getBackendMode() !== "supabase") return;
+    if (userId) get().scopeTo(userId);
+    if (!get().ownerUserId) return;
+    set({
+      lessons: [],
+      loading: false,
+      loaded: true,
+      status: "exhausted",
       error: "",
-    }));
-    return lesson;
+    });
   },
   loadOne: async (id) => {
+    const ownerUserId = get().ownerUserId;
+    if (!ownerUserId) return undefined;
+
     const existing = get().lessons.find((lesson) => lesson.id === id);
     if (existing) return existing;
-    const result = await lessonRepository.assignNext();
-    if (!result.ok || !result.data) return undefined;
-    const lesson = mapCanonicalLesson(result.data.lesson);
-    if (lesson.id !== id && result.data.assignment.lessonId !== id) {
-      return undefined;
-    }
+
+    const result = await lessonRepository.getPlayable(id);
+    if (!result.ok || get().ownerUserId !== ownerUserId) return undefined;
+
+    const lesson = mapCanonicalLesson(result.data);
     set((state) => ({
       lessons: [
         ...state.lessons.filter((item) => item.id !== lesson.id),

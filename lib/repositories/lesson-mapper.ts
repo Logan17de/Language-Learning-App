@@ -6,6 +6,7 @@ import type {
   StoryWord,
   VocabularyQuestion,
 } from "@/types/lesson";
+import { questionAllowsTappableWords } from "@/lib/lesson-question-inspection";
 import type { Json } from "@/types/database";
 import { normalizeLessonPhases } from "@/lib/lesson-contract";
 
@@ -138,6 +139,7 @@ function practiceQuestions(
         explanation: item.explanation,
         targetItemIds: item.target_item_ids,
         inspectableTerms: inspectableTerms(item.inspectable_terms),
+        tappableWords: questionAllowsTappableWords(item.cue),
       };
     });
   const grammar = value
@@ -166,6 +168,7 @@ function practiceQuestions(
       hintBack: item.hint_back,
       targetItemIds: item.target_item_ids,
       inspectableTerms: inspectableTerms(item.inspectable_terms),
+      tappableWords: questionAllowsTappableWords(item.cue),
     }));
   return { vocabulary, grammar };
 }
@@ -203,7 +206,7 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
   const practice = practiceQuestions(value.practice);
   const kanji = metadataKanji(value.version.metadata);
 
-  const result: LessonPackage = {
+  return {
     id: lesson.legacy_id ?? lesson.id,
     title: metadataText(value.version.metadata, "title") ?? lesson.title,
     japaneseTitle:
@@ -237,11 +240,8 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
     grammar,
     kanji,
     vocabulary,
-    // A missing practice region is malformed lesson data. Do not manufacture
-    // learner-facing questions or distractors in the mapper.
     vocabularyQuestions: practice.vocabulary,
     grammarQuestions: practice.grammar,
-    reviewItems: value.version.review_items,
     story: value.story.map((item) => {
       const words = value.storyWords
         .filter((word) => word.story_line_id === item.id)
@@ -287,6 +287,10 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
       id: item.id,
       difficulty: item.difficulty,
       question: item.question,
+      choices:
+        "choices" in item && Array.isArray(item.choices)
+          ? item.choices.filter((choice): choice is string => typeof choice === "string")
+          : undefined,
       answer: item.answer,
     })),
     listeningExercises: value.listening.map((item, index) => {
@@ -343,34 +347,10 @@ export function mapCanonicalLesson(value: CanonicalLesson): LessonPackage {
       targetItemIds: item.target_item_ids,
       inspectableTerms: inspectableTerms(item.inspectable_terms),
     })),
-    reviewQuestions: value.review.map((item) => ({
-      id: item.id,
-      prompt: item.prompt,
-      choices: item.choices,
-      correctAnswer: item.correct_answer,
-      explanation: item.explanation,
-      questionType:
-        item.question_type === "ordering" ||
-        item.question_type === "fill-blank" ||
-        item.question_type === "true-false"
-          ? item.question_type
-          : "multiple-choice",
-      category:
-        item.category === "kanji" ||
-        item.category === "vocabulary" ||
-        item.category === "grammar" ||
-        item.category === "listening" ||
-        item.category === "speaking"
-          ? item.category
-          : "vocabulary",
-      targetItemIds: item.target_item_ids,
-    })),
-    answerKeys: value.version.answer_keys,
     phases: normalizeLessonPhases(value.version.phases),
     runtimeAudio:
       metadataText(value.version.metadata, "runtimeAudio") === "browser_tts"
         ? "browser_tts"
         : "stored_or_api",
   };
-  return result;
 }

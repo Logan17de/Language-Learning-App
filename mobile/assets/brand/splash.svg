@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect x="76" y="76" width="360" height="360" rx="104" fill="#173C31"/>
+  <circle cx="256" cy="240" r="112" fill="#F6C8B4"/>
+  <text x="256" y="286" text-anchor="middle" font-family="Yu Gothic, Hiragino Sans, sans-serif" font-size="154" font-weight="800" fill="#173C31">愛</text>
+</svg>

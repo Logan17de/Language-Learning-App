@@ -2,7 +2,6 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { generateStructured } from "@/lib/gemini/structured-output";
-import { storeGeneratedVocabularyTerms } from "@/lib/gemini/generated-vocabulary-storage";
 import {
   readingPassagePrompt,
   readingPassageSchema,
@@ -12,12 +11,6 @@ import {
   type RawReadingQuestion,
   type RawReadingQuestions,
 } from "@/lib/gemini/reading-comprehension-contract";
-import {
-  simpleStoryEnrichmentSchema,
-  storyEnrichmentOutputIssues,
-  storyEnrichmentPrompt,
-  type SimpleStoryEnrichment,
-} from "@/lib/gemini/simple-story-enrichment-contract";
 import type {
   GenerationAuditEntry,
   InspectableTerm,
@@ -25,6 +18,7 @@ import type {
   StoryDraft,
 } from "@/lib/gemini/lesson-engine-v2";
 import type { JLPTLevel } from "@/types/lesson";
+import { partitionReadingPassage } from "@/lib/custom-lessons/reading-lines";
 
 export interface GeneratedReadingLine {
   speaker: string;
@@ -40,6 +34,10 @@ export interface GeneratedReadingRegion {
   lines: GeneratedReadingLine[];
   questions: RawReadingQuestion[];
   audit: GenerationAuditEntry;
+}
+
+function normalized(value: string): string {
+  return value.normalize("NFKC").trim().toLocaleLowerCase();
 }
 
 function readingPassageOutputIssues(value: unknown): string[] {
@@ -60,55 +58,52 @@ function readingQuestionIssues(value: unknown): string[] {
   if (!Array.isArray(questions) || questions.length !== 5) {
     return ["Reading response must contain exactly 5 questions."];
   }
+  const issues: string[] = [];
   const difficulties = questions.map((question) =>
     question && typeof question === "object" && !Array.isArray(question)
       ? (question as Record<string, unknown>).difficulty
       : null,
   );
-  const easy = difficulties.filter((value) => value === "easy").length;
-  const medium = difficulties.filter((value) => value === "medium").length;
-  const hard = difficulties.filter((value) => value === "hard").length;
-  return easy === 2 && medium === 2 && hard === 1
-    ? []
-    : ["Reading response must contain 2 easy, 2 medium, and 1 hard question."];
-}
-
-function sentences(value: string, japanese: boolean): string[] {
-  const matcher = japanese
-    ? /[^。！？!?]+[。！？!?]?/gu
-    : /[^.!?]+[.!?]?/gu;
-  return (value.match(matcher) ?? [value])
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function partitions(items: string[], count: number, separator = ""): string[] {
-  return Array.from({ length: count }, (_, index) => {
-    const start = Math.floor((index * items.length) / count);
-    const end = Math.floor(((index + 1) * items.length) / count);
-    return items.slice(start, end).join(separator);
+  const easy = difficulties.filter((item) => item === "easy").length;
+  const medium = difficulties.filter((item) => item === "medium").length;
+  const hard = difficulties.filter((item) => item === "hard").length;
+  if (easy !== 2 || medium !== 2 || hard !== 1) {
+    issues.push("Reading response must contain 2 easy, 2 medium, and 1 hard question.");
+  }
+  questions.forEach((question, index) => {
+    if (!question || typeof question !== "object" || Array.isArray(question)) {
+      issues.push(`Reading question ${index + 1} must be an object.`);
+      return;
+    }
+    const item = question as Record<string, unknown>;
+    const prompt = typeof item.question === "string" ? item.question.trim() : "";
+    const answer = typeof item.answer === "string" ? item.answer.trim() : "";
+    const choices = Array.isArray(item.choices)
+      ? item.choices.filter((choice): choice is string => typeof choice === "string" && choice.trim().length > 0)
+      : [];
+    if (!prompt) issues.push(`Reading question ${index + 1} requires a question.`);
+    if (choices.length !== 4 || new Set(choices.map(normalized)).size !== 4) {
+      issues.push(`Reading question ${index + 1} must contain four distinct choices.`);
+    }
+    if (!answer || !choices.map(normalized).includes(normalized(answer))) {
+      issues.push(`Reading question ${index + 1} answer must occur in its choices.`);
+    }
   });
+  return issues;
 }
 
-function readingLines(
-  passage: RawReadingPassage,
-  terms: InspectableTerm[],
-): GeneratedReadingLine[] {
-  const japaneseSentences = sentences(passage.japanese_story, true);
-  const englishSentences = sentences(passage.english_translation, false);
-  const count = Math.min(6, Math.max(4, japaneseSentences.length));
-  const japaneseParts = partitions(japaneseSentences, count);
-  const englishParts = partitions(englishSentences, count, " ");
-  return japaneseParts.map((japanese, index) => {
-    const lineTerms = terms.filter((term) => japanese.includes(term.surface));
-    return {
-      speaker: "Reading",
-      japanese,
-      english: englishParts[index] ?? "",
-      targetItemIds: [...new Set(lineTerms.map((term) => term.libraryId))].slice(0, 5),
-      inspectableTerms: lineTerms,
-    };
-  });
+function readingLines(passage: RawReadingPassage): GeneratedReadingLine[] {
+  return partitionReadingPassage({
+    japanese: passage.japanese_story,
+    english: passage.english_translation,
+    maximumLines: 6,
+  }).map(({ japanese, english }) => ({
+    speaker: "Reading",
+    japanese,
+    english,
+    targetItemIds: [],
+    inspectableTerms: [],
+  }));
 }
 
 export async function generateReadingRegion(input: {
@@ -125,7 +120,6 @@ export async function generateReadingRegion(input: {
     prompt: readingPassagePrompt({
       languageLevel: `JLPT ${input.level}`,
       topic: input.topic,
-      naturalInterests: context?.interests ?? input.draft.tags,
       targetGrammar: context?.targetGrammar ?? input.library.grammar.map((item) => item.pattern),
       targetKanji: context?.targetKanji ?? input.library.kanji.slice(0, 5).map((item) => item.character),
     }),
@@ -134,24 +128,6 @@ export async function generateReadingRegion(input: {
     exactSchemaName: true,
     validate: readingPassageOutputIssues,
     trace: { requestId: input.requestId, stage: "reading_passage" },
-  });
-
-  const enrichment = await generateStructured<SimpleStoryEnrichment>({
-    name: "reading_vocabulary",
-    prompt: storyEnrichmentPrompt(passage.value.japanese_story),
-    schema: simpleStoryEnrichmentSchema,
-    strictSchema: true,
-    exactSchemaName: true,
-    validate: storyEnrichmentOutputIssues,
-    trace: { requestId: input.requestId, stage: "reading_enrichment" },
-  });
-  const terms = await storeGeneratedVocabularyTerms({
-    admin: input.admin,
-    requestId: input.requestId,
-    level: input.level,
-    vocabulary: enrichment.value.vocabulary,
-    model: enrichment.model,
-    library: input.library,
   });
 
   const questions = await generateStructured<RawReadingQuestions>({
@@ -170,12 +146,14 @@ export async function generateReadingRegion(input: {
   return {
     title: passage.value.english_title,
     japaneseTitle: passage.value.japanese_title,
-    lines: readingLines(passage.value, terms),
+    lines: readingLines(passage.value),
     questions: questions.value.questions,
     audit: {
       stage: "grammar_reading_activities",
-      model: [...new Set([passage.model, enrichment.model, questions.model])].join(", "),
-      repaired: passage.repaired || enrichment.repaired || questions.repaired,
+      model: passage.model === questions.model
+        ? passage.model
+        : `${passage.model}, ${questions.model}`,
+      repaired: passage.repaired || questions.repaired,
     },
   };
 }

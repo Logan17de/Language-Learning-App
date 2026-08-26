@@ -7,8 +7,8 @@ export type ServerAuthorization =
   | { ok: true; userId: string; role: AppRole }
   | { ok: false; status: 401 | 403; message: string };
 
-export async function authorize(permission?: Permission): Promise<ServerAuthorization> {
-  const client = await createClient();
+export async function authorize(permission?: Permission, request?: Request): Promise<ServerAuthorization> {
+  const client = await createClient(request);
   if (!client) {
     return { ok: false, status: 401, message: "Backend is not configured." };
   }

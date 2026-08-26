@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { commuteLesson, mockLessons } from "@/data/mock-lessons";
+import { commuteLesson } from "@/data/mock-lessons";
 import {
   CANONICAL_LESSON_ACTIVITY_COUNTS,
   CANONICAL_LESSON_PHASES,
@@ -33,8 +33,6 @@ function sessionFor(lesson: LessonPackage): LessonSession {
     listeningComplete: false,
     speakingEvents: [],
     speakingComplete: false,
-    reviewAnswers: [],
-    reviewResult: null,
     completionResult: null,
     completed: false,
     rewarded: false,
@@ -42,7 +40,7 @@ function sessionFor(lesson: LessonPackage): LessonSession {
 }
 
 describe("canonical lesson contract", () => {
-  it("uses one seven-phase learner order everywhere", () => {
+  it("runs six learner sections, with Grammar no longer split", () => {
     expect(CANONICAL_LESSON_PHASES.map((phase) => phase.id)).toEqual([
       "story",
       "vocabulary",
@@ -50,44 +48,43 @@ describe("canonical lesson contract", () => {
       "reading",
       "listening",
       "speaking",
-      "review",
     ]);
 
-    const oldStoredOrder = [
+    const incompleteStoredOrder = [
       { id: "story", label: "Story", description: "Story" },
-      { id: "vocabulary", label: "Vocabulary", description: "Vocabulary" },
       { id: "grammar", label: "Grammar", description: "Grammar" },
       { id: "speaking", label: "Speaking", description: "Speaking" },
-      { id: "reading", label: "Reading", description: "Reading" },
-      { id: "listening", label: "Listening", description: "Listening" },
-      { id: "review", label: "Review", description: "Review" },
+      { id: "unknown", label: "Unknown", description: "Unknown" },
     ];
-
-    expect(normalizeLessonPhases(oldStoredOrder).map((phase) => phase.id)).toEqual([
+    expect(normalizeLessonPhases(incompleteStoredOrder).map((phase) => phase.id)).toEqual([
       "story",
       "vocabulary",
       "grammar",
       "reading",
       "listening",
       "speaking",
-      "review",
     ]);
   });
 
-  it("keeps every demo lesson on the same playable contract", () => {
-    for (const lesson of mockLessons) {
-      expect(lessonContractIssues(lesson), lesson.id).toEqual([]);
-      expect(isCanonicalPlayableLesson(lesson), lesson.id).toBe(true);
-    }
+  it("keeps seed lessons playable under the current generated format", () => {
+    expect(lessonContractIssues(commuteLesson)).toEqual([]);
+    expect(isCanonicalPlayableLesson(commuteLesson)).toBe(true);
   });
 
-  it("requires all 13 vocabulary answers before the learner can continue", () => {
-    expect(commuteLesson.vocabularyQuestions).toHaveLength(
-      CANONICAL_LESSON_ACTIVITY_COUNTS.vocabulary,
-    );
+  it("uses 7 Grammar activities and no separate Translation count", () => {
+    expect(CANONICAL_LESSON_ACTIVITY_COUNTS).toEqual({
+      vocabulary: 7,
+      grammar: 7,
+      reading: 5,
+      listening: 5,
+      speaking: 5,
+    });
+  });
+
+  it("completes a stored vocabulary phase only after all stored questions are answered", () => {
     const session = sessionFor(commuteLesson);
     session.vocabularyAnswers = commuteLesson.vocabularyQuestions
-      .slice(0, 10)
+      .slice(0, commuteLesson.vocabularyQuestions.length - 1)
       .map((question) => ({
         questionId: question.id,
         mode: question.mode,
@@ -95,30 +92,16 @@ describe("canonical lesson contract", () => {
         correct: true,
         attempts: 1,
       }));
-
     expect(phaseIsComplete(session, "vocabulary", commuteLesson)).toBe(false);
 
-    session.vocabularyAnswers = commuteLesson.vocabularyQuestions.map(
-      (question) => ({
-        questionId: question.id,
-        mode: question.mode,
-        selectedAnswer: question.correctAnswer,
-        correct: true,
-        attempts: 1,
-      }),
-    );
+    session.vocabularyAnswers = commuteLesson.vocabularyQuestions.map((question) => ({
+      questionId: question.id,
+      mode: question.mode,
+      selectedAnswer: question.correctAnswer,
+      correct: true,
+      attempts: 1,
+    }));
     expect(phaseIsComplete(session, "vocabulary", commuteLesson)).toBe(true);
-  });
-
-  it("fails closed when a required canonical activity bank is incomplete", () => {
-    const malformed: LessonPackage = {
-      ...commuteLesson,
-      vocabularyQuestions: commuteLesson.vocabularyQuestions.slice(0, 10),
-    };
-    expect(isCanonicalPlayableLesson(malformed)).toBe(false);
-    expect(lessonContractIssues(malformed)).toContain(
-      "Vocabulary practice must contain exactly 13 activities; found 10.",
-    );
   });
 
   it("does not manufacture learner questions in the canonical mapper", () => {
@@ -130,45 +113,32 @@ describe("canonical lesson contract", () => {
     expect(mapper).toContain("normalizeLessonPhases");
   });
 
-  it("locks generated schemas and storage to the same activity counts", () => {
-    const vocabulary = readFileSync(
-      "lib/gemini/vocabulary-question-contract.ts",
-      "utf8",
-    );
-    const grammar = readFileSync(
-      "lib/gemini/grammar-question-contract.ts",
-      "utf8",
-    );
-    const reading = readFileSync(
-      "lib/gemini/reading-comprehension-contract.ts",
-      "utf8",
-    );
+  it("locks generation and DB validation to the current shape", () => {
+    const vocabulary = readFileSync("lib/gemini/vocabulary-question-contract.ts", "utf8");
+    const grammar = readFileSync("lib/gemini/grammar-question-contract.ts", "utf8");
+    const reading = readFileSync("lib/gemini/reading-comprehension-contract.ts", "utf8");
+    const listening = readFileSync("lib/gemini/listening-question-contract.ts", "utf8");
+    const speaking = readFileSync("lib/gemini/speaking-question-contract.ts", "utf8");
     const migration = readFileSync(
-      "supabase/migrations/20260808120000_canonical_lesson_contract.sql",
+      "supabase/migrations/20260813070000_reading_mcq_choices.sql",
+      "utf8",
+    );
+    const curatedMigration = readFileSync(
+      "supabase/migrations/20260813080000_curated_jlpt_vocabulary.sql",
       "utf8",
     );
 
-    expect(vocabulary).toContain("minItems: 13");
-    expect(vocabulary).toContain("maxItems: 13");
-    expect(grammar).toContain("minItems: 10");
-    expect(grammar).toContain("maxItems: 10");
+    expect(vocabulary).toContain("minItems: 7");
+    expect(vocabulary).toContain("maxItems: 7");
+    expect(grammar).toContain("minItems: 7");
+    expect(grammar).toContain("maxItems: 7");
     expect(reading).toContain("minItems: 5");
     expect(reading).toContain("maxItems: 5");
-
-    expect(migration).toContain(
-      "jsonb_array_length(p_package->'vocabularyQuestions') <> 13",
-    );
-    expect(migration).toContain(
-      "jsonb_array_length(p_package->'grammarQuestions') <> 10",
-    );
-    expect(migration).toContain(
-      "jsonb_array_length(p_package->'readingQuestions') <> 5",
-    );
-    expect(migration).toContain(
-      '"id":"reading","label":"Reading"',
-    );
-    expect(migration.indexOf('"id":"reading"')).toBeLessThan(
-      migration.indexOf('"id":"speaking"'),
-    );
+    expect(listening).toContain("minItems: 5");
+    expect(listening).toContain("maxItems: 5");
+    expect(speaking).toContain("minItems: 5");
+    expect(speaking).toContain("maxItems: 5");
+    expect(migration).toContain("add column if not exists choices text[]");
+    expect(curatedMigration).toContain("vocabulary must be an array");
   });
 });

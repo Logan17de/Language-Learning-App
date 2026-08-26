@@ -7,8 +7,10 @@ export type BillingPeriod = "monthly" | "annual";
 export interface UserSubscription {
   plan: SubscriptionPlan;
   billingPeriod: BillingPeriod;
-  status: "active" | "cancelled";
+  status: "active" | "trial" | "cancelled" | "past_due";
   renewsAt?: string;
+  billingProvider?: "manual" | "dodo";
+  cancelAtPeriodEnd?: boolean;
 }
 
 export type ThemePreference = "light" | "dark" | "system";
@@ -19,18 +21,6 @@ export interface UserSettings {
   preferredFocus: LessonFocus;
   readingDifficulty: "guided" | "balanced" | "independent";
   speakingDifficulty: "easy" | "medium" | "hard";
-  audioVolume: number;
-  autoplay: boolean;
-  playbackSpeed: 0.75 | 1 | 1.25;
-  showTranscript: boolean;
-  microphonePermission: "not-asked" | "allowed" | "denied";
-  readingHighlights: boolean;
-  pronunciationFeedback: boolean;
-  dailyReminder: boolean;
-  reviewReminder: boolean;
-  streakReminder: boolean;
-  weeklyReport: boolean;
-  customLessonReady: boolean;
   theme: ThemePreference;
 }
 
@@ -39,7 +29,6 @@ export interface ProfileEdits {
   level: LearnerLevel;
   goal: LearningGoal;
   dailyMinutes: 15 | 30 | 45 | 60;
-  interests: string[];
 }
 
 export interface CustomLessonRequest {

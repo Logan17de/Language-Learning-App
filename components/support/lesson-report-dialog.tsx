@@ -6,20 +6,21 @@ import { usePathname } from "next/navigation";
 import type { LessonReport } from "@/types/app-preferences";
 import { useAppStore } from "@/store/app-store";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { reportRepository } from "@/lib/repositories/report-repository";
 import { getBackendMode } from "@/lib/supabase/config";
 
-const categories: LessonReport["category"][] = [
-  "incorrect translation",
-  "incorrect reading",
-  "grammar explanation issue",
-  "wrong answer key",
-  "audio issue",
-  "image issue",
-  "inappropriate content",
-  "lesson too difficult",
-  "technical issue",
-  "other",
+const categories: Array<{ value: LessonReport["category"]; label: string }> = [
+  { value: "incorrect translation", label: "incorrect English meaning" },
+  { value: "incorrect reading", label: "incorrect reading" },
+  { value: "grammar explanation issue", label: "grammar explanation issue" },
+  { value: "wrong answer key", label: "wrong answer key" },
+  { value: "audio issue", label: "audio issue" },
+  { value: "image issue", label: "image issue" },
+  { value: "inappropriate content", label: "inappropriate content" },
+  { value: "lesson too difficult", label: "lesson too difficult" },
+  { value: "technical issue", label: "technical issue" },
+  { value: "other", label: "other" },
 ];
 
 export function LessonReportDialog({
@@ -90,7 +91,7 @@ export function LessonReportDialog({
             ) : (
               <form className="mt-6 space-y-5" onSubmit={submit}>
                 <div className="rounded-2xl bg-moss-50 p-4 text-xs leading-5 text-moss-900"><strong>{lessonTitle}</strong><br />{lessonId}{phase ? ` · ${phase}` : ""}{activityId ? ` · ${activityId}` : ""}<br /><span className="opacity-60">{pathname}</span></div>
-                <label className="block"><span className="mb-2 block text-sm font-semibold">Issue category</span><select value={category} onChange={(event) => setCategory(event.target.value as LessonReport["category"])} className="form-input capitalize">{categories.map((item) => <option key={item}>{item}</option>)}</select></label>
+                <label className="block"><span className="mb-2 block text-sm font-semibold">Issue category</span><Select value={category} onChange={(event) => setCategory(event.target.value as LessonReport["category"])} className="capitalize">{categories.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</Select></label>
                 <label className="block"><span className="mb-2 block text-sm font-semibold">What seems wrong?</span><textarea required minLength={8} value={details} onChange={(event) => setDetails(event.target.value)} className="form-input min-h-32 resize-none py-3" placeholder="Describe what you expected and what you saw." /></label>
                 {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
                 <Button type="submit" disabled={loading} className="w-full"><Flag className="size-4" /> {loading ? "Submitting…" : "Save report"}</Button>

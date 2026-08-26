@@ -77,20 +77,42 @@ export function segmentStoredStoryLine(
   japanese: string,
   words: StoryWord[],
 ): StoredStorySegment[] {
-  const ordered = [...words].sort(
+  const uniqueWords = new Map<string, StoryWord>();
+  for (const word of [...words].sort(
     (left, right) => left.position - right.position,
+  )) {
+    if (word.surface && !uniqueWords.has(word.surface)) {
+      uniqueWords.set(word.surface, word);
+    }
+  }
+  const candidates = [...uniqueWords.values()].sort(
+    (left, right) => right.surface.length - left.surface.length,
   );
+  if (candidates.length === 0) return [{ text: japanese }];
+
   const segments: StoredStorySegment[] = [];
   let cursor = 0;
 
-  for (const word of ordered) {
-    const index = japanese.indexOf(word.surface, cursor);
-    if (index < 0) continue;
-    if (index > cursor) {
-      segments.push({ text: japanese.slice(cursor, index) });
+  while (cursor < japanese.length) {
+    let match: { index: number; word: StoryWord } | null = null;
+    for (const word of candidates) {
+      const index = japanese.indexOf(word.surface, cursor);
+      if (index < 0) continue;
+      if (
+        match === null ||
+        index < match.index ||
+        (index === match.index && word.surface.length > match.word.surface.length)
+      ) {
+        match = { index, word };
+      }
     }
-    segments.push({ text: word.surface, word });
-    cursor = index + word.surface.length;
+
+    if (match === null) break;
+    if (match.index > cursor) {
+      segments.push({ text: japanese.slice(cursor, match.index) });
+    }
+    segments.push({ text: match.word.surface, word: match.word });
+    cursor = match.index + match.word.surface.length;
   }
 
   if (cursor < japanese.length) {
