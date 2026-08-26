@@ -81,7 +81,6 @@ function persistedCompletionResult(
     score: Math.max(0, Math.min(100, Math.round(value.score))),
     xpGained: Math.max(0, Math.round(value.xp_awarded)),
     durationMinutes: Math.max(1, Math.round(value.duration_minutes)),
-    weakItems: [],
     completedAt: value.completed_at,
   };
 }

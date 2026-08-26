@@ -36,7 +36,7 @@ import type {
   OnboardingPreferences,
   UserProfile,
 } from "@/types/learner";
-import type { LearnerProgress, RecentLesson } from "@/types/progress";
+import type { LearnerProgress } from "@/types/progress";
 
 interface AppState {
   hasHydrated: boolean;
@@ -83,14 +83,12 @@ interface AppState {
   addCustomLessonRequest: (request: CustomLessonRequest) => void;
   addSupportRequest: (request: SupportRequest) => void;
   addLessonReport: (report: LessonReport) => void;
-  saveLessonProgress: (lessonId: string, percent: number) => void;
   startOrResumeLesson: (lessonId: string) => LessonSession;
   saveLessonSession: (session: LessonSession) => void;
   rewardLessonCompletion: (
     lesson: LessonPackage,
     result: LessonCompletionResult,
   ) => boolean;
-  completeLesson: (lesson: RecentLesson) => void;
   resetLessonSession: (lessonId: string) => void;
   keepOnlyLessonSession: (lessonId: string) => void;
   resetProgress: () => void;
@@ -397,15 +395,7 @@ export const useAppStore = create<AppState>()(
             learnedVocabularyCount: snapshot.learnedVocabularyCount,
             learnedKanjiCount: snapshot.learnedKanjiCount,
             learnedGrammarCount: snapshot.learnedGrammarCount,
-            weeklyActivity: snapshot.weeklyActivity,
-            weakKanji: snapshot.weakKanji,
-            weakVocabulary: snapshot.weakVocabulary,
-            grammarToReview: snapshot.grammarToReview,
-            recentLessons: snapshot.recentLessons,
             completedLessonIds: snapshot.completedLessonIds,
-            longestStreak: snapshot.longestStreak,
-            totalStudyMinutes: snapshot.totalStudyMinutes,
-            achievements: snapshot.achievements,
           },
         })),
       signOut: () =>
@@ -512,16 +502,6 @@ export const useAppStore = create<AppState>()(
         })),
       addLessonReport: (report) =>
         set((state) => ({ lessonReports: [report, ...state.lessonReports] })),
-      saveLessonProgress: (lessonId, percent) =>
-        set((state) => ({
-          progress: {
-            ...state.progress,
-            lessonProgress: {
-              ...state.progress.lessonProgress,
-              [lessonId]: percent,
-            },
-          },
-        })),
       startOrResumeLesson: (lessonId) => {
         const existing = get().lessonSessions[lessonId];
         if (existing) {
@@ -537,13 +517,6 @@ export const useAppStore = create<AppState>()(
         const session = createEmptyLessonSession(lessonId);
         set((state) => ({
           lessonSessions: { ...state.lessonSessions, [lessonId]: session },
-          progress: {
-            ...state.progress,
-            lessonProgress: {
-              ...state.progress.lessonProgress,
-              [lessonId]: 1,
-            },
-          },
         }));
         return session;
       },
@@ -557,22 +530,6 @@ export const useAppStore = create<AppState>()(
               updatedAt: new Date().toISOString(),
             },
           },
-          progress: {
-            ...state.progress,
-            lessonProgress: {
-              ...state.progress.lessonProgress,
-              [session.lessonId]: session.completed
-                ? 100
-                : Math.max(
-                    1,
-                    Math.round(
-                      (session.currentPhaseIndex /
-                        CANONICAL_LESSON_PHASES.length) *
-                        100,
-                    ),
-                  ),
-            },
-          },
         }));
       },
       rewardLessonCompletion: (lesson, result) => {
@@ -582,13 +539,6 @@ export const useAppStore = create<AppState>()(
         set((state) => {
           const currentSession = state.lessonSessions[lesson.id];
           if (!currentSession || currentSession.rewarded) return state;
-          const recentLesson: RecentLesson = {
-            lessonId: lesson.id,
-            title: lesson.title,
-            completedAt: "Just now",
-            score: result.score,
-            durationMinutes: result.durationMinutes,
-          };
           return {
             user: serverOwnsRewards
               ? state.user
@@ -604,29 +554,6 @@ export const useAppStore = create<AppState>()(
               completedLessonIds: [
                 ...new Set([...state.progress.completedLessonIds, lesson.id]),
               ],
-              recentLessons: [
-                recentLesson,
-                ...state.progress.recentLessons.filter(
-                  (item) => item.lessonId !== lesson.id,
-                ),
-              ],
-              lessonProgress: {
-                ...state.progress.lessonProgress,
-                [lesson.id]: 100,
-              },
-              weeklyActivity: serverOwnsRewards
-                ? state.progress.weeklyActivity
-                : addMinutesToToday(
-                    state.progress.weeklyActivity,
-                    result.durationMinutes,
-                  ),
-              totalStudyMinutes: serverOwnsRewards
-                ? state.progress.totalStudyMinutes
-                : state.progress.totalStudyMinutes + result.durationMinutes,
-              weakVocabulary: mergeWeakVocabulary(
-                state.progress.weakVocabulary,
-                result.weakItems,
-              ),
             },
             lessonSessions: {
               ...state.lessonSessions,
@@ -642,28 +569,6 @@ export const useAppStore = create<AppState>()(
         });
         return true;
       },
-      completeLesson: (lesson) =>
-        set((state) => ({
-          progress: {
-            ...state.progress,
-            completedLessonIds: [
-              ...new Set([
-                ...state.progress.completedLessonIds,
-                lesson.lessonId,
-              ]),
-            ],
-            recentLessons: [
-              lesson,
-              ...state.progress.recentLessons.filter(
-                (item) => item.lessonId !== lesson.lessonId,
-              ),
-            ],
-            lessonProgress: {
-              ...state.progress.lessonProgress,
-              [lesson.lessonId]: 100,
-            },
-          },
-        })),
       /**
        * A new lesson replaces the one before it, so the sessions it leaves
        * behind are dropped rather than kept as checkpoints the learner can no
@@ -682,13 +587,6 @@ export const useAppStore = create<AppState>()(
           delete lessonSessions[lessonId];
           return {
             lessonSessions,
-            progress: {
-              ...state.progress,
-              lessonProgress: {
-                ...state.progress.lessonProgress,
-                [lessonId]: 0,
-              },
-            },
           };
         }),
       resetProgress: () =>
@@ -709,10 +607,6 @@ export const useAppStore = create<AppState>()(
           onboarding: {
             ...current.onboarding,
             ...normalizeOnboardingPreferences(saved.onboarding),
-          },
-          progress: {
-            ...current.progress,
-            lessonProgress: saved.progress?.lessonProgress ?? {},
           },
           lessonSessions: Object.fromEntries(
             Object.entries(saved.lessonSessions ?? {}).map(
@@ -739,28 +633,3 @@ export const useAppStore = create<AppState>()(
     },
   ),
 );
-
-function addMinutesToToday(
-  activity: LearnerProgress["weeklyActivity"],
-  minutes: number,
-): LearnerProgress["weeklyActivity"] {
-  if (!activity.length) return activity;
-  const today = new Date().toLocaleDateString("en", { weekday: "short" });
-  return activity.map((day) =>
-    day.day === today ? { ...day, minutes: day.minutes + minutes } : day,
-  );
-}
-
-function mergeWeakVocabulary(
-  existing: LearnerProgress["weakVocabulary"],
-  terms: string[],
-): LearnerProgress["weakVocabulary"] {
-  const additions = terms
-    .filter((term) => !existing.some((item) => item.term === term))
-    .map((term) => ({
-      term,
-      meaning: "lesson target",
-      mastery: 45,
-    }));
-  return [...existing, ...additions];
-}

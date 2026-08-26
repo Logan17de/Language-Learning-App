@@ -32,7 +32,6 @@ describe("authenticated learner state regressions", () => {
   it("keeps XP, streak, and study totals server-owned in Supabase mode", () => {
     expect(appStore).toContain('const serverOwnsRewards = getBackendMode() === "supabase"');
     expect(appStore).toContain("user: serverOwnsRewards");
-    expect(appStore).toContain("weeklyActivity: serverOwnsRewards");
     expect(lessonResult).not.toContain("Math.max(streak, 13)");
     expect(lessonResult).toContain("progressRepository.loadCurrent()");
   });
@@ -58,11 +57,5 @@ describe("authenticated learner state regressions", () => {
   it("does not count hidden-tab time as lesson study time", () => {
     expect(lessonPlayer).toContain('document.visibilityState !== "visible"');
     expect(lessonPlayer).toContain("setElapsedSeconds((value) => value + 1)");
-  });
-
-  it("updates local weekly activity by the actual weekday", () => {
-    expect(appStore).toContain('toLocaleDateString("en", { weekday: "short" })');
-    expect(appStore).toContain("day.day === today");
-    expect(appStore).not.toContain("const index = activity.length - 1");
   });
 });

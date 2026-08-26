@@ -105,7 +105,6 @@ export interface LessonCompletionResult {
   score: number;
   xpGained: number;
   durationMinutes: number;
-  weakItems: string[];
   completedAt: string;
 }
 

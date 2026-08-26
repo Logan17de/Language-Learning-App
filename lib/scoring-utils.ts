@@ -1,8 +1,5 @@
 import type { LessonPackage } from "@/types/lesson";
-import {
-  storyWordIndependence,
-  storyWordScores,
-} from "@/lib/story-support";
+import { storyWordIndependence } from "@/lib/story-support";
 import { calculateLessonXp } from "@/lib/xp";
 import type {
   GrammarAnswer,
@@ -125,68 +122,11 @@ export function calculateLessonCompletion(
       speakingAccuracy * 10,
   );
 
-  const weakItems = unique([
-    ...storyWords
-      .filter((item) => {
-        const scores = storyWordScores(
-          session.storyInteractions,
-          item.lineId,
-          item.word,
-        );
-        return (
-          scores.meaning < item.word.baseMeaningScore ||
-          scores.recognition < item.word.baseRecognitionScore ||
-          scores.pronunciation < item.word.basePronunciationScore
-        );
-      })
-      .map((item) => item.word.surface),
-    ...session.vocabularyAnswers
-      .filter((answer) => !answer.correct)
-      .flatMap((answer) =>
-        exerciseTerms(
-          lesson,
-          lesson.vocabularyQuestions.find(
-            (question) => question.id === answer.questionId,
-          )?.targetItemIds,
-        ),
-      ),
-    ...session.grammarAnswers
-      .filter((answer) => !answer.correct)
-      .flatMap((answer) => {
-        const staticQuestion = lesson.grammarQuestions.find(
-          (question) => question.id === answer.questionId,
-        );
-        // Runtime translation targets stay server-owned. Their mastery evidence
-        // is persisted by validation, so completion scoring does not reconstruct them.
-        return staticQuestion
-          ? exerciseTerms(lesson, staticQuestion.targetItemIds)
-          : [];
-      }),
-    ...session.readingEvents
-      .filter((event) =>
-        ["paused-before-word", "pronunciation-issue", "stopped-at-word"].includes(
-          event.type,
-        ),
-      )
-      .map((event) => event.term),
-    ...listeningAnswers
-      .filter((event) => event.correct === false && event.questionId)
-      .flatMap((event) =>
-        exerciseTerms(
-          lesson,
-          lesson.listeningExercises.find(
-            (exercise) => exercise.id === event.questionId,
-          )?.targetItemIds,
-        ),
-      ),
-  ]).slice(0, 4);
-
   return {
     lessonId: lesson.id,
     score,
     xpGained: calculateLessonXp(score),
     durationMinutes: Math.max(1, Math.round(session.elapsedSeconds / 60)),
-    weakItems,
     completedAt: new Date().toISOString(),
   };
 }
@@ -195,25 +135,4 @@ function ratio(value: number, total: number): number {
   return Math.max(0, Math.min(1, value / total));
 }
 
-function unique(values: string[]): string[] {
-  return Array.from(new Set(values.filter(Boolean)));
-}
 
-function exerciseTerms(
-  lesson: LessonPackage,
-  targetItemIds: string[] | undefined,
-): string[] {
-  if (!targetItemIds?.length) return [];
-  const targetIds = new Set(targetItemIds);
-  return [
-    ...lesson.kanji
-      .filter((item) => item.libraryId && targetIds.has(item.libraryId))
-      .map((item) => item.character),
-    ...lesson.vocabulary
-      .filter((item) => item.libraryId && targetIds.has(item.libraryId))
-      .map((item) => item.term),
-    ...lesson.grammar
-      .filter((item) => item.libraryId && targetIds.has(item.libraryId))
-      .map((item) => item.pattern),
-  ];
-}

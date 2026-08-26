@@ -11,10 +11,6 @@ import type {
   LearningGoal,
 } from "@/types/learner";
 import type {
-  Achievement,
-  MasteryItem,
-  RecentLesson,
-  WeeklyActivity,
 } from "@/types/progress";
 
 export interface BackendProgressSnapshot {
@@ -30,15 +26,7 @@ export interface BackendProgressSnapshot {
   completedLessonCount: number;
   xp: number;
   streakDays: number;
-  longestStreak: number;
-  totalStudyMinutes: number;
-  weeklyActivity: WeeklyActivity[];
-  weakKanji: MasteryItem[];
-  weakVocabulary: MasteryItem[];
-  grammarToReview: MasteryItem[];
-  recentLessons: RecentLesson[];
   completedLessonIds: string[];
-  achievements: Achievement[];
 }
 
 function summaryNumber(value: unknown, key: string): number {
@@ -171,17 +159,14 @@ export const progressRepository = {
       profile,
       summary,
       weekly,
-      mastery,
       completions,
       completionCount,
-      earned,
-      definitions,
       lessons,
     ] = await Promise.all([
       client
         .from("profiles")
         .select(
-          "xp,streak_days,longest_streak,total_study_minutes,daily_study_minutes,current_jlpt_level,learning_goal,created_at,timezone",
+          "xp,streak_days,daily_study_minutes,current_jlpt_level,learning_goal,created_at,timezone",
         )
         .eq("id", userId)
         .single(),
@@ -193,15 +178,8 @@ export const progressRepository = {
         .order("activity_date", { ascending: false })
         .limit(7),
       client
-        .from("learner_mastery")
-        .select("*")
-        .eq("user_id", userId)
-        .in("item_type", ["kanji", "vocabulary", "grammar"])
-        .lt("mastery", 70)
-        .order("mastery"),
-      client
         .from("lesson_completions")
-        .select("*")
+        .select("lesson_id")
         .eq("user_id", userId)
         .order("completed_at", { ascending: false })
         .limit(20),
@@ -209,104 +187,22 @@ export const progressRepository = {
         .from("lesson_completions")
         .select("id", { count: "exact", head: true })
         .eq("user_id", userId),
-      client.from("user_achievements").select("*").eq("user_id", userId),
-      client.from("achievements").select("*").eq("active", true),
-      client.from("lessons").select("id,legacy_id,title"),
+      client.from("lessons").select("id,legacy_id"),
     ]);
     const firstError = [
       profile,
       summary,
       weekly,
-      mastery,
       completions,
       completionCount,
-      earned,
-      definitions,
       lessons,
     ].find((result) => result.error)?.error;
     if (firstError || !profile.data) {
       return failure(firstError, "Your progress could not be loaded.");
     }
 
-    const ids = (type: string) =>
-      (mastery.data ?? [])
-        .filter((item) => item.item_type === type)
-        .map((item) => item.item_key)
-        .filter((item, index, items) => items.indexOf(item) === index);
-    const kanjiIds = ids("kanji");
-    const vocabularyIds = ids("vocabulary");
-    const grammarIds = ids("grammar");
-    const [kanji, vocabulary, grammar] = await Promise.all([
-      kanjiIds.length
-        ? client
-            .from("kanji_records")
-            .select("id,character,meanings,readings")
-            .in("id", kanjiIds)
-        : Promise.resolve({ data: [], error: null }),
-      vocabularyIds.length
-        ? client
-            .from("vocabulary_records")
-            .select("id,written_form,reading,meaning")
-            .in("id", vocabularyIds)
-        : Promise.resolve({ data: [], error: null }),
-      grammarIds.length
-        ? client
-            .from("grammar_records")
-            .select("id,pattern,meaning")
-            .in("id", grammarIds)
-        : Promise.resolve({ data: [], error: null }),
-    ]);
-    const libraryError = [kanji, vocabulary, grammar].find(
-      (result) => result.error,
-    )?.error;
-    if (libraryError) {
-      return failure(libraryError, "Your progress items could not be loaded.");
-    }
-
-    const kanjiMap = new Map(
-      (kanji.data ?? []).map((item) => [item.id, item]),
-    );
-    const vocabularyMap = new Map(
-      (vocabulary.data ?? []).map((item) => [item.id, item]),
-    );
-    const grammarMap = new Map(
-      (grammar.data ?? []).map((item) => [item.id, item]),
-    );
-    const masteryFor = (type: string): MasteryItem[] =>
-      (mastery.data ?? [])
-        .filter((item) => item.item_type === type)
-        .map((item) => {
-          if (type === "kanji") {
-            const record = kanjiMap.get(item.item_key);
-            return {
-              term: record?.character ?? item.item_key,
-              reading: record?.readings[0],
-              meaning: record?.meanings[0] ?? "Kanji",
-              mastery: item.mastery,
-            };
-          }
-          if (type === "vocabulary") {
-            const record = vocabularyMap.get(item.item_key);
-            return {
-              term: record?.written_form ?? item.item_key,
-              reading: record?.reading,
-              meaning: record?.meaning ?? "Vocabulary",
-              mastery: item.mastery,
-            };
-          }
-          const record = grammarMap.get(item.item_key);
-          return {
-            term: record?.pattern ?? item.item_key,
-            meaning: record?.meaning ?? "Grammar",
-            mastery: item.mastery,
-          };
-        });
-
     const lessonMap = new Map(
       (lessons.data ?? []).map((lesson) => [lesson.id, lesson]),
-    );
-    const earnedMap = new Map(
-      (earned.data ?? []).map((item) => [item.achievement_id, item]),
     );
     const today = dateInTimeZone(profile.data.timezone);
     const latestActivityDate = (weekly.data ?? [])[0]?.activity_date;
@@ -334,48 +230,10 @@ export const progressRepository = {
         latestActivityDate,
         today,
       ),
-      longestStreak: profile.data.longest_streak,
-      totalStudyMinutes: profile.data.total_study_minutes,
-      weeklyActivity: (weekly.data ?? [])
-        .slice()
-        .reverse()
-        .map((item) => ({
-          day: new Date(`${item.activity_date}T00:00:00`).toLocaleDateString(
-            "en",
-            { weekday: "short" },
-          ),
-          minutes: item.minutes,
-          goal: goalMinutes,
-        })),
-      weakKanji: masteryFor("kanji"),
-      weakVocabulary: masteryFor("vocabulary"),
-      grammarToReview: masteryFor("grammar"),
-      recentLessons: (completions.data ?? []).map((completion) => {
-        const lesson = lessonMap.get(completion.lesson_id);
-        return {
-          lessonId: lesson?.legacy_id ?? completion.lesson_id,
-          title: lesson?.title ?? "Language lesson",
-          completedAt: completion.completed_at,
-          score: completion.score,
-          durationMinutes: completion.duration_minutes,
-        };
-      }),
       completedLessonIds: (completions.data ?? []).map(
         (completion) =>
           lessonMap.get(completion.lesson_id)?.legacy_id ?? completion.lesson_id,
       ),
-      achievements: (definitions.data ?? []).map((definition) => {
-        const item = earnedMap.get(definition.id);
-        return {
-          id: definition.key,
-          title: definition.title,
-          description: definition.description,
-          earned: Boolean(item?.earned_at),
-          earnedAt: item?.earned_at ?? undefined,
-          progress: item?.progress ?? 0,
-          target: definition.target,
-        };
-      }),
     });
   },
 };

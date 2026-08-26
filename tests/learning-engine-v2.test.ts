@@ -196,10 +196,9 @@ describe("learning engine contracts", () => {
       attempts: 1,
     }];
 
-    expect(calculateLessonCompletion(lesson, session).weakItems).toEqual([
-      lesson.vocabulary[0].term,
-      lesson.grammar[0].pattern,
-    ]);
+    // The lesson still scores; the weak-item list it used to build was read by
+    // nothing and has gone with the rest of the local progress machinery.
+    expect(calculateLessonCompletion(lesson, session).score).toBeLessThan(100);
   });
 
   it("does not contain commute-specific player fallbacks", () => {
