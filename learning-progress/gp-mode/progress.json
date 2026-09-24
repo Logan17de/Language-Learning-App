@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "mode": "GP",
+  "canonicalGrammarSource": "data/jlpt-catalog.json",
+  "totalGrammarPatterns": 641,
+  "jlptCounts": {
+    "N5": 82,
+    "N4": 112,
+    "N3": 136,
+    "N2": 124,
+    "N1": 187
+  },
+  "dailyTarget": 20,
+  "learnedGrammar": [],
+  "completedCount": 0,
+  "nextGrammar": {
+    "level": "N5",
+    "position": 1
+  },
+  "lastSessionDate": null,
+  "sessions": []
+}
