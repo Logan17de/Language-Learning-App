@@ -11,12 +11,174 @@
     "N1": 187
   },
   "dailyTarget": 20,
-  "learnedGrammar": [],
-  "completedCount": 0,
+  "learnedGrammar": [
+    {
+      "level": "N5",
+      "position": 1,
+      "pattern": "だ / です",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 2,
+      "pattern": "じゃない / ではない",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 3,
+      "pattern": "だった / でした",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 4,
+      "pattern": "じゃなかった / ではなかった",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 5,
+      "pattern": "か",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 6,
+      "pattern": "か～か",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 7,
+      "pattern": "が",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 8,
+      "pattern": "を",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 9,
+      "pattern": "に",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 10,
+      "pattern": "へ",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 11,
+      "pattern": "で",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 12,
+      "pattern": "と",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 13,
+      "pattern": "も",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 14,
+      "pattern": "の",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 15,
+      "pattern": "は",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 16,
+      "pattern": "から",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 17,
+      "pattern": "まで",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 18,
+      "pattern": "や",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 19,
+      "pattern": "ね",
+      "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 20,
+      "pattern": "よ",
+      "learnedDate": "2026-09-25"
+    }
+  ],
+  "completedCount": 20,
   "nextGrammar": {
     "level": "N5",
-    "position": 1
+    "position": 21
   },
-  "lastSessionDate": null,
-  "sessions": []
+  "lastSessionDate": "2026-09-25",
+  "sessions": [
+    {
+      "date": "2026-09-25",
+      "sessionNumber": 1,
+      "level": "N5",
+      "grammarPositions": {
+        "from": 1,
+        "to": 20
+      },
+      "grammarPatternsLearned": 20,
+      "grammarTest": {
+        "correct": 98,
+        "total": 100,
+        "accuracy": 0.98
+      },
+      "particleTest": {
+        "status": "skipped",
+        "reason": "N5 #1-20 were already predominantly particle-focused and the 100-question grammar test extensively tested particle selection."
+      },
+      "transitivityTest": {
+        "status": "skipped",
+        "reason": "Session ended after the grammar test."
+      },
+      "observedWeaknesses": [
+        {
+          "type": "particle",
+          "topic": "は vs が",
+          "detail": "Contrast/topic selection; missed Q62, then answered later contrast and identification questions correctly."
+        }
+      ],
+      "slipsNotMarkedWeak": [
+        {
+          "topic": "past copula",
+          "detail": "Q90 selected じゃない instead of でした; surrounding performance indicates an isolated slip."
+        }
+      ],
+      "notes": [
+        "Future multiple-choice questions should include realistic confusion-pair distractors when context disambiguates them, especially は vs が.",
+        "Avoid ambiguous multiple-choice items where more than one answer is grammatically valid without sufficient context."
+      ]
+    }
+  ]
 }
