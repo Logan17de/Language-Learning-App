@@ -1,4 +1,25 @@
 {
   "schemaVersion": 1,
-  "items": []
+  "items": [
+    {
+      "id": "wa-vs-ga-contrast-2026-09-25",
+      "particles": [
+        "は",
+        "が"
+      ],
+      "category": "contrast/topic selection",
+      "status": "emerging",
+      "firstMarkedDate": "2026-09-25",
+      "nextReviewDate": "2026-09-28",
+      "evidence": {
+        "sessionDate": "2026-09-25",
+        "question": 62,
+        "prompt": "私は日本に住んでいますが、兄はインドに住んでいます。",
+        "selectedPattern": "が / は",
+        "preferredPattern": "は / は",
+        "note": "Later は/が identification and contrast questions were answered correctly, so keep under observation rather than marking as a strong weakness."
+      },
+      "reviewGuidance": "Use contextual contrast-vs-identification questions with both は and が offered as plausible distractors."
+    }
+  ]
 }
