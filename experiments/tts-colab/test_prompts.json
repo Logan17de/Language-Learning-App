@@ -1,0 +1,25 @@
+{
+  "language": "ja",
+  "cases": [
+    {
+      "id": "short_word",
+      "text": "学校",
+      "purpose": "isolated vocabulary; check clipping and pronunciation"
+    },
+    {
+      "id": "question",
+      "text": "今日は学校で何を勉強しましたか？",
+      "purpose": "question intonation"
+    },
+    {
+      "id": "natural",
+      "text": "えっ、本当に？それはちょっとびっくりした。でも、きっと大丈夫だよ。",
+      "purpose": "natural conversational prosody"
+    },
+    {
+      "id": "teacher",
+      "text": "この漢字は「閉める」と読みます。窓を閉めてください。",
+      "purpose": "educational pronunciation"
+    }
+  ]
+}
