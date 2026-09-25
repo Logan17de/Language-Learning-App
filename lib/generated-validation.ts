@@ -24,7 +24,7 @@ const definitions = [
   ["question_explanations", "Question quality", "Explanations match answers"],
   ["question_ambiguity", "Question quality", "Questions are unambiguous"],
   ["language_natural", "Language quality", "Japanese is natural"],
-  ["language_translation", "Language quality", "Translations are accurate"],
+  ["language_translation", "Language quality", "English meanings are accurate"],
   ["language_grammar", "Language quality", "Grammar is correct"],
   ["language_reading", "Language quality", "Readings are correct"],
   ["language_register", "Language quality", "Polite and casual registers are consistent"],

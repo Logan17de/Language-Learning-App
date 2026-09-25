@@ -128,15 +128,28 @@ export function JLPTBatchGenerationWorkspace() {
     }
   }, [loadBatches]);
 
-  useEffect(() => { void refresh(); }, [refresh]);
   useEffect(() => {
-    if (!selectedBatchId) {
-      setDetail(null);
-      return;
-    }
-    void loadDetail(selectedBatchId).catch((loadError) => {
-      setError(loadError instanceof Error ? loadError.message : "Batch detail could not be loaded.");
+    let active = true;
+    // State updates land in a promise callback rather than synchronously in
+    // the effect body, so the initial load cannot cascade renders.
+    void Promise.resolve().then(() => { if (active) return refresh(); });
+    return () => { active = false; };
+  }, [refresh]);
+  useEffect(() => {
+    let active = true;
+    // Clearing and loading both happen off the synchronous effect body.
+    void Promise.resolve().then(() => {
+      if (!active) return;
+      if (!selectedBatchId) {
+        setDetail(null);
+        return;
+      }
+      return loadDetail(selectedBatchId).catch((loadError) => {
+        if (!active) return;
+        setError(loadError instanceof Error ? loadError.message : "Batch detail could not be loaded.");
+      });
     });
+    return () => { active = false; };
   }, [loadDetail, selectedBatchId]);
 
   async function createBatch() {

@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - staging
   workflow_dispatch:
 
 permissions:
@@ -14,13 +15,19 @@ concurrency:
   group: validate-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Validation is split into independent jobs so one failing gate cannot hide the
+# rest. In particular a TypeScript or lint failure must never stop us learning
+# whether the security/quota database suites pass. Nothing uses
+# continue-on-error: every gate below still fails the workflow when it fails.
 jobs:
-  validate:
+  static-analysis:
+    name: Type-check, lint, unit tests
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: test.apps.googleusercontent.com
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -34,11 +41,151 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Each gate reports its own result. `if: always()` lets the later gates
+      # run after an earlier failure; the job still fails overall.
       - name: Type-check
+        id: typecheck
+        if: always()
         run: npm run typecheck
 
+      - name: Lint
+        id: lint
+        if: always()
+        run: npm run lint
+
       - name: Run tests
+        id: unit
+        if: always()
         run: npm test
+
+      - name: Static analysis summary
+        if: always()
+        run: |
+          echo "typecheck: ${{ steps.typecheck.outcome }}"
+          echo "lint:      ${{ steps.lint.outcome }}"
+          echo "unit:      ${{ steps.unit.outcome }}"
+          {
+            echo "| Gate | Result |"
+            echo "| --- | --- |"
+            echo "| Type-check | ${{ steps.typecheck.outcome }} |"
+            echo "| Lint | ${{ steps.lint.outcome }} |"
+            echo "| Unit tests | ${{ steps.unit.outcome }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  database:
+    name: Supabase migrations and behavior tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Pinned so the database gate is reproducible. `latest` also performs a
+      # GitHub release lookup that can hit anonymous rate limits and fail the
+      # gate for reasons unrelated to this repository.
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.115.0
+
+      - name: Report Supabase CLI version
+        run: supabase --version
+
+      - name: Start local Supabase and apply migrations
+        id: start
+        run: supabase start
+
+      - name: Run database behavior tests
+        id: dbtests
+        if: always()
+        run: supabase test db
+
+      - name: Database summary
+        if: always()
+        run: |
+          echo "supabase start: ${{ steps.start.outcome }}"
+          echo "supabase test db: ${{ steps.dbtests.outcome }}"
+          {
+            echo "| Gate | Result |"
+            echo "| --- | --- |"
+            echo "| supabase start | ${{ steps.start.outcome }} |"
+            echo "| supabase test db | ${{ steps.dbtests.outcome }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Show Supabase logs on failure
+        if: failure()
+        run: supabase status || true
+
+  build:
+    name: Production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: test.apps.googleusercontent.com
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build
         run: npm run build
+
+  mobile:
+    name: Native Android and iOS application
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install native app dependencies
+        working-directory: mobile
+        run: npm ci
+
+      - name: Validate native app
+        working-directory: mobile
+        run: npm run validate
+
+      - name: Bundle Android application
+        working-directory: mobile
+        run: npx expo export --platform android --output-dir dist/android
+
+  # Single required status for branch protection. Fails if any gate above
+  # failed, was cancelled, or was skipped.
+  validate:
+    name: Validate application
+    runs-on: ubuntu-latest
+    needs: [static-analysis, database, build, mobile]
+    if: always()
+    steps:
+      - name: Require every gate to pass
+        run: |
+          echo "static-analysis: ${{ needs.static-analysis.result }}"
+          echo "database:        ${{ needs.database.result }}"
+          echo "build:           ${{ needs.build.result }}"
+          echo "mobile:          ${{ needs.mobile.result }}"
+          if [ "${{ needs.static-analysis.result }}" != "success" ] \
+            || [ "${{ needs.database.result }}" != "success" ] \
+            || [ "${{ needs.build.result }}" != "success" ] \
+            || [ "${{ needs.mobile.result }}" != "success" ]; then
+            echo "::error::One or more validation gates failed."
+            exit 1
+          fi
+          echo "All validation gates passed."

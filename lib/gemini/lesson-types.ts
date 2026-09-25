@@ -94,7 +94,6 @@ export interface LessonLibrarySeed {
 export interface LessonGenerationInput {
   topic: string;
   level: JLPTLevel;
-  interests: string[];
   durationMinutes: number;
   focus: string;
   speakingDifficulty: Difficulty;

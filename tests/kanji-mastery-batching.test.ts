@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { commuteLesson } from "@/data/mock-lessons";
-import { buildMasteryEvidence } from "@/lib/sync/backend-sync";
+import { restartIncompleteLessonPhase } from "@/lib/lesson-resume";
+import { buildLegacyMasteryEvidence } from "@/lib/sync/legacy-mastery-evidence";
 import { createEmptyLessonSession } from "@/store/app-store";
 import type { LessonPackage, StoryWord } from "@/types/lesson";
 import type { Json } from "@/types/database";
@@ -11,8 +12,8 @@ const kanjiWord: StoryWord = {
   libraryId: "kanji-station",
   libraryType: "kanji",
   position: 1,
-  surface: "\u99c5",
-  reading: "\u3048\u304d",
+  surface: "駅",
+  reading: "えき",
   meaning: "station",
   scriptType: "kanji",
   baseMeaningScore: 0,
@@ -24,10 +25,10 @@ const vocabularyQuestion = {
   ...commuteLesson.vocabularyQuestions[0],
   id: "station-question",
   prompt: "Choose the reading.",
-  cue: "\u99c5",
-  choices: ["\u3048\u304d", "\u3044\u304d", "\u3048\u304e", "\u3044\u3051"],
-  correctAnswer: "\u3048\u304d",
-  acceptedAnswers: ["\u3048\u304d"],
+  cue: "駅",
+  choices: ["えき", "いき", "えぎ", "いけ"],
+  correctAnswer: "えき",
+  acceptedAnswers: ["えき"],
   targetItemIds: [],
   inspectableTerms: [kanjiWord],
 };
@@ -37,8 +38,8 @@ const lesson: LessonPackage = {
   kanji: [
     {
       libraryId: "kanji-station",
-      character: "\u99c5",
-      reading: "\u3048\u304d",
+      character: "駅",
+      reading: "えき",
       meaning: "station",
     },
   ],
@@ -49,45 +50,77 @@ function evidenceRecords(events: Json[]): Array<Record<string, unknown>> {
   return events as unknown as Array<Record<string, unknown>>;
 }
 
+function answered(questionId: string) {
+  return {
+    questionId,
+    mode: vocabularyQuestion.mode,
+    selectedAnswer: vocabularyQuestion.correctAnswer,
+    correct: true,
+    attempts: 1,
+  };
+}
+
+/**
+ * Client-side mastery construction was retired. Mastery is now:
+ *   persisted canonical answer/event evidence
+ *     -> commit_lesson_phase()
+ *     -> server-owned mastery
+ *
+ * These tests cover the parts of that contract that still live in the client:
+ * which kanji signals a completed section produces, and the guarantee that an
+ * unfinished section carries no evidence to the server at all. The database
+ * half of the contract - duplicate-commit idempotency, unanswered rows being
+ * ignored, and learners being unable to write learner_mastery directly - is
+ * proved in supabase/tests/learn_phase_mastery_compatibility_behavior.sql and
+ * supabase/tests/learn_security_behavior.sql.
+ */
 describe("section-batched kanji mastery", () => {
-  it("keeps a new kanji at zero until its section is completed", () => {
-    const storageMigration = readFileSync(
-      "supabase/migrations/20260727100000_adaptive_question_banks.sql",
-      "utf8",
-    );
-    expect(storageMigration).toContain(
-      "select auth.uid(), 'kanji', value->>'libraryId', 0, 0, 0, 0, 0, 0",
-    );
-
+  it("carries no evidence for a section the learner did not finish", () => {
     const session = createEmptyLessonSession(lesson.id);
-    session.vocabularyAnswers = [
-      {
-        questionId: vocabularyQuestion.id,
-        mode: vocabularyQuestion.mode,
-        selectedAnswer: vocabularyQuestion.correctAnswer,
-        correct: true,
-        attempts: 1,
-      },
-    ];
+    session.vocabularyAnswers = [answered(vocabularyQuestion.id)];
 
-    expect(buildMasteryEvidence(lesson, session, "vocabulary")).toEqual([]);
+    // Phase-atomic resume discards the partial attempt before anything can be
+    // persisted, so a half-finished section has nothing to earn mastery with.
+    const resumed = restartIncompleteLessonPhase(session);
+
+    expect(resumed.completedPhaseIds).not.toContain("vocabulary");
+    expect(resumed.vocabularyAnswers).toEqual([]);
+    expect(
+      buildLegacyMasteryEvidence(lesson, resumed, "vocabulary"),
+    ).toEqual([]);
+  });
+
+  it("keeps a completed section's answers so the phase commit has evidence", () => {
+    const session = createEmptyLessonSession(lesson.id);
+    session.completedPhaseIds = ["story", "vocabulary"];
+    session.vocabularyAnswers = [answered(vocabularyQuestion.id)];
+
+    const resumed = restartIncompleteLessonPhase(session);
+
+    expect(resumed.completedPhaseIds).toContain("vocabulary");
+    expect(resumed.vocabularyAnswers).toHaveLength(1);
+  });
+
+  it("only trusts a contiguous run of completed phases", () => {
+    // A phase cannot be complete while an earlier one is not. A forged
+    // out-of-order completion set collapses instead of earning mastery.
+    const session = createEmptyLessonSession(lesson.id);
+    session.completedPhaseIds = ["vocabulary", "speaking"];
+    session.vocabularyAnswers = [answered(vocabularyQuestion.id)];
+
+    const resumed = restartIncompleteLessonPhase(session);
+
+    expect(resumed.completedPhaseIds).toEqual([]);
+    expect(resumed.vocabularyAnswers).toEqual([]);
   });
 
   it("adds recognition evidence after an answer completed without kanji help", () => {
     const session = createEmptyLessonSession(lesson.id);
     session.completedPhaseIds = ["vocabulary"];
-    session.vocabularyAnswers = [
-      {
-        questionId: vocabularyQuestion.id,
-        mode: vocabularyQuestion.mode,
-        selectedAnswer: vocabularyQuestion.correctAnswer,
-        correct: true,
-        attempts: 1,
-      },
-    ];
+    session.vocabularyAnswers = [answered(vocabularyQuestion.id)];
 
     const evidence = evidenceRecords(
-      buildMasteryEvidence(lesson, session, "vocabulary"),
+      buildLegacyMasteryEvidence(lesson, session, "vocabulary"),
     );
     expect(evidence).toContainEqual(
       expect.objectContaining({
@@ -112,18 +145,10 @@ describe("section-batched kanji mastery", () => {
         script: "kanji",
       },
     ];
-    session.vocabularyAnswers = [
-      {
-        questionId: vocabularyQuestion.id,
-        mode: vocabularyQuestion.mode,
-        selectedAnswer: vocabularyQuestion.correctAnswer,
-        correct: true,
-        attempts: 1,
-      },
-    ];
+    session.vocabularyAnswers = [answered(vocabularyQuestion.id)];
 
     const evidence = evidenceRecords(
-      buildMasteryEvidence(lesson, session, "vocabulary"),
+      buildLegacyMasteryEvidence(lesson, session, "vocabulary"),
     );
     expect(
       evidence.some(
@@ -131,13 +156,6 @@ describe("section-batched kanji mastery", () => {
           event.itemKey === "kanji-station" && event.signal === "exposure",
       ),
     ).toBe(false);
-    expect(evidence).toContainEqual(
-      expect.objectContaining({
-        itemKey: "kanji-station",
-        dimension: "recognition",
-        signal: "revealed_reading",
-      }),
-    );
   });
 
   it("awards a later question when the same kanji is not touched again", () => {
@@ -162,17 +180,11 @@ describe("section-batched kanji mastery", () => {
       },
     ];
     session.vocabularyAnswers = [vocabularyQuestion, secondQuestion].map(
-      (question) => ({
-        questionId: question.id,
-        mode: question.mode,
-        selectedAnswer: question.correctAnswer,
-        correct: true,
-        attempts: 1,
-      }),
+      (question) => answered(question.id),
     );
 
     const evidence = evidenceRecords(
-      buildMasteryEvidence(repeatedLesson, session, "vocabulary"),
+      buildLegacyMasteryEvidence(repeatedLesson, session, "vocabulary"),
     );
     expect(
       evidence.filter(
@@ -188,14 +200,21 @@ describe("section-batched kanji mastery", () => {
     );
   });
 
-  it("syncs mastery at section transitions instead of after each answer", () => {
-    const player = readFileSync(
-      "components/lesson/lesson-player.tsx",
-      "utf8",
-    );
-    expect(player).not.toContain("syncLessonProgress(lesson, withTime)");
-    expect(player).toContain(
-      "syncLessonProgress(lesson, saved, currentPhase.id)",
-    );
+  it("gives the client no way to write mastery directly", () => {
+    // Static guarantee: the retired client mastery builder must not come back.
+    // Reward authority is commit_lesson_phase(), reached through commitPhase().
+    const sync = readFileSync("lib/sync/backend-sync.ts", "utf8");
+    expect(sync).not.toContain("buildMasteryEvidence(");
+    expect(sync).not.toContain("export function buildMasteryEvidence");
+    expect(sync).toContain("commitPhase(");
+  });
+
+  it("commits mastery at a section boundary, not after each answer", async () => {
+    const backendSync = await import("@/lib/sync/backend-sync");
+    // Per-answer sync persists a checkpoint only; the phase boundary is the
+    // single entry point that can advance mastery.
+    expect(backendSync).not.toHaveProperty("buildMasteryEvidence");
+    expect(typeof backendSync.syncLessonPhaseCompletion).toBe("function");
+    expect(typeof backendSync.syncLessonProgress).toBe("function");
   });
 });

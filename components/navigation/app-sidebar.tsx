@@ -6,9 +6,7 @@ import {
   CircleHelp,
   Crown,
   House,
-  LibraryBig,
   Settings,
-  Sparkles,
   UserRound,
 } from "lucide-react";
 import Link from "next/link";
@@ -18,14 +16,12 @@ import { cn } from "@/lib/utils";
 
 const primary = [
   { label: "Home", href: "/home", icon: House },
-  { label: "Learn", href: "/learn", icon: LibraryBig },
-  { label: "Review", href: "/review", icon: BookOpen },
+  { label: "Learn", href: "/learn", icon: BookOpen },
   { label: "Progress", href: "/progress", icon: ChartNoAxesColumnIncreasing },
   { label: "Profile", href: "/profile", icon: UserRound },
 ];
 
 const secondary = [
-  { label: "Custom topic", href: "/custom-topic", icon: Sparkles },
   { label: "Subscription", href: "/subscription", icon: Crown },
   { label: "Settings", href: "/settings", icon: Settings },
   { label: "Support", href: "/support", icon: CircleHelp },
@@ -83,6 +79,7 @@ function SidebarLink({
   return (
     <Link
       href={href}
+      prefetch={false}
       aria-current={active ? "page" : undefined}
       className={cn(
         "group flex min-h-12 items-center gap-3 rounded-2xl px-3 text-sm font-semibold transition duration-180 focus:outline-none focus-visible:ring-4 focus-visible:ring-moss-100",

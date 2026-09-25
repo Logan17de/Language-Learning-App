@@ -7,6 +7,7 @@ import {
   type RepositoryResult,
 } from "@/lib/repositories/result";
 import type { Database } from "@/types/database";
+import { isUuid } from "@/lib/identifiers";
 
 type Lesson = Database["public"]["Tables"]["lessons"]["Row"];
 type Version = Database["public"]["Tables"]["lesson_versions"]["Row"];
@@ -23,50 +24,10 @@ export interface CanonicalLesson {
   readingQuestions: Database["public"]["Tables"]["lesson_reading_questions"]["Row"][];
   listening: Database["public"]["Tables"]["lesson_listening_activities"]["Row"][];
   speaking: Database["public"]["Tables"]["lesson_speaking_activities"]["Row"][];
-  review: Database["public"]["Tables"]["lesson_review_activities"]["Row"][];
+  /** Server-backed profile access. Locked payloads never contain Premium activities. */
+  premiumPhaseAccess: "full" | "locked";
   /** Learner-specific kanji with at least ten recorded story appearances. */
   knownKanji: string[];
-}
-
-export interface AssignedLesson {
-  assignmentId: string;
-  lessonId: string;
-  lessonVersionId: string;
-  selectionMode: "free_random" | "pro_interest" | "pro_custom";
-  interestMatches: string[];
-  reused: boolean;
-}
-
-function assignmentFromJson(value: unknown): AssignedLesson | null {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const row = value as Record<string, unknown>;
-  if (
-    typeof row.assignment_id !== "string" ||
-    typeof row.lesson_id !== "string" ||
-    typeof row.lesson_version_id !== "string"
-  ) {
-    return null;
-  }
-  const mode = row.selection_mode;
-  if (
-    mode !== "free_random" &&
-    mode !== "pro_interest" &&
-    mode !== "pro_custom"
-  ) {
-    return null;
-  }
-  return {
-    assignmentId: row.assignment_id,
-    lessonId: row.lesson_id,
-    lessonVersionId: row.lesson_version_id,
-    selectionMode: mode,
-    interestMatches: Array.isArray(row.interest_matches)
-      ? row.interest_matches.filter(
-          (item): item is string => typeof item === "string",
-        )
-      : [],
-    reused: row.reused === true,
-  };
 }
 
 async function loadContent(
@@ -77,6 +38,49 @@ async function loadContent(
   if (!client) return notConfigured();
   const rawClient = client as unknown as SupabaseClient;
   const versionId = version.id;
+
+  const { data: auth, error: authError } = await client.auth.getUser();
+  if (authError || !auth.user) {
+    return failure(authError ?? { code: "AUTH" }, "Your session has expired.");
+  }
+  const profile = await client
+    .from("profiles")
+    .select("subscription_plan,role")
+    .eq("id", auth.user.id)
+    .maybeSingle();
+  if (profile.error || !profile.data) {
+    return failure(profile.error, "Your lesson access could not be verified.");
+  }
+  const premiumPhaseAccess: CanonicalLesson["premiumPhaseAccess"] =
+    profile.data.subscription_plan !== "free" ||
+    profile.data.role === "admin" ||
+    profile.data.role === "content_editor"
+      ? "full"
+      : "locked";
+
+  const listeningPromise =
+    premiumPhaseAccess === "full"
+      ? client
+          .from("lesson_listening_activities")
+          .select("*")
+          .eq("lesson_version_id", versionId)
+          .order("position")
+      : Promise.resolve({
+          data: [] as CanonicalLesson["listening"],
+          error: null,
+        });
+  const speakingPromise =
+    premiumPhaseAccess === "full"
+      ? client
+          .from("lesson_speaking_activities")
+          .select("*")
+          .eq("lesson_version_id", versionId)
+          .order("position")
+      : Promise.resolve({
+          data: [] as CanonicalLesson["speaking"],
+          error: null,
+        });
+
   const [
     story,
     storyWords,
@@ -87,7 +91,6 @@ async function loadContent(
     readingQuestions,
     listening,
     speaking,
-    review,
     knownKanji,
   ] = await Promise.all([
     client
@@ -127,21 +130,8 @@ async function loadContent(
       .select("*")
       .eq("lesson_version_id", versionId)
       .order("position"),
-    client
-      .from("lesson_listening_activities")
-      .select("*")
-      .eq("lesson_version_id", versionId)
-      .order("position"),
-    client
-      .from("lesson_speaking_activities")
-      .select("*")
-      .eq("lesson_version_id", versionId)
-      .order("position"),
-    client
-      .from("lesson_review_activities")
-      .select("*")
-      .eq("lesson_version_id", versionId)
-      .order("position"),
+    listeningPromise,
+    speakingPromise,
     rawClient
       .from("learner_kanji_exposure_progress")
       .select("character,appearance_count")
@@ -163,7 +153,6 @@ async function loadContent(
     reading,
     listening,
     speaking,
-    review,
     knownKanji,
     ...(readingQuestionTableMissing ? [] : [readingQuestions]),
     ...(storyWordTableMissing ? [] : [storyWords]),
@@ -183,29 +172,131 @@ async function loadContent(
     readingQuestions: readingQuestionTableMissing ? [] : (readingQuestions.data ?? []),
     listening: listening.data ?? [],
     speaking: speaking.data ?? [],
-    review: review.data ?? [],
+    premiumPhaseAccess,
     knownKanji: (knownKanji.data ?? []).flatMap((row) =>
       typeof row.character === "string" ? [row.character] : [],
     ),
   });
 }
 
-export const lessonRepository = {
-  async assignNext(): Promise<
-    RepositoryResult<{ assignment: AssignedLesson; lesson: CanonicalLesson } | null>
-  > {
-    const client = createClient();
-    if (!client) return notConfigured();
-    const { data, error } = await client.rpc("assign_next_lesson");
-    if (error) return failure(error, "AIko could not select your next lesson.");
-    const assignment = assignmentFromJson(data);
-    if (!assignment) return success(null);
-    const lesson = await this.getPublished(assignment.lessonId);
-    return lesson.ok
-      ? success({ assignment, lesson: lesson.data })
-      : failure(lesson.error, lesson.error.message);
-  },
+/**
+ * A lesson's canonical id, remembered.
+ *
+ * A LessonPackage carries `legacy_id ?? id`, so anything holding one has to ask
+ * the database which row it means before it can touch that lesson's session.
+ * The answer never changes, and the whole of it is one small row, so asking
+ * twice is waste — and it was being asked on every section the learner
+ * finished, behind the full playable payload.
+ */
+const canonicalIds = new Map<string, string>();
 
+export async function canonicalLessonId(
+  idOrLegacyId: string,
+): Promise<RepositoryResult<string>> {
+  const cached = canonicalIds.get(idOrLegacyId);
+  if (cached) return success(cached);
+  const client = createClient();
+  if (!client) return notConfigured();
+  const byId = isUuid(idOrLegacyId)
+    ? await client.from("lessons").select("id").eq("id", idOrLegacyId).maybeSingle()
+    : null;
+  const result = byId?.data
+    ? byId
+    : await client
+        .from("lessons")
+        .select("id")
+        .eq("legacy_id", idOrLegacyId)
+        .maybeSingle();
+  if (result.error) {
+    return failure(result.error, "The lesson could not be identified.");
+  }
+  if (!result.data) {
+    return failure({ code: "PGRST116" }, "The lesson could not be identified.");
+  }
+  canonicalIds.set(idOrLegacyId, result.data.id);
+  return success(result.data.id);
+}
+
+/**
+ * The playable payload, fetched once for as long as it is being played.
+ *
+ * Opening a lesson used to fetch it three times over: once for the player,
+ * once to restore where the learner had got to, once more to commit the
+ * section they had just finished — each of them fifteen queries deep, and all
+ * three in the same second, in front of the learner. A version's content does
+ * not change while it is being played, so the second and third callers can have
+ * the first one's answer.
+ *
+ * The window is deliberately short. It exists to collapse a burst, not to hold
+ * a lesson in memory for the session.
+ */
+const PLAYABLE_CACHE_MS = 60_000;
+
+interface CachedPlayable {
+  at: number;
+  value: Promise<RepositoryResult<CanonicalLesson>>;
+}
+
+const playableCache = new Map<string, CachedPlayable>();
+
+function playablePayload(value: unknown): CanonicalLesson | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const row = value as Record<string, unknown>;
+  if (!row.lesson || !row.version) return null;
+  return {
+    lesson: row.lesson as CanonicalLesson["lesson"],
+    version: row.version as CanonicalLesson["version"],
+    story: Array.isArray(row.story) ? row.story as CanonicalLesson["story"] : [],
+    storyWords: Array.isArray(row.storyWords)
+      ? row.storyWords as CanonicalLesson["storyWords"]
+      : [],
+    vocabulary: Array.isArray(row.vocabulary)
+      ? row.vocabulary as CanonicalLesson["vocabulary"]
+      : [],
+    grammar: Array.isArray(row.grammar)
+      ? row.grammar as CanonicalLesson["grammar"]
+      : [],
+    practice: Array.isArray(row.practice)
+      ? row.practice as CanonicalLesson["practice"]
+      : [],
+    reading: Array.isArray(row.reading)
+      ? row.reading as CanonicalLesson["reading"]
+      : [],
+    readingQuestions: Array.isArray(row.readingQuestions)
+      ? row.readingQuestions as CanonicalLesson["readingQuestions"]
+      : [],
+    listening: Array.isArray(row.listening)
+      ? row.listening as CanonicalLesson["listening"]
+      : [],
+    speaking: Array.isArray(row.speaking)
+      ? row.speaking as CanonicalLesson["speaking"]
+      : [],
+    premiumPhaseAccess: row.premiumPhaseAccess === "full" ? "full" : "locked",
+    knownKanji: Array.isArray(row.knownKanji)
+      ? row.knownKanji.filter((item): item is string => typeof item === "string")
+      : [],
+  };
+}
+
+function readPlayableCache(
+  key: string,
+): Promise<RepositoryResult<CanonicalLesson>> | null {
+  const cached = playableCache.get(key);
+  if (!cached) return null;
+  if (Date.now() - cached.at > PLAYABLE_CACHE_MS) {
+    playableCache.delete(key);
+    return null;
+  }
+  return cached.value;
+}
+
+/** Anything that changes what a lesson contains drops what was remembered. */
+export function forgetCachedLessons(): void {
+  playableCache.clear();
+  canonicalIds.clear();
+}
+
+export const lessonRepository = {
   async listPublished(): Promise<RepositoryResult<Lesson[]>> {
     const client = createClient();
     if (!client) return notConfigured();
@@ -225,13 +316,15 @@ export const lessonRepository = {
   ): Promise<RepositoryResult<CanonicalLesson>> {
     const client = createClient();
     if (!client) return notConfigured();
-    const byId = await client
-      .from("lessons")
-      .select("*")
-      .eq("id", idOrLegacyId)
-      .eq("status", "published")
-      .maybeSingle();
-    const lessonResult = byId.data
+    const byId = isUuid(idOrLegacyId)
+      ? await client
+          .from("lessons")
+          .select("*")
+          .eq("id", idOrLegacyId)
+          .eq("status", "published")
+          .maybeSingle()
+      : null;
+    const lessonResult = byId?.data
       ? byId
       : await client
           .from("lessons")
@@ -262,54 +355,15 @@ export const lessonRepository = {
   async getPlayable(
     idOrLegacyId: string,
   ): Promise<RepositoryResult<CanonicalLesson>> {
-    const client = createClient();
-    if (!client) return notConfigured();
-    const byId = await client
-      .from("lessons")
-      .select("*")
-      .eq("id", idOrLegacyId)
-      .maybeSingle();
-    const lessonResult = byId.data
-      ? byId
-      : await client
-          .from("lessons")
-          .select("*")
-          .eq("legacy_id", idOrLegacyId)
-          .maybeSingle();
-    if (lessonResult.error) {
-      return failure(lessonResult.error, "Lesson could not be loaded.");
-    }
-    if (!lessonResult.data) {
-      return failure({ code: "PGRST116" }, "This lesson is unavailable.");
-    }
-    const active = await client
-      .from("lesson_sessions")
-      .select("lesson_version_id")
-      .eq("lesson_id", lessonResult.data.id)
-      .eq("status", "active")
-      .order("started_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (active.error) {
-      return failure(active.error, "Your saved lesson could not be loaded.");
-    }
-    const versionId =
-      active.data?.lesson_version_id ??
-      (lessonResult.data.status === "published"
-        ? lessonResult.data.current_version_id
-        : null);
-    if (!versionId) {
-      return failure({ code: "PGRST116" }, "This lesson is not published.");
-    }
-    const version = await client
-      .from("lesson_versions")
-      .select("*")
-      .eq("id", versionId)
-      .single();
-    if (version.error) {
-      return failure(version.error, "The lesson version could not be loaded.");
-    }
-    return loadContent(lessonResult.data, version.data);
+    const cached = readPlayableCache(idOrLegacyId);
+    if (cached) return cached;
+    const pending = loadPlayable(idOrLegacyId);
+    playableCache.set(idOrLegacyId, { at: Date.now(), value: pending });
+    // A lesson that could not be loaded is not worth remembering: the next
+    // caller should get a real attempt, not a repeat of the failure.
+    const result = await pending;
+    if (!result.ok) playableCache.delete(idOrLegacyId);
+    return result;
   },
 
   async getVersionForSession(
@@ -336,3 +390,76 @@ export const lessonRepository = {
     return loadContent(lesson.data, version.data);
   },
 };
+
+async function loadPlayable(
+  idOrLegacyId: string,
+): Promise<RepositoryResult<CanonicalLesson>> {
+  const client = createClient();
+  if (!client) return notConfigured();
+
+  if (isUuid(idOrLegacyId)) {
+    const payload = await client.rpc("get_playable_lesson_payload", {
+      p_lesson_id: idOrLegacyId,
+    });
+    if (!payload.error) {
+      const canonical = playablePayload(payload.data);
+      return canonical
+        ? success(canonical)
+        : failure({ code: "PGRST116" }, "This lesson is unavailable.");
+    }
+    // Keep the old loader as a deployment-order fallback while the migration
+    // and application release propagate. Real access/content errors still fail.
+    if (payload.error.code !== "PGRST202" && payload.error.code !== "42883") {
+      return failure(payload.error, "Lesson content could not be loaded.");
+    }
+  }
+
+  const byId = isUuid(idOrLegacyId)
+    ? await client
+        .from("lessons")
+        .select("*")
+        .eq("id", idOrLegacyId)
+        .maybeSingle()
+    : null;
+  const lessonResult = byId?.data
+    ? byId
+    : await client
+        .from("lessons")
+        .select("*")
+        .eq("legacy_id", idOrLegacyId)
+        .maybeSingle();
+  if (lessonResult.error) {
+    return failure(lessonResult.error, "Lesson could not be loaded.");
+  }
+  if (!lessonResult.data) {
+    return failure({ code: "PGRST116" }, "This lesson is unavailable.");
+  }
+  const active = await client
+    .from("lesson_sessions")
+    .select("lesson_version_id")
+    .eq("lesson_id", lessonResult.data.id)
+    .eq("status", "active")
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (active.error) {
+    return failure(active.error, "Your saved lesson could not be loaded.");
+  }
+  const versionId =
+    active.data?.lesson_version_id ??
+    (lessonResult.data.status === "published"
+      ? lessonResult.data.current_version_id
+      : null);
+  if (!versionId) {
+    return failure({ code: "PGRST116" }, "This lesson is not published.");
+  }
+  const version = await client
+    .from("lesson_versions")
+    .select("*")
+    .eq("id", versionId)
+    .single();
+  if (version.error) {
+    return failure(version.error, "The lesson version could not be loaded.");
+  }
+  return loadContent(lessonResult.data, version.data);
+}

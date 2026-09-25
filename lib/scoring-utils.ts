@@ -1,14 +1,10 @@
 import type { LessonPackage } from "@/types/lesson";
-import {
-  storyWordIndependence,
-  storyWordScores,
-} from "@/lib/story-support";
+import { storyWordIndependence } from "@/lib/story-support";
+import { calculateLessonXp } from "@/lib/xp";
 import type {
   GrammarAnswer,
   LessonCompletionResult,
   LessonSession,
-  ReviewAnswer,
-  ReviewResult,
   VocabularyAnswer,
 } from "@/types/lesson-session";
 
@@ -38,33 +34,69 @@ export function upsertGrammarAnswer(
   ];
 }
 
-export function calculateReviewResult(answers: ReviewAnswer[], totalCount = 5): ReviewResult {
-  const correctCount = answers.filter((answer) => answer.correct).length;
-  return {
-    answers,
-    correctCount,
-    totalCount,
-    score: Math.round((correctCount / totalCount) * 100),
-  };
-}
-
 export function calculateLessonCompletion(
   lesson: LessonPackage,
   session: LessonSession,
 ): LessonCompletionResult {
-  const reviewScore = session.reviewResult?.score ?? 0;
-  const vocabularyAccuracy = ratio(
+  const skippedPhases = new Set(session.skippedPhaseIds ?? []);
+  const vocabularyAccuracy = skippedPhases.has("vocabulary") ? 0 : ratio(
     session.vocabularyAnswers.filter((answer) => answer.correct).length,
-    Math.max(1, session.vocabularyAnswers.length),
+    Math.max(1, lesson.vocabularyQuestions.length),
   );
-  const grammarAccuracy = ratio(
-    session.grammarAnswers.filter((answer) => answer.correct).length,
-    Math.max(1, session.grammarAnswers.length),
+  // Grammar answers are scored against this lesson's own questions. The second
+  // set used to be the Translation section's; that section is gone, so the list
+  // was always empty and every term it fed evaluated to zero.
+  const staticGrammarIds = new Set(lesson.grammarQuestions.map((question) => question.id));
+  const relevantGrammarAnswers = session.grammarAnswers.filter((answer) =>
+    staticGrammarIds.has(answer.questionId),
   );
+  const grammarAccuracy = skippedPhases.has("grammar") ? 0 : ratio(
+    relevantGrammarAnswers.filter((answer) => answer.correct).length,
+    Math.max(1, lesson.grammarQuestions.length),
+  );
+  const readingQuestions = lesson.readingQuestions ?? [];
+  const readingCorrect = session.readingAnswers.filter((answer) => {
+    const question = readingQuestions.find(
+      (item) => item.id === answer.questionId,
+    );
+    return question ? evaluateAnswer(answer.response, question.answer) : false;
+  }).length;
+  const readingAccuracy = skippedPhases.has("reading") ? 0 : ratio(
+    readingCorrect,
+    Math.max(1, readingQuestions.length),
+  );
+  const listeningAnswers = session.listeningEvents.filter(
+    (event) => event.type === "answer",
+  );
+  const listeningAccuracy = skippedPhases.has("listening") ? 0 : ratio(
+    listeningAnswers.filter((event) => event.correct === true).length,
+    Math.max(1, lesson.listeningExercises.length),
+  );
+  const evaluatedSpeaking = session.speakingEvents.filter(
+    (event) => event.evaluationAvailable,
+  );
+  const speakingAccuracy = skippedPhases.has("speaking")
+    ? 0
+    : evaluatedSpeaking.length > 0
+    ? evaluatedSpeaking.reduce(
+        (total, event) =>
+          total +
+          ratio(
+            event.pronunciationConfidence + event.grammarAccuracy,
+            200,
+          ),
+        0,
+      ) / evaluatedSpeaking.length
+    : session.speakingComplete
+      ? 1
+      : 0;
+
   const storyWords = lesson.story.flatMap((line) =>
     line.words.map((word) => ({ lineId: line.id, word })),
   );
-  const storyIndependence = storyWords.length
+  const storyIndependence = skippedPhases.has("story")
+    ? 0
+    : storyWords.length
     ? storyWords.reduce(
         (total, item) =>
           total +
@@ -77,77 +109,24 @@ export function calculateLessonCompletion(
       ) /
       storyWords.length /
       100
-    : 1;
-  const score = Math.round(
-    reviewScore * 0.5 +
-      vocabularyAccuracy * 20 +
-      grammarAccuracy * 20 +
-      storyIndependence * 10,
-  );
-  const wordsNeedingReview = unique([
-    ...storyWords
-      .filter((item) => {
-        const scores = storyWordScores(
-          session.storyInteractions,
-          item.lineId,
-          item.word,
-        );
-        return (
-          scores.meaning < item.word.baseMeaningScore ||
-          scores.recognition < item.word.baseRecognitionScore ||
-          scores.pronunciation < item.word.basePronunciationScore
-        );
-      })
-      .map((item) => item.word.surface),
-    ...session.vocabularyAnswers
-      .filter((answer) => !answer.correct)
-      .flatMap((answer) =>
-        exerciseTerms(
-          lesson,
-          lesson.vocabularyQuestions.find(
-            (question) => question.id === answer.questionId,
-          )?.targetItemIds,
-        ),
-      ),
-    ...session.grammarAnswers
-      .filter((answer) => !answer.correct)
-      .flatMap((answer) =>
-        exerciseTerms(
-          lesson,
-          lesson.grammarQuestions.find(
-            (question) => question.id === answer.questionId,
-          )?.targetItemIds,
-        ),
-      ),
-    ...session.readingEvents
-      .filter((event) => ["paused-before-word", "pronunciation-issue", "stopped-at-word"].includes(event.type))
-      .map((event) => event.term),
-    ...session.reviewAnswers
-      .filter((answer) => !answer.correct)
-      .flatMap((answer) =>
-        exerciseTerms(
-          lesson,
-          lesson.reviewQuestions.find(
-            (question) => question.id === answer.questionId,
-          )?.targetItemIds,
-        ),
-      ),
-  ]).slice(0, 4);
+    : session.storyComplete
+      ? 1
+      : 0;
 
-  const speaking = session.speakingEvents.at(-1);
+  const score = Math.round(
+    storyIndependence * 15 +
+      vocabularyAccuracy * 25 +
+      grammarAccuracy * 25 +
+      readingAccuracy * 15 +
+      listeningAccuracy * 10 +
+      speakingAccuracy * 10,
+  );
+
   return {
     lessonId: lesson.id,
     score,
-    xpGained: 80 + Math.round(score * 0.7),
+    xpGained: calculateLessonXp(score),
     durationMinutes: Math.max(1, Math.round(session.elapsedSeconds / 60)),
-    recognitionChange: score >= 80 ? 4 : 2,
-    pronunciationChange:
-      speaking?.evaluationAvailable
-        ? Math.max(0, Math.round((speaking.pronunciationConfidence - 60) / 8))
-        : 0,
-    grammarUnderstandingChange: Math.max(1, Math.round(grammarAccuracy * 4)),
-    grammarProductionChange: Math.max(1, Math.round(grammarAccuracy * 3)),
-    wordsNeedingReview,
     completedAt: new Date().toISOString(),
   };
 }
@@ -156,25 +135,4 @@ function ratio(value: number, total: number): number {
   return Math.max(0, Math.min(1, value / total));
 }
 
-function unique(values: string[]): string[] {
-  return Array.from(new Set(values.filter(Boolean)));
-}
 
-function exerciseTerms(
-  lesson: LessonPackage,
-  targetItemIds: string[] | undefined,
-): string[] {
-  if (!targetItemIds?.length) return [];
-  const targetIds = new Set(targetItemIds);
-  return [
-    ...lesson.kanji
-      .filter((item) => item.libraryId && targetIds.has(item.libraryId))
-      .map((item) => item.character),
-    ...lesson.vocabulary
-      .filter((item) => item.libraryId && targetIds.has(item.libraryId))
-      .map((item) => item.term),
-    ...lesson.grammar
-      .filter((item) => item.libraryId && targetIds.has(item.libraryId))
-      .map((item) => item.pattern),
-  ];
-}

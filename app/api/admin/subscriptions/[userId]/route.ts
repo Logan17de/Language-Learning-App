@@ -19,12 +19,26 @@ export async function POST(request: NextRequest, context: { params: Promise<{ us
   }
   const admin = createAdminClient();
   const before = await admin.from("user_subscriptions").select("*").eq("user_id", userId).maybeSingle();
+  if (before.error) return NextResponse.json({ error: before.error.message }, { status: 400 });
+  if (before.data?.billing_provider === "dodo") {
+    return NextResponse.json(
+      { error: "Dodo-managed subscriptions must be changed through the customer billing portal." },
+      { status: 409 },
+    );
+  }
   const { data, error } = await admin.from("user_subscriptions").upsert({
     user_id: userId,
     plan: body.plan as typeof plans[number],
     status: body.status as typeof statuses[number],
     starts_at: new Date().toISOString(),
     mock_payment_status: "mocked",
+    billing_provider: "manual",
+    provider_customer_id: null,
+    provider_subscription_id: null,
+    provider_product_id: null,
+    provider_status: null,
+    cancel_at_period_end: false,
+    last_provider_event_at: null,
   }, { onConflict: "user_id" }).select("*").single();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   await admin.from("profiles").update({ subscription_plan: body.plan as typeof plans[number] }).eq("id", userId);

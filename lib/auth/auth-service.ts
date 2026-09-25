@@ -1,15 +1,12 @@
 "use client";
 
-import {
-  clearGoogleOAuthStorage,
-  createClient,
-  createGoogleOAuthClient,
-} from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { getAppUrl } from "@/lib/supabase/config";
 import {
   isStrongEnough,
   PASSWORD_REQUIREMENTS_MESSAGE,
 } from "@/lib/auth/password-strength";
+import { safeInternalRedirect } from "@/lib/auth/safe-internal-redirect";
 import {
   failure,
   notConfigured,
@@ -24,8 +21,26 @@ export interface AuthIdentity {
   displayName: string;
   role: AppRole;
   subscriptionPlan: "free" | "premium_monthly" | "premium_annual";
+  subscriptionStatus: "active" | "trial" | "cancelled" | "past_due";
+  subscriptionRenewsAt: string | null;
+  billingProvider: "manual" | "dodo";
+  cancelAtPeriodEnd: boolean;
   onboardingComplete: boolean;
 }
+
+type SubscriptionIdentity = {
+  status: AuthIdentity["subscriptionStatus"];
+  renews_at: string | null;
+  billing_provider: AuthIdentity["billingProvider"];
+  cancel_at_period_end: boolean;
+};
+
+const defaultSubscriptionIdentity: SubscriptionIdentity = {
+  status: "active",
+  renews_at: null,
+  billing_provider: "manual",
+  cancel_at_period_end: false,
+};
 
 function friendlyAuthMessage(message: string, code?: string): string {
   const lower = message.toLowerCase();
@@ -100,14 +115,113 @@ function friendlyAuthMessage(message: string, code?: string): string {
   return "Authentication could not be completed. Please try again.";
 }
 
+function friendlyRecoveryCodeMessage(message: string, code?: string): string {
+  const lower = message.toLowerCase();
+  const normalizedCode = code?.toLowerCase();
+
+  if (
+    normalizedCode === "otp_expired" ||
+    normalizedCode === "otp_disabled" ||
+    lower.includes("expired")
+  ) {
+    return "That code has expired. Request a new password-reset code.";
+  }
+
+  if (
+    normalizedCode === "otp_invalid" ||
+    normalizedCode === "invalid_otp" ||
+    lower.includes("invalid") ||
+    lower.includes("token")
+  ) {
+    return "That code is incorrect. Check the 6 digits and try again.";
+  }
+
+  return "That code could not be verified. Check the 6 digits and try again.";
+}
+
+async function loadActiveIdentity(
+  client: NonNullable<ReturnType<typeof createClient>>,
+  userId: string,
+  fallbackEmail: string,
+): Promise<RepositoryResult<AuthIdentity>> {
+  const [profile, preferences, subscription] = await Promise.all([
+    client
+      .from("profiles")
+      .select("display_name,role,status,subscription_plan")
+      .eq("id", userId)
+      .single(),
+    client
+      .from("user_preferences")
+      .select("onboarding_complete")
+      .eq("user_id", userId)
+      .maybeSingle(),
+    client
+      .from("user_subscriptions")
+      .select("status,renews_at,billing_provider,cancel_at_period_end")
+      .eq("user_id", userId)
+      .maybeSingle(),
+  ]);
+  if (profile.error) {
+    await client.auth.signOut({ scope: "local" });
+    return failure(profile.error, "Your profile could not be loaded.");
+  }
+  if (preferences.error) {
+    await client.auth.signOut({ scope: "local" });
+    return failure(
+      preferences.error,
+      "Your onboarding status could not be loaded.",
+    );
+  }
+  if (subscription.error) {
+    await client.auth.signOut({ scope: "local" });
+    return failure(subscription.error, "Your subscription could not be loaded.");
+  }
+  if (profile.data.status !== "active") {
+    await client.auth.signOut({ scope: "local" });
+    return failure(
+      { code: "42501" },
+      "This account is not active. Contact support.",
+    );
+  }
+  const billing = subscription.data ?? defaultSubscriptionIdentity;
+  return success({
+    id: userId,
+    email: fallbackEmail,
+    displayName: profile.data.display_name,
+    role: profile.data.role,
+    subscriptionPlan: profile.data.subscription_plan,
+    subscriptionStatus: billing.status,
+    subscriptionRenewsAt: billing.renews_at,
+    billingProvider: billing.billing_provider,
+    cancelAtPeriodEnd: billing.cancel_at_period_end,
+    onboardingComplete: preferences.data?.onboarding_complete ?? false,
+  });
+}
+
+function emailConfirmationCallback(next?: string) {
+  const callbackUrl = new URL("/auth/callback", getAppUrl());
+  callbackUrl.searchParams.set("flow", "email-confirmation");
+  const safeNext = safeInternalRedirect(next);
+  if (safeNext) callbackUrl.searchParams.set("next", safeNext);
+  return callbackUrl.toString();
+}
+
 export const authService = {
+  async hasSession(): Promise<boolean> {
+    const client = createClient();
+    if (!client) return false;
+    const { data, error } = await client.auth.getSession();
+    if (error) return false;
+    return Boolean(data.session?.user);
+  },
+
   async getIdentity(): Promise<RepositoryResult<AuthIdentity | null>> {
     const client = createClient();
     if (!client) return notConfigured();
     const { data, error } = await client.auth.getUser();
     if (error) return failure(error, "Your session could not be restored.");
     if (!data.user) return success(null);
-    const [profile, preferences] = await Promise.all([
+    const [profile, preferences, subscription] = await Promise.all([
       client
         .from("profiles")
         .select("display_name,role,status,subscription_plan")
@@ -118,6 +232,11 @@ export const authService = {
         .select("onboarding_complete")
         .eq("user_id", data.user.id)
         .maybeSingle(),
+      client
+        .from("user_subscriptions")
+        .select("status,renews_at,billing_provider,cancel_at_period_end")
+        .eq("user_id", data.user.id)
+        .maybeSingle(),
     ]);
     if (profile.error)
       return failure(profile.error, "Your profile could not be loaded.");
@@ -126,13 +245,23 @@ export const authService = {
         preferences.error,
         "Your onboarding status could not be loaded.",
       );
-    if (!profile.data || profile.data.status !== "active") return success(null);
+    if (subscription.error)
+      return failure(subscription.error, "Your subscription could not be loaded.");
+    if (!profile.data || profile.data.status !== "active") {
+      await client.auth.signOut({ scope: "local" });
+      return success(null);
+    }
+    const billing = subscription.data ?? defaultSubscriptionIdentity;
     return success({
       id: data.user.id,
       email: data.user.email ?? "",
       displayName: profile.data.display_name,
       role: profile.data.role,
       subscriptionPlan: profile.data.subscription_plan,
+      subscriptionStatus: billing.status,
+      subscriptionRenewsAt: billing.renews_at,
+      billingProvider: billing.billing_provider,
+      cancelAtPeriodEnd: billing.cancel_at_period_end,
       onboardingComplete: preferences.data?.onboarding_complete ?? false,
     });
   },
@@ -140,8 +269,8 @@ export const authService = {
   subscribe(listener: (signedIn: boolean) => void): () => void {
     const client = createClient();
     if (!client) return () => undefined;
-    const { data } = client.auth.onAuthStateChange((event, session) => {
-      listener(event !== "SIGNED_OUT" && Boolean(session?.user));
+    const { data } = client.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") listener(false);
     });
     return () => data.subscription.unsubscribe();
   },
@@ -150,7 +279,13 @@ export const authService = {
     email: string,
     password: string,
     displayName: string,
-  ): Promise<RepositoryResult<{ confirmationRequired: boolean }>> {
+    next?: string,
+  ): Promise<
+    RepositoryResult<{
+      confirmationRequired: boolean;
+      identity: AuthIdentity | null;
+    }>
+  > {
     if (!isStrongEnough(password)) {
       return failure(
         { code: "WEAK_PASSWORD" },
@@ -159,17 +294,46 @@ export const authService = {
     }
     const client = createClient();
     if (!client) return notConfigured();
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedDisplayName = displayName.trim();
     const { data, error } = await client.auth.signUp({
-      email,
+      email: normalizedEmail,
       password,
       options: {
-        emailRedirectTo: `${getAppUrl()}/auth/callback?next=/onboarding`,
-        data: { display_name: displayName },
+        emailRedirectTo: emailConfirmationCallback(next),
+        data: { display_name: normalizedDisplayName },
       },
+    });
+    if (error) {
+      return failure(error, friendlyAuthMessage(error.message, error.code));
+    }
+    if (!data.session) {
+      return success({ confirmationRequired: true, identity: null });
+    }
+
+    const identity = await loadActiveIdentity(
+      client,
+      data.session.user.id,
+      data.session.user.email ?? normalizedEmail,
+    );
+    if (!identity.ok) return identity;
+    return success({ confirmationRequired: false, identity: identity.data });
+  },
+
+  async resendSignUpConfirmation(
+    email: string,
+    next?: string,
+  ): Promise<RepositoryResult<null>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { error } = await client.auth.resend({
+      type: "signup",
+      email: email.trim().toLowerCase(),
+      options: { emailRedirectTo: emailConfirmationCallback(next) },
     });
     return error
       ? failure(error, friendlyAuthMessage(error.message, error.code))
-      : success({ confirmationRequired: !data.session });
+      : success(null);
   },
 
   async signIn(
@@ -178,56 +342,87 @@ export const authService = {
   ): Promise<RepositoryResult<AuthIdentity>> {
     const client = createClient();
     if (!client) return notConfigured();
+    const normalizedEmail = email.trim().toLowerCase();
     const { data, error } = await client.auth.signInWithPassword({
-      email,
+      email: normalizedEmail,
       password,
     });
     if (error) return failure(error, friendlyAuthMessage(error.message, error.code));
-    const [profile, preferences] = await Promise.all([
-      client
-        .from("profiles")
-        .select("display_name,role,status,subscription_plan")
-        .eq("id", data.user.id)
-        .single(),
-      client
-        .from("user_preferences")
-        .select("onboarding_complete")
-        .eq("user_id", data.user.id)
-        .maybeSingle(),
-    ]);
-    if (profile.error)
-      return failure(profile.error, "Your profile could not be loaded.");
-    if (preferences.error)
+    return loadActiveIdentity(
+      client,
+      data.user.id,
+      data.user.email ?? normalizedEmail,
+    );
+  },
+
+  async signInWithGoogleIdToken(
+    mode: "login" | "signup",
+    token: string,
+    nonce: string,
+  ): Promise<RepositoryResult<AuthIdentity>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { data, error } = await client.auth.signInWithIdToken({
+      provider: "google",
+      token,
+      nonce,
+    });
+    if (error) return failure(error, friendlyAuthMessage(error.message, error.code));
+    if (!data.user) {
       return failure(
-        preferences.error,
-        "Your onboarding status could not be loaded.",
-      );
-    if (profile.data.status !== "active") {
-      await client.auth.signOut();
-      return failure(
-        { code: "42501" },
-        "This account is not active. Contact support.",
+        { code: "GOOGLE_ID_TOKEN_NO_USER" },
+        "Google sign-in could not be completed. Please try again.",
       );
     }
-    return success({
-      id: data.user.id,
-      email: data.user.email ?? email,
-      displayName: profile.data.display_name,
-      role: profile.data.role,
-      subscriptionPlan: profile.data.subscription_plan,
-      onboardingComplete: preferences.data?.onboarding_complete ?? false,
-    });
+
+    const registrationComplete =
+      data.user.user_metadata?.aiko_google_registration_complete;
+    const createdAt = Date.parse(data.user.created_at);
+    const newlyCreated =
+      Number.isFinite(createdAt) && Date.now() - createdAt < 5 * 60 * 1000;
+
+    if (
+      mode === "login" &&
+      (registrationComplete === false ||
+        (registrationComplete !== true && newlyCreated))
+    ) {
+      await client.auth.updateUser({
+        data: { aiko_google_registration_complete: false },
+      });
+      await client.auth.signOut({ scope: "local" });
+      return failure(
+        { code: "NO_GOOGLE_ACCOUNT" },
+        "No AIko account is linked to this Google account. Create an account first.",
+      );
+    }
+
+    if (registrationComplete !== true) {
+      const { error: updateError } = await client.auth.updateUser({
+        data: { aiko_google_registration_complete: true },
+      });
+      if (updateError) {
+        await client.auth.signOut({ scope: "local" });
+        return failure(
+          updateError,
+          "Your Google account was verified, but AIko could not finish account setup. Please try again.",
+        );
+      }
+    }
+
+    return loadActiveIdentity(
+      client,
+      data.user.id,
+      data.user.email ?? "",
+    );
   },
 
   async signInWithGoogle(
-    mode: "login" | "signup" | "admin",
+    mode: "admin",
     next?: string,
   ): Promise<RepositoryResult<null>> {
-    clearGoogleOAuthStorage();
-    const client = createGoogleOAuthClient();
+    const client = createClient();
     if (!client) return notConfigured();
-    const safeNext =
-      next?.startsWith("/") && !next.startsWith("//") ? next : null;
+    const safeNext = safeInternalRedirect(next);
     const callbackUrl = new URL("/auth/callback", getAppUrl());
     callbackUrl.searchParams.set("flow", mode);
     if (safeNext) callbackUrl.searchParams.set("next", safeNext);
@@ -252,11 +447,25 @@ export const authService = {
   async requestPasswordReset(email: string): Promise<RepositoryResult<null>> {
     const client = createClient();
     if (!client) return notConfigured();
-    const { error } = await client.auth.resetPasswordForEmail(email, {
-      redirectTo: `${getAppUrl()}/auth/callback?next=/reset-password`,
-    });
+    const { error } = await client.auth.resetPasswordForEmail(email);
     return error
       ? failure(error, friendlyAuthMessage(error.message, error.code))
+      : success(null);
+  },
+
+  async verifyPasswordResetCode(
+    email: string,
+    token: string,
+  ): Promise<RepositoryResult<null>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { error } = await client.auth.verifyOtp({
+      email,
+      token,
+      type: "recovery",
+    });
+    return error
+      ? failure(error, friendlyRecoveryCodeMessage(error.message, error.code))
       : success(null);
   },
 

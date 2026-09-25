@@ -53,7 +53,7 @@ describe("custom lesson generation traces", () => {
     expect(story).toContain('stage: "story"');
     expect(generateRoute).toContain("requestId: generation.requestId");
     expect(generateRoute).toContain("withGenerationTraceContext");
-    expect(completeRoute).toContain("withGenerationTraceContext");
+    expect(completeRoute).toContain("processCustomLessonJobs");
   });
 
   it("records transient retries without turning trace failures into lesson failures", () => {

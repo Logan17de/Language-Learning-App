@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 const source = readFileSync("components/exercises/audio-control.tsx", "utf8");
 const player = readFileSync("components/lesson/lesson-player.tsx", "utf8");
+const listening = readFileSync("components/lesson/listening-phase.tsx", "utf8");
 
 describe("listening audio preload contract", () => {
   it("requests and buffers audio when the control mounts", () => {
@@ -31,11 +32,52 @@ describe("listening audio preload contract", () => {
     expect(source).not.toContain('fetch("/api/audio/tts", {\n          method');
   });
 
-  it("starts preloading listening-only audio when the lesson player mounts", () => {
+  it("releases media elements that never became playable", () => {
+    // The real defect behind the stuck "Loading audio..." control. Chrome caps
+    // how many media players a renderer holds, and the renderer outlives the
+    // page, so an element abandoned mid-load leaks its slot permanently. Once
+    // enough leak, every later load stalls at readyState 0 -- even a local
+    // data: URI -- and reloading cannot recover, because the reload lands in
+    // the same renderer. Failed loads must be torn down, not just dropped.
+    expect(source).toContain("function releaseAudio");
+    expect(source).toContain('audio.removeAttribute("src")');
+    // Both failure paths release, not just the error one.
+    const timeoutRelease = source.indexOf("releaseAudio(audio)");
+    expect(timeoutRelease).toBeGreaterThanOrEqual(0);
+    expect(source.indexOf("releaseAudio(audio)", timeoutRelease + 1)).toBeGreaterThan(timeoutRelease);
+  });
+
+  it("bounds the preloaded audio cache so retained clips cannot pile up", () => {
+    expect(source).toContain("const MAX_CACHED_AUDIO");
+    expect(source).toContain("evictStaleAudio()");
+    // Never yank a clip out from under a learner who is listening to it.
+    expect(source).toContain("if (!audio.paused) return;");
+  });
+
+  it("gives up on audio that never becomes playable", () => {
+    // Some environments leave a media element at readyState 0 forever without
+    // ever firing error. Without a deadline the promise never settles, the
+    // control stays on "Loading audio..." with the answers locked, and every
+    // retry rejoins the same cached dead wait.
+    expect(source).toContain("const AUDIO_LOAD_TIMEOUT_MS");
+    expect(source).toContain("clearTimeout(timer)");
+    expect(source).toContain("preloadedAudioCache.delete(key)");
+  });
+
+  it("warms the first listening clip before the learner reaches the phase", () => {
     expect(source).toContain("export function preloadListeningAudio");
-    expect(player).toContain("for (const exercise of lesson.listeningExercises)");
     expect(player).toContain("void preloadListeningAudio({");
-    expect(player).toContain("text: exercise.transcript");
-    expect(player).not.toContain("lesson.speakingExercises) {\n      void preloadListeningAudio");
+    expect(player).toContain("const first = lesson.listeningExercises[0]");
+    expect(player).toContain("text: first.transcript");
+    // Not all five at once: that would put five downloads in flight against
+    // the lesson content the learner is still reading.
+    expect(player).not.toContain("for (const exercise of lesson.listeningExercises)");
+  });
+
+  it("keeps exactly one listening clip ahead of the learner", () => {
+    expect(listening).toContain("const nextExercise = exercises[currentIndex + 1]");
+    expect(listening).toContain("void preloadListeningAudio({");
+    expect(listening).toContain("text: nextExercise.transcript");
+    expect(listening).toContain("audioAssetId: nextExercise.audioAssetId");
   });
 });

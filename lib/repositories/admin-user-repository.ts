@@ -8,7 +8,6 @@ import {
 import type { Database, ProfileRow } from "@/types/database";
 
 type Completion = Database["public"]["Tables"]["lesson_completions"]["Row"];
-type Review = Database["public"]["Tables"]["review_results"]["Row"];
 type Request = Database["public"]["Tables"]["custom_lesson_requests"]["Row"];
 type Report = Database["public"]["Tables"]["lesson_reports"]["Row"];
 type Ticket = Database["public"]["Tables"]["support_tickets"]["Row"];
@@ -33,7 +32,6 @@ export interface AdminUserDetailData {
   settings: Settings | null;
   subscriptions: Subscription[];
   completions: Completion[];
-  reviews: Review[];
   customRequests: Request[];
   reports: Report[];
   tickets: Ticket[];
@@ -95,13 +93,12 @@ export const adminUserRepository = {
   async getDetail(userId: string): Promise<RepositoryResult<AdminUserDetailData>> {
     const client = createClient();
     if (!client) return notConfigured();
-    const [profile, preferences, settings, subscriptions, completions, reviews, requests, reports, tickets, audit, mastery, activity] = await Promise.all([
+    const [profile, preferences, settings, subscriptions, completions, requests, reports, tickets, audit, mastery, activity] = await Promise.all([
       client.from("profiles").select("*").eq("id", userId).single(),
       client.from("user_preferences").select("*").eq("user_id", userId).maybeSingle(),
       client.from("user_settings").select("*").eq("user_id", userId).maybeSingle(),
       client.from("user_subscriptions").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
       client.from("lesson_completions").select("*").eq("user_id", userId).order("completed_at", { ascending: false }).limit(100),
-      client.from("review_results").select("*").eq("user_id", userId).order("completed_at", { ascending: false }).limit(100),
       client.from("custom_lesson_requests").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(100),
       client.from("lesson_reports").select("*").eq("user_id", userId).order("submitted_at", { ascending: false }).limit(100),
       client.from("support_tickets").select("*").eq("user_id", userId).order("last_message_at", { ascending: false }).limit(100),
@@ -109,7 +106,7 @@ export const adminUserRepository = {
       client.from("learner_mastery").select("*").eq("user_id", userId).order("updated_at", { ascending: false }).limit(1000),
       client.from("weekly_activity").select("*").eq("user_id", userId).order("activity_date", { ascending: false }).limit(90),
     ]);
-    const error = firstError([profile, preferences, settings, subscriptions, completions, reviews, requests, reports, tickets, audit, mastery, activity]);
+    const error = firstError([profile, preferences, settings, subscriptions, completions, requests, reports, tickets, audit, mastery, activity]);
     if (error) return failure(error, "User detail could not be loaded.");
     if (!profile.data) return failure({ code: "PGRST116" }, "User not found.");
 
@@ -119,7 +116,6 @@ export const adminUserRepository = {
       settings: settings.data,
       subscriptions: subscriptions.data ?? [],
       completions: completions.data ?? [],
-      reviews: reviews.data ?? [],
       customRequests: requests.data ?? [],
       reports: reports.data ?? [],
       tickets: tickets.data ?? [],

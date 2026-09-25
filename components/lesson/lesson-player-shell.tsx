@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, X } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -13,7 +13,8 @@ export function LessonPlayerShell({
   progress,
   canContinue,
   continueLabel,
-  onBack,
+  skipDisabled,
+  onSkip,
   onContinue,
   onExit,
   children,
@@ -25,7 +26,8 @@ export function LessonPlayerShell({
   progress: number;
   canContinue: boolean;
   continueLabel: string;
-  onBack: () => void;
+  skipDisabled?: boolean;
+  onSkip?: () => void;
   onContinue: () => void;
   onExit: () => void;
   children: ReactNode;
@@ -53,9 +55,13 @@ export function LessonPlayerShell({
 
       <footer className="fixed inset-x-0 bottom-0 z-40 border-t border-black/[.06] bg-white/95 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-5 sm:px-8">
-          <Button type="button" variant="ghost" onClick={onBack} className="px-4">
-            <ArrowLeft className="size-4" /> Back
-          </Button>
+          {onSkip ? (
+            <Button type="button" variant="ghost" onClick={onSkip} disabled={skipDisabled} className="px-4">
+              Skip section
+            </Button>
+          ) : (
+            <span aria-hidden="true" />
+          )}
           <Button type="button" onClick={onContinue} disabled={!canContinue} className="min-w-40">
             {continueLabel} <ArrowRight className="size-4" />
           </Button>

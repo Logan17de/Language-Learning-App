@@ -28,7 +28,6 @@ export type ProfileRow = Timestamps & {
   current_jlpt_level: Database["public"]["Enums"]["jlpt_level"];
   learning_goal: string | null;
   daily_study_minutes: number;
-  interests: string[];
   subscription_plan: Database["public"]["Enums"]["subscription_plan"];
   role: Database["public"]["Enums"]["app_role"];
   status: Database["public"]["Enums"]["account_status"];
@@ -111,9 +110,10 @@ export interface Database {
   public: {
     Tables: {
       profiles: TableDef<ProfileRow>;
-      user_preferences: TableDef<OwnedRow & { learning_goal: string | null; daily_study_minutes: number; interests: string[]; onboarding_complete: boolean }>;
+      user_preferences: TableDef<OwnedRow & { learning_goal: string | null; daily_study_minutes: number; onboarding_complete: boolean }>;
       user_settings: TableDef<OwnedRow & { settings: Json }>;
-      user_subscriptions: TableDef<OwnedRow & { plan: Database["public"]["Enums"]["subscription_plan"]; status: Database["public"]["Enums"]["subscription_status"]; billing_interval: string | null; starts_at: string; renews_at: string | null; cancelled_at: string | null; mock_payment_status: string }>;
+      user_subscriptions: TableDef<OwnedRow & { plan: Database["public"]["Enums"]["subscription_plan"]; status: Database["public"]["Enums"]["subscription_status"]; billing_interval: string | null; starts_at: string; renews_at: string | null; cancelled_at: string | null; mock_payment_status: string; billing_provider: "manual" | "dodo"; provider_customer_id: string | null; provider_subscription_id: string | null; provider_product_id: string | null; provider_status: string | null; cancel_at_period_end: boolean; last_provider_event_at: string | null }>;
+      billing_webhook_events: TableDef<{ webhook_id: string; provider: "dodo"; event_type: string; event_at: string; user_id: string | null; provider_subscription_id: string | null; payload: Json; processed_at: string }>;
       curriculum_levels: TableDef<Timestamps & { id: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; title: string; description: string; sequence_order: number }>;
       curriculum_items: TableDef<Timestamps & { id: string; curriculum_level_id: string; item_type: string; label: string; sequence_order: number; required: boolean; prerequisite_ids: string[]; archived_at: string | null }>;
       grammar_catalog: TableDef<Timestamps & { id: string; pattern: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; source_order: number; active: boolean; accepted_patterns: string[] }>;
@@ -121,7 +121,7 @@ export interface Database {
       kanji_catalog: TableDef<Timestamps & { id: string; character: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; source_order: number; active: boolean }>;
       kanji_records: TableDef<Timestamps & LibraryMetadata & { id: string; legacy_id: string | null; character: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; meanings: string[]; readings: string[]; onyomi: string[]; kunyomi: string[]; example_words: string[]; stroke_count: number; prerequisite_kanji: string[]; archived_at: string | null }>;
       kana_records: TableDef<Timestamps & { id: string; value: string; normalized_value: string; script_type: "hiragana" | "katakana" | "mixed"; usage_count: number }>;
-      vocabulary_records: TableDef<Timestamps & LibraryMetadata & { id: string; legacy_id: string | null; written_form: string; reading: string; kana_id: string; meaning: string; part_of_speech: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; tags: string[]; example_sentence: string; linked_kanji_ids: string[]; archived_at: string | null }>;
+      vocabulary_records: TableDef<Timestamps & LibraryMetadata & { id: string; legacy_id: string | null; written_form: string; dictionary_form: string; aliases: string[]; reading: string; kana_id: string; meaning: string; part_of_speech: string; jlpt_level: Database["public"]["Enums"]["jlpt_level"]; tags: string[]; example_sentence: string; linked_kanji_ids: string[]; archived_at: string | null }>;
       story_vocabulary_enrichments: TableDef<{ id: string; request_id: string; user_id: string; vocabulary_id: string; position: number; word: string; reading: string; meaning: string; source_model: string | null; created_at: string }>;
       lessons: TableDef<LessonRow>;
       lesson_versions: TableDef<LessonVersionRow>;
@@ -142,7 +142,7 @@ export interface Database {
       lesson_activity_answers: TableDef<OwnedRow & { lesson_session_id: string; phase: string; activity_id: string; selected_answer: string; correct: boolean; attempts: number; answer_data: Json }>;
       lesson_events: TableDef<OwnedRow & { lesson_session_id: string; client_event_id: string; phase: string; event_type: string; event_data: Json; occurred_at: string }>;
       lesson_completions: TableDef<OwnedRow & { lesson_id: string; lesson_version_id: string; lesson_session_id: string; score: number; xp_awarded: number; duration_minutes: number; completion_data: Json; completed_at: string }>;
-      lesson_assignments: TableDef<Timestamps & { id: string; user_id: string; lesson_id: string; lesson_version_id: string; selection_mode: "free_random" | "pro_interest" | "pro_custom"; status: "assigned" | "started" | "completed"; algorithm_version: string; interest_matches: string[]; assigned_at: string; started_at: string | null; completed_at: string | null }>;
+      lesson_assignments: TableDef<Timestamps & { id: string; user_id: string; lesson_id: string; lesson_version_id: string; selection_mode: "standard" | "pro_custom"; status: "assigned" | "started" | "completed" | "abandoned"; algorithm_version: string; assigned_at: string; started_at: string | null; completed_at: string | null }>;
       learner_mastery: TableDef<OwnedRow & { item_type: string; item_key: string; mastery: number; confidence: number; last_reviewed_at: string | null; next_review_at: string | null; evidence_count: number; meaning_score: number; recognition_score: number; pronunciation_score: number }>;
       learner_mastery_events: TableDef<{ id: string; user_id: string; lesson_id: string | null; lesson_version_id: string | null; lesson_session_id: string | null; client_event_id: string; item_type: "kanji" | "vocabulary" | "grammar"; item_key: string; dimension: "meaning" | "recognition" | "pronunciation"; signal: "exposure" | "revealed_reading" | "revealed_meaning" | "correct" | "incorrect" | "pronunciation_correct" | "pronunciation_incorrect"; score_delta: number; event_data: Json; occurred_at: string; created_at: string }>;
       review_queue: TableDef<OwnedRow & { item_type: string; item_key: string; prompt_data: Json; due_at: string; confidence: number; reason: string; status: string }>;
@@ -188,6 +188,28 @@ export interface Database {
       };
     };
     Functions: {
+      apply_dodo_subscription_event: {
+        Args: {
+          p_webhook_id: string;
+          p_event_type: string;
+          p_event_at: string;
+          p_payload: Json;
+          p_user_id: string;
+          p_plan: Database["public"]["Enums"]["subscription_plan"];
+          p_status: Database["public"]["Enums"]["subscription_status"];
+          p_billing_interval: string;
+          p_provider_customer_id: string;
+          p_provider_subscription_id: string;
+          p_provider_product_id: string;
+          p_provider_status: string;
+          p_starts_at: string;
+          p_renews_at: string | null;
+          p_cancelled_at: string | null;
+          p_cancel_at_period_end: boolean;
+          p_entitled: boolean;
+        };
+        Returns: Json;
+      };
       complete_lesson_session: {
         Args: { p_session_id: string; p_score: number; p_xp: number; p_duration_minutes: number; p_completion_data: Json };
         Returns: Json;
@@ -232,16 +254,20 @@ export interface Database {
         Args: Record<string, never>;
         Returns: Json;
       };
-      begin_custom_lesson_generation: {
-        Args: { p_topic: string; p_duration_minutes: number; p_focus: string; p_speaking_difficulty: string; p_note: string };
-        Returns: Json;
-      };
       begin_custom_lesson_generation_v2: {
         Args: { p_topic: string; p_level: Database["public"]["Enums"]["jlpt_level"] };
         Returns: Json;
       };
       begin_custom_lesson_generation_v3: {
         Args: { p_topic: string; p_level: Database["public"]["Enums"]["jlpt_level"] };
+        Returns: Json;
+      };
+      begin_custom_lesson_generation_v4: {
+        Args: { p_topic: string; p_level: Database["public"]["Enums"]["jlpt_level"] };
+        Returns: Json;
+      };
+      custom_lesson_scheduler_diagnostics: {
+        Args: Record<string, never>;
         Returns: Json;
       };
       enrich_custom_lesson_library: {
@@ -262,6 +288,22 @@ export interface Database {
       };
       get_learner_progress_summary: {
         Args: Record<string, never>;
+        Returns: Json;
+      };
+      get_playable_lesson_payload: {
+        Args: { p_lesson_id: string };
+        Returns: Json;
+      };
+      learner_level_mastery: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      lesson_mastery_progress: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      start_or_resume_lesson_session: {
+        Args: { p_lesson_id: string; p_lesson_version_id: string };
         Returns: Json;
       };
       record_mastery_evidence: {

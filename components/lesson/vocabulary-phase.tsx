@@ -11,6 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { selectNextAdaptiveQuestionIndex } from "@/lib/adaptive-difficulty";
 import { CANONICAL_LESSON_ACTIVITY_COUNTS } from "@/lib/lesson-contract";
+import {
+  answerSafeInspectableTerms,
+  questionAllowsTappableWords,
+} from "@/lib/lesson-question-inspection";
 
 const QUESTION_TARGET = CANONICAL_LESSON_ACTIVITY_COUNTS.vocabulary;
 
@@ -43,6 +47,16 @@ export function VocabularyPhase({
   const question = vocabularyQuestions[currentIndex];
   const answer = session.vocabularyAnswers.find((item) => item.questionId === question.id);
   const roundComplete = answeredCount >= QUESTION_TARGET;
+  const inspectableTerms = answerSafeInspectableTerms({
+    enabled:
+      question.tappableWords ?? questionAllowsTappableWords(question.cue),
+    prompt: question.prompt,
+    correctAnswer: question.correctAnswer,
+    targetItemIds: question.targetItemIds,
+    terms: question.inspectableTerms.length
+      ? question.inspectableTerms
+      : lesson.story.flatMap((line) => line.words),
+  });
 
   function select(selectedAnswer: string) {
     if (answer) return;
@@ -74,7 +88,7 @@ export function VocabularyPhase({
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-5xl">
       <div className="flex items-end justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -82,7 +96,7 @@ export function VocabularyPhase({
             <Badge tone="neutral">{question.modeLabel}</Badge>
           </div>
           <h2 className="mt-4 text-3xl font-semibold tracking-tight">Vocabulary & kanji</h2>
-          <p className="mt-2 text-sm leading-6 text-stone-500">Thirteen questions build from direct recognition to vocabulary in context.</p>
+          <p className="mt-2 text-sm leading-6 text-stone-500">Seven questions build from direct recognition to vocabulary in context.</p>
         </div>
         <p className="shrink-0 text-sm font-semibold text-stone-500">{Math.min(answeredCount + (answer ? 0 : 1), QUESTION_TARGET)} / {QUESTION_TARGET}</p>
       </div>
@@ -101,16 +115,17 @@ export function VocabularyPhase({
           answerCorrect={answer?.correct}
           lockAfterAnswer
           inspectChoices={false}
-          inspectableTerms={question.inspectableTerms.length ? question.inspectableTerms : lesson.story.flatMap((line) => line.words)}
+          inspectableTerms={inspectableTerms}
           onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, question.id, word, reveal))}
           onSelect={select}
+          answerAction={
+            answer && !roundComplete ? (
+              <Button type="button" className="h-full min-h-14 px-5" onClick={nextQuestion}>
+                Next <ArrowRight className="size-4" />
+              </Button>
+            ) : null
+          }
         />
-
-        {answer && !roundComplete && (
-          <Button type="button" className="mt-6" onClick={nextQuestion}>
-            Next question <ArrowRight className="size-4" />
-          </Button>
-        )}
 
         {answer && roundComplete && (
           <div className="mt-6 flex items-start gap-3 rounded-2xl bg-moss-50 p-4 text-sm text-moss-800">

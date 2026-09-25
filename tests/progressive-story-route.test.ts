@@ -1,8 +1,15 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-const customTopic = readFileSync(
-  "components/custom-topic/custom-topic-page.tsx",
+// /learn is the single learner lesson-creation surface. The old
+// components/custom-topic/custom-topic-page.tsx builder was deliberately
+// deleted and must not come back as a competing flow.
+const learnLibrary = readFileSync(
+  "components/learn/lesson-library.tsx",
+  "utf8",
+);
+const retiredCustomTopicRoute = readFileSync(
+  "app/custom-topic/page.tsx",
   "utf8",
 );
 const progressive = readFileSync(
@@ -23,15 +30,22 @@ const buildingRoute = readFileSync(
 );
 
 describe("progressive custom lesson reading", () => {
-  it("leaves the custom-topic builder as soon as the story request is ready", () => {
-    expect(customTopic).toContain('searchParams.get("requestId")');
-    expect(customTopic).toContain(
-      "router.replace(`/lesson/building/${encodeURIComponent(activeRequest)}`)",
-    );
-    expect(customTopic).toContain(
+  it("leaves the /learn builder as soon as the story request is ready", () => {
+    expect(learnLibrary).toContain("requestId?: string;");
+    expect(learnLibrary).toContain(
       "router.replace(`/lesson/building/${encodeURIComponent(result.requestId)}`)",
     );
-    expect(customTopic).not.toContain("<InspectableText");
+    // A lesson that is already built skips the building route entirely.
+    expect(learnLibrary).toContain(
+      "router.replace(`/lesson/${result.lesson_id}/play`)",
+    );
+    // The builder never renders story text itself; that is the player's job.
+    expect(learnLibrary).not.toContain("<InspectableText");
+  });
+
+  it("keeps /custom-topic retired instead of a competing builder", () => {
+    expect(retiredCustomTopicRoute).toContain('redirect("/learn")');
+    expect(retiredCustomTopicRoute).not.toContain("CustomTopicPage");
   });
 
   it("renders the story in the real lesson player with transient build notices", () => {
@@ -45,7 +59,8 @@ describe("progressive custom lesson reading", () => {
     expect(progressive).not.toContain("Lesson readiness");
     expect(progressive).not.toContain("lg:sticky lg:top-28");
     expect(progressive).toContain("<InspectableText");
-    expect(progressive).toContain("Story audio is off");
+    expect(progressive).toContain("Tap a word when you need its reading or meaning");
+    expect(progressive).not.toContain("supported words");
     expect(progressive).not.toContain("<AudioControl");
   });
 
@@ -56,25 +71,31 @@ describe("progressive custom lesson reading", () => {
     expect(progressive).toContain("createEmptyLessonSession(lessonId)");
     expect(progressive).toContain("session.currentPhaseIndex = 1");
     expect(progressive).toContain("session.storyComplete = true");
-    expect(progressive).toContain("router.push(`/lesson/${lessonId}/play`)");
-    expect(progressive).toContain('continueLabel={lessonReady ? "Vocabulary"');
+    expect(progressive).toContain("router.replace(`/lesson/${lessonId}/play`)");
+    expect(progressive).toContain("continueToLesson();");
+    expect(progressive).toContain("window.sessionStorage");
+    expect(progressive).not.toContain("document.hidden ? 10_000");
+    expect(progressive).toContain('continueLabel={canContinue ? "Vocabulary"');
+    expect(progressive).toContain("lessonPreloadSettled");
     expect(lessonPlayer).toContain(
       "const storedSessions = useAppStore.getState().lessonSessions",
     );
     expect(lessonPlayer).toContain("createEmptyLessonSession(lesson.id)");
     expect(lessonPlayer).toContain("queueMicrotask");
     expect(lessonPlayer).toContain("setSession(fallback)");
-    expect(lessonPlayer).toContain(
-      "const next = preferAdvancedSession(local, restored)",
-    );
+    // preferAdvancedSession was renamed preferDurableSession when resume
+    // became phase-atomic: the restored checkpoint is a durable phase
+    // boundary, not the furthest question the learner reached.
+    expect(lessonPlayer).toContain("preferDurableSession(");
+    expect(lessonPlayer).toContain("restartIncompleteLessonPhase(selected)");
     expect(lessonPlayer).not.toContain("startOrResumeLesson");
     expect(lessonPlayer).not.toContain("initialPersistedSessionRef");
   });
 
   it("carries a database route checkpoint into a legacy-mapped lesson", () => {
-    expect(lessonResolver).toContain(
-      "<LessonPlayer lesson={lesson} routeLessonId={lessonId} />",
-    );
+    expect(lessonResolver).toContain("<LessonPlayer");
+    expect(lessonResolver).toContain("lesson={lesson}");
+    expect(lessonResolver).toContain("routeLessonId={lessonId}");
     expect(lessonPlayer).toContain("storedSessions[routeLessonId]");
     expect(lessonPlayer).toContain(
       "normalizeLessonSession(lesson.id, routeSession)",

@@ -1,72 +1,78 @@
 "use client";
 
-import { useState } from "react";
 import {
   Brain,
   Check,
   CircleCheckBig,
   Crown,
   MessageCircleMore,
-  Route,
   Sparkles,
-  TrendingUp,
+  Volume2,
 } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
-import type { BillingPeriod } from "@/types/app-preferences";
 import { Badge } from "@/components/ui/badge";
-import { Button, ButtonLink } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import {
+  BillingReturnNotice,
+  CheckoutButton,
+  ManageBillingButton,
+} from "@/components/subscription/billing-actions";
 
 const premiumFeatures = [
   {
-    icon: Route,
-    title: "Interest-based recommendations",
-    copy: "Your interests rank suitable lessons while completed and assigned lessons stay out of rotation.",
+    icon: Sparkles,
+    title: "Five lessons each day",
+    copy: "Create up to five AI lessons from the topics and Japanese levels you choose.",
   },
   {
-    icon: Sparkles,
-    title: "Custom-topic AI lessons",
-    copy: "Generate a complete lesson package from your topic, level, weak grammar, and unseen kanji.",
+    icon: Volume2,
+    title: "Listening practice",
+    copy: "Hear the lesson audio and complete its connected listening activities.",
   },
   {
     icon: MessageCircleMore,
-    title: "Extended speaking practice",
-    copy: "Use guided-to-open speaking tasks with meaning-based answer evaluation.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Complete learning insights",
-    copy: "See deeper mastery, confidence, review priority, strengths, and weaknesses.",
+    title: "Speaking practice",
+    copy: "Read lesson sentences aloud with live transcription and sentence matching.",
   },
 ] as const;
 
 const proFeatureNames = [
-  "Interest-based lesson recommendations",
-  "Custom-topic AI lesson generation",
-  "Unlimited adaptive lesson access",
-  "Extended speaking practice",
-  "Deeper progress analytics and review",
+  "Five lesson creations each day",
+  "Listening practice with lesson audio",
+  "Speaking practice with live transcription",
 ];
 
 export function SubscriptionPage() {
   const subscription = useAppStore((state) => state.subscription);
-  return subscription.plan === "premium"
-    ? <PremiumSubscriptionPage />
-    : <FreeSubscriptionPage />;
+  return (
+    <>
+      <BillingReturnNotice />
+      {subscription.plan === "premium" ? <PremiumSubscriptionPage /> : <FreeSubscriptionPage />}
+    </>
+  );
+}
+
+function readableBillingDate(value?: string): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat("en", { dateStyle: "long" }).format(date);
 }
 
 function PremiumSubscriptionPage() {
   const subscription = useAppStore((state) => state.subscription);
+  const renewalDate = readableBillingDate(subscription.renewsAt);
+  const managedByDodo = subscription.billingProvider === "dodo";
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-7 sm:px-8 sm:py-9">
       <header className="flex flex-col gap-5 rounded-4xl bg-moss-900 p-7 text-white sm:flex-row sm:items-end sm:justify-between sm:p-9">
         <div>
           <Badge tone="orange"><Crown className="mr-1 size-3" /> Premium account</Badge>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">Your full AIko experience is active.</h1>
+          <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">Your complete lesson access is active.</h1>
           <p className="mt-3 max-w-2xl leading-7 text-white/65">
-            Custom generation, interest-shaped recommendations, extended speaking, and complete learning insights are unlocked.
+            Create up to five lessons each day and use Listening and Speaking practice.
           </p>
         </div>
         <div className="shrink-0 rounded-3xl border border-white/10 bg-white/8 px-6 py-5">
@@ -104,18 +110,26 @@ function PremiumSubscriptionPage() {
             </ButtonLink>
             <ButtonLink href="/progress" variant="secondary">View complete insights</ButtonLink>
             <ButtonLink href="/learn" variant="secondary">Continue my lesson</ButtonLink>
-            <ButtonLink href="/profile" variant="secondary">Update interests</ButtonLink>
+            <ButtonLink href="/profile" variant="secondary">View learning profile</ButtonLink>
           </div>
         </Card>
         <Card className="p-6 sm:p-7">
           <p className="text-xs font-semibold uppercase tracking-[.18em] text-stone-400">Plan management</p>
           <h2 className="mt-3 text-xl font-semibold capitalize">{subscription.billingPeriod} premium</h2>
           <p className="mt-2 text-sm leading-6 text-stone-500">
-            Billing checkout is not connected yet, so this account will not be automatically charged, renewed, or downgraded here.
+            {managedByDodo
+              ? subscription.cancelAtPeriodEnd
+                ? `Cancellation is scheduled${renewalDate ? ` for ${renewalDate}` : " at the end of this billing period"}. Your access remains active until then.`
+                : renewalDate
+                  ? `Your membership renews on ${renewalDate}. Manage payment methods, invoices, or cancellation securely.`
+                  : "Manage payment methods, invoices, renewal, or cancellation securely."
+              : "This Premium access was assigned by AIko and is managed by support."}
           </p>
-          <ButtonLink href="/support" variant="ghost" className="mt-4 px-0 text-moss-700">
-            Contact support about this plan
-          </ButtonLink>
+          <div className="mt-5">
+            {managedByDodo
+              ? <ManageBillingButton />
+              : <ButtonLink href="/support" variant="secondary" className="w-full">Contact support about this plan</ButtonLink>}
+          </div>
         </Card>
       </section>
     </div>
@@ -124,53 +138,34 @@ function PremiumSubscriptionPage() {
 
 function FreeSubscriptionPage() {
   const subscription = useAppStore((state) => state.subscription);
-  const [billing, setBilling] = useState<BillingPeriod>(subscription.billingPeriod);
-  const [showCheckoutNotice, setShowCheckoutNotice] = useState(false);
-  const price = billing === "annual" ? "¥20,000" : "¥2,000";
-  const priceSuffix = billing === "annual" ? "/ year" : "/ month";
+  const price = "$10 USD";
+  const priceSuffix = "/ month";
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-9">
       <header className="text-center">
         <Badge tone="neutral">Free account</Badge>
         <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-          Unlock the complete AIko system.
+          Unlock every lesson phase.
         </h1>
         <p className="mx-auto mt-3 max-w-2xl leading-7 text-stone-500">
-          Your free account keeps the core learning path. Premium adds personal lesson selection, AI-generated topics, extended speaking, and deeper insights.
+          Free includes one lesson each day plus Story, Vocabulary, Grammar, and Reading. Premium adds more daily lessons, Listening, and Speaking.
         </p>
       </header>
-
-      <div className="mx-auto mt-7 flex w-fit rounded-full bg-stone-100 p-1" role="group" aria-label="Premium billing period">
-        {(["monthly", "annual"] as BillingPeriod[]).map((period) => (
-          <button
-            key={period}
-            type="button"
-            onClick={() => setBilling(period)}
-            className={cn(
-              "min-h-11 rounded-full px-5 text-sm font-semibold capitalize sm:px-6",
-              billing === period ? "bg-white text-moss-700 shadow-sm" : "text-stone-500",
-            )}
-          >
-            {period}
-            {period === "annual" && <span className="ml-2 text-[10px] text-persimmon-600">save ¥4,000</span>}
-          </button>
-        ))}
-      </div>
 
       <section className="mx-auto mt-7 max-w-2xl overflow-hidden rounded-3xl border border-moss-900 bg-moss-900 text-white shadow-float">
         <div className="p-7 sm:p-9">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[.18em] text-moss-200">AIko Premium</p>
-              <h2 className="mt-2 text-3xl font-semibold">Everything unlocked</h2>
+              <h2 className="mt-2 text-3xl font-semibold">Complete lesson access</h2>
             </div>
-            <Badge tone="orange"><Sparkles className="mr-1 size-3" /> Full experience</Badge>
+            <Badge tone="orange"><Sparkles className="mr-1 size-3" /> Listening + Speaking</Badge>
           </div>
           <p className="mt-7 text-5xl font-semibold">
             {price}<span className="ml-2 text-sm font-normal text-white/50">{priceSuffix}</span>
           </p>
-          {billing === "annual" && <p className="mt-2 text-sm text-moss-200">Equivalent to about ¥1,667 per month.</p>}
+          <p className="mt-2 text-sm text-moss-200">One base price worldwide. Local currency and applicable tax appear at checkout.</p>
           <ul className="mt-7 grid gap-3 sm:grid-cols-2">
             {proFeatureNames.map((feature) => (
               <li key={feature} className="flex gap-3 text-sm leading-6 text-white/80">
@@ -178,31 +173,29 @@ function FreeSubscriptionPage() {
               </li>
             ))}
           </ul>
-          <Button
-            type="button"
-            onClick={() => setShowCheckoutNotice(true)}
+          <CheckoutButton
+            billingPeriod="monthly"
+            label={`Get Premium · ${price} ${priceSuffix}`}
             className="mt-8 w-full bg-persimmon-500 hover:bg-persimmon-600"
-          >
-            Get Premium · {price} {priceSuffix}
-          </Button>
+          />
           <p className="mt-4 text-center text-xs leading-5 text-white/45">
-            Checkout is not connected yet. You will not be charged from this page.
+            Secure checkout by Dodo Payments. The final localized total is shown before you pay, and Premium starts only after payment is confirmed.
           </p>
         </div>
       </section>
 
-      {showCheckoutNotice && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-5" role="dialog" aria-modal="true" aria-labelledby="checkout-notice">
-          <div className="w-full max-w-md rounded-4xl bg-white p-7 shadow-float">
-            <Sparkles className="size-8 text-persimmon-500" />
-            <h2 id="checkout-notice" className="mt-5 text-2xl font-semibold">Premium checkout is coming soon.</h2>
-            <p className="mt-3 text-sm leading-6 text-stone-500">
-              Payment is not connected, so AIko will not charge you or silently change this account. An administrator can assign beta premium access.
-            </p>
-            <Button className="mt-6 w-full" onClick={() => setShowCheckoutNotice(false)}>Got it</Button>
+      {subscription.billingProvider === "dodo" ? (
+        <Card className="mx-auto mt-5 max-w-2xl p-6 sm:flex sm:items-center sm:justify-between sm:gap-6">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[.18em] text-stone-400">Billing account</p>
+            <h2 className="mt-2 text-lg font-semibold">
+              {subscription.status === "past_due" ? "Payment needs attention" : "Previous Premium membership"}
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-stone-500">View invoices, payment methods, and past membership details.</p>
           </div>
-        </div>
-      )}
+          <div className="mt-4 shrink-0 sm:mt-0 sm:w-48"><ManageBillingButton /></div>
+        </Card>
+      ) : null}
     </div>
   );
 }

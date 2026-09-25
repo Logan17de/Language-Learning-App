@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Brand } from "@/components/ui/brand";
 import { ButtonLink } from "@/components/ui/button";
+import { AIKO_SUPPORT_EMAIL, AIKO_SUPPORT_MAILTO } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Privacy",
@@ -38,8 +39,11 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-xl font-semibold">Questions and requests</h2>
               <p className="mt-3 leading-7 text-stone-500">
-                Use the in-app support page for questions about stored information or account
-                access. This notice will be expanded as production services are introduced.
+                For privacy questions, stored-information requests, or account-access help, email{" "}
+                <a className="font-semibold text-moss-700 hover:underline" href={AIKO_SUPPORT_MAILTO}>
+                  {AIKO_SUPPORT_EMAIL}
+                </a>
+                .
               </p>
             </section>
           </div>

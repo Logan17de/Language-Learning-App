@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Check, Pencil, Plus, X } from "lucide-react";
+import { Check, Pencil } from "lucide-react";
 import type { DailyMinutes, LearnerLevel, LearningGoal } from "@/types/learner";
 import { useAppStore } from "@/store/app-store";
 import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { profileRepository } from "@/lib/repositories/profile-repository";
-import { getBackendMode } from "@/lib/supabase/config";
 
 const goals: LearningGoal[] = [
   "JLPT preparation",
@@ -15,7 +15,15 @@ const goals: LearningGoal[] = [
   "Daily life in Japan",
   "Travel",
 ];
-const levels: LearnerLevel[] = ["Beginner", "N5", "N4", "N3", "N2", "Not sure"];
+const levels: LearnerLevel[] = [
+  "Beginner",
+  "N5",
+  "N4",
+  "N3",
+  "N2",
+  "N1",
+  "Not sure",
+];
 
 export function ProfileForm() {
   const user = useAppStore((state) => state.user);
@@ -32,40 +40,29 @@ export function ProfileForm() {
   const [minutes, setMinutes] = useState<DailyMinutes>(
     onboarding.dailyMinutes ?? 30,
   );
-  const [interests, setInterests] = useState(onboarding.interests);
-  const [newInterest, setNewInterest] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
-    if (getBackendMode() === "supabase") {
-      setLoading(true);
-      const result = await profileRepository.updateCurrent({
-        display_name: name,
-        current_jlpt_level:
-          level === "Beginner" || level === "Not sure" ? "N5" : level,
-        learning_goal: goal,
-        daily_study_minutes: minutes,
-        interests,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      });
-      setLoading(false);
-      if (!result.ok) return setError(result.error.message);
-    }
-    updateProfile({ name, level, goal, dailyMinutes: minutes, interests });
+    setLoading(true);
+    const result = await profileRepository.updateCurrent({
+      display_name: name,
+      // JLPT level is earned through mastery and is server-owned, so the
+      // profile form no longer submits it.
+      learning_goal: goal,
+      daily_study_minutes: minutes,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+    setLoading(false);
+    if (!result.ok) return setError(result.error.message);
+
+    updateProfile({ name, level, goal, dailyMinutes: minutes });
     completeOnboarding();
     setEditing(false);
     setSaved(true);
     window.setTimeout(() => setSaved(false), 2200);
-  }
-
-  function addInterest() {
-    const value = newInterest.trim();
-    if (!value || interests.includes(value)) return;
-    setInterests([...interests, value]);
-    setNewInterest("");
   }
 
   if (!editing) {
@@ -85,14 +82,6 @@ export function ProfileForm() {
                 : "Not added yet"
             }
           />
-          <Detail
-            label="Interests"
-            value={
-              onboarding.interests.length
-                ? onboarding.interests.join(", ")
-                : "Not added yet"
-            }
-          />
         </dl>
         <Button
           type="button"
@@ -107,10 +96,7 @@ export function ProfileForm() {
             className="mt-4 flex items-center gap-2 text-sm font-semibold text-moss-700"
             role="status"
           >
-            <Check className="size-4" />{" "}
-            {getBackendMode() === "supabase"
-              ? "Profile changes synced."
-              : "Profile changes saved locally."}
+            <Check className="size-4" /> Profile changes synced.
           </p>
         )}
       </div>
@@ -148,46 +134,6 @@ export function ProfileForm() {
           options={["15", "30", "45", "60"]}
           suffix=" minutes"
         />
-      </div>
-      <div>
-        <p className="mb-2 text-sm font-semibold">Interests</p>
-        {interests.length === 0 && (
-          <p className="mb-3 text-sm leading-6 text-stone-500">
-            No interests added. Pro lessons remain random at your level until
-            you add at least one.
-          </p>
-        )}
-        <div className="flex flex-wrap gap-2">
-          {interests.map((interest) => (
-            <button
-              key={interest}
-              type="button"
-              onClick={() =>
-                setInterests(interests.filter((item) => item !== interest))
-              }
-              className="inline-flex min-h-10 items-center gap-2 rounded-full bg-moss-50 px-4 text-xs font-semibold text-moss-700"
-            >
-              {interest}
-              <X className="size-3" />
-            </button>
-          ))}
-        </div>
-        <div className="mt-3 flex gap-2">
-          <input
-            value={newInterest}
-            onChange={(event) => setNewInterest(event.target.value)}
-            className="form-input"
-            placeholder="Add an interest"
-          />
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={addInterest}
-            className="shrink-0 px-4"
-          >
-            <Plus className="size-4" /> Add
-          </Button>
-        </div>
       </div>
       {error && (
         <p
@@ -240,10 +186,9 @@ function SelectField({
   return (
     <label>
       <span className="mb-2 block text-sm font-semibold">{label}</span>
-      <select
+      <Select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="form-input"
       >
         {options.map((option) => (
           <option key={option} value={option}>
@@ -251,7 +196,7 @@ function SelectField({
             {suffix}
           </option>
         ))}
-      </select>
+      </Select>
     </label>
   );
 }

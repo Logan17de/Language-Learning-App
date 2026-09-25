@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   BookCheck,
   Brain,
@@ -12,9 +13,8 @@ import {
   LogOut,
   Mail,
   MessageCircleMore,
-  Route,
   Sparkles,
-  TrendingUp,
+  Volume2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store/app-store";
@@ -27,45 +27,37 @@ import { authService } from "@/lib/auth/auth-service";
 const premiumFeatures = [
   {
     icon: Sparkles,
-    title: "Custom AI lessons",
-    copy: "Create complete lessons around your own topic, level, weak grammar, and unseen kanji.",
+    title: "Five lessons each day",
+    copy: "Create up to five AI lessons from the topics and Japanese levels you choose.",
     href: "/custom-topic",
     action: "Create a lesson",
   },
   {
-    icon: Route,
-    title: "Interest-shaped path",
-    copy: "AIko ranks suitable lessons using your interests while preventing repeated lesson assignments.",
+    icon: Volume2,
+    title: "Listening practice",
+    copy: "Hear lesson audio and complete the connected listening activities.",
     href: "/learn",
-    action: "Continue learning",
+    action: "Start a lesson",
   },
   {
     icon: MessageCircleMore,
-    title: "Extended speaking",
-    copy: "Use the full speaking progression and meaning-based response evaluation.",
+    title: "Speaking practice",
+    copy: "Read lesson sentences aloud with live transcription and sentence matching.",
     href: "/learn",
     action: "Practise speaking",
-  },
-  {
-    icon: TrendingUp,
-    title: "Complete insights",
-    copy: "See deeper strength, weakness, mastery, and adaptive-review signals.",
-    href: "/progress",
-    action: "View insights",
   },
 ] as const;
 
 const freeIncluded = [
-  "Level-matched lessons selected by AIko",
-  "Core story, vocabulary, grammar, and review",
-  "Basic progress and strength/weakness feedback",
+  "One lesson creation each day",
+  "Story, vocabulary, grammar, and reading",
+  "Mastery and progress tracking",
 ];
 
 const freeLocked = [
-  "Interest-based lesson recommendations",
-  "Custom-topic AI lesson generation",
-  "Extended speaking and semantic evaluation",
-  "Deeper mastery analytics and adaptive insights",
+  "Five lesson creations each day",
+  "Listening practice with lesson audio",
+  "Speaking practice with live transcription",
 ];
 
 export function ProfilePage() {
@@ -76,12 +68,10 @@ export function ProfilePage() {
 }
 
 function PremiumAccountPage() {
-  const onboarding = useAppStore((state) => state.onboarding);
   const subscription = useAppStore((state) => state.subscription);
-  const hasInterests = onboarding.interests.length > 0;
 
   return (
-    <AccountLayout eyebrow="Premium account" title="Your complete AIko learning system.">
+    <AccountLayout eyebrow="Premium account" title="Your complete lesson access.">
       <div className="grid gap-5 lg:grid-cols-[.78fr_1.22fr]">
         <aside className="space-y-5">
           <AccountIdentityCard premium />
@@ -90,11 +80,9 @@ function PremiumAccountPage() {
               <Badge tone="orange"><Crown className="mr-1 size-3" /> Premium active</Badge>
               <span className="text-xs capitalize text-white/55">{subscription.billingPeriod} plan</span>
             </div>
-            <h2 className="mt-5 text-2xl font-semibold">Everything is unlocked.</h2>
+            <h2 className="mt-5 text-2xl font-semibold">Premium access is active.</h2>
             <p className="mt-2 text-sm leading-6 text-white/65">
-              {hasInterests
-                ? "Your interests are actively shaping lesson selection and custom generation."
-                : "Add interests to your learning profile so AIko can personalise your premium path."}
+              Five daily lesson creations, Listening, and Speaking are available on this account.
             </p>
             <ButtonLink href="/subscription" className="mt-5 w-full bg-persimmon-500 hover:bg-persimmon-600">
               Premium account details
@@ -120,10 +108,10 @@ function PremiumAccountPage() {
           </section>
           <Card className="p-6 sm:p-7">
             <div className="mb-5">
-              <Badge tone="moss"><Brain className="mr-1 size-3" /> Personalisation active</Badge>
+              <Badge tone="moss"><Brain className="mr-1 size-3" /> Learning profile</Badge>
               <h2 className="mt-3 text-2xl font-semibold">Learning profile</h2>
               <p className="mt-2 text-sm leading-6 text-stone-500">
-                These preferences directly influence premium lesson ranking and AI-generated content.
+                Keep your level, learning goal, and daily study target up to date.
               </p>
             </div>
             <ProfileForm />
@@ -149,7 +137,7 @@ function FreeAccountPage() {
               <Badge tone="neutral">Current free access</Badge>
               <h2 className="mt-3 text-2xl font-semibold">Keep learning at your level.</h2>
               <p className="mt-2 text-sm leading-6 text-stone-500">
-                AIko assigns random, non-repeating lessons at your current level. Interests can be saved, but they do not affect free lesson selection.
+                AIko assigns non-repeating lessons at your current level and records learning evidence as you practise.
               </p>
             </div>
             <div className="grid gap-px bg-stone-100 sm:grid-cols-2">
@@ -161,9 +149,9 @@ function FreeAccountPage() {
           <Card className="border-persimmon-100 bg-persimmon-50/60 p-6 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-7">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[.18em] text-persimmon-700">Unlock the full system</p>
-              <h2 className="mt-2 text-2xl font-semibold">Personalise every part of learning.</h2>
+              <h2 className="mt-2 text-2xl font-semibold">Add more control to learning.</h2>
               <p className="mt-2 max-w-xl text-sm leading-6 text-stone-600">
-                Premium adds custom AI lessons, interest matching, extended speaking, and complete progress insights.
+                Premium adds five daily lesson creations, Listening, and Speaking.
               </p>
             </div>
             <ButtonLink href="/subscription" className="mt-5 shrink-0 bg-persimmon-500 hover:bg-persimmon-600 sm:mt-0">
@@ -175,7 +163,7 @@ function FreeAccountPage() {
             <div className="mb-5">
               <h2 className="text-2xl font-semibold">Learning profile</h2>
               <p className="mt-2 text-sm leading-6 text-stone-500">
-                Your level and study preferences still guide pacing. Saved interests activate after upgrading.
+                Keep your level, learning goal, and daily study target up to date.
               </p>
             </div>
             <ProfileForm />
@@ -243,7 +231,8 @@ function AccountIdentityCard({ premium }: { premium: boolean }) {
 
 function AccountActions() {
   const router = useRouter();
-  const signOut = useAppStore((state) => state.signOut);
+  const [signingOut, setSigningOut] = useState(false);
+
   return (
     <div className="grid gap-2">
       <ButtonLink href="/settings" variant="secondary">Settings</ButtonLink>
@@ -251,14 +240,20 @@ function AccountActions() {
       <Button
         type="button"
         variant="ghost"
+        disabled={signingOut}
         onClick={async () => {
-          await authService.signOut();
-          signOut();
+          if (signingOut) return;
+          setSigningOut(true);
+          const result = await authService.signOut();
+          if (!result.ok) {
+            setSigningOut(false);
+            return;
+          }
           router.replace("/login");
-          router.refresh();
         }}
       >
-        <LogOut className="size-4" /> Log out
+        <LogOut className="size-4" />
+        {signingOut ? "Signing out…" : "Log out"}
       </Button>
     </div>
   );

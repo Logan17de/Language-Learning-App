@@ -19,7 +19,7 @@ export const CANONICAL_LESSON_PHASES = [
   {
     id: "reading",
     label: "Reading",
-    description: "Read closely and answer in Japanese.",
+    description: "Read closely and answer comprehension questions.",
   },
   {
     id: "listening",
@@ -31,40 +31,22 @@ export const CANONICAL_LESSON_PHASES = [
     label: "Speaking",
     description: "Read each displayed sentence aloud.",
   },
-  {
-    id: "review",
-    label: "Final review",
-    description: "Retrieve the lesson without hints.",
-  },
 ] as const satisfies readonly LessonPhase[];
 
 export const CANONICAL_LESSON_ACTIVITY_COUNTS = {
-  vocabulary: 13,
-  grammar: 10,
+  vocabulary: 7,
+  grammar: 7,
   reading: 5,
   listening: 5,
   speaking: 5,
-  review: 5,
 } as const;
 
 const canonicalPhaseIds = CANONICAL_LESSON_PHASES.map((phase) => phase.id);
-const canonicalReviewCategories = [
-  "kanji",
-  "vocabulary",
-  "grammar",
-  "listening",
-  "speaking",
-] as const;
 
 export function canonicalLessonPhases(): LessonPhase[] {
   return CANONICAL_LESSON_PHASES.map((phase) => ({ ...phase }));
 }
 
-/**
- * Phase order is a product contract, not lesson-authored content. Existing
- * stored labels/descriptions may be reused by id, but their order can never
- * change the learner flow.
- */
 export function normalizeLessonPhases(value: unknown): LessonPhase[] {
   if (!Array.isArray(value)) return canonicalLessonPhases();
 
@@ -73,13 +55,8 @@ export function normalizeLessonPhases(value: unknown): LessonPhase[] {
     if (!item || typeof item !== "object" || Array.isArray(item)) continue;
     const source = item as Record<string, unknown>;
     const id = source.id;
-    if (!canonicalPhaseIds.includes(id as LessonPhase["id"])) continue;
-    if (
-      typeof source.label !== "string" ||
-      typeof source.description !== "string"
-    ) {
-      continue;
-    }
+    if (!canonicalPhaseIds.includes(id as (typeof canonicalPhaseIds)[number])) continue;
+    if (typeof source.label !== "string" || typeof source.description !== "string") continue;
     byId.set(id as LessonPhase["id"], {
       id: id as LessonPhase["id"],
       label: source.label,
@@ -93,126 +70,94 @@ export function normalizeLessonPhases(value: unknown): LessonPhase[] {
   }));
 }
 
-function splitMatches(
-  values: string[],
-  expected: Record<string, number>,
-): boolean {
+function splitMatches(values: string[], expected: Record<string, number>): boolean {
   const counts = new Map<string, number>();
-  for (const value of values) {
-    counts.set(value, (counts.get(value) ?? 0) + 1);
-  }
-  return Object.entries(expected).every(
-    ([key, count]) => (counts.get(key) ?? 0) === count,
-  );
+  for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1);
+  return Object.entries(expected).every(([key, count]) => (counts.get(key) ?? 0) === count);
+}
+
+function exactCountIssue(label: string, actual: number, expected: number): string[] {
+  return actual === expected
+    ? []
+    : [`${label} must contain exactly ${expected} activities; found ${actual}.`];
 }
 
 export function lessonContractIssues(lesson: LessonPackage): string[] {
   const issues: string[] = [];
   const phaseIds = lesson.phases.map((phase) => phase.id);
-
-  if (
-    phaseIds.length !== canonicalPhaseIds.length ||
-    phaseIds.some((id, index) => id !== canonicalPhaseIds[index])
-  ) {
-    issues.push(`Lesson phases must be ${canonicalPhaseIds.join(" → ")}.`);
-  }
+  const currentPhases =
+    phaseIds.length === canonicalPhaseIds.length &&
+    phaseIds.every((id, index) => id === canonicalPhaseIds[index]);
+  if (!currentPhases) issues.push(`Lesson phases must be ${canonicalPhaseIds.join(" → ")}.`);
 
   if (!lesson.story.length) issues.push("Story must not be empty.");
-  if (!lesson.vocabulary.length) issues.push("Vocabulary must not be empty.");
   if (!lesson.grammar.length) issues.push("Grammar must not be empty.");
+  if (!lesson.readingConversation.length) issues.push("Reading passage must not be empty.");
 
-  const exactBanks: Array<[string, number, number]> = [
-    [
-      "Vocabulary practice",
-      lesson.vocabularyQuestions.length,
-      CANONICAL_LESSON_ACTIVITY_COUNTS.vocabulary,
-    ],
-    [
-      "Grammar practice",
-      lesson.grammarQuestions.length,
-      CANONICAL_LESSON_ACTIVITY_COUNTS.grammar,
-    ],
-    [
-      "Reading questions",
-      lesson.readingQuestions?.length ?? 0,
-      CANONICAL_LESSON_ACTIVITY_COUNTS.reading,
-    ],
-    [
+  issues.push(...exactCountIssue(
+    "Vocabulary practice",
+    lesson.vocabularyQuestions.length,
+    CANONICAL_LESSON_ACTIVITY_COUNTS.vocabulary,
+  ));
+  issues.push(...exactCountIssue(
+    "Grammar practice",
+    lesson.grammarQuestions.length,
+    CANONICAL_LESSON_ACTIVITY_COUNTS.grammar,
+  ));
+  issues.push(...exactCountIssue(
+    "Reading questions",
+    lesson.readingQuestions?.length ?? 0,
+    CANONICAL_LESSON_ACTIVITY_COUNTS.reading,
+  ));
+
+  const protectedPhasesLocked = lesson.premiumPhaseAccess === "locked";
+  if (protectedPhasesLocked) {
+    if (lesson.listeningExercises.length > 0 || lesson.speakingExercises.length > 0) {
+      issues.push("Locked Premium phases must not include protected activity payloads.");
+    }
+  } else {
+    issues.push(...exactCountIssue(
       "Listening practice",
       lesson.listeningExercises.length,
       CANONICAL_LESSON_ACTIVITY_COUNTS.listening,
-    ],
-    [
+    ));
+    issues.push(...exactCountIssue(
       "Speaking practice",
       lesson.speakingExercises.length,
       CANONICAL_LESSON_ACTIVITY_COUNTS.speaking,
-    ],
-    [
-      "Final review",
-      lesson.reviewQuestions.length,
-      CANONICAL_LESSON_ACTIVITY_COUNTS.review,
-    ],
-  ];
-  for (const [label, actual, expected] of exactBanks) {
-    if (actual !== expected) {
-      issues.push(
-        `${label} must contain exactly ${expected} activities; found ${actual}.`,
-      );
-    }
+    ));
   }
 
-  if (
-    !splitMatches(
-      lesson.vocabularyQuestions.map((question) => question.difficulty),
-      { Easy: 6, Medium: 4, Hard: 3 },
-    )
-  ) {
-    issues.push("Vocabulary practice must contain 6 Easy, 4 Medium, and 3 Hard questions.");
+  if (!splitMatches(
+    lesson.vocabularyQuestions.map((question) => question.difficulty),
+    { Easy: 3, Medium: 2, Hard: 2 },
+  )) {
+    issues.push("Vocabulary practice must contain 3 Easy, 2 Medium, and 2 Hard questions.");
   }
-  if (
-    !splitMatches(
-      lesson.grammarQuestions.map((question) => question.difficulty),
-      { Easy: 3, Medium: 4, Hard: 3 },
-    )
-  ) {
-    issues.push("Grammar practice must contain 3 Easy, 4 Medium, and 3 Hard questions.");
+  if (!splitMatches(
+    lesson.grammarQuestions.map((question) => question.difficulty),
+    { Easy: 3, Medium: 2, Hard: 2 },
+  )) {
+    issues.push("Grammar practice must contain 3 Easy, 2 Medium, and 2 Hard questions.");
   }
-  if (
-    !splitMatches(
-      (lesson.readingQuestions ?? []).map((question) => question.difficulty),
-      { easy: 2, medium: 2, hard: 1 },
-    )
-  ) {
+  if (!splitMatches(
+    (lesson.readingQuestions ?? []).map((question) => question.difficulty),
+    { easy: 2, medium: 2, hard: 1 },
+  )) {
     issues.push("Reading practice must contain 2 easy, 2 medium, and 1 hard question.");
   }
-  if (
-    !splitMatches(
-      lesson.speakingExercises.map((exercise) => exercise.mode),
-      { easy: 2, medium: 2, hard: 1 },
-    )
-  ) {
+  if (!protectedPhasesLocked && !splitMatches(
+    lesson.speakingExercises.map((exercise) => exercise.mode),
+    { easy: 2, medium: 2, hard: 1 },
+  )) {
     issues.push("Speaking practice must contain 2 easy, 2 medium, and 1 hard sentence.");
   }
 
-  if (!lesson.readingConversation.length) {
-    issues.push("Reading passage must not be empty.");
-  }
-
   if (
-    lesson.speakingExercises.some(
-      (exercise) => exercise.questionType !== "read_aloud",
-    )
+    !protectedPhasesLocked &&
+    lesson.speakingExercises.some((exercise) => exercise.questionType !== "read_aloud")
   ) {
     issues.push("Every speaking activity must use read_aloud mode.");
-  }
-
-  const reviewCategories = lesson.reviewQuestions.map(
-    (question) => question.category,
-  );
-  for (const category of canonicalReviewCategories) {
-    if (reviewCategories.filter((value) => value === category).length !== 1) {
-      issues.push(`Final review must contain exactly one ${category} question.`);
-    }
   }
 
   const ids = [
@@ -221,20 +166,13 @@ export function lessonContractIssues(lesson: LessonPackage): string[] {
     ...(lesson.readingQuestions ?? []).map((item) => item.id),
     ...lesson.listeningExercises.map((item) => item.id),
     ...lesson.speakingExercises.map((item) => item.id),
-    ...lesson.reviewQuestions.map((item) => item.id),
   ];
-  if (ids.some((id) => !id.trim())) {
-    issues.push("Every lesson activity must have a non-empty id.");
-  }
-  if (new Set(ids).size !== ids.length) {
-    issues.push("Lesson activity ids must be unique across all phases.");
-  }
+  if (ids.some((id) => !id.trim())) issues.push("Every lesson activity must have a non-empty id.");
+  if (new Set(ids).size !== ids.length) issues.push("Lesson activity ids must be unique across all phases.");
 
   return [...new Set(issues)];
 }
 
 export function isCanonicalPlayableLesson(lesson: LessonPackage): boolean {
-  return (
-    Boolean(lesson.id && lesson.title) && lessonContractIssues(lesson).length === 0
-  );
+  return Boolean(lesson.id && lesson.title) && lessonContractIssues(lesson).length === 0;
 }

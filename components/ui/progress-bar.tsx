@@ -4,10 +4,14 @@ export function ProgressBar({
   value,
   className,
   barClassName,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
 }: {
   value: number;
   className?: string;
   barClassName?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
 }) {
   const clampedValue = Math.min(100, Math.max(0, value));
 
@@ -15,6 +19,8 @@ export function ProgressBar({
     <div
       className={cn("h-2 overflow-hidden rounded-full bg-moss-100", className)}
       role="progressbar"
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={clampedValue}

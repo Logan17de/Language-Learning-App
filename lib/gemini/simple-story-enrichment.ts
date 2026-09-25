@@ -1,63 +1,92 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { generateStructured } from "@/lib/gemini/structured-output";
-import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
-  simpleStoryEnrichmentSchema,
-  storyEnrichmentOutputIssues,
-  storyEnrichmentPrompt,
-  type RawStoryVocabulary,
-  type SimpleStoryEnrichment,
-} from "@/lib/gemini/simple-story-enrichment-contract";
+  matchCuratedStoryVocabulary,
+  type CuratedVocabularyMatch,
+} from "@/lib/curated-vocabulary-catalog";
+import type { GenerationAuditEntry } from "@/lib/gemini/lesson-engine-v2";
 import type { StoryOnlyDraft } from "@/lib/gemini/story-pipeline-v3";
-import type { Json } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
 
+export const CURATED_VOCABULARY_SOURCE_MODEL = "jlpt-curated-csv";
+const CURATED_VOCABULARY_SOURCE = "JLPT curated CSV" as const;
+
+export interface RawStoryVocabulary {
+  word: string;
+  dictionaryForm: string;
+  reading: string;
+  meaning: string;
+  partOfSpeech: "other";
+  conjugationType: null;
+  aliases: string[];
+  source: typeof CURATED_VOCABULARY_SOURCE;
+  studyLevel: JLPTLevel;
+  sourceEntry: string;
+  sourceFile: string;
+}
+
+function storyJapanese(draft: StoryOnlyDraft): string {
+  return draft.lines.map((line) => line.japanese).join("\n").normalize("NFKC");
+}
+
+function asStoryVocabulary(match: CuratedVocabularyMatch): RawStoryVocabulary {
+  return {
+    word: match.word,
+    dictionaryForm: match.word,
+    reading: match.reading,
+    meaning: match.meaning,
+    partOfSpeech: "other",
+    conjugationType: null,
+    aliases: [],
+    source: CURATED_VOCABULARY_SOURCE,
+    studyLevel: match.studyLevel,
+    sourceEntry: match.id,
+    sourceFile: match.sourceFile,
+  };
+}
+
 /**
- * Run the exact simple enrichment contract from enrichment_test.py and link
- * every returned surface form, inserting only words absent from the library.
+ * Story tappability comes only from the manually curated JLPT catalogs committed
+ * under Vocabs/: compound vocabulary plus the solo-kanji reading catalog. Known
+ * compounds win overlapping matches; otherwise an individual kanji can provide
+ * its curated readings and meaning as a tappable fallback. No external dictionary
+ * or local JMdict cache participates in lesson generation.
  */
+export function lookupCuratedStoryVocabulary(draft: StoryOnlyDraft): RawStoryVocabulary[] {
+  return matchCuratedStoryVocabulary(storyJapanese(draft)).map(asStoryVocabulary);
+}
+
 export async function enrichGeneratedStoryVocabulary(input: {
-  admin: SupabaseClient;
   requestId: string;
   level: JLPTLevel;
   draft: StoryOnlyDraft;
-}): Promise<{
-  vocabulary: RawStoryVocabulary[];
-  audit: GenerationAuditEntry;
-}> {
-  const japaneseStory = input.draft.lines
-    .map((line) => line.japanese)
-    .join("");
-  const generated = await generateStructured<SimpleStoryEnrichment>({
-    name: "story_vocabulary",
-    prompt: storyEnrichmentPrompt(japaneseStory),
-    schema: simpleStoryEnrichmentSchema,
-    strictSchema: true,
-    exactSchemaName: true,
-    // The provider schema owns content shape. Retry only when no vocabulary
-    // was returned; do not semantically re-judge a populated response.
-    validate: storyEnrichmentOutputIssues,
-    trace: { requestId: input.requestId, stage: "library" },
-  });
+  admin?: SupabaseClient;
+}): Promise<{ vocabulary: RawStoryVocabulary[]; audit: GenerationAuditEntry }> {
+  const vocabulary = lookupCuratedStoryVocabulary(input.draft);
 
-  const stored = await input.admin.rpc("store_story_vocabulary_enrichment", {
-    p_request_id: input.requestId,
-    p_level: input.level,
-    p_vocabulary: generated.value.vocabulary as unknown as Json,
-    p_source_model: generated.model,
-  });
-  if (stored.error) {
-    throw new Error(`Story vocabulary could not be stored: ${stored.error.message}`);
+  // Tappable vocabulary is optional. A story should never be regenerated merely
+  // because the curated catalog has only a few (or zero) exact matches.
+  if (vocabulary.length > 0) {
+    const admin = input.admin ?? createAdminClient();
+    const { error } = await admin.rpc("store_story_vocabulary_enrichment", {
+      p_request_id: input.requestId,
+      p_level: input.level,
+      p_vocabulary: vocabulary,
+      p_source_model: CURATED_VOCABULARY_SOURCE_MODEL,
+    } as never);
+    if (error) {
+      throw new Error(`Curated story vocabulary could not be stored: ${error.message}`);
+    }
   }
 
   return {
-    vocabulary: generated.value.vocabulary,
+    vocabulary,
     audit: {
       stage: "library",
-      model: generated.model,
-      repaired: generated.repaired,
+      model: CURATED_VOCABULARY_SOURCE_MODEL,
+      repaired: false,
     },
   };
 }

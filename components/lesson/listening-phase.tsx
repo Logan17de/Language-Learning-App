@@ -1,11 +1,15 @@
 "use client";
 
+import { useEffect } from "react";
 import { ArrowRight, Check, Headphones, MessageSquareText } from "lucide-react";
 import { appendInspectableInteraction } from "@/lib/lesson-support";
 import type { ExerciseDifficulty, LessonPackage } from "@/types/lesson";
 import type { LessonSession, ListeningEvent } from "@/types/lesson-session";
 import { evaluateAnswer } from "@/lib/scoring-utils";
-import { AudioControl } from "@/components/exercises/audio-control";
+import {
+  AudioControl,
+  preloadListeningAudio,
+} from "@/components/exercises/audio-control";
 import { MultipleChoiceCard } from "@/components/exercises/multiple-choice-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -58,6 +62,18 @@ export function ListeningPhase({
       ? initialIndex
       : Math.min(session.activityIndex, exercises.length - 1);
   const exercise = exercises[currentIndex];
+
+  // Roll one clip ahead: while this question is on screen, the next one is
+  // already downloading, so moving on never waits for the network.
+  const nextExercise = exercises[currentIndex + 1];
+  useEffect(() => {
+    if (!nextExercise) return;
+    void preloadListeningAudio({
+      text: nextExercise.transcript,
+      audioAssetId: nextExercise.audioAssetId,
+      browserTts: lesson.runtimeAudio === "browser_tts",
+    }).catch(() => undefined);
+  }, [nextExercise, lesson.runtimeAudio]);
   const difficulty = adaptiveExercises[currentIndex].difficulty;
   const priorAnswer = session.listeningEvents.findLast(
     (event) => event.type === "answer" && event.questionId === exercise.id,
@@ -130,7 +146,7 @@ export function ListeningPhase({
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-5xl">
       <div className="text-center">
         <span className="mx-auto grid size-20 place-items-center rounded-4xl bg-moss-900 text-white"><Headphones className="size-8" /></span>
         <div className="mt-6 flex justify-center gap-2">
@@ -166,9 +182,24 @@ export function ListeningPhase({
             answerCorrect={priorAnswer?.correct}
             disabled={!heardEntireConversation}
             lockAfterAnswer
-            inspectableTerms={exercise.inspectableTerms ?? lesson.story.flatMap((line) => line.words)}
+            // Listening exercises are generated with an empty term list, and
+            // `??` keeps an empty array, so nothing was ever tappable. The
+            // lesson's own story words are the right fallback: the listening
+            // draws on the same language.
+            inspectableTerms={
+              exercise.inspectableTerms?.length
+                ? exercise.inspectableTerms
+                : lesson.story.flatMap((line) => line.words)
+            }
             onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, exercise.id, word, reveal))}
             onSelect={answer}
+            answerAction={
+              priorAnswer && answeredIds.size < exercises.length ? (
+                <Button type="button" className="h-full min-h-14 px-5" onClick={nextQuestion}>
+                  Next <ArrowRight className="size-4" />
+                </Button>
+              ) : null
+            }
           />
         </div>
 
@@ -180,11 +211,6 @@ export function ListeningPhase({
             </p>
             <p className="mt-4 flex items-center gap-2 text-xs font-semibold text-moss-700"><Check className="size-4" /> Listening answer saved</p>
           </div>
-        )}
-        {priorAnswer && answeredIds.size < exercises.length && (
-          <Button type="button" className="mt-5" onClick={nextQuestion}>
-            Next listening question <ArrowRight className="size-4" />
-          </Button>
         )}
       </Card>
     </div>

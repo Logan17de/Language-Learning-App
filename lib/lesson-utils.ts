@@ -1,9 +1,9 @@
 import type { LessonPackage } from "@/types/lesson";
 
 export function getLessonLoadLabel(lesson: LessonPackage): string {
-  const newItems = lesson.kanji.filter((item) => !item.isReview).length + lesson.grammar.length;
-  if (newItems <= 3) return "Light";
-  if (newItems <= 6) return "Balanced";
+  const learningItems = lesson.kanji.length + lesson.grammar.length;
+  if (learningItems <= 3) return "Light";
+  if (learningItems <= 6) return "Balanced";
   return "Focused";
 }
 

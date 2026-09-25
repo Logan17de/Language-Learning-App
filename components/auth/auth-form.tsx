@@ -2,11 +2,17 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { GoogleIdentityButton } from "@/components/auth/google-identity-button";
 import { Button } from "@/components/ui/button";
 import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
-import { useAppStore } from "@/store/app-store";
 import { authService } from "@/lib/auth/auth-service";
+import { applyClientIdentity } from "@/lib/auth/client-session";
+import { savePendingSignupConfirmation } from "@/lib/auth/pending-signup-confirmation";
+import {
+  safeInternalRedirect,
+  withSafeNext,
+} from "@/lib/auth/safe-internal-redirect";
 import { getBackendMode } from "@/lib/supabase/config";
 import {
   isStrongEnough,
@@ -14,128 +20,189 @@ import {
   PASSWORD_REQUIREMENTS_MESSAGE,
 } from "@/lib/auth/password-strength";
 
+const FIRST_NAME_MAX_LENGTH = 50;
+
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
-  const signIn = useAppStore((state) => state.signIn);
-  const onboardingComplete = useAppStore((state) => state.onboarding.completed);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [requestedNext, setRequestedNext] = useState<string | null>(null);
   const backendMode = getBackendMode();
 
   useEffect(() => {
-    const code = new URLSearchParams(window.location.search).get("error");
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("error");
     const messages: Record<string, string> = {
       "no-google-account":
-        "No AIko account is connected to this Google address. Create an account first, then use Google to log in.",
+        "No AIko account is linked to this Google account. Create an account first.",
       "oauth-cancelled":
-        "Google sign-in was cancelled or did not return an authorization code. Please try again.",
+        "Google sign-in was cancelled. You can try again when you’re ready.",
       "oauth-exchange":
         "Google sign-in could not be completed. Please try again.",
-      "oauth-verifier":
-        "The temporary Google sign-in session was lost. Start again in the same browser without clearing cookies.",
-      "oauth-expired":
-        "The Google sign-in request expired or was already used. Please start again.",
       "backend-not-configured":
         "Authentication is not configured for this deployment.",
       "auth-callback":
-        "Google sign-in could not be completed. Please try again.",
+        "Account setup could not be completed. Please try again.",
+      "account-inactive":
+        "This account is not active. Contact support if you think this is a mistake.",
+      "profile-load":
+        "Your learner profile could not be verified. Please try signing in again.",
+      "preferences-load":
+        "Your learning preferences could not be loaded. Please try signing in again.",
     };
     const message = code ? messages[code] : null;
-    if (!message) return;
-    const timer = window.setTimeout(() => setError(message), 0);
+    const confirmationRequired = params.get("confirmation") === "required";
+    const next = safeInternalRedirect(params.get("next"));
+    const timer = window.setTimeout(() => {
+      setRequestedNext(next);
+      if (message) setError(message);
+      if (confirmationRequired) {
+        setNotice(
+          "Account created. Check your email and confirm your address before logging in.",
+        );
+      }
+    }, 0);
     return () => window.clearTimeout(timer);
   }, []);
 
-  const requestedNext = () => {
-    if (typeof window === "undefined") return null;
-    const value = new URLSearchParams(window.location.search).get("next");
-    return value?.startsWith("/") && !value.startsWith("//") ? value : null;
-  };
+  function destination(accountOnboardingComplete: boolean): string {
+    if (accountOnboardingComplete) return requestedNext ?? "/home";
+    return requestedNext
+      ? `/onboarding?next=${encodeURIComponent(requestedNext)}`
+      : "/onboarding";
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
-    if (mode === "signup" && !isStrongEnough(password)) {
-      setError(PASSWORD_REQUIREMENTS_MESSAGE);
-      return;
-    }
-    setLoading(true);
-    if (backendMode === "demo") {
-      window.setTimeout(() => {
-        signIn(mode === "signup" ? name : undefined);
-        const next = requestedNext();
-        router.push(
-          mode === "signup" || !onboardingComplete
-            ? "/onboarding"
-            : (next ?? "/home"),
-        );
-      }, 650);
+    setNotice("");
+    if (backendMode !== "supabase") {
+      setError("Authentication is not configured for this deployment.");
       return;
     }
 
-    let accountOnboardingComplete = false;
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedName = name.trim();
     if (mode === "signup") {
-      const result = await authService.signUp(email, password, name);
-      setLoading(false);
-      if (!result.ok) return setError(result.error.message);
-      if (result.data.confirmationRequired) {
-        router.push("/login?confirmation=required");
+      if (!normalizedName) {
+        setError("Enter your first name.");
         return;
       }
-      signIn(name);
-    } else {
-      const result = await authService.signIn(email, password);
-      setLoading(false);
-      if (!result.ok) return setError(result.error.message);
-      accountOnboardingComplete = result.data.onboardingComplete;
-      signIn(result.data.displayName);
+      if (normalizedName.length > FIRST_NAME_MAX_LENGTH) {
+        setError(`First name must be ${FIRST_NAME_MAX_LENGTH} characters or fewer.`);
+        return;
+      }
+      if (!isStrongEnough(password)) {
+        setError(PASSWORD_REQUIREMENTS_MESSAGE);
+        return;
+      }
     }
-    router.push(
-      mode === "signup" || !accountOnboardingComplete
-        ? "/onboarding"
-        : (requestedNext() ?? "/home"),
-    );
-    router.refresh();
-  }
 
-  async function googleSignIn() {
-    setError("");
-    if (backendMode === "demo") {
-      setError(
-        "Google sign-in becomes available when Supabase Auth is connected.",
+    setLoading(true);
+    if (mode === "signup") {
+      const result = await authService.signUp(
+        normalizedEmail,
+        password,
+        normalizedName,
+        requestedNext ?? undefined,
       );
+      if (!result.ok) {
+        setLoading(false);
+        setError(result.error.message);
+        return;
+      }
+      if (result.data.confirmationRequired) {
+        setLoading(false);
+        savePendingSignupConfirmation(normalizedEmail, requestedNext);
+        router.push(
+          withSafeNext("/signup?confirmation=required", requestedNext),
+        );
+        return;
+      }
+      if (!result.data.identity) {
+        setLoading(false);
+        setError("Your new account could not be initialized. Please try again.");
+        return;
+      }
+
+      await applyClientIdentity(result.data.identity);
+      setLoading(false);
+      router.replace(destination(result.data.identity.onboardingComplete));
       return;
     }
+
+    const result = await authService.signIn(normalizedEmail, password);
+    if (!result.ok) {
+      setLoading(false);
+      setError(result.error.message);
+      return;
+    }
+
+    await applyClientIdentity(result.data);
+    setLoading(false);
+    router.replace(destination(result.data.onboardingComplete));
+  }
+
+  async function googleSignIn(credential: string, nonce: string) {
+    setError("");
+    setNotice("");
+    if (backendMode !== "supabase") {
+      setError("Authentication is not configured for this deployment.");
+      return;
+    }
+
     setLoading(true);
-    const result = await authService.signInWithGoogle(
+    const result = await authService.signInWithGoogleIdToken(
       mode,
-      requestedNext() ?? undefined,
+      credential,
+      nonce,
     );
     if (!result.ok) {
       setLoading(false);
       setError(result.error.message);
+      return;
     }
+
+    await applyClientIdentity(result.data);
+    setLoading(false);
+    router.replace(destination(result.data.onboardingComplete));
   }
 
   return (
     <form className="mt-8 space-y-5" onSubmit={submit}>
-      <Button
-        type="button"
-        variant="secondary"
-        className="w-full"
-        disabled={loading}
-        onClick={googleSignIn}
-      >
-        <GoogleMark />
-        {mode === "login"
-          ? "Log in with Google"
-          : "Create account with Google"}
-      </Button>
-      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[.16em] text-stone-300">
+      {backendMode !== "supabase" && (
+        <p
+          role="alert"
+          className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold leading-6 text-red-700"
+        >
+          Authentication is unavailable because this deployment is missing its backend configuration.
+        </p>
+      )}
+      {backendMode === "supabase" ? (
+        <GoogleIdentityButton
+          mode={mode}
+          disabled={loading}
+          onCredential={googleSignIn}
+          onError={setError}
+        />
+      ) : (
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-full"
+          disabled
+        >
+          {mode === "login"
+            ? "Log in with Google"
+            : "Create account with Google"}
+        </Button>
+      )}
+      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[.16em] text-stone-500">
         <span className="h-px flex-1 bg-stone-200" />
         or use email
         <span className="h-px flex-1 bg-stone-200" />
@@ -147,10 +214,11 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           </span>
           <input
             required
+            maxLength={FIRST_NAME_MAX_LENGTH}
             value={name}
             onChange={(event) => setName(event.target.value)}
             className="form-input"
-            placeholder="Hana"
+            placeholder="Your name"
             autoComplete="given-name"
           />
         </label>
@@ -186,14 +254,12 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                 ? "Create a strong password"
                 : "Enter your password"
             }
-            autoComplete={
-              mode === "signup" ? "new-password" : "current-password"
-            }
+            autoComplete={mode === "signup" ? "new-password" : "current-password"}
           />
           <button
             type="button"
             onClick={() => setShowPassword((value) => !value)}
-            className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-stone-400 hover:bg-stone-50"
+            className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-stone-500 hover:bg-stone-50"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
@@ -206,7 +272,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         {mode === "signup" ? (
           <PasswordStrengthMeter password={password} />
         ) : (
-          <p className="mt-2 text-xs leading-5 text-stone-400">
+          <p className="mt-2 text-xs leading-5 text-stone-500">
             Password strength is checked when you create or reset a password.
             Enter the password for your existing AIko account here.
           </p>
@@ -215,12 +281,21 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       {mode === "login" && (
         <div className="text-right">
           <a
-            href="/forgot-password"
+            href={withSafeNext("/forgot-password", requestedNext)}
             className="text-sm font-semibold text-moss-700 hover:underline"
           >
             Forgot password?
           </a>
         </div>
+      )}
+      {notice && (
+        <p
+          role="status"
+          className="flex gap-2 rounded-xl bg-moss-50 px-4 py-3 text-sm font-semibold leading-6 text-moss-800"
+        >
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
+          {notice}
+        </p>
       )}
       {error && (
         <p
@@ -230,42 +305,19 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           {error}
         </p>
       )}
-      <Button className="w-full" disabled={loading}>
+      <Button
+        className="w-full"
+        disabled={loading || backendMode !== "supabase"}
+      >
         {loading && <LoaderCircle className="size-4 animate-spin" />}
         {loading
-          ? "Preparing your path…"
+          ? mode === "login"
+            ? "Logging in…"
+            : "Creating account…"
           : mode === "login"
             ? "Log in"
             : "Create my account"}
       </Button>
-      <p className="text-center text-xs leading-5 text-stone-400">
-        {backendMode === "demo"
-          ? "Demo mode: email sign-in is local; Google requires Supabase Auth."
-          : "Your account is secured by Supabase Auth."}
-      </p>
     </form>
-  );
-}
-
-function GoogleMark() {
-  return (
-    <svg className="size-4" viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="#4285F4"
-        d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.6h3.3c1.9-1.8 2.9-4.4 2.9-7.5Z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 22c2.7 0 5-.9 6.7-2.3l-3.3-2.6c-.9.6-2.1 1-3.4 1a5.9 5.9 0 0 1-5.5-4.1H3.1v2.7A10 10 0 0 0 12 22Z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M6.5 14a6 6 0 0 1 0-3.9V7.4H3.1a10 10 0 0 0 0 9.3L6.5 14Z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 6c1.5 0 2.8.5 3.9 1.5l2.9-2.9A9.8 9.8 0 0 0 3.1 7.4l3.4 2.7A5.9 5.9 0 0 1 12 6Z"
-      />
-    </svg>
   );
 }

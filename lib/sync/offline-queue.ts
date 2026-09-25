@@ -2,7 +2,10 @@
 
 import type { Json } from "@/types/database";
 
-export type SyncOperationKind = "lesson_checkpoint" | "lesson_completion" | "review_checkpoint" | "review_completion";
+export type SyncOperationKind =
+  | "lesson_checkpoint"
+  | "lesson_phase_commit"
+  | "lesson_completion";
 
 export interface SyncOperation {
   id: string;
@@ -20,40 +23,119 @@ const eventName = "aiko-sync-status";
 export function readSyncQueue(): SyncOperation[] {
   if (typeof window === "undefined") return [];
   try {
-    const value: unknown = JSON.parse(window.localStorage.getItem(storageKey) ?? "[]");
-    return Array.isArray(value) ? value.filter((item): item is SyncOperation =>
-      typeof item === "object" && item !== null && "id" in item && "kind" in item && "payload" in item
-    ) : [];
+    const value: unknown = JSON.parse(
+      window.localStorage.getItem(storageKey) ?? "[]",
+    );
+    return Array.isArray(value)
+      ? value.filter(
+          (item): item is SyncOperation =>
+            typeof item === "object" &&
+            item !== null &&
+            "id" in item &&
+            "kind" in item &&
+            (item.kind === "lesson_checkpoint" ||
+              item.kind === "lesson_phase_commit" ||
+              item.kind === "lesson_completion") &&
+            "payload" in item,
+        )
+      : [];
   } catch {
     return [];
   }
 }
 
-function write(items: SyncOperation[]): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(storageKey, JSON.stringify(items.slice(-100)));
-  window.dispatchEvent(new CustomEvent(eventName, { detail: items.length }));
+function write(items: SyncOperation[]): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    window.localStorage.setItem(storageKey, JSON.stringify(items.slice(-100)));
+    window.dispatchEvent(new CustomEvent(eventName, { detail: items.length }));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-export function enqueueSync(kind: SyncOperationKind, dedupeKey: string, payload: Json, error?: string): void {
-  const current = readSyncQueue().filter((item) => item.dedupeKey !== dedupeKey);
-  write([...current, {
-    id: crypto.randomUUID(),
-    dedupeKey,
-    kind,
-    payload,
-    attempts: 0,
-    queuedAt: new Date().toISOString(),
-    lastError: error,
-  }]);
+export function enqueueSync(
+  kind: SyncOperationKind,
+  dedupeKey: string,
+  payload: Json,
+  error?: string,
+): boolean {
+  const current = readSyncQueue().filter(
+    (item) => item.dedupeKey !== dedupeKey,
+  );
+  return write([
+    ...current,
+    {
+      id: crypto.randomUUID(),
+      dedupeKey,
+      kind,
+      payload,
+      attempts: 0,
+      queuedAt: new Date().toISOString(),
+      lastError: error,
+    },
+  ]);
 }
 
 export function removeSyncOperation(id: string): void {
   write(readSyncQueue().filter((item) => item.id !== id));
 }
 
+export function discardLessonSyncOperations(lessonId: string): void {
+  const checkpointPrefix = `lesson_checkpoint:${lessonId}`;
+  const phasePrefix = `lesson_phase_commit:${lessonId}:`;
+  const completionPrefix = `lesson_completion:${lessonId}`;
+  write(
+    readSyncQueue().filter(
+      (item) =>
+        !item.dedupeKey.startsWith(checkpointPrefix) &&
+        !item.dedupeKey.startsWith(phasePrefix) &&
+        !item.dedupeKey.startsWith(completionPrefix),
+    ),
+  );
+}
+
+/**
+ * Drop everything queued for lessons other than the one now being learned.
+ *
+ * Starting a new lesson abandons the one before it, and its queued work can no
+ * longer succeed: commit_lesson_phase validates against the server checkpoint,
+ * which the abandoned session has already had reset, so the commit is refused
+ * with "phase is incomplete" on every retry. Left in place it retries forever
+ * and shows the learner a save warning about a lesson they have moved on from.
+ */
+export function discardSyncOperationsForOtherLessons(keepLessonId: string): void {
+  const kept = `:${keepLessonId}`;
+  write(
+    readSyncQueue().filter((item) => {
+      const separator = item.dedupeKey.indexOf(":");
+      if (separator < 0) return true;
+      const scope = item.dedupeKey.slice(separator);
+      return scope.startsWith(`${kept}:`) || scope === kept;
+    }),
+  );
+}
+
+export function hasPendingLessonPhaseCommit(lessonId: string): boolean {
+  const prefix = `lesson_phase_commit:${lessonId}:`;
+  return readSyncQueue().some((item) => item.dedupeKey.startsWith(prefix));
+}
+
+export function pendingLessonPhaseError(lessonId: string): string | undefined {
+  const prefix = `lesson_phase_commit:${lessonId}:`;
+  return readSyncQueue().find((item) => item.dedupeKey.startsWith(prefix))
+    ?.lastError;
+}
+
 export function markSyncAttempt(id: string, error: string): void {
-  write(readSyncQueue().map((item) => item.id === id ? { ...item, attempts: item.attempts + 1, lastError: error } : item));
+  write(
+    readSyncQueue().map((item) =>
+      item.id === id
+        ? { ...item, attempts: item.attempts + 1, lastError: error }
+        : item,
+    ),
+  );
 }
 
 export const syncStatusEvent = eventName;

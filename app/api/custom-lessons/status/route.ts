@@ -2,11 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { authorize } from "@/lib/auth/server-authorization";
 import { buildInteractiveStory } from "@/lib/gemini/lesson-activity-groups";
-import type {
-  ResolvedLessonLibrary,
-  StoryDraft,
-} from "@/lib/gemini/lesson-engine-v2";
+import type { ResolvedLessonLibrary, StoryDraft } from "@/lib/gemini/lesson-engine-v2";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,34 +18,38 @@ function response(body: Record<string, unknown>, status = 200) {
   });
 }
 
-export async function GET(request: NextRequest) {
-  const auth = await authorize("learn");
-  if (!auth.ok) return response({ error: auth.message }, auth.status);
+function stringValue(value: unknown, fallback: string): string {
+  return typeof value === "string" && value.trim() ? value : fallback;
+}
 
+async function confirmStoryEntitlement(
+  requestId: string,
+  request: NextRequest,
+): Promise<boolean> {
+  const client = await createClient(request);
+  if (!client) return false;
+  const rawClient = client as unknown as SupabaseClient;
+  const result = await rawClient.rpc("consume_custom_lesson_story_entitlement", {
+    p_request_id: requestId,
+  });
+  return !result.error && result.data === true;
+}
+
+export async function GET(request: NextRequest) {
+  const startedAt = Date.now();
+  const auth = await authorize("learn", request);
+  if (!auth.ok) return response({ error: auth.message }, auth.status);
   const requestId = request.nextUrl.searchParams.get("requestId")?.trim() ?? "";
-  if (!UUID.test(requestId)) {
-    return response({ error: "A valid generation request is required." }, 400);
-  }
+  if (!UUID.test(requestId)) return response({ error: "A valid generation request is required." }, 400);
 
   const admin = createAdminClient() as unknown as SupabaseClient;
   const found = await admin
     .from("progressive_lesson_drafts")
     .select([
-      "request_id",
-      "user_id",
-      "status",
-      "current_stage",
-      "progress_percent",
-      "story_draft",
-      "library_snapshot",
-      "completed_groups",
-      "failed_groups",
-      "build_attempts",
-      "lesson_id",
-      "lesson_version_id",
-      "assignment_id",
-      "audio_status",
-      "audio_attempts",
+      "request_id", "user_id", "status", "current_stage", "progress_percent",
+      "story_draft", "library_snapshot", "completed_groups", "failed_groups",
+      "lesson_id", "lesson_version_id", "assignment_id", "audio_status",
+      "resume_stage", "next_attempt_at", "failure_classification", "last_error",
     ].join(","))
     .eq("request_id", requestId)
     .eq("user_id", auth.userId)
@@ -55,40 +57,67 @@ export async function GET(request: NextRequest) {
   if (found.error) {
     console.error("Custom lesson status lookup failed.", {
       requestId,
+      stage: "status",
+      attempt: 1,
+      errorClassification: "transient",
+      providerRequestId: null,
+      durationMs: Date.now() - startedAt,
+      action: "resumed",
       message: found.error.message,
     });
     return response({ error: "AIko could not load this lesson's progress." }, 500);
   }
-  if (!found.data) {
-    return response({ error: "The lesson generation request was not found." }, 404);
-  }
+  if (!found.data) return response({ error: "The lesson generation request was not found." }, 404);
 
   const row = found.data as unknown as Record<string, unknown>;
+  const status = stringValue(row.status, "permanent_failure");
+  const currentStage = stringValue(row.current_stage, status);
   let story: ReturnType<typeof buildInteractiveStory> | null = null;
-  try {
-    story = buildInteractiveStory(
-      row.story_draft as StoryDraft,
-      row.library_snapshot as ResolvedLessonLibrary,
-    );
-  } catch (error) {
-    console.error("Stored custom lesson story could not be restored.", {
-      requestId,
-      message: error instanceof Error ? error.message : "Invalid story checkpoint.",
-    });
+  if (row.story_draft && row.library_snapshot) {
+    try {
+      story = buildInteractiveStory(
+        row.story_draft as StoryDraft,
+        row.library_snapshot as ResolvedLessonLibrary,
+      );
+    } catch (error) {
+      console.warn("Stored custom lesson story is waiting for checkpoint repair.", {
+        requestId,
+        stage: currentStage,
+        attempt: 1,
+        errorClassification: "content",
+        providerRequestId: null,
+        durationMs: Date.now() - startedAt,
+        action: "regenerated",
+        message: error instanceof Error ? error.message : "Invalid story checkpoint.",
+      });
+    }
   }
 
-  const status = typeof row.status === "string" ? row.status : "failed";
-  const buildAttempts = typeof row.build_attempts === "number" ? row.build_attempts : 0;
-  const audioAttempts = typeof row.audio_attempts === "number" ? row.audio_attempts : 0;
-  const lessonId = typeof row.lesson_id === "string" ? row.lesson_id : null;
-  const audioStatus = typeof row.audio_status === "string" ? row.audio_status : "pending";
-  const activityRetryable = status === "activities_failed" && buildAttempts < 3;
-  const permanentFailure = status === "failed";
+  // Story is the first usable learning content in the progressive flow. The
+  // authenticated database function must positively acknowledge the request's
+  // entitlement before Story can leave the server. A zero-row/misflagged free
+  // request therefore fails closed rather than exposing learning content.
+  if (story && !(await confirmStoryEntitlement(requestId, request))) {
+    console.error("Lesson entitlement could not be confirmed before Story exposure.", {
+      requestId,
+      userId: auth.userId,
+    });
+    return response(
+      { error: "AIko could not open this lesson safely. Please try again." },
+      409,
+    );
+  }
 
+  const lessonId = typeof row.lesson_id === "string" ? row.lesson_id : null;
+  const audioStatus = stringValue(row.audio_status, "pending");
+  const retryable = status === "retryable_failure";
+  const permanentFailure = status === "permanent_failure";
   return response({
     requestId,
     status,
-    currentStage: typeof row.current_stage === "string" ? row.current_stage : status,
+    currentStage,
+    resumeStage: typeof row.resume_stage === "string" ? row.resume_stage : null,
+    nextAttemptAt: typeof row.next_attempt_at === "string" ? row.next_attempt_at : null,
     progressPercent: typeof row.progress_percent === "number" ? row.progress_percent : 0,
     storyReady: Boolean(story),
     lessonReady: Boolean(lessonId),
@@ -98,11 +127,16 @@ export async function GET(request: NextRequest) {
     audioStatus,
     completedGroups: Array.isArray(row.completed_groups) ? row.completed_groups : [],
     failedGroups: Array.isArray(row.failed_groups) ? row.failed_groups : [],
-    retryable: activityRetryable || (audioStatus === "failed" && audioAttempts < 3),
+    retryable,
     permanentFailure,
+    failureClassification: typeof row.failure_classification === "string"
+      ? row.failure_classification
+      : null,
     message: permanentFailure
-      ? "AIko could not finish this lesson after several attempts. You can start a new lesson or retry later."
-      : undefined,
+      ? stringValue(row.last_error, "AIko could not finish this lesson. Start a new lesson after checking the reported configuration or catalog issue.")
+      : retryable
+        ? "A temporary stage failed. AIko will retry it automatically."
+        : undefined,
     story,
   });
 }

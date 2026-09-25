@@ -21,10 +21,10 @@ export function ProgressDashboard() {
       <header>
         <p className="section-kicker">Progress</p>
         <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-          Your {currentLevel} progress.
+          See what’s becoming familiar.
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-muted">
-          See level completion and the language you have actually accumulated through lessons.
+          AIko records mastery while you work through lessons. This page turns that activity into a simple view of how far you’ve moved through {currentLevel}.
         </p>
       </header>
 
@@ -37,9 +37,9 @@ export function ProgressDashboard() {
                 <Target className="size-5" aria-hidden="true" />
               </span>
               <div>
-                <h2 className="text-2xl font-semibold">{currentLevel} level completion</h2>
+                <h2 className="text-2xl font-semibold">Your {currentLevel} learning progress</h2>
                 <p className="mt-1 text-sm tabular-nums text-muted">
-                  {progress.levelCompletion}% complete
+                  {progress.levelCompletion}% of this level completed
                 </p>
               </div>
             </div>
@@ -52,8 +52,11 @@ export function ProgressDashboard() {
               <LearnedStat value={progress.learnedKanjiCount} label="kanji learned" />
               <LearnedStat
                 value={progress.learnedGrammarCount}
-                label="grammar learned"
+                label="grammar patterns learned"
               />
+            </div>
+            <div className="mt-6 rounded-2xl border border-moss-100 bg-moss-50/70 px-4 py-3 text-sm leading-6 text-moss-800">
+              You don’t need to maintain a separate review list. Evidence from completed lesson activities updates mastery in the background and helps AIko decide what needs more attention later.
             </div>
           </div>
         </div>

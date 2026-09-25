@@ -7,6 +7,10 @@ import {
   googleSpeechConfig,
   synthesizeGoogleSpeech,
 } from "@/lib/audio/google-tts";
+import {
+  dialogueSpeechKind,
+  normalizeSpeechText,
+} from "@/lib/audio/dialogue-speech";
 
 const AUDIO_BUCKET = "lesson-audio";
 const MAX_TEXT_LENGTH = 1_200;
@@ -37,10 +41,6 @@ function adminClient(): AdminClient {
   return createAdminClient() as unknown as AdminClient;
 }
 
-function normalizedText(value: string): string {
-  return value.normalize("NFKC").replace(/\s+/g, " ").trim();
-}
-
 function storagePath(text: string): string {
   const config = googleSpeechConfig();
   const signature = createHash("sha256")
@@ -50,6 +50,7 @@ function storagePath(text: string): string {
         language: config.languageCode,
         voice: config.voiceName,
         speakingRate: config.speakingRate,
+        speechFormat: dialogueSpeechKind(text),
         text,
       }),
     )
@@ -75,7 +76,7 @@ export async function ensureAudioAsset(
   value: string,
   client?: AdminClient,
 ): Promise<EnsuredAudioAsset> {
-  const text = normalizedText(value);
+  const text = normalizeSpeechText(value);
   if (!text || text.length > MAX_TEXT_LENGTH) {
     throw new Error("Japanese audio text must contain 1-1,200 characters.");
   }
@@ -150,7 +151,7 @@ type TextWork = {
 
 function addWork(map: Map<string, TextWork>, textValue: unknown, link?: LinkTarget) {
   if (typeof textValue !== "string") return;
-  const text = normalizedText(textValue);
+  const text = normalizeSpeechText(textValue);
   if (!text || text.length > MAX_TEXT_LENGTH) return;
   const item = map.get(text) ?? { text, links: [] };
   if (link) item.links.push(link);

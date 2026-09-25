@@ -1,0 +1,14 @@
+import { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Button, Card, Copy, Eyebrow } from '@/components/ui';
+import { palette, radius, space, type } from '@/constants/theme';
+
+export function PracticeCard({ index, total, difficulty, prompt, cue, choices, correctAnswer, explanation, hint }: { index: number; total: number; difficulty: string; prompt: string; cue?: string; choices: string[]; correctAnswer: string; explanation?: string; hint?: string }) {
+  const [selected, setSelected] = useState<string | null>(null); const [showHint, setShowHint] = useState(false); const correct = selected === correctAnswer;
+  return <Card style={styles.card}><View style={styles.top}><Eyebrow>{difficulty} · {index + 1} of {total}</Eyebrow></View><Text style={styles.prompt}>{prompt}</Text>{cue ? <Text style={styles.cue}>{cue}</Text> : null}
+    {hint && !selected ? <Button label={showHint ? hint : 'Show hint'} variant="quiet" icon="bulb-outline" onPress={() => setShowHint(true)} /> : null}
+    {choices.length ? <View style={styles.choices}>{choices.map((choice) => { const isSelected = selected === choice; const revealCorrect = selected && choice === correctAnswer; return <Pressable key={choice} disabled={Boolean(selected)} onPress={() => setSelected(choice)} style={[styles.choice, isSelected && (correct ? styles.correct : styles.wrong), revealCorrect && styles.correct]}><Text style={styles.choiceText}>{choice}</Text></Pressable>; })}</View> : <Button label={selected ? 'Answer shown' : 'Reveal answer'} variant="secondary" onPress={() => setSelected(correctAnswer)} />}
+    {selected ? <View style={[styles.feedback, correct ? styles.feedbackCorrect : styles.feedbackWrong]}><Text style={styles.feedbackTitle}>{correct ? 'Correct' : `Answer: ${correctAnswer}`}</Text>{explanation ? <Copy>{explanation}</Copy> : null}</View> : null}
+  </Card>;
+}
+const styles = StyleSheet.create({ card: { gap: space.lg }, top: { flexDirection: 'row', justifyContent: 'space-between' }, prompt: { color: palette.ink, fontSize: 20, lineHeight: 27, fontWeight: '800' }, cue: { color: palette.ink, fontFamily: type.japanese, fontSize: 23, lineHeight: 34 }, choices: { gap: space.md }, choice: { minHeight: 54, borderRadius: radius.md, borderWidth: 1, borderColor: palette.line, paddingHorizontal: space.lg, justifyContent: 'center', backgroundColor: palette.paper }, choiceText: { color: palette.ink, fontSize: 16 }, correct: { borderColor: palette.moss700, backgroundColor: palette.moss100 }, wrong: { borderColor: palette.danger, backgroundColor: palette.dangerSoft }, feedback: { borderRadius: radius.md, padding: space.lg, gap: space.sm }, feedbackCorrect: { backgroundColor: palette.moss50 }, feedbackWrong: { backgroundColor: palette.persimmon100 }, feedbackTitle: { color: palette.ink, fontWeight: '900', fontSize: 15 } });

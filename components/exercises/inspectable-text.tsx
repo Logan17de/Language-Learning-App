@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { StoryWord } from "@/types/lesson";
 import { cn } from "@/lib/utils";
+import { japaneseLang } from "@/lib/japanese-input";
 
 type RevealType = "reading" | "meaning";
 
@@ -142,7 +143,7 @@ export function InspectableText({
   ) : null;
 
   return (
-    <span className={className}>
+    <span className={className} lang={japaneseLang(text)}>
       {segments.map((segment, index) =>
         typeof segment === "string" ? (
           <span key={`text-${index}`}>{segment}</span>

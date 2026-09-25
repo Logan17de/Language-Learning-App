@@ -15,7 +15,31 @@ interface OnboardingUpdate {
   goal: LearningGoal | null;
   level: LearnerLevel | null;
   dailyMinutes: DailyMinutes | null;
-  interests: string[];
+}
+
+interface OnboardingCommit {
+  displayName: string;
+  goal: LearningGoal | null;
+  level: LearnerLevel;
+  dailyMinutes: DailyMinutes;
+}
+
+interface LearningPreferenceUpdate {
+  level?: LearnerLevel;
+  dailyMinutes?: DailyMinutes;
+  goal?: LearningGoal | null;
+}
+
+interface UntypedRpcResult {
+  data: unknown;
+  error: { message: string; code?: string } | null;
+}
+
+interface UntypedRpcClient {
+  rpc: (
+    fn: string,
+    args: Record<string, unknown>,
+  ) => Promise<UntypedRpcResult>;
 }
 
 function toDatabaseLevel(
@@ -60,7 +84,6 @@ export const profileRepository = {
       current_jlpt_level: values.current_jlpt_level,
       learning_goal: values.learning_goal,
       daily_study_minutes: values.daily_study_minutes,
-      interests: values.interests,
       timezone: values.timezone,
     };
     const { data, error } = await client
@@ -76,7 +99,6 @@ export const profileRepository = {
       .update({
         learning_goal: values.learning_goal,
         daily_study_minutes: values.daily_study_minutes,
-        interests: values.interests,
         onboarding_complete: true,
       })
       .eq("user_id", auth.user.id);
@@ -88,9 +110,63 @@ export const profileRepository = {
       : success(data);
   },
 
+  async updateLearningPreferences(
+    values: LearningPreferenceUpdate,
+  ): Promise<RepositoryResult<ProfileRow>> {
+    const client = createClient();
+    if (!client) return notConfigured();
+    const { data: auth } = await client.auth.getUser();
+    if (!auth.user) {
+      return failure(
+        { code: "AUTH" },
+        "Your session has expired. Please sign in again.",
+      );
+    }
+
+    const profileValues: ProfileUpdate = {
+      ...(values.level
+        ? { current_jlpt_level: toDatabaseLevel(values.level) }
+        : {}),
+      ...(values.dailyMinutes
+        ? { daily_study_minutes: values.dailyMinutes }
+        : {}),
+      ...(values.goal !== undefined ? { learning_goal: values.goal } : {}),
+    };
+    const { data, error } = await client
+      .from("profiles")
+      .update(profileValues)
+      .eq("id", auth.user.id)
+      .select("*")
+      .single();
+    if (error) {
+      return failure(error, "Your learning preferences could not be updated.");
+    }
+
+    const preferenceValues: Database["public"]["Tables"]["user_preferences"]["Update"] = {
+      ...(values.dailyMinutes
+        ? { daily_study_minutes: values.dailyMinutes }
+        : {}),
+      ...(values.goal !== undefined ? { learning_goal: values.goal } : {}),
+    };
+    if (Object.keys(preferenceValues).length) {
+      const preferences = await client
+        .from("user_preferences")
+        .update(preferenceValues)
+        .eq("user_id", auth.user.id);
+      if (preferences.error) {
+        return failure(
+          preferences.error,
+          "Your learning preferences could not be updated.",
+        );
+      }
+    }
+
+    return success(data);
+  },
+
   async saveOnboarding(
     values: OnboardingUpdate,
-  ): Promise<RepositoryResult<null>> {
+  ): Promise<RepositoryResult<OnboardingCommit>> {
     const client = createClient();
     if (!client) return notConfigured();
     const { data: auth } = await client.auth.getUser();
@@ -100,59 +176,33 @@ export const profileRepository = {
         "Your session has expired. Please sign in again.",
       );
 
-    const profileValues: ProfileUpdate = {
-      display_name: values.displayName.trim(),
-      interests: values.interests,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      ...(values.goal ? { learning_goal: values.goal } : {}),
-      ...(values.level
-        ? { current_jlpt_level: toDatabaseLevel(values.level) }
-        : {}),
-      ...(values.dailyMinutes
-        ? { daily_study_minutes: values.dailyMinutes }
-        : {}),
-    };
-    const profile = await client
-      .from("profiles")
-      .update(profileValues)
-      .eq("id", auth.user.id);
-    if (profile.error)
-      return failure(
-        profile.error,
-        "Your onboarding choices could not be saved.",
-      );
+    const displayName = values.displayName.trim() || "Learner";
+    const goal = values.goal;
+    const level = toDatabaseLevel(values.level ?? "N5");
+    const dailyMinutes = values.dailyMinutes ?? 30;
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 
-    const preferenceValues: Database["public"]["Tables"]["user_preferences"]["Update"] =
-      {
-        interests: values.interests,
-        onboarding_complete: true,
-        ...(values.goal ? { learning_goal: values.goal } : {}),
-        ...(values.dailyMinutes
-          ? { daily_study_minutes: values.dailyMinutes }
-          : {}),
-      };
-    const preferences = await client
-      .from("user_preferences")
-      .update(preferenceValues)
-      .eq("user_id", auth.user.id);
-    return preferences.error
-      ? failure(preferences.error, "Your onboarding status could not be saved.")
-      : success(null);
-  },
+    // Keep the generated Database type compatible with older deployed schemas
+    // while this RPC is absent from the generated type. Cast the client rather
+    // than extracting client.rpc: SupabaseClient.rpc uses `this.rest` internally.
+    const rpcClient = client as unknown as UntypedRpcClient;
+    const { error } = await rpcClient.rpc("complete_onboarding", {
+      p_display_name: displayName,
+      p_learning_goal: goal,
+      p_level: level,
+      p_daily_study_minutes: dailyMinutes,
+      p_timezone: timezone,
+    });
 
-  async markLegacyImported(): Promise<RepositoryResult<string>> {
-    const client = createClient();
-    if (!client) return notConfigured();
-    const { data: auth } = await client.auth.getUser();
-    if (!auth.user)
-      return failure({ code: "AUTH" }, "Your session has expired.");
-    const importedAt = new Date().toISOString();
-    const { error } = await client
-      .from("profiles")
-      .update({ legacy_imported_at: importedAt })
-      .eq("id", auth.user.id);
-    return error
-      ? failure(error, "The import marker could not be saved.")
-      : success(importedAt);
+    if (error) {
+      return failure(error, "Your onboarding choices could not be saved.");
+    }
+
+    return success({
+      displayName,
+      goal,
+      level,
+      dailyMinutes,
+    });
   },
 };

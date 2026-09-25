@@ -6,21 +6,16 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/types/database";
 import type { JLPTLevel } from "@/types/lesson";
 import type { LessonPlanV3 } from "@/lib/gemini/story-pipeline-v3";
+import {
+  LEARNED_MASTERY_THRESHOLD,
+  selectFromLowestMasteryPool,
+  selectRandomLevelTargets,
+} from "@/lib/mastery-target-selection";
 
 const LEVELS: JLPTLevel[] = ["N5", "N4", "N3", "N2", "N1"];
 
 interface Mastery {
   mastery: number;
-  evidenceCount: number;
-}
-
-interface InterestRow {
-  interests: string[];
-}
-
-interface ExposureRow {
-  character: string;
-  appearance_count: number;
 }
 
 interface CatalogSnapshot {
@@ -50,52 +45,6 @@ interface CatalogSnapshot {
 
 function allowedLevels(level: JLPTLevel): JLPTLevel[] {
   return LEVELS.slice(0, LEVELS.indexOf(level) + 1);
-}
-
-function stableHash(value: string): number {
-  let hash = 2166136261;
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
-}
-
-function compare(left: number[], right: number[]): number {
-  for (let index = 0; index < Math.max(left.length, right.length); index += 1) {
-    const difference = (left[index] ?? 0) - (right[index] ?? 0);
-    if (difference !== 0) return difference;
-  }
-  return 0;
-}
-
-function priority(
-  itemLevel: JLPTLevel,
-  requestedLevel: JLPTLevel,
-  mastery: Mastery | undefined,
-  seed: string,
-): number[] {
-  return [
-    mastery && mastery.evidenceCount > 0 && mastery.mastery < 75
-      ? 0
-      : !mastery || mastery.evidenceCount === 0
-        ? 1
-        : 2,
-    itemLevel === requestedLevel ? 0 : 1,
-    mastery?.mastery ?? 50,
-    stableHash(seed),
-  ];
-}
-
-function normalizedInterests(...sources: unknown[]): string[] {
-  const values = sources.flatMap((source) =>
-    Array.isArray(source)
-      ? source.filter((item): item is string => typeof item === "string")
-      : [],
-  );
-  return [...new Set(
-    values.map((item) => item.normalize("NFKC").trim()).filter(Boolean),
-  )].slice(0, 8);
 }
 
 const cachedCatalogSnapshot = unstable_cache(
@@ -144,8 +93,12 @@ const cachedCatalogSnapshot = unstable_cache(
 );
 
 /**
- * Static catalogs are cached for fifteen minutes. Learner mastery, interests,
- * and kanji exposure remain live and are fetched in parallel for every request.
+ * Static catalogs are cached for fifteen minutes. Learner mastery remains live
+ * and is fetched for every request.
+ *
+ * Learned means mastery >= 80. Learned kanji/grammar are never selected as new
+ * lesson targets. Each lesson chooses from the ten lowest-mastery eligible
+ * items: five kanji and three grammar patterns.
  */
 export async function selectLessonPlanV3(
   client: SupabaseClient<Database>,
@@ -154,35 +107,22 @@ export async function selectLessonPlanV3(
   level: JLPTLevel,
 ): Promise<LessonPlanV3> {
   const levels = allowedLevels(level);
-  const rawClient = client as unknown as SupabaseClient;
-  const [catalog, masteryResult, preferenceResult, profileResult, exposureResult] = await Promise.all([
+  const [catalog, masteryResult, profileResult] = await Promise.all([
     cachedCatalogSnapshot(levels.join(",")),
     client
       .from("learner_mastery")
-      .select("item_type,item_key,mastery,evidence_count")
+      .select("item_type,item_key,mastery")
       .eq("user_id", userId)
       .in("item_type", ["kanji", "grammar"]),
-    rawClient
-      .from("user_preferences")
-      .select("interests")
-      .eq("user_id", userId)
-      .maybeSingle(),
-    rawClient
+    client
       .from("profiles")
-      .select("interests")
+      .select("current_jlpt_level")
       .eq("id", userId)
       .maybeSingle(),
-    rawClient
-      .from("learner_kanji_exposure_progress")
-      .select("character,appearance_count")
-      .eq("user_id", userId)
-      .gte("appearance_count", 10),
   ]);
 
-  const firstError = [masteryResult, preferenceResult, profileResult, exposureResult]
-    .find((result) => result.error)?.error;
-  if (firstError) {
-    throw new Error(`Lesson targets could not be loaded: ${firstError.message}`);
+  if (masteryResult.error) {
+    throw new Error(`Lesson targets could not be loaded: ${masteryResult.error.message}`);
   }
 
   const kanjiKeys = new Map<string, string>();
@@ -206,54 +146,53 @@ export async function selectLessonPlanV3(
       : grammarKeys.get(row.item_key);
     if (!key) continue;
     const target = row.item_type === "kanji" ? kanjiMastery : grammarMastery;
-    target.set(key, {
-      mastery: row.mastery,
-      evidenceCount: row.evidence_count,
-    });
+    target.set(key, { mastery: row.mastery });
   }
 
-  const kanji = catalog.kanjiCatalog
-    .map((row) => ({
-      character: row.character,
-      level: row.jlpt_level,
-      priority: priority(
-        row.jlpt_level,
-        level,
-        kanjiMastery.get(row.character),
-        `${userId}:${topic}:kanji:${row.character}`,
-      ),
-    }))
-    .sort((left, right) => compare(left.priority, right.priority))
-    .slice(0, 5)
-    .map(({ character, level: itemLevel }) => ({ character, level: itemLevel }));
+  // A lesson deliberately requested below the learner's own level is revision:
+  // those items are usually already at or above the learned threshold, so the
+  // unlearned-pool rule would find nothing. Pick across the level at random
+  // instead. At or above their level, the normal weakest-first rule applies.
+  const learnerLevel = (profileResult.data?.current_jlpt_level ??
+    level) as JLPTLevel;
+  const isRevisionLevel = LEVELS.indexOf(level) < LEVELS.indexOf(learnerLevel);
+  const selectTargets = isRevisionLevel
+    ? selectRandomLevelTargets
+    : selectFromLowestMasteryPool;
 
-  const grammar = catalog.grammarCatalog
-    .map((row) => ({
-      pattern: row.pattern,
-      level: row.jlpt_level,
-      priority: priority(
-        row.jlpt_level,
-        level,
-        grammarMastery.get(row.pattern),
-        `${userId}:${topic}:grammar:${row.pattern}`,
-      ),
-    }))
-    .sort((left, right) => compare(left.priority, right.priority))
-    .slice(0, 3)
-    .map(({ pattern, level: itemLevel }) => ({ pattern, level: itemLevel }));
+  const kanji = selectTargets(
+    catalog.kanjiCatalog.map((row) => ({
+      value: { character: row.character, level: row.jlpt_level },
+      mastery: kanjiMastery.get(row.character)?.mastery ?? 0,
+      requestedLevel: row.jlpt_level === level,
+      sourceOrder: row.source_order,
+      selectionSeed: `${userId}:${topic}:kanji:${row.character}`,
+    })),
+    5,
+  );
+
+  const grammar = selectTargets(
+    catalog.grammarCatalog.map((row) => ({
+      value: { pattern: row.pattern, level: row.jlpt_level },
+      mastery: grammarMastery.get(row.pattern)?.mastery ?? 0,
+      requestedLevel: row.jlpt_level === level,
+      sourceOrder: row.source_order,
+      selectionSeed: `${userId}:${topic}:grammar:${row.pattern}`,
+    })),
+    3,
+  );
 
   if (kanji.length !== 5 || grammar.length !== 3) {
     throw new Error(
-      `Import the ${level} kanji and grammar catalogs before generating lessons.`,
+      isRevisionLevel
+        ? `The ${level} catalog does not have enough targets to build a revision lesson.`
+        : `Not enough unlearned ${level} lesson targets remain below ${LEARNED_MASTERY_THRESHOLD}% mastery.`,
     );
   }
 
-  const knownKanji = ((exposureResult.data ?? []) as ExposureRow[])
-    .filter((row) => row.appearance_count >= 10)
-    .map((row) => row.character);
-  const preferences = preferenceResult.data as InterestRow | null;
-  const profile = profileResult.data as InterestRow | null;
-  const interests = normalizedInterests(preferences?.interests, profile?.interests);
+  const knownKanji = [...kanjiMastery.entries()]
+    .filter(([, mastery]) => mastery.mastery >= LEARNED_MASTERY_THRESHOLD)
+    .map(([character]) => character);
 
-  return { kanji, grammar, knownKanji, interests };
+  return { kanji, grammar, knownKanji };
 }

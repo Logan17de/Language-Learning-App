@@ -1,19 +1,12 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { storeGeneratedVocabularyTerms } from "@/lib/gemini/generated-vocabulary-storage";
 import type {
   GenerationAuditEntry,
   InspectableTerm,
   ResolvedLessonLibrary,
   StoryDraft,
 } from "@/lib/gemini/lesson-engine-v2";
-import {
-  simpleStoryEnrichmentSchema,
-  storyEnrichmentOutputIssues,
-  storyEnrichmentPrompt,
-  type SimpleStoryEnrichment,
-} from "@/lib/gemini/simple-story-enrichment-contract";
 import {
   speakingReadAloudIssues,
   speakingReadAloudPrompt,
@@ -44,16 +37,6 @@ export interface GeneratedSpeakingRegion {
   audit: GenerationAuditEntry;
 }
 
-function uniqueTerms(terms: InspectableTerm[]): InspectableTerm[] {
-  const seen = new Set<string>();
-  return terms.filter((term) => {
-    const key = `${term.libraryId}:${term.surface}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
 export async function generateSpeakingRegion(input: {
   requestId?: string;
   admin?: SupabaseClient;
@@ -78,70 +61,25 @@ export async function generateSpeakingRegion(input: {
     trace: { requestId: input.requestId, stage: "speaking_read_aloud" },
   });
 
-  const speakingText = speaking.value.sentences
-    .map((item) => item.sentence)
-    .join("\n");
-  const enrichment = await generateStructured<SimpleStoryEnrichment>({
-    name: "speaking_vocabulary",
-    prompt: storyEnrichmentPrompt(speakingText),
-    schema: simpleStoryEnrichmentSchema,
-    strictSchema: true,
-    exactSchemaName: true,
-    validate: storyEnrichmentOutputIssues,
-    trace: { requestId: input.requestId, stage: "speaking_enrichment" },
-  });
-  const terms = await storeGeneratedVocabularyTerms({
-    admin: input.admin,
-    requestId: input.requestId,
-    level: input.level,
-    vocabulary: enrichment.value.vocabulary,
-    model: enrichment.model,
-    library: input.library,
-  });
-
-  const fallbackIds = [
-    ...input.library.grammar.map((item) => item.libraryId),
-    ...input.library.vocabulary.map((item) => item.libraryId),
-    ...input.library.kanji.map((item) => item.libraryId),
-  ];
   return {
-    exercises: speaking.value.sentences.map((item, index) => {
-      const inspectableTerms = uniqueTerms(
-        terms.filter((term) =>
-          item.sentence.includes(term.surface),
-        ),
-      );
-      const termIds = [...new Set(
-        inspectableTerms.map((term) => term.libraryId),
-      )].slice(0, 5);
-      const fallbackId = fallbackIds.length > 0
-        ? fallbackIds[index % fallbackIds.length]
-        : undefined;
-      return {
-        mode: item.difficulty,
-        questionType: "read_aloud",
-        prompt: item.sentence,
-        easyPrompt: item.difficulty === "easy" ? item.sentence : "",
-        mediumPrompt: item.difficulty === "medium" ? item.sentence : "",
-        hardPrompt: item.difficulty === "hard" ? item.sentence : "",
-        expectedAnswer: item.sentence,
-        modelAnswer: item.sentence,
-        expectedConcepts: [item.sentence],
-        semanticCriteria: ["The transcript should closely match the displayed sentence."],
-        targetItemIds: termIds.length > 0
-          ? termIds
-          : fallbackId
-            ? [fallbackId]
-            : [],
-        inspectableTerms,
-      };
-    }),
+    exercises: speaking.value.sentences.map((item) => ({
+      mode: item.difficulty,
+      questionType: "read_aloud",
+      prompt: item.sentence,
+      easyPrompt: item.difficulty === "easy" ? item.sentence : "",
+      mediumPrompt: item.difficulty === "medium" ? item.sentence : "",
+      hardPrompt: item.difficulty === "hard" ? item.sentence : "",
+      expectedAnswer: item.sentence,
+      modelAnswer: item.sentence,
+      expectedConcepts: [item.sentence],
+      semanticCriteria: ["The transcript should closely match the displayed sentence."],
+      targetItemIds: [],
+      inspectableTerms: [],
+    })),
     audit: {
       stage: "communication_activities",
-      model: speaking.model === enrichment.model
-        ? speaking.model
-        : `${speaking.model}, ${enrichment.model}`,
-      repaired: speaking.repaired || enrichment.repaired,
+      model: speaking.model,
+      repaired: speaking.repaired,
     },
   };
 }
