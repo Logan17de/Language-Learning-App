@@ -2,8 +2,10 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Alert } from "@/components/ui/alert";
 import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
 import { useAppStore } from "@/store/app-store";
 import { authService } from "@/lib/auth/auth-service";
@@ -135,10 +137,10 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           ? "Log in with Google"
           : "Create account with Google"}
       </Button>
-      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[.16em] text-stone-300">
-        <span className="h-px flex-1 bg-stone-200" />
+      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[.16em] text-muted">
+        <span className="h-px flex-1 bg-border" />
         or use email
-        <span className="h-px flex-1 bg-stone-200" />
+        <span className="h-px flex-1 bg-border" />
       </div>
       {mode === "signup" && (
         <label className="block">
@@ -193,7 +195,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           <button
             type="button"
             onClick={() => setShowPassword((value) => !value)}
-            className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-stone-400 hover:bg-stone-50"
+            className="absolute right-1.5 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-surface-muted"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
@@ -206,7 +208,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         {mode === "signup" ? (
           <PasswordStrengthMeter password={password} />
         ) : (
-          <p className="mt-2 text-xs leading-5 text-stone-400">
+          <p className="mt-2 text-xs leading-5 text-muted">
             Password strength is checked when you create or reset a password.
             Enter the password for your existing AIko account here.
           </p>
@@ -214,31 +216,24 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       </label>
       {mode === "login" && (
         <div className="text-right">
-          <a
+          <Link
             href="/forgot-password"
-            className="text-sm font-semibold text-moss-700 hover:underline"
+            className="inline-flex min-h-11 items-center rounded-xl px-2 text-sm font-semibold text-moss-700 hover:bg-moss-50"
           >
             Forgot password?
-          </a>
+          </Link>
         </div>
       )}
-      {error && (
-        <p
-          role="alert"
-          className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
-        >
-          {error}
-        </p>
-      )}
-      <Button className="w-full" disabled={loading}>
-        {loading && <LoaderCircle className="size-4 animate-spin" />}
+      {error && <Alert tone="error">{error}</Alert>}
+      <Button className="w-full" disabled={loading} aria-busy={loading}>
+        {loading && <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />}
         {loading
           ? "Preparing your path…"
           : mode === "login"
             ? "Log in"
             : "Create my account"}
       </Button>
-      <p className="text-center text-xs leading-5 text-stone-400">
+      <p className="text-center text-xs leading-5 text-muted">
         {backendMode === "demo"
           ? "Demo mode: email sign-in is local; Google requires Supabase Auth."
           : "Your account is secured by Supabase Auth."}

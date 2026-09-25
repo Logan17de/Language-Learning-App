@@ -103,7 +103,8 @@ export function InspectableText({
   const popup = active && typeof document !== "undefined" ? createPortal(
     <div
       ref={supportRef}
-      role="dialog"
+      role="status"
+      aria-live="polite"
       aria-label={`Help for ${active.word.surface}`}
       className={cn(
         "fixed z-[70] w-72 overflow-visible rounded-2xl border border-moss-700 bg-moss-900 text-white shadow-2xl transition duration-150",

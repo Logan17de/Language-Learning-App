@@ -20,7 +20,6 @@ import { PublicPrimaryAction } from "@/components/auth/public-auth-actions";
 import { PublicHeader } from "@/components/layout/public-header";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Brand } from "@/components/ui/brand";
 
 export const metadata: Metadata = {
   title: "AIko — Adaptive Language Learning",

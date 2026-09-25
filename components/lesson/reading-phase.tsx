@@ -93,7 +93,7 @@ export function ReadingPhase({
         <h2 className="mt-4 text-3xl font-semibold tracking-tight">
           {lesson.readingJapaneseTitle || "Read for meaning."}
         </h2>
-        <p className="mt-3 leading-7 text-stone-500">
+        <p className="mt-3 leading-7 text-muted">
           Read the passage carefully. Touch a supported word when you need its
           reading or meaning, then answer in a short Japanese sentence.
         </p>
@@ -131,7 +131,7 @@ export function ReadingPhase({
                 Question {currentIndex + 1}
               </h3>
             </div>
-            <p className="text-sm font-semibold text-stone-500">
+            <p className="text-sm font-semibold text-muted">
               {answers.length} / {questions.length}
             </p>
           </div>
@@ -148,7 +148,7 @@ export function ReadingPhase({
               />
             </p>
 
-            <label className="mt-7 block text-sm font-semibold text-stone-600" htmlFor="reading-answer">
+            <label className="mt-7 block text-sm font-semibold text-muted" htmlFor="reading-answer">
               日本語で答えてください
             </label>
             <textarea
@@ -158,7 +158,7 @@ export function ReadingPhase({
               disabled={Boolean(submitted)}
               onChange={(event) => setTypedAnswer(event.target.value)}
               placeholder="短い文で答えてください"
-              className="mt-2 w-full resize-none rounded-2xl border border-stone-200 bg-white px-4 py-3 font-serif text-lg leading-8 outline-none transition focus:border-moss-500 focus:ring-4 focus:ring-moss-100 disabled:bg-stone-50"
+              className="form-input mt-2 min-h-28 resize-none py-3 font-serif text-lg leading-8"
             />
 
             {!submitted && convertedAnswer && convertedAnswer !== typedAnswer && (
@@ -176,7 +176,7 @@ export function ReadingPhase({
                   <CheckCircle2 className="size-5" /> Reference answer
                 </p>
                 <p className="mt-3 font-serif text-lg leading-8">{question.answer}</p>
-                <p className="mt-2 text-xs leading-5 text-stone-500">
+                <p className="mt-2 text-xs leading-5 text-muted">
                   Your wording may be different when it communicates the same story-supported answer.
                 </p>
               </div>
@@ -200,9 +200,9 @@ export function ReadingPhase({
       )}
 
       {(complete || session.readingComplete) && (
-        <details className="mt-8 rounded-3xl border border-stone-200 bg-white p-6">
+        <details className="mt-8 rounded-3xl border border-border bg-surface p-6">
           <summary className="cursor-pointer font-semibold text-moss-800">View English translation</summary>
-          <div className="mt-5 space-y-4 text-justify leading-8 text-stone-600">
+          <div className="mt-5 space-y-4 text-justify leading-8 text-muted">
             {lesson.readingConversation.map((line, index) => (
               <p key={`translation-${index}`}>{line.english}</p>
             ))}

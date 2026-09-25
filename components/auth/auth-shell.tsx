@@ -11,10 +11,10 @@ export function AuthShell({ children }: { children: ReactNode }) {
         </div>
       </section>
       <aside className="relative hidden overflow-hidden bg-moss-900 lg:block">
-        <div className="absolute -right-24 -top-24 size-96 rounded-full bg-persimmon-400/20 blur-3xl" />
-        <div className="absolute -bottom-32 -left-24 size-[28rem] rounded-full bg-moss-500/25 blur-3xl" />
+        <div className="absolute -right-24 -top-24 size-96 rounded-full border-[5rem] border-persimmon-400/10" aria-hidden="true" />
+        <div className="absolute -bottom-32 -left-24 size-[28rem] rounded-full border-[6rem] border-moss-500/15" aria-hidden="true" />
         <div className="relative flex h-full flex-col justify-between p-14 text-white">
-          <p className="font-serif text-7xl text-white/10">学</p>
+          <p className="font-serif text-7xl text-white/10" aria-hidden="true">学</p>
           <div>
             <p className="max-w-xl text-4xl font-semibold leading-tight">Japanese that stays with you—because every lesson responds to what you find difficult.</p>
             <div className="mt-10 flex gap-3">

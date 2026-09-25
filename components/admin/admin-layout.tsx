@@ -92,10 +92,16 @@ export function AdminLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800">
+      <a
+        href="#admin-main-content"
+        className="fixed left-4 top-4 z-[70] -translate-y-24 rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white shadow-xl transition-transform focus:translate-y-0 focus:ring-4 focus:ring-teal-200"
+      >
+        Skip to admin content
+      </a>
       <AdminSidebar open={drawer} onClose={() => setDrawer(false)} />
       <div className="lg:pl-72">
         <AdminHeader onMenu={() => setDrawer(true)} />
-        <main className="mx-auto max-w-[1600px] px-4 py-7 sm:px-6 lg:px-8">{children}</main>
+        <main id="admin-main-content" className="mx-auto max-w-[1600px] px-4 py-7 sm:px-6 lg:px-8">{children}</main>
       </div>
     </div>
   );

@@ -8,6 +8,8 @@ import { useAppStore } from "@/store/app-store";
 import { SettingsSection } from "@/components/settings/settings-section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Alert } from "@/components/ui/alert";
+import { Dialog } from "@/components/ui/dialog";
 import { getBackendMode } from "@/lib/supabase/config";
 
 export function SettingsPage() {
@@ -21,6 +23,8 @@ export function SettingsPage() {
   const resetDemo = useAppStore((state) => state.resetDemo);
   const [confirm, setConfirm] = useState<"reset" | "delete" | null>(null);
   const [exported, setExported] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [confirmError, setConfirmError] = useState("");
 
   function exportData() {
     if (getBackendMode() === "supabase") {
@@ -41,9 +45,46 @@ export function SettingsPage() {
     window.setTimeout(() => setExported(false), 2200);
   }
 
+  function openConfirmation(action: "reset" | "delete") {
+    setConfirmError("");
+    setConfirm(action);
+  }
+
+  async function performDestructiveAction() {
+    if (!confirm || confirming) return;
+    setConfirmError("");
+    setConfirming(true);
+    if (confirm === "reset" && getBackendMode() === "supabase") {
+      try {
+        const response = await fetch("/api/account/reset-progress", {
+          method: "POST",
+        });
+        if (!response.ok) {
+          setConfirmError(
+            "AIko could not reset your progress. Nothing was changed; please try again.",
+          );
+          return;
+        }
+      } catch {
+        setConfirmError(
+          "The connection was interrupted. Nothing was changed; please try again.",
+        );
+        return;
+      } finally {
+        setConfirming(false);
+      }
+    } else {
+      setConfirming(false);
+    }
+
+    if (confirm === "reset") resetProgress();
+    else resetDemo();
+    setConfirm(null);
+  }
+
   return (
     <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
-      <header><p className="section-kicker">Settings</p><h1 className="mt-3 text-4xl font-semibold tracking-tight">Make AIko fit your routine.</h1><p className="mt-3 max-w-2xl text-stone-500">{getBackendMode() === "supabase" ? "Preferences sync to your account and remain cached on this device." : "All preferences remain on this device and can be changed at any time."}</p></header>
+      <header><p className="section-kicker">Settings</p><h1 className="mt-3 text-4xl font-semibold tracking-tight">Make AIko fit your routine.</h1><p className="mt-3 max-w-2xl text-muted">{getBackendMode() === "supabase" ? "Preferences sync to your account and remain cached on this device." : "All preferences remain on this device and can be changed at any time."}</p></header>
       <div className="mt-8 space-y-6">
         <SettingsSection icon={BookOpen} title="Learning" description="Set the pace and kind of support you prefer.">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -57,7 +98,7 @@ export function SettingsPage() {
         </SettingsSection>
 
         <SettingsSection icon={Headphones} title="Audio" description="Control the frontend-only playback simulations.">
-          <label className="block"><span className="flex justify-between text-sm font-semibold"><span>Simulated volume</span><span>{settings.audioVolume}%</span></span><input type="range" min={0} max={100} value={settings.audioVolume} onChange={(event) => update({ audioVolume: Number(event.target.value) })} className="mt-3 w-full accent-moss-600" /></label>
+          <label className="block"><span className="flex justify-between text-sm font-semibold"><span>Simulated volume</span><span className="tabular-nums">{settings.audioVolume}%</span></span><input type="range" min={0} max={100} value={settings.audioVolume} aria-valuetext={`${settings.audioVolume} percent`} onChange={(event) => update({ audioVolume: Number(event.target.value) })} className="mt-3 min-h-11 w-full accent-moss-600" /></label>
           <div className="grid gap-4 sm:grid-cols-2">
             <Toggle label="Autoplay lesson audio" checked={settings.autoplay} onChange={(checked) => update({ autoplay: checked })} />
             <Toggle label="Show transcript after answer" checked={settings.showTranscript} onChange={(checked) => update({ showTranscript: checked })} />
@@ -86,22 +127,41 @@ export function SettingsPage() {
 
         <SettingsSection icon={Palette} title="Appearance" description="The theme preference is persisted and applied across the app shell.">
           <div className="grid grid-cols-3 gap-3" role="radiogroup" aria-label="Theme">
-            {(["light", "dark", "system"] as ThemePreference[]).map((theme) => <button key={theme} type="button" role="radio" aria-checked={settings.theme === theme} onClick={() => update({ theme })} className={`min-h-20 rounded-2xl border text-sm font-semibold capitalize focus:outline-none focus:ring-4 focus:ring-moss-100 ${settings.theme === theme ? "border-moss-600 bg-moss-50 text-moss-700" : "border-stone-200 bg-white"}`}>{theme}</button>)}
+            {(["light", "dark", "system"] as ThemePreference[]).map((theme) => <button key={theme} type="button" role="radio" aria-checked={settings.theme === theme} onClick={() => update({ theme })} className={`min-h-20 rounded-2xl border text-sm font-semibold capitalize ${settings.theme === theme ? "border-moss-600 bg-moss-50 text-moss-700" : "border-border bg-surface text-muted hover:bg-surface-muted"}`}>{theme}</button>)}
           </div>
         </SettingsSection>
 
         <SettingsSection icon={Shield} title="Privacy" description="Review, export, or reset the local prototype data.">
-          <div className="rounded-2xl bg-stone-50 p-4 text-sm leading-6 text-stone-600">{getBackendMode() === "supabase" ? "Your export includes the server profile, settings, lesson sessions, completions, mastery, review data, reports, and support tickets." : `AIko currently stores one learner profile, ${progress.completedLessonIds.length} completed lesson IDs, ${progress.reviewQueue.length} review queue items, and settings locally.`}</div>
-          <div className="flex flex-wrap gap-3"><Button type="button" variant="secondary" onClick={exportData}><Download className="size-4" /> Export learning data</Button><Button type="button" variant="secondary" onClick={() => setConfirm("reset")}><TriangleAlert className="size-4" /> Reset progress</Button><Button type="button" variant="ghost" className="text-persimmon-600" onClick={() => setConfirm("delete")}><Trash2 className="size-4" /> Delete account</Button></div>
+          <div className="rounded-2xl bg-surface-muted p-4 text-sm leading-6 text-muted">{getBackendMode() === "supabase" ? "Your export includes the server profile, settings, lesson sessions, completions, mastery, review data, reports, and support tickets." : `AIko currently stores one learner profile, ${progress.completedLessonIds.length} completed lesson IDs, ${progress.reviewQueue.length} review queue items, and settings locally.`}</div>
+          <div className="flex flex-wrap gap-3"><Button type="button" variant="secondary" onClick={exportData}><Download className="size-4" /> Export learning data</Button><Button type="button" variant="secondary" onClick={() => openConfirmation("reset")}><TriangleAlert className="size-4" /> Reset progress</Button><Button type="button" variant="ghost" className="text-danger" onClick={() => openConfirmation("delete")}><Trash2 className="size-4" /> Delete account</Button></div>
           {exported && <p className="flex items-center gap-2 text-sm font-semibold text-moss-700" role="status"><Check className="size-4" /> Local data export prepared.</p>}
         </SettingsSection>
       </div>
 
-      {confirm && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-5" role="dialog" aria-modal="true" aria-labelledby="destructive-title">
-          <div className="w-full max-w-md rounded-4xl bg-white p-7 shadow-float"><Trash2 className="size-8 text-persimmon-500" /><Badge tone="orange" className="mt-5">Confirmation required</Badge><h2 id="destructive-title" className="mt-4 text-2xl font-semibold">{confirm === "reset" ? "Reset learning progress?" : getBackendMode() === "supabase" ? "Account deletion is not available yet" : "Delete this mock account?"}</h2><p className="mt-3 text-sm leading-6 text-stone-500">{confirm === "reset" ? "Lessons, reviews, scores, mastery, rewards, and review history will be cleared. Your account and profile preferences remain." : getBackendMode() === "supabase" ? "A future privileged deletion workflow will remove the authentication account safely. You can export or reset progress now." : "All locally persisted AIko state will return to demo defaults."}</p><div className="mt-6 flex gap-3"><Button variant="secondary" className="flex-1" onClick={() => setConfirm(null)}>Cancel</Button>{!(confirm === "delete" && getBackendMode() === "supabase") && <Button className="flex-1 bg-persimmon-500 hover:bg-persimmon-600" onClick={async () => { if (confirm === "reset") { if (getBackendMode() === "supabase") { const response = await fetch("/api/account/reset-progress", { method: "POST" }); if (!response.ok) return; } resetProgress(); } else resetDemo(); setConfirm(null); }}>{confirm === "reset" ? "Reset progress" : "Delete mock account"}</Button>}</div></div>
+      <Dialog
+        open={Boolean(confirm)}
+        onClose={() => {
+          if (!confirming) setConfirm(null);
+        }}
+        labelledBy="destructive-title"
+        describedBy="destructive-description"
+        closeOnBackdrop={!confirming}
+        panelClassName="max-w-md"
+      >
+        <Trash2 className="size-8 text-danger" aria-hidden="true" />
+        <Badge tone="orange" className="mt-5">Confirmation required</Badge>
+        <h2 id="destructive-title" className="mt-4 text-2xl font-semibold">{confirm === "reset" ? "Reset learning progress?" : getBackendMode() === "supabase" ? "Account deletion is not available yet" : "Delete this mock account?"}</h2>
+        <p id="destructive-description" className="mt-3 text-sm leading-6 text-muted">{confirm === "reset" ? "Lessons, reviews, scores, mastery, rewards, and review history will be cleared. Your account and profile preferences remain." : getBackendMode() === "supabase" ? "A future privileged deletion workflow will remove the authentication account safely. You can export or reset progress now." : "All locally persisted AIko state will return to demo defaults."}</p>
+        {confirmError && <Alert tone="error" className="mt-5">{confirmError}</Alert>}
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
+          <Button variant="secondary" className="flex-1" disabled={confirming} data-dialog-autofocus onClick={() => setConfirm(null)}>Cancel</Button>
+          {!(confirm === "delete" && getBackendMode() === "supabase") && (
+            <Button variant="danger" className="flex-1" disabled={confirming} aria-busy={confirming} onClick={() => void performDestructiveAction()}>
+              {confirming ? "Working…" : confirm === "reset" ? "Reset progress" : "Delete mock account"}
+            </Button>
+          )}
         </div>
-      )}
+      </Dialog>
     </div>
   );
 }
@@ -111,5 +171,5 @@ function Select({ label, value, options, onChange, suffix = "" }: { label: strin
 }
 
 function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
-  return <label className="flex min-h-14 cursor-pointer items-center justify-between gap-4 rounded-2xl border border-stone-100 bg-white px-4"><span className="text-sm font-semibold">{label}</span><input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="size-5 accent-moss-600" /></label>;
+  return <label className="flex min-h-14 cursor-pointer items-center justify-between gap-4 rounded-2xl border border-border bg-surface px-4 transition duration-180 hover:border-moss-200 hover:bg-moss-50"><span className="text-sm font-semibold">{label}</span><input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="size-5 accent-moss-600" /></label>;
 }

@@ -12,21 +12,23 @@ export function AnswerFeedback({
 }) {
   const Icon = correct ? CheckCircle2 : XCircle;
   const detail = correct
-    ? explanation
+    ? explanation || "You matched the expected answer."
     : "Check the correct answer and compare it with your response.";
   return (
     <div
       role="status"
       className={cn(
         "rounded-2xl border p-4",
-        correct ? "border-moss-200 bg-moss-50 text-moss-900" : "border-persimmon-100 bg-persimmon-50 text-persimmon-600",
+        correct
+          ? "border-positive-border bg-positive-surface text-positive"
+          : "border-danger-border bg-danger-surface text-danger",
       )}
     >
       <div className="flex items-start gap-3">
-        <Icon className="mt-0.5 size-5 shrink-0" />
+        <Icon className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
         <div>
           <p className="text-sm font-semibold">{correct ? "Correct." : "Not correct yet."}</p>
-          {!compact && <p className="mt-1 text-sm leading-6 opacity-75">{detail}</p>}
+          {!compact && <p className="mt-1 text-sm leading-6 opacity-85">{detail}</p>}
         </div>
       </div>
     </div>

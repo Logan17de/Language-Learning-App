@@ -34,14 +34,14 @@ export function LegacyImportAssistant() {
   }
 
   return (
-    <div className="fixed inset-x-4 bottom-4 z-[110] mx-auto max-w-lg rounded-2xl border border-moss-200 bg-white p-5 shadow-2xl">
-      <button type="button" onClick={() => setDismissed(true)} className="absolute right-3 top-3 grid size-9 place-items-center rounded-full text-stone-400 hover:bg-stone-100" aria-label="Dismiss import"><X className="size-4" /></button>
+    <div className="fixed inset-x-4 bottom-4 z-[110] mx-auto max-w-lg rounded-2xl border border-moss-200 bg-surface p-5 shadow-2xl">
+      <button type="button" onClick={() => setDismissed(true)} className="absolute right-2 top-2 grid size-11 place-items-center rounded-full text-muted hover:bg-surface-muted" aria-label="Dismiss import"><X className="size-4" aria-hidden="true" /></button>
       <CloudUpload className="size-6 text-moss-700" />
       <h2 className="mt-3 pr-8 text-lg font-bold text-ink">{report ? "Device progress import complete" : "AIko found progress saved on this device. Import it to your account?"}</h2>
       {report ? (
-        <p className="mt-2 text-sm leading-6 text-stone-600">Imported {report.lessons} lessons, {report.mastery} mastery items, {report.queue} review items, and {report.achievements} achievements. {report.skipped > 0 ? `${report.skipped} unsupported or malformed records were skipped.` : ""}</p>
+        <p className="mt-2 text-sm leading-6 text-muted">Imported {report.lessons} lessons, {report.mastery} mastery items, {report.queue} review items, and {report.achievements} achievements. {report.skipped > 0 ? `${report.skipped} unsupported or malformed records were skipped.` : ""}</p>
       ) : (
-        <p className="mt-2 text-sm leading-6 text-stone-600">Preview: {preview.summary.completedLessons} lessons, {preview.summary.masteryItems} mastery items, {preview.summary.reviewItems} review items, and {preview.summary.achievements} achievements. Existing server records are kept.</p>
+        <p className="mt-2 text-sm leading-6 text-muted">Preview: {preview.summary.completedLessons} lessons, {preview.summary.masteryItems} mastery items, {preview.summary.reviewItems} review items, and {preview.summary.achievements} achievements. Existing server records are kept.</p>
       )}
       {error && <p role="alert" className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">{error}</p>}
       <div className="mt-4 flex gap-3">

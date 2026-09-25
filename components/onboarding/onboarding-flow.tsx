@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import { Brand } from "@/components/ui/brand";
 import { Button } from "@/components/ui/button";
+import { Alert } from "@/components/ui/alert";
+import { Dialog } from "@/components/ui/dialog";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { cn } from "@/lib/utils";
 import { profileRepository } from "@/lib/repositories/profile-repository";
@@ -85,7 +87,10 @@ const interests = [
 export function OnboardingFlow() {
   const router = useRouter();
   const [step, setStep] = useState(0);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(() => {
+    const initialName = useAppStore.getState().user.name;
+    return initialName === "Hana" ? "" : initialName;
+  });
   const [customInterest, setCustomInterest] = useState("");
   const [showSkipDialog, setShowSkipDialog] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -103,12 +108,6 @@ export function OnboardingFlow() {
     signIn,
   } = useAppStore();
   const isPro = subscription.plan === "premium";
-
-  useEffect(() => {
-    setName((current) =>
-      current || (user.name === "Hana" ? "" : user.name),
-    );
-  }, [user.name]);
 
   const totalSteps = 7;
   const canContinue = useMemo(() => {
@@ -186,7 +185,7 @@ export function OnboardingFlow() {
               Skip for now
             </Button>
           )}
-          <span className="rounded-full bg-white px-3 py-2 text-xs font-semibold text-stone-500 shadow-sm sm:px-4">
+          <span className="rounded-full bg-surface px-3 py-2 text-xs font-semibold text-muted shadow-sm sm:px-4">
             Step {step + 1} of {totalSteps}
           </span>
         </div>
@@ -204,7 +203,7 @@ export function OnboardingFlow() {
               title="What should AIko call you?"
               description="This name appears on your Home and Profile pages. You can change it later."
             >
-              <div className="rounded-4xl bg-white p-6 shadow-card sm:p-8">
+              <div className="rounded-4xl bg-surface p-6 shadow-card sm:p-8">
                 <span className="grid size-12 place-items-center rounded-2xl bg-moss-100 text-moss-700">
                   <UserRound className="size-5" />
                 </span>
@@ -241,7 +240,7 @@ export function OnboardingFlow() {
                   >
                     <Icon className="size-5 text-moss-600" />
                     <span className="block font-semibold">{value}</span>
-                    <span className="mt-1 block text-xs leading-5 text-stone-500">
+                    <span className="mt-1 block text-xs leading-5 text-muted">
                       {detail}
                     </span>
                   </ChoiceCard>
@@ -269,7 +268,7 @@ export function OnboardingFlow() {
                         <Check className="size-4 text-moss-600" />
                       )}
                     </div>
-                    <span className="mt-2 block text-xs leading-5 text-stone-500">
+                    <span className="mt-2 block text-xs leading-5 text-muted">
                       {detail}
                     </span>
                   </ChoiceCard>
@@ -290,10 +289,10 @@ export function OnboardingFlow() {
                     key={minutes}
                     onClick={() => setDailyMinutes(minutes)}
                     className={cn(
-                      "min-h-36 rounded-3xl border bg-white p-5 text-left transition focus:outline-none focus:ring-4 focus:ring-moss-100",
+                      "min-h-36 rounded-3xl border bg-surface p-5 text-left transition duration-180",
                       onboarding.dailyMinutes === minutes
                         ? "border-moss-600 shadow-card"
-                        : "border-black/[.06] hover:border-moss-200",
+                        : "border-border hover:border-moss-200 hover:bg-moss-50",
                     )}
                   >
                     <Clock3
@@ -301,13 +300,13 @@ export function OnboardingFlow() {
                         "size-5",
                         onboarding.dailyMinutes === minutes
                           ? "text-moss-600"
-                          : "text-stone-300",
+                          : "text-muted",
                       )}
                     />
                     <span className="mt-7 block text-3xl font-semibold">
                       {minutes}
                     </span>
-                    <span className="text-xs text-stone-500">
+                    <span className="text-xs text-muted">
                       minutes / day
                     </span>
                   </button>
@@ -336,7 +335,7 @@ export function OnboardingFlow() {
                       "inline-flex min-h-12 items-center gap-2 rounded-full border px-5 text-sm font-semibold transition",
                       onboarding.interests.includes(name)
                         ? "border-moss-600 bg-moss-600 text-white"
-                        : "border-stone-200 bg-white text-stone-600 hover:border-moss-300",
+                        : "border-border bg-surface text-muted hover:border-moss-300 hover:bg-moss-50",
                     )}
                   >
                     <Icon className="size-4" />
@@ -425,11 +424,11 @@ export function OnboardingFlow() {
               <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
                 Let’s make Japanese part of your day.
               </h1>
-              <p className="mx-auto mt-5 max-w-md leading-7 text-stone-500">
+              <p className="mx-auto mt-5 max-w-md leading-7 text-muted">
                 We’ll start with a {onboarding.dailyMinutes}-minute{" "}
                 {onboarding.level} lesson for {onboarding.goal?.toLowerCase()}.
               </p>
-              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">
+              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted">
                 {isPro
                   ? onboarding.interests.length
                     ? "Your Pro plan will use your interests to rank suitable lessons."
@@ -452,7 +451,7 @@ export function OnboardingFlow() {
           )}
         </div>
 
-        <div className="mt-10 border-t border-black/[.06] pt-6">
+        <div className="mt-10 border-t border-border pt-6">
           {error && (
             <p
               role="alert"
@@ -486,32 +485,27 @@ export function OnboardingFlow() {
         </div>
       </div>
 
-      {showSkipDialog && (
-        <div
-          className="fixed inset-0 z-50 grid place-items-center bg-moss-950/45 px-5 py-8 backdrop-blur-sm"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget && !saving)
-              setShowSkipDialog(false);
-          }}
-        >
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="skip-profile-title"
-            className="w-full max-w-lg rounded-4xl bg-white p-7 shadow-2xl sm:p-9"
-          >
+      <Dialog
+        open={showSkipDialog}
+        onClose={() => {
+          if (!saving) setShowSkipDialog(false);
+        }}
+        labelledBy="skip-profile-title"
+        describedBy="skip-profile-description"
+        closeOnBackdrop={!saving}
+        panelClassName="max-w-lg sm:p-9"
+      >
             <span className="grid size-12 place-items-center rounded-2xl bg-moss-100 text-moss-700">
-              <Sparkles className="size-5" />
+              <Sparkles className="size-5" aria-hidden="true" />
             </span>
             <h2 id="skip-profile-title" className="mt-5 text-2xl font-semibold">
               Complete your profile later?
             </h2>
-            <p className="mt-3 leading-7 text-stone-500">
+            <p id="skip-profile-description" className="mt-3 leading-7 text-muted">
               You can skip now and finish your learning profile any time from
               Profile.
             </p>
-            <div className="mt-5 rounded-2xl bg-sand/70 p-4 text-sm leading-6 text-stone-600">
+            <div className="mt-5 rounded-2xl bg-surface-muted p-4 text-sm leading-6 text-muted">
               {isPro ? (
                 <>
                   <strong className="text-ink">Pro plan:</strong> without
@@ -527,20 +521,14 @@ export function OnboardingFlow() {
                 </>
               )}
             </div>
-            {error && (
-              <p
-                role="alert"
-                className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
-              >
-                {error}
-              </p>
-            )}
+            {error && <Alert tone="error" className="mt-4">{error}</Alert>}
             <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
                 type="button"
                 variant="secondary"
                 onClick={() => setShowSkipDialog(false)}
                 disabled={saving}
+                data-dialog-autofocus
               >
                 Keep setting up
               </Button>
@@ -549,13 +537,11 @@ export function OnboardingFlow() {
                 onClick={() => void finishOnboarding()}
                 disabled={saving}
               >
-                {saving && <LoaderCircle className="size-4 animate-spin" />}
+                {saving && <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />}
                 {saving ? "Saving…" : "Skip for now"}
               </Button>
             </div>
-          </section>
-        </div>
-      )}
+      </Dialog>
     </main>
   );
 }
@@ -577,7 +563,7 @@ function StepShell({
       <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
         {title}
       </h1>
-      <p className="mt-4 max-w-xl leading-7 text-stone-500">{description}</p>
+      <p className="mt-4 max-w-xl leading-7 text-muted">{description}</p>
       <div className="mt-9">{children}</div>
     </>
   );
@@ -596,11 +582,12 @@ function ChoiceCard({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={selected}
       className={cn(
-        "min-h-28 rounded-3xl border bg-white p-5 text-left transition focus:outline-none focus:ring-4 focus:ring-moss-100",
+        "min-h-28 rounded-3xl border bg-surface p-5 text-left transition duration-180",
         selected
           ? "border-moss-600 shadow-card"
-          : "border-black/[.06] hover:-translate-y-0.5 hover:border-moss-200 hover:shadow-card",
+          : "border-border hover:border-moss-200 hover:bg-moss-50 hover:shadow-card",
       )}
     >
       {children}

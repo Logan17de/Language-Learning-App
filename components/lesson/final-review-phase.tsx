@@ -67,17 +67,17 @@ export function FinalReviewPhase({
           <span className="mx-auto grid size-20 place-items-center rounded-4xl bg-persimmon-100 text-persimmon-600"><Trophy className="size-9" /></span>
           <Badge tone="orange" className="mt-6">Retrieval complete</Badge>
           <h2 className="mt-4 text-4xl font-semibold">{session.reviewResult.score}%</h2>
-          <p className="mt-2 text-stone-500">{session.reviewResult.correctCount} of {session.reviewResult.totalCount} correct without hints</p>
+          <p className="mt-2 text-muted">{session.reviewResult.correctCount} of {session.reviewResult.totalCount} correct without hints</p>
         </div>
         <div className="mt-8 space-y-3">
           {finalReviewQuestions.map((item) => {
             const result = session.reviewAnswers.find((answerItem) => answerItem.questionId === item.id);
             return (
-              <div key={item.id} className="flex items-start gap-3 rounded-2xl border border-black/[.06] bg-white p-4">
+              <div key={item.id} className="flex items-start gap-3 rounded-2xl border border-border bg-surface p-4">
                 <span className={`grid size-7 shrink-0 place-items-center rounded-full ${result?.correct ? "bg-moss-100 text-moss-700" : "bg-persimmon-100 text-persimmon-600"}`}>
                   {result?.correct ? <Check className="size-4" /> : <RotateCcw className="size-4" />}
                 </span>
-                <div><p className="text-sm font-semibold">{item.prompt}</p><p className="mt-1 text-xs text-stone-500">{result?.correct ? "Correct" : `Your answer: ${result?.selectedAnswer} · Correct: ${item.correctAnswer}`}</p></div>
+                <div><p className="text-sm font-semibold">{item.prompt}</p><p className="mt-1 text-xs text-muted">{result?.correct ? "Correct" : `Your answer: ${result?.selectedAnswer} · Correct: ${item.correctAnswer}`}</p></div>
               </div>
             );
           })}
@@ -89,11 +89,11 @@ export function FinalReviewPhase({
   return (
     <div className="mx-auto max-w-3xl">
       <div className="flex items-end justify-between gap-4">
-        <div><Badge tone="orange">No hints</Badge><h2 className="mt-4 text-3xl font-semibold">Final retrieval</h2><p className="mt-2 text-sm text-stone-500">Bring back what you learned across every skill.</p></div>
+        <div><Badge tone="orange">No hints</Badge><h2 className="mt-4 text-3xl font-semibold">Final retrieval</h2><p className="mt-2 text-sm text-muted">Bring back what you learned across every skill.</p></div>
         <p className="text-sm font-semibold">{currentIndex + 1} / {finalReviewQuestions.length}</p>
       </div>
       <ProgressBar value={(attemptedCount / finalReviewQuestions.length) * 100} className="mt-5" />
-      <div className="mt-8 rounded-4xl border border-black/[.06] bg-white p-6 shadow-card sm:p-9">
+      <div className="mt-8 rounded-4xl border border-border bg-surface p-6 shadow-card sm:p-9">
         <div className="flex flex-wrap gap-2">
           <Badge tone="neutral" className="capitalize">{question.category}</Badge>
           <Badge tone={difficultyTone(difficulty)}>{difficulty}</Badge>

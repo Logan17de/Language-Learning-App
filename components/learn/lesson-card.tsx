@@ -20,7 +20,7 @@ export function LessonCard({
   const primaryLabel = completed ? hasResult ? "View Results" : "Review" : active ? "Resume" : "Start";
 
   return (
-    <Card className="group overflow-hidden p-0 transition hover:-translate-y-0.5 hover:shadow-float">
+    <Card className="group overflow-hidden p-0 transition hover:border-moss-200 hover:shadow-float">
       <div className={`relative h-36 overflow-hidden p-5 ${lesson.source === "user_generated" ? "bg-persimmon-100" : "bg-moss-900 text-white"}`}>
         <div className="absolute -right-8 -top-10 size-40 rounded-full bg-white/10" />
         <span className="absolute bottom-[-2rem] right-4 font-serif text-8xl opacity-[.06]">{lesson.kanji[0]?.character ?? "学"}</span>
@@ -36,24 +36,24 @@ export function LessonCard({
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold">{lesson.title}</h2>
-            <p className="mt-1 font-serif text-sm text-stone-400">{lesson.japaneseTitle}</p>
+            <p className="mt-1 font-serif text-sm text-muted">{lesson.japaneseTitle}</p>
           </div>
           {completed && score !== undefined && <span className="rounded-full bg-moss-50 px-3 py-1 text-sm font-bold text-moss-700">{score}%</span>}
         </div>
-        <p className="mt-4 line-clamp-2 text-sm leading-6 text-stone-500">{lesson.summary}</p>
+        <p className="mt-4 line-clamp-2 text-sm leading-6 text-muted">{lesson.summary}</p>
         <div className="mt-4 flex flex-wrap gap-2">
           {lesson.grammar.slice(0, 2).map((item) => <Badge key={item.id} tone="neutral">{item.pattern}</Badge>)}
           {lesson.kanji.slice(0, 3).map((item) => <Badge key={item.character}>{item.character}</Badge>)}
         </div>
-        <div className="mt-5 flex items-center justify-between border-t border-stone-100 pt-4">
-          <div className="text-xs text-stone-400">
+        <div className="mt-5 flex items-center justify-between border-t border-border pt-4">
+          <div className="text-xs text-muted">
             <p className="flex items-center gap-1.5"><Clock3 className="size-3.5" /> {lesson.durationMinutes} min</p>
             <p className="mt-1 capitalize">{lesson.source.replaceAll("_", " ")}</p>
           </div>
           {malformed ? (
             <span className="flex items-center gap-2 text-xs font-semibold text-persimmon-600"><TriangleAlert className="size-4" /> Unavailable</span>
           ) : (
-            <ButtonLink href={primaryHref} className="min-h-10 px-5">{active ? <RotateCcw className="size-4" /> : <Play className="size-4" />}{primaryLabel}</ButtonLink>
+            <ButtonLink href={primaryHref} className="px-5">{active ? <RotateCcw className="size-4" /> : <Play className="size-4" />}{primaryLabel}</ButtonLink>
           )}
         </div>
       </div>

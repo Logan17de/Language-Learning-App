@@ -316,8 +316,8 @@ export function SpeakingPhase({
           <Badge>{exercise.mode}</Badge>
         </div>
         <h2 className="mt-4 text-3xl font-semibold">Read the sentence aloud.</h2>
-        <p className="mt-3 text-stone-500">You have up to 10 seconds. AIko shows the live transcript and compares only the sentence.</p>
-        <p className="mt-3 text-sm font-semibold text-stone-400">{currentIndex + 1} / {exercises.length}</p>
+        <p className="mt-3 text-muted">You have up to 10 seconds. AIko shows the live transcript and compares only the sentence.</p>
+        <p className="mt-3 text-sm font-semibold tabular-nums text-muted">{currentIndex + 1} / {exercises.length}</p>
       </div>
       <ProgressBar value={(completedIds.size / exercises.length) * 100} className="mt-6" />
       <Card className="mt-7 p-6 sm:p-8">

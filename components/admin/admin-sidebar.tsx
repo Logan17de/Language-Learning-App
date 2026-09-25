@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -49,13 +50,53 @@ const links = [
 
 export function AdminSidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const pathname = usePathname();
+  const sidebarRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+
+    function closeOnEscape(event: globalThis.KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
+    };
+  }, [onClose, open]);
+
+  function trapDrawerFocus(event: KeyboardEvent<HTMLElement>) {
+    if (!open || event.key !== "Tab") return;
+    const controls = Array.from(
+      sidebarRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ) ?? [],
+    );
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+    if (!first || !last) return;
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
   return (
     <>
       {open && <button type="button" className="fixed inset-0 z-40 bg-slate-950/50 lg:hidden" aria-label="Close admin navigation" onClick={onClose} />}
-      <aside className={cn("fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-slate-950 text-white transition-transform lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
+      <aside ref={sidebarRef} role={open ? "dialog" : undefined} aria-modal={open ? true : undefined} aria-label="Admin navigation" onKeyDown={trapDrawerFocus} className={cn("fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-slate-950 text-white transition-transform lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
         <div className="flex h-20 items-center justify-between border-b border-white/10 px-6">
           <Link href="/admin" className="flex items-center gap-3" onClick={onClose}><span className="grid size-10 place-items-center rounded-xl bg-teal-400 text-lg font-black text-slate-950">愛</span><span><strong className="block tracking-wide">AIko Admin</strong><small className="text-white/45">Operations console</small></span></Link>
-          <button type="button" className="grid size-10 place-items-center rounded-lg hover:bg-white/10 lg:hidden" onClick={onClose} aria-label="Close admin menu"><X className="size-5" /></button>
+          <button ref={closeButtonRef} type="button" className="grid size-11 place-items-center rounded-lg hover:bg-white/10 lg:hidden" onClick={onClose} aria-label="Close admin menu"><X className="size-5" aria-hidden="true" /></button>
         </div>
         <nav className="flex-1 overflow-y-auto p-4" aria-label="Admin navigation">
           <ul className="space-y-1">

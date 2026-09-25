@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useMemo, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -156,6 +156,12 @@ export function SupportPage() {
   const [query, setQuery] = useState("");
   const [draft, setDraft] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([initialMessage]);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
+  const conversationEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    conversationEndRef.current?.scrollIntoView({ block: "nearest" });
+  }, [messages]);
 
   const filteredFaqs = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -183,6 +189,10 @@ export function SupportPage() {
 
   function chooseTopic(label: string) {
     setDraft("I need help with " + label.toLowerCase() + ".");
+    window.requestAnimationFrame(() => {
+      messageInputRef.current?.scrollIntoView({ block: "center" });
+      messageInputRef.current?.focus();
+    });
   }
 
   return (
@@ -195,7 +205,7 @@ export function SupportPage() {
         <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
           How can we help?
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-stone-500">
+        <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-muted">
           Find clear answers about AIko or ask the support chat. This page is separate from your
           learning dashboard and contains support information only.
         </p>
@@ -214,7 +224,7 @@ export function SupportPage() {
               key={label}
               type="button"
               onClick={() => chooseTopic(label)}
-              className="group rounded-3xl border border-black/[.06] bg-white p-5 text-left shadow-card transition hover:-translate-y-0.5 hover:border-moss-200 focus:outline-none focus:ring-4 focus:ring-moss-100"
+              className="group rounded-3xl border border-border bg-surface p-5 text-left shadow-card transition duration-180 hover:border-moss-200 hover:shadow-float"
             >
               <span className="grid size-11 place-items-center rounded-2xl bg-moss-100 text-moss-700">
                 <Icon className="size-5" aria-hidden="true" />
@@ -226,7 +236,7 @@ export function SupportPage() {
                   aria-hidden="true"
                 />
               </span>
-              <span className="mt-2 block text-sm leading-6 text-stone-500">{copy}</span>
+              <span className="mt-2 block text-sm leading-6 text-muted">{copy}</span>
             </button>
           ))}
         </div>
@@ -242,7 +252,7 @@ export function SupportPage() {
           </div>
           <label className="relative mt-5 block">
             <Search
-              className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-stone-400"
+              className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted"
               aria-hidden="true"
             />
             <span className="sr-only">Search frequently asked questions</span>
@@ -260,7 +270,7 @@ export function SupportPage() {
 
         <section aria-labelledby="support-chat-heading">
           <Card className="overflow-hidden p-0 lg:sticky lg:top-24">
-            <div className="border-b border-black/[.06] bg-moss-900 p-5 text-white sm:p-6">
+            <div className="border-b border-border bg-moss-900 p-5 text-white sm:p-6">
               <div className="flex items-center justify-between gap-4">
                 <span className="grid size-11 place-items-center rounded-2xl bg-white/10 text-persimmon-400">
                   <Bot className="size-5" aria-hidden="true" />
@@ -276,7 +286,7 @@ export function SupportPage() {
             </div>
 
             <div
-              className="h-[25rem] space-y-4 overflow-y-auto bg-stone-50 p-5"
+              className="h-[25rem] space-y-4 overflow-y-auto bg-surface-muted p-5"
               aria-live="polite"
               aria-label="Support conversation"
             >
@@ -289,26 +299,28 @@ export function SupportPage() {
                     className={
                       message.role === "user"
                         ? "max-w-[88%] rounded-3xl rounded-br-lg bg-moss-600 px-4 py-3 text-sm leading-6 text-white"
-                        : "max-w-[88%] rounded-3xl rounded-bl-lg bg-white px-4 py-3 text-sm leading-6 text-stone-600 shadow-card"
+                        : "max-w-[88%] rounded-3xl rounded-bl-lg bg-surface px-4 py-3 text-sm leading-6 text-muted shadow-card"
                     }
                   >
                     {message.content}
                   </p>
                 </div>
               ))}
+              <div ref={conversationEndRef} />
             </div>
 
-            <form onSubmit={submitMessage} className="border-t border-black/[.06] bg-white p-4">
+            <form onSubmit={submitMessage} className="border-t border-border bg-surface p-4">
               <label className="sr-only" htmlFor="support-message">
                 Ask AIko Support
               </label>
               <div className="flex items-end gap-2">
                 <textarea
+                  ref={messageInputRef}
                   id="support-message"
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
                   rows={2}
-                  className="min-h-12 flex-1 resize-none rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-stone-300 focus:border-moss-500 focus:ring-4 focus:ring-moss-100"
+                  className="form-input min-h-12 flex-1 resize-none py-3 text-sm"
                   placeholder="Describe what you need help with…"
                 />
                 <button
@@ -322,9 +334,9 @@ export function SupportPage() {
               </div>
             </form>
 
-            <div className="flex gap-3 border-t border-black/[.06] bg-persimmon-50 px-5 py-4">
+            <div className="flex gap-3 border-t border-border bg-warning-surface px-5 py-4">
               <Sparkles className="mt-0.5 size-4 shrink-0 text-persimmon-600" aria-hidden="true" />
-              <p className="text-xs leading-5 text-stone-600">
+              <p className="text-xs leading-5 text-muted">
                 When the AI connection is added, it will answer from approved AIko support
                 material and say when that material does not contain a reliable answer.
               </p>
@@ -333,14 +345,14 @@ export function SupportPage() {
         </section>
       </div>
 
-      <section className="mt-12 rounded-3xl border border-black/[.06] bg-white p-6 sm:p-8">
+      <section className="mt-12 rounded-3xl border border-border bg-surface p-6 sm:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-3">
               <Wrench className="size-5 text-moss-600" aria-hidden="true" />
               <h2 className="text-xl font-semibold">Reporting a technical problem?</h2>
             </div>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-stone-500">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
               Tell the support chat which page you were using, what you tried, and any error
               message you saw. Do not include passwords or other sensitive credentials.
             </p>

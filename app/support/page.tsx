@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function SupportRoute() {
   return (
     <div className="min-h-screen bg-paper text-ink">
-      <header className="border-b border-black/[.06] bg-white">
+      <header className="border-b border-border bg-surface">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8">
           <Brand />
           <ButtonLink href="/" variant="ghost" className="min-h-10 px-4">
@@ -24,8 +24,8 @@ export default function SupportRoute() {
 
       <SupportPage />
 
-      <footer className="border-t border-black/[.06] bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-7 text-sm text-stone-500 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+      <footer className="border-t border-border bg-surface">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-7 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <p>© 2026 AIko. Support information for learners and visitors.</p>
           <div className="flex gap-5">
             <a className="hover:text-ink" href="/privacy">
