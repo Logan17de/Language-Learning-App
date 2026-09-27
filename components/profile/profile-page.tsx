@@ -111,7 +111,7 @@ function PremiumAccountPage() {
                   <Icon className="size-5" />
                 </div>
                 <h2 className="mt-4 text-lg font-semibold">{title}</h2>
-                <p className="mt-2 flex-1 text-sm leading-6 text-stone-500">{copy}</p>
+                <p className="mt-2 flex-1 text-sm leading-6 text-muted">{copy}</p>
                 <ButtonLink href={href} variant="ghost" className="mt-3 justify-start px-0 text-moss-700">
                   {action}
                 </ButtonLink>
@@ -122,7 +122,7 @@ function PremiumAccountPage() {
             <div className="mb-5">
               <Badge tone="moss"><Brain className="mr-1 size-3" /> Personalisation active</Badge>
               <h2 className="mt-3 text-2xl font-semibold">Learning profile</h2>
-              <p className="mt-2 text-sm leading-6 text-stone-500">
+              <p className="mt-2 text-sm leading-6 text-muted">
                 These preferences directly influence premium lesson ranking and AI-generated content.
               </p>
             </div>
@@ -145,10 +145,10 @@ function FreeAccountPage() {
 
         <div className="space-y-5">
           <Card className="overflow-hidden p-0">
-            <div className="border-b border-stone-100 bg-white p-6 sm:p-7">
+            <div className="border-b border-border bg-surface p-6 sm:p-7">
               <Badge tone="neutral">Current free access</Badge>
               <h2 className="mt-3 text-2xl font-semibold">Keep learning at your level.</h2>
-              <p className="mt-2 text-sm leading-6 text-stone-500">
+              <p className="mt-2 text-sm leading-6 text-muted">
                 AIko assigns random, non-repeating lessons at your current level. Interests can be saved, but they do not affect free lesson selection.
               </p>
             </div>
@@ -162,7 +162,7 @@ function FreeAccountPage() {
             <div>
               <p className="text-xs font-semibold uppercase tracking-[.18em] text-persimmon-700">Unlock the full system</p>
               <h2 className="mt-2 text-2xl font-semibold">Personalise every part of learning.</h2>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-stone-600">
+              <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
                 Premium adds custom AI lessons, interest matching, extended speaking, and complete progress insights.
               </p>
             </div>
@@ -174,7 +174,7 @@ function FreeAccountPage() {
           <Card className="p-6 sm:p-7">
             <div className="mb-5">
               <h2 className="text-2xl font-semibold">Learning profile</h2>
-              <p className="mt-2 text-sm leading-6 text-stone-500">
+              <p className="mt-2 text-sm leading-6 text-muted">
                 Your level and study preferences still guide pacing. Saved interests activate after upgrading.
               </p>
             </div>
@@ -212,7 +212,7 @@ function AccountIdentityCard({ premium }: { premium: boolean }) {
 
   return (
     <Card className="overflow-hidden p-0">
-      <div className={premium ? "bg-moss-900 p-6 text-center text-white" : "bg-white p-6 text-center"}>
+      <div className={premium ? "bg-moss-900 p-6 text-center text-white" : "bg-surface p-6 text-center"}>
         <div className={premium
           ? "mx-auto grid size-20 place-items-center rounded-3xl bg-persimmon-400 text-2xl font-semibold text-moss-900"
           : "mx-auto grid size-20 place-items-center rounded-3xl bg-moss-100 text-2xl font-semibold text-moss-800"
@@ -222,7 +222,7 @@ function AccountIdentityCard({ premium }: { premium: boolean }) {
         <h2 className="mt-4 text-2xl font-semibold">{user.name}</h2>
         <p className={premium
           ? "mt-2 flex items-center justify-center gap-2 text-sm text-white/55"
-          : "mt-2 flex items-center justify-center gap-2 text-sm text-stone-500"
+          : "mt-2 flex items-center justify-center gap-2 text-sm text-muted"
         }>
           <Mail className="size-4" /> {user.email}
         </p>
@@ -231,7 +231,7 @@ function AccountIdentityCard({ premium }: { premium: boolean }) {
           {premium ? "Premium account" : "Free account"}
         </Badge>
       </div>
-      <div className="grid grid-cols-2 gap-px bg-stone-100">
+      <div className="grid grid-cols-2 gap-px bg-border">
         <MiniStat icon={Flame} value={`${user.streakDays}`} label="day streak" />
         <MiniStat icon={Gem} value={user.xp.toLocaleString()} label="XP" />
         <MiniStat icon={BookCheck} value={`${progress.completedLessonIds.length}`} label="lessons" />
@@ -276,14 +276,14 @@ function PlanList({
   tone: "included" | "locked";
 }) {
   return (
-    <div className="bg-white p-6">
+    <div className="bg-surface p-6">
       <h3 className="text-sm font-semibold">{title}</h3>
       <ul className="mt-4 space-y-3">
         {items.map((item) => (
-          <li key={item} className="flex gap-3 text-sm leading-6 text-stone-600">
+          <li key={item} className="flex gap-3 text-sm leading-6 text-muted">
             <Icon className={tone === "included"
               ? "mt-1 size-4 shrink-0 text-moss-600"
-              : "mt-1 size-4 shrink-0 text-stone-400"
+              : "mt-1 size-4 shrink-0 text-muted"
             } />
             {item}
           </li>
@@ -303,10 +303,10 @@ function MiniStat({
   label: string;
 }) {
   return (
-    <div className="bg-white p-4 text-center">
+    <div className="bg-surface p-4 text-center">
       <Icon className="mx-auto size-4 text-moss-600" />
       <p className="mt-2 text-sm font-semibold">{value}</p>
-      <p className="mt-1 text-[10px] text-stone-400">{label}</p>
+      <p className="mt-1 text-[10px] text-muted">{label}</p>
     </div>
   );
 }

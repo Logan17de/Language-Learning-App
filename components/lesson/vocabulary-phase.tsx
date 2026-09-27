@@ -82,14 +82,14 @@ export function VocabularyPhase({
             <Badge tone="neutral">{question.modeLabel}</Badge>
           </div>
           <h2 className="mt-4 text-3xl font-semibold tracking-tight">Vocabulary & kanji</h2>
-          <p className="mt-2 text-sm leading-6 text-stone-500">Thirteen questions build from direct recognition to vocabulary in context.</p>
+          <p className="mt-2 text-sm leading-6 text-muted">Thirteen questions build from direct recognition to vocabulary in context.</p>
         </div>
-        <p className="shrink-0 text-sm font-semibold text-stone-500">{Math.min(answeredCount + (answer ? 0 : 1), QUESTION_TARGET)} / {QUESTION_TARGET}</p>
+        <p className="shrink-0 text-sm font-semibold tabular-nums text-muted">{Math.min(answeredCount + (answer ? 0 : 1), QUESTION_TARGET)} / {QUESTION_TARGET}</p>
       </div>
 
       <ProgressBar value={(answeredCount / QUESTION_TARGET) * 100} className="mt-5" />
 
-      <div className="mt-9 rounded-4xl border border-black/[.06] bg-white p-6 shadow-card sm:p-9">
+      <div className="mt-9 rounded-4xl border border-border bg-surface p-6 shadow-card sm:p-9">
         <MultipleChoiceCard
           prompt={question.prompt}
           cue={question.cue}

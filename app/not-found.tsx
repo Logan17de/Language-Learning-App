@@ -8,7 +8,7 @@ export default function NotFound() {
         <span className="mx-auto grid size-16 place-items-center rounded-3xl bg-moss-100 text-moss-700"><BookOpenText className="size-7" /></span>
         <p className="section-kicker mt-8">404 · Page not found</p>
         <h1 className="mt-4 text-4xl font-semibold tracking-tight">This lesson path has moved.</h1>
-        <p className="mx-auto mt-3 max-w-md text-stone-500">Return home and continue with the recommended lesson waiting for you.</p>
+        <p className="mx-auto mt-3 max-w-md text-muted">Return home and continue with the recommended lesson waiting for you.</p>
         <ButtonLink href="/home" className="mt-8">Return home</ButtonLink>
       </div>
     </main>

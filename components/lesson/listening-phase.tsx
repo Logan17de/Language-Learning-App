@@ -138,21 +138,21 @@ export function ListeningPhase({
           <Badge tone={difficultyTone(difficulty)}>{difficulty}</Badge>
         </div>
         <h2 className="mt-4 text-3xl font-semibold">{lesson.japaneseTitle}</h2>
-        <p className="mt-3 text-stone-500">The transcript stays hidden until you answer.</p>
-        <p className="mt-3 text-sm font-semibold text-stone-400">{currentIndex + 1} / {exercises.length}</p>
+        <p className="mt-3 text-muted">The transcript stays hidden until you answer.</p>
+        <p className="mt-3 text-sm font-semibold tabular-nums text-muted">{currentIndex + 1} / {exercises.length}</p>
       </div>
 
       <Card className="mt-8 p-6 sm:p-8">
         <ProgressBar value={(answeredIds.size / exercises.length) * 100} className="mb-6" />
         <AudioControl key={exercise.id} replayCount={replayCount} onPlay={play} onEnded={finishListening} text={exercise.transcript} audioAssetId={exercise.audioAssetId} browserTts={lesson.runtimeAudio === "browser_tts"} label="Play conversation" large />
-        <div className="mt-4 flex items-center justify-between text-xs text-stone-400">
+        <div className="mt-4 flex items-center justify-between text-xs text-muted">
           <span>Replay {replayCount} · first replay has no penalty</span>
           {replayCount >= 3 && <span className="font-semibold text-persimmon-600">Difficulty signal noted</span>}
         </div>
 
-        <div className="mt-8 border-t border-stone-100 pt-8">
+        <div className="mt-8 border-t border-border pt-8">
           {!heardEntireConversation && (
-            <p className="mb-5 rounded-2xl bg-stone-50 p-4 text-center text-sm font-semibold text-stone-500">
+            <p className="mb-5 rounded-2xl bg-surface-muted p-4 text-center text-sm font-semibold text-muted">
               Listen to the complete conversation to unlock the answers.
             </p>
           )}

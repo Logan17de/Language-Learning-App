@@ -28,13 +28,13 @@ export function LessonPreview({ lesson }: { lesson: LessonPackage }) {
 
   return (
     <div className="min-h-screen bg-paper">
-      <header className="border-b border-black/[.05] bg-white/80 backdrop-blur">
+      <header className="border-b border-border bg-surface/95 backdrop-blur">
         <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-5 sm:px-8">
-          <Link href="/home" className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-semibold text-stone-500 hover:bg-moss-50 hover:text-moss-700">
+          <Link href="/home" className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-sm font-semibold text-muted hover:bg-moss-50 hover:text-moss-700">
             <ArrowLeft className="size-4" /> Home
           </Link>
           <span className="text-sm font-semibold">Lesson preview</span>
-          <Link href="/home" aria-label="Close lesson preview" className="grid size-11 place-items-center rounded-full text-stone-400 hover:bg-stone-100"><X className="size-5" /></Link>
+          <Link href="/home" aria-label="Close lesson preview" className="grid size-11 place-items-center rounded-full text-muted hover:bg-surface-muted"><X className="size-5" aria-hidden="true" /></Link>
         </div>
       </header>
 
@@ -80,7 +80,7 @@ export function LessonPreview({ lesson }: { lesson: LessonPackage }) {
             <Card className="p-7">
               <div className="flex items-center gap-3">
                 <span className="grid size-11 place-items-center rounded-2xl bg-moss-100 text-moss-700"><Layers3 className="size-5" /></span>
-                <div><h2 className="text-xl font-semibold">What you’ll learn</h2><p className="text-sm text-stone-400">New material and timely review</p></div>
+                <div><h2 className="text-xl font-semibold">What you’ll learn</h2><p className="text-sm text-muted">New material and timely review</p></div>
               </div>
               <div className="mt-7 grid gap-6 sm:grid-cols-3">
                 <PreviewList title="New grammar" items={lesson.grammar.map((item) => ({ primary: item.pattern, secondary: item.meaning }))} />
@@ -98,17 +98,17 @@ export function LessonPreview({ lesson }: { lesson: LessonPackage }) {
                 {lesson.phases.map((phase, index) => (
                   <li key={phase.id} className="flex gap-4 rounded-2xl p-3">
                     <span className="grid size-8 shrink-0 place-items-center rounded-full bg-moss-50 text-xs font-bold text-moss-700">{index + 1}</span>
-                    <div><p className="text-sm font-semibold">{phase.label}</p><p className="mt-0.5 text-xs leading-5 text-stone-400">{phase.description}</p></div>
+                    <div><p className="text-sm font-semibold">{phase.label}</p><p className="mt-0.5 text-xs leading-5 text-muted">{phase.description}</p></div>
                   </li>
                 ))}
               </ol>
               <ButtonLink href={lessonHref} className="mt-7 w-full">
                 {actionLabel} <ArrowRight className="size-4" />
               </ButtonLink>
-              <Link href="/home" className="mt-3 flex min-h-12 items-center justify-center rounded-full text-sm font-semibold text-stone-500 hover:bg-stone-50">
+              <Link href="/home" className="mt-3 flex min-h-12 items-center justify-center rounded-full text-sm font-semibold text-muted hover:bg-surface-muted">
                 Choose another lesson
               </Link>
-              <p className="mt-4 text-center text-[11px] leading-5 text-stone-400">Your progress will be saved locally on this device.</p>
+              <p className="mt-4 text-center text-[11px] leading-5 text-muted">Your progress will be saved locally on this device.</p>
             </Card>
           </aside>
         </div>
@@ -121,14 +121,14 @@ export function LessonPreview({ lesson }: { lesson: LessonPackage }) {
 function PreviewList({ title, items, review = false }: { title: string; items: Array<{ primary: string; secondary: string }>; review?: boolean }) {
   return (
     <div>
-      <p className="text-xs font-bold uppercase tracking-[.15em] text-stone-400">{title}</p>
+      <p className="text-xs font-bold uppercase tracking-[.15em] text-muted">{title}</p>
       <ul className="mt-4 space-y-4">
         {items.map((item) => (
           <li key={item.primary} className="flex items-start gap-3">
             <span className={`mt-1 grid size-5 shrink-0 place-items-center rounded-full ${review ? "bg-persimmon-100 text-persimmon-600" : "bg-moss-100 text-moss-700"}`}>
               <Check className="size-3" />
             </span>
-            <div><p className="font-semibold">{item.primary}</p><p className="mt-0.5 text-xs text-stone-400">{item.secondary}</p></div>
+            <div><p className="font-semibold">{item.primary}</p><p className="mt-0.5 text-xs text-muted">{item.secondary}</p></div>
           </li>
         ))}
       </ul>

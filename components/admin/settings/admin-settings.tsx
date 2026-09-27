@@ -47,7 +47,8 @@ function BackendAdminSettings() {
   }
 
   useEffect(() => {
-    void load();
+    const timer = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   async function toggleFlag(flag: Database["public"]["Tables"]["feature_flags"]["Row"]) {

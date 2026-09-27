@@ -13,6 +13,15 @@
   --aiko-sand: 238 233 223;
   --aiko-progress-track: 226 238 231;
   --aiko-progress-fill: 79 128 104;
+  --aiko-positive: 21 128 79;
+  --aiko-positive-surface: 236 253 245;
+  --aiko-positive-border: 167 243 208;
+  --aiko-warning: 180 83 9;
+  --aiko-warning-surface: 255 251 235;
+  --aiko-warning-border: 253 230 138;
+  --aiko-danger: 185 28 28;
+  --aiko-danger-surface: 254 242 242;
+  --aiko-danger-border: 254 202 202;
 }
 
 .dark {
@@ -26,6 +35,15 @@
   --aiko-sand: 45 57 50;
   --aiko-progress-track: 52 75 64;
   --aiko-progress-fill: 117 170 142;
+  --aiko-positive: 110 231 183;
+  --aiko-positive-surface: 24 54 43;
+  --aiko-positive-border: 41 94 72;
+  --aiko-warning: 252 211 77;
+  --aiko-warning-surface: 65 48 22;
+  --aiko-warning-border: 113 78 20;
+  --aiko-danger: 252 165 165;
+  --aiko-danger-surface: 69 31 31;
+  --aiko-danger-border: 127 45 45;
 }
 
 * {
@@ -67,6 +85,22 @@ a,
 button:not(:disabled),
 [role="button"]:not([aria-disabled="true"]) {
   cursor: pointer;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid rgb(var(--aiko-progress-fill) / 0.48);
+  outline-offset: 3px;
+}
+
+:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
 }
 
 .dark .bg-white {
@@ -132,7 +166,7 @@ button:not(:disabled),
 
 @layer components {
   .form-input {
-    @apply min-h-12 w-full rounded-2xl border border-border bg-surface px-4 text-base text-ink outline-none transition duration-180 placeholder:text-muted/60 focus-visible:border-moss-500 focus-visible:ring-4 focus-visible:ring-moss-100;
+    @apply min-h-12 w-full rounded-2xl border border-border bg-surface px-4 text-base text-ink outline-none transition duration-180 placeholder:text-muted/60 hover:border-moss-200 focus-visible:border-moss-500 focus-visible:ring-4 focus-visible:ring-moss-100 disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-muted disabled:opacity-70;
   }
 
   .section-kicker {
@@ -145,6 +179,30 @@ button:not(:disabled),
 
   .field-label {
     @apply mb-1.5 block text-xs font-bold text-slate-600;
+  }
+
+  .page-container {
+    @apply mx-auto w-full max-w-6xl px-5 py-7 sm:px-8 sm:py-10;
+  }
+
+  .page-heading {
+    @apply text-4xl font-semibold tracking-tight text-ink sm:text-5xl;
+  }
+
+  .supporting-copy {
+    @apply text-sm leading-6 text-muted sm:text-base sm:leading-7;
+  }
+
+  .surface-card {
+    @apply rounded-3xl border border-border bg-surface shadow-card;
+  }
+
+  .dialog-backdrop {
+    @apply fixed inset-0 z-[70] grid place-items-center overflow-y-auto bg-ink/60 p-4 backdrop-blur-sm sm:p-6;
+  }
+
+  .dialog-panel {
+    @apply my-auto w-full max-w-lg rounded-3xl border border-border bg-surface p-6 text-ink shadow-float outline-none sm:p-7;
   }
 }
 

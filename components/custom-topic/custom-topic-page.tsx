@@ -16,6 +16,7 @@ import { useAppStore } from "@/store/app-store";
 import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Alert } from "@/components/ui/alert";
 import { GenerationProgress } from "@/components/custom-topic/generation-progress";
 import { getBackendMode } from "@/lib/supabase/config";
 
@@ -155,6 +156,14 @@ export function CustomTopicPage() {
   }
 
   const busy = state === "generating";
+  const topicIdeas = Array.from(
+    new Set([
+      ...onboarding.interests,
+      "A conversation at work",
+      "Ordering a regional meal",
+      "A weekend trip in Japan",
+    ]),
+  ).slice(0, 5);
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
@@ -166,7 +175,7 @@ export function CustomTopicPage() {
         <h1 className="mt-3 text-4xl font-semibold tracking-tight">
           What should your next story be about?
         </h1>
-        <p className="mt-3 max-w-2xl leading-7 text-stone-500">
+        <p className="mt-3 max-w-2xl leading-7 text-muted">
           Once the story passes its checks, AIko opens it directly in the lesson reader. The remaining lesson readiness stays visible beside your reading.
         </p>
       </header>
@@ -176,38 +185,65 @@ export function CustomTopicPage() {
           <form className="space-y-5" onSubmit={submit}>
             <Field label="Topic">
               <input
+                id="custom-topic"
                 required
                 minLength={2}
                 maxLength={120}
                 value={topic}
-                onChange={(event) => setTopic(event.target.value)}
+                onChange={(event) => {
+                  setTopic(event.target.value);
+                  if (state === "error") {
+                    setError("");
+                    setState("idle");
+                  }
+                }}
                 disabled={busy}
                 className="form-input disabled:cursor-not-allowed disabled:opacity-60"
                 placeholder="A sustainable farm, my first day at work…"
+                aria-describedby="custom-topic-help custom-topic-count"
               />
+              <p id="custom-topic-count" className="mt-2 text-right text-xs tabular-nums text-muted">
+                {topic.length} / 120
+              </p>
             </Field>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[.14em] text-muted">
+                Quick ideas
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {topicIdeas.map((idea) => (
+                  <button
+                    key={idea}
+                    type="button"
+                    disabled={busy}
+                    onClick={() => setTopic(idea)}
+                    className="min-h-11 rounded-full border border-border bg-surface px-4 text-left text-xs font-semibold text-muted transition duration-180 hover:border-moss-200 hover:bg-moss-50 hover:text-moss-800 disabled:opacity-50"
+                  >
+                    {idea}
+                  </button>
+                ))}
+              </div>
+            </div>
             <Field label="Level">
               <select
+                id="custom-level"
                 value={level}
                 onChange={(event) => setLevel(event.target.value as JLPTLevel)}
                 disabled={busy}
                 className="form-input disabled:cursor-not-allowed disabled:opacity-60"
+                aria-describedby="custom-level-help"
               >
                 {(["N5", "N4", "N3", "N2", "N1"] as JLPTLevel[]).map((item) => (
                   <option key={item} value={item}>{item}</option>
                 ))}
               </select>
             </Field>
-            {error && (
-              <p role="alert" className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
-                {error}
-              </p>
-            )}
-            <Button type="submit" disabled={busy} className="w-full">
+            {error && <Alert tone="error">{error}</Alert>}
+            <Button type="submit" disabled={busy} aria-busy={busy} className="w-full">
               {busy ? (
-                <LoaderCircle className="size-4 animate-spin" />
+                <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
               ) : (
-                <WandSparkles className="size-4" />
+                <WandSparkles className="size-4" aria-hidden="true" />
               )}
               {busy ? "Writing your story…" : "Create my lesson"}
             </Button>
@@ -219,7 +255,7 @@ export function CustomTopicPage() {
             <div role="status" aria-live="polite">
               <Badge tone="moss">Story generation</Badge>
               <h2 className="mt-4 text-2xl font-semibold">AIko is preparing the first phase.</h2>
-              <p className="mt-3 text-sm leading-6 text-stone-500">
+              <p className="mt-3 text-sm leading-6 text-muted">
                 This page is only the launch screen. The approved story will open automatically in the full lesson layout.
               </p>
               <div className="mt-7">
@@ -237,7 +273,7 @@ export function CustomTopicPage() {
                   </span>
                   <div>
                     <p className="font-semibold">Story opens in the real reader</p>
-                    <p className="mt-1 text-sm leading-6 text-stone-500">
+                    <p className="mt-1 text-sm leading-6 text-muted">
                       Library-backed words remain tappable, and story audio stays off.
                     </p>
                   </div>
@@ -248,7 +284,7 @@ export function CustomTopicPage() {
                   </span>
                   <div>
                     <p className="font-semibold">Activities build beside you</p>
-                    <p className="mt-1 text-sm leading-6 text-stone-500">
+                    <p className="mt-1 text-sm leading-6 text-muted">
                       The right-side readiness panel tracks questions, quality checks, saving, and audio.
                     </p>
                   </div>
@@ -259,7 +295,7 @@ export function CustomTopicPage() {
                   </span>
                   <div>
                     <p className="font-semibold">Continue when vocabulary is ready</p>
-                    <p className="mt-1 text-sm leading-6 text-stone-500">
+                    <p className="mt-1 text-sm leading-6 text-muted">
                       Listening and speaking audio may continue preparing in the background.
                     </p>
                   </div>
@@ -273,12 +309,29 @@ export function CustomTopicPage() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  const isTopic = label === "Topic";
+  const htmlFor = isTopic ? "custom-topic" : "custom-level";
+  const description = isTopic
+    ? "Describe a situation or goal. Specific prompts produce clearer learning context."
+    : "Vocabulary, grammar, and kanji are balanced automatically for this JLPT level.";
+
   return (
-    <label className="block">
-      <span className="mb-2 block text-sm font-semibold">{label}</span>
+    <div>
+      <label htmlFor={htmlFor} className="block text-sm font-semibold">
+        {label}
+      </label>
+      <p id={`${htmlFor}-help`} className="mb-2 mt-1 text-xs leading-5 text-muted">
+        {description}
+      </p>
       {children}
-    </label>
+    </div>
   );
 }
 

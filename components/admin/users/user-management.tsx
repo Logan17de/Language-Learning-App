@@ -43,7 +43,8 @@ export function UserManagement() {
   }
 
   useEffect(() => {
-    void loadUsers();
+    const timer = window.setTimeout(() => void loadUsers(), 0);
+    return () => window.clearTimeout(timer);
   }, [backendMode]);
 
   const users: AdminUserRecord[] = backendMode

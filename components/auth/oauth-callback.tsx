@@ -186,7 +186,7 @@ export function OAuthCallback() {
 
   return (
     <main className="grid min-h-screen place-items-center bg-paper px-5">
-      <div className="w-full max-w-sm rounded-3xl border border-stone-200 bg-white p-8 text-center shadow-soft">
+      <div className="w-full max-w-sm rounded-3xl border border-border bg-surface p-8 text-center shadow-soft">
         <div className="flex justify-center">
           <Brand />
         </div>
@@ -194,7 +194,7 @@ export function OAuthCallback() {
         <h1 className="mt-6 text-2xl font-semibold text-ink">
           Finishing sign-in
         </h1>
-        <p className="mt-3 text-sm leading-6 text-stone-500">{status}</p>
+        <p className="mt-3 text-sm leading-6 text-muted">{status}</p>
       </div>
     </main>
   );

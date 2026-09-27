@@ -260,7 +260,7 @@ export function StoryPhase({
           <h2 className="mt-4 text-3xl font-semibold tracking-tight">
             {lesson.japaneseTitle}
           </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-500">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
             Read naturally and touch a word only when you need help. Kanji
             reveals its hiragana first and meaning on the next touch. Kana
             reveals meaning immediately.
@@ -274,7 +274,7 @@ export function StoryPhase({
         </div>
       </div>
 
-      <div className="mt-6 flex items-start gap-3 rounded-2xl bg-persimmon-50 p-4 text-sm text-stone-600">
+      <div className="mt-6 flex items-start gap-3 rounded-2xl border border-warning-border bg-warning-surface p-4 text-sm text-muted">
         <Sparkles className="mt-0.5 size-4 shrink-0 text-persimmon-500" />
         <p>
           Meaning, recognition, and pronunciation are tracked separately.
@@ -355,11 +355,11 @@ export function StoryPhase({
           ))}
         </p>
 
-        <div className="mt-10 border-t border-stone-200 pt-8">
+        <div className="mt-10 border-t border-border pt-8">
           <p className="section-kicker">English story</p>
           <p
             lang="en"
-            className="mt-4 hyphens-auto text-base leading-7 text-justify text-stone-600 sm:text-lg"
+            className="mt-4 max-w-3xl hyphens-auto text-justify text-base leading-8 text-muted sm:text-lg"
             style={{ textJustify: "inter-word" }}
           >
             {lesson.story.map((line, lineIndex) => (
@@ -375,7 +375,8 @@ export function StoryPhase({
       {activeSupport && activeDetails && (
         <div
           ref={supportRef}
-          role="dialog"
+          role="status"
+          aria-live="polite"
           aria-label={`Help for ${activeSupport.word.surface}`}
           className={`fixed z-50 overflow-visible rounded-2xl border border-moss-700 bg-moss-900 text-white shadow-2xl transition duration-150 ease-out ${
             supportClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"
@@ -426,7 +427,7 @@ export function StoryPhase({
                 ? "Story explored"
                 : "Finished reading the story?"}
             </p>
-            <p className="mt-1 text-xs text-stone-500">
+            <p className="mt-1 text-xs text-muted">
               Your word-support choices are saved and will shape review.
             </p>
           </div>

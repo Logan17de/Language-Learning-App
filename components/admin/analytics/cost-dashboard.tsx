@@ -33,7 +33,8 @@ export function CostDashboard() {
   }
 
   useEffect(() => {
-    void refresh();
+    const timer = window.setTimeout(() => void refresh(), 0);
+    return () => window.clearTimeout(timer);
   }, [backendMode]);
 
   const live = useMemo(() => (data ? deriveCosts(data) : null), [data]);

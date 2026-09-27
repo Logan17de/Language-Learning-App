@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, KeyRound } from "lucide-react";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { Alert } from "@/components/ui/alert";
 import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
 import { Button } from "@/components/ui/button";
 import { authService } from "@/lib/auth/auth-service";
@@ -38,7 +39,7 @@ export default function ResetPasswordPage() {
     <AuthShell>
       <span className="mt-12 grid size-14 place-items-center rounded-2xl bg-moss-100 text-moss-700"><KeyRound /></span>
       <h1 className="mt-7 text-4xl font-semibold tracking-tight">Choose a new password.</h1>
-      <p className="mt-3 leading-7 text-stone-500">This updates the password for your AIko account.</p>
+      <p className="mt-3 leading-7 text-muted">This updates the password for your AIko account.</p>
       <form className="mt-8 space-y-5" onSubmit={submit}>
         <label className="block">
           <span className="mb-2 block text-sm font-semibold">New password</span>
@@ -55,8 +56,8 @@ export default function ResetPasswordPage() {
             <PasswordVisibility shown={showConfirmation} onToggle={() => setShowConfirmation((value) => !value)} />
           </span>
         </label>
-        {error && <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
-        <Button disabled={loading} className="w-full">{loading ? "Updating…" : "Update password"}</Button>
+        {error && <Alert tone="error">{error}</Alert>}
+        <Button disabled={loading} aria-busy={loading} className="w-full">{loading ? "Updating…" : "Update password"}</Button>
       </form>
     </AuthShell>
   );
@@ -64,7 +65,7 @@ export default function ResetPasswordPage() {
 
 function PasswordVisibility({ shown, onToggle }: { shown: boolean; onToggle: () => void }) {
   return (
-    <button type="button" onClick={onToggle} className="absolute right-2 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full text-stone-400 hover:bg-stone-50" aria-label={shown ? "Hide password" : "Show password"}>
+    <button type="button" onClick={onToggle} className="absolute right-1.5 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-surface-muted" aria-label={shown ? "Hide password" : "Show password"}>
       {shown ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
     </button>
   );

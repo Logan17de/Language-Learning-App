@@ -15,6 +15,7 @@ import { useAppStore } from "@/store/app-store";
 import type { BillingPeriod } from "@/types/app-preferences";
 import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
@@ -87,7 +88,7 @@ function PremiumSubscriptionPage() {
               </div>
               <div>
                 <h2 className="text-lg font-semibold">{title}</h2>
-                <p className="mt-2 text-sm leading-6 text-stone-500">{copy}</p>
+                <p className="mt-2 text-sm leading-6 text-muted">{copy}</p>
               </div>
             </div>
           </Card>
@@ -108,9 +109,9 @@ function PremiumSubscriptionPage() {
           </div>
         </Card>
         <Card className="p-6 sm:p-7">
-          <p className="text-xs font-semibold uppercase tracking-[.18em] text-stone-400">Plan management</p>
+          <p className="text-xs font-semibold uppercase tracking-[.18em] text-muted">Plan management</p>
           <h2 className="mt-3 text-xl font-semibold capitalize">{subscription.billingPeriod} premium</h2>
-          <p className="mt-2 text-sm leading-6 text-stone-500">
+          <p className="mt-2 text-sm leading-6 text-muted">
             Billing checkout is not connected yet, so this account will not be automatically charged, renewed, or downgraded here.
           </p>
           <ButtonLink href="/support" variant="ghost" className="mt-4 px-0 text-moss-700">
@@ -136,20 +137,21 @@ function FreeSubscriptionPage() {
         <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
           Unlock the complete AIko system.
         </h1>
-        <p className="mx-auto mt-3 max-w-2xl leading-7 text-stone-500">
+        <p className="mx-auto mt-3 max-w-2xl leading-7 text-muted">
           Your free account keeps the core learning path. Premium adds personal lesson selection, AI-generated topics, extended speaking, and deeper insights.
         </p>
       </header>
 
-      <div className="mx-auto mt-7 flex w-fit rounded-full bg-stone-100 p-1" role="group" aria-label="Premium billing period">
+      <div className="mx-auto mt-7 flex w-fit rounded-full bg-surface-muted p-1" role="group" aria-label="Premium billing period">
         {(["monthly", "annual"] as BillingPeriod[]).map((period) => (
           <button
             key={period}
             type="button"
             onClick={() => setBilling(period)}
+            aria-pressed={billing === period}
             className={cn(
               "min-h-11 rounded-full px-5 text-sm font-semibold capitalize sm:px-6",
-              billing === period ? "bg-white text-moss-700 shadow-sm" : "text-stone-500",
+              billing === period ? "bg-surface text-moss-700 shadow-sm" : "text-muted",
             )}
           >
             {period}
@@ -191,18 +193,20 @@ function FreeSubscriptionPage() {
         </div>
       </section>
 
-      {showCheckoutNotice && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-5" role="dialog" aria-modal="true" aria-labelledby="checkout-notice">
-          <div className="w-full max-w-md rounded-4xl bg-white p-7 shadow-float">
-            <Sparkles className="size-8 text-persimmon-500" />
+      <Dialog
+        open={showCheckoutNotice}
+        onClose={() => setShowCheckoutNotice(false)}
+        labelledBy="checkout-notice"
+        describedBy="checkout-description"
+        panelClassName="max-w-md"
+      >
+            <Sparkles className="size-8 text-persimmon-500" aria-hidden="true" />
             <h2 id="checkout-notice" className="mt-5 text-2xl font-semibold">Premium checkout is coming soon.</h2>
-            <p className="mt-3 text-sm leading-6 text-stone-500">
+            <p id="checkout-description" className="mt-3 text-sm leading-6 text-muted">
               Payment is not connected, so AIko will not charge you or silently change this account. An administrator can assign beta premium access.
             </p>
-            <Button className="mt-6 w-full" onClick={() => setShowCheckoutNotice(false)}>Got it</Button>
-          </div>
-        </div>
-      )}
+            <Button className="mt-6 w-full" data-dialog-autofocus onClick={() => setShowCheckoutNotice(false)}>Got it</Button>
+      </Dialog>
     </div>
   );
 }

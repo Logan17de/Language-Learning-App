@@ -107,7 +107,8 @@ export function BulkCompleteLessonImporter() {
   }, []);
 
   useEffect(() => {
-    void loadTts();
+    const timer = window.setTimeout(() => void loadTts(), 0);
+    return () => window.clearTimeout(timer);
   }, [loadTts]);
 
   useEffect(() => {

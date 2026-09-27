@@ -42,7 +42,8 @@ function BackendSupportDetail({ requestId }: { requestId: string }) {
   }
 
   useEffect(() => {
-    void load();
+    const timer = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(timer);
   }, [requestId]);
 
   async function updateTicket(values: { status?: string; priority?: string }) {

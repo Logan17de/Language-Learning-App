@@ -290,7 +290,7 @@ function BuildStatusToast({
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-ink">{displayed.value.title}</p>
-            <p className="mt-1 text-xs leading-5 text-stone-500">{displayed.value.detail}</p>
+            <p className="mt-1 text-xs leading-5 text-muted">{displayed.value.detail}</p>
           </div>
         </div>
         {!displayed.value.complete && !displayed.value.attention && (
@@ -513,7 +513,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
           <h1 className="mt-5 text-2xl font-semibold">
             {error ? "The story could not be restored." : "Opening your story…"}
           </h1>
-          <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-stone-500">
+          <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted">
             {error || "AIko is moving the approved story into the lesson reader."}
           </p>
           {error && (
@@ -547,7 +547,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
               <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
                 {storyTitle}
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-500">
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
                 Read naturally. Touch a supported word only when you need its reading or meaning. Story audio is off.
               </p>
             </div>
@@ -566,11 +566,11 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
               <InspectableText text={japanesePassage} terms={passageWords} />
             </p>
 
-            <div className="mt-10 border-t border-stone-200 pt-8">
+            <div className="mt-10 border-t border-border pt-8">
               <p className="section-kicker">English story</p>
               <p
                 lang="en"
-                className="mt-4 hyphens-auto text-base leading-7 text-justify text-stone-600 sm:text-lg"
+                className="mt-4 max-w-3xl hyphens-auto text-justify text-base leading-8 text-muted sm:text-lg"
                 style={{ textJustify: "inter-word" }}
               >
                 {englishPassage}
@@ -589,7 +589,7 @@ export function ProgressiveStoryPage({ requestId }: { requestId: string }) {
                 <p className="font-semibold">
                   {storyComplete ? "Story explored" : "Finished reading the story?"}
                 </p>
-                <p className="mt-1 text-xs text-stone-500">
+                <p className="mt-1 text-xs text-muted">
                   Mark it complete now. Vocabulary opens as soon as the generated lesson is ready.
                 </p>
               </div>
