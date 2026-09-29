@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LockKeyhole, ShieldCheck } from "lucide-react";
-import { useAdminStore } from "@/store/admin-store";
+import { useAdminSessionStore } from "@/store/admin-session-store";
 import { Button } from "@/components/ui/button";
 import { authService } from "@/lib/auth/auth-service";
 import { canAccessAdmin } from "@/lib/auth/permissions";
@@ -12,20 +12,16 @@ import { getBackendMode } from "@/lib/supabase/config";
 function adminOAuthError(code: string | null): string {
   if (!code) return "";
   const messages: Record<string, string> = {
-    "admin-access-denied":
-      "This account is not the AIko owner account.",
-    "oauth-cancelled":
-      "Google sign-in was cancelled. Please try again.",
-    "oauth-exchange":
-      "Google sign-in could not be completed. Please try again.",
+    "admin-access-denied": "This account is not the AIko owner account.",
+    "oauth-cancelled": "Google sign-in was cancelled. Please try again.",
+    "oauth-exchange": "Google sign-in could not be completed. Please try again.",
     "oauth-verifier":
       "The temporary Google sign-in session was lost. Please try again in the same browser.",
     "oauth-expired":
       "The Google sign-in request expired. Please start again.",
     "backend-not-configured":
       "Authentication is not configured for this deployment.",
-    "auth-callback":
-      "Google sign-in could not be completed.",
+    "auth-callback": "Google sign-in could not be completed.",
   };
   return messages[code] ?? "Google sign-in could not be completed.";
 }
@@ -33,13 +29,14 @@ function adminOAuthError(code: string | null): string {
 export function AdminLogin() {
   const router = useRouter();
   const search = useSearchParams();
-  const login = useAdminStore((state) => state.login);
-  const establishBackendSession = useAdminStore((state) => state.establishBackendSession);
+  const establishBackendSession = useAdminSessionStore(
+    (state) => state.establishBackendSession,
+  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(() => adminOAuthError(search.get("error")));
   const [loading, setLoading] = useState(false);
-  const demoMode = getBackendMode() === "demo";
+  const backendReady = getBackendMode() === "supabase";
 
   function requestedAdminPath(): string {
     const next = search.get("next");
@@ -50,12 +47,15 @@ export function AdminLogin() {
 
   async function googleSignIn() {
     setError("");
-    if (demoMode) {
-      setError("Google sign-in requires the Supabase backend.");
+    if (!backendReady) {
+      setError("Authentication is not configured for this deployment.");
       return;
     }
     setLoading(true);
-    const result = await authService.signInWithGoogle("admin", requestedAdminPath());
+    const result = await authService.signInWithGoogle(
+      "admin",
+      requestedAdminPath(),
+    );
     if (!result.ok) {
       setLoading(false);
       setError(result.error.message);
@@ -65,29 +65,28 @@ export function AdminLogin() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
-    if (getBackendMode() === "demo" && !login(email, password)) {
-      setError("The mock admin credentials do not match.");
+    if (!backendReady) {
+      setError("Authentication is not configured for this deployment.");
       return;
     }
-    if (getBackendMode() === "supabase") {
-      setLoading(true);
-      const result = await authService.signIn(email, password);
-      setLoading(false);
-      if (!result.ok) {
-        setError(result.error.message);
-        return;
-      }
-      if (!canAccessAdmin(result.data.role)) {
-        await authService.signOut();
-        setError("This account is not the AIko owner account.");
-        return;
-      }
-      establishBackendSession(
-        result.data.email,
-        result.data.displayName,
-        result.data.role.replace("_", " "),
-      );
+
+    setLoading(true);
+    const result = await authService.signIn(email, password);
+    setLoading(false);
+    if (!result.ok) {
+      setError(result.error.message);
+      return;
     }
+    if (!canAccessAdmin(result.data.role)) {
+      await authService.signOut();
+      setError("This account is not the AIko owner account.");
+      return;
+    }
+    establishBackendSession(
+      result.data.email,
+      result.data.displayName,
+      result.data.role.replace("_", " "),
+    );
     router.replace(requestedAdminPath());
   }
 
@@ -104,24 +103,22 @@ export function AdminLogin() {
           Private owner workspace.
         </h1>
         <p className="mt-6 max-w-lg leading-7 text-white/55">
-          {demoMode
-            ? "This demo workspace uses deterministic mock data and local persistence."
-            : "Production administration is restricted to AIko's single owner account and server-verified permissions."}
+          Production administration is restricted to AIko&apos;s owner account
+          and server-verified permissions.
         </p>
       </section>
+
       <section className="mx-auto mt-12 w-full max-w-md rounded-3xl bg-white p-7 text-slate-900 shadow-2xl sm:p-9 lg:mt-0">
         <LockKeyhole className="size-6 text-teal-700" />
         <h2 className="mt-5 text-2xl font-bold">Owner sign in</h2>
         <p className="mt-2 text-sm text-slate-500">
-          {demoMode
-            ? "Use the documented local prototype credentials."
-            : "Only the configured AIko owner account can open this workspace."}
+          Only the configured AIko owner account can open this workspace.
         </p>
         <Button
           type="button"
           variant="secondary"
           className="mt-7 w-full rounded-xl border border-slate-200 bg-white hover:bg-slate-50"
-          disabled={loading}
+          disabled={loading || !backendReady}
           onClick={googleSignIn}
         >
           <GoogleMark />
@@ -156,18 +153,26 @@ export function AdminLogin() {
             />
           </label>
           {error && (
-            <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+            <p
+              role="alert"
+              className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+            >
               {error}
             </p>
           )}
           <Button
             type="submit"
-            disabled={loading}
+            disabled={loading || !backendReady}
             className="w-full rounded-xl bg-slate-950 hover:bg-slate-800"
           >
             {loading ? "Verifying owner…" : "Open private workspace"}
           </Button>
         </form>
+        {!backendReady && (
+          <p className="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
+            The Supabase backend is not configured for this deployment.
+          </p>
+        )}
       </section>
     </main>
   );

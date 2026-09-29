@@ -9,7 +9,7 @@ import {
   createGoogleOAuthClient,
 } from "@/lib/supabase/client";
 import { canAccessAdmin, type AppRole } from "@/lib/auth/permissions";
-import { useAdminStore } from "@/store/admin-store";
+import { useAdminSessionStore } from "@/store/admin-session-store";
 
 type GoogleFlow = "login" | "signup" | "admin";
 
@@ -100,7 +100,6 @@ export function OAuthCallback() {
         clearGoogleOAuthStorage();
       }
 
-      // Remove the one-time authorization code before any further navigation.
       window.history.replaceState({}, "", "/auth/callback");
 
       const { data: auth, error: userError } = await client.auth.getUser();
@@ -156,7 +155,7 @@ export function OAuthCallback() {
           return;
         }
 
-        useAdminStore.getState().establishBackendSession(
+        useAdminSessionStore.getState().establishBackendSession(
           profile.data.email ?? auth.user.email ?? "",
           profile.data.display_name,
           role.replace("_", " "),

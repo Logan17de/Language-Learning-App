@@ -94,11 +94,15 @@ async function sleep(milliseconds: number): Promise<void> {
 export async function generateStructured<T>(
   input: StructuredGenerationInput,
 ): Promise<StructuredGeneration<T>> {
+  const startedAt = Date.now();
   const release = await acquireCallSlot();
   try {
     for (let attempt = 0; ; attempt += 1) {
       try {
-        return await generateStructuredWithOpenAI<T>(input);
+        return await generateStructuredWithOpenAI<T>({
+          ...input,
+          timeoutMs: input.timeoutMs ?? (input.trace?.requestId ? 65_000 : undefined),
+        });
       } catch (error) {
         if (attempt >= TRANSIENT_RETRIES || !transientModelError(error)) {
           throw error;
@@ -106,6 +110,13 @@ export async function generateStructured<T>(
         const retry = attempt + 1;
         const delayMs = retryDelayMs(retry);
         const message = error instanceof Error ? error.message : String(error);
+        const providerRequestId = error instanceof OpenAIApiError
+          ? error.providerRequestId
+          : error && typeof error === "object" && "providerRequestId" in error &&
+              typeof error.providerRequestId === "string"
+            ? error.providerRequestId
+            : null;
+        const durationMs = Date.now() - startedAt;
         await saveGenerationTrace({
           trace: input.trace,
           name: input.name,
@@ -118,9 +129,21 @@ export async function generateStructured<T>(
             retry,
             maxRetries: TRANSIENT_RETRIES,
             delayMs,
+            errorClassification: "transient",
+            providerRequestId,
+            durationMs,
+            action: "resumed",
           },
         });
         console.warn("Retrying transient OpenAI structured generation.", {
+          requestId: input.trace?.requestId ?? null,
+          stage: input.trace?.stage ?? input.name,
+          group: input.trace?.group ?? null,
+          attempt: retry,
+          errorClassification: "transient",
+          providerRequestId,
+          durationMs,
+          action: "resumed",
           name: input.name,
           retry,
           maxRetries: TRANSIENT_RETRIES,

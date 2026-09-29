@@ -169,6 +169,13 @@ export function ListeningPhase({
             inspectableTerms={exercise.inspectableTerms ?? lesson.story.flatMap((line) => line.words)}
             onInspect={(word, reveal) => onChange(appendInspectableInteraction(session, exercise.id, word, reveal))}
             onSelect={answer}
+            answerAction={
+              priorAnswer && answeredIds.size < exercises.length ? (
+                <Button type="button" className="h-full min-h-14 px-5" onClick={nextQuestion}>
+                  Next <ArrowRight className="size-4" />
+                </Button>
+              ) : null
+            }
           />
         </div>
 
@@ -180,11 +187,6 @@ export function ListeningPhase({
             </p>
             <p className="mt-4 flex items-center gap-2 text-xs font-semibold text-moss-700"><Check className="size-4" /> Listening answer saved</p>
           </div>
-        )}
-        {priorAnswer && answeredIds.size < exercises.length && (
-          <Button type="button" className="mt-5" onClick={nextQuestion}>
-            Next listening question <ArrowRight className="size-4" />
-          </Button>
         )}
       </Card>
     </div>

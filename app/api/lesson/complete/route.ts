@@ -20,12 +20,16 @@ export async function POST(request: NextRequest) {
   const completionData: Json = {
     submitted: submittedData,
     metrics: {
+      story_score: metrics.storyScore,
       vocabulary_correct: metrics.vocabularyCorrect,
       vocabulary_total: metrics.vocabularyTotal,
       grammar_correct: metrics.grammarCorrect,
       grammar_total: metrics.grammarTotal,
-      review_correct: metrics.reviewCorrect,
-      review_total: metrics.reviewTotal,
+      reading_correct: metrics.readingCorrect,
+      reading_total: metrics.readingTotal,
+      listening_correct: metrics.listeningCorrect,
+      listening_total: metrics.listeningTotal,
+      speaking_score: metrics.speakingScore,
     },
   };
   const result = await client.rpc("complete_lesson_session", {

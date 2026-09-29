@@ -10,15 +10,40 @@ const route = readFileSync("app/api/custom-lessons/generate/route.ts", "utf8");
 const completionRoute = readFileSync("app/api/custom-lessons/complete/route.ts", "utf8");
 const statusRoute = readFileSync("app/api/custom-lessons/status/route.ts", "utf8");
 const workerRoute = readFileSync("app/api/internal/custom-lessons/process/route.ts", "utf8");
-const runner = readFileSync("lib/custom-lessons/job-runner.ts", "utf8");
-const groups = readFileSync("lib/gemini/lesson-activity-groups.ts", "utf8");
-const audio = readFileSync("lib/audio/audio-library.ts", "utf8");
-const durableMigration = readFileSync(
-  "supabase/migrations/20260728010000_durable_custom_lesson_jobs.sql",
+const workerAuthorization = readFileSync(
+  "lib/custom-lessons/worker-authorization.ts",
   "utf8",
 );
-const targets = readFileSync("lib/gemini/lesson-targets.ts", "utf8");
-const generation = readFileSync("lib/gemini/lesson-generation.ts", "utf8");
+const runner = readFileSync("lib/custom-lessons/job-runner.ts", "utf8");
+const groups = readFileSync("lib/gemini/lesson-activity-groups.ts", "utf8");
+const checkpoints = readFileSync("lib/custom-lessons/checkpoint-validation.ts", "utf8");
+const placeholderEnrichment = readFileSync("lib/custom-lessons/placeholder-enrichment.ts", "utf8");
+const storyEnrichment = readFileSync("lib/gemini/simple-story-enrichment.ts", "utf8");
+const curatedVocabulary = readFileSync("lib/curated-vocabulary-catalog.ts", "utf8");
+const readingGeneration = readFileSync("lib/gemini/reading-region-generation.ts", "utf8");
+const listeningGeneration = readFileSync("lib/gemini/listening-region-generation.ts", "utf8");
+const speakingGeneration = readFileSync("lib/gemini/speaking-region-generation.ts", "utf8");
+const audio = readFileSync("lib/audio/audio-library.ts", "utf8");
+const durableMigration = readFileSync(
+  "supabase/migrations/20260810090000_stage_based_custom_lesson_jobs.sql",
+  "utf8",
+);
+const currentContractMigration = readFileSync(
+  "supabase/migrations/20260813070000_reading_mcq_choices.sql",
+  "utf8",
+);
+const curatedVocabularyMigration = readFileSync(
+  "supabase/migrations/20260813080000_curated_jlpt_vocabulary.sql",
+  "utf8",
+);
+const scheduler = readFileSync(
+  "supabase/migrations/20260810100000_supabase_custom_lesson_scheduler.sql",
+  "utf8",
+);
+const identityMigration = readFileSync(
+  "supabase/migrations/20260812180000_catalog_identity_only_lesson_targets.sql",
+  "utf8",
+);
 const quota = readFileSync(
   "supabase/migrations/20260727003000_failed_custom_lessons_do_not_consume_quota.sql",
   "utf8",
@@ -41,9 +66,9 @@ describe("custom lesson engine contract", () => {
     expect(form).not.toContain('<Field label="Speaking difficulty">');
     expect(form).not.toContain('<Field label="Optional note">');
     expect(form).toContain("JSON.stringify({ topic, level })");
-    expect(route).toContain('begin_custom_lesson_generation_v3');
-    expect(route).toContain('p_topic: topic');
-    expect(route).toContain('p_level: level');
+    expect(route).toContain("begin_custom_lesson_generation_v4");
+    expect(route).toContain("p_topic: topic");
+    expect(route).toContain("p_level: level");
   });
 
   it("opens the resolved story in the real reader and polls durable backend progress", () => {
@@ -55,71 +80,87 @@ describe("custom lesson engine contract", () => {
     );
     expect(progressiveReader).toContain("<LessonPlayerShell");
     expect(progressiveReader).toContain("/api/custom-lessons/status?requestId=");
-    expect(progressiveReader).toContain("Story audio is off");
     expect(progressiveReader).toContain('data-testid="lesson-build-toast"');
-    expect(progressiveReader).not.toContain("Lesson readiness");
-    expect(progressiveReader).toContain("session.currentPhaseIndex = 1");
-    expect(progressiveReader).not.toContain("<AudioControl");
-    expect(form).toContain("AbortSignal.timeout(180_000)");
-    expect(route).toContain('status: "story_ready"');
-    expect(route).toContain("buildInteractiveStory");
+    expect(form).not.toContain("AbortSignal.timeout");
+    expect(route).toContain('status: "queued"');
+    expect(route).toContain("{ status: 202 }");
     expect(route).toContain("after(async () =>");
-    expect(route).toContain("processCustomLessonJobs");
+    expect(route).toContain("processCustomLessonFastPath");
     expect(completionRoute).not.toContain("generatePlayableLesson");
-    expect(completionRoute).toContain("status: \"activities_queued\"");
+    expect(completionRoute).toContain("the scheduler will resume it");
     expect(statusRoute).toContain('.eq("user_id", auth.userId)');
   });
 
-  it("uses durable atomic claims and independently persisted parallel groups", () => {
-    expect(workerRoute).toContain("CUSTOM_LESSON_WORKER_SECRET");
-    expect(workerRoute).toContain("CRON_SECRET");
-    expect(runner).toContain("Promise.allSettled(executions)");
-    expect(runner).toContain('rpc("claim_progressive_lesson_job"');
+  it("uses durable atomic stage claims and only three persisted activity groups", () => {
+    expect(workerRoute).toContain("customLessonWorkerAuthorized");
+    expect(workerAuthorization).toContain("CUSTOM_LESSON_WORKER_SECRET");
+    expect(workerAuthorization).toContain("CRON_SECRET");
+    expect(runner).toContain('rpc("claim_custom_lesson_stage"');
     expect(runner).toContain('rpc("save_progressive_lesson_group"');
     expect(runner).toContain('rpc("store_generated_lesson_package_background"');
     expect(groups).toContain("generateVocabularyAndKanjiActivities");
     expect(groups).toContain("generateGrammarAndReadingActivities");
     expect(groups).toContain("generateListeningAndSpeakingActivities");
-    expect(groups).toContain("generateFinalReviewActivities");
-    expect(groups).toContain("vocabularyQuestionsPrompt");
-    expect(groups).toContain("grammarQuestionsPrompt");
+    expect(checkpoints).toContain('"vocabulary_and_kanji"');
+    expect(checkpoints).toContain('"grammar_and_reading"');
+    expect(checkpoints).toContain('"listening_and_speaking"');
+    expect(checkpoints).not.toContain('| "final_review"');
     expect(durableMigration).toContain("for update skip locked");
-    expect(durableMigration).toContain("interval '10 minutes'");
+    expect(durableMigration).toContain("interval '8 minutes'");
     expect(durableMigration).toContain("completed_groups");
+    expect(runner).toContain("group_attempts");
+    expect(scheduler).toContain("net.http_post");
+    expect(scheduler).toContain("custom_lesson_worker_url");
+    expect(scheduler).toContain("'* * * * *'");
   });
 
-  it("keeps model-controlled identifiers out of library enrichment", () => {
-    const engine = readFileSync("lib/gemini/lesson-engine-v2.ts", "utf8");
-    const mapping = readFileSync("lib/gemini/library-enrichment-mapping.ts", "utf8");
-    expect(engine).toContain("mapLibraryEnrichment");
-    expect(mapping).toContain("requestIndex");
-    expect(mapping).toContain("Do not output character, pattern, writtenForm");
-    expect(mapping).toContain("linkedKanjiForWord");
+  it("uses the curated JLPT CSVs only for original-story tappability", () => {
+    expect(storyEnrichment).toContain('CURATED_VOCABULARY_SOURCE_MODEL = "jlpt-curated-csv"');
+    expect(storyEnrichment).toContain("matchCuratedStoryVocabulary");
+    expect(storyEnrichment).toContain('rpc("store_story_vocabulary_enrichment"');
+    expect(storyEnrichment).not.toContain("lookup_jmdict_vocabulary");
+    expect(curatedVocabulary).toContain("Vocabs/jlpt_n5_compounds.csv");
+    expect(curatedVocabulary).toContain("Vocabs/jlpt_n1_compounds.csv");
+    expect(curatedVocabulary).toContain("longest spelling");
+    expect(curatedVocabularyMigration).toContain("drop table if exists public.jmdict_entries cascade");
+    expect(curatedVocabularyMigration).toContain("jlpt-curated-csv");
+    expect(placeholderEnrichment).toContain('model: "catalog-identities-only"');
+    expect(placeholderEnrichment).not.toContain("generateStructured");
+    for (const source of [readingGeneration, listeningGeneration, speakingGeneration]) {
+      expect(source).not.toContain("lookupJapaneseDictionaryVocabulary");
+      expect(source).not.toContain("storeGeneratedVocabularyTerms");
+    }
+  });
+
+  it("generates kanji and grammar teaching content in their actual lesson stages", () => {
+    expect(groups).toContain("kanjiTeaching");
+    expect(groups).toContain("grammarTeaching");
+    expect(groups).toContain("adaptKanjiTeaching");
+    expect(groups).toContain("adaptGrammarTeaching");
+    expect(groups).toContain("kanji: input.groups.vocabularyAndKanji.kanjiTeaching");
+    expect(groups).toContain("grammar: input.groups.grammarAndReading.grammarTeaching");
+    expect(identityMigration).toContain("lessonTargetIdentityOnly");
+    expect(identityMigration).toContain("teachingMetadataRequired");
+  });
+
+  it("uses the current 7-7-5-5-5 package and removes final review from the learner flow", () => {
+    expect(currentContractMigration).toContain("vocabularyQuestions must contain exactly 7 items");
+    expect(currentContractMigration).toContain("grammarQuestions must contain exactly 7 items");
+    expect(currentContractMigration).toContain("readingQuestions must contain exactly 5 items");
+    expect(currentContractMigration).toContain("listeningExercises must contain exactly 5 items");
+    expect(currentContractMigration).toContain("speakingExercises must contain exactly 5 items");
+    expect(currentContractMigration).toContain("reviewQuestions must be empty");
+    expect(currentContractMigration).toContain("Final review is intentionally removed");
   });
 
   it("publishes lesson content before audio and limits TTS to voice activities", () => {
-    expect(runner.indexOf('status: "lesson_ready"')).toBeLessThan(
-      runner.indexOf("prepareAudioJob(admin, refreshed.request_id)"),
+    expect(runner.indexOf('finishStage(admin, job, "audio", 90')).toBeLessThan(
+      runner.indexOf("prepareStoredLessonAudio(job.lesson_version_id, admin)"),
     );
     expect(audio).toContain('.from("lesson_listening_activities")');
     expect(audio).not.toContain('.from("lesson_speaking_activities")');
-    expect(audio).toContain('.from("lesson_listening_activities")');
     expect(audio).not.toContain('.from("lesson_story_lines")');
     expect(audio).not.toContain('.from("lesson_reading_sections")');
-  });
-
-  it("enriches only missing library categories before selecting targets", () => {
-    expect(targets).toContain("libraryNeedsEnrichment");
-    expect(targets).toContain("generateLessonLibrarySeed");
-    expect(targets).toContain("enrich_custom_lesson_library");
-    expect(targets).toContain("selectedKanjiNeedDetails ? seed.kanji : []");
-    expect(targets).toContain("selectedGrammarNeedDetails ? seed.grammar : []");
-    expect(targets).toContain("vocabularyRows.length < 20 ? seed.vocabulary : []");
-    expect(targets).toContain('.from("kanji_catalog")');
-    expect(targets).toContain('.from("grammar_catalog")');
-    expect(generation).toContain("Required kanji (exact)");
-    expect(generation).toContain("Required grammar patterns (exact)");
-    expect(generation).toContain("Every meaningful Japanese content word or kanji");
   });
 
   it("normalizes the complete user-provided JLPT catalogs", () => {

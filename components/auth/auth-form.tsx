@@ -17,7 +17,6 @@ import {
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
   const signIn = useAppStore((state) => state.signIn);
-  const onboardingComplete = useAppStore((state) => state.onboarding.completed);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
@@ -59,24 +58,16 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    if (backendMode !== "supabase") {
+      setError("Authentication is not configured for this deployment.");
+      return;
+    }
     if (mode === "signup" && !isStrongEnough(password)) {
       setError(PASSWORD_REQUIREMENTS_MESSAGE);
       return;
     }
-    setLoading(true);
-    if (backendMode === "demo") {
-      window.setTimeout(() => {
-        signIn(mode === "signup" ? name : undefined);
-        const next = requestedNext();
-        router.push(
-          mode === "signup" || !onboardingComplete
-            ? "/onboarding"
-            : (next ?? "/home"),
-        );
-      }, 650);
-      return;
-    }
 
+    setLoading(true);
     let accountOnboardingComplete = false;
     if (mode === "signup") {
       const result = await authService.signUp(email, password, name);
@@ -104,10 +95,8 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
 
   async function googleSignIn() {
     setError("");
-    if (backendMode === "demo") {
-      setError(
-        "Google sign-in becomes available when Supabase Auth is connected.",
-      );
+    if (backendMode !== "supabase") {
+      setError("Authentication is not configured for this deployment.");
       return;
     }
     setLoading(true);
@@ -127,7 +116,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         type="button"
         variant="secondary"
         className="w-full"
-        disabled={loading}
+        disabled={loading || backendMode !== "supabase"}
         onClick={googleSignIn}
       >
         <GoogleMark />
@@ -186,9 +175,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
                 ? "Create a strong password"
                 : "Enter your password"
             }
-            autoComplete={
-              mode === "signup" ? "new-password" : "current-password"
-            }
+            autoComplete={mode === "signup" ? "new-password" : "current-password"}
           />
           <button
             type="button"
@@ -230,7 +217,10 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           {error}
         </p>
       )}
-      <Button className="w-full" disabled={loading}>
+      <Button
+        className="w-full"
+        disabled={loading || backendMode !== "supabase"}
+      >
         {loading && <LoaderCircle className="size-4 animate-spin" />}
         {loading
           ? "Preparing your path…"
@@ -239,9 +229,9 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             : "Create my account"}
       </Button>
       <p className="text-center text-xs leading-5 text-stone-400">
-        {backendMode === "demo"
-          ? "Demo mode: email sign-in is local; Google requires Supabase Auth."
-          : "Your account is secured by Supabase Auth."}
+        {backendMode === "supabase"
+          ? "Your account is secured by Supabase Auth."
+          : "Authentication is unavailable because the backend is not configured."}
       </p>
     </form>
   );

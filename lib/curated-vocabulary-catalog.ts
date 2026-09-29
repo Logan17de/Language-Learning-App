@@ -1,0 +1,153 @@
+import "server-only";
+
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import type { JLPTLevel } from "@/types/lesson";
+
+export interface CuratedVocabularyEntry {
+  id: string;
+  word: string;
+  reading: string;
+  meaning: string;
+  studyLevel: JLPTLevel;
+  sourceFile: string;
+}
+
+export interface CuratedVocabularyMatch extends CuratedVocabularyEntry {
+  start: number;
+  end: number;
+}
+
+const CATALOG_FILES = [
+  "Vocabs/jlpt_n5_compounds.csv",
+  "Vocabs/jlpt_n4_compounds.csv",
+  "Vocabs/jlpt_n3_compounds.csv",
+  "Vocabs/jlpt_n2_compounds(1).csv",
+  "Vocabs/jlpt_n1_compounds.csv",
+] as const;
+
+let catalogCache: CuratedVocabularyEntry[] | null = null;
+
+function parseCsvRows(input: string): string[][] {
+  const source = input.replace(/^\uFEFF/u, "");
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = "";
+  let quoted = false;
+
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index]!;
+    if (quoted) {
+      if (char === '"' && source[index + 1] === '"') {
+        field += '"';
+        index += 1;
+      } else if (char === '"') {
+        quoted = false;
+      } else {
+        field += char;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      quoted = true;
+    } else if (char === ",") {
+      row.push(field);
+      field = "";
+    } else if (char === "\n") {
+      row.push(field);
+      if (row.some((value) => value.trim().length > 0)) rows.push(row);
+      row = [];
+      field = "";
+    } else if (char !== "\r") {
+      field += char;
+    }
+  }
+
+  row.push(field);
+  if (row.some((value) => value.trim().length > 0)) rows.push(row);
+  return rows;
+}
+
+function isJlptLevel(value: string): value is JLPTLevel {
+  return value === "N5" || value === "N4" || value === "N3" || value === "N2" || value === "N1";
+}
+
+function loadCatalogFile(sourceFile: string): CuratedVocabularyEntry[] {
+  const rows = parseCsvRows(readFileSync(join(process.cwd(), sourceFile), "utf8"));
+  const header = rows[0]?.map((value) => value.trim()) ?? [];
+  const idIndex = header.indexOf("id");
+  const wordIndex = header.indexOf("word");
+  const readingIndex = header.indexOf("reading");
+  const meaningIndex = header.indexOf("english_meaning");
+  const levelIndex = header.indexOf("study_level");
+  if ([idIndex, wordIndex, readingIndex, meaningIndex, levelIndex].some((index) => index < 0)) {
+    throw new Error(`Curated vocabulary CSV ${sourceFile} has an unexpected header.`);
+  }
+
+  return rows.slice(1).flatMap((row) => {
+    const id = row[idIndex]?.trim() ?? "";
+    const word = row[wordIndex]?.normalize("NFKC").trim() ?? "";
+    const reading = row[readingIndex]?.normalize("NFKC").trim() ?? "";
+    const meaning = row[meaningIndex]?.trim() ?? "";
+    const studyLevel = row[levelIndex]?.trim() ?? "";
+    if (!id || !word || !reading || !meaning || !isJlptLevel(studyLevel)) return [];
+    return [{ id, word, reading, meaning, studyLevel, sourceFile }];
+  });
+}
+
+export function loadCuratedVocabularyCatalog(): CuratedVocabularyEntry[] {
+  if (catalogCache) return catalogCache;
+  const byId = new Map<string, CuratedVocabularyEntry>();
+  for (const sourceFile of CATALOG_FILES) {
+    for (const entry of loadCatalogFile(sourceFile)) {
+      if (!byId.has(entry.id)) byId.set(entry.id, entry);
+    }
+  }
+  catalogCache = [...byId.values()];
+  return catalogCache;
+}
+
+/**
+ * Finds exact curated vocabulary spellings in the generated story. When words
+ * overlap, the longest spelling at each position wins (日本人 over 日本, etc.).
+ * Returned entries are unique but ordered by their first occurrence.
+ */
+export function matchCuratedStoryVocabulary(japanese: string): CuratedVocabularyMatch[] {
+  const story = japanese.normalize("NFKC");
+  const byStart = new Map<number, CuratedVocabularyMatch[]>();
+
+  for (const entry of loadCuratedVocabularyCatalog()) {
+    const word = entry.word.normalize("NFKC");
+    let start = story.indexOf(word);
+    while (start >= 0) {
+      const match = { ...entry, start, end: start + word.length };
+      const current = byStart.get(start) ?? [];
+      current.push(match);
+      byStart.set(start, current);
+      start = story.indexOf(word, start + Math.max(1, word.length));
+    }
+  }
+
+  const selected: CuratedVocabularyMatch[] = [];
+  let occupiedUntil = 0;
+  for (let start = 0; start < story.length; start += 1) {
+    if (start < occupiedUntil) continue;
+    const candidates = byStart.get(start);
+    if (!candidates?.length) continue;
+    candidates.sort((left, right) =>
+      (right.end - right.start) - (left.end - left.start) ||
+      left.id.localeCompare(right.id),
+    );
+    const best = candidates[0]!;
+    selected.push(best);
+    occupiedUntil = best.end;
+  }
+
+  const seen = new Set<string>();
+  return selected.filter((match) => {
+    if (seen.has(match.id)) return false;
+    seen.add(match.id);
+    return true;
+  });
+}

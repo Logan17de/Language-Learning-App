@@ -1,7 +1,6 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { storeGeneratedVocabularyTerms } from "@/lib/gemini/generated-vocabulary-storage";
 import {
   listeningQuestionIssues,
   listeningQuestionsPrompt,
@@ -14,12 +13,6 @@ import type {
   InspectableTerm,
   ResolvedLessonLibrary,
 } from "@/lib/gemini/lesson-engine-v2";
-import {
-  simpleStoryEnrichmentSchema,
-  storyEnrichmentOutputIssues,
-  storyEnrichmentPrompt,
-  type SimpleStoryEnrichment,
-} from "@/lib/gemini/simple-story-enrichment-contract";
 import { generateStructured } from "@/lib/gemini/structured-output";
 import type { JLPTLevel } from "@/types/lesson";
 
@@ -46,26 +39,6 @@ function difficulty(value: RawListeningDifficulty): GeneratedListeningExercise["
   return "Medium";
 }
 
-function uniqueTerms(terms: InspectableTerm[]): InspectableTerm[] {
-  const seen = new Set<string>();
-  return terms.filter((term) => {
-    const key = `${term.libraryId}:${term.surface}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-function generatedText(value: RawListeningQuestions): string {
-  return value.questions
-    .flatMap((question) => [
-      ...question.conversation,
-      question.question,
-      ...question.choices,
-    ])
-    .join("\n");
-}
-
 export async function generateListeningRegion(input: {
   requestId?: string;
   admin?: SupabaseClient;
@@ -87,68 +60,22 @@ export async function generateListeningRegion(input: {
     trace: { requestId: input.requestId, stage: "listening_questions" },
   });
 
-  const listeningText = generatedText(listening.value);
-  const enrichment = await generateStructured<SimpleStoryEnrichment>({
-    name: "listening_vocabulary",
-    prompt: storyEnrichmentPrompt(listeningText),
-    schema: simpleStoryEnrichmentSchema,
-    strictSchema: true,
-    exactSchemaName: true,
-    validate: storyEnrichmentOutputIssues,
-    trace: { requestId: input.requestId, stage: "listening_enrichment" },
-  });
-  const terms = await storeGeneratedVocabularyTerms({
-    admin: input.admin,
-    requestId: input.requestId,
-    level: input.level,
-    vocabulary: enrichment.value.vocabulary,
-    model: enrichment.model,
-    library: input.library,
-  });
-
-  const fallbackIds = [
-    ...input.library.grammar.map((item) => item.libraryId),
-    ...input.library.vocabulary.map((item) => item.libraryId),
-    ...input.library.kanji.map((item) => item.libraryId),
-  ];
   return {
-    exercises: listening.value.questions.map((question, index) => {
-      const text = [
-        ...question.conversation,
-        question.question,
-        ...question.choices,
-      ].join("\n");
-      const inspectableTerms = uniqueTerms(
-        terms.filter((term) => text.includes(term.surface)),
-      );
-      const termIds = [...new Set(
-        inspectableTerms.map((term) => term.libraryId),
-      )].slice(0, 5);
-      const fallbackId = fallbackIds.length > 0
-        ? fallbackIds[index % fallbackIds.length]
-        : undefined;
-      return {
-        difficulty: difficulty(question.difficulty),
-        conversationLines: question.conversation,
-        prompt: question.question,
-        transcript: question.conversation.join("\n"),
-        choices: question.choices,
-        correctAnswer: question.answer,
-        explanation: `The correct answer is ${question.answer}.`,
-        targetItemIds: termIds.length > 0
-          ? termIds
-          : fallbackId
-            ? [fallbackId]
-            : [],
-        inspectableTerms,
-      };
-    }),
+    exercises: listening.value.questions.map((question) => ({
+      difficulty: difficulty(question.difficulty),
+      conversationLines: question.conversation,
+      prompt: question.question,
+      transcript: question.conversation.join("\n"),
+      choices: question.choices,
+      correctAnswer: question.answer,
+      explanation: `The correct answer is ${question.answer}.`,
+      targetItemIds: [],
+      inspectableTerms: [],
+    })),
     audit: {
       stage: "communication_activities",
-      model: listening.model === enrichment.model
-        ? listening.model
-        : `${listening.model}, ${enrichment.model}`,
-      repaired: listening.repaired || enrichment.repaired,
+      model: listening.model,
+      repaired: listening.repaired,
     },
   };
 }

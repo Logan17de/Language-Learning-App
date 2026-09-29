@@ -88,20 +88,6 @@ export interface SpeakingEvent {
   successfulRetry: boolean;
 }
 
-export interface ReviewAnswer {
-  questionId: string;
-  category: "kanji" | "vocabulary" | "grammar" | "listening" | "speaking";
-  selectedAnswer: string;
-  correct: boolean;
-}
-
-export interface ReviewResult {
-  answers: ReviewAnswer[];
-  correctCount: number;
-  totalCount: number;
-  score: number;
-}
-
 export interface LessonCompletionResult {
   lessonId: string;
   score: number;
@@ -148,8 +134,6 @@ export interface LessonSession {
   listeningComplete: boolean;
   speakingEvents: SpeakingEvent[];
   speakingComplete: boolean;
-  reviewAnswers: ReviewAnswer[];
-  reviewResult: ReviewResult | null;
   completionResult: LessonCompletionResult | null;
   completed: boolean;
   rewarded: boolean;

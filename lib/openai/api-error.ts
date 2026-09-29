@@ -2,11 +2,13 @@ type UnknownRecord = Record<string, unknown>;
 
 export class OpenAIApiError extends Error {
   readonly allowFallback: boolean;
+  readonly providerRequestId: string | null;
 
-  constructor(message: string, allowFallback: boolean) {
+  constructor(message: string, allowFallback: boolean, providerRequestId: string | null = null) {
     super(message);
     this.name = "OpenAIApiError";
     this.allowFallback = allowFallback;
+    this.providerRequestId = providerRequestId;
   }
 }
 
@@ -86,6 +88,7 @@ export function createOpenAIApiError(
   model: string,
   status: number,
   payload: unknown,
+  providerRequestId: string | null = null,
 ): OpenAIApiError {
   const diagnostics = getOpenAIApiDiagnostics(payload);
   const facts = [
@@ -102,6 +105,7 @@ export function createOpenAIApiError(
     return new OpenAIApiError(
       "OpenAI authentication failed. Replace OPENAI_API_KEY in Vercel with an active server-side API key, then redeploy.",
       false,
+      providerRequestId,
     );
   }
 
@@ -109,6 +113,7 @@ export function createOpenAIApiError(
     return new OpenAIApiError(
       `OpenAI access to ${model} was denied. Confirm that this API project can use GPT-5.6 Luna and that the key has Responses API permission.`,
       false,
+      providerRequestId,
     );
   }
 
@@ -122,6 +127,7 @@ export function createOpenAIApiError(
     return new OpenAIApiError(
       "OpenAI API credits or billing are unavailable for this project. Add billing/credits before generating lessons.",
       false,
+      providerRequestId,
     );
   }
 
@@ -129,6 +135,7 @@ export function createOpenAIApiError(
     return new OpenAIApiError(
       detail ?? `${model} is not available to this OpenAI API project.`,
       true,
+      providerRequestId,
     );
   }
 
@@ -136,6 +143,7 @@ export function createOpenAIApiError(
     return new OpenAIApiError(
       detail ?? `${model} is temporarily rate limited.`,
       true,
+      providerRequestId,
     );
   }
 
@@ -148,11 +156,13 @@ export function createOpenAIApiError(
         ? `OpenAI rejected the structured request${location}: ${detail}`
         : `OpenAI rejected the structured request${location} as invalid.`,
       false,
+      providerRequestId,
     );
   }
 
   return new OpenAIApiError(
     detail ?? `${model} request failed with status ${status}.`,
     status === 408 || status === 409 || status >= 500,
+    providerRequestId,
   );
 }
