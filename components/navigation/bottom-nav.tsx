@@ -30,7 +30,7 @@ const items = [
     label: "Profile",
     href: "/profile",
     icon: UserRound,
-    matches: ["/profile", "/settings", "/support", "/subscription"],
+    matches: ["/profile", "/settings", "/subscription"],
   },
 ];
 

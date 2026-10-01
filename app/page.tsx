@@ -119,7 +119,7 @@ export default function LandingPage() {
             className="absolute inset-x-0 top-0 -z-10 h-[38rem] bg-[radial-gradient(circle_at_78%_20%,rgba(229,119,72,.16),transparent_34%),radial-gradient(circle_at_18%_14%,rgba(79,128,104,.17),transparent_30%)]"
             aria-hidden="true"
           />
-          <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 pb-16 pt-10 sm:px-8 sm:pt-14 lg:grid-cols-[1.04fr_.96fr] lg:gap-14 lg:py-20">
+          <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 pb-12 pt-8 sm:px-8 sm:pt-10 lg:grid-cols-[1.04fr_.96fr] lg:gap-12 lg:py-14">
             <div className="animate-fade-up">
               <Badge className="gap-2 py-2">
                 <Sparkles className="size-3.5" aria-hidden="true" />
@@ -206,7 +206,7 @@ export default function LandingPage() {
 
         <section
           id="learning-system"
-          className="scroll-mt-20 flex min-h-[calc(100svh-5rem)] items-center bg-white py-16 sm:py-20"
+          className="scroll-mt-20 bg-white py-12 sm:py-16"
         >
           <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
             <div className="mx-auto max-w-3xl text-center">
@@ -241,7 +241,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="py-16 sm:py-20" aria-labelledby="adapt-heading">
+        <section className="py-12 sm:py-16" aria-labelledby="adapt-heading">
           <div className="mx-auto grid max-w-7xl gap-8 px-5 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
             <div>
               <p className="section-kicker">Adaptation grounded in practice</p>
@@ -281,7 +281,7 @@ export default function LandingPage() {
 
         <section
           id="lesson-journey"
-          className="scroll-mt-20 flex min-h-[calc(100svh-5rem)] items-center bg-white py-16 sm:py-20"
+          className="scroll-mt-20 bg-white py-12 sm:py-16"
         >
           <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
             <div className="max-w-3xl">
@@ -317,7 +317,7 @@ export default function LandingPage() {
 
         <section
           id="founder"
-          className="scroll-mt-20 flex min-h-[calc(100svh-5rem)] items-center bg-white py-16 sm:py-20"
+          className="scroll-mt-20 bg-white py-12 sm:py-16"
         >
           <div className="mx-auto grid w-full max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center">
             <div>
@@ -390,8 +390,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="app-availability" className="scroll-mt-20 px-5 py-12 sm:px-8 sm:py-16" aria-labelledby="availability-heading">
-          <div className="mx-auto max-w-7xl overflow-hidden rounded-4xl bg-persimmon-50 px-6 py-10 text-center sm:px-16 sm:py-12">
+        <section id="app-availability" className="scroll-mt-20 px-5 py-10 sm:px-8 sm:py-12" aria-labelledby="availability-heading">
+          <div className="mx-auto max-w-7xl overflow-hidden rounded-4xl bg-persimmon-50 px-6 py-8 text-center sm:px-16 sm:py-10">
             <p className="section-kicker !text-persimmon-600">Coming soon</p>
             <h2
               id="availability-heading"
@@ -408,20 +408,19 @@ export default function LandingPage() {
       </main>
 
       <footer className="border-t border-black/[.06] bg-white">
-        <div className="mx-auto flex max-w-7xl justify-end px-5 py-8 sm:px-8">
+        <div className="mx-auto flex max-w-7xl justify-end px-5 py-6 sm:px-8">
           <nav
             className="flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-stone-500"
             aria-label="Footer navigation"
           >
             <a className={focusRing} href="#lesson-journey">How lessons work</a>
             <a className={focusRing} href="#app-availability">Phone app</a>
-            <a className={focusRing} href="/support">Support</a>
             <a className={focusRing} href="/privacy">Privacy</a>
             <a className={focusRing} href="/terms">Terms</a>
           </nav>
         </div>
         <div className="border-t border-black/[.06]">
-          <p className="mx-auto max-w-7xl px-5 py-5 text-xs text-stone-400 sm:px-8">
+          <p className="mx-auto max-w-7xl px-5 py-4 text-xs text-stone-400 sm:px-8">
             © 2026 AIko. Built independently with the help of AI.
           </p>
         </div>

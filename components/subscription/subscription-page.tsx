@@ -113,9 +113,6 @@ function PremiumSubscriptionPage() {
           <p className="mt-2 text-sm leading-6 text-stone-500">
             Billing checkout is not connected yet, so this account will not be automatically charged, renewed, or downgraded here.
           </p>
-          <ButtonLink href="/support" variant="ghost" className="mt-4 px-0 text-moss-700">
-            Contact support about this plan
-          </ButtonLink>
         </Card>
       </section>
     </div>

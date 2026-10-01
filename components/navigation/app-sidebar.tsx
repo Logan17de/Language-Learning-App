@@ -3,7 +3,6 @@
 import {
   BookOpen,
   ChartNoAxesColumnIncreasing,
-  CircleHelp,
   Crown,
   House,
   LibraryBig,
@@ -28,7 +27,6 @@ const secondary = [
   { label: "Custom topic", href: "/custom-topic", icon: Sparkles },
   { label: "Subscription", href: "/subscription", icon: Crown },
   { label: "Settings", href: "/settings", icon: Settings },
-  { label: "Support", href: "/support", icon: CircleHelp },
 ];
 
 export function AppSidebar() {

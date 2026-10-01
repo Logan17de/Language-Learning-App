@@ -247,7 +247,6 @@ function AccountActions() {
   return (
     <div className="grid gap-2">
       <ButtonLink href="/settings" variant="secondary">Settings</ButtonLink>
-      <ButtonLink href="/support" variant="ghost">Help & support</ButtonLink>
       <Button
         type="button"
         variant="ghost"
