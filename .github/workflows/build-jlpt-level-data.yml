@@ -45,7 +45,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --quiet -- data/jlpt; then
+          if [ -z "$(git status --porcelain -- data/jlpt)" ]; then
             echo "No generated changes."
             exit 0
           fi
