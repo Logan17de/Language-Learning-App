@@ -13,7 +13,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
       </span>
       {!compact && (
         <span className="text-xl font-bold tracking-tight text-ink">
-          AIko <span className="font-serif font-normal text-persimmon-500">愛子</span>
+          AIko
         </span>
       )}
     </Link>
