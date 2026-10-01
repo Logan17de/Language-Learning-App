@@ -7,17 +7,20 @@ import { BackendSessionHydrator } from "@/components/backend/backend-session-hyd
 import { LearnerRouteGuard } from "@/components/auth/learner-route-guard";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://aiko.zetbros.com"),
   title: {
-    default: "AIko — Adaptive Language Learning",
+    default: "AIko — Phone App Coming Soon",
     template: "%s · AIko",
   },
   description:
-    "Structured language learning through stories, vocabulary, grammar, reading, listening, speaking, and personalised review. Launching first with Japanese.",
+    "The AIko phone app is coming soon. Learn through connected, adaptive language lessons. The web app will not be available.",
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "AIko — Adaptive Language Learning",
+    title: "AIko — Phone App Coming Soon",
     description:
-      "Structured language learning through connected lessons and personalised review. Launching first with Japanese.",
+      "The AIko phone app is coming soon. The web app will not be available.",
     type: "website",
+    url: "https://aiko.zetbros.com",
   },
 };
 

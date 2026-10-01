@@ -16,20 +16,18 @@ import {
   Sparkles,
   UserRound,
 } from "lucide-react";
-import { PublicPrimaryAction } from "@/components/auth/public-auth-actions";
 import { PublicHeader } from "@/components/layout/public-header";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Brand } from "@/components/ui/brand";
 
 export const metadata: Metadata = {
-  title: "AIko — Adaptive Language Learning",
+  title: "AIko — Phone App Coming Soon",
   description:
-    "Learn through structured stories, vocabulary, grammar, reading, listening, speaking, and personalised review. AIko launches with Japanese and is designed for more languages.",
+    "The AIko phone app is coming soon. Learn through connected, adaptive language lessons. The web app will not be available.",
   openGraph: {
-    title: "AIko — Adaptive Language Learning",
+    title: "AIko — Phone App Coming Soon",
     description:
-      "Structured language learning through connected lessons and personalised review. Launching first with Japanese.",
+      "The AIko phone app is coming soon. The web app will not be available.",
     type: "website",
   },
 };
@@ -102,53 +100,20 @@ const learningSignals = [
   "Review performance",
 ];
 
-const plans = [
-  {
-    name: "Free",
-    copy: "A clear, structured way to begin learning.",
-    features: [
-      "Structured language lessons",
-      "Limited learning sessions",
-      "Basic vocabulary and grammar review",
-      "Basic progress tracking",
-      "Limited speaking practice",
-      "Random non-repeating lessons at your level",
-    ],
-    price: "¥0",
-    cadence: "",
-    annual: null,
-    cta: "Start Free",
-    primary: false,
-  },
-  {
-    name: "Pro",
-    copy: "More freedom, feedback, and continuity as you grow.",
-    features: [
-      "Unlimited learning sessions",
-      "Request lessons about your own topics",
-      "Level- and interest-matched lesson assignments",
-      "Voice-based speaking practice",
-      "Advanced reading and pronunciation feedback",
-      "Adaptive review and learner memory",
-      "Full progress insights",
-      "Future languages and premium tutors when available",
-    ],
-    price: "¥2,000",
-    cadence: "/ month",
-    annual: "¥20,000 / year",
-    cta: "Explore Pro",
-    primary: true,
-  },
-];
-
 const focusRing =
   "rounded-md outline-none transition focus-visible:ring-4 focus-visible:ring-moss-200 focus-visible:ring-offset-2";
 
 export default function LandingPage() {
   return (
     <div className="overflow-x-clip bg-paper text-ink">
+      <a
+        href="#main-content"
+        className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-full bg-moss-900 px-5 py-3 text-sm font-semibold text-white shadow-float transition focus:translate-y-0 focus:outline-none focus:ring-4 focus:ring-moss-200"
+      >
+        Skip to main content
+      </a>
       <PublicHeader />
-      <main>
+      <main id="main-content">
         <section className="relative isolate" aria-labelledby="hero-heading">
           <div
             className="absolute inset-x-0 top-0 -z-10 h-[38rem] bg-[radial-gradient(circle_at_78%_20%,rgba(229,119,72,.16),transparent_34%),radial-gradient(circle_at_18%_14%,rgba(79,128,104,.17),transparent_30%)]"
@@ -158,23 +123,22 @@ export default function LandingPage() {
             <div className="animate-fade-up">
               <Badge className="gap-2 py-2">
                 <Sparkles className="size-3.5" aria-hidden="true" />
-                Structured language learning, personalised by AI
+                Phone app coming soon
               </Badge>
               <h1
                 id="hero-heading"
                 className="mt-7 max-w-4xl text-5xl font-semibold leading-[1.03] tracking-[-0.045em] text-ink sm:text-6xl lg:text-[4.5rem]"
               >
-                Learn a language through lessons that{" "}
+                Your next language,{" "}
                 <span className="font-serif font-normal italic text-persimmon-500">
-                  adapt to you.
+                  in your pocket.
                 </span>
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-8 text-stone-600">
-                AIko combines structured lessons, speaking practice, review, and personalised
-                guidance in one learning experience. Japanese is only the beginning.
+                The AIko phone app is coming soon. Explore connected lessons, speaking
+                practice, and personalised guidance in one learning experience.
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                <PublicPrimaryAction signedOutLabel="Start learning" hideWhenSignedIn className="group px-7" />
                 <a
                   href="#learning-system"
                   className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold text-ink hover:bg-white ${focusRing}`}
@@ -185,7 +149,7 @@ export default function LandingPage() {
               </div>
               <p className="mt-5 flex items-center gap-2 text-sm font-medium text-stone-500">
                 <span className="size-2 rounded-full bg-persimmon-500" aria-hidden="true" />
-                Currently launching with Japanese.
+                The web app will not be available.
               </p>
             </div>
 
@@ -253,7 +217,6 @@ export default function LandingPage() {
               <p className="mt-5 text-lg leading-8 text-stone-500">
                 Each activity builds on the one before it. What you practise, reveal, retry,
                 and remember helps AIko decide where your attention may be most useful next.
-                Learners do not browse or star lessons; the path handles that decision.
               </p>
             </div>
             <ol className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -353,94 +316,6 @@ export default function LandingPage() {
         </section>
 
         <section
-          id="pricing"
-          className="scroll-mt-20 flex min-h-[calc(100svh-5rem)] items-center py-16 sm:py-20"
-        >
-          <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">
-            <div className="mx-auto max-w-3xl text-center">
-              <p className="section-kicker">Free and Pro</p>
-              <h2 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-                Begin with structure. Add depth as you grow.
-              </h2>
-              <p className="mt-5 text-lg leading-8 text-stone-500">
-                Start with the essentials, then choose Pro when you want more sessions,
-                feedback, and lessons built around your interests. Every plan remains
-                level-based, and AIko never reassigns the same lesson.
-              </p>
-            </div>
-            <div className="mt-10 grid gap-6 md:grid-cols-2">
-              {plans.map((plan) => (
-                <Card
-                  key={plan.name}
-                  className={
-                    plan.primary
-                      ? "flex h-full flex-col border-moss-700 !bg-moss-900 p-8 text-white sm:p-10"
-                      : "flex h-full flex-col p-8 sm:p-10"
-                  }
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-4">
-                      <h3 className="text-3xl font-semibold">{plan.name}</h3>
-                      {plan.primary && <Badge tone="orange">More ways to learn</Badge>}
-                    </div>
-                    <div className="mt-6 flex flex-wrap items-end gap-x-2 gap-y-1">
-                      <span className="text-4xl font-semibold tracking-tight">{plan.price}</span>
-                      {plan.cadence && (
-                        <span className={plan.primary ? "pb-1 text-white/60" : "pb-1 text-stone-500"}>
-                          {plan.cadence}
-                        </span>
-                      )}
-                    </div>
-                    {plan.annual && (
-                      <p className={`mt-2 text-sm font-semibold ${plan.primary ? "text-persimmon-400" : "text-moss-700"}`}>
-                        {plan.annual}
-                      </p>
-                    )}
-                    <p className={`mt-4 leading-7 ${plan.primary ? "text-white/65" : "text-stone-500"}`}>
-                      {plan.copy}
-                    </p>
-                  </div>
-                  <ul className="mt-8 flex-1 space-y-4 text-sm">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-3">
-                        <span
-                          className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-full ${
-                            plan.primary
-                              ? "bg-persimmon-500/20 text-persimmon-400"
-                              : "bg-moss-100 text-moss-600"
-                          }`}
-                        >
-                          <Check className="size-3.5" aria-hidden="true" />
-                        </span>
-                        <span className={plan.primary ? "text-white/80" : "text-stone-600"}>
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  <PublicPrimaryAction
-                    signedOutLabel={plan.cta}
-                    signedInLabel={plan.primary ? "Explore Pro" : "Go to dashboard"}
-                    signedInHref={plan.primary ? "/subscription" : "/home"}
-                    hideWhenSignedIn={!plan.primary}
-                    showAiIcon={plan.primary}
-                    variant={plan.primary ? "primary" : "secondary"}
-                    className={
-                      plan.primary
-                        ? "mt-9 w-full bg-persimmon-500 hover:bg-persimmon-600"
-                        : "mt-9 w-full"
-                    }
-                  />
-                </Card>
-              ))}
-            </div>
-            <p className="mt-5 text-center text-sm text-stone-400">
-              Pro costs ¥2,000 per month or ¥20,000 per year.
-            </p>
-          </div>
-        </section>
-
-        <section
           id="founder"
           className="scroll-mt-20 flex min-h-[calc(100svh-5rem)] items-center bg-white py-16 sm:py-20"
         >
@@ -515,22 +390,19 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="px-5 py-12 sm:px-8 sm:py-16" aria-labelledby="final-cta-heading">
+        <section id="app-availability" className="scroll-mt-20 px-5 py-12 sm:px-8 sm:py-16" aria-labelledby="availability-heading">
           <div className="mx-auto max-w-7xl overflow-hidden rounded-4xl bg-persimmon-50 px-6 py-10 text-center sm:px-16 sm:py-12">
-            <p className="section-kicker !text-persimmon-600">Your first language awaits</p>
+            <p className="section-kicker !text-persimmon-600">Coming soon</p>
             <h2
-              id="final-cta-heading"
+              id="availability-heading"
               className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl"
             >
-              Start with Japanese. Grow with AIko.
+              AIko is coming to your phone.
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-stone-500">
-              Begin with structured lessons today. As AIko grows, more languages, lesson
-              styles, and AI tutors will follow.
+              The phone app is coming soon. The web app will not be available.
+              Explore how AIko connects your learning while we prepare the phone app.
             </p>
-            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-              <PublicPrimaryAction signedOutLabel="Create your account" hideWhenSignedIn className="group" />
-            </div>
           </div>
         </section>
       </main>
@@ -541,8 +413,8 @@ export default function LandingPage() {
             className="flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-stone-500"
             aria-label="Footer navigation"
           >
-            <a className={focusRing} href="#lesson-journey">Learn</a>
-            <a className={focusRing} href="#pricing">Pricing</a>
+            <a className={focusRing} href="#lesson-journey">How lessons work</a>
+            <a className={focusRing} href="#app-availability">Phone app</a>
             <a className={focusRing} href="/support">Support</a>
             <a className={focusRing} href="/privacy">Privacy</a>
             <a className={focusRing} href="/terms">Terms</a>
