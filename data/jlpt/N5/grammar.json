@@ -1,0 +1,412 @@
+[
+  {
+    "position": 1,
+    "pattern": "だ / です",
+    "level": "N5"
+  },
+  {
+    "position": 2,
+    "pattern": "じゃない / ではない",
+    "level": "N5"
+  },
+  {
+    "position": 3,
+    "pattern": "だった / でした",
+    "level": "N5"
+  },
+  {
+    "position": 4,
+    "pattern": "じゃなかった / ではなかった",
+    "level": "N5"
+  },
+  {
+    "position": 5,
+    "pattern": "か",
+    "level": "N5"
+  },
+  {
+    "position": 6,
+    "pattern": "か～か",
+    "level": "N5"
+  },
+  {
+    "position": 7,
+    "pattern": "が",
+    "level": "N5"
+  },
+  {
+    "position": 8,
+    "pattern": "を",
+    "level": "N5"
+  },
+  {
+    "position": 9,
+    "pattern": "に",
+    "level": "N5"
+  },
+  {
+    "position": 10,
+    "pattern": "へ",
+    "level": "N5"
+  },
+  {
+    "position": 11,
+    "pattern": "で",
+    "level": "N5"
+  },
+  {
+    "position": 12,
+    "pattern": "と",
+    "level": "N5"
+  },
+  {
+    "position": 13,
+    "pattern": "も",
+    "level": "N5"
+  },
+  {
+    "position": 14,
+    "pattern": "の",
+    "level": "N5"
+  },
+  {
+    "position": 15,
+    "pattern": "は",
+    "level": "N5"
+  },
+  {
+    "position": 16,
+    "pattern": "から",
+    "level": "N5"
+  },
+  {
+    "position": 17,
+    "pattern": "まで",
+    "level": "N5"
+  },
+  {
+    "position": 18,
+    "pattern": "や",
+    "level": "N5"
+  },
+  {
+    "position": 19,
+    "pattern": "ね",
+    "level": "N5"
+  },
+  {
+    "position": 20,
+    "pattern": "よ",
+    "level": "N5"
+  },
+  {
+    "position": 21,
+    "pattern": "だけ",
+    "level": "N5"
+  },
+  {
+    "position": 22,
+    "pattern": "しか～ない",
+    "level": "N5"
+  },
+  {
+    "position": 23,
+    "pattern": "でも",
+    "level": "N5"
+  },
+  {
+    "position": 24,
+    "pattern": "けど",
+    "level": "N5"
+  },
+  {
+    "position": 25,
+    "pattern": "けれども",
+    "level": "N5"
+  },
+  {
+    "position": 26,
+    "pattern": "そして",
+    "level": "N5"
+  },
+  {
+    "position": 27,
+    "pattern": "それから",
+    "level": "N5"
+  },
+  {
+    "position": 28,
+    "pattern": "しかし",
+    "level": "N5"
+  },
+  {
+    "position": 29,
+    "pattern": "だから",
+    "level": "N5"
+  },
+  {
+    "position": 30,
+    "pattern": "ので",
+    "level": "N5"
+  },
+  {
+    "position": 31,
+    "pattern": "のに",
+    "level": "N5"
+  },
+  {
+    "position": 32,
+    "pattern": "たり～たり",
+    "level": "N5"
+  },
+  {
+    "position": 33,
+    "pattern": "て形",
+    "level": "N5"
+  },
+  {
+    "position": 34,
+    "pattern": "ている",
+    "level": "N5"
+  },
+  {
+    "position": 35,
+    "pattern": "てある",
+    "level": "N5"
+  },
+  {
+    "position": 36,
+    "pattern": "てから",
+    "level": "N5"
+  },
+  {
+    "position": 37,
+    "pattern": "てもいい",
+    "level": "N5"
+  },
+  {
+    "position": 38,
+    "pattern": "てはいけない",
+    "level": "N5"
+  },
+  {
+    "position": 39,
+    "pattern": "ちゃいけない / じゃいけない",
+    "level": "N5"
+  },
+  {
+    "position": 40,
+    "pattern": "ないでください",
+    "level": "N5"
+  },
+  {
+    "position": 41,
+    "pattern": "なければならない",
+    "level": "N5"
+  },
+  {
+    "position": 42,
+    "pattern": "なくてもいい",
+    "level": "N5"
+  },
+  {
+    "position": 43,
+    "pattern": "ないといけない",
+    "level": "N5"
+  },
+  {
+    "position": 44,
+    "pattern": "なくちゃ / なきゃ",
+    "level": "N5"
+  },
+  {
+    "position": 45,
+    "pattern": "たい",
+    "level": "N5"
+  },
+  {
+    "position": 46,
+    "pattern": "たくない",
+    "level": "N5"
+  },
+  {
+    "position": 47,
+    "pattern": "たことがある",
+    "level": "N5"
+  },
+  {
+    "position": 48,
+    "pattern": "つもり",
+    "level": "N5"
+  },
+  {
+    "position": 49,
+    "pattern": "予定",
+    "level": "N5"
+  },
+  {
+    "position": 50,
+    "pattern": "ましょう",
+    "level": "N5"
+  },
+  {
+    "position": 51,
+    "pattern": "ましょうか",
+    "level": "N5"
+  },
+  {
+    "position": 52,
+    "pattern": "ませんか",
+    "level": "N5"
+  },
+  {
+    "position": 53,
+    "pattern": "ましょうと思う",
+    "level": "N5"
+  },
+  {
+    "position": 54,
+    "pattern": "ほうがいい",
+    "level": "N5"
+  },
+  {
+    "position": 55,
+    "pattern": "ほしい",
+    "level": "N5"
+  },
+  {
+    "position": 56,
+    "pattern": "がほしい",
+    "level": "N5"
+  },
+  {
+    "position": 57,
+    "pattern": "たがる",
+    "level": "N5"
+  },
+  {
+    "position": 58,
+    "pattern": "ことができる",
+    "level": "N5"
+  },
+  {
+    "position": 59,
+    "pattern": "方（かた）",
+    "level": "N5"
+  },
+  {
+    "position": 60,
+    "pattern": "前に",
+    "level": "N5"
+  },
+  {
+    "position": 61,
+    "pattern": "後で",
+    "level": "N5"
+  },
+  {
+    "position": 62,
+    "pattern": "とき",
+    "level": "N5"
+  },
+  {
+    "position": 63,
+    "pattern": "ながら",
+    "level": "N5"
+  },
+  {
+    "position": 64,
+    "pattern": "もう",
+    "level": "N5"
+  },
+  {
+    "position": 65,
+    "pattern": "まだ",
+    "level": "N5"
+  },
+  {
+    "position": 66,
+    "pattern": "まだ～ていない",
+    "level": "N5"
+  },
+  {
+    "position": 67,
+    "pattern": "あまり～ない",
+    "level": "N5"
+  },
+  {
+    "position": 68,
+    "pattern": "全然～ない",
+    "level": "N5"
+  },
+  {
+    "position": 69,
+    "pattern": "いつも",
+    "level": "N5"
+  },
+  {
+    "position": 70,
+    "pattern": "よく",
+    "level": "N5"
+  },
+  {
+    "position": 71,
+    "pattern": "時々",
+    "level": "N5"
+  },
+  {
+    "position": 72,
+    "pattern": "一番",
+    "level": "N5"
+  },
+  {
+    "position": 73,
+    "pattern": "より～ほうが",
+    "level": "N5"
+  },
+  {
+    "position": 74,
+    "pattern": "の中で",
+    "level": "N5"
+  },
+  {
+    "position": 75,
+    "pattern": "くらい / ぐらい",
+    "level": "N5"
+  },
+  {
+    "position": 76,
+    "pattern": "ごろ",
+    "level": "N5"
+  },
+  {
+    "position": 77,
+    "pattern": "くらいかかる",
+    "level": "N5"
+  },
+  {
+    "position": 78,
+    "pattern": "に行く / に来る",
+    "level": "N5"
+  },
+  {
+    "position": 79,
+    "pattern": "にする",
+    "level": "N5"
+  },
+  {
+    "position": 80,
+    "pattern": "になる",
+    "level": "N5"
+  },
+  {
+    "position": 81,
+    "pattern": "がある",
+    "level": "N5"
+  },
+  {
+    "position": 82,
+    "pattern": "がいる",
+    "level": "N5"
+  }
+]

@@ -1,0 +1,4189 @@
+[
+  {
+    "id": "N2_K001",
+    "kanji": "軍",
+    "meaning": "army; military",
+    "readings": [
+      "ぐん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K002",
+    "kanji": "兵",
+    "meaning": "soldier; troops",
+    "readings": [
+      "へい",
+      "ひょう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K003",
+    "kanji": "島",
+    "meaning": "island",
+    "readings": [
+      "とう",
+      "しま"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K004",
+    "kanji": "村",
+    "meaning": "village",
+    "readings": [
+      "そん",
+      "むら"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K005",
+    "kanji": "門",
+    "meaning": "gate; branch; field",
+    "readings": [
+      "もん",
+      "かど"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K006",
+    "kanji": "戸",
+    "meaning": "door; household",
+    "readings": [
+      "こ",
+      "と"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K007",
+    "kanji": "武",
+    "meaning": "military; warrior",
+    "readings": [
+      "ぶ",
+      "む"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K008",
+    "kanji": "城",
+    "meaning": "castle",
+    "readings": [
+      "じょう",
+      "しろ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K009",
+    "kanji": "総",
+    "meaning": "whole; general; total",
+    "readings": [
+      "そう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K010",
+    "kanji": "団",
+    "meaning": "group; association",
+    "readings": [
+      "だん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K011",
+    "kanji": "線",
+    "meaning": "line; track; wire",
+    "readings": [
+      "せん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K012",
+    "kanji": "設",
+    "meaning": "establish; set up",
+    "readings": [
+      "せつ",
+      "もうける"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K013",
+    "kanji": "勢",
+    "meaning": "force; power; condition",
+    "readings": [
+      "せい",
+      "いきおい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K014",
+    "kanji": "党",
+    "meaning": "party; faction",
+    "readings": [
+      "とう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K015",
+    "kanji": "史",
+    "meaning": "history",
+    "readings": [
+      "し"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K016",
+    "kanji": "営",
+    "meaning": "manage; operate; camp",
+    "readings": [
+      "えい",
+      "いとなむ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K017",
+    "kanji": "府",
+    "meaning": "urban prefecture; government office",
+    "readings": [
+      "ふ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K018",
+    "kanji": "巻",
+    "meaning": "roll; volume; wind",
+    "readings": [
+      "かん",
+      "まく",
+      "まき"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K019",
+    "kanji": "介",
+    "meaning": "mediate; assist; introduce",
+    "readings": [
+      "かい"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K020",
+    "kanji": "蔵",
+    "meaning": "storehouse; store; possess",
+    "readings": [
+      "ぞう",
+      "くら"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K021",
+    "kanji": "造",
+    "meaning": "make; build; create",
+    "readings": [
+      "ぞう",
+      "つくる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K022",
+    "kanji": "根",
+    "meaning": "root; basis",
+    "readings": [
+      "こん",
+      "ね"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K023",
+    "kanji": "寺",
+    "meaning": "Buddhist temple",
+    "readings": [
+      "じ",
+      "てら"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K024",
+    "kanji": "査",
+    "meaning": "investigate; inspect",
+    "readings": [
+      "さ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K025",
+    "kanji": "将",
+    "meaning": "commander; future; about to",
+    "readings": [
+      "しょう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K026",
+    "kanji": "改",
+    "meaning": "reform; revise; change",
+    "readings": [
+      "かい",
+      "あらためる",
+      "あらたまる"
+    ],
+    "level": "N2",
+    "compound_count": 5
+  },
+  {
+    "id": "N2_K027",
+    "kanji": "県",
+    "meaning": "prefecture",
+    "readings": [
+      "けん"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K028",
+    "kanji": "泉",
+    "meaning": "spring; fountain",
+    "readings": [
+      "せん",
+      "いずみ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K029",
+    "kanji": "像",
+    "meaning": "image; statue",
+    "readings": [
+      "ぞう"
+    ],
+    "level": "N2",
+    "compound_count": 4
+  },
+  {
+    "id": "N2_K030",
+    "kanji": "細",
+    "meaning": "thin; fine; detailed",
+    "readings": [
+      "さい",
+      "ほそい",
+      "ほそる",
+      "こまか",
+      "こまかい"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K031",
+    "kanji": "谷",
+    "meaning": "valley",
+    "readings": [
+      "こく",
+      "たに"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K032",
+    "kanji": "奥",
+    "meaning": "interior; inner part",
+    "readings": [
+      "おう",
+      "おく"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K033",
+    "kanji": "再",
+    "meaning": "again; re-",
+    "readings": [
+      "さい",
+      "ふたたび"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K034",
+    "kanji": "血",
+    "meaning": "blood",
+    "readings": [
+      "けつ",
+      "ち"
+    ],
+    "level": "N2",
+    "compound_count": 4
+  },
+  {
+    "id": "N2_K035",
+    "kanji": "算",
+    "meaning": "calculate; count",
+    "readings": [
+      "さん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K036",
+    "kanji": "象",
+    "meaning": "elephant; image; phenomenon",
+    "readings": [
+      "しょう",
+      "ぞう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K037",
+    "kanji": "清",
+    "meaning": "pure; clean",
+    "readings": [
+      "せい",
+      "きよい",
+      "きよまる",
+      "きよめる"
+    ],
+    "level": "N2",
+    "compound_count": 4
+  },
+  {
+    "id": "N2_K038",
+    "kanji": "技",
+    "meaning": "skill; technique",
+    "readings": [
+      "ぎ",
+      "わざ"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K039",
+    "kanji": "州",
+    "meaning": "state; province; sandbank",
+    "readings": [
+      "しゅう",
+      "す"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K040",
+    "kanji": "領",
+    "meaning": "territory; domain; receive",
+    "readings": [
+      "りょう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K041",
+    "kanji": "橋",
+    "meaning": "bridge",
+    "readings": [
+      "きょう",
+      "はし"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K042",
+    "kanji": "芸",
+    "meaning": "art; performance",
+    "readings": [
+      "げい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K043",
+    "kanji": "型",
+    "meaning": "type; model; mold",
+    "readings": [
+      "けい",
+      "かた"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K044",
+    "kanji": "香",
+    "meaning": "fragrance; incense",
+    "readings": [
+      "こう",
+      "か",
+      "かおり",
+      "かおる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K045",
+    "kanji": "量",
+    "meaning": "quantity; measure",
+    "readings": [
+      "りょう",
+      "はかる"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K046",
+    "kanji": "久",
+    "meaning": "long time",
+    "readings": [
+      "きゅう",
+      "ひさしい"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K047",
+    "kanji": "境",
+    "meaning": "boundary; border; situation",
+    "readings": [
+      "きょう",
+      "さかい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K048",
+    "kanji": "階",
+    "meaning": "floor; level; rank",
+    "readings": [
+      "かい"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K049",
+    "kanji": "区",
+    "meaning": "district; ward; divide",
+    "readings": [
+      "く"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K050",
+    "kanji": "波",
+    "meaning": "wave",
+    "readings": [
+      "は",
+      "なみ"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K051",
+    "kanji": "移",
+    "meaning": "move; transfer",
+    "readings": [
+      "い",
+      "うつる",
+      "うつす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K052",
+    "kanji": "域",
+    "meaning": "area; region",
+    "readings": [
+      "いき"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K053",
+    "kanji": "周",
+    "meaning": "circumference; around",
+    "readings": [
+      "しゅう",
+      "まわり"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K054",
+    "kanji": "接",
+    "meaning": "contact; connect",
+    "readings": [
+      "せつ",
+      "つぐ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K055",
+    "kanji": "鉄",
+    "meaning": "iron; railway",
+    "readings": [
+      "てつ"
+    ],
+    "level": "N2",
+    "compound_count": 4
+  },
+  {
+    "id": "N2_K056",
+    "kanji": "頃",
+    "meaning": "around; about; time",
+    "readings": [
+      "ころ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K057",
+    "kanji": "材",
+    "meaning": "material; timber; talent",
+    "readings": [
+      "ざい"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K058",
+    "kanji": "個",
+    "meaning": "individual; counter for items",
+    "readings": [
+      "こ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K059",
+    "kanji": "協",
+    "meaning": "cooperate; cooperation",
+    "readings": [
+      "きょう"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K060",
+    "kanji": "各",
+    "meaning": "each; every",
+    "readings": [
+      "かく",
+      "おのおの"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K061",
+    "kanji": "帯",
+    "meaning": "belt; zone; carry",
+    "readings": [
+      "たい",
+      "おびる",
+      "おび"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K062",
+    "kanji": "歴",
+    "meaning": "history; career",
+    "readings": [
+      "れき"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K063",
+    "kanji": "編",
+    "meaning": "compile; edit; knit",
+    "readings": [
+      "へん",
+      "あむ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K064",
+    "kanji": "裏",
+    "meaning": "back; reverse; inside",
+    "readings": [
+      "り",
+      "うら"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K065",
+    "kanji": "比",
+    "meaning": "compare; ratio",
+    "readings": [
+      "ひ",
+      "くらべる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K066",
+    "kanji": "坂",
+    "meaning": "slope; hill",
+    "readings": [
+      "はん",
+      "さか"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K067",
+    "kanji": "装",
+    "meaning": "dress; equip; attire",
+    "readings": [
+      "そう",
+      "しょう",
+      "よそおう"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K068",
+    "kanji": "省",
+    "meaning": "ministry; omit; reflect",
+    "readings": [
+      "せい",
+      "しょう",
+      "かえりみる",
+      "はぶく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K069",
+    "kanji": "税",
+    "meaning": "tax",
+    "readings": [
+      "ぜい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K070",
+    "kanji": "競",
+    "meaning": "compete",
+    "readings": [
+      "きょう",
+      "けい",
+      "きそう",
+      "せる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K071",
+    "kanji": "囲",
+    "meaning": "surround; enclose",
+    "readings": [
+      "い",
+      "かこむ",
+      "かこう"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K072",
+    "kanji": "辺",
+    "meaning": "area; vicinity; side",
+    "readings": [
+      "へん",
+      "あたり",
+      "べ"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K073",
+    "kanji": "河",
+    "meaning": "river",
+    "readings": [
+      "か",
+      "かわ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K074",
+    "kanji": "極",
+    "meaning": "extreme; pole",
+    "readings": [
+      "きょく",
+      "ごく",
+      "きわめる",
+      "きわまる",
+      "きわみ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K075",
+    "kanji": "防",
+    "meaning": "prevent; defend",
+    "readings": [
+      "ぼう",
+      "ふせぐ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K076",
+    "kanji": "低",
+    "meaning": "low",
+    "readings": [
+      "てい",
+      "ひくい",
+      "ひくめる",
+      "ひくまる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K077",
+    "kanji": "林",
+    "meaning": "woods; grove",
+    "readings": [
+      "りん",
+      "はやし"
+    ],
+    "level": "N2",
+    "compound_count": 4
+  },
+  {
+    "id": "N2_K078",
+    "kanji": "導",
+    "meaning": "guide; lead",
+    "readings": [
+      "どう",
+      "みちびく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K079",
+    "kanji": "森",
+    "meaning": "forest",
+    "readings": [
+      "しん",
+      "もり"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K080",
+    "kanji": "丸",
+    "meaning": "circle; round; whole",
+    "readings": [
+      "がん",
+      "まる",
+      "まるい",
+      "まるめる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K081",
+    "kanji": "胸",
+    "meaning": "chest; heart",
+    "readings": [
+      "きょう",
+      "むね"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K082",
+    "kanji": "陸",
+    "meaning": "land",
+    "readings": [
+      "りく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K083",
+    "kanji": "療",
+    "meaning": "heal; treatment",
+    "readings": [
+      "りょう"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K084",
+    "kanji": "諸",
+    "meaning": "various; many",
+    "readings": [
+      "しょ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K085",
+    "kanji": "管",
+    "meaning": "pipe; manage; control",
+    "readings": [
+      "かん",
+      "くだ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K086",
+    "kanji": "仲",
+    "meaning": "relationship; intermediary",
+    "readings": [
+      "ちゅう",
+      "なか"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K087",
+    "kanji": "革",
+    "meaning": "leather; reform",
+    "readings": [
+      "かく",
+      "かわ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K088",
+    "kanji": "担",
+    "meaning": "carry; bear; take charge",
+    "readings": [
+      "たん",
+      "かつぐ",
+      "になう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K089",
+    "kanji": "効",
+    "meaning": "effect; efficiency",
+    "readings": [
+      "こう",
+      "きく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K090",
+    "kanji": "賞",
+    "meaning": "prize; reward; praise",
+    "readings": [
+      "しょう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K091",
+    "kanji": "星",
+    "meaning": "star",
+    "readings": [
+      "せい",
+      "ほし"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K092",
+    "kanji": "復",
+    "meaning": "return; restore; repeat",
+    "readings": [
+      "ふく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K093",
+    "kanji": "片",
+    "meaning": "one side; fragment",
+    "readings": [
+      "へん",
+      "かた"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K094",
+    "kanji": "並",
+    "meaning": "line up; ordinary",
+    "readings": [
+      "へい",
+      "なみ",
+      "ならべる",
+      "ならぶ",
+      "ならびに"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K095",
+    "kanji": "底",
+    "meaning": "bottom",
+    "readings": [
+      "てい",
+      "そこ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K096",
+    "kanji": "温",
+    "meaning": "warm; temperature",
+    "readings": [
+      "おん",
+      "あたたか",
+      "あたたかい",
+      "あたたまる",
+      "あたためる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K097",
+    "kanji": "軽",
+    "meaning": "light; slight",
+    "readings": [
+      "けい",
+      "かるい",
+      "かろやか"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K098",
+    "kanji": "録",
+    "meaning": "record",
+    "readings": [
+      "ろく"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K099",
+    "kanji": "腰",
+    "meaning": "waist; lower back",
+    "readings": [
+      "よう",
+      "こし"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K100",
+    "kanji": "著",
+    "meaning": "write; notable; remarkable",
+    "readings": [
+      "ちょ",
+      "あらわす",
+      "いちじるしい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K101",
+    "kanji": "乱",
+    "meaning": "disorder; disturb",
+    "readings": [
+      "らん",
+      "みだれる",
+      "みだす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K102",
+    "kanji": "章",
+    "meaning": "chapter; badge",
+    "readings": [
+      "しょう"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K103",
+    "kanji": "殿",
+    "meaning": "palace; lord; hall",
+    "readings": [
+      "でん",
+      "てん",
+      "との",
+      "どの"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K104",
+    "kanji": "布",
+    "meaning": "cloth; spread",
+    "readings": [
+      "ふ",
+      "ぬの"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K105",
+    "kanji": "角",
+    "meaning": "angle; corner; horn",
+    "readings": [
+      "かく",
+      "かど",
+      "つの"
+    ],
+    "level": "N2",
+    "compound_count": 4
+  },
+  {
+    "id": "N2_K106",
+    "kanji": "仏",
+    "meaning": "Buddha; France",
+    "readings": [
+      "ぶつ",
+      "ほとけ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K107",
+    "kanji": "永",
+    "meaning": "eternal; long",
+    "readings": [
+      "えい",
+      "ながい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K108",
+    "kanji": "誌",
+    "meaning": "magazine; record",
+    "readings": [
+      "し"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K109",
+    "kanji": "減",
+    "meaning": "decrease; reduce",
+    "readings": [
+      "げん",
+      "へる",
+      "へらす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K110",
+    "kanji": "略",
+    "meaning": "abbreviate; omit; strategy",
+    "readings": [
+      "りゃく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K111",
+    "kanji": "準",
+    "meaning": "standard; semi-; prepare",
+    "readings": [
+      "じゅん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K112",
+    "kanji": "委",
+    "meaning": "committee; entrust",
+    "readings": [
+      "い",
+      "ゆだねる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K113",
+    "kanji": "令",
+    "meaning": "order; command",
+    "readings": [
+      "れい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K114",
+    "kanji": "刊",
+    "meaning": "publish; edition",
+    "readings": [
+      "かん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K115",
+    "kanji": "焼",
+    "meaning": "burn; bake",
+    "readings": [
+      "しょう",
+      "やく",
+      "やける"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K116",
+    "kanji": "里",
+    "meaning": "village; hometown; ri",
+    "readings": [
+      "り",
+      "さと"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K117",
+    "kanji": "圧",
+    "meaning": "pressure; press",
+    "readings": [
+      "あつ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K118",
+    "kanji": "額",
+    "meaning": "amount; forehead; frame",
+    "readings": [
+      "がく",
+      "ひたい"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K119",
+    "kanji": "印",
+    "meaning": "mark; seal; print",
+    "readings": [
+      "いん",
+      "しるし"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K120",
+    "kanji": "池",
+    "meaning": "pond",
+    "readings": [
+      "ち",
+      "いけ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K121",
+    "kanji": "臣",
+    "meaning": "retainer; minister",
+    "readings": [
+      "しん",
+      "じん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K122",
+    "kanji": "庫",
+    "meaning": "warehouse; storage",
+    "readings": [
+      "こ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K123",
+    "kanji": "農",
+    "meaning": "agriculture; farming",
+    "readings": [
+      "のう"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K124",
+    "kanji": "板",
+    "meaning": "board; plank; plate",
+    "readings": [
+      "はん",
+      "ばん",
+      "いた"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K125",
+    "kanji": "恋",
+    "meaning": "romance; love",
+    "readings": [
+      "れん",
+      "こう",
+      "こい",
+      "こいしい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K126",
+    "kanji": "羽",
+    "meaning": "feather; wing; counter for birds",
+    "readings": [
+      "う",
+      "は",
+      "はね"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K127",
+    "kanji": "専",
+    "meaning": "specialty; exclusive",
+    "readings": [
+      "せん",
+      "もっぱら"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K128",
+    "kanji": "逆",
+    "meaning": "reverse; opposite",
+    "readings": [
+      "ぎゃく",
+      "さか",
+      "さからう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K129",
+    "kanji": "腕",
+    "meaning": "arm; ability",
+    "readings": [
+      "わん",
+      "うで"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K130",
+    "kanji": "短",
+    "meaning": "short; defect",
+    "readings": [
+      "たん",
+      "みじかい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K131",
+    "kanji": "普",
+    "meaning": "universal; general",
+    "readings": [
+      "ふ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K132",
+    "kanji": "岩",
+    "meaning": "rock; boulder",
+    "readings": [
+      "がん",
+      "いわ"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K133",
+    "kanji": "竹",
+    "meaning": "bamboo",
+    "readings": [
+      "ちく",
+      "たけ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K134",
+    "kanji": "児",
+    "meaning": "child",
+    "readings": [
+      "じ"
+    ],
+    "level": "N2",
+    "compound_count": 4
+  },
+  {
+    "id": "N2_K135",
+    "kanji": "毛",
+    "meaning": "hair; fur",
+    "readings": [
+      "もう",
+      "け"
+    ],
+    "level": "N2",
+    "compound_count": 6
+  },
+  {
+    "id": "N2_K136",
+    "kanji": "版",
+    "meaning": "printing plate; edition",
+    "readings": [
+      "はん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K137",
+    "kanji": "宇",
+    "meaning": "eaves; universe; space",
+    "readings": [
+      "う"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K138",
+    "kanji": "況",
+    "meaning": "condition; situation",
+    "readings": [
+      "きょう"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K139",
+    "kanji": "被",
+    "meaning": "suffer; be subjected to; cover",
+    "readings": [
+      "ひ",
+      "こうむる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K140",
+    "kanji": "岸",
+    "meaning": "shore; coast",
+    "readings": [
+      "がん",
+      "きし"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K141",
+    "kanji": "超",
+    "meaning": "exceed; super-",
+    "readings": [
+      "ちょう",
+      "こえる",
+      "こす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K142",
+    "kanji": "豊",
+    "meaning": "abundant; rich",
+    "readings": [
+      "ほう",
+      "ゆたか"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K143",
+    "kanji": "含",
+    "meaning": "include; contain",
+    "readings": [
+      "がん",
+      "ふくむ",
+      "ふくめる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K144",
+    "kanji": "植",
+    "meaning": "plant",
+    "readings": [
+      "しょく",
+      "うえる",
+      "うわる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K145",
+    "kanji": "補",
+    "meaning": "supplement; compensate; candidate",
+    "readings": [
+      "ほ",
+      "おぎなう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K146",
+    "kanji": "暴",
+    "meaning": "violent; expose",
+    "readings": [
+      "ぼう",
+      "あばく",
+      "あばれる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K147",
+    "kanji": "課",
+    "meaning": "section; lesson; task",
+    "readings": [
+      "か"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K148",
+    "kanji": "跡",
+    "meaning": "trace; remains; track",
+    "readings": [
+      "せき",
+      "あと"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K149",
+    "kanji": "触",
+    "meaning": "touch; contact",
+    "readings": [
+      "しょく",
+      "ふれる",
+      "さわる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K150",
+    "kanji": "玉",
+    "meaning": "jewel; ball",
+    "readings": [
+      "ぎょく",
+      "たま"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K151",
+    "kanji": "震",
+    "meaning": "quake; shake",
+    "readings": [
+      "しん",
+      "ふるう",
+      "ふるえる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K152",
+    "kanji": "億",
+    "meaning": "hundred million",
+    "readings": [
+      "おく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K153",
+    "kanji": "肩",
+    "meaning": "shoulder",
+    "readings": [
+      "けん",
+      "かた"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K154",
+    "kanji": "劇",
+    "meaning": "drama; intense",
+    "readings": [
+      "げき"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K155",
+    "kanji": "刺",
+    "meaning": "stab; thorn; calling card",
+    "readings": [
+      "し",
+      "さす",
+      "ささる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K156",
+    "kanji": "述",
+    "meaning": "state; mention",
+    "readings": [
+      "じゅつ",
+      "のべる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K157",
+    "kanji": "輪",
+    "meaning": "wheel; ring",
+    "readings": [
+      "りん",
+      "わ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K158",
+    "kanji": "浅",
+    "meaning": "shallow",
+    "readings": [
+      "せん",
+      "あさい"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K159",
+    "kanji": "純",
+    "meaning": "pure; genuine",
+    "readings": [
+      "じゅん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K160",
+    "kanji": "薄",
+    "meaning": "thin; weak; pale",
+    "readings": [
+      "はく",
+      "うすい",
+      "うすめる",
+      "うすまる",
+      "うすらぐ",
+      "うすれる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K161",
+    "kanji": "阪",
+    "meaning": "slope; Osaka",
+    "readings": [
+      "はん"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K162",
+    "kanji": "韓",
+    "meaning": "Korea",
+    "readings": [
+      "かん"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K163",
+    "kanji": "固",
+    "meaning": "hard; firm; solid",
+    "readings": [
+      "こ",
+      "かためる",
+      "かたまる",
+      "かたい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K164",
+    "kanji": "巨",
+    "meaning": "gigantic; huge",
+    "readings": [
+      "きょ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K165",
+    "kanji": "講",
+    "meaning": "lecture; explain",
+    "readings": [
+      "こう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K166",
+    "kanji": "般",
+    "meaning": "general; sort",
+    "readings": [
+      "はん"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K167",
+    "kanji": "湯",
+    "meaning": "hot water; bath",
+    "readings": [
+      "とう",
+      "ゆ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K168",
+    "kanji": "捨",
+    "meaning": "discard; throw away",
+    "readings": [
+      "しゃ",
+      "すてる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K169",
+    "kanji": "衣",
+    "meaning": "clothing; garment",
+    "readings": [
+      "い",
+      "ころも"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K170",
+    "kanji": "替",
+    "meaning": "replace; exchange",
+    "readings": [
+      "たい",
+      "かえる",
+      "かわる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K171",
+    "kanji": "央",
+    "meaning": "center; middle",
+    "readings": [
+      "おう"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K172",
+    "kanji": "骨",
+    "meaning": "bone",
+    "readings": [
+      "こつ",
+      "ほね"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K173",
+    "kanji": "齢",
+    "meaning": "age",
+    "readings": [
+      "れい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K174",
+    "kanji": "照",
+    "meaning": "shine; illuminate; compare",
+    "readings": [
+      "しょう",
+      "てる",
+      "てらす",
+      "てれる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K175",
+    "kanji": "層",
+    "meaning": "layer; stratum",
+    "readings": [
+      "そう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K176",
+    "kanji": "弱",
+    "meaning": "weak",
+    "readings": [
+      "じゃく",
+      "よわい",
+      "よわる",
+      "よわまる",
+      "よわめる"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K177",
+    "kanji": "築",
+    "meaning": "build; construct",
+    "readings": [
+      "ちく",
+      "きずく"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K178",
+    "kanji": "脳",
+    "meaning": "brain",
+    "readings": [
+      "のう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K179",
+    "kanji": "航",
+    "meaning": "navigate; voyage",
+    "readings": [
+      "こう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K180",
+    "kanji": "快",
+    "meaning": "pleasant; cheerful; rapid",
+    "readings": [
+      "かい",
+      "こころよい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K181",
+    "kanji": "翌",
+    "meaning": "next; following",
+    "readings": [
+      "よく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K182",
+    "kanji": "旧",
+    "meaning": "old; former",
+    "readings": [
+      "きゅう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K183",
+    "kanji": "筆",
+    "meaning": "writing brush; writing",
+    "readings": [
+      "ひつ",
+      "ふで"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K184",
+    "kanji": "換",
+    "meaning": "exchange; replace",
+    "readings": [
+      "かん",
+      "かえる",
+      "かわる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K185",
+    "kanji": "群",
+    "meaning": "group; flock",
+    "readings": [
+      "ぐん",
+      "むれる",
+      "むれ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K186",
+    "kanji": "爆",
+    "meaning": "explode; bomb",
+    "readings": [
+      "ばく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K187",
+    "kanji": "捜",
+    "meaning": "search; investigate",
+    "readings": [
+      "そう",
+      "さがす"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K188",
+    "kanji": "油",
+    "meaning": "oil",
+    "readings": [
+      "ゆ",
+      "あぶら"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K189",
+    "kanji": "叫",
+    "meaning": "shout; cry out",
+    "readings": [
+      "きょう",
+      "さけぶ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K190",
+    "kanji": "伸",
+    "meaning": "stretch; extend",
+    "readings": [
+      "しん",
+      "のびる",
+      "のばす",
+      "のべる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K191",
+    "kanji": "承",
+    "meaning": "consent; receive; acknowledge",
+    "readings": [
+      "しょう",
+      "うけたまわる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K192",
+    "kanji": "雲",
+    "meaning": "cloud",
+    "readings": [
+      "うん",
+      "くも"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K193",
+    "kanji": "練",
+    "meaning": "practice; train; refine",
+    "readings": [
+      "れん",
+      "ねる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K194",
+    "kanji": "紹",
+    "meaning": "introduce",
+    "readings": [
+      "しょう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K195",
+    "kanji": "包",
+    "meaning": "wrap; enclose; include",
+    "readings": [
+      "ほう",
+      "つつむ"
+    ],
+    "level": "N2",
+    "compound_count": 4
+  },
+  {
+    "id": "N2_K196",
+    "kanji": "庁",
+    "meaning": "government office; agency",
+    "readings": [
+      "ちょう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K197",
+    "kanji": "測",
+    "meaning": "measure; estimate",
+    "readings": [
+      "そく",
+      "はかる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K198",
+    "kanji": "占",
+    "meaning": "occupy; hold; fortune-tell",
+    "readings": [
+      "せん",
+      "しめる",
+      "うらなう"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K199",
+    "kanji": "混",
+    "meaning": "mix; blend; crowded",
+    "readings": [
+      "こん",
+      "まじる",
+      "まざる",
+      "まぜる",
+      "こむ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K200",
+    "kanji": "倍",
+    "meaning": "double; times",
+    "readings": [
+      "ばい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K201",
+    "kanji": "乳",
+    "meaning": "milk; breast",
+    "readings": [
+      "にゅう",
+      "ちち",
+      "ち"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K202",
+    "kanji": "荒",
+    "meaning": "rough; wild; desolate",
+    "readings": [
+      "こう",
+      "あらい",
+      "あれる",
+      "あらす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K203",
+    "kanji": "詰",
+    "meaning": "pack; fill; question closely",
+    "readings": [
+      "きつ",
+      "つめる",
+      "つまる",
+      "つむ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K204",
+    "kanji": "栄",
+    "meaning": "prosper; glory",
+    "readings": [
+      "えい",
+      "さかえる",
+      "はえ",
+      "はえる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K205",
+    "kanji": "床",
+    "meaning": "floor; bed",
+    "readings": [
+      "しょう",
+      "とこ",
+      "ゆか"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K206",
+    "kanji": "則",
+    "meaning": "rule; principle",
+    "readings": [
+      "そく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K207",
+    "kanji": "禁",
+    "meaning": "prohibit; ban",
+    "readings": [
+      "きん"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K208",
+    "kanji": "順",
+    "meaning": "order; obey",
+    "readings": [
+      "じゅん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K209",
+    "kanji": "枚",
+    "meaning": "counter for flat objects",
+    "readings": [
+      "まい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K210",
+    "kanji": "厚",
+    "meaning": "thick; kind",
+    "readings": [
+      "こう",
+      "あつい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K211",
+    "kanji": "皮",
+    "meaning": "skin; hide",
+    "readings": [
+      "ひ",
+      "かわ"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K212",
+    "kanji": "輸",
+    "meaning": "transport; import/export",
+    "readings": [
+      "ゆ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K213",
+    "kanji": "濃",
+    "meaning": "thick; concentrated",
+    "readings": [
+      "のう",
+      "こい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K214",
+    "kanji": "簡",
+    "meaning": "simple; brief",
+    "readings": [
+      "かん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K215",
+    "kanji": "孫",
+    "meaning": "grandchild; descendant",
+    "readings": [
+      "そん",
+      "まご"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K216",
+    "kanji": "丈",
+    "meaning": "length; sturdy",
+    "readings": [
+      "じょう",
+      "たけ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K217",
+    "kanji": "黄",
+    "meaning": "yellow",
+    "readings": [
+      "こう",
+      "おう",
+      "き"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K218",
+    "kanji": "届",
+    "meaning": "deliver; reach; report",
+    "readings": [
+      "とどける",
+      "とどく"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K219",
+    "kanji": "絡",
+    "meaning": "entangle; contact",
+    "readings": [
+      "らく",
+      "からむ",
+      "からまる",
+      "からめる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K220",
+    "kanji": "採",
+    "meaning": "gather; adopt",
+    "readings": [
+      "さい",
+      "とる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K221",
+    "kanji": "傾",
+    "meaning": "incline; lean; tendency",
+    "readings": [
+      "けい",
+      "かたむく",
+      "かたむける"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K222",
+    "kanji": "鼻",
+    "meaning": "nose",
+    "readings": [
+      "び",
+      "はな"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K223",
+    "kanji": "宝",
+    "meaning": "treasure",
+    "readings": [
+      "ほう",
+      "たから"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K224",
+    "kanji": "患",
+    "meaning": "suffer; patient",
+    "readings": [
+      "かん",
+      "わずらう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K225",
+    "kanji": "延",
+    "meaning": "extend; postpone",
+    "readings": [
+      "えん",
+      "のびる",
+      "のべる",
+      "のばす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K226",
+    "kanji": "律",
+    "meaning": "law; rhythm",
+    "readings": [
+      "りつ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K227",
+    "kanji": "希",
+    "meaning": "hope; rare",
+    "readings": [
+      "き"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K228",
+    "kanji": "甘",
+    "meaning": "sweet; indulgent; lenient",
+    "readings": [
+      "かん",
+      "あまい",
+      "あまえる",
+      "あまやかす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K229",
+    "kanji": "湾",
+    "meaning": "bay; gulf",
+    "readings": [
+      "わん"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K230",
+    "kanji": "沈",
+    "meaning": "sink; submerge; be depressed",
+    "readings": [
+      "ちん",
+      "しずむ",
+      "しずめる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K231",
+    "kanji": "販",
+    "meaning": "sell; marketing",
+    "readings": [
+      "はん"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K232",
+    "kanji": "欧",
+    "meaning": "Europe",
+    "readings": [
+      "おう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K233",
+    "kanji": "砂",
+    "meaning": "sand",
+    "readings": [
+      "さ",
+      "しゃ",
+      "すな"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K234",
+    "kanji": "尊",
+    "meaning": "respect; noble",
+    "readings": [
+      "そん",
+      "たっとい",
+      "とうとい",
+      "たっとぶ",
+      "とうとぶ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K235",
+    "kanji": "紅",
+    "meaning": "crimson; red",
+    "readings": [
+      "こう",
+      "べに",
+      "くれない"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K236",
+    "kanji": "複",
+    "meaning": "duplicate; compound",
+    "readings": [
+      "ふく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K237",
+    "kanji": "泊",
+    "meaning": "stay overnight",
+    "readings": [
+      "はく",
+      "とまる",
+      "とめる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K238",
+    "kanji": "荷",
+    "meaning": "load; baggage",
+    "readings": [
+      "か",
+      "に"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K239",
+    "kanji": "枝",
+    "meaning": "branch; twig",
+    "readings": [
+      "し",
+      "えだ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K240",
+    "kanji": "依",
+    "meaning": "depend; rely",
+    "readings": [
+      "い"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K241",
+    "kanji": "幼",
+    "meaning": "young; early childhood; immature",
+    "readings": [
+      "よう",
+      "おさない"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K242",
+    "kanji": "斬",
+    "meaning": "cut; behead",
+    "readings": [
+      "ざん",
+      "きる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K243",
+    "kanji": "勇",
+    "meaning": "courage; brave",
+    "readings": [
+      "ゆう",
+      "いさむ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K244",
+    "kanji": "昇",
+    "meaning": "rise; ascend",
+    "readings": [
+      "しょう",
+      "のぼる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K245",
+    "kanji": "寿",
+    "meaning": "longevity; congratulations",
+    "readings": [
+      "じゅ",
+      "ことぶき"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K246",
+    "kanji": "菜",
+    "meaning": "vegetable; greens",
+    "readings": [
+      "さい",
+      "な"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K247",
+    "kanji": "季",
+    "meaning": "season",
+    "readings": [
+      "き"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K248",
+    "kanji": "液",
+    "meaning": "liquid",
+    "readings": [
+      "えき"
+    ],
+    "level": "N2",
+    "compound_count": 4
+  },
+  {
+    "id": "N2_K249",
+    "kanji": "券",
+    "meaning": "ticket; certificate",
+    "readings": [
+      "けん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K250",
+    "kanji": "祭",
+    "meaning": "festival; worship",
+    "readings": [
+      "さい",
+      "まつる",
+      "まつり"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K251",
+    "kanji": "袋",
+    "meaning": "bag; sack",
+    "readings": [
+      "たい",
+      "ふくろ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K252",
+    "kanji": "燃",
+    "meaning": "burn; combust; fuel",
+    "readings": [
+      "ねん",
+      "もえる",
+      "もやす",
+      "もす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K253",
+    "kanji": "毒",
+    "meaning": "poison",
+    "readings": [
+      "どく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K254",
+    "kanji": "札",
+    "meaning": "bill; tag; card",
+    "readings": [
+      "さつ",
+      "ふだ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K255",
+    "kanji": "狙",
+    "meaning": "aim at; target",
+    "readings": [
+      "そ",
+      "ねらう"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K256",
+    "kanji": "脇",
+    "meaning": "side; armpit",
+    "readings": [
+      "わき"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K257",
+    "kanji": "卒",
+    "meaning": "graduate; soldier",
+    "readings": [
+      "そつ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K258",
+    "kanji": "副",
+    "meaning": "vice-; secondary; copy",
+    "readings": [
+      "ふく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K259",
+    "kanji": "敬",
+    "meaning": "respect",
+    "readings": [
+      "けい",
+      "うやまう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K260",
+    "kanji": "針",
+    "meaning": "needle; pointer",
+    "readings": [
+      "しん",
+      "はり"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K261",
+    "kanji": "拝",
+    "meaning": "worship; humbly see",
+    "readings": [
+      "はい",
+      "おがむ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K262",
+    "kanji": "浴",
+    "meaning": "bathe",
+    "readings": [
+      "よく",
+      "あびる",
+      "あびせる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K263",
+    "kanji": "悩",
+    "meaning": "worry; trouble",
+    "readings": [
+      "のう",
+      "なやむ",
+      "なやます"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K264",
+    "kanji": "汚",
+    "meaning": "dirty; pollute",
+    "readings": [
+      "お",
+      "けがす",
+      "けがれる",
+      "けがらわしい",
+      "よごす",
+      "よごれる",
+      "きたない"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K265",
+    "kanji": "灯",
+    "meaning": "lamp; light",
+    "readings": [
+      "とう",
+      "ひ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K266",
+    "kanji": "坊",
+    "meaning": "boy; Buddhist monk; priest",
+    "readings": [
+      "ぼう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K267",
+    "kanji": "尻",
+    "meaning": "buttocks; rear",
+    "readings": [
+      "しり"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K268",
+    "kanji": "涙",
+    "meaning": "tear",
+    "readings": [
+      "るい",
+      "なみだ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K269",
+    "kanji": "停",
+    "meaning": "stop; halt",
+    "readings": [
+      "てい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K270",
+    "kanji": "了",
+    "meaning": "finish; understand",
+    "readings": [
+      "りょう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K271",
+    "kanji": "汗",
+    "meaning": "sweat",
+    "readings": [
+      "かん",
+      "あせ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K272",
+    "kanji": "郵",
+    "meaning": "mail; postal",
+    "readings": [
+      "ゆう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K273",
+    "kanji": "幅",
+    "meaning": "width; breadth; range",
+    "readings": [
+      "ふく",
+      "はば"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K274",
+    "kanji": "童",
+    "meaning": "child",
+    "readings": [
+      "どう",
+      "わらべ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K275",
+    "kanji": "虫",
+    "meaning": "insect",
+    "readings": [
+      "ちゅう",
+      "むし"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K276",
+    "kanji": "埋",
+    "meaning": "bury; fill",
+    "readings": [
+      "まい",
+      "うめる",
+      "うまる",
+      "うもれる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K277",
+    "kanji": "舟",
+    "meaning": "boat",
+    "readings": [
+      "しゅう",
+      "ふね"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K278",
+    "kanji": "闇",
+    "meaning": "darkness",
+    "readings": [
+      "やみ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K279",
+    "kanji": "棒",
+    "meaning": "stick; rod",
+    "readings": [
+      "ぼう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K280",
+    "kanji": "貨",
+    "meaning": "goods; money",
+    "readings": [
+      "か"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K281",
+    "kanji": "肌",
+    "meaning": "skin",
+    "readings": [
+      "はだ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K282",
+    "kanji": "臓",
+    "meaning": "internal organ",
+    "readings": [
+      "ぞう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K283",
+    "kanji": "塩",
+    "meaning": "salt",
+    "readings": [
+      "えん",
+      "しお"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K284",
+    "kanji": "均",
+    "meaning": "equal; average",
+    "readings": [
+      "きん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K285",
+    "kanji": "湖",
+    "meaning": "lake",
+    "readings": [
+      "こ",
+      "みずうみ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K286",
+    "kanji": "損",
+    "meaning": "loss; damage",
+    "readings": [
+      "そん",
+      "そこなう",
+      "そこねる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K287",
+    "kanji": "膝",
+    "meaning": "knee",
+    "readings": [
+      "ひざ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K288",
+    "kanji": "辛",
+    "meaning": "spicy; bitter; painful",
+    "readings": [
+      "しん",
+      "からい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K289",
+    "kanji": "双",
+    "meaning": "pair; twin",
+    "readings": [
+      "そう",
+      "ふた"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K290",
+    "kanji": "軒",
+    "meaning": "eaves; counter for houses",
+    "readings": [
+      "けん",
+      "のき"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K291",
+    "kanji": "績",
+    "meaning": "achievement; result",
+    "readings": [
+      "せき"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K292",
+    "kanji": "干",
+    "meaning": "dry; interfere",
+    "readings": [
+      "かん",
+      "ほす",
+      "ひる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K293",
+    "kanji": "姓",
+    "meaning": "surname",
+    "readings": [
+      "せい",
+      "しょう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K294",
+    "kanji": "掘",
+    "meaning": "dig",
+    "readings": [
+      "くつ",
+      "ほる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K295",
+    "kanji": "籍",
+    "meaning": "register; membership; record",
+    "readings": [
+      "せき"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K296",
+    "kanji": "珍",
+    "meaning": "rare; unusual",
+    "readings": [
+      "ちん",
+      "めずらしい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K297",
+    "kanji": "訓",
+    "meaning": "instruction; reading; lesson",
+    "readings": [
+      "くん"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K298",
+    "kanji": "預",
+    "meaning": "deposit; entrust",
+    "readings": [
+      "よ",
+      "あずける",
+      "あずかる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K299",
+    "kanji": "署",
+    "meaning": "government office; signature",
+    "readings": [
+      "しょ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K300",
+    "kanji": "漁",
+    "meaning": "fishing",
+    "readings": [
+      "ぎょ",
+      "りょう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K301",
+    "kanji": "緑",
+    "meaning": "green",
+    "readings": [
+      "りょく",
+      "みどり"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K302",
+    "kanji": "畳",
+    "meaning": "tatami; fold",
+    "readings": [
+      "じょう",
+      "たたむ",
+      "たたみ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K303",
+    "kanji": "咲",
+    "meaning": "bloom",
+    "readings": [
+      "さく"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K304",
+    "kanji": "貿",
+    "meaning": "trade",
+    "readings": [
+      "ぼう"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K305",
+    "kanji": "踊",
+    "meaning": "dance",
+    "readings": [
+      "よう",
+      "おどる",
+      "おどり"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K306",
+    "kanji": "封",
+    "meaning": "seal; close",
+    "readings": [
+      "ふう",
+      "ほう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K307",
+    "kanji": "兆",
+    "meaning": "sign; trillion",
+    "readings": [
+      "ちょう",
+      "きざす",
+      "きざし"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K308",
+    "kanji": "柱",
+    "meaning": "pillar; column",
+    "readings": [
+      "ちゅう",
+      "はしら"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K309",
+    "kanji": "駐",
+    "meaning": "station; be stationed; reside",
+    "readings": [
+      "ちゅう"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K310",
+    "kanji": "祝",
+    "meaning": "celebrate",
+    "readings": [
+      "しゅく",
+      "いわう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K311",
+    "kanji": "炭",
+    "meaning": "charcoal; coal",
+    "readings": [
+      "たん",
+      "すみ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K312",
+    "kanji": "柔",
+    "meaning": "soft; gentle; flexible",
+    "readings": [
+      "じゅう",
+      "にゅう",
+      "やわらか",
+      "やわらかい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K313",
+    "kanji": "雇",
+    "meaning": "employ; hire",
+    "readings": [
+      "こ",
+      "やとう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K314",
+    "kanji": "乾",
+    "meaning": "dry; heaven",
+    "readings": [
+      "かん",
+      "かわく",
+      "かわかす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K315",
+    "kanji": "鋭",
+    "meaning": "sharp; acute",
+    "readings": [
+      "えい",
+      "するどい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K316",
+    "kanji": "氷",
+    "meaning": "ice",
+    "readings": [
+      "ひょう",
+      "こおり",
+      "ひ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K317",
+    "kanji": "隅",
+    "meaning": "corner",
+    "readings": [
+      "ぐう",
+      "すみ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K318",
+    "kanji": "冊",
+    "meaning": "counter for books; volume",
+    "readings": [
+      "さつ",
+      "さく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K319",
+    "kanji": "糸",
+    "meaning": "thread",
+    "readings": [
+      "し",
+      "いと"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K320",
+    "kanji": "募",
+    "meaning": "recruit; collect",
+    "readings": [
+      "ぼ",
+      "つのる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K321",
+    "kanji": "硬",
+    "meaning": "hard; stiff",
+    "readings": [
+      "こう",
+      "かたい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K322",
+    "kanji": "塗",
+    "meaning": "paint; coat",
+    "readings": [
+      "と",
+      "ぬる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K323",
+    "kanji": "憎",
+    "meaning": "hate",
+    "readings": [
+      "ぞう",
+      "にくむ",
+      "にくい",
+      "にくらしい",
+      "にくしみ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K324",
+    "kanji": "泥",
+    "meaning": "mud",
+    "readings": [
+      "でい",
+      "どろ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K325",
+    "kanji": "脂",
+    "meaning": "fat; grease",
+    "readings": [
+      "し",
+      "あぶら"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K326",
+    "kanji": "粉",
+    "meaning": "powder",
+    "readings": [
+      "ふん",
+      "こ",
+      "こな"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K327",
+    "kanji": "詞",
+    "meaning": "word; part of speech",
+    "readings": [
+      "し"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K328",
+    "kanji": "筒",
+    "meaning": "tube; cylinder",
+    "readings": [
+      "とう",
+      "つつ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K329",
+    "kanji": "掃",
+    "meaning": "sweep; clean",
+    "readings": [
+      "そう",
+      "はく"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K330",
+    "kanji": "塔",
+    "meaning": "tower; pagoda",
+    "readings": [
+      "とう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K331",
+    "kanji": "賢",
+    "meaning": "wise; clever",
+    "readings": [
+      "けん",
+      "かしこい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K332",
+    "kanji": "拾",
+    "meaning": "pick up",
+    "readings": [
+      "しゅう",
+      "じゅう",
+      "ひろう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K333",
+    "kanji": "麦",
+    "meaning": "wheat; barley",
+    "readings": [
+      "ばく",
+      "むぎ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K334",
+    "kanji": "刷",
+    "meaning": "print",
+    "readings": [
+      "さつ",
+      "する"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K335",
+    "kanji": "卵",
+    "meaning": "egg",
+    "readings": [
+      "らん",
+      "たまご"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K336",
+    "kanji": "械",
+    "meaning": "machine; mechanism",
+    "readings": [
+      "かい"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K337",
+    "kanji": "皿",
+    "meaning": "plate; dish",
+    "readings": [
+      "さら"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K338",
+    "kanji": "祈",
+    "meaning": "pray",
+    "readings": [
+      "き",
+      "いのる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K339",
+    "kanji": "灰",
+    "meaning": "ash",
+    "readings": [
+      "かい",
+      "はい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K340",
+    "kanji": "召",
+    "meaning": "summon; call",
+    "readings": [
+      "しょう",
+      "めす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K341",
+    "kanji": "溶",
+    "meaning": "melt; dissolve",
+    "readings": [
+      "よう",
+      "とける",
+      "とかす",
+      "とく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K342",
+    "kanji": "磨",
+    "meaning": "polish; grind",
+    "readings": [
+      "ま",
+      "みがく"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K343",
+    "kanji": "粒",
+    "meaning": "grain; particle",
+    "readings": [
+      "りゅう",
+      "つぶ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K344",
+    "kanji": "喫",
+    "meaning": "consume; drink; smoke",
+    "readings": [
+      "きつ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K345",
+    "kanji": "机",
+    "meaning": "desk",
+    "readings": [
+      "き",
+      "つくえ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K346",
+    "kanji": "貯",
+    "meaning": "save; store",
+    "readings": [
+      "ちょ"
+    ],
+    "level": "N2",
+    "compound_count": 3
+  },
+  {
+    "id": "N2_K347",
+    "kanji": "匹",
+    "meaning": "counter for small animals",
+    "readings": [
+      "ひつ",
+      "ひき"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K348",
+    "kanji": "綿",
+    "meaning": "cotton",
+    "readings": [
+      "めん",
+      "わた"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K349",
+    "kanji": "贈",
+    "meaning": "give; present",
+    "readings": [
+      "ぞう",
+      "おくる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K350",
+    "kanji": "凍",
+    "meaning": "freeze",
+    "readings": [
+      "とう",
+      "こおる",
+      "こごえる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K351",
+    "kanji": "瓶",
+    "meaning": "bottle",
+    "readings": [
+      "びん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K352",
+    "kanji": "帽",
+    "meaning": "hat; cap",
+    "readings": [
+      "ぼう"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K353",
+    "kanji": "涼",
+    "meaning": "cool; refreshing",
+    "readings": [
+      "りょう",
+      "すずしい",
+      "すずむ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K354",
+    "kanji": "秒",
+    "meaning": "second",
+    "readings": [
+      "びょう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K355",
+    "kanji": "湿",
+    "meaning": "damp; humid",
+    "readings": [
+      "しつ",
+      "しめる",
+      "しめす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K356",
+    "kanji": "蒸",
+    "meaning": "steam; evaporate",
+    "readings": [
+      "じょう",
+      "むす",
+      "むれる",
+      "むらす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K357",
+    "kanji": "菓",
+    "meaning": "confectionery",
+    "readings": [
+      "か"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K358",
+    "kanji": "耕",
+    "meaning": "cultivate; plow",
+    "readings": [
+      "こう",
+      "たがやす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K359",
+    "kanji": "鉱",
+    "meaning": "mineral; ore",
+    "readings": [
+      "こう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K360",
+    "kanji": "膚",
+    "meaning": "skin",
+    "readings": [
+      "ふ"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K361",
+    "kanji": "胃",
+    "meaning": "stomach",
+    "readings": [
+      "い"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K362",
+    "kanji": "挟",
+    "meaning": "insert; pinch; between",
+    "readings": [
+      "きょう",
+      "はさむ",
+      "はさまる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K363",
+    "kanji": "郊",
+    "meaning": "suburb; outskirts",
+    "readings": [
+      "こう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K364",
+    "kanji": "銅",
+    "meaning": "copper",
+    "readings": [
+      "どう"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K365",
+    "kanji": "鈍",
+    "meaning": "dull; blunt",
+    "readings": [
+      "どん",
+      "にぶい",
+      "にぶる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K366",
+    "kanji": "貝",
+    "meaning": "shellfish; shell",
+    "readings": [
+      "かい"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K367",
+    "kanji": "缶",
+    "meaning": "can; tin",
+    "readings": [
+      "かん"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K368",
+    "kanji": "枯",
+    "meaning": "wither; dry up",
+    "readings": [
+      "こ",
+      "かれる",
+      "からす"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K369",
+    "kanji": "滴",
+    "meaning": "drop; drip",
+    "readings": [
+      "てき",
+      "しずく",
+      "したたる"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K370",
+    "kanji": "符",
+    "meaning": "sign; symbol",
+    "readings": [
+      "ふ"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K371",
+    "kanji": "畜",
+    "meaning": "livestock",
+    "readings": [
+      "ちく"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K372",
+    "kanji": "軟",
+    "meaning": "soft; flexible",
+    "readings": [
+      "なん",
+      "やわらか",
+      "やわらかい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  },
+  {
+    "id": "N2_K373",
+    "kanji": "濯",
+    "meaning": "wash; rinse",
+    "readings": [
+      "たく"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K374",
+    "kanji": "隻",
+    "meaning": "counter for ships; one of a pair",
+    "readings": [
+      "せき"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K375",
+    "kanji": "伺",
+    "meaning": "ask; visit; inquire humbly",
+    "readings": [
+      "し",
+      "うかがう"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K376",
+    "kanji": "沸",
+    "meaning": "boil",
+    "readings": [
+      "ふつ",
+      "わく",
+      "わかす"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K377",
+    "kanji": "曇",
+    "meaning": "cloudy",
+    "readings": [
+      "どん",
+      "くもる"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K378",
+    "kanji": "肯",
+    "meaning": "agree; affirm",
+    "readings": [
+      "こう"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K379",
+    "kanji": "燥",
+    "meaning": "dry; parched",
+    "readings": [
+      "そう"
+    ],
+    "level": "N2",
+    "compound_count": 1
+  },
+  {
+    "id": "N2_K380",
+    "kanji": "零",
+    "meaning": "zero; spill",
+    "readings": [
+      "れい"
+    ],
+    "level": "N2",
+    "compound_count": 2
+  }
+]

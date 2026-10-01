@@ -1,0 +1,622 @@
+[
+  {
+    "position": 1,
+    "pattern": "あげく",
+    "level": "N2"
+  },
+  {
+    "position": 2,
+    "pattern": "あるいは",
+    "level": "N2"
+  },
+  {
+    "position": 3,
+    "pattern": "以上に",
+    "level": "N2"
+  },
+  {
+    "position": 4,
+    "pattern": "以上は",
+    "level": "N2"
+  },
+  {
+    "position": 5,
+    "pattern": "一応",
+    "level": "N2"
+  },
+  {
+    "position": 6,
+    "pattern": "一気に",
+    "level": "N2"
+  },
+  {
+    "position": 7,
+    "pattern": "いよいよ",
+    "level": "N2"
+  },
+  {
+    "position": 8,
+    "pattern": "得ない",
+    "level": "N2"
+  },
+  {
+    "position": 9,
+    "pattern": "得る",
+    "level": "N2"
+  },
+  {
+    "position": 10,
+    "pattern": "おまけに",
+    "level": "N2"
+  },
+  {
+    "position": 11,
+    "pattern": "かと思ったら",
+    "level": "N2"
+  },
+  {
+    "position": 12,
+    "pattern": "か～ないかのうちに",
+    "level": "N2"
+  },
+  {
+    "position": 13,
+    "pattern": "限り",
+    "level": "N2"
+  },
+  {
+    "position": 14,
+    "pattern": "限りでは",
+    "level": "N2"
+  },
+  {
+    "position": 15,
+    "pattern": "限りに",
+    "level": "N2"
+  },
+  {
+    "position": 16,
+    "pattern": "限りの",
+    "level": "N2"
+  },
+  {
+    "position": 17,
+    "pattern": "かねない",
+    "level": "N2"
+  },
+  {
+    "position": 18,
+    "pattern": "かねる",
+    "level": "N2"
+  },
+  {
+    "position": 19,
+    "pattern": "からある / からする / からの",
+    "level": "N2"
+  },
+  {
+    "position": 20,
+    "pattern": "から言うと",
+    "level": "N2"
+  },
+  {
+    "position": 21,
+    "pattern": "からこそ",
+    "level": "N2"
+  },
+  {
+    "position": 22,
+    "pattern": "からして",
+    "level": "N2"
+  },
+  {
+    "position": 23,
+    "pattern": "からすると / からすれば",
+    "level": "N2"
+  },
+  {
+    "position": 24,
+    "pattern": "からといって",
+    "level": "N2"
+  },
+  {
+    "position": 25,
+    "pattern": "からには",
+    "level": "N2"
+  },
+  {
+    "position": 26,
+    "pattern": "から見ると",
+    "level": "N2"
+  },
+  {
+    "position": 27,
+    "pattern": "がきっかけで / をきっかけに",
+    "level": "N2"
+  },
+  {
+    "position": 28,
+    "pattern": "げ",
+    "level": "N2"
+  },
+  {
+    "position": 29,
+    "pattern": "ことか",
+    "level": "N2"
+  },
+  {
+    "position": 30,
+    "pattern": "ことだ",
+    "level": "N2"
+  },
+  {
+    "position": 31,
+    "pattern": "ことだから",
+    "level": "N2"
+  },
+  {
+    "position": 32,
+    "pattern": "ことなく",
+    "level": "N2"
+  },
+  {
+    "position": 33,
+    "pattern": "ことに",
+    "level": "N2"
+  },
+  {
+    "position": 34,
+    "pattern": "ことにはならない",
+    "level": "N2"
+  },
+  {
+    "position": 35,
+    "pattern": "ことは～が",
+    "level": "N2"
+  },
+  {
+    "position": 36,
+    "pattern": "ざるを得ない",
+    "level": "N2"
+  },
+  {
+    "position": 37,
+    "pattern": "次第で",
+    "level": "N2"
+  },
+  {
+    "position": 38,
+    "pattern": "次第では",
+    "level": "N2"
+  },
+  {
+    "position": 39,
+    "pattern": "次第だ",
+    "level": "N2"
+  },
+  {
+    "position": 40,
+    "pattern": "上",
+    "level": "N2"
+  },
+  {
+    "position": 41,
+    "pattern": "末に",
+    "level": "N2"
+  },
+  {
+    "position": 42,
+    "pattern": "ずじまい",
+    "level": "N2"
+  },
+  {
+    "position": 43,
+    "pattern": "ずにはすまない",
+    "level": "N2"
+  },
+  {
+    "position": 44,
+    "pattern": "せいぜい",
+    "level": "N2"
+  },
+  {
+    "position": 45,
+    "pattern": "だけあって",
+    "level": "N2"
+  },
+  {
+    "position": 46,
+    "pattern": "だけでなく",
+    "level": "N2"
+  },
+  {
+    "position": 47,
+    "pattern": "だけに",
+    "level": "N2"
+  },
+  {
+    "position": 48,
+    "pattern": "だけのことはある",
+    "level": "N2"
+  },
+  {
+    "position": 49,
+    "pattern": "だけましだ",
+    "level": "N2"
+  },
+  {
+    "position": 50,
+    "pattern": "だけは",
+    "level": "N2"
+  },
+  {
+    "position": 51,
+    "pattern": "だって",
+    "level": "N2"
+  },
+  {
+    "position": 52,
+    "pattern": "たところで",
+    "level": "N2"
+  },
+  {
+    "position": 53,
+    "pattern": "たとえ～ても",
+    "level": "N2"
+  },
+  {
+    "position": 54,
+    "pattern": "たばかりに",
+    "level": "N2"
+  },
+  {
+    "position": 55,
+    "pattern": "たまえ",
+    "level": "N2"
+  },
+  {
+    "position": 56,
+    "pattern": "つつ",
+    "level": "N2"
+  },
+  {
+    "position": 57,
+    "pattern": "つつある",
+    "level": "N2"
+  },
+  {
+    "position": 58,
+    "pattern": "てでも",
+    "level": "N2"
+  },
+  {
+    "position": 59,
+    "pattern": "てはならない",
+    "level": "N2"
+  },
+  {
+    "position": 60,
+    "pattern": "というものだ",
+    "level": "N2"
+  },
+  {
+    "position": 61,
+    "pattern": "というものではない",
+    "level": "N2"
+  },
+  {
+    "position": 62,
+    "pattern": "といった",
+    "level": "N2"
+  },
+  {
+    "position": 63,
+    "pattern": "ところから",
+    "level": "N2"
+  },
+  {
+    "position": 64,
+    "pattern": "どころではない",
+    "level": "N2"
+  },
+  {
+    "position": 65,
+    "pattern": "ないことには",
+    "level": "N2"
+  },
+  {
+    "position": 66,
+    "pattern": "ないではいられない",
+    "level": "N2"
+  },
+  {
+    "position": 67,
+    "pattern": "ないではすまない",
+    "level": "N2"
+  },
+  {
+    "position": 68,
+    "pattern": "ないものか",
+    "level": "N2"
+  },
+  {
+    "position": 69,
+    "pattern": "ながらも",
+    "level": "N2"
+  },
+  {
+    "position": 70,
+    "pattern": "なくはない",
+    "level": "N2"
+  },
+  {
+    "position": 71,
+    "pattern": "なしに",
+    "level": "N2"
+  },
+  {
+    "position": 72,
+    "pattern": "など / なんか / なんて",
+    "level": "N2"
+  },
+  {
+    "position": 73,
+    "pattern": "にあたって",
+    "level": "N2"
+  },
+  {
+    "position": 74,
+    "pattern": "に応じて",
+    "level": "N2"
+  },
+  {
+    "position": 75,
+    "pattern": "にかかわらず",
+    "level": "N2"
+  },
+  {
+    "position": 76,
+    "pattern": "にかかわる",
+    "level": "N2"
+  },
+  {
+    "position": 77,
+    "pattern": "に限って",
+    "level": "N2"
+  },
+  {
+    "position": 78,
+    "pattern": "に限らず",
+    "level": "N2"
+  },
+  {
+    "position": 79,
+    "pattern": "に限る",
+    "level": "N2"
+  },
+  {
+    "position": 80,
+    "pattern": "に加えて",
+    "level": "N2"
+  },
+  {
+    "position": 81,
+    "pattern": "に際して",
+    "level": "N2"
+  },
+  {
+    "position": 82,
+    "pattern": "に先立って",
+    "level": "N2"
+  },
+  {
+    "position": 83,
+    "pattern": "にしては",
+    "level": "N2"
+  },
+  {
+    "position": 84,
+    "pattern": "に相違ない",
+    "level": "N2"
+  },
+  {
+    "position": 85,
+    "pattern": "に沿って",
+    "level": "N2"
+  },
+  {
+    "position": 86,
+    "pattern": "につき",
+    "level": "N2"
+  },
+  {
+    "position": 87,
+    "pattern": "に伴って",
+    "level": "N2"
+  },
+  {
+    "position": 88,
+    "pattern": "に反して",
+    "level": "N2"
+  },
+  {
+    "position": 89,
+    "pattern": "にほかならない",
+    "level": "N2"
+  },
+  {
+    "position": 90,
+    "pattern": "に基づいて",
+    "level": "N2"
+  },
+  {
+    "position": 91,
+    "pattern": "ぬきにして",
+    "level": "N2"
+  },
+  {
+    "position": 92,
+    "pattern": "のみ",
+    "level": "N2"
+  },
+  {
+    "position": 93,
+    "pattern": "のみならず",
+    "level": "N2"
+  },
+  {
+    "position": 94,
+    "pattern": "ばかりか",
+    "level": "N2"
+  },
+  {
+    "position": 95,
+    "pattern": "ばかりだ",
+    "level": "N2"
+  },
+  {
+    "position": 96,
+    "pattern": "ばかりに",
+    "level": "N2"
+  },
+  {
+    "position": 97,
+    "pattern": "はともかく",
+    "level": "N2"
+  },
+  {
+    "position": 98,
+    "pattern": "は別として",
+    "level": "N2"
+  },
+  {
+    "position": 99,
+    "pattern": "ほかない",
+    "level": "N2"
+  },
+  {
+    "position": 100,
+    "pattern": "まい",
+    "level": "N2"
+  },
+  {
+    "position": 101,
+    "pattern": "もかまわず",
+    "level": "N2"
+  },
+  {
+    "position": 102,
+    "pattern": "ものがある",
+    "level": "N2"
+  },
+  {
+    "position": 103,
+    "pattern": "ものだ",
+    "level": "N2"
+  },
+  {
+    "position": 104,
+    "pattern": "ものではない",
+    "level": "N2"
+  },
+  {
+    "position": 105,
+    "pattern": "ものの",
+    "level": "N2"
+  },
+  {
+    "position": 106,
+    "pattern": "やら～やら",
+    "level": "N2"
+  },
+  {
+    "position": 107,
+    "pattern": "ようでは",
+    "level": "N2"
+  },
+  {
+    "position": 108,
+    "pattern": "ようではないか",
+    "level": "N2"
+  },
+  {
+    "position": 109,
+    "pattern": "ようものなら",
+    "level": "N2"
+  },
+  {
+    "position": 110,
+    "pattern": "をきっかけに",
+    "level": "N2"
+  },
+  {
+    "position": 111,
+    "pattern": "を契機に",
+    "level": "N2"
+  },
+  {
+    "position": 112,
+    "pattern": "をこめて",
+    "level": "N2"
+  },
+  {
+    "position": 113,
+    "pattern": "を問わず",
+    "level": "N2"
+  },
+  {
+    "position": 114,
+    "pattern": "をめぐって",
+    "level": "N2"
+  },
+  {
+    "position": 115,
+    "pattern": "をもとに",
+    "level": "N2"
+  },
+  {
+    "position": 116,
+    "pattern": "を除いて",
+    "level": "N2"
+  },
+  {
+    "position": 117,
+    "pattern": "逆に",
+    "level": "N2"
+  },
+  {
+    "position": 118,
+    "pattern": "末",
+    "level": "N2"
+  },
+  {
+    "position": 119,
+    "pattern": "果たして",
+    "level": "N2"
+  },
+  {
+    "position": 120,
+    "pattern": "再び",
+    "level": "N2"
+  },
+  {
+    "position": 121,
+    "pattern": "どうせ",
+    "level": "N2"
+  },
+  {
+    "position": 122,
+    "pattern": "どうやら",
+    "level": "N2"
+  },
+  {
+    "position": 123,
+    "pattern": "ちなみに",
+    "level": "N2"
+  },
+  {
+    "position": 124,
+    "pattern": "ちっとも～ない",
+    "level": "N2"
+  }
+]

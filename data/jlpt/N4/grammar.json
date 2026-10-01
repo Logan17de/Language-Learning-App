@@ -1,0 +1,562 @@
+[
+  {
+    "position": 1,
+    "pattern": "間",
+    "level": "N4"
+  },
+  {
+    "position": 2,
+    "pattern": "間に",
+    "level": "N4"
+  },
+  {
+    "position": 3,
+    "pattern": "あとで",
+    "level": "N4"
+  },
+  {
+    "position": 4,
+    "pattern": "あまり",
+    "level": "N4"
+  },
+  {
+    "position": 5,
+    "pattern": "以上",
+    "level": "N4"
+  },
+  {
+    "position": 6,
+    "pattern": "以下",
+    "level": "N4"
+  },
+  {
+    "position": 7,
+    "pattern": "以外",
+    "level": "N4"
+  },
+  {
+    "position": 8,
+    "pattern": "以内",
+    "level": "N4"
+  },
+  {
+    "position": 9,
+    "pattern": "うちに",
+    "level": "N4"
+  },
+  {
+    "position": 10,
+    "pattern": "お～ください",
+    "level": "N4"
+  },
+  {
+    "position": 11,
+    "pattern": "お～になる",
+    "level": "N4"
+  },
+  {
+    "position": 12,
+    "pattern": "お～する",
+    "level": "N4"
+  },
+  {
+    "position": 13,
+    "pattern": "かどうか",
+    "level": "N4"
+  },
+  {
+    "position": 14,
+    "pattern": "かもしれない",
+    "level": "N4"
+  },
+  {
+    "position": 15,
+    "pattern": "から作る",
+    "level": "N4"
+  },
+  {
+    "position": 16,
+    "pattern": "がする",
+    "level": "N4"
+  },
+  {
+    "position": 17,
+    "pattern": "が必要",
+    "level": "N4"
+  },
+  {
+    "position": 18,
+    "pattern": "がり",
+    "level": "N4"
+  },
+  {
+    "position": 19,
+    "pattern": "がる / がっている",
+    "level": "N4"
+  },
+  {
+    "position": 20,
+    "pattern": "きっと",
+    "level": "N4"
+  },
+  {
+    "position": 21,
+    "pattern": "こと",
+    "level": "N4"
+  },
+  {
+    "position": 22,
+    "pattern": "ことがある",
+    "level": "N4"
+  },
+  {
+    "position": 23,
+    "pattern": "ことにする",
+    "level": "N4"
+  },
+  {
+    "position": 24,
+    "pattern": "ことになる",
+    "level": "N4"
+  },
+  {
+    "position": 25,
+    "pattern": "ことになっている",
+    "level": "N4"
+  },
+  {
+    "position": 26,
+    "pattern": "さ",
+    "level": "N4"
+  },
+  {
+    "position": 27,
+    "pattern": "させる",
+    "level": "N4"
+  },
+  {
+    "position": 28,
+    "pattern": "させられる",
+    "level": "N4"
+  },
+  {
+    "position": 29,
+    "pattern": "そうだ（様態）",
+    "level": "N4"
+  },
+  {
+    "position": 30,
+    "pattern": "そうだ（伝聞）",
+    "level": "N4"
+  },
+  {
+    "position": 31,
+    "pattern": "そうに / そうな",
+    "level": "N4"
+  },
+  {
+    "position": 32,
+    "pattern": "すぎる",
+    "level": "N4"
+  },
+  {
+    "position": 33,
+    "pattern": "ずつ",
+    "level": "N4"
+  },
+  {
+    "position": 34,
+    "pattern": "たばかり",
+    "level": "N4"
+  },
+  {
+    "position": 35,
+    "pattern": "たら",
+    "level": "N4"
+  },
+  {
+    "position": 36,
+    "pattern": "たらどう",
+    "level": "N4"
+  },
+  {
+    "position": 37,
+    "pattern": "てあげる",
+    "level": "N4"
+  },
+  {
+    "position": 38,
+    "pattern": "ていただく",
+    "level": "N4"
+  },
+  {
+    "position": 39,
+    "pattern": "ておく",
+    "level": "N4"
+  },
+  {
+    "position": 40,
+    "pattern": "てくれる",
+    "level": "N4"
+  },
+  {
+    "position": 41,
+    "pattern": "てくださる",
+    "level": "N4"
+  },
+  {
+    "position": 42,
+    "pattern": "てしまう / ちゃう",
+    "level": "N4"
+  },
+  {
+    "position": 43,
+    "pattern": "てみる",
+    "level": "N4"
+  },
+  {
+    "position": 44,
+    "pattern": "ても",
+    "level": "N4"
+  },
+  {
+    "position": 45,
+    "pattern": "てもらう",
+    "level": "N4"
+  },
+  {
+    "position": 46,
+    "pattern": "てよかった",
+    "level": "N4"
+  },
+  {
+    "position": 47,
+    "pattern": "という",
+    "level": "N4"
+  },
+  {
+    "position": 48,
+    "pattern": "と言う",
+    "level": "N4"
+  },
+  {
+    "position": 49,
+    "pattern": "と思う",
+    "level": "N4"
+  },
+  {
+    "position": 50,
+    "pattern": "とか～とか",
+    "level": "N4"
+  },
+  {
+    "position": 51,
+    "pattern": "ところ",
+    "level": "N4"
+  },
+  {
+    "position": 52,
+    "pattern": "ところだ",
+    "level": "N4"
+  },
+  {
+    "position": 53,
+    "pattern": "ところに / へ",
+    "level": "N4"
+  },
+  {
+    "position": 54,
+    "pattern": "な",
+    "level": "N4"
+  },
+  {
+    "position": 55,
+    "pattern": "なければ",
+    "level": "N4"
+  },
+  {
+    "position": 56,
+    "pattern": "なさい",
+    "level": "N4"
+  },
+  {
+    "position": 57,
+    "pattern": "なら",
+    "level": "N4"
+  },
+  {
+    "position": 58,
+    "pattern": "にくい",
+    "level": "N4"
+  },
+  {
+    "position": 59,
+    "pattern": "に見える",
+    "level": "N4"
+  },
+  {
+    "position": 60,
+    "pattern": "のが上手",
+    "level": "N4"
+  },
+  {
+    "position": 61,
+    "pattern": "のが下手",
+    "level": "N4"
+  },
+  {
+    "position": 62,
+    "pattern": "のが好き",
+    "level": "N4"
+  },
+  {
+    "position": 63,
+    "pattern": "のでしょうか",
+    "level": "N4"
+  },
+  {
+    "position": 64,
+    "pattern": "のは～だ",
+    "level": "N4"
+  },
+  {
+    "position": 65,
+    "pattern": "のを見る",
+    "level": "N4"
+  },
+  {
+    "position": 66,
+    "pattern": "のを忘れる",
+    "level": "N4"
+  },
+  {
+    "position": 67,
+    "pattern": "ば",
+    "level": "N4"
+  },
+  {
+    "position": 68,
+    "pattern": "場合は",
+    "level": "N4"
+  },
+  {
+    "position": 69,
+    "pattern": "始める",
+    "level": "N4"
+  },
+  {
+    "position": 70,
+    "pattern": "はずだ",
+    "level": "N4"
+  },
+  {
+    "position": 71,
+    "pattern": "はずがない",
+    "level": "N4"
+  },
+  {
+    "position": 72,
+    "pattern": "必要がある",
+    "level": "N4"
+  },
+  {
+    "position": 73,
+    "pattern": "方が",
+    "level": "N4"
+  },
+  {
+    "position": 74,
+    "pattern": "ほど～ない",
+    "level": "N4"
+  },
+  {
+    "position": 75,
+    "pattern": "までに",
+    "level": "N4"
+  },
+  {
+    "position": 76,
+    "pattern": "みたいだ",
+    "level": "N4"
+  },
+  {
+    "position": 77,
+    "pattern": "みたいに / みたいな",
+    "level": "N4"
+  },
+  {
+    "position": 78,
+    "pattern": "やすい",
+    "level": "N4"
+  },
+  {
+    "position": 79,
+    "pattern": "ようだ",
+    "level": "N4"
+  },
+  {
+    "position": 80,
+    "pattern": "ように / ような",
+    "level": "N4"
+  },
+  {
+    "position": 81,
+    "pattern": "ようと思う",
+    "level": "N4"
+  },
+  {
+    "position": 82,
+    "pattern": "ように言う",
+    "level": "N4"
+  },
+  {
+    "position": 83,
+    "pattern": "ようにする",
+    "level": "N4"
+  },
+  {
+    "position": 84,
+    "pattern": "ようになる",
+    "level": "N4"
+  },
+  {
+    "position": 85,
+    "pattern": "らしい",
+    "level": "N4"
+  },
+  {
+    "position": 86,
+    "pattern": "れる / られる（受身）",
+    "level": "N4"
+  },
+  {
+    "position": 87,
+    "pattern": "られる（可能）",
+    "level": "N4"
+  },
+  {
+    "position": 88,
+    "pattern": "られる（尊敬）",
+    "level": "N4"
+  },
+  {
+    "position": 89,
+    "pattern": "んです / のです",
+    "level": "N4"
+  },
+  {
+    "position": 90,
+    "pattern": "一度も～ない",
+    "level": "N4"
+  },
+  {
+    "position": 91,
+    "pattern": "一緒に",
+    "level": "N4"
+  },
+  {
+    "position": 92,
+    "pattern": "意向形",
+    "level": "N4"
+  },
+  {
+    "position": 93,
+    "pattern": "おかげで",
+    "level": "N4"
+  },
+  {
+    "position": 94,
+    "pattern": "おきに",
+    "level": "N4"
+  },
+  {
+    "position": 95,
+    "pattern": "かい",
+    "level": "N4"
+  },
+  {
+    "position": 96,
+    "pattern": "かしら",
+    "level": "N4"
+  },
+  {
+    "position": 97,
+    "pattern": "かな",
+    "level": "N4"
+  },
+  {
+    "position": 98,
+    "pattern": "しかない",
+    "level": "N4"
+  },
+  {
+    "position": 99,
+    "pattern": "じゃないか",
+    "level": "N4"
+  },
+  {
+    "position": 100,
+    "pattern": "せいで",
+    "level": "N4"
+  },
+  {
+    "position": 101,
+    "pattern": "たところ",
+    "level": "N4"
+  },
+  {
+    "position": 102,
+    "pattern": "てほしい",
+    "level": "N4"
+  },
+  {
+    "position": 103,
+    "pattern": "てもらえませんか",
+    "level": "N4"
+  },
+  {
+    "position": 104,
+    "pattern": "でございます",
+    "level": "N4"
+  },
+  {
+    "position": 105,
+    "pattern": "でも（例示）",
+    "level": "N4"
+  },
+  {
+    "position": 106,
+    "pattern": "なかなか～ない",
+    "level": "N4"
+  },
+  {
+    "position": 107,
+    "pattern": "によると",
+    "level": "N4"
+  },
+  {
+    "position": 108,
+    "pattern": "まず",
+    "level": "N4"
+  },
+  {
+    "position": 109,
+    "pattern": "まるで～ようだ",
+    "level": "N4"
+  },
+  {
+    "position": 110,
+    "pattern": "もう～た",
+    "level": "N4"
+  },
+  {
+    "position": 111,
+    "pattern": "もし",
+    "level": "N4"
+  },
+  {
+    "position": 112,
+    "pattern": "もし～たら",
+    "level": "N4"
+  }
+]

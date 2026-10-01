@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "levels": {
+    "N5": {
+      "kanji": 80,
+      "vocabulary": 674,
+      "grammar": 82
+    },
+    "N4": {
+      "kanji": 170,
+      "vocabulary": 630,
+      "grammar": 112
+    },
+    "N3": {
+      "kanji": 370,
+      "vocabulary": 1659,
+      "grammar": 136
+    },
+    "N2": {
+      "kanji": 380,
+      "vocabulary": 1778,
+      "grammar": 124
+    },
+    "N1": {
+      "kanji": 1136,
+      "vocabulary": 3070,
+      "grammar": 187
+    }
+  },
+  "totals": {
+    "kanji": 2136,
+    "vocabulary": 7811,
+    "grammar": 641
+  },
+  "sources": {
+    "kanji": "Vocabs/jlpt_all_kanji_with_kana_readings.csv",
+    "grammar": "data/jlpt-catalog.json",
+    "vocabulary": {
+      "name": "OpenJLPT",
+      "repository": "https://github.com/evanclan/OpenJLPT",
+      "commit": "88eaef9c589f787194903e733c7f7b6df9d6ebc0",
+      "license": "CC BY-SA 4.0"
+    }
+  }
+}

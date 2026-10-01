@@ -1,0 +1,980 @@
+[
+  {
+    "id": "N5_K001",
+    "kanji": "人",
+    "meaning": "person; human",
+    "readings": [
+      "じん",
+      "にん",
+      "ひと"
+    ],
+    "level": "N5",
+    "compound_count": 16
+  },
+  {
+    "id": "N5_K002",
+    "kanji": "一",
+    "meaning": "one",
+    "readings": [
+      "いち",
+      "いつ",
+      "ひと",
+      "ひとつ"
+    ],
+    "level": "N5",
+    "compound_count": 12
+  },
+  {
+    "id": "N5_K003",
+    "kanji": "日",
+    "meaning": "day; sun",
+    "readings": [
+      "にち",
+      "じつ",
+      "ひ",
+      "か"
+    ],
+    "level": "N5",
+    "compound_count": 29
+  },
+  {
+    "id": "N5_K004",
+    "kanji": "大",
+    "meaning": "big; large",
+    "readings": [
+      "だい",
+      "たい",
+      "おお",
+      "おおきい",
+      "おおいに"
+    ],
+    "level": "N5",
+    "compound_count": 6
+  },
+  {
+    "id": "N5_K005",
+    "kanji": "年",
+    "meaning": "year",
+    "readings": [
+      "ねん",
+      "とし"
+    ],
+    "level": "N5",
+    "compound_count": 11
+  },
+  {
+    "id": "N5_K006",
+    "kanji": "出",
+    "meaning": "exit; go out; come out",
+    "readings": [
+      "しゅつ",
+      "でる",
+      "だす"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K007",
+    "kanji": "本",
+    "meaning": "book; origin; main",
+    "readings": [
+      "ほん",
+      "もと"
+    ],
+    "level": "N5",
+    "compound_count": 4
+  },
+  {
+    "id": "N5_K008",
+    "kanji": "中",
+    "meaning": "middle; inside",
+    "readings": [
+      "ちゅう",
+      "なか"
+    ],
+    "level": "N5",
+    "compound_count": 5
+  },
+  {
+    "id": "N5_K009",
+    "kanji": "子",
+    "meaning": "child",
+    "readings": [
+      "し",
+      "す",
+      "こ"
+    ],
+    "level": "N5",
+    "compound_count": 4
+  },
+  {
+    "id": "N5_K010",
+    "kanji": "見",
+    "meaning": "see; look",
+    "readings": [
+      "けん",
+      "みる",
+      "みえる",
+      "みせる"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K011",
+    "kanji": "国",
+    "meaning": "country",
+    "readings": [
+      "こく",
+      "くに"
+    ],
+    "level": "N5",
+    "compound_count": 7
+  },
+  {
+    "id": "N5_K012",
+    "kanji": "上",
+    "meaning": "up; above; top",
+    "readings": [
+      "じょう",
+      "うえ",
+      "かみ",
+      "あげる",
+      "あがる",
+      "のぼる",
+      "のぼせる",
+      "のぼす"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K013",
+    "kanji": "分",
+    "meaning": "part; minute; divide; understand",
+    "readings": [
+      "ぶん",
+      "ふん",
+      "ぶ",
+      "わける",
+      "わかれる",
+      "わかる",
+      "わかつ"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K014",
+    "kanji": "生",
+    "meaning": "life; birth; live",
+    "readings": [
+      "せい",
+      "しょう",
+      "いきる",
+      "いかす",
+      "いける",
+      "うまれる",
+      "うむ",
+      "おう",
+      "はえる",
+      "はやす",
+      "き",
+      "なま"
+    ],
+    "level": "N5",
+    "compound_count": 8
+  },
+  {
+    "id": "N5_K015",
+    "kanji": "行",
+    "meaning": "go; carry out; line",
+    "readings": [
+      "こう",
+      "ぎょう",
+      "いく",
+      "ゆく",
+      "おこなう"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K016",
+    "kanji": "二",
+    "meaning": "two",
+    "readings": [
+      "に",
+      "ふた",
+      "ふたつ"
+    ],
+    "level": "N5",
+    "compound_count": 7
+  },
+  {
+    "id": "N5_K017",
+    "kanji": "間",
+    "meaning": "interval; between; space",
+    "readings": [
+      "かん",
+      "けん",
+      "あいだ",
+      "ま"
+    ],
+    "level": "N5",
+    "compound_count": 6
+  },
+  {
+    "id": "N5_K018",
+    "kanji": "時",
+    "meaning": "time; hour",
+    "readings": [
+      "じ",
+      "とき"
+    ],
+    "level": "N5",
+    "compound_count": 5
+  },
+  {
+    "id": "N5_K019",
+    "kanji": "気",
+    "meaning": "spirit; feeling; air",
+    "readings": [
+      "き",
+      "け"
+    ],
+    "level": "N5",
+    "compound_count": 4
+  },
+  {
+    "id": "N5_K020",
+    "kanji": "十",
+    "meaning": "ten",
+    "readings": [
+      "じゅう",
+      "じっ",
+      "とお",
+      "と"
+    ],
+    "level": "N5",
+    "compound_count": 5
+  },
+  {
+    "id": "N5_K021",
+    "kanji": "女",
+    "meaning": "woman; female",
+    "readings": [
+      "じょ",
+      "にょ",
+      "おんな",
+      "め"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K022",
+    "kanji": "三",
+    "meaning": "three",
+    "readings": [
+      "さん",
+      "み",
+      "みつ",
+      "みっつ"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K023",
+    "kanji": "前",
+    "meaning": "front; before",
+    "readings": [
+      "ぜん",
+      "まえ"
+    ],
+    "level": "N5",
+    "compound_count": 4
+  },
+  {
+    "id": "N5_K024",
+    "kanji": "入",
+    "meaning": "enter; put in",
+    "readings": [
+      "にゅう",
+      "いる",
+      "いれる",
+      "はいる"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K025",
+    "kanji": "小",
+    "meaning": "small",
+    "readings": [
+      "しょう",
+      "ちいさい",
+      "こ",
+      "お"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K026",
+    "kanji": "後",
+    "meaning": "after; behind",
+    "readings": [
+      "ご",
+      "こう",
+      "のち",
+      "うしろ",
+      "あと",
+      "おくれる"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K027",
+    "kanji": "長",
+    "meaning": "long; leader; chief",
+    "readings": [
+      "ちょう",
+      "ながい"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K028",
+    "kanji": "下",
+    "meaning": "down; below",
+    "readings": [
+      "か",
+      "げ",
+      "した",
+      "しも",
+      "もと",
+      "さげる",
+      "さがる",
+      "くだる",
+      "くだす",
+      "くださる",
+      "おろす",
+      "おりる"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K029",
+    "kanji": "学",
+    "meaning": "study; learning",
+    "readings": [
+      "がく",
+      "まなぶ"
+    ],
+    "level": "N5",
+    "compound_count": 12
+  },
+  {
+    "id": "N5_K030",
+    "kanji": "月",
+    "meaning": "month; moon",
+    "readings": [
+      "げつ",
+      "がつ",
+      "つき"
+    ],
+    "level": "N5",
+    "compound_count": 21
+  },
+  {
+    "id": "N5_K031",
+    "kanji": "何",
+    "meaning": "what; how many",
+    "readings": [
+      "か",
+      "なに"
+    ],
+    "level": "N5",
+    "compound_count": 7
+  },
+  {
+    "id": "N5_K032",
+    "kanji": "来",
+    "meaning": "come; next",
+    "readings": [
+      "らい",
+      "くる",
+      "きたる",
+      "きたす"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K033",
+    "kanji": "話",
+    "meaning": "talk; story; conversation",
+    "readings": [
+      "わ",
+      "はなす",
+      "はなし"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K034",
+    "kanji": "山",
+    "meaning": "mountain",
+    "readings": [
+      "さん",
+      "やま"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K035",
+    "kanji": "高",
+    "meaning": "high; expensive",
+    "readings": [
+      "こう",
+      "たかい",
+      "たか",
+      "たかまる",
+      "たかめる"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K036",
+    "kanji": "今",
+    "meaning": "now; present",
+    "readings": [
+      "こん",
+      "きん",
+      "いま"
+    ],
+    "level": "N5",
+    "compound_count": 6
+  },
+  {
+    "id": "N5_K037",
+    "kanji": "書",
+    "meaning": "write; writing; book",
+    "readings": [
+      "しょ",
+      "かく"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K038",
+    "kanji": "五",
+    "meaning": "five",
+    "readings": [
+      "ご",
+      "いつ",
+      "いつつ"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K039",
+    "kanji": "名",
+    "meaning": "name; reputation",
+    "readings": [
+      "めい",
+      "みょう",
+      "な"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K040",
+    "kanji": "金",
+    "meaning": "gold; money; metal",
+    "readings": [
+      "きん",
+      "こん",
+      "かね"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K041",
+    "kanji": "男",
+    "meaning": "man; male",
+    "readings": [
+      "だん",
+      "なん",
+      "おとこ"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K042",
+    "kanji": "外",
+    "meaning": "outside; foreign",
+    "readings": [
+      "がい",
+      "げ",
+      "そと",
+      "ほか",
+      "はずす",
+      "はずれる"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K043",
+    "kanji": "四",
+    "meaning": "four",
+    "readings": [
+      "し",
+      "よ",
+      "よつ",
+      "よっつ",
+      "よん"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K044",
+    "kanji": "先",
+    "meaning": "ahead; previous; earlier",
+    "readings": [
+      "せん",
+      "さき"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K045",
+    "kanji": "川",
+    "meaning": "river",
+    "readings": [
+      "せん",
+      "かわ"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K046",
+    "kanji": "東",
+    "meaning": "east",
+    "readings": [
+      "とう",
+      "ひがし"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K047",
+    "kanji": "聞",
+    "meaning": "hear; listen; ask",
+    "readings": [
+      "ぶん",
+      "もん",
+      "きく",
+      "きこえる"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K048",
+    "kanji": "語",
+    "meaning": "language; word",
+    "readings": [
+      "ご",
+      "かたる",
+      "かたらう"
+    ],
+    "level": "N5",
+    "compound_count": 4
+  },
+  {
+    "id": "N5_K049",
+    "kanji": "九",
+    "meaning": "nine",
+    "readings": [
+      "きゅう",
+      "く",
+      "ここの",
+      "ここのつ"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K050",
+    "kanji": "食",
+    "meaning": "eat; food",
+    "readings": [
+      "しょく",
+      "くう",
+      "くらう",
+      "たべる"
+    ],
+    "level": "N5",
+    "compound_count": 6
+  },
+  {
+    "id": "N5_K051",
+    "kanji": "八",
+    "meaning": "eight",
+    "readings": [
+      "はち",
+      "や",
+      "やつ",
+      "やっつ"
+    ],
+    "level": "N5",
+    "compound_count": 4
+  },
+  {
+    "id": "N5_K052",
+    "kanji": "水",
+    "meaning": "water",
+    "readings": [
+      "すい",
+      "みず"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K053",
+    "kanji": "天",
+    "meaning": "heaven; sky",
+    "readings": [
+      "てん",
+      "あめ"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K054",
+    "kanji": "木",
+    "meaning": "tree; wood",
+    "readings": [
+      "ぼく",
+      "もく",
+      "き"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K055",
+    "kanji": "六",
+    "meaning": "six",
+    "readings": [
+      "ろく",
+      "む",
+      "むつ",
+      "むっつ"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K056",
+    "kanji": "万",
+    "meaning": "ten thousand",
+    "readings": [
+      "まん",
+      "ばん"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K057",
+    "kanji": "白",
+    "meaning": "white",
+    "readings": [
+      "はく",
+      "びゃく",
+      "しろ",
+      "しろい"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K058",
+    "kanji": "七",
+    "meaning": "seven",
+    "readings": [
+      "しち",
+      "なな",
+      "ななつ"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K059",
+    "kanji": "円",
+    "meaning": "yen; circle",
+    "readings": [
+      "えん",
+      "まるい"
+    ],
+    "level": "N5",
+    "compound_count": 4
+  },
+  {
+    "id": "N5_K060",
+    "kanji": "電",
+    "meaning": "electricity",
+    "readings": [
+      "でん"
+    ],
+    "level": "N5",
+    "compound_count": 4
+  },
+  {
+    "id": "N5_K061",
+    "kanji": "父",
+    "meaning": "father",
+    "readings": [
+      "ふ",
+      "ちち"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K062",
+    "kanji": "北",
+    "meaning": "north",
+    "readings": [
+      "ほく",
+      "きた"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K063",
+    "kanji": "車",
+    "meaning": "car; vehicle",
+    "readings": [
+      "しゃ",
+      "くるま"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K064",
+    "kanji": "母",
+    "meaning": "mother",
+    "readings": [
+      "ぼ",
+      "はは"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K065",
+    "kanji": "半",
+    "meaning": "half",
+    "readings": [
+      "はん",
+      "なかば"
+    ],
+    "level": "N5",
+    "compound_count": 5
+  },
+  {
+    "id": "N5_K066",
+    "kanji": "百",
+    "meaning": "hundred",
+    "readings": [
+      "ひゃく"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  },
+  {
+    "id": "N5_K067",
+    "kanji": "土",
+    "meaning": "earth; soil",
+    "readings": [
+      "ど",
+      "と",
+      "つち"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K068",
+    "kanji": "西",
+    "meaning": "west",
+    "readings": [
+      "せい",
+      "さい",
+      "にし"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K069",
+    "kanji": "読",
+    "meaning": "read",
+    "readings": [
+      "どく",
+      "とく",
+      "よむ"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K070",
+    "kanji": "千",
+    "meaning": "thousand",
+    "readings": [
+      "せん",
+      "ち"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K071",
+    "kanji": "校",
+    "meaning": "school",
+    "readings": [
+      "こう"
+    ],
+    "level": "N5",
+    "compound_count": 6
+  },
+  {
+    "id": "N5_K072",
+    "kanji": "右",
+    "meaning": "right",
+    "readings": [
+      "う",
+      "ゆう",
+      "みぎ"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K073",
+    "kanji": "南",
+    "meaning": "south",
+    "readings": [
+      "なん",
+      "みなみ"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K074",
+    "kanji": "左",
+    "meaning": "left",
+    "readings": [
+      "さ",
+      "ひだり"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K075",
+    "kanji": "友",
+    "meaning": "friend",
+    "readings": [
+      "ゆう",
+      "とも"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K076",
+    "kanji": "火",
+    "meaning": "fire",
+    "readings": [
+      "か",
+      "ひ"
+    ],
+    "level": "N5",
+    "compound_count": 2
+  },
+  {
+    "id": "N5_K077",
+    "kanji": "毎",
+    "meaning": "every",
+    "readings": [
+      "まい"
+    ],
+    "level": "N5",
+    "compound_count": 6
+  },
+  {
+    "id": "N5_K078",
+    "kanji": "雨",
+    "meaning": "rain",
+    "readings": [
+      "う",
+      "あめ"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K079",
+    "kanji": "休",
+    "meaning": "rest; holiday",
+    "readings": [
+      "きゅう",
+      "やすむ",
+      "やすまる",
+      "やすめる"
+    ],
+    "level": "N5",
+    "compound_count": 1
+  },
+  {
+    "id": "N5_K080",
+    "kanji": "午",
+    "meaning": "noon",
+    "readings": [
+      "ご"
+    ],
+    "level": "N5",
+    "compound_count": 3
+  }
+]

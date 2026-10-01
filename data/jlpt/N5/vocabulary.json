@@ -1,0 +1,10488 @@
+[
+  {
+    "id": "ada066edfd",
+    "word": "会う",
+    "reading": "あう",
+    "romaji": "au",
+    "meanings": [
+      "to meet"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5u",
+      "vi"
+    ],
+    "jmdict_id": 1198180
+  },
+  {
+    "id": "ebec658463",
+    "word": "青",
+    "reading": "あお",
+    "romaji": "ao",
+    "meanings": [
+      "blue"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1381380
+  },
+  {
+    "id": "51a671ec17",
+    "word": "青い",
+    "reading": "あおい",
+    "romaji": "aoi",
+    "meanings": [
+      "blue"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1381390
+  },
+  {
+    "id": "2dacb910b2",
+    "word": "赤",
+    "reading": "あか",
+    "romaji": "aka",
+    "meanings": [
+      "red"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 2013900
+  },
+  {
+    "id": "44ba38cf8b",
+    "word": "赤い",
+    "reading": "あかい",
+    "romaji": "akai",
+    "meanings": [
+      "red"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1383240
+  },
+  {
+    "id": "91987ae840",
+    "word": "明るい",
+    "reading": "あかるい",
+    "romaji": "akarui",
+    "meanings": [
+      "bright"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1532350
+  },
+  {
+    "id": "8dc7006bda",
+    "word": "秋",
+    "reading": "あき",
+    "romaji": "aki",
+    "meanings": [
+      "autumn"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1332650
+  },
+  {
+    "id": "fc3bc1e6f1",
+    "word": "開く",
+    "reading": "あく",
+    "romaji": "aku",
+    "meanings": [
+      "to open",
+      "to become open"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k",
+      "vi"
+    ],
+    "jmdict_id": 1586270
+  },
+  {
+    "id": "321963ed35",
+    "word": "開ける",
+    "reading": "あける",
+    "romaji": "akeru",
+    "meanings": [
+      "to open"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1202450
+  },
+  {
+    "id": "9661cbac61",
+    "word": "上げる",
+    "reading": "あげる",
+    "romaji": "ageru",
+    "meanings": [
+      "to give"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1352320
+  },
+  {
+    "id": "d46ae79a26",
+    "word": "朝",
+    "reading": "あさ",
+    "romaji": "asa",
+    "meanings": [
+      "morning"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1428280
+  },
+  {
+    "id": "98bc6f72ae",
+    "word": "朝ごはん",
+    "reading": "あさごはん",
+    "romaji": "asagohan",
+    "meanings": [
+      "breakfast"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1586330
+  },
+  {
+    "id": "b3b4041c52",
+    "word": "あさって",
+    "reading": "あさって",
+    "romaji": "asatte",
+    "meanings": [
+      "day after tomorrow"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1584640
+  },
+  {
+    "id": "27df3d5802",
+    "word": "足",
+    "reading": "あし",
+    "romaji": "ashi",
+    "meanings": [
+      "foot",
+      "leg"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1404630
+  },
+  {
+    "id": "115ec83476",
+    "word": "明日",
+    "reading": "あした",
+    "romaji": "ashita",
+    "meanings": [
+      "tomorrow"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1584660
+  },
+  {
+    "id": "bee501faf0",
+    "word": "あそこ",
+    "reading": "あそこ",
+    "romaji": "asoko",
+    "meanings": [
+      "over there"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1000320
+  },
+  {
+    "id": "2d55571300",
+    "word": "遊ぶ",
+    "reading": "あそぶ",
+    "romaji": "asobu",
+    "meanings": [
+      "to play",
+      "to make a visit"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5b",
+      "vi"
+    ],
+    "jmdict_id": 1542160
+  },
+  {
+    "id": "f665c2128a",
+    "word": "暖かい",
+    "reading": "あたたかい",
+    "romaji": "atatakai",
+    "meanings": [
+      "warm"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1586420
+  },
+  {
+    "id": "b62cb9ce4c",
+    "word": "頭",
+    "reading": "あたま",
+    "romaji": "atama",
+    "meanings": [
+      "head"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1582310
+  },
+  {
+    "id": "8ae27e3b51",
+    "word": "新しい",
+    "reading": "あたらしい",
+    "romaji": "atarashii",
+    "meanings": [
+      "new"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1361490
+  },
+  {
+    "id": "34e6f7d220",
+    "word": "あちら",
+    "reading": "あちら",
+    "romaji": "achira",
+    "meanings": [
+      "there"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1483185
+  },
+  {
+    "id": "9949d87445",
+    "word": "厚い",
+    "reading": "あつい",
+    "romaji": "atsui",
+    "meanings": [
+      "kind",
+      "deep",
+      "thick"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1275320
+  },
+  {
+    "id": "7b4aecdf7b",
+    "word": "暑い",
+    "reading": "あつい",
+    "romaji": "atsui",
+    "meanings": [
+      "hot"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1343460
+  },
+  {
+    "id": "a379d413fd",
+    "word": "熱い",
+    "reading": "あつい",
+    "romaji": "atsui",
+    "meanings": [
+      "hot to the touch"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1467720
+  },
+  {
+    "id": "60dd63379e",
+    "word": "あっち",
+    "reading": "あっち",
+    "romaji": "atchi",
+    "meanings": [
+      "over there"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1483185
+  },
+  {
+    "id": "4f134c9b38",
+    "word": "後",
+    "reading": "あと",
+    "romaji": "ato",
+    "meanings": [
+      "afterwards"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1269320
+  },
+  {
+    "id": "afdf384f68",
+    "word": "あなた",
+    "reading": "あなた",
+    "romaji": "anata",
+    "meanings": [
+      "you"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1223615
+  },
+  {
+    "id": "4aab699864",
+    "word": "兄",
+    "reading": "あに",
+    "romaji": "ani",
+    "meanings": [
+      "(humble) older brother"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1249900
+  },
+  {
+    "id": "8bfeb208b4",
+    "word": "姉",
+    "reading": "あね",
+    "romaji": "ane",
+    "meanings": [
+      "(humble) older sister"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1307630
+  },
+  {
+    "id": "ac4706068b",
+    "word": "あの",
+    "reading": "あの",
+    "romaji": "ano",
+    "meanings": [
+      "that over there"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-pn"
+    ],
+    "jmdict_id": 1000420
+  },
+  {
+    "id": "0cf05b3a0d",
+    "word": "アパート",
+    "reading": "アパート",
+    "romaji": "apaato",
+    "meanings": [
+      "apartment"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1017760
+  },
+  {
+    "id": "a5aceb6426",
+    "word": "あびる",
+    "reading": "あびる",
+    "romaji": "abiru",
+    "meanings": [
+      "to bathe",
+      "to shower"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1547450
+  },
+  {
+    "id": "0509cb3b27",
+    "word": "危ない",
+    "reading": "あぶない",
+    "romaji": "abunai",
+    "meanings": [
+      "dangerous"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1218380
+  },
+  {
+    "id": "4afffe5811",
+    "word": "甘い",
+    "reading": "あまい",
+    "romaji": "amai",
+    "meanings": [
+      "sweet"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1213400
+  },
+  {
+    "id": "eac90e8e98",
+    "word": "あまり",
+    "reading": "あまり",
+    "romaji": "amari",
+    "meanings": [
+      "not very"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1584930
+  },
+  {
+    "id": "5d72771a3c",
+    "word": "飴",
+    "reading": "あめ",
+    "romaji": "ame",
+    "meanings": [
+      "candy"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1153520
+  },
+  {
+    "id": "277a58c9df",
+    "word": "雨",
+    "reading": "あめ",
+    "romaji": "ame",
+    "meanings": [
+      "rain"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1171900
+  },
+  {
+    "id": "f8fa96946f",
+    "word": "洗う",
+    "reading": "あらう",
+    "romaji": "arau",
+    "meanings": [
+      "to wash"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5u",
+      "vt"
+    ],
+    "jmdict_id": 1390930
+  },
+  {
+    "id": "93461820fe",
+    "word": "ありがとう",
+    "reading": "ありがとう",
+    "romaji": "arigatou",
+    "meanings": [
+      "Thank you"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "int"
+    ],
+    "jmdict_id": 1586820
+  },
+  {
+    "id": "ac08788418",
+    "word": "ある",
+    "reading": "ある",
+    "romaji": "aru",
+    "meanings": [
+      "to be",
+      "to have (used for inanimate objects)"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "v5r-i",
+      "vi"
+    ],
+    "jmdict_id": 1296400
+  },
+  {
+    "id": "55f3080ce4",
+    "word": "歩く",
+    "reading": "あるく",
+    "romaji": "aruku",
+    "meanings": [
+      "to walk"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k",
+      "vi"
+    ],
+    "jmdict_id": 1514320
+  },
+  {
+    "id": "d727a76b22",
+    "word": "あれ",
+    "reading": "あれ",
+    "romaji": "are",
+    "meanings": [
+      "that"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1000580
+  },
+  {
+    "id": "e37a087c0f",
+    "word": "いい",
+    "reading": "いい",
+    "romaji": "ii",
+    "meanings": [
+      "good"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-ix"
+    ],
+    "jmdict_id": 2820690
+  },
+  {
+    "id": "6d4596ae46",
+    "word": "いいえ",
+    "reading": "いいえ",
+    "romaji": "iie",
+    "meanings": [
+      "no"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "int"
+    ],
+    "jmdict_id": 1583250
+  },
+  {
+    "id": "ae0cc00f94",
+    "word": "言う",
+    "reading": "いう",
+    "romaji": "iu",
+    "meanings": [
+      "to say"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5u",
+      "vt"
+    ],
+    "jmdict_id": 1587040
+  },
+  {
+    "id": "9f074820b1",
+    "word": "家",
+    "reading": "いえ",
+    "romaji": "ie",
+    "meanings": [
+      "house"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1191730
+  },
+  {
+    "id": "a3f296ad9a",
+    "word": "いかが",
+    "reading": "いかが",
+    "romaji": "ikaga",
+    "meanings": [
+      "how"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 2845606
+  },
+  {
+    "id": "66e4692df7",
+    "word": "行く",
+    "reading": "いく",
+    "romaji": "iku",
+    "meanings": [
+      "to go"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k-s",
+      "vi"
+    ],
+    "jmdict_id": 1578850
+  },
+  {
+    "id": "026ae57b50",
+    "word": "いくつ",
+    "reading": "いくつ",
+    "romaji": "ikutsu",
+    "meanings": [
+      "how many?",
+      "how old?"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1219960
+  },
+  {
+    "id": "4fc98c6938",
+    "word": "いくら",
+    "reading": "いくら",
+    "romaji": "ikura",
+    "meanings": [
+      "how much?"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1219980
+  },
+  {
+    "id": "43c874a6c8",
+    "word": "池",
+    "reading": "いけ",
+    "romaji": "ike",
+    "meanings": [
+      "pond"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1421700
+  },
+  {
+    "id": "ca76162587",
+    "word": "医者",
+    "reading": "いしゃ",
+    "romaji": "isha",
+    "meanings": [
+      "medical doctor"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1159980
+  },
+  {
+    "id": "d305fa14a8",
+    "word": "いす",
+    "reading": "いす",
+    "romaji": "isu",
+    "meanings": [
+      "chair"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1157070
+  },
+  {
+    "id": "cd1bcc2b1b",
+    "word": "忙しい",
+    "reading": "いそがしい",
+    "romaji": "isogashii",
+    "meanings": [
+      "busy",
+      "irritated"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1519290
+  },
+  {
+    "id": "4dae367794",
+    "word": "痛い",
+    "reading": "いたい",
+    "romaji": "itai",
+    "meanings": [
+      "painful"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1432680
+  },
+  {
+    "id": "eac7a22620",
+    "word": "いただきます",
+    "reading": "いただきます",
+    "romaji": "itadakimasu",
+    "meanings": [
+      "expression of gratitude before meals"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "exp"
+    ],
+    "jmdict_id": 1410800
+  },
+  {
+    "id": "9d8f862791",
+    "word": "一",
+    "reading": "いち",
+    "romaji": "ichi",
+    "meanings": [
+      "one"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "num",
+      "pref"
+    ],
+    "jmdict_id": 1160790
+  },
+  {
+    "id": "1cfccd0cdd",
+    "word": "一日",
+    "reading": "いちにち",
+    "romaji": "ichinichi",
+    "meanings": [
+      "one day",
+      "first of month"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1576260
+  },
+  {
+    "id": "cb96f363df",
+    "word": "いちばん",
+    "reading": "いちばん",
+    "romaji": "ichiban",
+    "meanings": [
+      "best",
+      "first"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1165970
+  },
+  {
+    "id": "fac6fc0838",
+    "word": "いつ",
+    "reading": "いつ",
+    "romaji": "itsu",
+    "meanings": [
+      "when"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1188760
+  },
+  {
+    "id": "2a7c4baf86",
+    "word": "五日",
+    "reading": "いつか",
+    "romaji": "itsuka",
+    "meanings": [
+      "five days",
+      "fifth day"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1268570
+  },
+  {
+    "id": "2dc7289c82",
+    "word": "一緒",
+    "reading": "いっしょ",
+    "romaji": "issho",
+    "meanings": [
+      "together"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1163400
+  },
+  {
+    "id": "9ac35c3990",
+    "word": "五つ",
+    "reading": "いつつ",
+    "romaji": "itsutsu",
+    "meanings": [
+      "five"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1268070
+  },
+  {
+    "id": "dea2a1df8b",
+    "word": "いつも",
+    "reading": "いつも",
+    "romaji": "itsumo",
+    "meanings": [
+      "always"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1188890
+  },
+  {
+    "id": "0df89f5010",
+    "word": "犬",
+    "reading": "いぬ",
+    "romaji": "inu",
+    "meanings": [
+      "dog"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1258330
+  },
+  {
+    "id": "ce75c75644",
+    "word": "今",
+    "reading": "いま",
+    "romaji": "ima",
+    "meanings": [
+      "now"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no",
+      "adv"
+    ],
+    "jmdict_id": 1288850
+  },
+  {
+    "id": "cb29ccdd2a",
+    "word": "意味",
+    "reading": "いみ",
+    "romaji": "imi",
+    "meanings": [
+      "meaning"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vt"
+    ],
+    "jmdict_id": 1156800
+  },
+  {
+    "id": "12047d019b",
+    "word": "妹",
+    "reading": "いもうと",
+    "romaji": "imouto",
+    "meanings": [
+      "(humble) younger sister"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1524590
+  },
+  {
+    "id": "eda751e069",
+    "word": "嫌",
+    "reading": "いや",
+    "romaji": "iya",
+    "meanings": [
+      "unpleasant"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adj-na"
+    ],
+    "jmdict_id": 1587610
+  },
+  {
+    "id": "1ff0529d03",
+    "word": "入口",
+    "reading": "いりぐち",
+    "romaji": "iriguchi",
+    "meanings": [
+      "entrance"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1582820
+  },
+  {
+    "id": "9438889173",
+    "word": "いる",
+    "reading": "いる",
+    "romaji": "iru",
+    "meanings": [
+      "to be",
+      "to have (used for people and animals)"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "aux-v",
+      "v1"
+    ],
+    "jmdict_id": 1577980
+  },
+  {
+    "id": "7a84208708",
+    "word": "要る",
+    "reading": "いる",
+    "romaji": "iru",
+    "meanings": [
+      "to need"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1546640
+  },
+  {
+    "id": "6d824d5110",
+    "word": "入れる",
+    "reading": "いれる",
+    "romaji": "ireru",
+    "meanings": [
+      "to put in"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1465610
+  },
+  {
+    "id": "523266ea6f",
+    "word": "色",
+    "reading": "いろ",
+    "romaji": "iro",
+    "meanings": [
+      "colour"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1357600
+  },
+  {
+    "id": "f74dd1ee9a",
+    "word": "いろいろ",
+    "reading": "いろいろ",
+    "romaji": "iroiro",
+    "meanings": [
+      "various"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-na",
+      "adj-no"
+    ],
+    "jmdict_id": 1587850
+  },
+  {
+    "id": "08a3ed212d",
+    "word": "上",
+    "reading": "うえ",
+    "romaji": "ue",
+    "meanings": [
+      "on top of"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1352130
+  },
+  {
+    "id": "93bdc81dd9",
+    "word": "後ろ",
+    "reading": "うしろ",
+    "romaji": "ushiro",
+    "meanings": [
+      "behind"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1269410
+  },
+  {
+    "id": "d2b2316e45",
+    "word": "薄い",
+    "reading": "うすい",
+    "romaji": "usui",
+    "meanings": [
+      "thin",
+      "weak"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1475480
+  },
+  {
+    "id": "036f4180a2",
+    "word": "歌",
+    "reading": "うた",
+    "romaji": "uta",
+    "meanings": [
+      "song"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1193180
+  },
+  {
+    "id": "3464318c23",
+    "word": "歌う",
+    "reading": "うたう",
+    "romaji": "utau",
+    "meanings": [
+      "to sing"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5u",
+      "vt",
+      "vi"
+    ],
+    "jmdict_id": 1588120
+  },
+  {
+    "id": "63bc7722fa",
+    "word": "生まれる",
+    "reading": "うまれる",
+    "romaji": "umareru",
+    "meanings": [
+      "to be born"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vi"
+    ],
+    "jmdict_id": 1378690
+  },
+  {
+    "id": "06ac21dc7d",
+    "word": "海",
+    "reading": "うみ",
+    "romaji": "umi",
+    "meanings": [
+      "sea"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1201190
+  },
+  {
+    "id": "f7e1da43df",
+    "word": "売る",
+    "reading": "うる",
+    "romaji": "uru",
+    "meanings": [
+      "to sell"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vt"
+    ],
+    "jmdict_id": 1473950
+  },
+  {
+    "id": "7ecfe0d248",
+    "word": "煩い",
+    "reading": "うるさい",
+    "romaji": "urusai",
+    "meanings": [
+      "noisy",
+      "annoying"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1481920
+  },
+  {
+    "id": "1ef8a05bf3",
+    "word": "上着",
+    "reading": "うわぎ",
+    "romaji": "uwagi",
+    "meanings": [
+      "jacket"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1580340
+  },
+  {
+    "id": "5bb390da0b",
+    "word": "絵",
+    "reading": "え",
+    "romaji": "e",
+    "meanings": [
+      "picture"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1202270
+  },
+  {
+    "id": "92b1621231",
+    "word": "映画",
+    "reading": "えいが",
+    "romaji": "eiga",
+    "meanings": [
+      "movie"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1173720
+  },
+  {
+    "id": "8a88cfbcb8",
+    "word": "映画館",
+    "reading": "えいがかん",
+    "romaji": "eigakan",
+    "meanings": [
+      "cinema"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1173750
+  },
+  {
+    "id": "16adc7bd03",
+    "word": "英語",
+    "reading": "えいご",
+    "romaji": "eigo",
+    "meanings": [
+      "English language"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1174420
+  },
+  {
+    "id": "8ac60a4060",
+    "word": "ええ",
+    "reading": "ええ",
+    "romaji": "ee",
+    "meanings": [
+      "yes"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "int"
+    ],
+    "jmdict_id": 1001140
+  },
+  {
+    "id": "d5f359c20b",
+    "word": "駅",
+    "reading": "えき",
+    "romaji": "eki",
+    "meanings": [
+      "station"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1175140
+  },
+  {
+    "id": "eb1695baf6",
+    "word": "エレベーター",
+    "reading": "エレベーター",
+    "romaji": "erebeetaa",
+    "meanings": [
+      "elevator"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1030630
+  },
+  {
+    "id": "381da4d060",
+    "word": "鉛筆",
+    "reading": "えんぴつ",
+    "romaji": "enpitsu",
+    "meanings": [
+      "pencil"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1178590
+  },
+  {
+    "id": "7f02ae8fa1",
+    "word": "おいしい",
+    "reading": "おいしい",
+    "romaji": "oishii",
+    "meanings": [
+      "delicious"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1486650
+  },
+  {
+    "id": "60813fffd1",
+    "word": "多い",
+    "reading": "おおい",
+    "romaji": "ooi",
+    "meanings": [
+      "many"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1407460
+  },
+  {
+    "id": "8fa5a63fc7",
+    "word": "大きい",
+    "reading": "おおきい",
+    "romaji": "ookii",
+    "meanings": [
+      "big"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1588880
+  },
+  {
+    "id": "3a2de0afca",
+    "word": "大きな",
+    "reading": "おおきな",
+    "romaji": "ookina",
+    "meanings": [
+      "big"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-pn"
+    ],
+    "jmdict_id": 1412890
+  },
+  {
+    "id": "57ed89b240",
+    "word": "大勢",
+    "reading": "おおぜい",
+    "romaji": "oozei",
+    "meanings": [
+      "great number of people"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1414220
+  },
+  {
+    "id": "2007947770",
+    "word": "お母さん",
+    "reading": "おかあさん",
+    "romaji": "okaasan",
+    "meanings": [
+      "(honorable) mother"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1002650
+  },
+  {
+    "id": "669019c625",
+    "word": "お菓子",
+    "reading": "おかし",
+    "romaji": "okashi",
+    "meanings": [
+      "sweets",
+      "candy"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1001710
+  },
+  {
+    "id": "3e015d0a8b",
+    "word": "お金",
+    "reading": "おかね",
+    "romaji": "okane",
+    "meanings": [
+      "money"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1001820
+  },
+  {
+    "id": "248a353e09",
+    "word": "起きる",
+    "reading": "おきる",
+    "romaji": "okiru",
+    "meanings": [
+      "to get up"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vi"
+    ],
+    "jmdict_id": 1223640
+  },
+  {
+    "id": "96845304fd",
+    "word": "置く",
+    "reading": "おく",
+    "romaji": "oku",
+    "meanings": [
+      "to put"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k",
+      "vt"
+    ],
+    "jmdict_id": 1421850
+  },
+  {
+    "id": "6c4661d672",
+    "word": "奥さん",
+    "reading": "おくさん",
+    "romaji": "okusan",
+    "meanings": [
+      "(honorable) wife"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1179330
+  },
+  {
+    "id": "f843b00173",
+    "word": "お酒",
+    "reading": "おさけ",
+    "romaji": "osake",
+    "meanings": [
+      "alcohol",
+      "rice wine"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1329015
+  },
+  {
+    "id": "101d46a061",
+    "word": "お皿",
+    "reading": "おさら",
+    "romaji": "osara",
+    "meanings": [
+      "plate",
+      "dish"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1299685
+  },
+  {
+    "id": "1b89f0f993",
+    "word": "お祖父さん",
+    "reading": "おじいさん",
+    "romaji": "ojiisan",
+    "meanings": [
+      "grandfather",
+      "male senior citizen"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1002320
+  },
+  {
+    "id": "f2fa049fdd",
+    "word": "教える",
+    "reading": "おしえる",
+    "romaji": "oshieru",
+    "meanings": [
+      "to teach",
+      "to tell"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1236900
+  },
+  {
+    "id": "ce8facdf69",
+    "word": "押す",
+    "reading": "おす",
+    "romaji": "osu",
+    "meanings": [
+      "to push",
+      "to stamp something"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5s",
+      "vt"
+    ],
+    "jmdict_id": 1180470
+  },
+  {
+    "id": "a082687f7a",
+    "word": "遅い",
+    "reading": "おそい",
+    "romaji": "osoi",
+    "meanings": [
+      "late",
+      "slow"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1421970
+  },
+  {
+    "id": "edca336b1f",
+    "word": "お茶",
+    "reading": "おちゃ",
+    "romaji": "ocha",
+    "meanings": [
+      "green tea"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1002430
+  },
+  {
+    "id": "75a36b034c",
+    "word": "お手洗い",
+    "reading": "おてあらい",
+    "romaji": "otearai",
+    "meanings": [
+      "bathroom"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1002100
+  },
+  {
+    "id": "89807c7c22",
+    "word": "お父さん",
+    "reading": "おとうさん",
+    "romaji": "otousan",
+    "meanings": [
+      "(honorable) father"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1002590
+  },
+  {
+    "id": "db32745bbc",
+    "word": "弟",
+    "reading": "おとうと",
+    "romaji": "otouto",
+    "meanings": [
+      "younger brother"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1581930
+  },
+  {
+    "id": "2fd7d45c8d",
+    "word": "男",
+    "reading": "おとこ",
+    "romaji": "otoko",
+    "meanings": [
+      "man"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "n-pref"
+    ],
+    "jmdict_id": 1419990
+  },
+  {
+    "id": "6f664d3ded",
+    "word": "男の子",
+    "reading": "おとこのこ",
+    "romaji": "otokonoko",
+    "meanings": [
+      "boy"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "exp",
+      "n"
+    ],
+    "jmdict_id": 1420010
+  },
+  {
+    "id": "f0f3826045",
+    "word": "一昨日",
+    "reading": "おととい",
+    "romaji": "ototoi",
+    "meanings": [
+      "day before yesterday"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1576050
+  },
+  {
+    "id": "b75778f0ce",
+    "word": "一昨年",
+    "reading": "おととし",
+    "romaji": "ototoshi",
+    "meanings": [
+      "year before last"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1576060
+  },
+  {
+    "id": "6f5049e2d4",
+    "word": "大人",
+    "reading": "おとな",
+    "romaji": "otona",
+    "meanings": [
+      "adult"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no",
+      "adj-na"
+    ],
+    "jmdict_id": 1414170
+  },
+  {
+    "id": "3707072a6b",
+    "word": "おなか",
+    "reading": "おなか",
+    "romaji": "onaka",
+    "meanings": [
+      "stomach"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1002610
+  },
+  {
+    "id": "7c134ec812",
+    "word": "同じ",
+    "reading": "おなじ",
+    "romaji": "onaji",
+    "meanings": [
+      "same"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-f",
+      "adj-na"
+    ],
+    "jmdict_id": 1451750
+  },
+  {
+    "id": "c6f43a8cc3",
+    "word": "お兄さん",
+    "reading": "おにいさん",
+    "romaji": "oniisan",
+    "meanings": [
+      "(honorable) older brother"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1001830
+  },
+  {
+    "id": "af378a4c86",
+    "word": "お姉さん",
+    "reading": "おねえさん",
+    "romaji": "oneesan",
+    "meanings": [
+      "(honorable) older sister"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1001990
+  },
+  {
+    "id": "4df6eda2a2",
+    "word": "お願いします",
+    "reading": "おねがいします",
+    "romaji": "onegaishimasu",
+    "meanings": [
+      "please"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "exp"
+    ],
+    "jmdict_id": 1001720
+  },
+  {
+    "id": "12d9487797",
+    "word": "おばあさん",
+    "reading": "おばあさん",
+    "romaji": "obaasan",
+    "meanings": [
+      "grandmother",
+      "female senior-citizen"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1002330
+  },
+  {
+    "id": "03d7b15720",
+    "word": "伯母さん",
+    "reading": "おばさん",
+    "romaji": "obasan",
+    "meanings": [
+      "aunt"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 2261500
+  },
+  {
+    "id": "36bff8d879",
+    "word": "おはよう",
+    "reading": "おはよう",
+    "romaji": "ohayou",
+    "meanings": [
+      "(abbreviation) Good morning"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "int"
+    ],
+    "jmdict_id": 1612820
+  },
+  {
+    "id": "f347485004",
+    "word": "お風呂",
+    "reading": "おふろ",
+    "romaji": "ofuro",
+    "meanings": [
+      "bath"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 2220600
+  },
+  {
+    "id": "7a073616e5",
+    "word": "お弁当",
+    "reading": "おべんとう",
+    "romaji": "obentou",
+    "meanings": [
+      "boxed lunch"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1513065
+  },
+  {
+    "id": "dad2d16220",
+    "word": "覚える",
+    "reading": "おぼえる",
+    "romaji": "oboeru",
+    "meanings": [
+      "to remember"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1206050
+  },
+  {
+    "id": "ae5d1778d1",
+    "word": "おまわりさん",
+    "reading": "おまわりさん",
+    "romaji": "omawarisan",
+    "meanings": [
+      "friendly term for policeman"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1002120
+  },
+  {
+    "id": "cdfb776826",
+    "word": "重い",
+    "reading": "おもい",
+    "romaji": "omoi",
+    "meanings": [
+      "heavy"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1335750
+  },
+  {
+    "id": "2568873ebd",
+    "word": "おもしろい",
+    "reading": "おもしろい",
+    "romaji": "omoshiroi",
+    "meanings": [
+      "interesting"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1533580
+  },
+  {
+    "id": "3c5bb8f223",
+    "word": "泳ぐ",
+    "reading": "およぐ",
+    "romaji": "oyogu",
+    "meanings": [
+      "to swim"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5g",
+      "vi"
+    ],
+    "jmdict_id": 1174340
+  },
+  {
+    "id": "ae00442122",
+    "word": "降りる",
+    "reading": "おりる",
+    "romaji": "oriru",
+    "meanings": [
+      "to get off",
+      "to descend"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vi"
+    ],
+    "jmdict_id": 1589500
+  },
+  {
+    "id": "d7960dc78d",
+    "word": "終る",
+    "reading": "おわる",
+    "romaji": "owaru",
+    "meanings": [
+      "to finish"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1589600
+  },
+  {
+    "id": "cdea017272",
+    "word": "音楽",
+    "reading": "おんがく",
+    "romaji": "ongaku",
+    "meanings": [
+      "music"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1183720
+  },
+  {
+    "id": "980a922ad3",
+    "word": "女",
+    "reading": "おんな",
+    "romaji": "onna",
+    "meanings": [
+      "woman"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "n-pref"
+    ],
+    "jmdict_id": 1344930
+  },
+  {
+    "id": "e6afab391a",
+    "word": "女の子",
+    "reading": "おんなのこ",
+    "romaji": "onnanoko",
+    "meanings": [
+      "girl"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "exp",
+      "n"
+    ],
+    "jmdict_id": 1344970
+  },
+  {
+    "id": "31a803c7f5",
+    "word": "外国",
+    "reading": "がいこく",
+    "romaji": "gaikoku",
+    "meanings": [
+      "foreign country"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1203620
+  },
+  {
+    "id": "70f1678111",
+    "word": "外国人",
+    "reading": "がいこくじん",
+    "romaji": "gaikokujin",
+    "meanings": [
+      "foreigner"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1203650
+  },
+  {
+    "id": "2120ff505c",
+    "word": "会社",
+    "reading": "かいしゃ",
+    "romaji": "kaisha",
+    "meanings": [
+      "company"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1198550
+  },
+  {
+    "id": "7cb27c411e",
+    "word": "階段",
+    "reading": "かいだん",
+    "romaji": "kaidan",
+    "meanings": [
+      "stairs"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1203090
+  },
+  {
+    "id": "a771d4f949",
+    "word": "買い物",
+    "reading": "かいもの",
+    "romaji": "kaimono",
+    "meanings": [
+      "shopping"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n",
+      "vs",
+      "vi"
+    ],
+    "jmdict_id": 1589730
+  },
+  {
+    "id": "bdb125e5c6",
+    "word": "買う",
+    "reading": "かう",
+    "romaji": "kau",
+    "meanings": [
+      "to buy"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5u",
+      "vt"
+    ],
+    "jmdict_id": 1473740
+  },
+  {
+    "id": "8ea4b03d7f",
+    "word": "返す",
+    "reading": "かえす",
+    "romaji": "kaesu",
+    "meanings": [
+      "to return something"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5s",
+      "vt"
+    ],
+    "jmdict_id": 1512130
+  },
+  {
+    "id": "1d22f1d023",
+    "word": "帰る",
+    "reading": "かえる",
+    "romaji": "kaeru",
+    "meanings": [
+      "to go back"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1221270
+  },
+  {
+    "id": "687082e55c",
+    "word": "かかる",
+    "reading": "かかる",
+    "romaji": "kakaru",
+    "meanings": [
+      "to take time or money"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1207590
+  },
+  {
+    "id": "e2d6576c76",
+    "word": "かぎ",
+    "reading": "かぎ",
+    "romaji": "kagi",
+    "meanings": [
+      "key"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1260490
+  },
+  {
+    "id": "f7c7f35d9e",
+    "word": "書く",
+    "reading": "かく",
+    "romaji": "kaku",
+    "meanings": [
+      "to write"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k",
+      "vt"
+    ],
+    "jmdict_id": 1343950
+  },
+  {
+    "id": "452102ad0a",
+    "word": "学生",
+    "reading": "がくせい",
+    "romaji": "gakusei",
+    "meanings": [
+      "student"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1206900
+  },
+  {
+    "id": "0ce2b98d3b",
+    "word": "かける",
+    "reading": "かける",
+    "romaji": "kakeru",
+    "meanings": [
+      "to call by phone"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1207610
+  },
+  {
+    "id": "6f54881e59",
+    "word": "傘",
+    "reading": "かさ",
+    "romaji": "kasa",
+    "meanings": [
+      "umbrella"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1301940
+  },
+  {
+    "id": "1122cac409",
+    "word": "貸す",
+    "reading": "かす",
+    "romaji": "kasu",
+    "meanings": [
+      "to lend"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5s",
+      "vt"
+    ],
+    "jmdict_id": 1411160
+  },
+  {
+    "id": "c1a28465a2",
+    "word": "風",
+    "reading": "かぜ",
+    "romaji": "kaze",
+    "meanings": [
+      "wind"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1499720
+  },
+  {
+    "id": "c9b5da4d10",
+    "word": "風邪",
+    "reading": "かぜ",
+    "romaji": "kaze",
+    "meanings": [
+      "a cold"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1583720
+  },
+  {
+    "id": "1c9db63bdc",
+    "word": "家族",
+    "reading": "かぞく",
+    "romaji": "kazoku",
+    "meanings": [
+      "family"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1192150
+  },
+  {
+    "id": "e34295f3e1",
+    "word": "方",
+    "reading": "かた",
+    "romaji": "kata",
+    "meanings": [
+      "person",
+      "way of doing"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1516925
+  },
+  {
+    "id": "dd8ac16bd2",
+    "word": "学校",
+    "reading": "がっこう",
+    "romaji": "gakkou",
+    "meanings": [
+      "school"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1206730
+  },
+  {
+    "id": "613c41bd1d",
+    "word": "カップ",
+    "reading": "カップ",
+    "romaji": "kappu",
+    "meanings": [
+      "cup"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1037670
+  },
+  {
+    "id": "66eeeb818b",
+    "word": "家庭",
+    "reading": "かてい",
+    "romaji": "katei",
+    "meanings": [
+      "household"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1192280
+  },
+  {
+    "id": "4092bfd9bb",
+    "word": "角",
+    "reading": "かど",
+    "romaji": "kado",
+    "meanings": [
+      "a corner"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1206110
+  },
+  {
+    "id": "6e6a06687d",
+    "word": "かばん",
+    "reading": "かばん",
+    "romaji": "kaban",
+    "meanings": [
+      "bag",
+      "basket"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1208910
+  },
+  {
+    "id": "749f78c9d1",
+    "word": "花瓶",
+    "reading": "かびん",
+    "romaji": "kabin",
+    "meanings": [
+      "a vase"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1194870
+  },
+  {
+    "id": "cd08f9cdc2",
+    "word": "紙",
+    "reading": "かみ",
+    "romaji": "kami",
+    "meanings": [
+      "paper"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1311530
+  },
+  {
+    "id": "9d648d38ad",
+    "word": "カメラ",
+    "reading": "カメラ",
+    "romaji": "kamera",
+    "meanings": [
+      "camera"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1038350
+  },
+  {
+    "id": "0dbf9ef8ca",
+    "word": "火曜日",
+    "reading": "かようび",
+    "romaji": "kayoubi",
+    "meanings": [
+      "Tuesday"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1194290
+  },
+  {
+    "id": "d2546ac97b",
+    "word": "辛い",
+    "reading": "からい",
+    "romaji": "karai",
+    "meanings": [
+      "spicy"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1365850
+  },
+  {
+    "id": "a556e5edce",
+    "word": "体",
+    "reading": "からだ",
+    "romaji": "karada",
+    "meanings": [
+      "body"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1409140
+  },
+  {
+    "id": "8cd440a181",
+    "word": "借りる",
+    "reading": "かりる",
+    "romaji": "kariru",
+    "meanings": [
+      "to borrow"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1323560
+  },
+  {
+    "id": "a8b9eb425d",
+    "word": "軽い",
+    "reading": "かるい",
+    "romaji": "karui",
+    "meanings": [
+      "light"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1252560
+  },
+  {
+    "id": "9decc44f4e",
+    "word": "カレー",
+    "reading": "カレー",
+    "romaji": "karee",
+    "meanings": [
+      "curry"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1039140
+  },
+  {
+    "id": "6382448bd3",
+    "word": "カレンダー",
+    "reading": "カレンダー",
+    "romaji": "karendaa",
+    "meanings": [
+      "calendar"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1039220
+  },
+  {
+    "id": "bcf12e002d",
+    "word": "川",
+    "reading": "かわ",
+    "romaji": "kawa",
+    "meanings": [
+      "river"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1390020
+  },
+  {
+    "id": "bad3423a93",
+    "word": "かわいい",
+    "reading": "かわいい",
+    "romaji": "kawaii",
+    "meanings": [
+      "cute"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1577200
+  },
+  {
+    "id": "fdc787af58",
+    "word": "漢字",
+    "reading": "かんじ",
+    "romaji": "kanji",
+    "meanings": [
+      "Chinese character"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1213170
+  },
+  {
+    "id": "22836046e2",
+    "word": "木",
+    "reading": "き",
+    "romaji": "ki",
+    "meanings": [
+      "tree",
+      "wood"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1534520
+  },
+  {
+    "id": "5d679a1af2",
+    "word": "黄色",
+    "reading": "きいろ",
+    "romaji": "kiiro",
+    "meanings": [
+      "yellow"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no",
+      "adj-na"
+    ],
+    "jmdict_id": 1576760
+  },
+  {
+    "id": "0b36c8d6c6",
+    "word": "黄色い",
+    "reading": "きいろい",
+    "romaji": "kiiroi",
+    "meanings": [
+      "yellow"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1182030
+  },
+  {
+    "id": "6030b50276",
+    "word": "消える",
+    "reading": "きえる",
+    "romaji": "kieru",
+    "meanings": [
+      "to disappear"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vi"
+    ],
+    "jmdict_id": 1350040
+  },
+  {
+    "id": "dc19a213cd",
+    "word": "聞く",
+    "reading": "きく",
+    "romaji": "kiku",
+    "meanings": [
+      "to hear",
+      "to listen to",
+      "to ask"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k",
+      "vt"
+    ],
+    "jmdict_id": 1591110
+  },
+  {
+    "id": "fa320a51ea",
+    "word": "北",
+    "reading": "きた",
+    "romaji": "kita",
+    "meanings": [
+      "north"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1520670
+  },
+  {
+    "id": "4fb1c0d758",
+    "word": "ギター",
+    "reading": "ギター",
+    "romaji": "gitaa",
+    "meanings": [
+      "guitar"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1042820
+  },
+  {
+    "id": "7d1cf1538b",
+    "word": "汚い",
+    "reading": "きたない",
+    "romaji": "kitanai",
+    "meanings": [
+      "dirty"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1178940
+  },
+  {
+    "id": "5620a00afc",
+    "word": "喫茶店",
+    "reading": "きっさてん",
+    "romaji": "kissaten",
+    "meanings": [
+      "coffee lounge"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1226440
+  },
+  {
+    "id": "e101e41f54",
+    "word": "切手",
+    "reading": "きって",
+    "romaji": "kitte",
+    "meanings": [
+      "postage stamp"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1385070
+  },
+  {
+    "id": "4fee5be397",
+    "word": "切符",
+    "reading": "きっぷ",
+    "romaji": "kippu",
+    "meanings": [
+      "ticket"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1385170
+  },
+  {
+    "id": "a94a4be08f",
+    "word": "昨日",
+    "reading": "きのう",
+    "romaji": "kinou",
+    "meanings": [
+      "yesterday"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1579260
+  },
+  {
+    "id": "8f81565ad7",
+    "word": "九",
+    "reading": "きゅう",
+    "romaji": "kyuu",
+    "meanings": [
+      "nine"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1578150
+  },
+  {
+    "id": "b4faf372f3",
+    "word": "牛肉",
+    "reading": "ぎゅうにく",
+    "romaji": "gyuuniku",
+    "meanings": [
+      "beef"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1231580
+  },
+  {
+    "id": "797ae8d562",
+    "word": "牛乳",
+    "reading": "ぎゅうにゅう",
+    "romaji": "gyuunyuu",
+    "meanings": [
+      "milk"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1231590
+  },
+  {
+    "id": "0400a204bd",
+    "word": "今日",
+    "reading": "きょう",
+    "romaji": "kyou",
+    "meanings": [
+      "today"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1579110
+  },
+  {
+    "id": "85eb994887",
+    "word": "教室",
+    "reading": "きょうしつ",
+    "romaji": "kyoushitsu",
+    "meanings": [
+      "classroom"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1237150
+  },
+  {
+    "id": "976c4f7174",
+    "word": "兄弟",
+    "reading": "きょうだい",
+    "romaji": "kyoudai",
+    "meanings": [
+      "(humble) siblings"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1249960
+  },
+  {
+    "id": "ec4e1dfc87",
+    "word": "去年",
+    "reading": "きょねん",
+    "romaji": "kyonen",
+    "meanings": [
+      "last year"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1231690
+  },
+  {
+    "id": "d106dac023",
+    "word": "嫌い",
+    "reading": "きらい",
+    "romaji": "kirai",
+    "meanings": [
+      "hate"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-na",
+      "n"
+    ],
+    "jmdict_id": 1257240
+  },
+  {
+    "id": "cf23f5fba1",
+    "word": "切る",
+    "reading": "きる",
+    "romaji": "kiru",
+    "meanings": [
+      "to cut"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vt"
+    ],
+    "jmdict_id": 1384830
+  },
+  {
+    "id": "45fbcb8670",
+    "word": "着る",
+    "reading": "きる",
+    "romaji": "kiru",
+    "meanings": [
+      "to put on from the shoulders down"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1423000
+  },
+  {
+    "id": "43cd9825f0",
+    "word": "きれい",
+    "reading": "きれい",
+    "romaji": "kirei",
+    "meanings": [
+      "pretty",
+      "clean"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-na"
+    ],
+    "jmdict_id": 1591900
+  },
+  {
+    "id": "36016e0c51",
+    "word": "キロ",
+    "reading": "キロ",
+    "romaji": "kiro",
+    "meanings": [
+      "kilometre",
+      "kilogram"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1042610
+  },
+  {
+    "id": "a59efa3057",
+    "word": "銀行",
+    "reading": "ぎんこう",
+    "romaji": "ginkou",
+    "meanings": [
+      "bank"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1243490
+  },
+  {
+    "id": "b00c4af0a2",
+    "word": "金曜日",
+    "reading": "きんようび",
+    "romaji": "kin'youbi",
+    "meanings": [
+      "Friday"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1243320
+  },
+  {
+    "id": "95ccaa32f5",
+    "word": "薬",
+    "reading": "くすり",
+    "romaji": "kusuri",
+    "meanings": [
+      "medicine"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1538160
+  },
+  {
+    "id": "a36841ba49",
+    "word": "ください",
+    "reading": "ください",
+    "romaji": "kudasai",
+    "meanings": [
+      "please"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "exp"
+    ],
+    "jmdict_id": 1184270
+  },
+  {
+    "id": "6b454b895e",
+    "word": "果物",
+    "reading": "くだもの",
+    "romaji": "kudamono",
+    "meanings": [
+      "fruit"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1193060
+  },
+  {
+    "id": "a123a147d7",
+    "word": "口",
+    "reading": "くち",
+    "romaji": "kuchi",
+    "meanings": [
+      "mouth",
+      "opening"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1275640
+  },
+  {
+    "id": "9dd0572f05",
+    "word": "靴",
+    "reading": "くつ",
+    "romaji": "kutsu",
+    "meanings": [
+      "shoes"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1246700
+  },
+  {
+    "id": "20a1278928",
+    "word": "靴下",
+    "reading": "くつした",
+    "romaji": "kutsushita",
+    "meanings": [
+      "socks"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1246740
+  },
+  {
+    "id": "b55dd305d1",
+    "word": "国",
+    "reading": "くに",
+    "romaji": "kuni",
+    "meanings": [
+      "country"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1592250
+  },
+  {
+    "id": "eec0f93991",
+    "word": "曇り",
+    "reading": "くもり",
+    "romaji": "kumori",
+    "meanings": [
+      "cloudy weather"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1592340
+  },
+  {
+    "id": "c34fdb6092",
+    "word": "曇る",
+    "reading": "くもる",
+    "romaji": "kumoru",
+    "meanings": [
+      "to become cloudy",
+      "to become dim"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1457560
+  },
+  {
+    "id": "01a0587b49",
+    "word": "暗い",
+    "reading": "くらい",
+    "romaji": "kurai",
+    "meanings": [
+      "gloomy"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1154330
+  },
+  {
+    "id": "72c04ce067",
+    "word": "クラス",
+    "reading": "クラス",
+    "romaji": "kurasu",
+    "meanings": [
+      "class"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1044070
+  },
+  {
+    "id": "5538df2bce",
+    "word": "グラム",
+    "reading": "グラム",
+    "romaji": "guramu",
+    "meanings": [
+      "gram"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1046810
+  },
+  {
+    "id": "2e2abd26ca",
+    "word": "来る",
+    "reading": "くる",
+    "romaji": "kuru",
+    "meanings": [
+      "to come"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "vk",
+      "vi"
+    ],
+    "jmdict_id": 1547720
+  },
+  {
+    "id": "d6b85573f3",
+    "word": "車",
+    "reading": "くるま",
+    "romaji": "kuruma",
+    "meanings": [
+      "car",
+      "vehicle"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1323080
+  },
+  {
+    "id": "3c32cfb08a",
+    "word": "黒",
+    "reading": "くろ",
+    "romaji": "kuro",
+    "meanings": [
+      "black"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1287410
+  },
+  {
+    "id": "5e5300cf62",
+    "word": "黒い",
+    "reading": "くろい",
+    "romaji": "kuroi",
+    "meanings": [
+      "black"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1287420
+  },
+  {
+    "id": "e1634cb3e9",
+    "word": "警官",
+    "reading": "けいかん",
+    "romaji": "keikan",
+    "meanings": [
+      "policeman"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1252330
+  },
+  {
+    "id": "9c1d724a61",
+    "word": "今朝",
+    "reading": "けさ",
+    "romaji": "kesa",
+    "meanings": [
+      "this morning"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1579100
+  },
+  {
+    "id": "19f270c68f",
+    "word": "消す",
+    "reading": "けす",
+    "romaji": "kesu",
+    "meanings": [
+      "to erase",
+      "to turn off power"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5s",
+      "vt"
+    ],
+    "jmdict_id": 1350110
+  },
+  {
+    "id": "dd34250740",
+    "word": "結構",
+    "reading": "けっこう",
+    "romaji": "kekkou",
+    "meanings": [
+      "splendid",
+      "enough"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adj-na"
+    ],
+    "jmdict_id": 1254760
+  },
+  {
+    "id": "2eb252da72",
+    "word": "結婚",
+    "reading": "けっこん",
+    "romaji": "kekkon",
+    "meanings": [
+      "marriage"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vi"
+    ],
+    "jmdict_id": 1254790
+  },
+  {
+    "id": "04e80a2ba1",
+    "word": "月曜日",
+    "reading": "げつようび",
+    "romaji": "getsuyoubi",
+    "meanings": [
+      "Monday"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1255890
+  },
+  {
+    "id": "2e1642b248",
+    "word": "玄関",
+    "reading": "げんかん",
+    "romaji": "genkan",
+    "meanings": [
+      "entry hall"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1263400
+  },
+  {
+    "id": "442c4aa1ca",
+    "word": "元気",
+    "reading": "げんき",
+    "romaji": "genki",
+    "meanings": [
+      "health",
+      "vitality"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adj-na",
+      "n"
+    ],
+    "jmdict_id": 1260720
+  },
+  {
+    "id": "47c1fdbe2f",
+    "word": "五",
+    "reading": "ご",
+    "romaji": "go",
+    "meanings": [
+      "five"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1268060
+  },
+  {
+    "id": "05cf590971",
+    "word": "公園",
+    "reading": "こうえん",
+    "romaji": "kouen",
+    "meanings": [
+      "park"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1273270
+  },
+  {
+    "id": "8699b8bec2",
+    "word": "交差点",
+    "reading": "こうさてん",
+    "romaji": "kousaten",
+    "meanings": [
+      "intersection"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1592970
+  },
+  {
+    "id": "1288e600be",
+    "word": "紅茶",
+    "reading": "こうちゃ",
+    "romaji": "koucha",
+    "meanings": [
+      "black tea"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1280770
+  },
+  {
+    "id": "402eb0d21f",
+    "word": "交番",
+    "reading": "こうばん",
+    "romaji": "kouban",
+    "meanings": [
+      "police box"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1272500
+  },
+  {
+    "id": "d890e45616",
+    "word": "声",
+    "reading": "こえ",
+    "romaji": "koe",
+    "meanings": [
+      "voice"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1380440
+  },
+  {
+    "id": "c552e79d34",
+    "word": "コート",
+    "reading": "コート",
+    "romaji": "kooto",
+    "meanings": [
+      "coat",
+      "tennis court"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 2842174
+  },
+  {
+    "id": "67126059f1",
+    "word": "コーヒー",
+    "reading": "コーヒー",
+    "romaji": "koohii",
+    "meanings": [
+      "coffee"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1049180
+  },
+  {
+    "id": "05123676c2",
+    "word": "ここ",
+    "reading": "ここ",
+    "romaji": "koko",
+    "meanings": [
+      "here"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1288810
+  },
+  {
+    "id": "9a7c962266",
+    "word": "午後",
+    "reading": "ごご",
+    "romaji": "gogo",
+    "meanings": [
+      "afternoon"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1268990
+  },
+  {
+    "id": "f114f6f499",
+    "word": "九日",
+    "reading": "ここのか",
+    "romaji": "kokonoka",
+    "meanings": [
+      "nine days",
+      "ninth day"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1243850
+  },
+  {
+    "id": "cff3c57405",
+    "word": "九つ",
+    "reading": "ここのつ",
+    "romaji": "kokonotsu",
+    "meanings": [
+      "nine"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1243600
+  },
+  {
+    "id": "c92dbe626a",
+    "word": "午前",
+    "reading": "ごぜん",
+    "romaji": "gozen",
+    "meanings": [
+      "morning"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1269060
+  },
+  {
+    "id": "d5d8c608aa",
+    "word": "答える",
+    "reading": "こたえる",
+    "romaji": "kotaeru",
+    "meanings": [
+      "to answer"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vi"
+    ],
+    "jmdict_id": 1449540
+  },
+  {
+    "id": "a9191729e3",
+    "word": "ごちそうさま",
+    "reading": "ごちそうさま",
+    "romaji": "gochisousama",
+    "meanings": [
+      "feast"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "int"
+    ],
+    "jmdict_id": 1270520
+  },
+  {
+    "id": "e9e492c68a",
+    "word": "こちら",
+    "reading": "こちら",
+    "romaji": "kochira",
+    "meanings": [
+      "this person or way"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1004500
+  },
+  {
+    "id": "be9b8bcb5e",
+    "word": "こっち",
+    "reading": "こっち",
+    "romaji": "kotchi",
+    "meanings": [
+      "this person or way"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1004500
+  },
+  {
+    "id": "2da7034c1e",
+    "word": "コップ",
+    "reading": "コップ",
+    "romaji": "koppu",
+    "meanings": [
+      "a glass"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1050390
+  },
+  {
+    "id": "0020b9ee4e",
+    "word": "今年",
+    "reading": "ことし",
+    "romaji": "kotoshi",
+    "meanings": [
+      "this year"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1579130
+  },
+  {
+    "id": "491cfa69be",
+    "word": "言葉",
+    "reading": "ことば",
+    "romaji": "kotoba",
+    "meanings": [
+      "word",
+      "language"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1264540
+  },
+  {
+    "id": "1f4bb6e503",
+    "word": "子供",
+    "reading": "こども",
+    "romaji": "kodomo",
+    "meanings": [
+      "child"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1307850
+  },
+  {
+    "id": "bd3a2ad2ad",
+    "word": "この",
+    "reading": "この",
+    "romaji": "kono",
+    "meanings": [
+      "this"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-pn"
+    ],
+    "jmdict_id": 1582920
+  },
+  {
+    "id": "a2694d259e",
+    "word": "御飯",
+    "reading": "ごはん",
+    "romaji": "gohan",
+    "meanings": [
+      "cooked rice",
+      "meal"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1270590
+  },
+  {
+    "id": "f586d7d023",
+    "word": "コピーする",
+    "reading": "コピーする",
+    "romaji": "kopiisuru",
+    "meanings": [
+      "to copy"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n",
+      "vs",
+      "vt"
+    ],
+    "jmdict_id": 1050590
+  },
+  {
+    "id": "61994485cb",
+    "word": "困る",
+    "reading": "こまる",
+    "romaji": "komaru",
+    "meanings": [
+      "to be worried"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1289590
+  },
+  {
+    "id": "4a11eb5fb4",
+    "word": "ごめんなさい",
+    "reading": "ごめんなさい",
+    "romaji": "gomennasai",
+    "meanings": [
+      "I beg your pardon",
+      "excuse me"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "exp"
+    ],
+    "jmdict_id": 1270680
+  },
+  {
+    "id": "6313cc9cb5",
+    "word": "これ",
+    "reading": "これ",
+    "romaji": "kore",
+    "meanings": [
+      "this"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1628530
+  },
+  {
+    "id": "3793173687",
+    "word": "今月",
+    "reading": "こんげつ",
+    "romaji": "kongetsu",
+    "meanings": [
+      "this month"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1289100
+  },
+  {
+    "id": "7a27eadef1",
+    "word": "今週",
+    "reading": "こんしゅう",
+    "romaji": "konshuu",
+    "meanings": [
+      "this week"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1289220
+  },
+  {
+    "id": "e1978f90df",
+    "word": "こんな",
+    "reading": "こんな",
+    "romaji": "konna",
+    "meanings": [
+      "such"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-pn"
+    ],
+    "jmdict_id": 1004880
+  },
+  {
+    "id": "0a65b39cf7",
+    "word": "こんにちは",
+    "reading": "こんにちは",
+    "romaji": "konnichiwa",
+    "meanings": [
+      "hello",
+      "good day (daytime greeting, id)"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "int"
+    ],
+    "jmdict_id": 1289400
+  },
+  {
+    "id": "eb1c9a5df9",
+    "word": "今晩",
+    "reading": "こんばん",
+    "romaji": "konban",
+    "meanings": [
+      "this evening"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1289470
+  },
+  {
+    "id": "6c0551dd8a",
+    "word": "こんばんは",
+    "reading": "こんばんは",
+    "romaji": "konbanwa",
+    "meanings": [
+      "good evening"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "int"
+    ],
+    "jmdict_id": 1289480
+  },
+  {
+    "id": "7ba7ba2434",
+    "word": "さあ",
+    "reading": "さあ",
+    "romaji": "saa",
+    "meanings": [
+      "well…"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "int"
+    ],
+    "jmdict_id": 1005110
+  },
+  {
+    "id": "a96e3a2b33",
+    "word": "財布",
+    "reading": "さいふ",
+    "romaji": "saifu",
+    "meanings": [
+      "wallet"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1296970
+  },
+  {
+    "id": "dbd7cd319c",
+    "word": "魚",
+    "reading": "さかな",
+    "romaji": "sakana",
+    "meanings": [
+      "fish"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1578010
+  },
+  {
+    "id": "20fcc4f54f",
+    "word": "先",
+    "reading": "さき",
+    "romaji": "saki",
+    "meanings": [
+      "the future",
+      "previous"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1387210
+  },
+  {
+    "id": "4c39babf5f",
+    "word": "咲く",
+    "reading": "さく",
+    "romaji": "saku",
+    "meanings": [
+      "to bloom"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k",
+      "vi"
+    ],
+    "jmdict_id": 1297210
+  },
+  {
+    "id": "c10cb3070d",
+    "word": "作文",
+    "reading": "さくぶん",
+    "romaji": "sakubun",
+    "meanings": [
+      "composition",
+      "writing"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vi"
+    ],
+    "jmdict_id": 1297960
+  },
+  {
+    "id": "4e2aefb855",
+    "word": "差す",
+    "reading": "さす",
+    "romaji": "sasu",
+    "meanings": [
+      "to stretch out hands",
+      "to raise an umbrella"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5s",
+      "vt"
+    ],
+    "jmdict_id": 1291330
+  },
+  {
+    "id": "a371cc6a54",
+    "word": "雑誌",
+    "reading": "ざっし",
+    "romaji": "zasshi",
+    "meanings": [
+      "magazine"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1299400
+  },
+  {
+    "id": "8af5030b7a",
+    "word": "砂糖",
+    "reading": "さとう",
+    "romaji": "satou",
+    "meanings": [
+      "sugar"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1291600
+  },
+  {
+    "id": "688bc67044",
+    "word": "寒い",
+    "reading": "さむい",
+    "romaji": "samui",
+    "meanings": [
+      "cold"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1210360
+  },
+  {
+    "id": "0a1f511640",
+    "word": "さようなら",
+    "reading": "さようなら",
+    "romaji": "sayounara",
+    "meanings": [
+      "good-bye"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "int"
+    ],
+    "jmdict_id": 1291050
+  },
+  {
+    "id": "45c705d5b2",
+    "word": "再来年",
+    "reading": "さらいねん",
+    "romaji": "sarainen",
+    "meanings": [
+      "year after next"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1293660
+  },
+  {
+    "id": "5cb07674a3",
+    "word": "三",
+    "reading": "さん",
+    "romaji": "san",
+    "meanings": [
+      "three"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1579350
+  },
+  {
+    "id": "e2695084c9",
+    "word": "散歩",
+    "reading": "さんぽ",
+    "romaji": "sanpo",
+    "meanings": [
+      "to stroll"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vi"
+    ],
+    "jmdict_id": 1303620
+  },
+  {
+    "id": "da4b805e0b",
+    "word": "四",
+    "reading": "し",
+    "romaji": "shi",
+    "meanings": [
+      "four"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1579470
+  },
+  {
+    "id": "b366a3d677",
+    "word": "塩",
+    "reading": "しお",
+    "romaji": "shio",
+    "meanings": [
+      "salt"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1576630
+  },
+  {
+    "id": "2c41aedcba",
+    "word": "しかし",
+    "reading": "しかし",
+    "romaji": "shikashi",
+    "meanings": [
+      "however"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "conj"
+    ],
+    "jmdict_id": 1505990
+  },
+  {
+    "id": "d5c916ca85",
+    "word": "時間",
+    "reading": "じかん",
+    "romaji": "jikan",
+    "meanings": [
+      "time"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1315920
+  },
+  {
+    "id": "573bc15b1d",
+    "word": "仕事",
+    "reading": "しごと",
+    "romaji": "shigoto",
+    "meanings": [
+      "job"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vi"
+    ],
+    "jmdict_id": 1304970
+  },
+  {
+    "id": "8ec35978bd",
+    "word": "辞書",
+    "reading": "じしょ",
+    "romaji": "jisho",
+    "meanings": [
+      "dictionary"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1318970
+  },
+  {
+    "id": "178469ba7a",
+    "word": "静か",
+    "reading": "しずか",
+    "romaji": "shizuka",
+    "meanings": [
+      "quiet"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-na"
+    ],
+    "jmdict_id": 1381820
+  },
+  {
+    "id": "dd36cae3a9",
+    "word": "下",
+    "reading": "した",
+    "romaji": "shita",
+    "meanings": [
+      "below"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1184140
+  },
+  {
+    "id": "988db98632",
+    "word": "七",
+    "reading": "しち",
+    "romaji": "shichi",
+    "meanings": [
+      "seven"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1319210
+  },
+  {
+    "id": "2c5c99977c",
+    "word": "質問",
+    "reading": "しつもん",
+    "romaji": "shitsumon",
+    "meanings": [
+      "question"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vt",
+      "vi",
+      "adj-no"
+    ],
+    "jmdict_id": 1320760
+  },
+  {
+    "id": "ebf194a316",
+    "word": "自転車",
+    "reading": "じてんしゃ",
+    "romaji": "jitensha",
+    "meanings": [
+      "bicycle"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1318290
+  },
+  {
+    "id": "78fd1a0e8a",
+    "word": "自動車",
+    "reading": "じどうしゃ",
+    "romaji": "jidousha",
+    "meanings": [
+      "automobile"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1318400
+  },
+  {
+    "id": "ec6fd2f845",
+    "word": "死ぬ",
+    "reading": "しぬ",
+    "romaji": "shinu",
+    "meanings": [
+      "to die"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5n",
+      "vi"
+    ],
+    "jmdict_id": 1310730
+  },
+  {
+    "id": "6156bfb418",
+    "word": "字引",
+    "reading": "じびき",
+    "romaji": "jibiki",
+    "meanings": [
+      "dictionary"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1315140
+  },
+  {
+    "id": "995a632b12",
+    "word": "自分",
+    "reading": "じぶん",
+    "romaji": "jibun",
+    "meanings": [
+      "oneself"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1318610
+  },
+  {
+    "id": "01420cdf0f",
+    "word": "閉まる",
+    "reading": "しまる",
+    "romaji": "shimaru",
+    "meanings": [
+      "to close",
+      "to be closed"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1436560
+  },
+  {
+    "id": "8e6c15bef9",
+    "word": "締める",
+    "reading": "しめる",
+    "romaji": "shimeru",
+    "meanings": [
+      "to tie"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1436570
+  },
+  {
+    "id": "95827b08e3",
+    "word": "閉める",
+    "reading": "しめる",
+    "romaji": "shimeru",
+    "meanings": [
+      "to close something"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1508590
+  },
+  {
+    "id": "091c8c0e07",
+    "word": "じゃ",
+    "reading": "じゃ",
+    "romaji": "ja",
+    "meanings": [
+      "well then…"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "conj"
+    ],
+    "jmdict_id": 1005900
+  },
+  {
+    "id": "5101640e7e",
+    "word": "写真",
+    "reading": "しゃしん",
+    "romaji": "shashin",
+    "meanings": [
+      "photograph"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1321900
+  },
+  {
+    "id": "f71424e3ff",
+    "word": "シャツ",
+    "reading": "シャツ",
+    "romaji": "shatsu",
+    "meanings": [
+      "shirt"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1061520
+  },
+  {
+    "id": "d9c88143a2",
+    "word": "シャワー",
+    "reading": "シャワー",
+    "romaji": "shawaa",
+    "meanings": [
+      "shower"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1061820
+  },
+  {
+    "id": "db9f5d4422",
+    "word": "十",
+    "reading": "じゅう",
+    "romaji": "juu",
+    "meanings": [
+      "ten"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1579840
+  },
+  {
+    "id": "5bae559507",
+    "word": "授業",
+    "reading": "じゅぎょう",
+    "romaji": "jugyou",
+    "meanings": [
+      "lesson",
+      "class work"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vi"
+    ],
+    "jmdict_id": 1330290
+  },
+  {
+    "id": "4daa103d7d",
+    "word": "宿題",
+    "reading": "しゅくだい",
+    "romaji": "shukudai",
+    "meanings": [
+      "homework"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1337270
+  },
+  {
+    "id": "1763fc412a",
+    "word": "上手",
+    "reading": "じょうず",
+    "romaji": "jouzu",
+    "meanings": [
+      "skillful"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adj-na",
+      "n"
+    ],
+    "jmdict_id": 1353320
+  },
+  {
+    "id": "50525927ee",
+    "word": "丈夫",
+    "reading": "じょうぶ",
+    "romaji": "joubu",
+    "meanings": [
+      "strong",
+      "durable"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adj-na"
+    ],
+    "jmdict_id": 1580480
+  },
+  {
+    "id": "9476d7966d",
+    "word": "しょうゆ",
+    "reading": "しょうゆ",
+    "romaji": "shouyu",
+    "meanings": [
+      "soy sauce"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1595020
+  },
+  {
+    "id": "dcc87a37fb",
+    "word": "食堂",
+    "reading": "しょくどう",
+    "romaji": "shokudou",
+    "meanings": [
+      "dining hall"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1358550
+  },
+  {
+    "id": "1fcb2fece8",
+    "word": "知る",
+    "reading": "しる",
+    "romaji": "shiru",
+    "meanings": [
+      "to know"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vt"
+    ],
+    "jmdict_id": 1420470
+  },
+  {
+    "id": "98eace7008",
+    "word": "白",
+    "reading": "しろ",
+    "romaji": "shiro",
+    "meanings": [
+      "white"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1474900
+  },
+  {
+    "id": "8997f64f52",
+    "word": "白い",
+    "reading": "しろい",
+    "romaji": "shiroi",
+    "meanings": [
+      "white"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1474910
+  },
+  {
+    "id": "b8317395af",
+    "word": "新聞",
+    "reading": "しんぶん",
+    "romaji": "shinbun",
+    "meanings": [
+      "newspaper"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1362360
+  },
+  {
+    "id": "44d9d70862",
+    "word": "水曜日",
+    "reading": "すいようび",
+    "romaji": "suiyoubi",
+    "meanings": [
+      "Wednesday"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1372190
+  },
+  {
+    "id": "e82727193e",
+    "word": "吸う",
+    "reading": "すう",
+    "romaji": "suu",
+    "meanings": [
+      "to smoke",
+      "to suck"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5u",
+      "vt"
+    ],
+    "jmdict_id": 1228260
+  },
+  {
+    "id": "f0f5f6b29b",
+    "word": "スカート",
+    "reading": "スカート",
+    "romaji": "sukaato",
+    "meanings": [
+      "skirt"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1067470
+  },
+  {
+    "id": "20cbecd474",
+    "word": "好き",
+    "reading": "すき",
+    "romaji": "suki",
+    "meanings": [
+      "likeable"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-na",
+      "n"
+    ],
+    "jmdict_id": 1277450
+  },
+  {
+    "id": "ce75057c4c",
+    "word": "すぐ",
+    "reading": "すぐ",
+    "romaji": "sugu",
+    "meanings": [
+      "immediately",
+      "soon",
+      "easily",
+      "right (near)",
+      "honest",
+      "upright"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv",
+      "n"
+    ],
+    "jmdict_id": 1430610
+  },
+  {
+    "id": "0d38b01113",
+    "word": "少ない",
+    "reading": "すくない",
+    "romaji": "sukunai",
+    "meanings": [
+      "a few"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1348910
+  },
+  {
+    "id": "a8722990f1",
+    "word": "すぐに",
+    "reading": "すぐに",
+    "romaji": "suguni",
+    "meanings": [
+      "instantly"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1430620
+  },
+  {
+    "id": "c373555102",
+    "word": "少し",
+    "reading": "すこし",
+    "romaji": "sukoshi",
+    "meanings": [
+      "few"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1348870
+  },
+  {
+    "id": "67f5908e10",
+    "word": "涼しい",
+    "reading": "すずしい",
+    "romaji": "suzushii",
+    "meanings": [
+      "refreshing"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1554370
+  },
+  {
+    "id": "8149d77689",
+    "word": "ストーブ",
+    "reading": "ストーブ",
+    "romaji": "sutoobu",
+    "meanings": [
+      "heater"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1070790
+  },
+  {
+    "id": "938a169f6c",
+    "word": "スプーン",
+    "reading": "スプーン",
+    "romaji": "supuun",
+    "meanings": [
+      "spoon"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1072590
+  },
+  {
+    "id": "0a33903ccf",
+    "word": "スポーツ",
+    "reading": "スポーツ",
+    "romaji": "supootsu",
+    "meanings": [
+      "sport"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1073210
+  },
+  {
+    "id": "10fe0704ca",
+    "word": "ズボン",
+    "reading": "ズボン",
+    "romaji": "zubon",
+    "meanings": [
+      "trousers"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1074260
+  },
+  {
+    "id": "feae64eac4",
+    "word": "すみません",
+    "reading": "すみません",
+    "romaji": "sumimasen",
+    "meanings": [
+      "sorry",
+      "excuse me"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "exp",
+      "int"
+    ],
+    "jmdict_id": 1295060
+  },
+  {
+    "id": "d671097071",
+    "word": "住む",
+    "reading": "すむ",
+    "romaji": "sumu",
+    "meanings": [
+      "to live in"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5m",
+      "vi"
+    ],
+    "jmdict_id": 1334040
+  },
+  {
+    "id": "508131fe89",
+    "word": "スリッパ",
+    "reading": "スリッパ",
+    "romaji": "surippa",
+    "meanings": [
+      "slippers"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1073900
+  },
+  {
+    "id": "c4cdc162d7",
+    "word": "する",
+    "reading": "する",
+    "romaji": "suru",
+    "meanings": [
+      "to do"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "vs-i"
+    ],
+    "jmdict_id": 1157170
+  },
+  {
+    "id": "c9a15e8777",
+    "word": "座る",
+    "reading": "すわる",
+    "romaji": "suwaru",
+    "meanings": [
+      "to sit"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1291800
+  },
+  {
+    "id": "898b067287",
+    "word": "背",
+    "reading": "せ",
+    "romaji": "se",
+    "meanings": [
+      "height",
+      "stature"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 2147990
+  },
+  {
+    "id": "af7459ef1e",
+    "word": "生徒",
+    "reading": "せいと",
+    "romaji": "seito",
+    "meanings": [
+      "pupil"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1379380
+  },
+  {
+    "id": "4b0b49a42d",
+    "word": "セーター",
+    "reading": "セーター",
+    "romaji": "seetaa",
+    "meanings": [
+      "sweater",
+      "jumper"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1074270
+  },
+  {
+    "id": "b48d0c99d4",
+    "word": "せっけん",
+    "reading": "せっけん",
+    "romaji": "sekken",
+    "meanings": [
+      "economy"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n",
+      "vs",
+      "vt",
+      "vi"
+    ],
+    "jmdict_id": 1386220
+  },
+  {
+    "id": "9d432ac114",
+    "word": "背広",
+    "reading": "せびろ",
+    "romaji": "sebiro",
+    "meanings": [
+      "business suit"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1472740
+  },
+  {
+    "id": "d12ee2e932",
+    "word": "狭い",
+    "reading": "せまい",
+    "romaji": "semai",
+    "meanings": [
+      "narrow"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1237680
+  },
+  {
+    "id": "434707d737",
+    "word": "ゼロ",
+    "reading": "ゼロ",
+    "romaji": "zero",
+    "meanings": [
+      "zero"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 2839962
+  },
+  {
+    "id": "1729d60f09",
+    "word": "千",
+    "reading": "せん",
+    "romaji": "sen",
+    "meanings": [
+      "thousand"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1388740
+  },
+  {
+    "id": "0eaa93c144",
+    "word": "先月",
+    "reading": "せんげつ",
+    "romaji": "sengetsu",
+    "meanings": [
+      "last month"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1387500
+  },
+  {
+    "id": "b8c4cd80db",
+    "word": "先週",
+    "reading": "せんしゅう",
+    "romaji": "senshuu",
+    "meanings": [
+      "last week"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1387870
+  },
+  {
+    "id": "814bdc2cec",
+    "word": "先生",
+    "reading": "せんせい",
+    "romaji": "sensei",
+    "meanings": [
+      "teacher",
+      "doctor"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "n-suf"
+    ],
+    "jmdict_id": 1387990
+  },
+  {
+    "id": "4d0ca7b320",
+    "word": "洗濯",
+    "reading": "せんたく",
+    "romaji": "sentaku",
+    "meanings": [
+      "washing"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vt"
+    ],
+    "jmdict_id": 1390980
+  },
+  {
+    "id": "acba6e07ba",
+    "word": "全部",
+    "reading": "ぜんぶ",
+    "romaji": "zenbu",
+    "meanings": [
+      "all"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no",
+      "adv"
+    ],
+    "jmdict_id": 1396130
+  },
+  {
+    "id": "501df34d31",
+    "word": "掃除",
+    "reading": "そうじ",
+    "romaji": "souji",
+    "meanings": [
+      "to clean",
+      "to sweep"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vt"
+    ],
+    "jmdict_id": 1399790
+  },
+  {
+    "id": "e75777d218",
+    "word": "そうして",
+    "reading": "そうして",
+    "romaji": "soushite",
+    "meanings": [
+      "and"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "conj"
+    ],
+    "jmdict_id": 1612860
+  },
+  {
+    "id": "5ef867ff81",
+    "word": "そこ",
+    "reading": "そこ",
+    "romaji": "soko",
+    "meanings": [
+      "that place"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1006670
+  },
+  {
+    "id": "105df79571",
+    "word": "そちら",
+    "reading": "そちら",
+    "romaji": "sochira",
+    "meanings": [
+      "over there"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1006780
+  },
+  {
+    "id": "80981fa136",
+    "word": "そっち",
+    "reading": "そっち",
+    "romaji": "sotchi",
+    "meanings": [
+      "over there"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1006780
+  },
+  {
+    "id": "68ad5f4363",
+    "word": "外",
+    "reading": "そと",
+    "romaji": "soto",
+    "meanings": [
+      "outside"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1203250
+  },
+  {
+    "id": "cb1c02a574",
+    "word": "その",
+    "reading": "その",
+    "romaji": "sono",
+    "meanings": [
+      "that"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-pn"
+    ],
+    "jmdict_id": 1006830
+  },
+  {
+    "id": "38c854e97f",
+    "word": "そば",
+    "reading": "そば",
+    "romaji": "soba",
+    "meanings": [
+      "near",
+      "beside"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1403830
+  },
+  {
+    "id": "6ff51bace3",
+    "word": "空",
+    "reading": "そら",
+    "romaji": "sora",
+    "meanings": [
+      "sky"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1245290
+  },
+  {
+    "id": "79d922e359",
+    "word": "それ",
+    "reading": "それ",
+    "romaji": "sore",
+    "meanings": [
+      "that"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1006970
+  },
+  {
+    "id": "799b7cabe0",
+    "word": "それから",
+    "reading": "それから",
+    "romaji": "sorekara",
+    "meanings": [
+      "after that"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "exp"
+    ],
+    "jmdict_id": 1006980
+  },
+  {
+    "id": "46c1721526",
+    "word": "それでは",
+    "reading": "それでは",
+    "romaji": "soredewa",
+    "meanings": [
+      "in that situation"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "exp"
+    ],
+    "jmdict_id": 1406050
+  },
+  {
+    "id": "5b303264b9",
+    "word": "大学",
+    "reading": "だいがく",
+    "romaji": "daigaku",
+    "meanings": [
+      "university"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1413240
+  },
+  {
+    "id": "992fc07339",
+    "word": "大使館",
+    "reading": "たいしかん",
+    "romaji": "taishikan",
+    "meanings": [
+      "embassy"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1413890
+  },
+  {
+    "id": "2f62b9db5e",
+    "word": "大丈夫",
+    "reading": "だいじょうぶ",
+    "romaji": "daijoubu",
+    "meanings": [
+      "all right"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adj-na"
+    ],
+    "jmdict_id": 1414150
+  },
+  {
+    "id": "9ee7cd3382",
+    "word": "大好き",
+    "reading": "だいすき",
+    "romaji": "daisuki",
+    "meanings": [
+      "to be very likeable"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-na"
+    ],
+    "jmdict_id": 1413660
+  },
+  {
+    "id": "b3a8593e53",
+    "word": "大切",
+    "reading": "たいせつ",
+    "romaji": "taisetsu",
+    "meanings": [
+      "important"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adj-na"
+    ],
+    "jmdict_id": 1414340
+  },
+  {
+    "id": "1c0b0f77b6",
+    "word": "台所",
+    "reading": "だいどころ",
+    "romaji": "daidokoro",
+    "meanings": [
+      "kitchen"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1412640
+  },
+  {
+    "id": "e04372c490",
+    "word": "たいへん",
+    "reading": "たいへん",
+    "romaji": "taihen",
+    "meanings": [
+      "very"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1415000
+  },
+  {
+    "id": "c74892f565",
+    "word": "高い",
+    "reading": "たかい",
+    "romaji": "takai",
+    "meanings": [
+      "tall",
+      "expensive"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1283190
+  },
+  {
+    "id": "a7c72d9bb1",
+    "word": "たくさん",
+    "reading": "たくさん",
+    "romaji": "takusan",
+    "meanings": [
+      "many"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-no",
+      "adj-na",
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1415870
+  },
+  {
+    "id": "2d5a93eb11",
+    "word": "タクシー",
+    "reading": "タクシー",
+    "romaji": "takushii",
+    "meanings": [
+      "taxi"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1076190
+  },
+  {
+    "id": "6298cfc5d6",
+    "word": "出す",
+    "reading": "だす",
+    "romaji": "dasu",
+    "meanings": [
+      "to put out"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5s",
+      "vt"
+    ],
+    "jmdict_id": 1338180
+  },
+  {
+    "id": "932afda20b",
+    "word": "立つ",
+    "reading": "たつ",
+    "romaji": "tatsu",
+    "meanings": [
+      "to stand"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5t",
+      "vi"
+    ],
+    "jmdict_id": 1597040
+  },
+  {
+    "id": "e7ca1b2fd5",
+    "word": "たて",
+    "reading": "たて",
+    "romaji": "tate",
+    "meanings": [
+      "length",
+      "height"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1335640
+  },
+  {
+    "id": "372b08211e",
+    "word": "建物",
+    "reading": "たてもの",
+    "romaji": "tatemono",
+    "meanings": [
+      "building"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1257540
+  },
+  {
+    "id": "9b2d455dfe",
+    "word": "楽しい",
+    "reading": "たのしい",
+    "romaji": "tanoshii",
+    "meanings": [
+      "enjoyable"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1207240
+  },
+  {
+    "id": "7e9d38afeb",
+    "word": "頼む",
+    "reading": "たのむ",
+    "romaji": "tanomu",
+    "meanings": [
+      "to ask"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5m",
+      "vt"
+    ],
+    "jmdict_id": 1548370
+  },
+  {
+    "id": "80beed00bf",
+    "word": "たばこ",
+    "reading": "たばこ",
+    "romaji": "tabako",
+    "meanings": [
+      "tobacco",
+      "cigarettes"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1597150
+  },
+  {
+    "id": "d9eba03b7b",
+    "word": "たぶん",
+    "reading": "たぶん",
+    "romaji": "tabun",
+    "meanings": [
+      "probably"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1407980
+  },
+  {
+    "id": "5c89b3094a",
+    "word": "食べ物",
+    "reading": "たべもの",
+    "romaji": "tabemono",
+    "meanings": [
+      "food"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1358340
+  },
+  {
+    "id": "86f67e2dc3",
+    "word": "食べる",
+    "reading": "たべる",
+    "romaji": "taberu",
+    "meanings": [
+      "to eat"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1358280
+  },
+  {
+    "id": "4d66739694",
+    "word": "卵",
+    "reading": "たまご",
+    "romaji": "tamago",
+    "meanings": [
+      "egg"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1549140
+  },
+  {
+    "id": "3d2ca62c5f",
+    "word": "誰",
+    "reading": "だれ",
+    "romaji": "dare",
+    "meanings": [
+      "who"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1416830
+  },
+  {
+    "id": "2e610178ae",
+    "word": "誕生日",
+    "reading": "たんじょうび",
+    "romaji": "tanjoubi",
+    "meanings": [
+      "birthday"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1419110
+  },
+  {
+    "id": "55dbb815ba",
+    "word": "だんだん",
+    "reading": "だんだん",
+    "romaji": "dandan",
+    "meanings": [
+      "gradually"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv",
+      "adv-to"
+    ],
+    "jmdict_id": 1597350
+  },
+  {
+    "id": "d4779ac36c",
+    "word": "小さい",
+    "reading": "ちいさい",
+    "romaji": "chiisai",
+    "meanings": [
+      "little"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1347750
+  },
+  {
+    "id": "38a8411ec3",
+    "word": "小さな",
+    "reading": "ちいさな",
+    "romaji": "chiisana",
+    "meanings": [
+      "little"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-pn"
+    ],
+    "jmdict_id": 2136180
+  },
+  {
+    "id": "a21ba677f2",
+    "word": "近い",
+    "reading": "ちかい",
+    "romaji": "chikai",
+    "meanings": [
+      "near"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1242130
+  },
+  {
+    "id": "35e9881c22",
+    "word": "違う",
+    "reading": "ちがう",
+    "romaji": "chigau",
+    "meanings": [
+      "to differ"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5u",
+      "vi"
+    ],
+    "jmdict_id": 1158880
+  },
+  {
+    "id": "6d7293f7cf",
+    "word": "近く",
+    "reading": "ちかく",
+    "romaji": "chikaku",
+    "meanings": [
+      "near"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n",
+      "adj-no",
+      "adv"
+    ],
+    "jmdict_id": 1242160
+  },
+  {
+    "id": "3134199c25",
+    "word": "地下鉄",
+    "reading": "ちかてつ",
+    "romaji": "chikatetsu",
+    "meanings": [
+      "underground train"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1420900
+  },
+  {
+    "id": "ffa3dda331",
+    "word": "地図",
+    "reading": "ちず",
+    "romaji": "chizu",
+    "meanings": [
+      "map"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1421290
+  },
+  {
+    "id": "f9b377e253",
+    "word": "茶色",
+    "reading": "ちゃいろ",
+    "romaji": "chairo",
+    "meanings": [
+      "brown"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1422720
+  },
+  {
+    "id": "3d12036023",
+    "word": "ちゃわん",
+    "reading": "ちゃわん",
+    "romaji": "chawan",
+    "meanings": [
+      "rice bowl"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1597530
+  },
+  {
+    "id": "9b08365493",
+    "word": "ちょうど",
+    "reading": "ちょうど",
+    "romaji": "choudo",
+    "meanings": [
+      "exactly"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1427340
+  },
+  {
+    "id": "602fdffbf2",
+    "word": "ちょっと",
+    "reading": "ちょっと",
+    "romaji": "chotto",
+    "meanings": [
+      "somewhat"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1163940
+  },
+  {
+    "id": "c88e0ba104",
+    "word": "使う",
+    "reading": "つかう",
+    "romaji": "tsukau",
+    "meanings": [
+      "to use"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5u",
+      "vt"
+    ],
+    "jmdict_id": 1305990
+  },
+  {
+    "id": "156f17113e",
+    "word": "疲れる",
+    "reading": "つかれる",
+    "romaji": "tsukareru",
+    "meanings": [
+      "to get tired"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vi"
+    ],
+    "jmdict_id": 1483740
+  },
+  {
+    "id": "d00ef0a9d5",
+    "word": "次",
+    "reading": "つぎ",
+    "romaji": "tsugi",
+    "meanings": [
+      "next"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1316380
+  },
+  {
+    "id": "9d4a68ce12",
+    "word": "着く",
+    "reading": "つく",
+    "romaji": "tsuku",
+    "meanings": [
+      "to arrive at"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k",
+      "vi"
+    ],
+    "jmdict_id": 1422970
+  },
+  {
+    "id": "672321bac9",
+    "word": "机",
+    "reading": "つくえ",
+    "romaji": "tsukue",
+    "meanings": [
+      "desk"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1220210
+  },
+  {
+    "id": "6e922a750e",
+    "word": "作る",
+    "reading": "つくる",
+    "romaji": "tsukuru",
+    "meanings": [
+      "to make"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vt"
+    ],
+    "jmdict_id": 1597890
+  },
+  {
+    "id": "edc22b8d98",
+    "word": "つける",
+    "reading": "つける",
+    "romaji": "tsukeru",
+    "meanings": [
+      "to turn on"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1610400
+  },
+  {
+    "id": "ba6c46f68c",
+    "word": "勤める",
+    "reading": "つとめる",
+    "romaji": "tsutomeru",
+    "meanings": [
+      "to work for someone"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt",
+      "vi"
+    ],
+    "jmdict_id": 1240825
+  },
+  {
+    "id": "3a94b5e981",
+    "word": "つまらない",
+    "reading": "つまらない",
+    "romaji": "tsumaranai",
+    "meanings": [
+      "boring"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1008190
+  },
+  {
+    "id": "a23d308800",
+    "word": "冷たい",
+    "reading": "つめたい",
+    "romaji": "tsumetai",
+    "meanings": [
+      "cold to the touch"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1556730
+  },
+  {
+    "id": "d99745fbb6",
+    "word": "強い",
+    "reading": "つよい",
+    "romaji": "tsuyoi",
+    "meanings": [
+      "powerful"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1236070
+  },
+  {
+    "id": "5b9670420a",
+    "word": "手",
+    "reading": "て",
+    "romaji": "te",
+    "meanings": [
+      "hand"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1327190
+  },
+  {
+    "id": "0cf2b43e9c",
+    "word": "テープ",
+    "reading": "テープ",
+    "romaji": "teepu",
+    "meanings": [
+      "tape"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1078750
+  },
+  {
+    "id": "ff161262dd",
+    "word": "テーブル",
+    "reading": "テーブル",
+    "romaji": "teeburu",
+    "meanings": [
+      "table"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1078630
+  },
+  {
+    "id": "dc0ae29019",
+    "word": "テープレコーダー",
+    "reading": "テープレコーダー",
+    "romaji": "teepurekoodaa",
+    "meanings": [
+      "tape recorder"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1078810
+  },
+  {
+    "id": "375cfbefdd",
+    "word": "出かける",
+    "reading": "でかける",
+    "romaji": "dekakeru",
+    "meanings": [
+      "to go out"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vi"
+    ],
+    "jmdict_id": 1598550
+  },
+  {
+    "id": "218ea67735",
+    "word": "手紙",
+    "reading": "てがみ",
+    "romaji": "tegami",
+    "meanings": [
+      "letter"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1327720
+  },
+  {
+    "id": "69d0d632fa",
+    "word": "できる",
+    "reading": "できる",
+    "romaji": "dekiru",
+    "meanings": [
+      "to be able to"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "v1",
+      "vi"
+    ],
+    "jmdict_id": 1340450
+  },
+  {
+    "id": "151fd72164",
+    "word": "出口",
+    "reading": "でぐち",
+    "romaji": "deguchi",
+    "meanings": [
+      "exit"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1338850
+  },
+  {
+    "id": "90e9410bff",
+    "word": "テスト",
+    "reading": "テスト",
+    "romaji": "tesuto",
+    "meanings": [
+      "test"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n",
+      "vs",
+      "vt"
+    ],
+    "jmdict_id": 1079760
+  },
+  {
+    "id": "d33540fe8e",
+    "word": "では",
+    "reading": "では",
+    "romaji": "dewa",
+    "meanings": [
+      "with that..."
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "exp"
+    ],
+    "jmdict_id": 1008450
+  },
+  {
+    "id": "0144505953",
+    "word": "デパート",
+    "reading": "デパート",
+    "romaji": "depaato",
+    "meanings": [
+      "department store"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1083590
+  },
+  {
+    "id": "3f71089c32",
+    "word": "でも",
+    "reading": "でも",
+    "romaji": "demo",
+    "meanings": [
+      "but"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "conj"
+    ],
+    "jmdict_id": 1008460
+  },
+  {
+    "id": "5ef4f7dde9",
+    "word": "出る",
+    "reading": "でる",
+    "romaji": "deru",
+    "meanings": [
+      "to appear",
+      "to leave"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vi"
+    ],
+    "jmdict_id": 1338240
+  },
+  {
+    "id": "c7e14d8454",
+    "word": "テレビ",
+    "reading": "テレビ",
+    "romaji": "terebi",
+    "meanings": [
+      "television"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1080510
+  },
+  {
+    "id": "679e34031e",
+    "word": "天気",
+    "reading": "てんき",
+    "romaji": "tenki",
+    "meanings": [
+      "weather"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1438690
+  },
+  {
+    "id": "a7c36fdb70",
+    "word": "電気",
+    "reading": "でんき",
+    "romaji": "denki",
+    "meanings": [
+      "electricity",
+      "electric light"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1443000
+  },
+  {
+    "id": "62b5c13164",
+    "word": "電車",
+    "reading": "でんしゃ",
+    "romaji": "densha",
+    "meanings": [
+      "electric train"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1443530
+  },
+  {
+    "id": "3c039918ba",
+    "word": "電話",
+    "reading": "でんわ",
+    "romaji": "denwa",
+    "meanings": [
+      "telephone"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vt",
+      "vi"
+    ],
+    "jmdict_id": 1443840
+  },
+  {
+    "id": "6f4691297f",
+    "word": "戸",
+    "reading": "と",
+    "romaji": "to",
+    "meanings": [
+      "Japanese style door"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1266970
+  },
+  {
+    "id": "677d3c5fac",
+    "word": "ドア",
+    "reading": "ドア",
+    "romaji": "doa",
+    "meanings": [
+      "Western style door"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1087820
+  },
+  {
+    "id": "e1e7c2d290",
+    "word": "トイレ",
+    "reading": "トイレ",
+    "romaji": "toire",
+    "meanings": [
+      "toilet"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1084810
+  },
+  {
+    "id": "d0fb41651f",
+    "word": "どう",
+    "reading": "どう",
+    "romaji": "dou",
+    "meanings": [
+      "how",
+      "in what way"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1008910
+  },
+  {
+    "id": "a891b73f8b",
+    "word": "どうして",
+    "reading": "どうして",
+    "romaji": "doushite",
+    "meanings": [
+      "for what reason"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1466940
+  },
+  {
+    "id": "a71cbc3ce4",
+    "word": "どうぞ",
+    "reading": "どうぞ",
+    "romaji": "douzo",
+    "meanings": [
+      "please"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1189130
+  },
+  {
+    "id": "93b9cec3d4",
+    "word": "どうぞよろしく",
+    "reading": "どうぞよろしく",
+    "romaji": "douzoyoroshiku",
+    "meanings": [
+      "pleased to meet you"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "exp"
+    ],
+    "jmdict_id": 1008960
+  },
+  {
+    "id": "03d03cf25d",
+    "word": "動物",
+    "reading": "どうぶつ",
+    "romaji": "doubutsu",
+    "meanings": [
+      "animal"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1451470
+  },
+  {
+    "id": "d2cb14f88a",
+    "word": "どうも",
+    "reading": "どうも",
+    "romaji": "doumo",
+    "meanings": [
+      "thanks"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "int"
+    ],
+    "jmdict_id": 1009000
+  },
+  {
+    "id": "f840779b9e",
+    "word": "遠い",
+    "reading": "とおい",
+    "romaji": "tooi",
+    "meanings": [
+      "far"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1177800
+  },
+  {
+    "id": "e8579084ba",
+    "word": "十日",
+    "reading": "とおか",
+    "romaji": "tooka",
+    "meanings": [
+      "ten days",
+      "the tenth day"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1335000
+  },
+  {
+    "id": "978a2cefa5",
+    "word": "時々",
+    "reading": "ときどき",
+    "romaji": "tokidoki",
+    "meanings": [
+      "sometimes"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adv",
+      "adj-no"
+    ],
+    "jmdict_id": 1598680
+  },
+  {
+    "id": "e3ad76810f",
+    "word": "時計",
+    "reading": "とけい",
+    "romaji": "tokei",
+    "meanings": [
+      "watch",
+      "clock"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1316140
+  },
+  {
+    "id": "ad884a3b70",
+    "word": "どこ",
+    "reading": "どこ",
+    "romaji": "doko",
+    "meanings": [
+      "where"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1577140
+  },
+  {
+    "id": "ca332ac7b4",
+    "word": "所",
+    "reading": "ところ",
+    "romaji": "tokoro",
+    "meanings": [
+      "place"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv",
+      "suf"
+    ],
+    "jmdict_id": 1343100
+  },
+  {
+    "id": "358fc382cb",
+    "word": "年",
+    "reading": "とし",
+    "romaji": "toshi",
+    "meanings": [
+      "year"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1468060
+  },
+  {
+    "id": "de5a452667",
+    "word": "図書館",
+    "reading": "としょかん",
+    "romaji": "toshokan",
+    "meanings": [
+      "library"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1370420
+  },
+  {
+    "id": "5480c153dc",
+    "word": "どちら",
+    "reading": "どちら",
+    "romaji": "dochira",
+    "meanings": [
+      "which of two"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1189360
+  },
+  {
+    "id": "e8a4843059",
+    "word": "どっち",
+    "reading": "どっち",
+    "romaji": "dotchi",
+    "meanings": [
+      "which"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1189360
+  },
+  {
+    "id": "a3679ee665",
+    "word": "とても",
+    "reading": "とても",
+    "romaji": "totemo",
+    "meanings": [
+      "very"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1008630
+  },
+  {
+    "id": "10fb2e55c0",
+    "word": "どなた",
+    "reading": "どなた",
+    "romaji": "donata",
+    "meanings": [
+      "who"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1189370
+  },
+  {
+    "id": "c597c353cb",
+    "word": "隣",
+    "reading": "となり",
+    "romaji": "tonari",
+    "meanings": [
+      "next door to"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1555830
+  },
+  {
+    "id": "cd4b8c6381",
+    "word": "どの",
+    "reading": "どの",
+    "romaji": "dono",
+    "meanings": [
+      "which"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-pn"
+    ],
+    "jmdict_id": 1920240
+  },
+  {
+    "id": "397b682fa7",
+    "word": "飛ぶ",
+    "reading": "とぶ",
+    "romaji": "tobu",
+    "meanings": [
+      "to fly",
+      "to hop"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5b",
+      "vi"
+    ],
+    "jmdict_id": 1429700
+  },
+  {
+    "id": "9d1aa046d6",
+    "word": "止まる",
+    "reading": "とまる",
+    "romaji": "tomaru",
+    "meanings": [
+      "to come to a halt"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1310620
+  },
+  {
+    "id": "72c525f37a",
+    "word": "友達",
+    "reading": "ともだち",
+    "romaji": "tomodachi",
+    "meanings": [
+      "friend"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1540170
+  },
+  {
+    "id": "86e7fb81c6",
+    "word": "土曜日",
+    "reading": "どようび",
+    "romaji": "doyoubi",
+    "meanings": [
+      "Saturday"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1445590
+  },
+  {
+    "id": "7e4fccba7f",
+    "word": "鳥",
+    "reading": "とり",
+    "romaji": "tori",
+    "meanings": [
+      "bird"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1430250
+  },
+  {
+    "id": "3669c65744",
+    "word": "鶏肉",
+    "reading": "とりにく",
+    "romaji": "toriniku",
+    "meanings": [
+      "chicken meat"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1253020
+  },
+  {
+    "id": "4cc27797ba",
+    "word": "撮る",
+    "reading": "とる",
+    "romaji": "toru",
+    "meanings": [
+      "to take a photo or record a film"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vt"
+    ],
+    "jmdict_id": 1298790
+  },
+  {
+    "id": "1313ed47fb",
+    "word": "取る",
+    "reading": "とる",
+    "romaji": "toru",
+    "meanings": [
+      "to take something"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vt"
+    ],
+    "jmdict_id": 1326980
+  },
+  {
+    "id": "b21477c7db",
+    "word": "どれ",
+    "reading": "どれ",
+    "romaji": "dore",
+    "meanings": [
+      "which (of three or more)"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1009290
+  },
+  {
+    "id": "3ae88c29c4",
+    "word": "ナイフ",
+    "reading": "ナイフ",
+    "romaji": "naifu",
+    "meanings": [
+      "knife"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1089890
+  },
+  {
+    "id": "5d32281da9",
+    "word": "中",
+    "reading": "なか",
+    "romaji": "naka",
+    "meanings": [
+      "middle"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1423310
+  },
+  {
+    "id": "fcea29f192",
+    "word": "長い",
+    "reading": "ながい",
+    "romaji": "nagai",
+    "meanings": [
+      "long"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1429750
+  },
+  {
+    "id": "07a4101167",
+    "word": "鳴く",
+    "reading": "なく",
+    "romaji": "naku",
+    "meanings": [
+      "to make a sound (of an animal)",
+      "to cry",
+      "to chirp",
+      "to sing (of birds)"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k",
+      "vi"
+    ],
+    "jmdict_id": 1532870
+  },
+  {
+    "id": "04015c3825",
+    "word": "無くす",
+    "reading": "なくす",
+    "romaji": "nakusu",
+    "meanings": [
+      "to lose something"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5s",
+      "vt"
+    ],
+    "jmdict_id": 1529530
+  },
+  {
+    "id": "ef9536b1ee",
+    "word": "なぜ",
+    "reading": "なぜ",
+    "romaji": "naze",
+    "meanings": [
+      "why"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1577120
+  },
+  {
+    "id": "641ddbf693",
+    "word": "夏",
+    "reading": "なつ",
+    "romaji": "natsu",
+    "meanings": [
+      "summer"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1191320
+  },
+  {
+    "id": "e09167a3d4",
+    "word": "夏休み",
+    "reading": "なつやすみ",
+    "romaji": "natsuyasumi",
+    "meanings": [
+      "summer holiday"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1191420
+  },
+  {
+    "id": "cf58476318",
+    "word": "など",
+    "reading": "など",
+    "romaji": "nado",
+    "meanings": [
+      "et cetera"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "prt"
+    ],
+    "jmdict_id": 1582300
+  },
+  {
+    "id": "e65bf7ad23",
+    "word": "七つ",
+    "reading": "ななつ",
+    "romaji": "nanatsu",
+    "meanings": [
+      "seven"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1319220
+  },
+  {
+    "id": "75ed3c3b2b",
+    "word": "七日",
+    "reading": "なのか",
+    "romaji": "nanoka",
+    "meanings": [
+      "seven days",
+      "the seventh day"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1579630
+  },
+  {
+    "id": "a812b1ac7f",
+    "word": "名前",
+    "reading": "なまえ",
+    "romaji": "namae",
+    "meanings": [
+      "name"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1531710
+  },
+  {
+    "id": "a95b0a87ad",
+    "word": "習う",
+    "reading": "ならう",
+    "romaji": "narau",
+    "meanings": [
+      "to learn"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5u",
+      "vt"
+    ],
+    "jmdict_id": 1333070
+  },
+  {
+    "id": "1227b20370",
+    "word": "並ぶ",
+    "reading": "ならぶ",
+    "romaji": "narabu",
+    "meanings": [
+      "to line up",
+      "to stand in a line"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5b",
+      "vi"
+    ],
+    "jmdict_id": 1508380
+  },
+  {
+    "id": "1635de1a94",
+    "word": "並べる",
+    "reading": "ならべる",
+    "romaji": "naraberu",
+    "meanings": [
+      "to line up",
+      "to set up"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1508390
+  },
+  {
+    "id": "e05de4981d",
+    "word": "なる",
+    "reading": "なる",
+    "romaji": "naru",
+    "meanings": [
+      "to become"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1375610
+  },
+  {
+    "id": "558866ef86",
+    "word": "何",
+    "reading": "なん",
+    "romaji": "nan",
+    "meanings": [
+      "what"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 1577100
+  },
+  {
+    "id": "34108268e1",
+    "word": "二",
+    "reading": "に",
+    "romaji": "ni",
+    "meanings": [
+      "two"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1461140
+  },
+  {
+    "id": "c17f97fafc",
+    "word": "賑やか",
+    "reading": "にぎやか",
+    "romaji": "nigiyaka",
+    "meanings": [
+      "bustling",
+      "busy"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-na"
+    ],
+    "jmdict_id": 1463480
+  },
+  {
+    "id": "efac1fc502",
+    "word": "肉",
+    "reading": "にく",
+    "romaji": "niku",
+    "meanings": [
+      "meat"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1463520
+  },
+  {
+    "id": "436f1c3c65",
+    "word": "西",
+    "reading": "にし",
+    "romaji": "nishi",
+    "meanings": [
+      "west"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1380840
+  },
+  {
+    "id": "d8c3a3f0d0",
+    "word": "日曜日",
+    "reading": "にちようび",
+    "romaji": "nichiyoubi",
+    "meanings": [
+      "Sunday"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1464900
+  },
+  {
+    "id": "2e6c7d2d9d",
+    "word": "荷物",
+    "reading": "にもつ",
+    "romaji": "nimotsu",
+    "meanings": [
+      "luggage"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1195430
+  },
+  {
+    "id": "b824bec2c5",
+    "word": "ニュース",
+    "reading": "ニュース",
+    "romaji": "nyuusu",
+    "meanings": [
+      "news"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1091500
+  },
+  {
+    "id": "9ef6c9d703",
+    "word": "庭",
+    "reading": "にわ",
+    "romaji": "niwa",
+    "meanings": [
+      "garden"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1436130
+  },
+  {
+    "id": "3af80b5b2a",
+    "word": "脱ぐ",
+    "reading": "ぬぐ",
+    "romaji": "nugu",
+    "meanings": [
+      "to take off clothes"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5g",
+      "vt"
+    ],
+    "jmdict_id": 1416400
+  },
+  {
+    "id": "2f01adebd7",
+    "word": "温い",
+    "reading": "ぬるい",
+    "romaji": "nurui",
+    "meanings": [
+      "luke warm"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1183300
+  },
+  {
+    "id": "18046e46a1",
+    "word": "ネクタイ",
+    "reading": "ネクタイ",
+    "romaji": "nekutai",
+    "meanings": [
+      "tie",
+      "necktie"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1092820
+  },
+  {
+    "id": "cbbfc8cad6",
+    "word": "猫",
+    "reading": "ねこ",
+    "romaji": "neko",
+    "meanings": [
+      "cat"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1467640
+  },
+  {
+    "id": "0c6e923ef9",
+    "word": "寝る",
+    "reading": "ねる",
+    "romaji": "neru",
+    "meanings": [
+      "to go to bed",
+      "to sleep"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vi"
+    ],
+    "jmdict_id": 1360010
+  },
+  {
+    "id": "278c1e0e04",
+    "word": "ノート",
+    "reading": "ノート",
+    "romaji": "nooto",
+    "meanings": [
+      "notebook",
+      "exercise book"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1093450
+  },
+  {
+    "id": "7817fc9d64",
+    "word": "登る",
+    "reading": "のぼる",
+    "romaji": "noboru",
+    "meanings": [
+      "to climb"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1352570
+  },
+  {
+    "id": "5e8fc8669c",
+    "word": "飲み物",
+    "reading": "のみもの",
+    "romaji": "nomimono",
+    "meanings": [
+      "a drink"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1600430
+  },
+  {
+    "id": "e0bcec9bd9",
+    "word": "飲む",
+    "reading": "のむ",
+    "romaji": "nomu",
+    "meanings": [
+      "to drink"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5m",
+      "vt"
+    ],
+    "jmdict_id": 1169870
+  },
+  {
+    "id": "822c5e11a6",
+    "word": "乗る",
+    "reading": "のる",
+    "romaji": "noru",
+    "meanings": [
+      "to get on",
+      "to ride"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1355120
+  },
+  {
+    "id": "390ac6443d",
+    "word": "歯",
+    "reading": "は",
+    "romaji": "ha",
+    "meanings": [
+      "tooth"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1313000
+  },
+  {
+    "id": "28111455cd",
+    "word": "パーティー",
+    "reading": "パーティー",
+    "romaji": "paatii",
+    "meanings": [
+      "party"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1100760
+  },
+  {
+    "id": "542f39c93d",
+    "word": "はい",
+    "reading": "はい",
+    "romaji": "hai",
+    "meanings": [
+      "yes"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "int"
+    ],
+    "jmdict_id": 1010080
+  },
+  {
+    "id": "5cc1dad1e8",
+    "word": "灰皿",
+    "reading": "はいざら",
+    "romaji": "haizara",
+    "meanings": [
+      "ashtray"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1201940
+  },
+  {
+    "id": "c428d02d43",
+    "word": "入る",
+    "reading": "はいる",
+    "romaji": "hairu",
+    "meanings": [
+      "to enter",
+      "to contain"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1465590
+  },
+  {
+    "id": "645e1e3b4d",
+    "word": "葉書",
+    "reading": "はがき",
+    "romaji": "hagaki",
+    "meanings": [
+      "postcard"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1546590
+  },
+  {
+    "id": "4729cc56f4",
+    "word": "はく",
+    "reading": "はく",
+    "romaji": "haku",
+    "meanings": [
+      "to wear",
+      "to put on trousers"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "v5k",
+      "vt"
+    ],
+    "jmdict_id": 1607260
+  },
+  {
+    "id": "658b912df8",
+    "word": "箱",
+    "reading": "はこ",
+    "romaji": "hako",
+    "meanings": [
+      "box"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1585650
+  },
+  {
+    "id": "7ce7f7d305",
+    "word": "はし",
+    "reading": "はし",
+    "romaji": "hashi",
+    "meanings": [
+      "chopsticks"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1476410
+  },
+  {
+    "id": "8f663254b0",
+    "word": "橋",
+    "reading": "はし",
+    "romaji": "hashi",
+    "meanings": [
+      "bridge"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1237410
+  },
+  {
+    "id": "8fea1e3f3c",
+    "word": "始まる",
+    "reading": "はじまる",
+    "romaji": "hajimaru",
+    "meanings": [
+      "to begin"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1307500
+  },
+  {
+    "id": "e5b36d7b24",
+    "word": "初め",
+    "reading": "はじめ",
+    "romaji": "hajime",
+    "meanings": [
+      "beginning"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1342540
+  },
+  {
+    "id": "3f18999e09",
+    "word": "初めて",
+    "reading": "はじめて",
+    "romaji": "hajimete",
+    "meanings": [
+      "for the first time"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adv",
+      "adj-no"
+    ],
+    "jmdict_id": 1342550
+  },
+  {
+    "id": "a2c1e54c17",
+    "word": "はじめまして",
+    "reading": "はじめまして",
+    "romaji": "hajimemashite",
+    "meanings": [
+      "How do you do?",
+      "I am glad to meet you"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "exp"
+    ],
+    "jmdict_id": 1625780
+  },
+  {
+    "id": "244e138920",
+    "word": "走る",
+    "reading": "はしる",
+    "romaji": "hashiru",
+    "meanings": [
+      "to run"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1402540
+  },
+  {
+    "id": "bd7df6c7a2",
+    "word": "バス",
+    "reading": "バス",
+    "romaji": "basu",
+    "meanings": [
+      "bus"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1098390
+  },
+  {
+    "id": "4385616659",
+    "word": "バター",
+    "reading": "バター",
+    "romaji": "bataa",
+    "meanings": [
+      "butter"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1098620
+  },
+  {
+    "id": "c65a346458",
+    "word": "二十歳",
+    "reading": "はたち",
+    "romaji": "hatachi",
+    "meanings": [
+      "20 years old",
+      "20th year"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1600790
+  },
+  {
+    "id": "9ea671262d",
+    "word": "働く",
+    "reading": "はたらく",
+    "romaji": "hataraku",
+    "meanings": [
+      "to work"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k",
+      "vi"
+    ],
+    "jmdict_id": 1451150
+  },
+  {
+    "id": "6eeff514e0",
+    "word": "八",
+    "reading": "はち",
+    "romaji": "hachi",
+    "meanings": [
+      "eight"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1583090
+  },
+  {
+    "id": "153de06669",
+    "word": "二十日",
+    "reading": "はつか",
+    "romaji": "hatsuka",
+    "meanings": [
+      "twenty days",
+      "twentieth"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1600850
+  },
+  {
+    "id": "6485c3c2a7",
+    "word": "花",
+    "reading": "はな",
+    "romaji": "hana",
+    "meanings": [
+      "flower"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1194500
+  },
+  {
+    "id": "8b5843f7fb",
+    "word": "鼻",
+    "reading": "はな",
+    "romaji": "hana",
+    "meanings": [
+      "nose"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1486720
+  },
+  {
+    "id": "1ed0362cc3",
+    "word": "話",
+    "reading": "はなし",
+    "romaji": "hanashi",
+    "meanings": [
+      "talk",
+      "story"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1600900
+  },
+  {
+    "id": "9d5bde24ec",
+    "word": "話す",
+    "reading": "はなす",
+    "romaji": "hanasu",
+    "meanings": [
+      "to speak"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5s",
+      "vt"
+    ],
+    "jmdict_id": 1562350
+  },
+  {
+    "id": "4db42e0181",
+    "word": "早い",
+    "reading": "はやい",
+    "romaji": "hayai",
+    "meanings": [
+      "early"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1404975
+  },
+  {
+    "id": "406d15f6e9",
+    "word": "速い",
+    "reading": "はやい",
+    "romaji": "hayai",
+    "meanings": [
+      "quick"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1404975
+  },
+  {
+    "id": "f16244c585",
+    "word": "春",
+    "reading": "はる",
+    "romaji": "haru",
+    "meanings": [
+      "spring"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1341000
+  },
+  {
+    "id": "f47c4aee42",
+    "word": "貼る",
+    "reading": "はる",
+    "romaji": "haru",
+    "meanings": [
+      "to stick"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vt"
+    ],
+    "jmdict_id": 1427900
+  },
+  {
+    "id": "9edf8548bb",
+    "word": "晴れ",
+    "reading": "はれ",
+    "romaji": "hare",
+    "meanings": [
+      "clear weather"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1376460
+  },
+  {
+    "id": "3be88666ba",
+    "word": "晴れる",
+    "reading": "はれる",
+    "romaji": "hareru",
+    "meanings": [
+      "to be sunny"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vi"
+    ],
+    "jmdict_id": 1376470
+  },
+  {
+    "id": "9cd7c780c3",
+    "word": "半",
+    "reading": "はん",
+    "romaji": "han",
+    "meanings": [
+      "half"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n-pref",
+      "n"
+    ],
+    "jmdict_id": 1478750
+  },
+  {
+    "id": "532c73de5d",
+    "word": "晩",
+    "reading": "ばん",
+    "romaji": "ban",
+    "meanings": [
+      "evening"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1482110
+  },
+  {
+    "id": "098e9e7e67",
+    "word": "パン",
+    "reading": "パン",
+    "romaji": "pan",
+    "meanings": [
+      "bread"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1103090
+  },
+  {
+    "id": "ee3206bb3f",
+    "word": "ハンカチ",
+    "reading": "ハンカチ",
+    "romaji": "hankachi",
+    "meanings": [
+      "handkerchief"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1096420
+  },
+  {
+    "id": "67775e3b25",
+    "word": "番号",
+    "reading": "ばんごう",
+    "romaji": "bangou",
+    "meanings": [
+      "number"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1482290
+  },
+  {
+    "id": "246b5ae84d",
+    "word": "晩御飯",
+    "reading": "ばんごはん",
+    "romaji": "bangohan",
+    "meanings": [
+      "evening meal"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1601340
+  },
+  {
+    "id": "a1cda8cb11",
+    "word": "半分",
+    "reading": "はんぶん",
+    "romaji": "hanbun",
+    "meanings": [
+      "half minute"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adv",
+      "n"
+    ],
+    "jmdict_id": 1479890
+  },
+  {
+    "id": "0a38c65004",
+    "word": "東",
+    "reading": "ひがし",
+    "romaji": "higashi",
+    "meanings": [
+      "east"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1447440
+  },
+  {
+    "id": "5b84039234",
+    "word": "引く",
+    "reading": "ひく",
+    "romaji": "hiku",
+    "meanings": [
+      "to pull"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k",
+      "vt"
+    ],
+    "jmdict_id": 1169250
+  },
+  {
+    "id": "23911a0718",
+    "word": "弾く",
+    "reading": "ひく",
+    "romaji": "hiku",
+    "meanings": [
+      "to play an instrument with strings",
+      "including piano"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k",
+      "vt"
+    ],
+    "jmdict_id": 1419370
+  },
+  {
+    "id": "e25cf6ed2f",
+    "word": "低い",
+    "reading": "ひくい",
+    "romaji": "hikui",
+    "meanings": [
+      "short",
+      "low"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1434180
+  },
+  {
+    "id": "a81612169c",
+    "word": "飛行機",
+    "reading": "ひこうき",
+    "romaji": "hikouki",
+    "meanings": [
+      "aeroplane"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1485470
+  },
+  {
+    "id": "ec5bd86b72",
+    "word": "左",
+    "reading": "ひだり",
+    "romaji": "hidari",
+    "meanings": [
+      "left hand side"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1290800
+  },
+  {
+    "id": "d91ee7a9ed",
+    "word": "人",
+    "reading": "ひと",
+    "romaji": "hito",
+    "meanings": [
+      "person"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1580640
+  },
+  {
+    "id": "537f8af3d6",
+    "word": "一つ",
+    "reading": "ひとつ",
+    "romaji": "hitotsu",
+    "meanings": [
+      "one"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1160820
+  },
+  {
+    "id": "3554fb81b8",
+    "word": "一月",
+    "reading": "ひとつき",
+    "romaji": "hitotsuki",
+    "meanings": [
+      "one month"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1162130
+  },
+  {
+    "id": "3fb1b70809",
+    "word": "一人",
+    "reading": "ひとり",
+    "romaji": "hitori",
+    "meanings": [
+      "one person"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1576150
+  },
+  {
+    "id": "7a9ce8e2df",
+    "word": "暇",
+    "reading": "ひま",
+    "romaji": "hima",
+    "meanings": [
+      "free time"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1577280
+  },
+  {
+    "id": "13696bc9b5",
+    "word": "百",
+    "reading": "ひゃく",
+    "romaji": "hyaku",
+    "meanings": [
+      "hundred"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1488000
+  },
+  {
+    "id": "734d275fd9",
+    "word": "病院",
+    "reading": "びょういん",
+    "romaji": "byouin",
+    "meanings": [
+      "hospital"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1490220
+  },
+  {
+    "id": "c551bc3f7c",
+    "word": "病気",
+    "reading": "びょうき",
+    "romaji": "byouki",
+    "meanings": [
+      "illness"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1490230
+  },
+  {
+    "id": "5d7a8d133b",
+    "word": "昼",
+    "reading": "ひる",
+    "romaji": "hiru",
+    "meanings": [
+      "noon",
+      "daytime"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1426250
+  },
+  {
+    "id": "0b492c3209",
+    "word": "昼御飯",
+    "reading": "ひるごはん",
+    "romaji": "hirugohan",
+    "meanings": [
+      "midday meal"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1602340
+  },
+  {
+    "id": "230d5c7343",
+    "word": "広い",
+    "reading": "ひろい",
+    "romaji": "hiroi",
+    "meanings": [
+      "spacious",
+      "wide"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1278410
+  },
+  {
+    "id": "ef9babb012",
+    "word": "フィルム",
+    "reading": "フィルム",
+    "romaji": "firumu",
+    "meanings": [
+      "roll of film"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1109380
+  },
+  {
+    "id": "d156402900",
+    "word": "封筒",
+    "reading": "ふうとう",
+    "romaji": "fuutou",
+    "meanings": [
+      "envelope"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1499690
+  },
+  {
+    "id": "55c1439239",
+    "word": "プール",
+    "reading": "プール",
+    "romaji": "puuru",
+    "meanings": [
+      "swimming pool"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1115150
+  },
+  {
+    "id": "71e2aefb9d",
+    "word": "フォーク",
+    "reading": "フォーク",
+    "romaji": "fooku",
+    "meanings": [
+      "fork"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1110110
+  },
+  {
+    "id": "15f4136421",
+    "word": "吹く",
+    "reading": "ふく",
+    "romaji": "fuku",
+    "meanings": [
+      "to blow"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k",
+      "vi"
+    ],
+    "jmdict_id": 1370760
+  },
+  {
+    "id": "68571540e1",
+    "word": "服",
+    "reading": "ふく",
+    "romaji": "fuku",
+    "meanings": [
+      "clothes"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "n-suf"
+    ],
+    "jmdict_id": 1500940
+  },
+  {
+    "id": "0c1dbd4838",
+    "word": "二つ",
+    "reading": "ふたつ",
+    "romaji": "futatsu",
+    "meanings": [
+      "two"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1461160
+  },
+  {
+    "id": "c518fb9116",
+    "word": "豚肉",
+    "reading": "ぶたにく",
+    "romaji": "butaniku",
+    "meanings": [
+      "pork"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1457440
+  },
+  {
+    "id": "94c2076821",
+    "word": "二人",
+    "reading": "ふたり",
+    "romaji": "futari",
+    "meanings": [
+      "two people"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1582670
+  },
+  {
+    "id": "750786cc55",
+    "word": "二日",
+    "reading": "ふつか",
+    "romaji": "futsuka",
+    "meanings": [
+      "two days",
+      "second day of the month"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1462900
+  },
+  {
+    "id": "4162724f9a",
+    "word": "太い",
+    "reading": "ふとい",
+    "romaji": "futoi",
+    "meanings": [
+      "fat"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1408180
+  },
+  {
+    "id": "eb9acca7ba",
+    "word": "冬",
+    "reading": "ふゆ",
+    "romaji": "fuyu",
+    "meanings": [
+      "winter"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1446070
+  },
+  {
+    "id": "5791e248f1",
+    "word": "降る",
+    "reading": "ふる",
+    "romaji": "furu",
+    "meanings": [
+      "to fall (e.g. rain or snow)"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1282790
+  },
+  {
+    "id": "aa60dd4a11",
+    "word": "古い",
+    "reading": "ふるい",
+    "romaji": "furui",
+    "meanings": [
+      "old (not used for people)"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1265070
+  },
+  {
+    "id": "34784ed6ca",
+    "word": "ふろ",
+    "reading": "ふろ",
+    "romaji": "furo",
+    "meanings": [
+      "bath"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1500100
+  },
+  {
+    "id": "79ddbb2b98",
+    "word": "文章",
+    "reading": "ぶんしょう",
+    "romaji": "bunshou",
+    "meanings": [
+      "sentence",
+      "text"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1505470
+  },
+  {
+    "id": "f8fc73bd75",
+    "word": "ページ",
+    "reading": "ページ",
+    "romaji": "peeji",
+    "meanings": [
+      "page"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n",
+      "ctr"
+    ],
+    "jmdict_id": 1120410
+  },
+  {
+    "id": "619dae70e9",
+    "word": "下手",
+    "reading": "へた",
+    "romaji": "heta",
+    "meanings": [
+      "unskillful"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adj-na",
+      "n"
+    ],
+    "jmdict_id": 1185200
+  },
+  {
+    "id": "91cf4ea2fd",
+    "word": "ベッド",
+    "reading": "ベッド",
+    "romaji": "beddo",
+    "meanings": [
+      "bed"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1119650
+  },
+  {
+    "id": "db38ebd955",
+    "word": "ペット",
+    "reading": "ペット",
+    "romaji": "petto",
+    "meanings": [
+      "pet"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1120990
+  },
+  {
+    "id": "e78074927c",
+    "word": "部屋",
+    "reading": "へや",
+    "romaji": "heya",
+    "meanings": [
+      "room"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1499320
+  },
+  {
+    "id": "71c372d7b2",
+    "word": "辺",
+    "reading": "へん",
+    "romaji": "hen",
+    "meanings": [
+      "area"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1512070
+  },
+  {
+    "id": "dd1183b005",
+    "word": "ペン",
+    "reading": "ペン",
+    "romaji": "pen",
+    "meanings": [
+      "pen"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1121380
+  },
+  {
+    "id": "65783b95dd",
+    "word": "勉強",
+    "reading": "べんきょう",
+    "romaji": "benkyou",
+    "meanings": [
+      "to study"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vt"
+    ],
+    "jmdict_id": 1512670
+  },
+  {
+    "id": "84887dde48",
+    "word": "便利",
+    "reading": "べんり",
+    "romaji": "benri",
+    "meanings": [
+      "useful",
+      "convenient"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adj-na"
+    ],
+    "jmdict_id": 1512610
+  },
+  {
+    "id": "cfc75623ae",
+    "word": "帽子",
+    "reading": "ぼうし",
+    "romaji": "boushi",
+    "meanings": [
+      "hat"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1519170
+  },
+  {
+    "id": "785a997045",
+    "word": "ボールペン",
+    "reading": "ボールペン",
+    "romaji": "boorupen",
+    "meanings": [
+      "ball-point pen"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1123590
+  },
+  {
+    "id": "f71c69492e",
+    "word": "ほか",
+    "reading": "ほか",
+    "romaji": "hoka",
+    "meanings": [
+      "other",
+      "the rest"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1203260
+  },
+  {
+    "id": "ab9f2792c4",
+    "word": "ポケット",
+    "reading": "ポケット",
+    "romaji": "poketto",
+    "meanings": [
+      "pocket"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1124970
+  },
+  {
+    "id": "418493d941",
+    "word": "欲しい",
+    "reading": "ほしい",
+    "romaji": "hoshii",
+    "meanings": [
+      "want"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i",
+      "aux-adj"
+    ],
+    "jmdict_id": 1547330
+  },
+  {
+    "id": "2dbe65ee1d",
+    "word": "ポスト",
+    "reading": "ポスト",
+    "romaji": "posuto",
+    "meanings": [
+      "post"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1125150
+  },
+  {
+    "id": "785adc4f9d",
+    "word": "細い",
+    "reading": "ほそい",
+    "romaji": "hosoi",
+    "meanings": [
+      "thin"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1295510
+  },
+  {
+    "id": "04ab635f4b",
+    "word": "ボタン",
+    "reading": "ボタン",
+    "romaji": "botan",
+    "meanings": [
+      "button"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1123880
+  },
+  {
+    "id": "23ec5a0b3d",
+    "word": "ホテル",
+    "reading": "ホテル",
+    "romaji": "hoteru",
+    "meanings": [
+      "hotel"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1122650
+  },
+  {
+    "id": "0e8f798dbf",
+    "word": "本",
+    "reading": "ほん",
+    "romaji": "hon",
+    "meanings": [
+      "book"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1522150
+  },
+  {
+    "id": "3839786bac",
+    "word": "本棚",
+    "reading": "ほんだな",
+    "romaji": "hondana",
+    "meanings": [
+      "bookshelves"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1522980
+  },
+  {
+    "id": "849baaf2c3",
+    "word": "ほんとう",
+    "reading": "ほんとう",
+    "romaji": "hontou",
+    "meanings": [
+      "truth"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n",
+      "adj-no",
+      "adj-na"
+    ],
+    "jmdict_id": 1523060
+  },
+  {
+    "id": "a59ba12bc5",
+    "word": "毎朝",
+    "reading": "まいあさ",
+    "romaji": "maiasa",
+    "meanings": [
+      "every morning"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1524700
+  },
+  {
+    "id": "771fbe6b4d",
+    "word": "毎月",
+    "reading": "まいげつ",
+    "romaji": "maigetsu",
+    "meanings": [
+      "every month"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adv",
+      "n"
+    ],
+    "jmdict_id": 1584350
+  },
+  {
+    "id": "fd1c93832f",
+    "word": "毎週",
+    "reading": "まいしゅう",
+    "romaji": "maishuu",
+    "meanings": [
+      "every week"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1524690
+  },
+  {
+    "id": "039a696225",
+    "word": "毎日",
+    "reading": "まいにち",
+    "romaji": "mainichi",
+    "meanings": [
+      "every day"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1524720
+  },
+  {
+    "id": "83700909d4",
+    "word": "毎年",
+    "reading": "まいねん",
+    "romaji": "mainen",
+    "meanings": [
+      "every year"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adv",
+      "n"
+    ],
+    "jmdict_id": 1584360
+  },
+  {
+    "id": "2584943533",
+    "word": "毎晩",
+    "reading": "まいばん",
+    "romaji": "maiban",
+    "meanings": [
+      "every night"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1524730
+  },
+  {
+    "id": "319e218950",
+    "word": "前",
+    "reading": "まえ",
+    "romaji": "mae",
+    "meanings": [
+      "before"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1392580
+  },
+  {
+    "id": "ae3e0a705f",
+    "word": "曲る",
+    "reading": "まがる",
+    "romaji": "magaru",
+    "meanings": [
+      "to turn",
+      "to bend"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1239730
+  },
+  {
+    "id": "b19034ded1",
+    "word": "まずい",
+    "reading": "まずい",
+    "romaji": "mazui",
+    "meanings": [
+      "unpleasant"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1495000
+  },
+  {
+    "id": "162e00c6ef",
+    "word": "また",
+    "reading": "また",
+    "romaji": "mata",
+    "meanings": [
+      "again",
+      "and"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1524930
+  },
+  {
+    "id": "6a7163f5f7",
+    "word": "まだ",
+    "reading": "まだ",
+    "romaji": "mada",
+    "meanings": [
+      "yet",
+      "still"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1527110
+  },
+  {
+    "id": "4d76d06d84",
+    "word": "町",
+    "reading": "まち",
+    "romaji": "machi",
+    "meanings": [
+      "town",
+      "city"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1603990
+  },
+  {
+    "id": "6a39701228",
+    "word": "待つ",
+    "reading": "まつ",
+    "romaji": "matsu",
+    "meanings": [
+      "to wait"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5t",
+      "vt",
+      "vi"
+    ],
+    "jmdict_id": 1410590
+  },
+  {
+    "id": "ede9ab2f7f",
+    "word": "まっすぐ",
+    "reading": "まっすぐ",
+    "romaji": "massugu",
+    "meanings": [
+      "straight ahead",
+      "direct"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-na",
+      "adv",
+      "n"
+    ],
+    "jmdict_id": 1580600
+  },
+  {
+    "id": "27f9d40392",
+    "word": "マッチ",
+    "reading": "マッチ",
+    "romaji": "matchi",
+    "meanings": [
+      "match"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1128430
+  },
+  {
+    "id": "7734194821",
+    "word": "窓",
+    "reading": "まど",
+    "romaji": "mado",
+    "meanings": [
+      "window"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1401400
+  },
+  {
+    "id": "ab36109960",
+    "word": "丸い",
+    "reading": "まるい",
+    "romaji": "marui",
+    "meanings": [
+      "round",
+      "circular"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1604230
+  },
+  {
+    "id": "a0ff0f67c8",
+    "word": "万",
+    "reading": "まん",
+    "romaji": "man",
+    "meanings": [
+      "ten thousand"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1584460
+  },
+  {
+    "id": "6318b0423a",
+    "word": "万年筆",
+    "reading": "まんねんひつ",
+    "romaji": "mannenhitsu",
+    "meanings": [
+      "fountain pen"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1526360
+  },
+  {
+    "id": "7309a238e8",
+    "word": "磨く",
+    "reading": "みがく",
+    "romaji": "migaku",
+    "meanings": [
+      "to brush teeth",
+      "to polish"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5k",
+      "vt"
+    ],
+    "jmdict_id": 1523940
+  },
+  {
+    "id": "f1046f3190",
+    "word": "右",
+    "reading": "みぎ",
+    "romaji": "migi",
+    "meanings": [
+      "right side"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1171010
+  },
+  {
+    "id": "8568eded6e",
+    "word": "短い",
+    "reading": "みじかい",
+    "romaji": "mijikai",
+    "meanings": [
+      "short"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1418620
+  },
+  {
+    "id": "69a792520f",
+    "word": "水",
+    "reading": "みず",
+    "romaji": "mizu",
+    "meanings": [
+      "water"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1371260
+  },
+  {
+    "id": "0c8a588e53",
+    "word": "店",
+    "reading": "みせ",
+    "romaji": "mise",
+    "meanings": [
+      "shop"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1582120
+  },
+  {
+    "id": "db35a99e28",
+    "word": "見せる",
+    "reading": "みせる",
+    "romaji": "miseru",
+    "meanings": [
+      "to show"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1259210
+  },
+  {
+    "id": "dc29195f18",
+    "word": "道",
+    "reading": "みち",
+    "romaji": "michi",
+    "meanings": [
+      "street"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1454080
+  },
+  {
+    "id": "1713d0bbe8",
+    "word": "三日",
+    "reading": "みっか",
+    "romaji": "mikka",
+    "meanings": [
+      "three days",
+      "third day of the month"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1301330
+  },
+  {
+    "id": "b36b221d33",
+    "word": "三つ",
+    "reading": "みっつ",
+    "romaji": "mittsu",
+    "meanings": [
+      "three"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1299740
+  },
+  {
+    "id": "85e4ba2f28",
+    "word": "緑",
+    "reading": "みどり",
+    "romaji": "midori",
+    "meanings": [
+      "green"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adj-no"
+    ],
+    "jmdict_id": 1555300
+  },
+  {
+    "id": "d2b9c47656",
+    "word": "皆さん",
+    "reading": "みなさん",
+    "romaji": "minasan",
+    "meanings": [
+      "everyone"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1202170
+  },
+  {
+    "id": "84e465b526",
+    "word": "南",
+    "reading": "みなみ",
+    "romaji": "minami",
+    "meanings": [
+      "south"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1459870
+  },
+  {
+    "id": "e8cdf8b85a",
+    "word": "耳",
+    "reading": "みみ",
+    "romaji": "mimi",
+    "meanings": [
+      "ear"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1317170
+  },
+  {
+    "id": "85b37b6884",
+    "word": "見る",
+    "reading": "みる",
+    "romaji": "miru",
+    "meanings": [
+      "to see",
+      "to watch"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1259290
+  },
+  {
+    "id": "2676514561",
+    "word": "みんな",
+    "reading": "みんな",
+    "romaji": "minna",
+    "meanings": [
+      "everyone"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "n",
+      "pn",
+      "adv"
+    ],
+    "jmdict_id": 1202150
+  },
+  {
+    "id": "bf44ddad08",
+    "word": "六日",
+    "reading": "むいか",
+    "romaji": "muika",
+    "meanings": [
+      "six days",
+      "sixth day of the month"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1561470
+  },
+  {
+    "id": "8e862f05f0",
+    "word": "向こう",
+    "reading": "むこう",
+    "romaji": "mukou",
+    "meanings": [
+      "over there"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1277140
+  },
+  {
+    "id": "0a3894175f",
+    "word": "難しい",
+    "reading": "むずかしい",
+    "romaji": "muzukashii",
+    "meanings": [
+      "difficult"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1460850
+  },
+  {
+    "id": "7ecc2c4bfc",
+    "word": "六つ",
+    "reading": "むっつ",
+    "romaji": "muttsu",
+    "meanings": [
+      "six"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1585315
+  },
+  {
+    "id": "5028971b39",
+    "word": "村",
+    "reading": "むら",
+    "romaji": "mura",
+    "meanings": [
+      "village"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1406820
+  },
+  {
+    "id": "ae534d4ca8",
+    "word": "目",
+    "reading": "め",
+    "romaji": "me",
+    "meanings": [
+      "eye"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1604890
+  },
+  {
+    "id": "eb5450490b",
+    "word": "メートル",
+    "reading": "メートル",
+    "romaji": "meetoru",
+    "meanings": [
+      "metre"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1132570
+  },
+  {
+    "id": "72eb77e07a",
+    "word": "眼鏡",
+    "reading": "めがね",
+    "romaji": "megane",
+    "meanings": [
+      "glasses"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1577670
+  },
+  {
+    "id": "c5b7ad76fd",
+    "word": "もう",
+    "reading": "もう",
+    "romaji": "mou",
+    "meanings": [
+      "already"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1012480
+  },
+  {
+    "id": "3ae16ad93a",
+    "word": "もう一度",
+    "reading": "もういちど",
+    "romaji": "mouichido",
+    "meanings": [
+      "again"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "exp",
+      "adv"
+    ],
+    "jmdict_id": 2005860
+  },
+  {
+    "id": "d10bb92f3e",
+    "word": "木曜日",
+    "reading": "もくようび",
+    "romaji": "mokuyoubi",
+    "meanings": [
+      "Thursday"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1534890
+  },
+  {
+    "id": "16fda19d79",
+    "word": "持つ",
+    "reading": "もつ",
+    "romaji": "motsu",
+    "meanings": [
+      "to hold"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5t",
+      "vt"
+    ],
+    "jmdict_id": 1315720
+  },
+  {
+    "id": "a8f5f4c59e",
+    "word": "もっと",
+    "reading": "もっと",
+    "romaji": "motto",
+    "meanings": [
+      "more"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1012620
+  },
+  {
+    "id": "782272bfda",
+    "word": "物",
+    "reading": "もの",
+    "romaji": "mono",
+    "meanings": [
+      "thing"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1502390
+  },
+  {
+    "id": "5b92758003",
+    "word": "門",
+    "reading": "もん",
+    "romaji": "mon",
+    "meanings": [
+      "gate"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1584800
+  },
+  {
+    "id": "4f0f6b6ae7",
+    "word": "問題",
+    "reading": "もんだい",
+    "romaji": "mondai",
+    "meanings": [
+      "problem"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1536010
+  },
+  {
+    "id": "8d29f60b23",
+    "word": "八百屋",
+    "reading": "やおや",
+    "romaji": "yaoya",
+    "meanings": [
+      "greengrocer"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1476960
+  },
+  {
+    "id": "936289666e",
+    "word": "野菜",
+    "reading": "やさい",
+    "romaji": "yasai",
+    "meanings": [
+      "vegetable"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1537370
+  },
+  {
+    "id": "ead1ae2736",
+    "word": "易しい",
+    "reading": "やさしい",
+    "romaji": "yasashii",
+    "meanings": [
+      "easy",
+      "simple"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1157000
+  },
+  {
+    "id": "33b86212ca",
+    "word": "安い",
+    "reading": "やすい",
+    "romaji": "yasui",
+    "meanings": [
+      "cheap"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1153670
+  },
+  {
+    "id": "d4a1d27d3b",
+    "word": "休み",
+    "reading": "やすみ",
+    "romaji": "yasumi",
+    "meanings": [
+      "rest",
+      "holiday"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1227500
+  },
+  {
+    "id": "3e3efcb45f",
+    "word": "休む",
+    "reading": "やすむ",
+    "romaji": "yasumu",
+    "meanings": [
+      "to rest"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5m",
+      "vi"
+    ],
+    "jmdict_id": 1227560
+  },
+  {
+    "id": "62c4216674",
+    "word": "八つ",
+    "reading": "やっつ",
+    "romaji": "yattsu",
+    "meanings": [
+      "eight"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1583095
+  },
+  {
+    "id": "e8a5cbdf0a",
+    "word": "山",
+    "reading": "やま",
+    "romaji": "yama",
+    "meanings": [
+      "mountain"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "ctr"
+    ],
+    "jmdict_id": 1302680
+  },
+  {
+    "id": "f81d503d6f",
+    "word": "やる",
+    "reading": "やる",
+    "romaji": "yaru",
+    "meanings": [
+      "to do"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "v5r",
+      "vt"
+    ],
+    "jmdict_id": 1012980
+  },
+  {
+    "id": "285b008622",
+    "word": "夕方",
+    "reading": "ゆうがた",
+    "romaji": "yuugata",
+    "meanings": [
+      "evening"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1542790
+  },
+  {
+    "id": "ae2b9f6d7e",
+    "word": "夕飯",
+    "reading": "ゆうはん",
+    "romaji": "yuuhan",
+    "meanings": [
+      "dinner"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1584910
+  },
+  {
+    "id": "8b86921749",
+    "word": "郵便局",
+    "reading": "ゆうびんきょく",
+    "romaji": "yuubinkyoku",
+    "meanings": [
+      "post office"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1542430
+  },
+  {
+    "id": "39fff8fc4b",
+    "word": "昨夜",
+    "reading": "ゆうべ",
+    "romaji": "yuube",
+    "meanings": [
+      "last night"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1542640
+  },
+  {
+    "id": "50b217ed0b",
+    "word": "有名",
+    "reading": "ゆうめい",
+    "romaji": "yuumei",
+    "meanings": [
+      "famous"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "adj-na"
+    ],
+    "jmdict_id": 1541620
+  },
+  {
+    "id": "78c044b951",
+    "word": "雪",
+    "reading": "ゆき",
+    "romaji": "yuki",
+    "meanings": [
+      "snow"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1386500
+  },
+  {
+    "id": "d980cb1531",
+    "word": "ゆっくりと",
+    "reading": "ゆっくりと",
+    "romaji": "yukkurito",
+    "meanings": [
+      "slowly"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv",
+      "adv-to",
+      "vs"
+    ],
+    "jmdict_id": 1013050
+  },
+  {
+    "id": "4f8e83945d",
+    "word": "八日",
+    "reading": "ようか",
+    "romaji": "youka",
+    "meanings": [
+      "eight days",
+      "eighth day of the month"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1476920
+  },
+  {
+    "id": "1907b6fc38",
+    "word": "洋服",
+    "reading": "ようふく",
+    "romaji": "youfuku",
+    "meanings": [
+      "western-style clothes"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1546020
+  },
+  {
+    "id": "19db29fbbb",
+    "word": "よく",
+    "reading": "よく",
+    "romaji": "yoku",
+    "meanings": [
+      "often",
+      "well"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adv"
+    ],
+    "jmdict_id": 1605870
+  },
+  {
+    "id": "4cb7c969c4",
+    "word": "横",
+    "reading": "よこ",
+    "romaji": "yoko",
+    "meanings": [
+      "beside",
+      "side",
+      "width"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1180570
+  },
+  {
+    "id": "222ae96df7",
+    "word": "四日",
+    "reading": "よっか",
+    "romaji": "yokka",
+    "meanings": [
+      "four days",
+      "fouth day of the month"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1307320
+  },
+  {
+    "id": "1000ee441a",
+    "word": "四つ",
+    "reading": "よっつ",
+    "romaji": "yottsu",
+    "meanings": [
+      "four"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1307040
+  },
+  {
+    "id": "76f05a0739",
+    "word": "呼ぶ",
+    "reading": "よぶ",
+    "romaji": "yobu",
+    "meanings": [
+      "to call out",
+      "to invite"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5b",
+      "vt"
+    ],
+    "jmdict_id": 1266440
+  },
+  {
+    "id": "eb7e675902",
+    "word": "読む",
+    "reading": "よむ",
+    "romaji": "yomu",
+    "meanings": [
+      "to read"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5m",
+      "vt"
+    ],
+    "jmdict_id": 1456360
+  },
+  {
+    "id": "6c214111ea",
+    "word": "より",
+    "reading": "より",
+    "romaji": "yori",
+    "meanings": [
+      "than",
+      "(used for comparison)"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "prt"
+    ],
+    "jmdict_id": 1013190
+  },
+  {
+    "id": "1a0aec6793",
+    "word": "夜",
+    "reading": "よる",
+    "romaji": "yoru",
+    "meanings": [
+      "evening",
+      "night"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1536350
+  },
+  {
+    "id": "83da293775",
+    "word": "弱い",
+    "reading": "よわい",
+    "romaji": "yowai",
+    "meanings": [
+      "weak"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1324520
+  },
+  {
+    "id": "61fd50f12e",
+    "word": "来月",
+    "reading": "らいげつ",
+    "romaji": "raigetsu",
+    "meanings": [
+      "next month"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1547900
+  },
+  {
+    "id": "7a4ef637be",
+    "word": "来週",
+    "reading": "らいしゅう",
+    "romaji": "raishuu",
+    "meanings": [
+      "next week"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1548010
+  },
+  {
+    "id": "c68f2caa2f",
+    "word": "来年",
+    "reading": "らいねん",
+    "romaji": "rainen",
+    "meanings": [
+      "next year"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "adv"
+    ],
+    "jmdict_id": 1548220
+  },
+  {
+    "id": "670f2dd0dc",
+    "word": "ラジオ",
+    "reading": "ラジオ",
+    "romaji": "rajio",
+    "meanings": [
+      "radio"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1138860
+  },
+  {
+    "id": "924572e50c",
+    "word": "ラジカセ",
+    "reading": "ラジカセ",
+    "romaji": "rajikase",
+    "meanings": [
+      "radio cassette player"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1138960
+  },
+  {
+    "id": "a45af4ed89",
+    "word": "りっぱ",
+    "reading": "りっぱ",
+    "romaji": "rippa",
+    "meanings": [
+      "splendid"
+    ],
+    "level": "N5",
+    "writing_type": "hiragana",
+    "pos": [
+      "adj-na"
+    ],
+    "jmdict_id": 1551790
+  },
+  {
+    "id": "dc7d39c7af",
+    "word": "留学生",
+    "reading": "りゅうがくせい",
+    "romaji": "ryuugakusei",
+    "meanings": [
+      "overseas student"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1552750
+  },
+  {
+    "id": "0139a208fe",
+    "word": "両親",
+    "reading": "りょうしん",
+    "romaji": "ryoushin",
+    "meanings": [
+      "both parents"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1602710
+  },
+  {
+    "id": "ee85169acd",
+    "word": "料理",
+    "reading": "りょうり",
+    "romaji": "ryouri",
+    "meanings": [
+      "cuisine"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vt"
+    ],
+    "jmdict_id": 1554310
+  },
+  {
+    "id": "2ba96bef9a",
+    "word": "旅行",
+    "reading": "りょこう",
+    "romaji": "ryokou",
+    "meanings": [
+      "travel"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vi"
+    ],
+    "jmdict_id": 1553170
+  },
+  {
+    "id": "92b3bb727e",
+    "word": "零",
+    "reading": "れい",
+    "romaji": "rei",
+    "meanings": [
+      "zero"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1557630
+  },
+  {
+    "id": "f7a15687a1",
+    "word": "冷蔵庫",
+    "reading": "れいぞうこ",
+    "romaji": "reizouko",
+    "meanings": [
+      "refrigerator"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1557110
+  },
+  {
+    "id": "0455201fe6",
+    "word": "レコード",
+    "reading": "レコード",
+    "romaji": "rekoodo",
+    "meanings": [
+      "record"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1144940
+  },
+  {
+    "id": "31893e4378",
+    "word": "レストラン",
+    "reading": "レストラン",
+    "romaji": "resutoran",
+    "meanings": [
+      "restaurant"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1145310
+  },
+  {
+    "id": "d23f06249a",
+    "word": "練習",
+    "reading": "れんしゅう",
+    "romaji": "renshuu",
+    "meanings": [
+      "to practice"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n",
+      "vs",
+      "vt"
+    ],
+    "jmdict_id": 1559160
+  },
+  {
+    "id": "5fc0f979e6",
+    "word": "廊下",
+    "reading": "ろうか",
+    "romaji": "rouka",
+    "meanings": [
+      "corridor"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1560670
+  },
+  {
+    "id": "f9ccc7bfdf",
+    "word": "六",
+    "reading": "ろく",
+    "romaji": "roku",
+    "meanings": [
+      "six"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "num"
+    ],
+    "jmdict_id": 1585310
+  },
+  {
+    "id": "38249a2dd2",
+    "word": "ワイシャツ",
+    "reading": "ワイシャツ",
+    "romaji": "waishatsu",
+    "meanings": [
+      "business shirt"
+    ],
+    "level": "N5",
+    "writing_type": "katakana",
+    "pos": [
+      "n"
+    ],
+    "jmdict_id": 1148640
+  },
+  {
+    "id": "640761cb8b",
+    "word": "若い",
+    "reading": "わかい",
+    "romaji": "wakai",
+    "meanings": [
+      "young"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1324300
+  },
+  {
+    "id": "ecee43eb04",
+    "word": "分かる",
+    "reading": "わかる",
+    "romaji": "wakaru",
+    "meanings": [
+      "to be understood"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1606560
+  },
+  {
+    "id": "0ca0de9dea",
+    "word": "忘れる",
+    "reading": "わすれる",
+    "romaji": "wasureru",
+    "meanings": [
+      "to forget"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v1",
+      "vt"
+    ],
+    "jmdict_id": 1519210
+  },
+  {
+    "id": "d5c2e69813",
+    "word": "私",
+    "reading": "わたくし",
+    "romaji": "watakushi",
+    "meanings": [
+      "(humble) I",
+      "myself"
+    ],
+    "level": "N5",
+    "writing_type": "kanji",
+    "pos": [
+      "pn"
+    ],
+    "jmdict_id": 2842390
+  },
+  {
+    "id": "b1d440d4e1",
+    "word": "渡す",
+    "reading": "わたす",
+    "romaji": "watasu",
+    "meanings": [
+      "to hand over"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5s",
+      "vt"
+    ],
+    "jmdict_id": 1444610
+  },
+  {
+    "id": "78255b9860",
+    "word": "渡る",
+    "reading": "わたる",
+    "romaji": "wataru",
+    "meanings": [
+      "to go across"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "v5r",
+      "vi"
+    ],
+    "jmdict_id": 1444680
+  },
+  {
+    "id": "13b6dbec03",
+    "word": "悪い",
+    "reading": "わるい",
+    "romaji": "warui",
+    "meanings": [
+      "bad"
+    ],
+    "level": "N5",
+    "writing_type": "mixed",
+    "pos": [
+      "adj-i"
+    ],
+    "jmdict_id": 1151260
+  }
+]
