@@ -1,6 +1,4 @@
 const USER = "Mayuna";
-const PASSWORD_SHA256 = "9317824a5a58e32b3eaf2f44ebf0ebff06bc85a0aaa10f08c856cce347bc8ae2";
-const SESSION_SECRET = "djfdQh7XnWPHUEXGG4ltDbVnaAyNvDIVAy4vwPoMzBJlPtCbqv6pLfaF2chnXpxf";
 const COOKIE = "eego_session";
 const COOKIE_PATH = "/functions/v1/eego";
 
@@ -17,7 +15,7 @@ function fromB64u(s: string) {
   for (let i=0;i<raw.length;i++) out[i] = raw.charCodeAt(i); return out;
 }
 async function hmac(body: string) {
-  const key = await crypto.subtle.importKey("raw", te.encode(SESSION_SECRET), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
+  const key = await crypto.subtle.importKey("raw", te.encode(SERVICE_KEY), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
   return b64u(new Uint8Array(await crypto.subtle.sign("HMAC", key, te.encode(body))));
 }
 async function makeSession() {
@@ -91,7 +89,9 @@ Deno.serve(async (req:Request)=>{
     if(req.method!=="POST") return json({error:"Method not allowed"},405);
     const body=await req.json().catch(()=>({}));
     if(body.action==="login"){
-      if(body.username!==USER || await sha256(String(body.password||""))!==PASSWORD_SHA256) return json({error:"Incorrect username or password."},401);
+      const cfg=await db("eego_private_config?key=eq.login_password_sha256&select=value&limit=1")||[];
+      const expected=cfg[0]?.value||"";
+      if(body.username!==USER || !expected || await sha256(String(body.password||""))!==expected) return json({error:"Incorrect username or password."},401);
       const token=await makeSession(); return json({ok:true},200,{"set-cookie":`${COOKIE}=${token}; HttpOnly; Secure; SameSite=Lax; Path=${COOKIE_PATH}; Max-Age=2592000`});
     }
     if(!(await validSession(req))) return json({error:"Unauthorized"},401);
