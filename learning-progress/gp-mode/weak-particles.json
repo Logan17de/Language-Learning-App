@@ -8,9 +8,9 @@
         "が"
       ],
       "category": "contrast/topic selection",
-      "status": "emerging",
+      "status": "improving",
       "firstMarkedDate": "2026-09-25",
-      "nextReviewDate": "2026-09-28",
+      "nextReviewDate": "2026-10-09",
       "evidence": {
         "sessionDate": "2026-09-25",
         "question": 62,
@@ -19,7 +19,19 @@
         "preferredPattern": "は / は",
         "note": "Later は/が identification and contrast questions were answered correctly, so keep under observation rather than marking as a strong weakness."
       },
-      "reviewGuidance": "Use contextual contrast-vs-identification questions with both は and が offered as plausible distractors."
+      "reviewGuidance": "Continue contextual contrast-vs-identification questions with both は and が as plausible choices, including nested topic structures such as XはYは...がZは....",
+      "lastReviewedDate": "2026-10-06",
+      "latestEvidence": {
+        "sessionDate": "2026-10-06",
+        "correctQuestions": [
+          141,
+          152
+        ],
+        "missedQuestion": 159,
+        "selectedPattern": "が / は",
+        "preferredPattern": "は / は",
+        "note": "Two contrast/topic items were correct; one nested topic/contrast item was missed. Keep under review."
+      }
     }
   ]
 }
