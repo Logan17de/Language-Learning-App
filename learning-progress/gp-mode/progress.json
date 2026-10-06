@@ -131,14 +131,74 @@
       "position": 20,
       "pattern": "よ",
       "learnedDate": "2026-09-25"
+    },
+    {
+      "level": "N5",
+      "position": 21,
+      "pattern": "だけ",
+      "learnedDate": "2026-10-06"
+    },
+    {
+      "level": "N5",
+      "position": 22,
+      "pattern": "しか～ない",
+      "learnedDate": "2026-10-06"
+    },
+    {
+      "level": "N5",
+      "position": 23,
+      "pattern": "でも",
+      "learnedDate": "2026-10-06"
+    },
+    {
+      "level": "N5",
+      "position": 24,
+      "pattern": "けど",
+      "learnedDate": "2026-10-06"
+    },
+    {
+      "level": "N5",
+      "position": 25,
+      "pattern": "けれども",
+      "learnedDate": "2026-10-06"
+    },
+    {
+      "level": "N5",
+      "position": 26,
+      "pattern": "そして",
+      "learnedDate": "2026-10-06"
+    },
+    {
+      "level": "N5",
+      "position": 27,
+      "pattern": "それから",
+      "learnedDate": "2026-10-06"
+    },
+    {
+      "level": "N5",
+      "position": 28,
+      "pattern": "しかし",
+      "learnedDate": "2026-10-06"
+    },
+    {
+      "level": "N5",
+      "position": 29,
+      "pattern": "だから",
+      "learnedDate": "2026-10-06"
+    },
+    {
+      "level": "N5",
+      "position": 30,
+      "pattern": "ので",
+      "learnedDate": "2026-10-06"
     }
   ],
-  "completedCount": 20,
+  "completedCount": 30,
   "nextGrammar": {
     "level": "N5",
-    "position": 21
+    "position": 31
   },
-  "lastSessionDate": "2026-09-25",
+  "lastSessionDate": "2026-10-06",
   "sessions": [
     {
       "date": "2026-09-25",
@@ -179,6 +239,87 @@
         "Future multiple-choice questions should include realistic confusion-pair distractors when context disambiguates them, especially は vs が.",
         "Avoid ambiguous multiple-choice items where more than one answer is grammatically valid without sufficient context."
       ]
+    },
+    {
+      "date": "2026-10-06",
+      "sessionNumber": 2,
+      "level": "N5",
+      "grammarPositions": {
+        "from": 21,
+        "to": 30
+      },
+      "grammarPatternsLearned": 10,
+      "grammarTest": {
+        "correct": 53,
+        "totalAnswered": 59,
+        "skipped": 1,
+        "totalPresented": 60,
+        "accuracyAnswered": 0.8983,
+        "batches": [
+          {
+            "range": "101-110",
+            "correct": 10,
+            "answered": 10
+          },
+          {
+            "range": "111-120",
+            "correct": 7,
+            "answered": 9,
+            "skipped": [
+              115
+            ]
+          },
+          {
+            "range": "121-130",
+            "correct": 9,
+            "answered": 10
+          },
+          {
+            "range": "131-140",
+            "correct": 8,
+            "answered": 10
+          },
+          {
+            "range": "141-160",
+            "correct": 19,
+            "answered": 20
+          }
+        ]
+      },
+      "observedWeaknesses": [
+        {
+          "type": "grammar",
+          "topic": "しか～ない",
+          "detail": "Missed Q117 and Q132; confused しか～ない with alternatives such as でも."
+        },
+        {
+          "type": "grammar",
+          "topic": "contrast vs reason connectors",
+          "detail": "Missed Q111, Q121 and Q134; needs clearer discrimination among けど/けれども, だから and ので from sentence logic."
+        },
+        {
+          "type": "particle",
+          "topic": "は vs が",
+          "detail": "Q141 and Q152 were correct, but Q159 still showed topic/contrast confusion. Improving, not cleared."
+        }
+      ],
+      "slipsNotMarkedWeak": [
+        {
+          "topic": "丈夫 vocabulary",
+          "detail": "Q115 was skipped because 丈夫 was unknown; learned 丈夫 = sturdy/durable and distinguished it from 大丈夫."
+        }
+      ],
+      "notes": [
+        "Present practice in batches of 10 questions.",
+        "For each question, show the kanji sentence, then the same sentence in hiragana, then the options.",
+        "Mix the target grammar patterns instead of testing them in catalog order.",
+        "After explaining a mistake, stop and wait for the learner to confirm understanding before moving to the next set.",
+        "Avoid ambiguous multiple-choice items where more than one answer is naturally defensible without enough context."
+      ],
+      "transitivityTest": {
+        "status": "not_practiced",
+        "reason": "Session focused on N5 grammar #21-30 and the final mixed review."
+      }
     }
   ]
 }
