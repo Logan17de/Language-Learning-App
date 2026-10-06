@@ -1,4 +1,52 @@
 {
   "schemaVersion": 1,
-  "items": []
+  "items": [
+    {
+      "id": "shika-nai-2026-10-06",
+      "level": "N5",
+      "pattern": "しか～ない",
+      "status": "weak",
+      "firstMarkedDate": "2026-10-06",
+      "nextReviewDate": "2026-10-09",
+      "evidence": [
+        {
+          "question": 117,
+          "note": "Selected でも instead of しか in 日曜日しか休めません."
+        },
+        {
+          "question": 132,
+          "note": "Selected でも instead of しか in コンビニしかありません."
+        }
+      ],
+      "reviewGuidance": "Mix しか～ない against だけ and でも. Require a negative predicate for しか～ない and use context that clearly distinguishes 'only' from 'even'."
+    },
+    {
+      "id": "contrast-vs-reason-2026-10-06",
+      "level": "N5",
+      "patterns": [
+        "けど",
+        "けれども",
+        "だから",
+        "ので"
+      ],
+      "status": "weak",
+      "firstMarkedDate": "2026-10-06",
+      "nextReviewDate": "2026-10-09",
+      "evidence": [
+        {
+          "question": 111,
+          "note": "Used ので where contrast けれども was intended."
+        },
+        {
+          "question": 121,
+          "note": "Used だから where contrast けど was intended."
+        },
+        {
+          "question": 134,
+          "note": "Used けれども where reason/result だから was intended."
+        }
+      ],
+      "reviewGuidance": "Use unambiguous contexts that force contrast vs reason/result. Prefer semantic relationship testing over surface-form clues."
+    }
+  ]
 }
