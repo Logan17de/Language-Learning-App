@@ -20,17 +20,16 @@
         "note": "Later は/が identification and contrast questions were answered correctly, so keep under observation rather than marking as a strong weakness."
       },
       "reviewGuidance": "Continue contextual contrast-vs-identification questions with both は and が as plausible choices, including nested topic structures such as XはYは...がZは....",
-      "lastReviewedDate": "2026-10-06",
+      "lastReviewedDate": "2026-10-07",
       "latestEvidence": {
-        "sessionDate": "2026-10-06",
+        "sessionDate": "2026-10-07",
         "correctQuestions": [
-          141,
-          152
+          174,
+          182,
+          190,
+          200
         ],
-        "missedQuestion": 159,
-        "selectedPattern": "が / は",
-        "preferredPattern": "は / は",
-        "note": "Two contrast/topic items were correct; one nested topic/contrast item was missed. Keep under review."
+        "note": "Four mixed-review items correct, including contrast/topic and identification uses. Keep one more scheduled review before clearing."
       }
     }
   ]
