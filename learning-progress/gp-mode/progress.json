@@ -191,14 +191,74 @@
       "position": 30,
       "pattern": "ので",
       "learnedDate": "2026-10-06"
+    },
+    {
+      "level": "N5",
+      "position": 31,
+      "pattern": "のに",
+      "learnedDate": "2026-10-07"
+    },
+    {
+      "level": "N5",
+      "position": 32,
+      "pattern": "たり～たり",
+      "learnedDate": "2026-10-07"
+    },
+    {
+      "level": "N5",
+      "position": 33,
+      "pattern": "て形",
+      "learnedDate": "2026-10-07"
+    },
+    {
+      "level": "N5",
+      "position": 34,
+      "pattern": "ている",
+      "learnedDate": "2026-10-07"
+    },
+    {
+      "level": "N5",
+      "position": 35,
+      "pattern": "てある",
+      "learnedDate": "2026-10-07"
+    },
+    {
+      "level": "N5",
+      "position": 36,
+      "pattern": "てから",
+      "learnedDate": "2026-10-07"
+    },
+    {
+      "level": "N5",
+      "position": 37,
+      "pattern": "てもいい",
+      "learnedDate": "2026-10-07"
+    },
+    {
+      "level": "N5",
+      "position": 38,
+      "pattern": "てはいけない",
+      "learnedDate": "2026-10-07"
+    },
+    {
+      "level": "N5",
+      "position": 39,
+      "pattern": "ちゃいけない / じゃいけない",
+      "learnedDate": "2026-10-07"
+    },
+    {
+      "level": "N5",
+      "position": 40,
+      "pattern": "ないでください",
+      "learnedDate": "2026-10-07"
     }
   ],
-  "completedCount": 30,
+  "completedCount": 40,
   "nextGrammar": {
     "level": "N5",
-    "position": 31
+    "position": 41
   },
-  "lastSessionDate": "2026-10-06",
+  "lastSessionDate": "2026-10-07",
   "sessions": [
     {
       "date": "2026-09-25",
@@ -319,6 +379,77 @@
       "transitivityTest": {
         "status": "not_practiced",
         "reason": "Session focused on N5 grammar #21-30 and the final mixed review."
+      }
+    },
+    {
+      "date": "2026-10-07",
+      "sessionNumber": 3,
+      "level": "N5",
+      "grammarPositions": {
+        "from": 31,
+        "to": 40
+      },
+      "grammarPatternsLearned": 10,
+      "grammarTest": {
+        "correct": 36,
+        "validAnswered": 39,
+        "totalPresented": 40,
+        "excludedInvalidQuestions": [
+          183
+        ],
+        "accuracyValid": 0.9231,
+        "batches": [
+          {
+            "range": "161-170",
+            "correct": 9,
+            "answered": 10
+          },
+          {
+            "range": "171-200",
+            "correct": 27,
+            "validAnswered": 29,
+            "totalPresented": 30,
+            "excluded": [
+              183
+            ]
+          }
+        ]
+      },
+      "observedWeaknesses": [
+        {
+          "type": "grammar",
+          "topic": "のに vs ので",
+          "detail": "Missed Q184 and Q199 by swapping contrast/surprise (のに) with reason/result (ので). Learner recognized afterward that のに had been mentally attached to the wrong sentences."
+        }
+      ],
+      "improvingAreas": [
+        {
+          "topic": "ている vs てある",
+          "detail": "Missed Q166 initially, then correctly answered Q175, Q180, Q185 and Q197 after explanation. Treat as improving rather than a persistent weakness."
+        },
+        {
+          "topic": "しか～ない",
+          "detail": "Previously weak; answered Q171, Q181 and Q194 correctly in today's mixed review."
+        },
+        {
+          "topic": "は vs が",
+          "detail": "Previously improving; answered Q174, Q182, Q190 and Q200 correctly in today's mixed review."
+        }
+      ],
+      "excludedQuestionNotes": [
+        {
+          "question": 183,
+          "detail": "Question construction was malformed: 脱ぐ → 脱いで, so '脱い + てもいい' would incorrectly produce 脱いてもいい. Learner correctly caught the conjugation issue. Excluded from scoring."
+        }
+      ],
+      "notes": [
+        "Continue showing each question as kanji sentence, hiragana reading, then options.",
+        "Continue mixing patterns and older weak points.",
+        "When explaining mistakes, stop and wait for learner confirmation before continuing."
+      ],
+      "transitivityTest": {
+        "status": "embedded",
+        "detail": "ている vs てある and verb-form distinctions were tested within the mixed grammar review."
       }
     }
   ]
