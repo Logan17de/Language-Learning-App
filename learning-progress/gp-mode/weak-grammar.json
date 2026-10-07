@@ -5,7 +5,7 @@
       "id": "shika-nai-2026-10-06",
       "level": "N5",
       "pattern": "しか～ない",
-      "status": "weak",
+      "status": "improving",
       "firstMarkedDate": "2026-10-06",
       "nextReviewDate": "2026-10-09",
       "evidence": [
@@ -18,7 +18,16 @@
           "note": "Selected でも instead of しか in コンビニしかありません."
         }
       ],
-      "reviewGuidance": "Mix しか～ない against だけ and でも. Require a negative predicate for しか～ない and use context that clearly distinguishes 'only' from 'even'."
+      "reviewGuidance": "Mix しか～ない against だけ and でも. Require a negative predicate for しか～ない and use context that clearly distinguishes 'only' from 'even'.",
+      "lastReviewedDate": "2026-10-07",
+      "latestEvidence": {
+        "correctQuestions": [
+          171,
+          181,
+          194
+        ],
+        "note": "Three clean mixed-review answers. Keep scheduled review before clearing."
+      }
     },
     {
       "id": "contrast-vs-reason-2026-10-06",
@@ -29,7 +38,7 @@
         "だから",
         "ので"
       ],
-      "status": "weak",
+      "status": "improving",
       "firstMarkedDate": "2026-10-06",
       "nextReviewDate": "2026-10-09",
       "evidence": [
@@ -46,7 +55,41 @@
           "note": "Used けれども where reason/result だから was intended."
         }
       ],
-      "reviewGuidance": "Use unambiguous contexts that force contrast vs reason/result. Prefer semantic relationship testing over surface-form clues."
+      "reviewGuidance": "Use unambiguous contexts that force contrast vs reason/result. Prefer semantic relationship testing over surface-form clues.",
+      "lastReviewedDate": "2026-10-07",
+      "latestEvidence": {
+        "correctQuestions": [
+          177,
+          178,
+          186,
+          191,
+          198
+        ],
+        "missedQuestion": 184,
+        "note": "General contrast-vs-reason discrimination improved, but ので was still confused with のに in one item."
+      }
+    },
+    {
+      "id": "noni-vs-node-2026-10-07",
+      "level": "N5",
+      "patterns": [
+        "のに",
+        "ので"
+      ],
+      "status": "weak",
+      "firstMarkedDate": "2026-10-07",
+      "nextReviewDate": "2026-10-10",
+      "evidence": [
+        {
+          "question": 184,
+          "note": "Selected のに where reason/result ので was required: train delay caused missing the meeting."
+        },
+        {
+          "question": 199,
+          "note": "Selected ので where unexpected contrast のに was required: only 20 years old, yet already a company leader."
+        }
+      ],
+      "reviewGuidance": "Contrast direct cause/result (ので) with expectation-breaking 'even though/yet' (のに). Use paired sentences where only the semantic relationship changes."
     }
   ]
 }
