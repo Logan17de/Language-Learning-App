@@ -251,14 +251,74 @@
       "position": 40,
       "pattern": "ないでください",
       "learnedDate": "2026-10-07"
+    },
+    {
+      "level": "N5",
+      "position": 41,
+      "pattern": "なければならない",
+      "learnedDate": "2026-10-08"
+    },
+    {
+      "level": "N5",
+      "position": 42,
+      "pattern": "なくてもいい",
+      "learnedDate": "2026-10-08"
+    },
+    {
+      "level": "N5",
+      "position": 43,
+      "pattern": "ないといけない",
+      "learnedDate": "2026-10-08"
+    },
+    {
+      "level": "N5",
+      "position": 44,
+      "pattern": "なくちゃ / なきゃ",
+      "learnedDate": "2026-10-08"
+    },
+    {
+      "level": "N5",
+      "position": 45,
+      "pattern": "たい",
+      "learnedDate": "2026-10-08"
+    },
+    {
+      "level": "N5",
+      "position": 46,
+      "pattern": "たくない",
+      "learnedDate": "2026-10-08"
+    },
+    {
+      "level": "N5",
+      "position": 47,
+      "pattern": "たことがある",
+      "learnedDate": "2026-10-08"
+    },
+    {
+      "level": "N5",
+      "position": 48,
+      "pattern": "つもり",
+      "learnedDate": "2026-10-08"
+    },
+    {
+      "level": "N5",
+      "position": 49,
+      "pattern": "予定",
+      "learnedDate": "2026-10-08"
+    },
+    {
+      "level": "N5",
+      "position": 50,
+      "pattern": "ましょう",
+      "learnedDate": "2026-10-08"
     }
   ],
-  "completedCount": 40,
+  "completedCount": 50,
   "nextGrammar": {
     "level": "N5",
-    "position": 41
+    "position": 51
   },
-  "lastSessionDate": "2026-10-07",
+  "lastSessionDate": "2026-10-08",
   "sessions": [
     {
       "date": "2026-09-25",
@@ -451,6 +511,115 @@
         "status": "embedded",
         "detail": "ている vs てある and verb-form distinctions were tested within the mixed grammar review."
       }
+    },
+    {
+      "date": "2026-10-08",
+      "sessionNumber": 4,
+      "level": "N5",
+      "grammarPositions": {
+        "from": 41,
+        "to": 50
+      },
+      "grammarPatternsLearned": 10,
+      "grammarTest": {
+        "range": "201-220",
+        "correct": 16,
+        "validAnswered": 18,
+        "totalSubmitted": 20,
+        "invalidOrAmbiguousQuestions": [
+          217,
+          219
+        ],
+        "incorrectQuestions": [
+          201,
+          206
+        ],
+        "accuracyValid": 0.8889,
+        "answersSubmitted": {
+          "201": "B",
+          "202": "C",
+          "203": "D",
+          "204": "B",
+          "205": "C",
+          "206": "B",
+          "207": "D",
+          "208": "B",
+          "209": "B",
+          "210": "C",
+          "211": "B",
+          "212": "D",
+          "213": "B",
+          "214": "C",
+          "215": "A",
+          "216": "D",
+          "217": "C",
+          "218": "A",
+          "219": "A",
+          "220": "D"
+        }
+      },
+      "vocabularyBarriers": [
+        {
+          "question": 201,
+          "selected": "B",
+          "expected": "A",
+          "topic": "社員証（しゃいんしょう）/ 規則（きそく）/ 見せる（みせる）",
+          "note": "Learner reports the missed answer stemmed from unfamiliar kanji/word meanings, not established weakness in なければならない."
+        },
+        {
+          "question": 206,
+          "selected": "B",
+          "expected": "A",
+          "topic": "旅行（りょこう）/ 沖縄（おきなわ）/ 泳ぐ（およぐ）/ いつか",
+          "note": "Learner reports the missed answer stemmed from unfamiliar kanji/word meanings, not established weakness in たい vs たことがある."
+        }
+      ],
+      "observedWeaknesses": [],
+      "improvingAreas": [
+        {
+          "topic": "のに vs ので",
+          "detail": "Correct Q212 (のに) and Q213 (ので). Retain scheduled review."
+        },
+        {
+          "topic": "は vs が",
+          "detail": "Correct Q214; continue tracked review."
+        },
+        {
+          "topic": "しか～ない / だけ",
+          "detail": "Correct Q211; continue tracked review."
+        }
+      ],
+      "questionValidityNotes": [
+        {
+          "question": 217,
+          "note": "Excluded for semantic ambiguity: not wanting to stay up vs needing to stay up for interview preparation."
+        },
+        {
+          "question": 219,
+          "note": "Excluded for semantic ambiguity: not required to attend vs intending to attend on a public holiday."
+        }
+      ],
+      "notes": [
+        "Next question format: Japanese kanji sentence, full hiragana reading, English meaning of the sentence (leave the grammar blank intact), then options.",
+        "Provide hiragana readings and brief English vocabulary glosses for unfamiliar kanji in BOTH the question and answer options, without revealing the correct grammar option.",
+        "Use ten questions at a time, mixed patterns, no answers/hints in advance.",
+        "If a mistake requires explanation, stop and wait until the learner understands before issuing the next batch.",
+        "Do not mark grammar weaknesses solely from questions missed due to kanji/vocabulary comprehension."
+      ]
     }
-  ]
+  ],
+  "practicePreferences": {
+    "questionsPerBatch": 10,
+    "randomizePatternOrder": true,
+    "presentationOrder": [
+      "kanjiSentence",
+      "hiraganaSentence",
+      "englishSentenceWithBlank",
+      "options"
+    ],
+    "annotateOptionReadings": true,
+    "vocabularyGlosses": "Give English definitions of kanji-bearing vocabulary from stems and options without revealing the grammar choice",
+    "waitForUnderstandingAfterMistake": true,
+    "ambiguityPolicy": "Avoid items where multiple choices are defensible; do not score ambiguous items"
+  }
 }
