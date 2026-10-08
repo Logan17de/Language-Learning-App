@@ -33,3 +33,12 @@ Update the progress files with:
 - session/date information
 
 The canonical grammar inventory remains `data/jlpt-catalog.json`; these files track the learner, not a second grammar catalog.
+
+## Learner-specific question format (updated 2026-10-08)
+- Present **10 mixed questions per batch** rather than grouping by grammar pattern.
+- For **every** question, show: **(1) Japanese with kanji, (2) same full sentence in hiragana, (3) English meaning with the blank preserved, (4) multiple-choice options**.
+- For option text containing kanji, provide its **hiragana reading**. Add short **English vocabulary glosses** for kanji words in question stems and options (e.g. 規則 = rule, 泳ぐ = swim), but do **not** translate away the target grammar or identify the correct answer.
+- Distinguish vocabulary/kanji comprehension errors from demonstrated grammar errors. Ask or use learner clarification before tagging a new grammar weakness.
+- Avoid ambiguous distractors and **exclude** any item where multiple answers are defensible.
+- After explaining an error, **stop** until the learner confirms understanding. Do not automatically send another batch.
+- Retain weak reviews from this directory without assuming that newly practiced patterns are already mastered.
