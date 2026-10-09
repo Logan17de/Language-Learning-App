@@ -1,0 +1,11 @@
+Use case: illustration-story
+Asset type: single portrait narrative illustration for Chapter 1.
+Primary request: Ren brushing his teeth in his home washroom, pausing mid-brush with a small playful foam moustache across his upper lip. A few tiny foam flecks are visible near the sink, keeping the sink only slightly messy.
+Input images: Image 1 is the exact identity and clothing reference for Ren; Image 2 is the illustration style reference; Image 3 is the washroom geography reference only.
+Scene/backdrop: A simple Japanese home washroom, using the spatial cues of Image 3: pale warm walls, small white sink/vanity, mirror, nearby doorway, soft daylight. Render the environment as hand-painted illustration, not as a 3D model.
+Subject: Ren, age 10, tousled medium-brown hair, large warm brown eyes, cream pajama top with sage-green collar and sage-green pajama trousers, matching the home pajamas in Image 1. He is brushing his teeth and looking at his reflection with a mildly amused, caught-in-the-act expression.
+Style/medium: polished warm children’s storybook illustration matching Image 2: soft painterly shading, clean expressive linework, gentle natural textures, warm morning light; no photorealism and no 3D render.
+Composition/framing: vertical portrait 2:3. Medium shot showing Ren from waist up, sink and mirror legible. Place Ren’s face and toothbrush action in the central middle area; keep the bottom quarter comparatively quiet and low-detail for a future interface overlay. One coherent full-bleed image, no panels.
+Lighting/mood: soft warm morning daylight, cozy and playful.
+Color palette: cream, warm wood, muted sage green, brown hair, subdued peach skin tones.
+Constraints: Ren’s face, age, hair, and cream-and-sage pajamas should closely follow Image 1. The room’s layout should follow Image 3. No mother in this scene. No text, captions, borders, watermark, UI, or graphic overlays. Avoid splashing toothpaste or a heavily dirty sink.

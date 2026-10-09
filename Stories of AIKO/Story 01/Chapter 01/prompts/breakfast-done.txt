@@ -1,0 +1,9 @@
+Use case: illustration-story
+Asset type: single portrait narrative illustration for Chapter 1.
+Primary request: Create the next moment in the same breakfast scene: Ren has finished eating and looks satisfied; his plate is now empty. His mother smiles warmly at him.
+Input images: Image 1 is the previous breakfast frame and is the exact camera, composition, room and continuity reference; Image 2 is Ren's identity reference; Image 3 is his mother's identity reference; Image 4 is the new dining room geography reference.
+Scene/backdrop: Keep the same dining room and table scene from Image 1, matching the room arrangement in Image 4: pale walls, left-side window, light table, upholstered pale seating and wood floor. The storybook illustration should remain painterly and 2D.
+Subject: The same 10-year-old Ren, same tousled brown hair and cream pajama shirt with sage-green collar and sage pajama trousers, sits at the table with an empty plate in front of him. He has a satisfied, pleased expression, hands relaxed after finishing breakfast. His mother, with the same tied-back dark hair, cream blouse, terracotta cardigan and sage apron, smiles at him from beside/behind the table.
+Style/medium: match the warm storybook illustration and soft natural morning lighting of Image 1; clean expressive linework and gentle painted shading; no photorealism or 3D.
+Composition/framing: vertical 2:3 portrait. Match Image 1's camera angle, crop, character positions, table, chairs, window, background, lighting, and overall framing as closely as possible. Keep Ren's face and empty plate visible in the central middle area. Leave bottom quarter relatively quiet. One coherent full-bleed image, no panels.
+Constraints: this is the immediate continuation of Image 1. Keep Ren and mother consistent. The plate in front of Ren is completely empty and clean, without toast or egg. No text, captions, borders, watermark, UI, or graphic overlays.

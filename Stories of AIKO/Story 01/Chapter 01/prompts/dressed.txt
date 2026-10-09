@@ -1,0 +1,9 @@
+Use case: storybook-illustration
+Asset type: portrait Chapter 1 illustration in a consistent children’s story app
+Input images: Image 1 is Ren identity and school clothes. Image 2 is the authoritative bedroom layout reference: reproduce its room architecture and furniture positions, including the bed's diagonal orientation, headboard and nightstand, windows on both walls, door and open floor area. Image 3 is style reference only: borrow its warm hand-painted children's anime texture, line quality, and morning lighting; do not borrow its room layout, bookshelf, wall art, posters, green curtain, rug, bed orientation or furniture.
+Scene/backdrop: Render the bedroom shown in Image 2 as a softly hand-painted, warm children’s anime room. Keep the same camera view and exact placements of bed, nightstand, windows, door, and open floor shown in Image 2. Keep the uncluttered walls and furniture of Image 2.
+Subject: Ren from Image 1 stands at the bedside, fully dressed in sage pullover over cream collared shirt, navy shorts, white knee socks, and tan lace-up shoes. He is ready for school and not wearing a backpack.
+Composition/framing: portrait 2:3, full body, eye-level, Ren centered near bedside. The room geometry from Image 2 must remain recognizable. Keep lower quarter simple and uncluttered for caption overlay.
+Lighting/mood: warm early morning sunlight, gentle and hopeful.
+Constraints: style comes only from Image 3. Room geometry comes only from Image 2. Preserve the bedroom structure and camera viewpoint from Image 2.
+Avoid: bookshelf, posters, wall art, green curtain, rug, alternate room, changed window layout, changed bed orientation, panels, text, UI, watermark, extra people, bag worn, cropped feet.

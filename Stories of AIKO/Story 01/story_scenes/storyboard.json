@@ -1,0 +1,93 @@
+{
+  "storyId": "ren-story-01",
+  "status": "draft",
+  "workspacePage": "http://127.0.0.1:4177/story-assets/Workshop/index.html",
+  "scenes": [
+    {
+      "id": "01",
+      "title": "Ren is sleeping",
+      "camera": "Top view",
+      "image": "01-ren-sleeping-top-view.png",
+      "width": 1122,
+      "height": 1402,
+      "generator": "Built-in image_gen",
+      "promptFile": "01-ren-sleeping-top-view.prompt.txt",
+      "status": "Draft for review"
+    },
+    {
+      "id": "02",
+      "title": "Ren is sleeping",
+      "camera": "Diagonal view",
+      "image": "02-ren-sleeping-diagonal-view.png",
+      "alt": "Diagonal view of Ren asleep in his cream and sage pajamas, with the cream alarm clock clearly visible on the bedside bookcase.",
+      "width": 887,
+      "height": 1774,
+      "generator": "Built-in image_gen",
+      "promptFile": "02-ren-sleeping-diagonal-view.prompt.txt",
+      "status": "Draft for review"
+    },
+    {
+      "id": "03",
+      "title": "The alarm rings",
+      "camera": "Diagonal view",
+      "image": "03-alarm-ringing-manga-v2.png",
+      "alt": "Ren sleeps while the bedside alarm shakes gently, with manga ringing lettering and vibration marks beside the bells and clock body.",
+      "width": 887,
+      "height": 1774,
+      "generator": "Built-in image_gen",
+      "promptFile": "03-alarm-ringing-manga-v2.prompt.txt",
+      "status": "Draft for review",
+      "animation": {
+        "type": "manga-alarm",
+        "baseImage": "02-ren-sleeping-diagonal-view.png"
+      },
+      "interaction": {
+        "type": "clock",
+        "nextScene": "04"
+      },
+      "audio": {
+        "file": "Story 01/Audio/microsammy-clock-alarm-8761.mp3",
+        "loop": true,
+        "volume": 0.55,
+        "stopOnExit": true
+      }
+    },
+    {
+      "id": "04",
+      "title": "Ren stops the alarm",
+      "camera": "Diagonal view",
+      "image": "04-ren-stops-alarm.png",
+      "alt": "Still asleep with his eyes closed and a sleepy annoyed frown, Ren rests his hand on top of the alarm clock to silence it.",
+      "width": 887,
+      "height": 1774,
+      "generator": "Built-in image_gen",
+      "promptFile": "04-ren-stops-alarm.prompt.txt",
+      "status": "Draft for review"
+    },
+    {
+      "id": "05",
+      "title": "Ren sleeps peacefully again",
+      "camera": "Diagonal view",
+      "image": "05-ren-sleeps-peacefully-again.png",
+      "alt": "Ren has pulled his arm back from the silent alarm clock and sleeps peacefully again, eyes closed with a small contented smile.",
+      "width": 887,
+      "height": 1774,
+      "generator": "Built-in image_gen",
+      "promptFile": "05-ren-sleeps-peacefully-again.prompt.txt",
+      "status": "Draft for review"
+    },
+    {
+      "id": "06",
+      "title": "Ren wakes up at 7:05",
+      "camera": "Diagonal view",
+      "image": "06-ren-rubs-eyes-0705.png",
+      "alt": "At 7:05 in the morning, Ren sits up in bed rubbing his sleepy eyes, with the green duvet over his lap and the bedside clock showing five past seven.",
+      "time": "07:05",
+      "width": 887,
+      "height": 1774,
+      "generator": "Built-in image_gen",
+      "promptFile": "06-ren-rubs-eyes-0705.prompt.txt",
+      "status": "Draft for review"
+    }
+  ]
+}

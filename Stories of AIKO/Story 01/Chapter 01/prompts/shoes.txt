@@ -1,0 +1,11 @@
+Use case: storybook-illustration
+Asset type: single portrait narrative illustration for Chapter 1 of a warm children’s story app
+Input images: Image 1 defines Ren’s identity, hair, face, age, body proportions, exact school outfit and character style; Image 2 defines the hand-painted children’s anime finish and palette; Image 3 is the geometry reference for the genkan entrance, shoe bench and doorway; Image 4 is the exact brown school backpack design worn in character reference.
+Scene/backdrop: A Japanese home genkan matching Image 3: pale entry floor, small raised interior floor, low shoe bench against the side, and open doorway with a hint of the quiet neighborhood outside. Preserve this spatial geometry, interpreted as a warm illustrated environment.
+Subject: Ren, the same 10-year-old boy, in his sage green pullover over cream collared shirt, navy shorts, and white knee socks, sits on the genkan bench tying his tan lace-up school shoes. His dark brown school backpack rests beside him on the floor, clearly visible and not worn.
+Style/medium: warm hand-painted children’s anime storybook illustration, soft painterly textures and tidy delicate linework, matching Image 2 and Ren’s design in Image 1.
+Composition/framing: vertical portrait, medium-wide eye-level view. Show Ren seated and tying one shoe, both legs and shoes readable, backpack beside him, and enough of the entrance/doorway to establish the genkan. Place main details in upper-middle; keep lower quarter visually uncomplicated with pale entry floor for later caption overlay.
+Lighting/mood: gentle morning light from open doorway, calm anticipation and cozy warmth.
+Color palette: warm ivory walls, pale wood and entry tile, sage green, muted navy, tan leather shoes, dark brown bag.
+Constraints: One continuous illustration, natural child anatomy and hands, backpack design consistent with Image 1, genkan layout based on Image 3.
+Avoid: panels, collage, text, lettering, UI, watermark, extra people, backpack worn, missing shoes, cropped feet, clutter in lower quarter.

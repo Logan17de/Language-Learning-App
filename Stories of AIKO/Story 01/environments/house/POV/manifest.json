@@ -1,0 +1,214 @@
+{
+  "title": "Ren’s house — first-person views",
+  "generator": "Built-in image_gen",
+  "created": "2026-10-08",
+  "status": "Reusable drafts for later story use",
+  "format": "Portrait, approximately 1:2",
+  "layoutNotes": "Bedroom, washroom, kitchen and entrance follow existing references. Connecting landing, stairs, hallway and full living room extend areas not previously shown. Route assumes bedroom upstairs and washroom downstairs.",
+  "assets": [
+    {
+      "id": "01-bed-toward-door",
+      "title": "From bed toward bedroom door",
+      "file": "01-bed-toward-door.png",
+      "promptFile": "01-bed-toward-door.prompt.txt",
+      "prompt": "Use case: illustration-story. Create ONE reusable AIKO first-person environment illustration. The camera IS Ren's eyes, age ten, never an external shot of Ren. No people, bodies, hands, feet, human reflections or visible cameras. Match supplied house references closely: softly painted anime/storybook art, cream plaster, honey-colored wood, sage accents and plants, warm gentle early morning daylight. Same modest two-storey Japanese family home. Tall portrait 1:2 composition for a 390x764 mobile scene. Full bleed single picture, no collage, panels, captions, typography, UI, watermark or border. Keep useful doorways and interactive objects inside safe central frame. Reference images supply room identity, furniture and style; change camera to specified POV, do not simply crop the reference.\nSpecific shot: True first-person view from Ren's eyes while SITTING UP against the pillow, looking LENGTHWISE over the sage duvet toward the wooden FOOTBOARD, then toward the opposite wall and OPEN BEDROOM DOOR beyond the foot of the bed. The window and pillow/headboard are BEHIND the viewer, do not show a bed viewed from outside. Sage duvet fills lower quarter as the viewer's lap, no body parts. Bedroom desk on the viewer's LEFT side wall (because reverse direction from original room view); modest dresser, cream/sage striped rug beside bed. Open honey-wood door ahead slightly right leads to a warm wood-floored upstairs hallway. Establish this door placement consistently for later shots.",
+      "references": [
+        "Story 01/environments/house/bedroom.png"
+      ],
+      "category": "environments",
+      "scope": "story-01",
+      "camera": "First person, child eye height",
+      "width": 887,
+      "height": 1774,
+      "bytes": 1976138
+    },
+    {
+      "id": "02-bedside-standing",
+      "title": "Standing beside the bed",
+      "file": "02-bedside-standing.png",
+      "promptFile": "02-bedside-standing.prompt.txt",
+      "prompt": "Use case: illustration-story. Create ONE reusable AIKO first-person environment illustration. The camera IS Ren's eyes, age ten, never an external shot of Ren. No people, bodies, hands, feet, human reflections or visible cameras. Match supplied house references closely: softly painted anime/storybook art, cream plaster, honey-colored wood, sage accents and plants, warm gentle early morning daylight. Same modest two-storey Japanese family home. Tall portrait 1:2 composition for a 390x764 mobile scene. Full bleed single picture, no collage, panels, captions, typography, UI, watermark or border. Keep useful doorways and interactive objects inside safe central frame. Reference images supply room identity, furniture and style; change camera to specified POV, do not simply crop the reference.\nSpecific shot: True POV of a child who has just stood up beside the bed, looking toward the SAME open door opposite the headboard. Camera eye height 1.25m, slight downward gaze. Bed's sage duvet and wooden footboard occupy the RIGHT foreground, cream/sage striped rug below, desk and chair along LEFT wall, warm wooden open door ahead leading to upstairs hallway. This is a forward walking view from beside the bed toward its exit, not looking back at Ren sleeping. No visible person or body.\nReference 1 is the established reverse bedroom view. Move camera beside the bed without changing that doorway, desk, dresser or landing.",
+      "references": [
+        "Story 01/environments/house/POV/01-bed-toward-door.png",
+        "Story 01/environments/house/bedroom.png"
+      ],
+      "category": "environments",
+      "scope": "story-01",
+      "camera": "First person, child eye height",
+      "width": 896,
+      "height": 1755,
+      "bytes": 2189395
+    },
+    {
+      "id": "03-bedroom-door-to-landing",
+      "title": "Bedroom doorway onto landing",
+      "file": "03-bedroom-door-to-landing.png",
+      "promptFile": "03-bedroom-door-to-landing.prompt.txt",
+      "prompt": "Use case: illustration-story. Create ONE reusable AIKO first-person environment illustration. The camera IS Ren's eyes, age ten, never an external shot of Ren. No people, bodies, hands, feet, human reflections or visible cameras. Match supplied house references closely: softly painted anime/storybook art, cream plaster, honey-colored wood, sage accents and plants, warm gentle early morning daylight. Same modest two-storey Japanese family home. Tall portrait 1:2 composition for a 390x764 mobile scene. Full bleed single picture, no collage, panels, captions, typography, UI, watermark or border. Keep useful doorways and interactive objects inside safe central frame. Reference images supply room identity, furniture and style; change camera to specified POV, do not simply crop the reference.\nSpecific shot: First-person view standing in Ren's open bedroom doorway looking into the upstairs landing. Only slim wooden bedroom door jambs in foreground, a sliver of sage bedroom rug at lower right. Warm oak floor, cream walls, honey-wood trim. A short modest hall leads ahead to a safely railed staircase descending on the RIGHT. Small frosted window at landing left, one simple botanical print. Establish a compact normal two-storey Japanese home; no long hotel corridor, no ornate stairs. Camera at a ten-year-old's eye height 1.25m.\nReference 1 establishes exact doorway and landing continuity. Move through that door: retain stair rail on RIGHT, closed door on LEFT wall, and window on the far wall (use this far-window position instead of moving window to left).",
+      "references": [
+        "Story 01/environments/house/POV/02-bedside-standing.png",
+        "Story 01/environments/house/bedroom.png",
+        "Story 01/environments/house/genkan.png"
+      ],
+      "category": "environments",
+      "scope": "story-01",
+      "camera": "First person, child eye height",
+      "width": 896,
+      "height": 1755,
+      "bytes": 1796190
+    },
+    {
+      "id": "04-stairs-going-down",
+      "title": "Downstairs from the landing",
+      "file": "04-stairs-going-down.png",
+      "promptFile": "04-stairs-going-down.prompt.txt",
+      "prompt": "Use case: illustration-story. Create ONE reusable AIKO first-person environment illustration. The camera IS Ren's eyes, age ten, never an external shot of Ren. No people, bodies, hands, feet, human reflections or visible cameras. Match supplied house references closely: softly painted anime/storybook art, cream plaster, honey-colored wood, sage accents and plants, warm gentle early morning daylight. Same modest two-storey Japanese family home. Tall portrait 1:2 composition for a 390x764 mobile scene. Full bleed single picture, no collage, panels, captions, typography, UI, watermark or border. Keep useful doorways and interactive objects inside safe central frame. Reference images supply room identity, furniture and style; change camera to specified POV, do not simply crop the reference.\nSpecific shot: First-person view from the top of the same modest enclosed wooden stairs, looking down toward a sunlit ground-floor landing. Child eye height, mild downward gaze, natural perspective, safe simple wooden handrail on RIGHT and cream wall on LEFT. Warm oak steps, no spiral, no steep distorted perspective. At bottom landing straight ahead, an open wood-framed doorway offers a small glimpse of the cream-tiled washroom with sage towels. Match preceding upstairs landing and existing house materials.\nReference 1 is the same upstairs landing. Turn right and approach the head of those stairs, then look down the staircase. Keep the stair trim consistent.",
+      "references": [
+        "Story 01/environments/house/POV/03-bedroom-door-to-landing.png",
+        "Story 01/environments/house/genkan.png",
+        "Story 01/environments/house/wash-area.png"
+      ],
+      "category": "environments",
+      "scope": "story-01",
+      "camera": "First person, child eye height",
+      "width": 887,
+      "height": 1774,
+      "bytes": 1804776
+    },
+    {
+      "id": "05-hallway-to-washroom",
+      "title": "Hallway approaching washroom",
+      "file": "05-hallway-to-washroom-v3.png",
+      "promptFile": "05-hallway-to-washroom-v3.prompt.txt",
+      "prompt": "Use case: illustration-story. Correct image 5 for AIKO's house story, portrait 1:2, using the SAME room as reference 1.\nReference 1 is the master floorplan view FROM THE BATH. Its visible doorway on the LEFT wall leads to the hallway. Reference 2 is the sink detail. Reference 3 is the hallway exterior framing only, with incorrect contents beyond its door.\nCreate the new camera view standing in the HALLWAY just outside the LEFT-WALL DOORWAY shown in reference 1, facing through that opening across the washroom toward the sink. This requires rotating the camera approximately 90 degrees relative to reference 1, NOT shrinking reference 1 and placing it through a doorway.\nPhysical room plan: the sink/wood mirror/white washing machine occupy the wall OPPOSITE the hallway entrance. The frosted window, towel rack, hamper occupy the wall to the viewer's LEFT when entering. The opening to the bath is on the viewer's RIGHT. Keep the actual fixtures fixed in the room. The sink and mirror should appear almost frontally across the room with a gentle oblique angle, not receding along the right wall into the distance. The actual frosted window must be on the left side wall, NOT directly ahead above or left beside the sink on the far wall. A mirror reflection must not be mistaken for a second actual window.\nHallway foreground has honey oak floor, wooden doorway, partial kitchen opening left and hallway plant cabinet right as reference 3. Widen framing enough to see the layout naturally. Beyond threshold cream tile, sage striped mat across the sink, white rectangular ceramic basin on honey oak two-door vanity, chrome faucet, white potted plant at sink left, white pump then sage pump then green toothbrush cup at right matching reference 2. Wooden framed mirror above sink, white washing machine to its right. On left wall actual frosted window and beneath/near it wicker hamper and narrow towel shelf, preserving reference1's arrangement as seen from this changed viewpoint. A narrow glimpse of bath doorway on right is enough.\nPreserve AIKO hand painted anime storybook rendering and warm morning light, cream honey-wood and sage palette. No people or reflections of people, no text, no UI. The priority is physically consistent room geometry viewed through the existing LEFT entrance, rather than repeating the bath viewpoint.",
+      "references": [
+        "Story 01/environments/house/POV/06-bath-toward-sink-v2.png",
+        "Story 01/environments/house/POV/07-sink-and-toothbrush.png",
+        "Story 01/environments/house/POV/05-hallway-to-washroom.png"
+      ],
+      "category": "environments",
+      "scope": "story-01",
+      "camera": "First person from hallway through the left-wall entrance; sink opposite, window on left",
+      "width": 887,
+      "height": 1774,
+      "bytes": 1969465
+    },
+    {
+      "id": "06-washroom-doorway",
+      "title": "From the bath toward the sink",
+      "file": "06-bath-toward-sink-v2.png",
+      "promptFile": "06-bath-toward-sink-v2.prompt.txt",
+      "prompt": "Use case: precise-object-edit, AIKO environment continuity correction.\nImage 1 is the washroom scene to correct. Image 2 is the APPROVED close-up of its sink and must remain consistent.\nThis shot is a FIRST-PERSON VIEW FROM THE BATHING-ROOM SIDE LOOKING TOWARD THE SINK, not entering from the house hallway. Keep the same child eye height and tall 1:2 composition.\nMake this concrete correction to image 1: the open doorway on the LEFT must be the ENTRANCE TO THE WHOLE WASHROOM FROM THE HOUSE HALLWAY. Replace the bath/tub, bath stool and tiled bathing compartment currently visible through that left doorway with the warm oak-floor house hallway beyond a simple honey-wood doorframe. No bathtub or shower visible on the left. The bathing compartment is behind the viewer/camera.\nPreserve the sink on the RIGHT in its existing slight three-quarter angle and orientation, NOT frontal and NOT mirrored. Preserve the same white rectangular basin, chrome tap, oak two-door cabinet with silver handles, wood-framed wide MIRROR above it, white-potted plant at counter LEFT, white and sage pump bottles and sage cup of toothbrushes at counter RIGHT, sage side towel and washing machine partly at far right. Image 2 provides exact sink and accessory identity. Keep rear frosted window, towel shelf and folded green towels, wicker hamper, cream tiled floor, sage striped rug, warm morning light and softly painted AIKO storybook style. The mirror remains a mirror, not an exterior window. No people/reflections, bodies, typography, labels, UI or watermark.\nThe reader should immediately understand: camera is at the bath side; household entrance is LEFT; familiar angled vanity is RIGHT.\n",
+      "references": [
+        "Story 01/environments/house/POV/06-washroom-doorway.png",
+        "Story 01/environments/house/POV/07-sink-and-toothbrush.png"
+      ],
+      "category": "environments",
+      "scope": "story-01",
+      "camera": "First person from bath toward sink; hallway entrance on left",
+      "width": 887,
+      "height": 1774,
+      "bytes": 2088266
+    },
+    {
+      "id": "07-sink-and-toothbrush",
+      "title": "At the sink, ready to brush",
+      "file": "07-sink-and-toothbrush.png",
+      "promptFile": "07-sink-and-toothbrush.prompt.txt",
+      "prompt": "Use case: illustration-story. Create ONE reusable AIKO first-person environment illustration. The camera IS Ren's eyes, age ten, never an external shot of Ren. No people, bodies, hands, feet, human reflections or visible cameras. Match supplied house references closely: softly painted anime/storybook art, cream plaster, honey-colored wood, sage accents and plants, warm gentle early morning daylight. Same modest two-storey Japanese family home. Tall portrait 1:2 composition for a 390x764 mobile scene. Full bleed single picture, no collage, panels, captions, typography, UI, watermark or border. Keep useful doorways and interactive objects inside safe central frame. Reference images supply room identity, furniture and style; change camera to specified POV, do not simply crop the reference.\nSpecific shot: True first-person CLOSE POV standing directly at the existing bathroom sink at Ren's child eye height, looking slightly DOWN at white basin, chrome faucet, white soap dispenser, sage soap bottle and sage toothbrush cup on RIGHT with familiar colored toothbrushes, wood vanity bottom edge. Large mirror's LOWER edge only across top; no character reflection. Aim downward enough to exclude the mirror's central reflection. Objects comfortably reachable, sink centered, tap prominent for later interaction. Preserve existing sink shape, countertop and prop colors.\nReferences show the SAME sink. Step up to it and turn camera right, then look down into it; do not make another distant doorway view. Cropping out most of the mirror is intentional to keep a clean reusable POV.",
+      "references": [
+        "Story 01/environments/house/POV/06-washroom-doorway.png",
+        "Story 01/environments/house/wash-area.png"
+      ],
+      "category": "environments",
+      "scope": "story-01",
+      "camera": "First person, child eye height",
+      "width": 887,
+      "height": 1774,
+      "bytes": 1829521
+    },
+    {
+      "id": "08-bathroom-bath",
+      "title": "Inside the bathing room",
+      "file": "08-bathroom-bath.png",
+      "promptFile": "08-bathroom-bath.prompt.txt",
+      "prompt": "Use case: illustration-story. Create ONE reusable AIKO first-person environment illustration. The camera IS Ren's eyes, age ten, never an external shot of Ren. No people, bodies, hands, feet, human reflections or visible cameras. Match supplied house references closely: softly painted anime/storybook art, cream plaster, honey-colored wood, sage accents and plants, warm gentle early morning daylight. Same modest two-storey Japanese family home. Tall portrait 1:2 composition for a 390x764 mobile scene. Full bleed single picture, no collage, panels, captions, typography, UI, watermark or border. Keep useful doorways and interactive objects inside safe central frame. Reference images supply room identity, furniture and style; change camera to specified POV, do not simply crop the reference.\nSpecific shot: First-person child-eye view stepping through the glass door to the bathing room glimpsed at LEFT of wash-area reference. Show existing pale sage Japanese soaking tub beneath frosted wood-trimmed window, cream/light-gray waterproof walls, practical chrome shower on side wall with handheld shower hose, white bath stool and cream textured non-slip floor. Camera from doorway, slight downward view to see floor and tub rim, private room EMPTY, no water running, no person/body/reflection. Keep modest real house scale and exact reference palette.",
+      "references": [
+        "Story 01/environments/house/POV/06-washroom-doorway.png",
+        "Story 01/environments/house/wash-area.png"
+      ],
+      "category": "environments",
+      "scope": "story-01",
+      "camera": "First person, child eye height",
+      "width": 896,
+      "height": 1756,
+      "bytes": 2005074
+    },
+    {
+      "id": "09-kitchen-entrance",
+      "title": "Entering kitchen and dining room",
+      "file": "09-kitchen-entrance.png",
+      "promptFile": "09-kitchen-entrance.prompt.txt",
+      "prompt": "Use case: illustration-story. Create ONE reusable AIKO first-person environment illustration. The camera IS Ren's eyes, age ten, never an external shot of Ren. No people, bodies, hands, feet, human reflections or visible cameras. Match supplied house references closely: softly painted anime/storybook art, cream plaster, honey-colored wood, sage accents and plants, warm gentle early morning daylight. Same modest two-storey Japanese family home. Tall portrait 1:2 composition for a 390x764 mobile scene. Full bleed single picture, no collage, panels, captions, typography, UI, watermark or border. Keep useful doorways and interactive objects inside safe central frame. Reference images supply room identity, furniture and style; change camera to specified POV, do not simply crop the reference.\nSpecific shot: First-person child-eye view entering the exact kitchen-dining reference room, with oak dining table ahead in foreground and sage-cushion chairs, three breakfast place settings with rice egg vegetables and soup. Cream refrigerator LEFT of rear kitchen run, sage lower cabinets, cream upper cabinets, sink in middle under small rear window, stove and sage kettle RIGHT. Large sunny window on LEFT wall. Same everyday objects and geometry, no people. Low eye height 1.25m, natural slight upward sense toward counters, not aerial view.",
+      "references": [
+        "Story 01/environments/house/kitchen-dining.png"
+      ],
+      "category": "environments",
+      "scope": "story-01",
+      "camera": "First person, child eye height",
+      "width": 887,
+      "height": 1774,
+      "bytes": 1973867
+    },
+    {
+      "id": "10-breakfast-seated",
+      "title": "Sitting at the breakfast table",
+      "file": "10-breakfast-seated.png",
+      "promptFile": "10-breakfast-seated.prompt.txt",
+      "prompt": "Use case: illustration-story. Create ONE reusable AIKO first-person environment illustration. The camera IS Ren's eyes, age ten, never an external shot of Ren. No people, bodies, hands, feet, human reflections or visible cameras. Match supplied house references closely: softly painted anime/storybook art, cream plaster, honey-colored wood, sage accents and plants, warm gentle early morning daylight. Same modest two-storey Japanese family home. Tall portrait 1:2 composition for a 390x764 mobile scene. Full bleed single picture, no collage, panels, captions, typography, UI, watermark or border. Keep useful doorways and interactive objects inside safe central frame. Reference images supply room identity, furniture and style; change camera to specified POV, do not simply crop the reference.\nSpecific shot: True first-person SEATED CHILD POV at the near-side breakfast seat of the existing oak table. His own rice bowl, small egg/vegetable plate, soup bowl, wooden chopsticks and sage mug in lower foreground. Across table one empty wooden chair and another place setting; beyond, the same sage kitchen cabinet run, cream fridge LEFT, sink center, kettle/stove RIGHT. Camera around 1m high above floor, slight downward gaze toward breakfast. No hands, people or body, reusable scene. Match exact meal style and table materials from reference.\nReference 1 establishes the current room. Move into the NEAR-LEFT chair and sit. Place the viewer's own meal directly at bottom foreground; do NOT keep chair between viewer and their meal, do not show outside view of table. Keep food proportions modest child breakfast.",
+      "references": [
+        "Story 01/environments/house/POV/09-kitchen-entrance.png",
+        "Story 01/environments/house/kitchen-dining.png"
+      ],
+      "category": "environments",
+      "scope": "story-01",
+      "camera": "First person, child eye height",
+      "width": 887,
+      "height": 1774,
+      "bytes": 2100962
+    },
+    {
+      "id": "11-living-room",
+      "title": "Looking into the living room",
+      "file": "11-living-room.png",
+      "promptFile": "11-living-room.prompt.txt",
+      "prompt": "Use case: illustration-story. Create ONE reusable AIKO first-person environment illustration. The camera IS Ren's eyes, age ten, never an external shot of Ren. No people, bodies, hands, feet, human reflections or visible cameras. Match supplied house references closely: softly painted anime/storybook art, cream plaster, honey-colored wood, sage accents and plants, warm gentle early morning daylight. Same modest two-storey Japanese family home. Tall portrait 1:2 composition for a 390x764 mobile scene. Full bleed single picture, no collage, panels, captions, typography, UI, watermark or border. Keep useful doorways and interactive objects inside safe central frame. Reference images supply room identity, furniture and style; change camera to specified POV, do not simply crop the reference.\nSpecific shot: First-person child-eye view entering the living room seen through the LEFT opening in genkan reference. Expand that SAME partial room: light cream fabric sofa, low simple oak coffee table, sage green textured rug, large sunny window/sliding glass doors with sheer cream curtains, indoor plant near window, a modest low wooden bookshelf. Cozy small family living room, match genkan's light wood floor and cream walls. Frame from doorway, no people, no luxury, no giant television wall, no added story action. Morning continuity, 1.25m camera height.",
+      "references": [
+        "Story 01/environments/house/genkan.png",
+        "Story 01/environments/house/kitchen-dining.png"
+      ],
+      "category": "environments",
+      "scope": "story-01",
+      "camera": "First person, child eye height",
+      "width": 887,
+      "height": 1774,
+      "bytes": 2283014
+    },
+    {
+      "id": "12-genkan-going-out",
+      "title": "At the entrance, ready to leave",
+      "file": "12-genkan-going-out.png",
+      "promptFile": "12-genkan-going-out.prompt.txt",
+      "prompt": "Use case: illustration-story. Create ONE reusable AIKO first-person environment illustration. The camera IS Ren's eyes, age ten, never an external shot of Ren. No people, bodies, hands, feet, human reflections or visible cameras. Match supplied house references closely: softly painted anime/storybook art, cream plaster, honey-colored wood, sage accents and plants, warm gentle early morning daylight. Same modest two-storey Japanese family home. Tall portrait 1:2 composition for a 390x764 mobile scene. Full bleed single picture, no collage, panels, captions, typography, UI, watermark or border. Keep useful doorways and interactive objects inside safe central frame. Reference images supply room identity, furniture and style; change camera to specified POV, do not simply crop the reference.\nSpecific shot: True first-person child-eye view from raised wood floor at entrance, looking slightly DOWN toward the step and family shoes then ahead to the existing dark oak front door with narrow vertical glass. Exact genkan reference: low oak shoe cabinet on LEFT, plant and frame on top, ochre child sneakers beside white/navy family shoes on gray tiles, umbrella stand and small potted plant RIGHT, hooks with cream tote upper right. Keep door closed. Interior POV, no exterior scene, no people or legs, shoes clear for later interaction.",
+      "references": [
+        "Story 01/environments/house/genkan.png"
+      ],
+      "category": "environments",
+      "scope": "story-01",
+      "camera": "First person, child eye height",
+      "width": 887,
+      "height": 1774,
+      "bytes": 2160843
+    }
+  ]
+}
