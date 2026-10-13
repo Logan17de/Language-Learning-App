@@ -1,0 +1,900 @@
+[
+  {
+    "target": "人",
+    "level": "N5",
+    "meaning": "person; human",
+    "readings": [
+      "じん",
+      "にん",
+      "ひと"
+    ],
+    "sourceId": "N5_K001"
+  },
+  {
+    "target": "一",
+    "level": "N5",
+    "meaning": "one",
+    "readings": [
+      "いち",
+      "いつ",
+      "ひと",
+      "ひとつ"
+    ],
+    "sourceId": "N5_K002"
+  },
+  {
+    "target": "日",
+    "level": "N5",
+    "meaning": "day; sun",
+    "readings": [
+      "にち",
+      "じつ",
+      "ひ",
+      "か"
+    ],
+    "sourceId": "N5_K003"
+  },
+  {
+    "target": "大",
+    "level": "N5",
+    "meaning": "big; large",
+    "readings": [
+      "だい",
+      "たい",
+      "おお",
+      "おおきい",
+      "おおいに"
+    ],
+    "sourceId": "N5_K004"
+  },
+  {
+    "target": "年",
+    "level": "N5",
+    "meaning": "year",
+    "readings": [
+      "ねん",
+      "とし"
+    ],
+    "sourceId": "N5_K005"
+  },
+  {
+    "target": "出",
+    "level": "N5",
+    "meaning": "exit; go out; come out",
+    "readings": [
+      "しゅつ",
+      "でる",
+      "だす"
+    ],
+    "sourceId": "N5_K006"
+  },
+  {
+    "target": "本",
+    "level": "N5",
+    "meaning": "book; origin; main",
+    "readings": [
+      "ほん",
+      "もと"
+    ],
+    "sourceId": "N5_K007"
+  },
+  {
+    "target": "中",
+    "level": "N5",
+    "meaning": "middle; inside",
+    "readings": [
+      "ちゅう",
+      "なか"
+    ],
+    "sourceId": "N5_K008"
+  },
+  {
+    "target": "子",
+    "level": "N5",
+    "meaning": "child",
+    "readings": [
+      "し",
+      "す",
+      "こ"
+    ],
+    "sourceId": "N5_K009"
+  },
+  {
+    "target": "見",
+    "level": "N5",
+    "meaning": "see; look",
+    "readings": [
+      "けん",
+      "みる",
+      "みえる",
+      "みせる"
+    ],
+    "sourceId": "N5_K010"
+  },
+  {
+    "target": "国",
+    "level": "N5",
+    "meaning": "country",
+    "readings": [
+      "こく",
+      "くに"
+    ],
+    "sourceId": "N5_K011"
+  },
+  {
+    "target": "上",
+    "level": "N5",
+    "meaning": "up; above; top",
+    "readings": [
+      "じょう",
+      "うえ",
+      "かみ",
+      "あげる",
+      "あがる",
+      "のぼる",
+      "のぼせる",
+      "のぼす"
+    ],
+    "sourceId": "N5_K012"
+  },
+  {
+    "target": "分",
+    "level": "N5",
+    "meaning": "part; minute; divide; understand",
+    "readings": [
+      "ぶん",
+      "ふん",
+      "ぶ",
+      "わける",
+      "わかれる",
+      "わかる",
+      "わかつ"
+    ],
+    "sourceId": "N5_K013"
+  },
+  {
+    "target": "生",
+    "level": "N5",
+    "meaning": "life; birth; live",
+    "readings": [
+      "せい",
+      "しょう",
+      "いきる",
+      "いかす",
+      "いける",
+      "うまれる",
+      "うむ",
+      "おう",
+      "はえる",
+      "はやす",
+      "き",
+      "なま"
+    ],
+    "sourceId": "N5_K014"
+  },
+  {
+    "target": "行",
+    "level": "N5",
+    "meaning": "go; carry out; line",
+    "readings": [
+      "こう",
+      "ぎょう",
+      "いく",
+      "ゆく",
+      "おこなう"
+    ],
+    "sourceId": "N5_K015"
+  },
+  {
+    "target": "二",
+    "level": "N5",
+    "meaning": "two",
+    "readings": [
+      "に",
+      "ふた",
+      "ふたつ"
+    ],
+    "sourceId": "N5_K016"
+  },
+  {
+    "target": "間",
+    "level": "N5",
+    "meaning": "interval; between; space",
+    "readings": [
+      "かん",
+      "けん",
+      "あいだ",
+      "ま"
+    ],
+    "sourceId": "N5_K017"
+  },
+  {
+    "target": "時",
+    "level": "N5",
+    "meaning": "time; hour",
+    "readings": [
+      "じ",
+      "とき"
+    ],
+    "sourceId": "N5_K018"
+  },
+  {
+    "target": "気",
+    "level": "N5",
+    "meaning": "spirit; feeling; air",
+    "readings": [
+      "き",
+      "け"
+    ],
+    "sourceId": "N5_K019"
+  },
+  {
+    "target": "十",
+    "level": "N5",
+    "meaning": "ten",
+    "readings": [
+      "じゅう",
+      "じっ",
+      "とお",
+      "と"
+    ],
+    "sourceId": "N5_K020"
+  },
+  {
+    "target": "女",
+    "level": "N5",
+    "meaning": "woman; female",
+    "readings": [
+      "じょ",
+      "にょ",
+      "おんな",
+      "め"
+    ],
+    "sourceId": "N5_K021"
+  },
+  {
+    "target": "三",
+    "level": "N5",
+    "meaning": "three",
+    "readings": [
+      "さん",
+      "み",
+      "みつ",
+      "みっつ"
+    ],
+    "sourceId": "N5_K022"
+  },
+  {
+    "target": "前",
+    "level": "N5",
+    "meaning": "front; before",
+    "readings": [
+      "ぜん",
+      "まえ"
+    ],
+    "sourceId": "N5_K023"
+  },
+  {
+    "target": "入",
+    "level": "N5",
+    "meaning": "enter; put in",
+    "readings": [
+      "にゅう",
+      "いる",
+      "いれる",
+      "はいる"
+    ],
+    "sourceId": "N5_K024"
+  },
+  {
+    "target": "小",
+    "level": "N5",
+    "meaning": "small",
+    "readings": [
+      "しょう",
+      "ちいさい",
+      "こ",
+      "お"
+    ],
+    "sourceId": "N5_K025"
+  },
+  {
+    "target": "後",
+    "level": "N5",
+    "meaning": "after; behind",
+    "readings": [
+      "ご",
+      "こう",
+      "のち",
+      "うしろ",
+      "あと",
+      "おくれる"
+    ],
+    "sourceId": "N5_K026"
+  },
+  {
+    "target": "長",
+    "level": "N5",
+    "meaning": "long; leader; chief",
+    "readings": [
+      "ちょう",
+      "ながい"
+    ],
+    "sourceId": "N5_K027"
+  },
+  {
+    "target": "下",
+    "level": "N5",
+    "meaning": "down; below",
+    "readings": [
+      "か",
+      "げ",
+      "した",
+      "しも",
+      "もと",
+      "さげる",
+      "さがる",
+      "くだる",
+      "くだす",
+      "くださる",
+      "おろす",
+      "おりる"
+    ],
+    "sourceId": "N5_K028"
+  },
+  {
+    "target": "学",
+    "level": "N5",
+    "meaning": "study; learning",
+    "readings": [
+      "がく",
+      "まなぶ"
+    ],
+    "sourceId": "N5_K029"
+  },
+  {
+    "target": "月",
+    "level": "N5",
+    "meaning": "month; moon",
+    "readings": [
+      "げつ",
+      "がつ",
+      "つき"
+    ],
+    "sourceId": "N5_K030"
+  },
+  {
+    "target": "何",
+    "level": "N5",
+    "meaning": "what; how many",
+    "readings": [
+      "か",
+      "なに"
+    ],
+    "sourceId": "N5_K031"
+  },
+  {
+    "target": "来",
+    "level": "N5",
+    "meaning": "come; next",
+    "readings": [
+      "らい",
+      "くる",
+      "きたる",
+      "きたす"
+    ],
+    "sourceId": "N5_K032"
+  },
+  {
+    "target": "話",
+    "level": "N5",
+    "meaning": "talk; story; conversation",
+    "readings": [
+      "わ",
+      "はなす",
+      "はなし"
+    ],
+    "sourceId": "N5_K033"
+  },
+  {
+    "target": "山",
+    "level": "N5",
+    "meaning": "mountain",
+    "readings": [
+      "さん",
+      "やま"
+    ],
+    "sourceId": "N5_K034"
+  },
+  {
+    "target": "高",
+    "level": "N5",
+    "meaning": "high; expensive",
+    "readings": [
+      "こう",
+      "たかい",
+      "たか",
+      "たかまる",
+      "たかめる"
+    ],
+    "sourceId": "N5_K035"
+  },
+  {
+    "target": "今",
+    "level": "N5",
+    "meaning": "now; present",
+    "readings": [
+      "こん",
+      "きん",
+      "いま"
+    ],
+    "sourceId": "N5_K036"
+  },
+  {
+    "target": "書",
+    "level": "N5",
+    "meaning": "write; writing; book",
+    "readings": [
+      "しょ",
+      "かく"
+    ],
+    "sourceId": "N5_K037"
+  },
+  {
+    "target": "五",
+    "level": "N5",
+    "meaning": "five",
+    "readings": [
+      "ご",
+      "いつ",
+      "いつつ"
+    ],
+    "sourceId": "N5_K038"
+  },
+  {
+    "target": "名",
+    "level": "N5",
+    "meaning": "name; reputation",
+    "readings": [
+      "めい",
+      "みょう",
+      "な"
+    ],
+    "sourceId": "N5_K039"
+  },
+  {
+    "target": "金",
+    "level": "N5",
+    "meaning": "gold; money; metal",
+    "readings": [
+      "きん",
+      "こん",
+      "かね"
+    ],
+    "sourceId": "N5_K040"
+  },
+  {
+    "target": "男",
+    "level": "N5",
+    "meaning": "man; male",
+    "readings": [
+      "だん",
+      "なん",
+      "おとこ"
+    ],
+    "sourceId": "N5_K041"
+  },
+  {
+    "target": "外",
+    "level": "N5",
+    "meaning": "outside; foreign",
+    "readings": [
+      "がい",
+      "げ",
+      "そと",
+      "ほか",
+      "はずす",
+      "はずれる"
+    ],
+    "sourceId": "N5_K042"
+  },
+  {
+    "target": "四",
+    "level": "N5",
+    "meaning": "four",
+    "readings": [
+      "し",
+      "よ",
+      "よつ",
+      "よっつ",
+      "よん"
+    ],
+    "sourceId": "N5_K043"
+  },
+  {
+    "target": "先",
+    "level": "N5",
+    "meaning": "ahead; previous; earlier",
+    "readings": [
+      "せん",
+      "さき"
+    ],
+    "sourceId": "N5_K044"
+  },
+  {
+    "target": "川",
+    "level": "N5",
+    "meaning": "river",
+    "readings": [
+      "せん",
+      "かわ"
+    ],
+    "sourceId": "N5_K045"
+  },
+  {
+    "target": "東",
+    "level": "N5",
+    "meaning": "east",
+    "readings": [
+      "とう",
+      "ひがし"
+    ],
+    "sourceId": "N5_K046"
+  },
+  {
+    "target": "聞",
+    "level": "N5",
+    "meaning": "hear; listen; ask",
+    "readings": [
+      "ぶん",
+      "もん",
+      "きく",
+      "きこえる"
+    ],
+    "sourceId": "N5_K047"
+  },
+  {
+    "target": "語",
+    "level": "N5",
+    "meaning": "language; word",
+    "readings": [
+      "ご",
+      "かたる",
+      "かたらう"
+    ],
+    "sourceId": "N5_K048"
+  },
+  {
+    "target": "九",
+    "level": "N5",
+    "meaning": "nine",
+    "readings": [
+      "きゅう",
+      "く",
+      "ここの",
+      "ここのつ"
+    ],
+    "sourceId": "N5_K049"
+  },
+  {
+    "target": "食",
+    "level": "N5",
+    "meaning": "eat; food",
+    "readings": [
+      "しょく",
+      "くう",
+      "くらう",
+      "たべる"
+    ],
+    "sourceId": "N5_K050"
+  },
+  {
+    "target": "八",
+    "level": "N5",
+    "meaning": "eight",
+    "readings": [
+      "はち",
+      "や",
+      "やつ",
+      "やっつ"
+    ],
+    "sourceId": "N5_K051"
+  },
+  {
+    "target": "水",
+    "level": "N5",
+    "meaning": "water",
+    "readings": [
+      "すい",
+      "みず"
+    ],
+    "sourceId": "N5_K052"
+  },
+  {
+    "target": "天",
+    "level": "N5",
+    "meaning": "heaven; sky",
+    "readings": [
+      "てん",
+      "あめ"
+    ],
+    "sourceId": "N5_K053"
+  },
+  {
+    "target": "木",
+    "level": "N5",
+    "meaning": "tree; wood",
+    "readings": [
+      "ぼく",
+      "もく",
+      "き"
+    ],
+    "sourceId": "N5_K054"
+  },
+  {
+    "target": "六",
+    "level": "N5",
+    "meaning": "six",
+    "readings": [
+      "ろく",
+      "む",
+      "むつ",
+      "むっつ"
+    ],
+    "sourceId": "N5_K055"
+  },
+  {
+    "target": "万",
+    "level": "N5",
+    "meaning": "ten thousand",
+    "readings": [
+      "まん",
+      "ばん"
+    ],
+    "sourceId": "N5_K056"
+  },
+  {
+    "target": "白",
+    "level": "N5",
+    "meaning": "white",
+    "readings": [
+      "はく",
+      "びゃく",
+      "しろ",
+      "しろい"
+    ],
+    "sourceId": "N5_K057"
+  },
+  {
+    "target": "七",
+    "level": "N5",
+    "meaning": "seven",
+    "readings": [
+      "しち",
+      "なな",
+      "ななつ"
+    ],
+    "sourceId": "N5_K058"
+  },
+  {
+    "target": "円",
+    "level": "N5",
+    "meaning": "yen; circle",
+    "readings": [
+      "えん",
+      "まるい"
+    ],
+    "sourceId": "N5_K059"
+  },
+  {
+    "target": "電",
+    "level": "N5",
+    "meaning": "electricity",
+    "readings": [
+      "でん"
+    ],
+    "sourceId": "N5_K060"
+  },
+  {
+    "target": "父",
+    "level": "N5",
+    "meaning": "father",
+    "readings": [
+      "ふ",
+      "ちち"
+    ],
+    "sourceId": "N5_K061"
+  },
+  {
+    "target": "北",
+    "level": "N5",
+    "meaning": "north",
+    "readings": [
+      "ほく",
+      "きた"
+    ],
+    "sourceId": "N5_K062"
+  },
+  {
+    "target": "車",
+    "level": "N5",
+    "meaning": "car; vehicle",
+    "readings": [
+      "しゃ",
+      "くるま"
+    ],
+    "sourceId": "N5_K063"
+  },
+  {
+    "target": "母",
+    "level": "N5",
+    "meaning": "mother",
+    "readings": [
+      "ぼ",
+      "はは"
+    ],
+    "sourceId": "N5_K064"
+  },
+  {
+    "target": "半",
+    "level": "N5",
+    "meaning": "half",
+    "readings": [
+      "はん",
+      "なかば"
+    ],
+    "sourceId": "N5_K065"
+  },
+  {
+    "target": "百",
+    "level": "N5",
+    "meaning": "hundred",
+    "readings": [
+      "ひゃく"
+    ],
+    "sourceId": "N5_K066"
+  },
+  {
+    "target": "土",
+    "level": "N5",
+    "meaning": "earth; soil",
+    "readings": [
+      "ど",
+      "と",
+      "つち"
+    ],
+    "sourceId": "N5_K067"
+  },
+  {
+    "target": "西",
+    "level": "N5",
+    "meaning": "west",
+    "readings": [
+      "せい",
+      "さい",
+      "にし"
+    ],
+    "sourceId": "N5_K068"
+  },
+  {
+    "target": "読",
+    "level": "N5",
+    "meaning": "read",
+    "readings": [
+      "どく",
+      "とく",
+      "よむ"
+    ],
+    "sourceId": "N5_K069"
+  },
+  {
+    "target": "千",
+    "level": "N5",
+    "meaning": "thousand",
+    "readings": [
+      "せん",
+      "ち"
+    ],
+    "sourceId": "N5_K070"
+  },
+  {
+    "target": "校",
+    "level": "N5",
+    "meaning": "school",
+    "readings": [
+      "こう"
+    ],
+    "sourceId": "N5_K071"
+  },
+  {
+    "target": "右",
+    "level": "N5",
+    "meaning": "right",
+    "readings": [
+      "う",
+      "ゆう",
+      "みぎ"
+    ],
+    "sourceId": "N5_K072"
+  },
+  {
+    "target": "南",
+    "level": "N5",
+    "meaning": "south",
+    "readings": [
+      "なん",
+      "みなみ"
+    ],
+    "sourceId": "N5_K073"
+  },
+  {
+    "target": "左",
+    "level": "N5",
+    "meaning": "left",
+    "readings": [
+      "さ",
+      "ひだり"
+    ],
+    "sourceId": "N5_K074"
+  },
+  {
+    "target": "友",
+    "level": "N5",
+    "meaning": "friend",
+    "readings": [
+      "ゆう",
+      "とも"
+    ],
+    "sourceId": "N5_K075"
+  },
+  {
+    "target": "火",
+    "level": "N5",
+    "meaning": "fire",
+    "readings": [
+      "か",
+      "ひ"
+    ],
+    "sourceId": "N5_K076"
+  },
+  {
+    "target": "毎",
+    "level": "N5",
+    "meaning": "every",
+    "readings": [
+      "まい"
+    ],
+    "sourceId": "N5_K077"
+  },
+  {
+    "target": "雨",
+    "level": "N5",
+    "meaning": "rain",
+    "readings": [
+      "う",
+      "あめ"
+    ],
+    "sourceId": "N5_K078"
+  },
+  {
+    "target": "休",
+    "level": "N5",
+    "meaning": "rest; holiday",
+    "readings": [
+      "きゅう",
+      "やすむ",
+      "やすまる",
+      "やすめる"
+    ],
+    "sourceId": "N5_K079"
+  },
+  {
+    "target": "午",
+    "level": "N5",
+    "meaning": "noon",
+    "readings": [
+      "ご"
+    ],
+    "sourceId": "N5_K080"
+  }
+]

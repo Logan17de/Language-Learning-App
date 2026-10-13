@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "source": "Kanji Recall v32",
+  "current_level": "N5",
+  "last_lesson": "N5-001",
+  "states": [
+    "strong",
+    "weak",
+    "unknown"
+  ],
+  "default_state": "unassessed",
+  "kanji": {},
+  "vocabulary": {},
+  "lesson_history": [
+    {
+      "lesson_id": "N5-001",
+      "feedback_status": "awaiting_feedback"
+    }
+  ]
+}

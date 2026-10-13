@@ -1,0 +1,234 @@
+{
+  "id": "N5-001",
+  "level": "N5",
+  "title": "雨の日の本",
+  "paragraphs": [
+    "今日は雨です。わたしは七時におきて、外を見ました。お父さんは「大雨だね」といいました。でも、学校へ行く時間です。",
+    "学校へ行く前に、かばんの中に日本語の本を入れました。本の名前は「小さな山と大きな川」です。電車の中で、その本を読みました。",
+    "学校で、先生が「今日の本を見せてください」といいました。わたしはかばんの中を見ました。でも、本がありません。",
+    "先生に「本がありません」と話しました。先生は「かばんの下を見てください」といいました。",
+    "かばんの下に、本がありました。「あった！」とわたしはいいました。",
+    "先生と二人の学生といっしょに、本を読みました。本の中には、日本の山と川の話がありました。",
+    "学校の後で、外を見ると、雨はやんでいました。「今日はいい日です」とわたしはいいました。"
+  ],
+  "allowed_source": "Kanji Recall v32 single-kanji level index + N5 compound/kana cards",
+  "introduced_kanji": [
+    "七",
+    "下",
+    "中",
+    "二",
+    "人",
+    "今",
+    "先",
+    "入",
+    "前",
+    "名",
+    "外",
+    "大",
+    "学",
+    "小",
+    "山",
+    "川",
+    "後",
+    "日",
+    "時",
+    "本",
+    "校",
+    "父",
+    "生",
+    "行",
+    "見",
+    "話",
+    "語",
+    "読",
+    "車",
+    "間",
+    "雨",
+    "電"
+  ],
+  "focus_cards": [
+    {
+      "target": "今日",
+      "type": "compound",
+      "reading": "きょう",
+      "source_id": "N5_V048",
+      "surface_forms": [
+        "今日"
+      ]
+    },
+    {
+      "target": "大雨",
+      "type": "compound",
+      "reading": "おおあめ",
+      "source_id": "N5_V159",
+      "surface_forms": [
+        "大雨"
+      ]
+    },
+    {
+      "target": "学校",
+      "type": "compound",
+      "reading": "がっこう",
+      "source_id": "N5_V014",
+      "surface_forms": [
+        "学校"
+      ]
+    },
+    {
+      "target": "時間",
+      "type": "compound",
+      "reading": "じかん",
+      "source_id": "N5_V041",
+      "surface_forms": [
+        "時間"
+      ]
+    },
+    {
+      "target": "日本語",
+      "type": "compound",
+      "reading": "にほんご",
+      "source_id": "N5_V003",
+      "surface_forms": [
+        "日本語"
+      ]
+    },
+    {
+      "target": "名前",
+      "type": "compound",
+      "reading": "なまえ",
+      "source_id": "N5_V032",
+      "surface_forms": [
+        "名前"
+      ]
+    },
+    {
+      "target": "電車",
+      "type": "compound",
+      "reading": "でんしゃ",
+      "source_id": "N5_V153",
+      "surface_forms": [
+        "電車"
+      ]
+    },
+    {
+      "target": "先生",
+      "type": "compound",
+      "reading": "せんせい",
+      "source_id": "N5_V021",
+      "surface_forms": [
+        "先生"
+      ]
+    },
+    {
+      "target": "二人",
+      "type": "compound",
+      "reading": "ふたり",
+      "source_id": "N5_V099",
+      "surface_forms": [
+        "二人"
+      ]
+    },
+    {
+      "target": "学生",
+      "type": "compound",
+      "reading": "がくせい",
+      "source_id": "N5_V013",
+      "surface_forms": [
+        "学生"
+      ]
+    },
+    {
+      "target": "日本",
+      "type": "compound",
+      "reading": "にほん",
+      "source_id": "N5_V001",
+      "surface_forms": [
+        "日本"
+      ]
+    },
+    {
+      "target": "お父さん",
+      "type": "kana",
+      "reading": "おとうさん",
+      "source_id": "OPENJLPT_89807c7c22",
+      "surface_forms": [
+        "お父さん"
+      ]
+    },
+    {
+      "target": "見る",
+      "type": "kana",
+      "reading": "みる",
+      "source_id": "OPENJLPT_85b37b6884",
+      "surface_forms": [
+        "見ました",
+        "見ると"
+      ]
+    },
+    {
+      "target": "行く",
+      "type": "kana",
+      "reading": "いく",
+      "source_id": "OPENJLPT_66e4692df7",
+      "surface_forms": [
+        "行く"
+      ]
+    },
+    {
+      "target": "入れる",
+      "type": "kana",
+      "reading": "いれる",
+      "source_id": "OPENJLPT_6d824d5110",
+      "surface_forms": [
+        "入れました"
+      ]
+    },
+    {
+      "target": "小さな",
+      "type": "kana",
+      "reading": "ちいさな",
+      "source_id": "OPENJLPT_38a8411ec3",
+      "surface_forms": [
+        "小さな"
+      ]
+    },
+    {
+      "target": "大きな",
+      "type": "kana",
+      "reading": "おおきな",
+      "source_id": "OPENJLPT_3a2de0afca",
+      "surface_forms": [
+        "大きな"
+      ]
+    },
+    {
+      "target": "読む",
+      "type": "kana",
+      "reading": "よむ",
+      "source_id": "OPENJLPT_eb7e675902",
+      "surface_forms": [
+        "読みました"
+      ]
+    },
+    {
+      "target": "見せる",
+      "type": "kana",
+      "reading": "みせる",
+      "source_id": "OPENJLPT_db35a99e28",
+      "surface_forms": [
+        "見せて"
+      ]
+    },
+    {
+      "target": "話す",
+      "type": "kana",
+      "reading": "はなす",
+      "source_id": "OPENJLPT_9d5bde24ec",
+      "surface_forms": [
+        "話しました"
+      ]
+    }
+  ],
+  "review_status": "awaiting_feedback",
+  "notes": "Story text deliberately omits furigana and translations. No kanji above the N5 single-card level occurs; conjugated N5 vocabulary is permitted."
+}
