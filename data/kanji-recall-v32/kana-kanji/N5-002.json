@@ -1,0 +1,4 @@
+[
+{"target":"渡る","level":"N5","targetType":"kana","meaning":"to go across","readings":["わたる"],"reading":"わたる","breakdown":[{"kanji":"渡","meaning":"cross; hand over","reading":"と"},{"kana":"る"}],"memory":"渡る → わたる","logic":"Contains both kanji and hiragana","mnemonicType":"Kanji + Kana","exampleWord":"渡る","exampleReading":"わたる","exampleMeaning":"to go across","sourceId":"OPENJLPT_78255b9860","componentLevels":"N5","baseForm":"渡る","dataSource":"OpenJLPT / JMdict (CC BY-SA 4.0)"},
+{"target":"悪い","level":"N5","targetType":"kana","meaning":"bad","readings":["わるい"],"reading":"わるい","breakdown":[{"kanji":"悪","meaning":"bad; evil","reading":"あく"},{"kana":"い"}],"memory":"悪い → わるい","logic":"Contains both kanji and hiragana","mnemonicType":"Kanji + Kana","exampleWord":"悪い","exampleReading":"わるい","exampleMeaning":"bad","sourceId":"OPENJLPT_13b6dbec03","componentLevels":"N5","baseForm":"悪い","dataSource":"OpenJLPT / JMdict (CC BY-SA 4.0)"}
+]

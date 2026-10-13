@@ -1,0 +1,194 @@
+{
+  "source_apk_name": "Kanji-Recall-v32-Stable-MultiSelect-Native-Export.apk",
+  "source_apk_sha256": "d3d6de85681558dcd3978c4e651f783937e48f459ed0c809ce2608d41455c51a",
+  "source_asset": "assets/data/cards.js",
+  "source_cards_total": 6999,
+  "export_scope": [
+    "compound",
+    "kana"
+  ],
+  "exported_cards_total": 4863,
+  "record_fields_preserved": true,
+  "duplicate_target_counts": {
+    "compound": 0,
+    "kana-kanji": 0
+  },
+  "categories": {
+    "compound": {
+      "source_targetType": "compound",
+      "total": 2882,
+      "levels": {
+        "N5": 208,
+        "N4": 405,
+        "N3": 562,
+        "N2": 622,
+        "N1": 1085
+      },
+      "files": [
+        {
+          "path": "compound/N5-001.json",
+          "count": 200,
+          "sha256": "c57c4e6031e55e97de82fb029e08e6a9fcbb6eb1b585d4ec1f67ff12384beffb"
+        },
+        {
+          "path": "compound/N5-002.json",
+          "count": 8,
+          "sha256": "062a9f51cea365b95dfe552239d0c1b525ef3fa7549c627c08e3159658656048"
+        },
+        {
+          "path": "compound/N4-001.json",
+          "count": 200,
+          "sha256": "26a64ff0ebfface34ff796e3d8960f9262f8c22510c43ae3837bad03e603a68d"
+        },
+        {
+          "path": "compound/N4-002.json",
+          "count": 200,
+          "sha256": "7ac3dd739783d65603bc41046518df3b3de2e4098fd6b636906e557408d5ed2f"
+        },
+        {
+          "path": "compound/N4-003.json",
+          "count": 5,
+          "sha256": "2396471cc2eb0f6b070256c1a5c48bcdcf69b44ee7d78e24ffbbe39e483afce3"
+        },
+        {
+          "path": "compound/N3-001.json",
+          "count": 200,
+          "sha256": "2cade8778990b966150bfcfe48d2428b1ff0cd1e6bc9d73140f441f9f7c5304c"
+        },
+        {
+          "path": "compound/N3-002.json",
+          "count": 200,
+          "sha256": "d96031ec41efe8e81c8cecd5fe4708ab2b938e3ff7a576f3b8f90f8df551acc4"
+        },
+        {
+          "path": "compound/N3-003.json",
+          "count": 162,
+          "sha256": "4f55439edb1d73335d3886ff149f504328d718be890986755da68912cb91f451"
+        },
+        {
+          "path": "compound/N2-001.json",
+          "count": 200,
+          "sha256": "a73df58f26977dd92b5d68c88fedbd234208a84f11e4969cf45ae059ddcfd47e"
+        },
+        {
+          "path": "compound/N2-002.json",
+          "count": 200,
+          "sha256": "a15a0beeeb48f3a25ede1bd8c13f5071151183ed5aa96a342db99a489fb0e34f"
+        },
+        {
+          "path": "compound/N2-003.json",
+          "count": 200,
+          "sha256": "dfc9e2aa4da180dc7603581c36b95a00c4ad2380508b738fd5b2ee6a91840d41"
+        },
+        {
+          "path": "compound/N2-004.json",
+          "count": 22,
+          "sha256": "e66ebd040291ca0e0127c6a0f6096d4b1e3c27939a1d06647ac4f905000d7483"
+        },
+        {
+          "path": "compound/N1-001.json",
+          "count": 200,
+          "sha256": "723661c25d0fb937677292fcbaca1fad251578f5762265c37f1b1c7bf318a4b3"
+        },
+        {
+          "path": "compound/N1-002.json",
+          "count": 200,
+          "sha256": "aabdc19eb499742c986b9ec5d0b1485d18c8608e20b02ab1b63830e82fa4d4d3"
+        },
+        {
+          "path": "compound/N1-003.json",
+          "count": 200,
+          "sha256": "70e326a9c59faf901bf92072bb490f5de91de0edfdf15c56f89bf4ad2c98c151"
+        },
+        {
+          "path": "compound/N1-004.json",
+          "count": 200,
+          "sha256": "2fa791c4068a27b8108af3bcbc51d2fab20594b1d5eb0575f1018ddef7d29259"
+        },
+        {
+          "path": "compound/N1-005.json",
+          "count": 200,
+          "sha256": "3800f9f731df4b52c3c7714829e83abb6e32cb338951a4ade9ebaad6afbbc2e5"
+        },
+        {
+          "path": "compound/N1-006.json",
+          "count": 85,
+          "sha256": "674bb0d2501ccb181a7ee64cc244a6f7bfdafdf5bdb8b49c282d4734b6228a88"
+        }
+      ]
+    },
+    "kana-kanji": {
+      "source_targetType": "kana",
+      "total": 1981,
+      "levels": {
+        "N5": 202,
+        "N4": 197,
+        "N3": 354,
+        "N2": 492,
+        "N1": 736
+      },
+      "files": [
+        {
+          "path": "kana-kanji/N5-001.json",
+          "count": 200,
+          "sha256": "02746dba35ef2666d34c1106e5bdead02a8d07ba2791ba7599aa79d9aa5dcf7e"
+        },
+        {
+          "path": "kana-kanji/N5-002.json",
+          "count": 2,
+          "sha256": "2e431956bb84c9c3c34171a179b4bb4ce8ed81939f03b5b7cf4995ca95696ff9"
+        },
+        {
+          "path": "kana-kanji/N4-001.json",
+          "count": 197,
+          "sha256": "d27002eec4871750be64a12b3df6273869ef70c5e0b58a0db925b0780daef125"
+        },
+        {
+          "path": "kana-kanji/N3-001.json",
+          "count": 200,
+          "sha256": "7d50a9574250d7d8e68555d213cfa46eb995493866568481541687e51eef6f3b"
+        },
+        {
+          "path": "kana-kanji/N3-002.json",
+          "count": 154,
+          "sha256": "68fff7855dae06ac93098ccdde8f20c57f77d6c7c1d89ef64450e153e2baeaf2"
+        },
+        {
+          "path": "kana-kanji/N2-001.json",
+          "count": 200,
+          "sha256": "ca140bbb1033c2c6eae9f151378143febf38eaab7e8506a6a694c4dc0da8de90"
+        },
+        {
+          "path": "kana-kanji/N2-002.json",
+          "count": 200,
+          "sha256": "b3e9f796d3ef6d130bb44df59efa35112d003efb3b146f60267a72667d35ed36"
+        },
+        {
+          "path": "kana-kanji/N2-003.json",
+          "count": 92,
+          "sha256": "ba7fb760947c3e1de776386ee8be1405ffc8c2e0739b53d67b46e8df41e271b5"
+        },
+        {
+          "path": "kana-kanji/N1-001.json",
+          "count": 200,
+          "sha256": "76d6bf33a3459ac780cac4dd698f193d7a493c2ce0dfec33fe2846123d6e6f70"
+        },
+        {
+          "path": "kana-kanji/N1-002.json",
+          "count": 200,
+          "sha256": "44fad9e972749fcdc6de6c72e0387cbd782e4391a4d1bccc0f99a771067d4384"
+        },
+        {
+          "path": "kana-kanji/N1-003.json",
+          "count": 200,
+          "sha256": "685796c0114cc8f47c83d8c79390f93f348a3d1f74c011a4e7eb5fde084a07fe"
+        },
+        {
+          "path": "kana-kanji/N1-004.json",
+          "count": 136,
+          "sha256": "994a91686594ddbc985c73aeee18fe63a6bc05c1812e6adfb65b23b9b4353265"
+        }
+      ]
+    }
+  }
+}
