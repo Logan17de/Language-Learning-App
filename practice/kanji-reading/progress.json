@@ -174,6 +174,61 @@
       "status": "weak",
       "last_lesson": "N5-002",
       "note": "Reading-specific difficulty (2026-10-14): in 大きな木, read ひ; correct 木＝き (tree). Recycle 木／き in future N5 stories."
+    },
+    "開": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "note": "Meaning/look-up for 開かれる; linked N4 character, exact individual decoding not separately tested. Feedback 2026-10-14."
+    },
+    "会": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "note": "Read 会に correctly (かいに) but reported uncertainty; confidence-review target. Feedback 2026-10-14."
+    },
+    "書": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "note": "N5: 書店 required lookup; flagged for review, individual 書 reading not independently tested. Feedback 2026-10-14."
+    },
+    "店": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "note": "N4: 書店 required lookup; review within compounds. Feedback 2026-10-14."
+    },
+    "道": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "note": "Read 道 correctly (みち); nevertheless learner self-categorized it as weak/hesitant. Feedback 2026-10-14."
+    },
+    "通": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "note": "N4: 通って required lookup; repeat this inflection. Feedback 2026-10-14."
+    },
+    "走": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "note": "N4: read 走り出しました as hashiridemashita; beginning 走り may be correct, but review combination. Feedback 2026-10-14."
+    },
+    "出": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "note": "N5: 走り出しました read hashiridemashita vs hashiridashimashita; specifically revisit 出す vs 出る reading. Feedback 2026-10-14."
+    },
+    "止": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "note": "N4: 中止 required meaning lookup; practice 中止. Feedback 2026-10-14."
+    },
+    "無": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "note": "N4: 無事 required meaning lookup; practice 無事. Feedback 2026-10-14."
+    },
+    "事": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "note": "N4: 無事 required meaning lookup; inferred component review, individual recognition not verified. Feedback 2026-10-14."
     }
   },
   "vocabulary": {
@@ -310,6 +365,114 @@
       "note": "Story-context verb (not a verified v32 focus card). Read さがりる; correct おりる (to descend); distinguish 下がる（さがる）. Confirmed as an N4 kana+kanji entry in original APK.",
       "source_level": "N4",
       "source_id": "OPENJLPT_4806278f5b"
+    },
+    "開かれる": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "source_level": "N4",
+      "observed_surface": "開かれる",
+      "feedback_kind": "meaning_lookup",
+      "note": "Looked up meaning. Mark reading/meaning confidence weak; no incorrect pronunciation reported. Feedback 2026-10-14.",
+      "type": "contextual-surface"
+    },
+    "会": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "source_level": "N4",
+      "observed_surface": "会に",
+      "feedback_kind": "hesitation_correct",
+      "attempted_reading": "かいに (kaini)",
+      "correct_reading": "かいに (kai ni)",
+      "note": "Read correctly as かいに but wanted to verify; retain confidence-review priority. Feedback 2026-10-14."
+    },
+    "書店": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "source_level": "N4",
+      "observed_surface": "書店",
+      "feedback_kind": "meaning_lookup",
+      "note": "Looked up meaning; compound and its previously-unassessed N5 書 component should recur. Feedback 2026-10-14.",
+      "source_id": "N4_V237",
+      "type": "compound"
+    },
+    "道": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "source_level": "N4",
+      "observed_surface": "道",
+      "feedback_kind": "hesitation_correct",
+      "attempted_reading": "みち (michi)",
+      "correct_reading": "みち (michi)",
+      "note": "Read みち correctly; included in self-described weak list due to uncertainty. Feedback 2026-10-14."
+    },
+    "通る": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "source_level": "N4",
+      "observed_surface": "通って",
+      "feedback_kind": "meaning_lookup",
+      "note": "Needed meaning check for 通って; use the same inflection and new contexts. Feedback 2026-10-14.",
+      "source_id": "OPENJLPT_e9c1a3ae2c",
+      "type": "kana"
+    },
+    "走り出す": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "source_level": "N4",
+      "observed_surface": "走り出しました",
+      "feedback_kind": "incorrect_reading",
+      "attempted_reading": "はしりでました (hashiridemashita)",
+      "correct_reading": "はしりだしました (hashiridashimashita)",
+      "note": "Mistaken 出 reading in 走り出す compound: だす rather than でる; review combined verb, plus N5 出. Feedback 2026-10-14.",
+      "type": "contextual-verb"
+    },
+    "中止": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "source_level": "N4",
+      "observed_surface": "中止",
+      "feedback_kind": "meaning_lookup",
+      "note": "Needed meaning check for 中止; existing N5 中 remains strong until its specific reading is missed. Feedback 2026-10-14.",
+      "source_id": "N4_V293",
+      "type": "compound"
+    },
+    "無事": {
+      "status": "weak",
+      "last_lesson": "N4-001",
+      "source_level": "N4",
+      "observed_surface": "無事",
+      "feedback_kind": "meaning_lookup",
+      "note": "Needed meaning check for 無事; review meaning and reading in new contexts. Feedback 2026-10-14.",
+      "source_id": "N4_V145",
+      "type": "compound"
+    },
+    "会に": {
+      "status": "weak",
+      "type": "contextual-surface",
+      "last_lesson": "N4-001",
+      "source_level": "N4",
+      "feedback_kind": "hesitation_correct",
+      "attempted_reading": "かいに (kaini)",
+      "correct_reading": "かいに (kai ni)",
+      "note": "Correct reading, but learner requested confidence review. 2026-10-14."
+    },
+    "走り出しました": {
+      "status": "weak",
+      "type": "contextual-surface",
+      "last_lesson": "N4-001",
+      "source_level": "N4+N5",
+      "feedback_kind": "incorrect_reading",
+      "attempted_reading": "はしりでました",
+      "correct_reading": "はしりだしました",
+      "note": "Review 走り出す combined verb and 出す reading. 2026-10-14."
+    },
+    "通って": {
+      "status": "weak",
+      "type": "contextual-surface",
+      "last_lesson": "N4-001",
+      "source_level": "N4",
+      "feedback_kind": "meaning_lookup",
+      "note": "Review 通る inflection; required lookup in this passage. 2026-10-14."
     }
   },
   "lesson_history": [
@@ -356,14 +519,80 @@
     {
       "lesson_id": "N4-001",
       "level": "N4",
-      "feedback_status": "awaiting_feedback",
+      "feedback_status": "partial_feedback",
       "new_n4_kanji": 59,
       "reused_n5_kanji": 30,
       "reviewing_n5_weak": [
         "木",
         "下りる",
         "一本"
-      ]
+      ],
+      "feedback_date": "2026-10-14",
+      "reported_difficulties": [
+        {
+          "surface": "開かれる",
+          "target": "開かれる",
+          "kanji_review_anchor": "開",
+          "kind": "meaning_lookup",
+          "status": "weak"
+        },
+        {
+          "surface": "会に",
+          "target": "会",
+          "kanji_review_anchor": "会",
+          "kind": "hesitation_correct",
+          "attempted": "かいに (kaini)",
+          "correct": "かいに (kai ni)",
+          "status": "weak"
+        },
+        {
+          "surface": "書店",
+          "target": "書店",
+          "kanji_review_anchor": "書",
+          "kind": "meaning_lookup",
+          "status": "weak"
+        },
+        {
+          "surface": "道",
+          "target": "道",
+          "kanji_review_anchor": "道",
+          "kind": "hesitation_correct",
+          "attempted": "みち (michi)",
+          "correct": "みち (michi)",
+          "status": "weak"
+        },
+        {
+          "surface": "通って",
+          "target": "通る",
+          "kanji_review_anchor": "通",
+          "kind": "meaning_lookup",
+          "status": "weak"
+        },
+        {
+          "surface": "走り出しました",
+          "target": "走り出す",
+          "kanji_review_anchor": "走",
+          "kind": "incorrect_reading",
+          "attempted": "はしりでました (hashiridemashita)",
+          "correct": "はしりだしました (hashiridashimashita)",
+          "status": "weak"
+        },
+        {
+          "surface": "中止",
+          "target": "中止",
+          "kanji_review_anchor": "止",
+          "kind": "meaning_lookup",
+          "status": "weak"
+        },
+        {
+          "surface": "無事",
+          "target": "無事",
+          "kanji_review_anchor": "無",
+          "kind": "meaning_lookup",
+          "status": "weak"
+        }
+      ],
+      "note": "Learner looked up meanings rather than requesting explanations. 会に and 道 were read correctly but marked for confidence review. 走り出しました was misread (はしりでました instead of はしりだしました). Other characters not promoted based on silence. Repeat flagged N4 and N5 components in future stories."
     }
   ],
   "last_completed_lesson": "N5-001",
@@ -377,5 +606,38 @@
       "n5_unconfirmed_at_transition": 49
     }
   ],
-  "review_policy": "Any N5 character or word difficulty reported while reading N4 lessons must be recorded as weak (or unknown if explicitly unknown), preserving previous feedback and avoiding blanket mastery assumptions."
+  "review_policy": "Any N5 character or word difficulty reported while reading N4 lessons must be recorded as weak (or unknown if explicitly unknown), preserving previous feedback and avoiding blanket mastery assumptions.",
+  "next_lesson_priorities": {
+    "level": "N4",
+    "prioritize_weak_vocabulary": [
+      "開かれる",
+      "会",
+      "書店",
+      "道",
+      "通る",
+      "走り出す",
+      "中止",
+      "無事"
+    ],
+    "prioritize_weak_kanji": [
+      "開",
+      "会",
+      "書",
+      "店",
+      "道",
+      "通",
+      "走",
+      "出",
+      "止",
+      "無",
+      "事"
+    ],
+    "retain_n5_review": [
+      "木",
+      "下",
+      "一本",
+      "下りる"
+    ],
+    "policy": "Favor weak and unknown entries while reusing already strong N5 kanji; no N3+ kanji."
+  }
 }
