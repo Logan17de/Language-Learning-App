@@ -2316,10 +2316,18 @@
     ]
   },
   "story_selection_policy": [
-    "Only use characters from the APK single-character N5+N4 catalog in current N4 stories. No N3/N2/N1 even if memoryState exists.",
-    "Prioritize same-target weak/unknown from this export, with explicit story-reading difficulty taking precedence over older app labels.",
-    "Review N5 weak words and character readings during N4 stories, preserving old N5 progress. Reuse mastered/familiar N5 and N4 vocabulary naturally but never assume component-kanji mastery.",
-    "App weakKanji characters classified above current level are tracked here but withheld from stories until promoted.",
-    "Do not change manually recorded strong/weak/unknown in progress.json based only on imported app word-level state. New story feedback updates the separate manual progress."
-  ]
+    "User-defined state interpretation governs selection: unknown = very new, weak = reading or meaning unknown, familiar = recognition taking around 10 seconds (not mastered).",
+    "N4 active: prioritize character-permitted weak and unknown N4 vocabulary for targeted exposure and reuse. Use familiar words deliberately in repeated contexts to improve retrieval speed, rather than treating them as already mastered.",
+    "Retain mastered vocabulary as supporting language, but don't claim that each constituent kanji is mastered from a mastered word.",
+    "Preserve manual story-reading feedback as separate evidence. If an app-familiar item was misread in a later story, the later weak status takes precedence for story practice.",
+    "Never include characters beyond the permitted N4+N5 single-character catalog; N3/N2/N1 entries remain deferred.",
+    "Do not alter the original Kanji Recall app export or overwrite verified reading progress on import."
+  ],
+  "user_confirmed_memory_state_meanings": {
+    "date": "2026-10-14",
+    "familiar": "Recognizable after about 10 seconds: slow recall; review for speed.",
+    "weak": "Does not know the reading or meaning: priority for reinforcement.",
+    "unknown": "Very new to the learner: introduce in context, then revisit.",
+    "mastered": "No new definition provided; preserve export label without inferring a recall-time threshold."
+  }
 }

@@ -31,3 +31,14 @@ Story N5-001: learner confirmed reading all 32 distinct kanji and 20 focus entri
 - For the active N4 reading curriculum, first choose **unknown/weak N4 vocabulary** whose characters all belong to the APK's N4+N5 *single-kanji whitelist*, then reinforce N5 words/characters the learner struggles with. Mix familiar/mastered items for fluency; skip any N3+ characters even if the app classifies the word N4.
 - **Latest explicit story feedback overrides older app memory for the same target.** Keep `progress.json` manually verified per-kanji statuses separate from the imported app snapshot. Example: app `下りる` is familiar, but a later reading lesson found it weak, so it stays a review priority. App `中止` is unknown, and story reading also reported difficulty, so prioritize it.
 - Each new app export can replace or version the snapshot separately; do not discard historical story feedback.
+
+## User-confirmed interpretation of app memory states (2026-10-14)
+
+These definitions are from the learner, **not** an inference based on the export's labels:
+
+- **Familiar:** The learner **can recognize** the kanji/vocabulary, but needs approximately **10 seconds**. Treat as **slow recognition**, not mastery. Revisit in short reading contexts to build faster recall. Never automatically promote familiar to strong merely because it appeared in a story.
+- **Weak:** The learner **does not know the reading or the meaning** (one or both may be missing). This needs focused reinforcement in multiple stories, plus specific checking of the reading and meaning during subsequent feedback.
+- **Unknown:** The kanji/vocabulary is **very new** to the learner. Introduce it with gentle contextual repetition before assuming familiarity.
+- **Mastered:** Retain the app's label without assigning a new proficiency/time-based definition; the learner has not provided one. Can be used for natural supporting language.
+
+Important: These labels in the imported `latestStates` apply to **whole vocabulary targets**. Never assume that every component kanji has the same memory state. Keep explicit story-reading corrections and individual-kanji statuses in `progress.json`; new corrections can make an app-familiar word a reading weakness without altering the unmodified raw export. For N4 stories, prioritize permitted N4 weak and unknown vocabulary, deliberately repeat N4 familiar vocabulary to improve **recognition speed**, then weave in mastered N4/N5 and weak N5 words. N3+ kanji remain excluded.

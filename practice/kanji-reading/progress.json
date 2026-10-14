@@ -687,5 +687,29 @@
     "priority_basis": "N4 weak/unknown app vocabulary (character-gated) plus explicit story weak; N5 weak also reviewed; known words recycled",
     "manual_story_states_preserved": true,
     "imported_word_states_into_manual_kanji": false
+  },
+  "app_memory_state_meanings": {
+    "defined_by": "learner, 2026-10-14",
+    "familiar": {
+      "description": "I can recognize those kanjis after 10 secs.",
+      "meaning": "Recognizes after approximately ten seconds; slow retrieval, not confidently mastered.",
+      "lesson_treatment": "Revisit regularly with varied context, measuring reduced hesitation; no automatic promotion."
+    },
+    "weak": {
+      "description": "I don't know the reading or meaning.",
+      "meaning": "Lacks the reading or the meaning, potentially both.",
+      "lesson_treatment": "Prioritize for reading/meaning reinforcement and keep weak until explicitly reassessed."
+    },
+    "unknown": {
+      "description": "That means that kanji is very new to me.",
+      "meaning": "Very new vocabulary/kanji to the learner.",
+      "lesson_treatment": "Introduce through readable context, then revisit; do not presume any previous recognition."
+    },
+    "mastered": {
+      "description": "App-export label; learner definition not yet supplied.",
+      "meaning": "Retain as labeled by app, without inventing a recall-time threshold.",
+      "lesson_treatment": "Reuse as comfortable supporting vocabulary unless later story feedback reports difficulty."
+    },
+    "applicability": "Imported latestStates refer to vocabulary items; kanji components must not inherit their word status automatically."
   }
 }
