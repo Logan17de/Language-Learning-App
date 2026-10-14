@@ -1,0 +1,379 @@
+{
+  "id": "N4-005",
+  "level": "N4",
+  "title": "レストランの一日",
+  "paragraphs": [
+    "今日から、私は町のレストランで店員の仕事を始めました。",
+    "店の主人は「この店の特色は魚料理だよ」と言い、注文の用紙をくれました。",
+    "昼になると人が集まり、魚料理のいいにおいが店の中に広がりました。",
+    "私は飲料を運びましたが、女の人の注文を一つまちがえてしまいました。",
+    "主人は「安心して。魚料理をもう一つ用意しよう」と言ってくれました。",
+    "そのとき、「明日は工事のため休業」と書かれた紙を見た男の人が来ました。",
+    "「いつまた店を開きますか」と聞かれ、私は「あさってです」と答えました。",
+    "安心した男の人は「では、今日の料理をもう一つ注文します」と言いました。",
+    "夕方、私は会計の用紙に代金を書きながら、今日のことを思い出しました。",
+    "帰りに主人から「今日もよくできたね」と言われ、私は「あさってもがんばります！」と答えました。"
+  ],
+  "line_count": 10,
+  "allowed_source": "Kanji Recall v32 N4/N5 single-character catalog, v32 N4/N5 vocabulary, October 14 memory snapshot and N4-004 learner feedback",
+  "introduced_kanji": [
+    "一",
+    "中",
+    "主",
+    "事",
+    "人",
+    "今",
+    "仕",
+    "代",
+    "休",
+    "会",
+    "出",
+    "員",
+    "夕",
+    "女",
+    "始",
+    "安",
+    "工",
+    "帰",
+    "広",
+    "店",
+    "心",
+    "思",
+    "意",
+    "文",
+    "料",
+    "方",
+    "日",
+    "明",
+    "昼",
+    "書",
+    "来",
+    "業",
+    "注",
+    "特",
+    "理",
+    "用",
+    "男",
+    "町",
+    "私",
+    "答",
+    "紙",
+    "聞",
+    "色",
+    "見",
+    "言",
+    "計",
+    "運",
+    "金",
+    "開",
+    "集",
+    "飲",
+    "魚"
+  ],
+  "introduced_n4_kanji": [
+    "主",
+    "事",
+    "仕",
+    "代",
+    "会",
+    "員",
+    "夕",
+    "始",
+    "安",
+    "工",
+    "帰",
+    "広",
+    "店",
+    "心",
+    "思",
+    "意",
+    "文",
+    "料",
+    "方",
+    "明",
+    "昼",
+    "業",
+    "注",
+    "特",
+    "理",
+    "用",
+    "町",
+    "私",
+    "答",
+    "紙",
+    "色",
+    "言",
+    "計",
+    "運",
+    "開",
+    "集",
+    "飲",
+    "魚"
+  ],
+  "recycled_n5_kanji": [
+    "一",
+    "中",
+    "人",
+    "今",
+    "休",
+    "出",
+    "女",
+    "日",
+    "書",
+    "来",
+    "男",
+    "聞",
+    "見",
+    "金"
+  ],
+  "focus_cards": [
+    {
+      "target": "店員",
+      "type": "compound",
+      "reading": "てんいん",
+      "source_id": "N4_V161",
+      "source_level": "N4",
+      "surface_forms": [
+        "店員"
+      ],
+      "app_memory_state": "mastered"
+    },
+    {
+      "target": "仕事",
+      "type": "compound",
+      "reading": "しごと",
+      "source_id": "N5_V130",
+      "source_level": "N5",
+      "surface_forms": [
+        "仕事"
+      ],
+      "app_memory_state": "mastered"
+    },
+    {
+      "target": "主人",
+      "type": "compound",
+      "reading": "しゅじん",
+      "source_id": "N4_V083",
+      "source_level": "N4",
+      "surface_forms": [
+        "主人"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "特色",
+      "type": "compound",
+      "reading": "とくしょく",
+      "source_id": "N4_V203",
+      "source_level": "N4",
+      "surface_forms": [
+        "特色"
+      ],
+      "app_memory_state": "unknown"
+    },
+    {
+      "target": "料理",
+      "type": "compound",
+      "reading": "りょうり",
+      "source_id": "N5_V151",
+      "source_level": "N5",
+      "surface_forms": [
+        "魚料理",
+        "料理"
+      ],
+      "app_memory_state": "familiar"
+    },
+    {
+      "target": "注文",
+      "type": "compound",
+      "reading": "ちゅうもん",
+      "source_id": "N4_V326",
+      "source_level": "N4",
+      "surface_forms": [
+        "注文"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "用紙",
+      "type": "compound",
+      "reading": "ようし",
+      "source_id": "N4_V320",
+      "source_level": "N4",
+      "surface_forms": [
+        "用紙"
+      ],
+      "app_memory_state": "unknown"
+    },
+    {
+      "target": "飲料",
+      "type": "compound",
+      "reading": "いんりょう",
+      "source_id": "N4_V350",
+      "source_level": "N4",
+      "surface_forms": [
+        "飲料"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "運ぶ",
+      "type": "kana",
+      "reading": "はこぶ",
+      "source_id": "OPENJLPT_2404bdfdb3",
+      "source_level": "N4",
+      "surface_forms": [
+        "運びました"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "安心",
+      "type": "compound",
+      "reading": "あんしん",
+      "source_id": "N4_V058",
+      "source_level": "N4",
+      "surface_forms": [
+        "安心"
+      ],
+      "app_memory_state": "mastered"
+    },
+    {
+      "target": "用意",
+      "type": "compound",
+      "reading": "ようい",
+      "source_id": "N4_V080",
+      "source_level": "N4",
+      "surface_forms": [
+        "用意"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "工事",
+      "type": "compound",
+      "reading": "こうじ",
+      "source_id": "N4_V299",
+      "source_level": "N4",
+      "surface_forms": [
+        "工事"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "会計",
+      "type": "compound",
+      "reading": "かいけい",
+      "source_id": "N4_V260",
+      "source_level": "N4",
+      "surface_forms": [
+        "会計"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "代金",
+      "type": "compound",
+      "reading": "だいきん",
+      "source_id": "N4_V032",
+      "source_level": "N4",
+      "surface_forms": [
+        "代金"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "帰り",
+      "type": "kana",
+      "reading": "かえり",
+      "source_id": "OPENJLPT_6365c5ac47",
+      "source_level": "N4",
+      "surface_forms": [
+        "帰り"
+      ],
+      "app_memory_state": "mastered"
+    }
+  ],
+  "review_targets": [
+    {
+      "surface": "特色",
+      "target": "特色",
+      "previous_state": "weak",
+      "focus": "incorrect_reading",
+      "previous_attempt": "tokushuu",
+      "correct": "tokushoku",
+      "review_priority": "high"
+    },
+    {
+      "surface": "休業",
+      "target": "休業",
+      "previous_state": "weak",
+      "focus": "meaning_only",
+      "previous_reading": "kyuugyou (correct)",
+      "review_priority": "high"
+    },
+    {
+      "surface": "主人",
+      "target": "主人",
+      "previous_state": "familiar",
+      "focus": "faster_recall",
+      "review_priority": "medium"
+    },
+    {
+      "surface": "用紙",
+      "target": "用紙",
+      "previous_state": "weak",
+      "focus": "recognition_and_reading",
+      "review_priority": "medium"
+    },
+    {
+      "surface": "飲料",
+      "target": "飲料",
+      "previous_state": "weak",
+      "focus": "recognition_and_reading",
+      "review_priority": "medium"
+    },
+    {
+      "surface": "広がりました",
+      "target": "広がる",
+      "previous_state": "weak",
+      "focus": "contextual_verb",
+      "review_priority": "medium"
+    },
+    {
+      "surface": "開きます",
+      "target": "開く",
+      "previous_state": "weak",
+      "focus": "transitive_hiraku_usage",
+      "review_priority": "medium"
+    }
+  ],
+  "app_memory_snapshot": "app-exports/2026-10-14-summary.json",
+  "app_memory_distribution": {
+    "unknown": [
+      "特色",
+      "用紙"
+    ],
+    "weak": [
+      "主人",
+      "注文",
+      "飲料",
+      "運ぶ",
+      "用意",
+      "工事",
+      "会計",
+      "代金"
+    ],
+    "familiar": [
+      "料理"
+    ],
+    "mastered": [
+      "店員",
+      "仕事",
+      "安心",
+      "帰り"
+    ]
+  },
+  "review_status": "awaiting_feedback",
+  "notes": "Exactly 10 physical story lines requested by learner. Worker perspective. Contextual 休業 meaning and 開きます / ひらく reading remain separate from APK focus-card claims. No stronger mastery inferred without explicit feedback."
+}

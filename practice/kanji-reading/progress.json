@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Kanji Recall v32",
   "current_level": "N4",
-  "last_lesson": "N4-004",
+  "last_lesson": "N4-005",
   "states": [
     "strong",
     "familiar",
@@ -1020,6 +1020,45 @@
           "elapsed_seconds": "not measured"
         }
       ]
+    },
+    {
+      "lesson_id": "N4-005",
+      "level": "N4",
+      "feedback_status": "awaiting_feedback",
+      "line_count": 10,
+      "introduced_distinct_kanji": 52,
+      "n4_kanji": 38,
+      "n5_reused": 14,
+      "source_verified_focus_count": 15,
+      "reviewing_latest_report": [
+        "特色",
+        "休業",
+        "主人"
+      ],
+      "additional_weak_review": [
+        "用紙",
+        "飲料",
+        "広がる",
+        "開く"
+      ],
+      "app_unknown_targets": [
+        "特色",
+        "用紙"
+      ],
+      "app_weak_targets": [
+        "主人",
+        "注文",
+        "飲料",
+        "運ぶ",
+        "用意",
+        "工事",
+        "会計",
+        "代金"
+      ],
+      "app_familiar_targets": [
+        "料理"
+      ],
+      "note": "10 physical lines; previous reader feedback retained; no invented mastery."
     }
   ],
   "last_completed_lesson": "N5-001",
@@ -1086,22 +1125,15 @@
       "下りる"
     ],
     "policy": "Maintain separate reading-vs-meaning-vs-retrieval feedback. No N3+ kanji.",
-    "active_lesson": "N4-004",
+    "active_lesson": "N4-005",
     "reviewing_now": [
-      "用紙",
       "特色",
-      "借金",
-      "屋外",
-      "歌手",
+      "休業",
+      "主人",
+      "用紙",
       "飲料",
       "広がる",
-      "開く",
-      "開く",
-      "走り出す",
-      "通る",
-      "下りる",
-      "一本",
-      "木"
+      "開く"
     ],
     "app_unknown_now": [
       "特色",
@@ -1119,7 +1151,7 @@
       "夕日",
       "通る"
     ],
-    "next_requested": "N4-005",
+    "next_requested": "N4-006",
     "n5_component_review_without_single_char_demotion": [
       "金",
       "外"
@@ -1139,7 +1171,8 @@
       "特色": "Reading とくしょく, not とくしゅう",
       "休業": "Correct reading きゅうぎょう, meaning not yet known",
       "主人": "Recognized after initial hesitation; improve recall speed."
-    }
+    },
+    "ten_lines_per_story": true
   },
   "app_export_snapshot": {
     "source_path": "practice/kanji-reading/app-exports/kanji-recall-2026-10-14-export.json",
@@ -1175,5 +1208,10 @@
       "lesson_treatment": "Reuse as comfortable supporting vocabulary unless later story feedback reports difficulty."
     },
     "applicability": "Imported latestStates refer to vocabulary items; kanji components must not inherit their word status automatically."
+  },
+  "story_format_policy": {
+    "max_lines": 10,
+    "exactly_10_lines": true,
+    "description": "Learner requested exactly 10 Japanese story lines per lesson, preserve hard line breaks in Markdown; no furigana; N4+N5 permitted."
   }
 }
