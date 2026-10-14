@@ -676,5 +676,16 @@
       "一本",
       "下りる"
     ]
+  },
+  "app_export_snapshot": {
+    "source_path": "practice/kanji-reading/app-exports/kanji-recall-2026-10-14-export.json",
+    "summary_path": "practice/kanji-reading/app-exports/2026-10-14-summary.json",
+    "raw_git_blob_sha": "5a6883025798c08466ac0d2fc0f183f7b5b7cfdc",
+    "exported_at": "2026-10-14T02:30:34.863Z",
+    "source_word_count": 1062,
+    "history_days": 10,
+    "priority_basis": "N4 weak/unknown app vocabulary (character-gated) plus explicit story weak; N5 weak also reviewed; known words recycled",
+    "manual_story_states_preserved": true,
+    "imported_word_states_into_manual_kanji": false
   }
 }

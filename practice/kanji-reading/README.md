@@ -23,3 +23,11 @@ python practice/kanji-reading/validate_stories.py
 Validator checks that every kanji in a story title/text is within the permitted single-kanji level catalog and each focus card (N4 or reused N5) matches the APK's exported vocabulary at its recorded `source_level`. It also checks the current-level promotion threshold; a learner-requested manual level transition is recorded in progress and requires no claim that N5 is mastered. If higher-level kanji appear before the threshold, it fails.
 
 Story N5-001: learner confirmed reading all 32 distinct kanji and 20 focus entries without difficulty on 2026-10-14; recorded as strong in story context. Story N5-002 has partial feedback (weak 木, 下りる and 一本); N4-001 is now awaiting feedback after a manual, user-authorized increase in difficulty.
+
+## Kanji Recall app memory snapshot (2026-10-14)
+
+- Full original user export: `app-exports/kanji-recall-2026-10-14-export.json` (exact original bytes, SHA Git blob 5a6883025798c08466ac0d2fc0f183f7b5b7cfdc). Includes 1,062 word memory states, 46 app-specific weak characters, settings and dated practice history. Summary and level-separated memory indices: `app-exports/2026-10-14-summary.json`.
+- The app's `mastered`, `familiar`, `weak`, `unknown` statuses belong to **vocabulary entries**, not individual kanji. Never mark individual characters as mastered solely from a compound state. The separately recorded `weakKanji` list is character-level app feedback.
+- For the active N4 reading curriculum, first choose **unknown/weak N4 vocabulary** whose characters all belong to the APK's N4+N5 *single-kanji whitelist*, then reinforce N5 words/characters the learner struggles with. Mix familiar/mastered items for fluency; skip any N3+ characters even if the app classifies the word N4.
+- **Latest explicit story feedback overrides older app memory for the same target.** Keep `progress.json` manually verified per-kanji statuses separate from the imported app snapshot. Example: app `下りる` is familiar, but a later reading lesson found it weak, so it stays a review priority. App `中止` is unknown, and story reading also reported difficulty, so prioritize it.
+- Each new app export can replace or version the snapshot separately; do not discard historical story feedback.
