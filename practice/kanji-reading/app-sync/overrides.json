@@ -1,0 +1,7 @@
+{
+  "format": "kanji-recall-state-overrides",
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-14",
+  "notes": "Each override uses a targetType|target key and a unique revision. Device applies each revision only once; remote change does not count as a flashcard attempt.",
+  "overrides": {}
+}
