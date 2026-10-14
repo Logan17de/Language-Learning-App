@@ -5,6 +5,7 @@
   "last_lesson": "N4-004",
   "states": [
     "strong",
+    "familiar",
     "weak",
     "unknown"
   ],
@@ -543,15 +544,17 @@
     },
     "特色": {
       "status": "weak",
-      "last_lesson": "N4-003",
+      "last_lesson": "N4-004",
       "reported_surface": "特色",
       "source_level": "N4",
       "type": "compound",
       "source_id": "N4_V203",
       "source_reading": "とくしょく",
       "prior_app_state": "unknown",
-      "feedback_kind": "reading_or_meaning_difficulty_unspecified",
-      "note": "Did not recognize or was unsure of word in N4 Story 003; app previously labeled unknown. Learner report 2026-10-14."
+      "feedback_kind": "incorrect_reading",
+      "note": "Story N4-004: learner read 特色 as tokushuu; correct とくしょく. Prior N4-003 weak report and app unknown status retained as history. 2026-10-14.",
+      "attempted_reading": "とくしゅう (tokushuu)",
+      "correct_reading": "とくしょく (tokushoku)"
     },
     "借金": {
       "status": "weak",
@@ -636,6 +639,32 @@
       "type": "contextual-surface",
       "base_form": "開く",
       "note": "User supplied 開い, located within 会を開いてください. Contextual form 開いて (not APK N5 intransitive 開く/あく). Keep reading issue without assuming exact error; repeat 開いて in other contexts. Learner report 2026-10-14."
+    },
+    "休業": {
+      "status": "weak",
+      "last_lesson": "N4-004",
+      "type": "contextual-compound",
+      "source_level": "N4+N5",
+      "reported_surface": "休業",
+      "feedback_kind": "meaning_only",
+      "attempted_reading": "きゅうぎょう (kyuugyou)",
+      "correct_reading": "きゅうぎょう (kyuugyou)",
+      "reading_verified_by_learner": true,
+      "meaning_known": false,
+      "source_id": null,
+      "note": "Story N4-004: pronounced 休業 correctly and identified 休 (rest) + 業 (business), but did not know word meaning. Review meaning only; do not demote either component kanji or invent a v32 source card. 2026-10-14."
+    },
+    "主人": {
+      "status": "familiar",
+      "last_lesson": "N4-004",
+      "type": "compound",
+      "source_level": "N4",
+      "source_id": "N4_V083",
+      "source_reading": "しゅじん",
+      "reported_surface": "主人",
+      "feedback_kind": "hesitant_but_recalled",
+      "app_state_at_export": "weak",
+      "note": "Story N4-004: briefly forgot, then could remember. Familiar/slow recall for reinforcement; actual recall delay not measured. More recent user feedback takes precedence over earlier app 'weak' snapshot. 2026-10-14."
     }
   },
   "lesson_history": [
@@ -922,7 +951,7 @@
     {
       "lesson_id": "N4-004",
       "level": "N4",
-      "feedback_status": "awaiting_feedback",
+      "feedback_status": "partial_feedback",
       "introduced_distinct_kanji": 94,
       "n4_kanji": 58,
       "n5_reused": 36,
@@ -961,7 +990,36 @@
         "広がりました",
         "開い"
       ],
-      "note": "No status upgrades inferred from earlier stories. Feedback pending."
+      "note": "Learner explicitly reported only three items: 特色 misread; 休業 pronunciation correctly known but meaning unknown; 主人 briefly forgotten then retrieved (familiar). Do not assume remaining Story 004 words mastered. N5/N4 per-character states remain unchanged from this report.",
+      "feedback_date": "2026-10-14",
+      "reported_difficulties": [
+        {
+          "surface": "特色",
+          "target": "特色",
+          "status": "weak",
+          "kind": "incorrect_reading",
+          "attempted": "とくしゅう (tokushuu)",
+          "correct": "とくしょく (tokushoku)",
+          "app_state_at_export": "unknown"
+        },
+        {
+          "surface": "休業",
+          "target": "休業",
+          "status": "weak",
+          "kind": "meaning_only",
+          "reading_verified": "きゅうぎょう (kyuugyou)",
+          "meaning_not_known": true,
+          "individual_kanji_demoted": false
+        },
+        {
+          "surface": "主人",
+          "target": "主人",
+          "status": "familiar",
+          "kind": "hesitant_but_recalled",
+          "app_state_at_export": "weak",
+          "elapsed_seconds": "not measured"
+        }
+      ]
     }
   ],
   "last_completed_lesson": "N5-001",
@@ -979,8 +1037,9 @@
   "next_lesson_priorities": {
     "level": "N4",
     "prioritize_weak_vocabulary": [
-      "用紙",
       "特色",
+      "休業",
+      "用紙",
       "借金",
       "屋外",
       "歌手",
@@ -1026,7 +1085,7 @@
       "一本",
       "下りる"
     ],
-    "policy": "Favor weak and unknown entries while reusing already strong N5 kanji; no N3+ kanji.",
+    "policy": "Maintain separate reading-vs-meaning-vs-retrieval feedback. No N3+ kanji.",
     "active_lesson": "N4-004",
     "reviewing_now": [
       "用紙",
@@ -1060,22 +1119,27 @@
       "夕日",
       "通る"
     ],
-    "next_requested": "N4-004",
+    "next_requested": "N4-005",
     "n5_component_review_without_single_char_demotion": [
       "金",
       "外"
     ],
     "recently_reported_weak_surfaces": [
-      "用紙",
       "特色",
-      "借金",
-      "屋外",
-      "歌手",
-      "飲料",
-      "広がりました",
-      "開い"
+      "休業"
     ],
-    "recognition_rule": "Unknown app targets remain tagged unknown in immutable export; explicit story difficulty is a separate weak review flag. Do not infer isolated mastery or weakness for N5 components from compounds alone."
+    "recognition_rule": "Unknown app targets remain tagged unknown in immutable export; explicit story difficulty is a separate weak review flag. Do not infer isolated mastery or weakness for N5 components from compounds alone.",
+    "prioritize_familiar_vocabulary": [
+      "主人"
+    ],
+    "recently_reported_familiar_surfaces": [
+      "主人"
+    ],
+    "targeted_review_notes": {
+      "特色": "Reading とくしょく, not とくしゅう",
+      "休業": "Correct reading きゅうぎょう, meaning not yet known",
+      "主人": "Recognized after initial hesitation; improve recall speed."
+    }
   },
   "app_export_snapshot": {
     "source_path": "practice/kanji-reading/app-exports/kanji-recall-2026-10-14-export.json",
