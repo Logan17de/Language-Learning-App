@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Kanji Recall v32",
   "current_level": "N4",
-  "last_lesson": "N4-001",
+  "last_lesson": "N4-002",
   "states": [
     "strong",
     "weak",
@@ -593,6 +593,29 @@
         }
       ],
       "note": "Learner looked up meanings rather than requesting explanations. 会に and 道 were read correctly but marked for confidence review. 走り出しました was misread (はしりでました instead of はしりだしました). Other characters not promoted based on silence. Repeat flagged N4 and N5 components in future stories."
+    },
+    {
+      "lesson_id": "N4-002",
+      "level": "N4",
+      "feedback_status": "awaiting_feedback",
+      "introduced_distinct_kanji": 84,
+      "n4_kanji": 49,
+      "n5_reused": 35,
+      "reviewing_weak_surfaces": [
+        "開かれる",
+        "会に",
+        "書店",
+        "道",
+        "通って",
+        "走り出しました",
+        "中止",
+        "無事",
+        "木",
+        "一本",
+        "下りる"
+      ],
+      "source_verified_focus_count": 26,
+      "note": "No automatic promotion to strong; learner feedback pending."
     }
   ],
   "last_completed_lesson": "N5-001",
@@ -638,6 +661,20 @@
       "一本",
       "下りる"
     ],
-    "policy": "Favor weak and unknown entries while reusing already strong N5 kanji; no N3+ kanji."
+    "policy": "Favor weak and unknown entries while reusing already strong N5 kanji; no N3+ kanji.",
+    "active_lesson": "N4-002",
+    "reviewing_now": [
+      "開かれる",
+      "会に",
+      "書店",
+      "道",
+      "通って",
+      "走り出しました",
+      "中止",
+      "無事",
+      "木",
+      "一本",
+      "下りる"
+    ]
   }
 }

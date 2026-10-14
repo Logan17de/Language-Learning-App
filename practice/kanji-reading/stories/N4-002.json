@@ -1,0 +1,528 @@
+{
+  "id": "N4-002",
+  "level": "N4",
+  "title": "書店から走り出した犬",
+  "paragraphs": [
+    "日曜日の朝、町の書店で読書会が開かれる日でした。私は友人とその会に行きました。店の前には「雨なら中止」と書かれた紙がありました。でも、空は明るく、雨はふっていませんでした。",
+    "店の中には新しい本と古い本がたくさんありました。店員は「今日は動物の物語を読みます。会場は店の中の大きなへやです」と教えてくれました。私はその本を買おうと思いました。",
+    "会が始まる前に、外で女の子が「白い犬がいません！」とさけびました。女の子は店の前の大きな木に犬をつないでいましたが、いつの間にかいなくなったのです。",
+    "私は友人と外へ走り出しました。女の子は「犬はこの道を通って、広場の方へ行ったと思います」と話しました。三人は急いで道を通って、広場へ行きました。",
+    "広場へ下りる道には、一本の古い木が立っていました。木の右には赤い花があり、左には小さな店があります。私たちは店の人にも質問しましたが、犬を見た人はいませんでした。",
+    "友人が「犬はどこへ行ったんだろう」と言いました。私は木の下に小さな足あとを見つけました。「この近くにいるかもしれない」と思い、木の後ろを見ました。",
+    "そこには白い犬がいました。小さな男の子といっしょに走っていたのです。女の子は走ってきて、「無事でよかった！」と言いました。友人も安心したようでした。",
+    "私たちは犬といっしょに書店へ帰りました。店員は親切に水を出してくれました。そして「読書会は中止ではありません。まだ時間がありますよ」と言いました。",
+    "会場に入ると、みんなが本を開いて待っていました。今日の本の題名は「白い犬の一日」です。友人は私に「今の話と同じだね」と言って、わらいました。",
+    "会が終わった後、私は本を一つ買いました。帰り道、友人が「今度もこの書店に来よう」と言いました。私は「でも、犬が走り出さない日がいいね」と答えました。"
+  ],
+  "allowed_source": "Kanji Recall v32 APK single-character N5/N4 catalog and extracted N4/N5 compound + kana+kanji vocabulary",
+  "introduced_kanji": [
+    "一",
+    "三",
+    "下",
+    "中",
+    "事",
+    "人",
+    "今",
+    "会",
+    "入",
+    "出",
+    "切",
+    "前",
+    "動",
+    "友",
+    "古",
+    "右",
+    "同",
+    "名",
+    "員",
+    "問",
+    "場",
+    "外",
+    "大",
+    "女",
+    "始",
+    "子",
+    "安",
+    "小",
+    "左",
+    "帰",
+    "広",
+    "店",
+    "度",
+    "待",
+    "後",
+    "心",
+    "思",
+    "急",
+    "教",
+    "新",
+    "方",
+    "日",
+    "明",
+    "時",
+    "曜",
+    "書",
+    "朝",
+    "木",
+    "本",
+    "来",
+    "止",
+    "水",
+    "無",
+    "物",
+    "犬",
+    "男",
+    "町",
+    "白",
+    "私",
+    "空",
+    "立",
+    "答",
+    "紙",
+    "終",
+    "花",
+    "行",
+    "見",
+    "親",
+    "言",
+    "話",
+    "語",
+    "読",
+    "買",
+    "質",
+    "赤",
+    "走",
+    "足",
+    "近",
+    "通",
+    "道",
+    "開",
+    "間",
+    "雨",
+    "題"
+  ],
+  "introduced_n4_kanji": [
+    "事",
+    "会",
+    "切",
+    "動",
+    "古",
+    "同",
+    "員",
+    "問",
+    "場",
+    "始",
+    "安",
+    "帰",
+    "広",
+    "店",
+    "度",
+    "待",
+    "心",
+    "思",
+    "急",
+    "教",
+    "新",
+    "方",
+    "明",
+    "曜",
+    "朝",
+    "止",
+    "無",
+    "物",
+    "犬",
+    "町",
+    "私",
+    "空",
+    "立",
+    "答",
+    "紙",
+    "終",
+    "花",
+    "親",
+    "言",
+    "買",
+    "質",
+    "赤",
+    "走",
+    "足",
+    "近",
+    "通",
+    "道",
+    "開",
+    "題"
+  ],
+  "recycled_n5_kanji": [
+    "一",
+    "三",
+    "下",
+    "中",
+    "人",
+    "今",
+    "入",
+    "出",
+    "前",
+    "友",
+    "右",
+    "名",
+    "外",
+    "大",
+    "女",
+    "子",
+    "小",
+    "左",
+    "後",
+    "日",
+    "時",
+    "書",
+    "木",
+    "本",
+    "来",
+    "水",
+    "男",
+    "白",
+    "行",
+    "見",
+    "話",
+    "語",
+    "読",
+    "間",
+    "雨"
+  ],
+  "focus_cards": [
+    {
+      "target": "書店",
+      "type": "compound",
+      "reading": "しょてん",
+      "source_id": "N4_V237",
+      "source_level": "N4",
+      "surface_forms": [
+        "書店"
+      ]
+    },
+    {
+      "target": "読書",
+      "type": "compound",
+      "reading": "どくしょ",
+      "source_id": "N5_V030",
+      "source_level": "N5",
+      "surface_forms": [
+        "読書会"
+      ]
+    },
+    {
+      "target": "中止",
+      "type": "compound",
+      "reading": "ちゅうし",
+      "source_id": "N4_V293",
+      "source_level": "N4",
+      "surface_forms": [
+        "中止"
+      ]
+    },
+    {
+      "target": "店員",
+      "type": "compound",
+      "reading": "てんいん",
+      "source_id": "N4_V161",
+      "source_level": "N4",
+      "surface_forms": [
+        "店員"
+      ]
+    },
+    {
+      "target": "動物",
+      "type": "compound",
+      "reading": "どうぶつ",
+      "source_id": "N4_V038",
+      "source_level": "N4",
+      "surface_forms": [
+        "動物"
+      ]
+    },
+    {
+      "target": "物語",
+      "type": "compound",
+      "reading": "ものがたり",
+      "source_id": "N4_V040",
+      "source_level": "N4",
+      "surface_forms": [
+        "物語"
+      ]
+    },
+    {
+      "target": "会場",
+      "type": "compound",
+      "reading": "かいじょう",
+      "source_id": "N4_V015",
+      "source_level": "N4",
+      "surface_forms": [
+        "会場"
+      ]
+    },
+    {
+      "target": "広場",
+      "type": "compound",
+      "reading": "ひろば",
+      "source_id": "N4_V234",
+      "source_level": "N4",
+      "surface_forms": [
+        "広場"
+      ]
+    },
+    {
+      "target": "質問",
+      "type": "compound",
+      "reading": "しつもん",
+      "source_id": "N4_V131",
+      "source_level": "N4",
+      "surface_forms": [
+        "質問"
+      ]
+    },
+    {
+      "target": "無事",
+      "type": "compound",
+      "reading": "ぶじ",
+      "source_id": "N4_V145",
+      "source_level": "N4",
+      "surface_forms": [
+        "無事"
+      ]
+    },
+    {
+      "target": "安心",
+      "type": "compound",
+      "reading": "あんしん",
+      "source_id": "N4_V058",
+      "source_level": "N4",
+      "surface_forms": [
+        "安心"
+      ]
+    },
+    {
+      "target": "親切",
+      "type": "compound",
+      "reading": "しんせつ",
+      "source_id": "N4_V153",
+      "source_level": "N4",
+      "surface_forms": [
+        "親切"
+      ]
+    },
+    {
+      "target": "題名",
+      "type": "compound",
+      "reading": "だいめい",
+      "source_id": "N4_V183",
+      "source_level": "N4",
+      "surface_forms": [
+        "題名"
+      ]
+    },
+    {
+      "target": "今度",
+      "type": "compound",
+      "reading": "こんど",
+      "source_id": "N4_V069",
+      "source_level": "N4",
+      "surface_forms": [
+        "今度"
+      ]
+    },
+    {
+      "target": "通る",
+      "type": "kana",
+      "reading": "とおる",
+      "source_id": "OPENJLPT_e9c1a3ae2c",
+      "source_level": "N4",
+      "surface_forms": [
+        "通って"
+      ]
+    },
+    {
+      "target": "下りる",
+      "type": "kana",
+      "reading": "おりる",
+      "source_id": "OPENJLPT_4806278f5b",
+      "source_level": "N4",
+      "surface_forms": [
+        "下りる"
+      ]
+    },
+    {
+      "target": "帰り",
+      "type": "kana",
+      "reading": "かえり",
+      "source_id": "OPENJLPT_6365c5ac47",
+      "source_level": "N4",
+      "surface_forms": [
+        "帰り道"
+      ]
+    },
+    {
+      "target": "新しい",
+      "type": "kana",
+      "reading": "あたらしい",
+      "source_id": "OPENJLPT_8ae27e3b51",
+      "source_level": "N5",
+      "surface_forms": [
+        "新しい"
+      ]
+    },
+    {
+      "target": "明るい",
+      "type": "kana",
+      "reading": "あかるい",
+      "source_id": "OPENJLPT_91987ae840",
+      "source_level": "N5",
+      "surface_forms": [
+        "明るく"
+      ]
+    },
+    {
+      "target": "買う",
+      "type": "kana",
+      "reading": "かう",
+      "source_id": "OPENJLPT_bdb125e5c6",
+      "source_level": "N5",
+      "surface_forms": [
+        "買おう",
+        "買いました"
+      ]
+    },
+    {
+      "target": "走る",
+      "type": "kana",
+      "reading": "はしる",
+      "source_id": "OPENJLPT_244e138920",
+      "source_level": "N5",
+      "surface_forms": [
+        "走って"
+      ]
+    },
+    {
+      "target": "赤い",
+      "type": "kana",
+      "reading": "あかい",
+      "source_id": "OPENJLPT_44ba38cf8b",
+      "source_level": "N5",
+      "surface_forms": [
+        "赤い"
+      ]
+    },
+    {
+      "target": "白い",
+      "type": "kana",
+      "reading": "しろい",
+      "source_id": "OPENJLPT_8997f64f52",
+      "source_level": "N5",
+      "surface_forms": [
+        "白い"
+      ]
+    },
+    {
+      "target": "入る",
+      "type": "kana",
+      "reading": "はいる",
+      "source_id": "OPENJLPT_c428d02d43",
+      "source_level": "N5",
+      "surface_forms": [
+        "入ると"
+      ]
+    },
+    {
+      "target": "出す",
+      "type": "kana",
+      "reading": "だす",
+      "source_id": "OPENJLPT_6298cfc5d6",
+      "source_level": "N5",
+      "surface_forms": [
+        "出して"
+      ]
+    },
+    {
+      "target": "一日",
+      "type": "compound",
+      "reading": "いちにち",
+      "source_id": "N5_V071",
+      "source_level": "N5",
+      "surface_forms": [
+        "一日"
+      ]
+    }
+  ],
+  "review_targets": [
+    {
+      "surface": "開かれる",
+      "prior_status": "weak",
+      "previous_lesson": "N4-001",
+      "priority": "high"
+    },
+    {
+      "surface": "会に",
+      "prior_status": "weak",
+      "previous_lesson": "N4-001",
+      "priority": "high",
+      "note": "Previously read correctly, but learner requested confidence reinforcement"
+    },
+    {
+      "surface": "書店",
+      "prior_status": "weak",
+      "previous_lesson": "N4-001",
+      "priority": "high"
+    },
+    {
+      "surface": "道",
+      "prior_status": "weak",
+      "previous_lesson": "N4-001",
+      "priority": "high",
+      "note": "Previously read correctly, but learner requested confidence reinforcement"
+    },
+    {
+      "surface": "通って",
+      "prior_status": "weak",
+      "previous_lesson": "N4-001",
+      "priority": "high"
+    },
+    {
+      "surface": "走り出しました",
+      "prior_status": "weak",
+      "previous_lesson": "N4-001",
+      "priority": "high",
+      "note": "Previously said hashiridemashita; drill verb 出す reading"
+    },
+    {
+      "surface": "中止",
+      "prior_status": "weak",
+      "previous_lesson": "N4-001",
+      "priority": "high"
+    },
+    {
+      "surface": "無事",
+      "prior_status": "weak",
+      "previous_lesson": "N4-001",
+      "priority": "high"
+    },
+    {
+      "surface": "木",
+      "prior_status": "weak",
+      "previous_lesson": "N5-002",
+      "priority": "high"
+    },
+    {
+      "surface": "一本",
+      "prior_status": "weak",
+      "previous_lesson": "N5-002",
+      "priority": "high"
+    },
+    {
+      "surface": "下りる",
+      "prior_status": "weak",
+      "previous_lesson": "N5-002",
+      "priority": "high"
+    }
+  ],
+  "review_status": "awaiting_feedback",
+  "notes": "Reading only without furigana or English meanings. Eleven surface-form reviews targeted, preserving all past N5 and N4 progress. Other character mastery awaits explicit user confirmation."
+}
