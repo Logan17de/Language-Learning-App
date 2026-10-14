@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Kanji Recall v32",
   "current_level": "N4",
-  "last_lesson": "N4-003",
+  "last_lesson": "N4-004",
   "states": [
     "strong",
     "weak",
@@ -918,6 +918,50 @@
           ]
         }
       ]
+    },
+    {
+      "lesson_id": "N4-004",
+      "level": "N4",
+      "feedback_status": "awaiting_feedback",
+      "introduced_distinct_kanji": 94,
+      "n4_kanji": 58,
+      "n5_reused": 36,
+      "source_verified_focus_count": 21,
+      "app_unknown_targets": [
+        "特色",
+        "用紙",
+        "借金"
+      ],
+      "app_weak_targets": [
+        "主人",
+        "工事",
+        "屋外",
+        "飲料",
+        "売店",
+        "歌手",
+        "文字",
+        "夕日",
+        "通る"
+      ],
+      "app_familiar_targets": [
+        "食品",
+        "質問",
+        "大切",
+        "下りる",
+        "集まる",
+        "走る"
+      ],
+      "user_reported_recent_weak_review": [
+        "用紙",
+        "特色",
+        "借金",
+        "屋外",
+        "歌手",
+        "飲料",
+        "広がりました",
+        "開い"
+      ],
+      "note": "No status upgrades inferred from earlier stories. Feedback pending."
     }
   ],
   "last_completed_lesson": "N5-001",
@@ -983,40 +1027,37 @@
       "下りる"
     ],
     "policy": "Favor weak and unknown entries while reusing already strong N5 kanji; no N3+ kanji.",
-    "active_lesson": "N4-003",
+    "active_lesson": "N4-004",
     "reviewing_now": [
-      "開かれる",
-      "会",
-      "道",
-      "通る",
+      "用紙",
+      "特色",
+      "借金",
+      "屋外",
+      "歌手",
+      "飲料",
+      "広がる",
+      "開く",
+      "開く",
       "走り出す",
-      "中止",
-      "無事",
-      "木",
+      "通る",
+      "下りる",
       "一本",
-      "下りる"
+      "木"
     ],
     "app_unknown_now": [
       "特色",
-      "借金",
       "用紙",
-      "中止"
+      "借金"
     ],
     "app_weak_now": [
-      "会館",
+      "主人",
+      "工事",
       "屋外",
-      "屋上",
-      "計画",
-      "歌手",
       "飲料",
-      "花見",
-      "意見",
-      "会場",
-      "青空",
-      "無事",
-      "用意",
-      "親切",
-      "運ぶ",
+      "売店",
+      "歌手",
+      "文字",
+      "夕日",
       "通る"
     ],
     "next_requested": "N4-004",
