@@ -1,0 +1,591 @@
+{
+  "id": "N4-003",
+  "level": "N4",
+  "title": "会館の青い用紙",
+  "paragraphs": [
+    "春の土曜日、町の古い会館で歌の会が開かれることになりました。会館の人は「この町の特色は歌と花です」と話しました。私と友人は、会の用意をすることにしました。",
+    "会の目的は、古い会館をこれからも使えるようにお金を集めることです。会館には借金があり、来年までにお金を用意しなければなりません。友人は「何かいい考えはないかな」と言いました。",
+    "会は屋外の広場で開かれる計画でした。天気が悪ければ中止です。朝、会館の人が青い用紙を持ってきました。「ここに歌手の名前と時間を書いてください」と言いました。",
+    "私たちは飲料や花を運び、木の下に小さな店を作りました。一本の大きな木の下では、友人が白い紙に「花見もできます」と書いていました。",
+    "昼前になると強い風がふき、青い用紙が見えなくなりました。友人は「これがないと、だれが歌うか分からない！」と言って、走り出しました。私は広場から会館までの道を通って、紙をさがしました。",
+    "会館の屋上に上がると、青い用紙が赤い花の上にありました。しかし、紙には水がついていて、字がほとんど見えませんでした。花に水をあげていた女の人も、こまったようなかおをしました。",
+    "友人は「どうしよう。もう中止かな」と言いました。私は「一人ずつ歌手に聞いて、名前を書きなおそう」という意見を出しました。みんなは「それがいい」と言いました。",
+    "屋上から下りると、会場には町の人が集まっていました。私たちは少しずつ新しい用紙を作りました。会が始まると、青空の下に歌が広がりました。小さな子どもも歌を楽しみました。",
+    "夕方、一人の男の子が「来年も会を開いてください」と言いました。会館の人は「今日のお金で借金をすべてかえすことはできませんが、会館をこれからも使えるようにする力になります」と言いました。",
+    "帰り道、友人は「今日は無事に会を開けてよかった。来年は風の日でも用紙がとばないようにしよう」と言いました。私は「この町の人は親切だね。またここで歌を聞きたい」と答えました。"
+  ],
+  "allowed_source": "Kanji Recall v32 single N4+N5 catalog; user-provided October 14 app memory export; compound and kana+kanji source records",
+  "introduced_kanji": [
+    "一",
+    "上",
+    "下",
+    "中",
+    "事",
+    "人",
+    "今",
+    "会",
+    "何",
+    "作",
+    "使",
+    "借",
+    "出",
+    "分",
+    "切",
+    "前",
+    "力",
+    "友",
+    "古",
+    "名",
+    "土",
+    "場",
+    "夕",
+    "外",
+    "大",
+    "天",
+    "女",
+    "始",
+    "子",
+    "字",
+    "小",
+    "少",
+    "屋",
+    "帰",
+    "年",
+    "広",
+    "店",
+    "強",
+    "悪",
+    "意",
+    "手",
+    "持",
+    "料",
+    "新",
+    "方",
+    "日",
+    "春",
+    "昼",
+    "時",
+    "曜",
+    "書",
+    "朝",
+    "木",
+    "本",
+    "来",
+    "楽",
+    "歌",
+    "止",
+    "気",
+    "水",
+    "無",
+    "特",
+    "用",
+    "男",
+    "町",
+    "画",
+    "白",
+    "的",
+    "目",
+    "私",
+    "空",
+    "答",
+    "紙",
+    "考",
+    "聞",
+    "色",
+    "花",
+    "見",
+    "親",
+    "言",
+    "計",
+    "話",
+    "赤",
+    "走",
+    "通",
+    "運",
+    "道",
+    "金",
+    "開",
+    "間",
+    "集",
+    "青",
+    "風",
+    "飲",
+    "館"
+  ],
+  "introduced_n4_kanji": [
+    "事",
+    "会",
+    "作",
+    "使",
+    "借",
+    "切",
+    "力",
+    "古",
+    "場",
+    "夕",
+    "始",
+    "字",
+    "少",
+    "屋",
+    "帰",
+    "広",
+    "店",
+    "強",
+    "悪",
+    "意",
+    "手",
+    "持",
+    "料",
+    "新",
+    "方",
+    "春",
+    "昼",
+    "曜",
+    "朝",
+    "楽",
+    "歌",
+    "止",
+    "無",
+    "特",
+    "用",
+    "町",
+    "画",
+    "的",
+    "目",
+    "私",
+    "空",
+    "答",
+    "紙",
+    "考",
+    "色",
+    "花",
+    "親",
+    "言",
+    "計",
+    "赤",
+    "走",
+    "通",
+    "運",
+    "道",
+    "開",
+    "集",
+    "青",
+    "風",
+    "飲",
+    "館"
+  ],
+  "recycled_n5_kanji": [
+    "一",
+    "上",
+    "下",
+    "中",
+    "人",
+    "今",
+    "何",
+    "出",
+    "分",
+    "前",
+    "友",
+    "名",
+    "土",
+    "外",
+    "大",
+    "天",
+    "女",
+    "子",
+    "小",
+    "年",
+    "日",
+    "時",
+    "書",
+    "木",
+    "本",
+    "来",
+    "気",
+    "水",
+    "男",
+    "白",
+    "聞",
+    "見",
+    "話",
+    "金",
+    "間"
+  ],
+  "focus_cards": [
+    {
+      "target": "会館",
+      "type": "compound",
+      "reading": "かいかん",
+      "source_id": "N4_V333",
+      "source_level": "N4",
+      "surface_forms": [
+        "会館"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "特色",
+      "type": "compound",
+      "reading": "とくしょく",
+      "source_id": "N4_V203",
+      "source_level": "N4",
+      "surface_forms": [
+        "特色"
+      ],
+      "app_memory_state": "unknown"
+    },
+    {
+      "target": "借金",
+      "type": "compound",
+      "reading": "しゃっきん",
+      "source_id": "N4_V391",
+      "source_level": "N4",
+      "surface_forms": [
+        "借金"
+      ],
+      "app_memory_state": "unknown"
+    },
+    {
+      "target": "用紙",
+      "type": "compound",
+      "reading": "ようし",
+      "source_id": "N4_V320",
+      "source_level": "N4",
+      "surface_forms": [
+        "用紙"
+      ],
+      "app_memory_state": "unknown"
+    },
+    {
+      "target": "屋外",
+      "type": "compound",
+      "reading": "おくがい",
+      "source_id": "N4_V093",
+      "source_level": "N4",
+      "surface_forms": [
+        "屋外"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "屋上",
+      "type": "compound",
+      "reading": "おくじょう",
+      "source_id": "N4_V092",
+      "source_level": "N4",
+      "surface_forms": [
+        "屋上"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "計画",
+      "type": "compound",
+      "reading": "けいかく",
+      "source_id": "N4_V166",
+      "source_level": "N4",
+      "surface_forms": [
+        "計画"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "中止",
+      "type": "compound",
+      "reading": "ちゅうし",
+      "source_id": "N4_V293",
+      "source_level": "N4",
+      "surface_forms": [
+        "中止"
+      ],
+      "app_memory_state": "unknown"
+    },
+    {
+      "target": "歌手",
+      "type": "compound",
+      "reading": "かしゅ",
+      "source_id": "N4_V323",
+      "source_level": "N4",
+      "surface_forms": [
+        "歌手"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "飲料",
+      "type": "compound",
+      "reading": "いんりょう",
+      "source_id": "N4_V350",
+      "source_level": "N4",
+      "surface_forms": [
+        "飲料"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "花見",
+      "type": "compound",
+      "reading": "はなみ",
+      "source_id": "N4_V307",
+      "source_level": "N4",
+      "surface_forms": [
+        "花見"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "意見",
+      "type": "compound",
+      "reading": "いけん",
+      "source_id": "N4_V078",
+      "source_level": "N4",
+      "surface_forms": [
+        "意見"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "会場",
+      "type": "compound",
+      "reading": "かいじょう",
+      "source_id": "N4_V015",
+      "source_level": "N4",
+      "surface_forms": [
+        "会場"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "青空",
+      "type": "compound",
+      "reading": "あおぞら",
+      "source_id": "N4_V210",
+      "source_level": "N4",
+      "surface_forms": [
+        "青空"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "無事",
+      "type": "compound",
+      "reading": "ぶじ",
+      "source_id": "N4_V145",
+      "source_level": "N4",
+      "surface_forms": [
+        "無事"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "用意",
+      "type": "compound",
+      "reading": "ようい",
+      "source_id": "N4_V080",
+      "source_level": "N4",
+      "surface_forms": [
+        "用意"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "広場",
+      "type": "compound",
+      "reading": "ひろば",
+      "source_id": "N4_V234",
+      "source_level": "N4",
+      "surface_forms": [
+        "広場"
+      ],
+      "app_memory_state": "familiar"
+    },
+    {
+      "target": "親切",
+      "type": "compound",
+      "reading": "しんせつ",
+      "source_id": "N4_V153",
+      "source_level": "N4",
+      "surface_forms": [
+        "親切"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "運ぶ",
+      "type": "kana",
+      "reading": "はこぶ",
+      "source_id": "OPENJLPT_2404bdfdb3",
+      "source_level": "N4",
+      "surface_forms": [
+        "運び"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "集まる",
+      "type": "kana",
+      "reading": "あつまる",
+      "source_id": "OPENJLPT_8c98c01eff",
+      "source_level": "N4",
+      "surface_forms": [
+        "集まって"
+      ],
+      "app_memory_state": "familiar"
+    },
+    {
+      "target": "上がる",
+      "type": "kana",
+      "reading": "あがる",
+      "source_id": "OPENJLPT_4a3152836b",
+      "source_level": "N4",
+      "surface_forms": [
+        "上がると"
+      ],
+      "app_memory_state": "mastered"
+    },
+    {
+      "target": "下りる",
+      "type": "kana",
+      "reading": "おりる",
+      "source_id": "OPENJLPT_4806278f5b",
+      "source_level": "N4",
+      "surface_forms": [
+        "下りると"
+      ],
+      "app_memory_state": "familiar"
+    },
+    {
+      "target": "通る",
+      "type": "kana",
+      "reading": "とおる",
+      "source_id": "OPENJLPT_e9c1a3ae2c",
+      "source_level": "N4",
+      "surface_forms": [
+        "通って"
+      ],
+      "app_memory_state": "weak"
+    },
+    {
+      "target": "楽しむ",
+      "type": "kana",
+      "reading": "たのしむ",
+      "source_id": "OPENJLPT_9f86b83cad",
+      "source_level": "N4",
+      "surface_forms": [
+        "楽しみました"
+      ],
+      "app_memory_state": "mastered"
+    },
+    {
+      "target": "帰り",
+      "type": "kana",
+      "reading": "かえり",
+      "source_id": "OPENJLPT_6365c5ac47",
+      "source_level": "N4",
+      "surface_forms": [
+        "帰り道"
+      ],
+      "app_memory_state": "mastered"
+    }
+  ],
+  "review_targets": [
+    {
+      "surface": "開かれる",
+      "target": "開かれる",
+      "kind": "manual_weak",
+      "prior_lesson": "N4-001"
+    },
+    {
+      "surface": "会",
+      "target": "会",
+      "kind": "manual_correct_but_hesitant",
+      "prior_lesson": "N4-001"
+    },
+    {
+      "surface": "道",
+      "target": "道",
+      "kind": "manual_correct_but_hesitant",
+      "prior_lesson": "N4-001"
+    },
+    {
+      "surface": "通って",
+      "target": "通る",
+      "kind": "manual_weak",
+      "prior_lesson": "N4-001"
+    },
+    {
+      "surface": "走り出しました",
+      "target": "走り出す",
+      "kind": "manual_misreading",
+      "prior_lesson": "N4-001"
+    },
+    {
+      "surface": "中止",
+      "target": "中止",
+      "kind": "manual_weak_and_app_unknown",
+      "prior_lesson": "N4-001"
+    },
+    {
+      "surface": "無事",
+      "target": "無事",
+      "kind": "manual_weak",
+      "prior_lesson": "N4-001"
+    },
+    {
+      "surface": "木",
+      "target": "木",
+      "kind": "manual_weak_n5_character",
+      "prior_lesson": "N5-002"
+    },
+    {
+      "surface": "一本",
+      "target": "一本",
+      "kind": "manual_weak_n5_counter",
+      "prior_lesson": "N5-002"
+    },
+    {
+      "surface": "下りる",
+      "target": "下りる",
+      "kind": "manual_weak_n4_verb",
+      "prior_lesson": "N5-002"
+    }
+  ],
+  "app_memory_snapshot": "app-exports/2026-10-14-summary.json",
+  "app_memory_distribution": {
+    "unknown": [
+      "特色",
+      "借金",
+      "用紙",
+      "中止"
+    ],
+    "weak": [
+      "会館",
+      "屋外",
+      "屋上",
+      "計画",
+      "歌手",
+      "飲料",
+      "花見",
+      "意見",
+      "会場",
+      "青空",
+      "無事",
+      "用意",
+      "親切",
+      "運ぶ",
+      "通る"
+    ],
+    "familiar": [
+      "広場",
+      "集まる",
+      "下りる"
+    ],
+    "mastered": [
+      "上がる",
+      "楽しむ",
+      "帰り"
+    ]
+  },
+  "review_status": "awaiting_feedback",
+  "notes": "Introduces all four current eligible N4 unknown words in contextual reading; prioritizes N4 weak and manual N5 weak. Familiar words are recognized with delay, so repeat for speed. User reported no feedback on N4-002 yet; no automatic strength upgrades."
+}

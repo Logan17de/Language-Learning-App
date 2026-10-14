@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Kanji Recall v32",
   "current_level": "N4",
-  "last_lesson": "N4-002",
+  "last_lesson": "N4-003",
   "states": [
     "strong",
     "weak",
@@ -616,6 +616,56 @@
       ],
       "source_verified_focus_count": 26,
       "note": "No automatic promotion to strong; learner feedback pending."
+    },
+    {
+      "lesson_id": "N4-003",
+      "level": "N4",
+      "feedback_status": "awaiting_feedback",
+      "introduced_distinct_kanji": 95,
+      "n4_kanji": 60,
+      "n5_reused": 35,
+      "app_unknown_targets": [
+        "特色",
+        "借金",
+        "用紙",
+        "中止"
+      ],
+      "app_weak_targets": [
+        "会館",
+        "屋外",
+        "屋上",
+        "計画",
+        "歌手",
+        "飲料",
+        "花見",
+        "意見",
+        "会場",
+        "青空",
+        "無事",
+        "用意",
+        "親切",
+        "運ぶ",
+        "通る"
+      ],
+      "app_familiar_targets": [
+        "広場",
+        "集まる",
+        "下りる"
+      ],
+      "reviewing_manual_weak": [
+        "開かれる",
+        "会",
+        "道",
+        "通る",
+        "走り出す",
+        "中止",
+        "無事",
+        "木",
+        "一本",
+        "下りる"
+      ],
+      "source_verified_focus_count": 25,
+      "note": "No status upgrades from publication; await reading feedback."
     }
   ],
   "last_completed_lesson": "N5-001",
@@ -662,19 +712,41 @@
       "下りる"
     ],
     "policy": "Favor weak and unknown entries while reusing already strong N5 kanji; no N3+ kanji.",
-    "active_lesson": "N4-002",
+    "active_lesson": "N4-003",
     "reviewing_now": [
       "開かれる",
-      "会に",
-      "書店",
+      "会",
       "道",
-      "通って",
-      "走り出しました",
+      "通る",
+      "走り出す",
       "中止",
       "無事",
       "木",
       "一本",
       "下りる"
+    ],
+    "app_unknown_now": [
+      "特色",
+      "借金",
+      "用紙",
+      "中止"
+    ],
+    "app_weak_now": [
+      "会館",
+      "屋外",
+      "屋上",
+      "計画",
+      "歌手",
+      "飲料",
+      "花見",
+      "意見",
+      "会場",
+      "青空",
+      "無事",
+      "用意",
+      "親切",
+      "運ぶ",
+      "通る"
     ]
   },
   "app_export_snapshot": {
