@@ -16,9 +16,9 @@
       "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
     },
     "下": {
-      "status": "strong",
-      "last_lesson": "N5-001",
-      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+      "status": "weak",
+      "last_lesson": "N5-002",
+      "note": "Strong for previous Story 001 context; reading-specific difficulty (2026-10-14): 下りる was read さがりる; correct おりる, versus 下がる＝さがる. Review alternate readings while retaining earlier した recognition."
     },
     "中": {
       "status": "strong",
@@ -169,6 +169,11 @@
       "status": "strong",
       "last_lesson": "N5-001",
       "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "木": {
+      "status": "weak",
+      "last_lesson": "N5-002",
+      "note": "Reading-specific difficulty (2026-10-14): in 大きな木, read ひ; correct 木＝き (tree). Recycle 木／き in future N5 stories."
     }
   },
   "vocabulary": {
@@ -291,6 +296,18 @@
       "type": "kana",
       "last_lesson": "N5-001",
       "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "一本": {
+      "status": "weak",
+      "type": "counter",
+      "last_lesson": "N5-002",
+      "note": "Story-context counter (not a verified v32 focus card). Read いちほん; correct いっぽん (sound change いち＋ほん→いっぽん). Target pronunciation, not individual kanji mastery."
+    },
+    "下りる": {
+      "status": "weak",
+      "type": "contextual-verb",
+      "last_lesson": "N5-002",
+      "note": "Story-context verb (not a verified v32 focus card). Read さがりる; correct おりる (to descend); distinguish 下がる（さがる）."
     }
   },
   "lesson_history": [
@@ -304,9 +321,35 @@
     },
     {
       "lesson_id": "N5-002",
-      "feedback_status": "awaiting_feedback",
+      "feedback_status": "partial_feedback",
       "introduced_distinct_kanji": 46,
-      "new_unassessed_kanji": 28
+      "new_unassessed_kanji": 28,
+      "feedback_date": "2026-10-14",
+      "reported_difficulties": [
+        {
+          "surface": "大きな木",
+          "kanji": "木",
+          "attempted": "hi",
+          "correct": "き (ki)",
+          "status": "weak"
+        },
+        {
+          "surface": "一本",
+          "attempted": "ichihon",
+          "correct": "いっぽん (ippon)",
+          "status": "weak",
+          "issue": "counter sound change"
+        },
+        {
+          "surface": "下りる",
+          "kanji": "下",
+          "attempted": "sagariru",
+          "correct": "おりる (oriru)",
+          "status": "weak",
+          "issue": "reading differs from 下がる (さがる)"
+        }
+      ],
+      "note": "Only explicitly reported difficulties recorded. Other Story 002 kanji remain unassessed unless already confirmed strong from Story 001; no general mastery claim yet."
     }
   ],
   "last_completed_lesson": "N5-001"
