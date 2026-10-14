@@ -1,0 +1,522 @@
+{
+  "id": "N4-001",
+  "level": "N4",
+  "title": "夜の駅と古い地図",
+  "paragraphs": [
+    "土曜日の夕方、私は友人と山の近くの町へ出発しました。目的は古い旅館で開かれる小さな会に出ることです。友人は十年前の地図を持っていて、「これなら安心だ」と言いました。",
+    "駅に着いたとき、外はもう夜でした。地図には駅の前に書店があるはずでしたが、今は大きな店になっています。友人は「道をまちがえたかな」と不安そうに言いました。",
+    "私は駅員に質問しました。駅員は古い地図を見て、「この道は今、工事をしています。地下へ下りてから、右の道を通ってください」と教えてくれました。",
+    "駅員は、新しい道を赤い紙に書いてくれました。「特に、古い木の下で左にまがらないように注意してください」と言いました。",
+    "外に出ると強い風がふいていました。赤い紙が友人の手からはなれ、一本の大きな木の下までとんでいきました。友人は「紙がないと、また道が分からなくなる！」と言って、走り出しました。",
+    "木の下で紙を見つけました。でも、赤い紙の下に、もう一まい紙がありました。その紙には「今夜の会は中止」と書いてありました。",
+    "二人は何も言えませんでした。友人は「せっかく来たのに。今日の計画はどうなるの？」と言いました。私は少し考えて、古い紙の下に小さく書かれた「去年の秋」という字を見つけました。",
+    "「これは去年のものだよ。今日の会は中止じゃない！」と言うと、友人は安心してわらいました。",
+    "その後、私たちは地図を見ながら旅館へ歩きました。会場に着くと、店員が「無事に来られてよかったですね」と言いました。",
+    "友人は「今度は新しい地図を用意しよう」と言いました。私は「それと、風が強い日は紙を大切に持とう」と答えました。帰りの電車では、二人で何度もこの話をしました。"
+  ],
+  "allowed_source": "Kanji Recall v32 single-kanji level index, N4 and N5 character whitelist; extracted compound and kana+kanji vocabulary",
+  "introduced_kanji": [
+    "一",
+    "下",
+    "不",
+    "中",
+    "事",
+    "二",
+    "人",
+    "今",
+    "会",
+    "何",
+    "出",
+    "分",
+    "切",
+    "前",
+    "十",
+    "去",
+    "友",
+    "古",
+    "右",
+    "員",
+    "問",
+    "図",
+    "土",
+    "地",
+    "場",
+    "夕",
+    "外",
+    "夜",
+    "大",
+    "字",
+    "安",
+    "小",
+    "少",
+    "山",
+    "工",
+    "左",
+    "帰",
+    "年",
+    "店",
+    "度",
+    "強",
+    "後",
+    "心",
+    "意",
+    "手",
+    "持",
+    "教",
+    "新",
+    "方",
+    "旅",
+    "日",
+    "曜",
+    "書",
+    "木",
+    "本",
+    "来",
+    "止",
+    "歩",
+    "注",
+    "無",
+    "特",
+    "用",
+    "町",
+    "画",
+    "発",
+    "的",
+    "目",
+    "着",
+    "私",
+    "秋",
+    "答",
+    "紙",
+    "考",
+    "見",
+    "言",
+    "計",
+    "話",
+    "質",
+    "赤",
+    "走",
+    "車",
+    "近",
+    "通",
+    "道",
+    "開",
+    "電",
+    "風",
+    "館",
+    "駅"
+  ],
+  "introduced_n4_kanji": [
+    "不",
+    "事",
+    "会",
+    "切",
+    "去",
+    "古",
+    "員",
+    "問",
+    "図",
+    "地",
+    "場",
+    "夕",
+    "夜",
+    "字",
+    "安",
+    "少",
+    "工",
+    "帰",
+    "店",
+    "度",
+    "強",
+    "心",
+    "意",
+    "手",
+    "持",
+    "教",
+    "新",
+    "方",
+    "旅",
+    "曜",
+    "止",
+    "歩",
+    "注",
+    "無",
+    "特",
+    "用",
+    "町",
+    "画",
+    "発",
+    "的",
+    "目",
+    "着",
+    "私",
+    "秋",
+    "答",
+    "紙",
+    "考",
+    "言",
+    "計",
+    "質",
+    "赤",
+    "走",
+    "近",
+    "通",
+    "道",
+    "開",
+    "風",
+    "館",
+    "駅"
+  ],
+  "recycled_n5_kanji": [
+    "一",
+    "下",
+    "中",
+    "二",
+    "人",
+    "今",
+    "何",
+    "出",
+    "分",
+    "前",
+    "十",
+    "友",
+    "右",
+    "土",
+    "外",
+    "大",
+    "小",
+    "山",
+    "左",
+    "年",
+    "後",
+    "日",
+    "書",
+    "木",
+    "本",
+    "来",
+    "見",
+    "話",
+    "車",
+    "電"
+  ],
+  "focus_cards": [
+    {
+      "target": "夕方",
+      "type": "compound",
+      "reading": "ゆうがた",
+      "source_id": "N4_V023",
+      "source_level": "N4",
+      "surface_forms": [
+        "夕方"
+      ]
+    },
+    {
+      "target": "出発",
+      "type": "compound",
+      "reading": "しゅっぱつ",
+      "source_id": "N4_V060",
+      "source_level": "N4",
+      "surface_forms": [
+        "出発"
+      ]
+    },
+    {
+      "target": "目的",
+      "type": "compound",
+      "reading": "もくてき",
+      "source_id": "N4_V019",
+      "source_level": "N4",
+      "surface_forms": [
+        "目的"
+      ]
+    },
+    {
+      "target": "旅館",
+      "type": "compound",
+      "reading": "りょかん",
+      "source_id": "N4_V335",
+      "source_level": "N4",
+      "surface_forms": [
+        "旅館"
+      ]
+    },
+    {
+      "target": "地図",
+      "type": "compound",
+      "reading": "ちず",
+      "source_id": "N4_V024",
+      "source_level": "N4",
+      "surface_forms": [
+        "地図"
+      ]
+    },
+    {
+      "target": "安心",
+      "type": "compound",
+      "reading": "あんしん",
+      "source_id": "N4_V058",
+      "source_level": "N4",
+      "surface_forms": [
+        "安心"
+      ]
+    },
+    {
+      "target": "書店",
+      "type": "compound",
+      "reading": "しょてん",
+      "source_id": "N4_V237",
+      "source_level": "N4",
+      "surface_forms": [
+        "書店"
+      ]
+    },
+    {
+      "target": "不安",
+      "type": "compound",
+      "reading": "ふあん",
+      "source_id": "N4_V106",
+      "source_level": "N4",
+      "surface_forms": [
+        "不安"
+      ]
+    },
+    {
+      "target": "駅員",
+      "type": "compound",
+      "reading": "えきいん",
+      "source_id": "N4_V162",
+      "source_level": "N4",
+      "surface_forms": [
+        "駅員"
+      ]
+    },
+    {
+      "target": "質問",
+      "type": "compound",
+      "reading": "しつもん",
+      "source_id": "N4_V131",
+      "source_level": "N4",
+      "surface_forms": [
+        "質問"
+      ]
+    },
+    {
+      "target": "工事",
+      "type": "compound",
+      "reading": "こうじ",
+      "source_id": "N4_V299",
+      "source_level": "N4",
+      "surface_forms": [
+        "工事"
+      ]
+    },
+    {
+      "target": "地下",
+      "type": "compound",
+      "reading": "ちか",
+      "source_id": "N4_V026",
+      "source_level": "N4",
+      "surface_forms": [
+        "地下"
+      ]
+    },
+    {
+      "target": "下りる",
+      "type": "kana",
+      "reading": "おりる",
+      "source_id": "OPENJLPT_4806278f5b",
+      "source_level": "N4",
+      "surface_forms": [
+        "下りて"
+      ]
+    },
+    {
+      "target": "通る",
+      "type": "kana",
+      "reading": "とおる",
+      "source_id": "OPENJLPT_e9c1a3ae2c",
+      "source_level": "N4",
+      "surface_forms": [
+        "通って"
+      ]
+    },
+    {
+      "target": "特に",
+      "type": "kana",
+      "reading": "とくに",
+      "source_id": "OPENJLPT_0b2acf3460",
+      "source_level": "N4",
+      "surface_forms": [
+        "特に"
+      ]
+    },
+    {
+      "target": "注意",
+      "type": "compound",
+      "reading": "ちゅうい",
+      "source_id": "N4_V079",
+      "source_level": "N4",
+      "surface_forms": [
+        "注意"
+      ]
+    },
+    {
+      "target": "今夜",
+      "type": "compound",
+      "reading": "こんや",
+      "source_id": "N4_V207",
+      "source_level": "N4",
+      "surface_forms": [
+        "今夜"
+      ]
+    },
+    {
+      "target": "中止",
+      "type": "compound",
+      "reading": "ちゅうし",
+      "source_id": "N4_V293",
+      "source_level": "N4",
+      "surface_forms": [
+        "中止"
+      ]
+    },
+    {
+      "target": "見つける",
+      "type": "kana",
+      "reading": "みつける",
+      "source_id": "OPENJLPT_64f85b7fdf",
+      "source_level": "N4",
+      "surface_forms": [
+        "見つけました"
+      ]
+    },
+    {
+      "target": "会場",
+      "type": "compound",
+      "reading": "かいじょう",
+      "source_id": "N4_V015",
+      "source_level": "N4",
+      "surface_forms": [
+        "会場"
+      ]
+    },
+    {
+      "target": "店員",
+      "type": "compound",
+      "reading": "てんいん",
+      "source_id": "N4_V161",
+      "source_level": "N4",
+      "surface_forms": [
+        "店員"
+      ]
+    },
+    {
+      "target": "無事",
+      "type": "compound",
+      "reading": "ぶじ",
+      "source_id": "N4_V145",
+      "source_level": "N4",
+      "surface_forms": [
+        "無事"
+      ]
+    },
+    {
+      "target": "大切",
+      "type": "compound",
+      "reading": "たいせつ",
+      "source_id": "N4_V152",
+      "source_level": "N4",
+      "surface_forms": [
+        "大切"
+      ]
+    },
+    {
+      "target": "帰り",
+      "type": "kana",
+      "reading": "かえり",
+      "source_id": "OPENJLPT_6365c5ac47",
+      "source_level": "N4",
+      "surface_forms": [
+        "帰り"
+      ]
+    },
+    {
+      "target": "考える",
+      "type": "kana",
+      "reading": "かんがえる",
+      "source_id": "OPENJLPT_cc34f28850",
+      "source_level": "N4",
+      "surface_forms": [
+        "考えて"
+      ]
+    },
+    {
+      "target": "計画",
+      "type": "compound",
+      "reading": "けいかく",
+      "source_id": "N4_V166",
+      "source_level": "N4",
+      "surface_forms": [
+        "計画"
+      ]
+    },
+    {
+      "target": "今度",
+      "type": "compound",
+      "reading": "こんど",
+      "source_id": "N4_V069",
+      "source_level": "N4",
+      "surface_forms": [
+        "今度"
+      ]
+    },
+    {
+      "target": "電車",
+      "type": "compound",
+      "reading": "でんしゃ",
+      "source_id": "N5_V153",
+      "source_level": "N5",
+      "surface_forms": [
+        "電車"
+      ]
+    },
+    {
+      "target": "今日",
+      "type": "compound",
+      "reading": "きょう",
+      "source_id": "N5_V048",
+      "source_level": "N5",
+      "surface_forms": [
+        "今日"
+      ]
+    }
+  ],
+  "review_targets": [
+    {
+      "surface": "木",
+      "target": "木",
+      "type": "single",
+      "source_level": "N5",
+      "prior_status": "weak",
+      "review_note": "Distinguish 木＝き from 日＝ひ."
+    },
+    {
+      "surface": "下りて",
+      "target": "下りる",
+      "type": "kana",
+      "source_level": "N4",
+      "prior_status": "weak",
+      "review_note": "Read 下りる＝おりる, not さがりる."
+    },
+    {
+      "surface": "一本",
+      "target": "一本",
+      "type": "contextual-counter",
+      "source_level": "N5",
+      "prior_status": "weak",
+      "review_note": "Read 一本＝いっぽん (sound change)."
+    }
+  ],
+  "review_status": "awaiting_feedback",
+  "notes": "Explicit learner-requested jump to N4 despite 48 N5 characters not confirmed strong. N5 statuses are preserved. Only N4+N5 kanji used; N5 weak words 木/下りる/一本 deliberately repeated."
+}

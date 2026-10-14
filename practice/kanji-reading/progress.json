@@ -1,8 +1,8 @@
 {
   "version": 1,
   "source": "Kanji Recall v32",
-  "current_level": "N5",
-  "last_lesson": "N5-002",
+  "current_level": "N4",
+  "last_lesson": "N4-001",
   "states": [
     "strong",
     "weak",
@@ -305,9 +305,11 @@
     },
     "下りる": {
       "status": "weak",
-      "type": "contextual-verb",
+      "type": "kana",
       "last_lesson": "N5-002",
-      "note": "Story-context verb (not a verified v32 focus card). Read さがりる; correct おりる (to descend); distinguish 下がる（さがる）."
+      "note": "Story-context verb (not a verified v32 focus card). Read さがりる; correct おりる (to descend); distinguish 下がる（さがる）. Confirmed as an N4 kana+kanji entry in original APK.",
+      "source_level": "N4",
+      "source_id": "OPENJLPT_4806278f5b"
     }
   },
   "lesson_history": [
@@ -350,7 +352,30 @@
         }
       ],
       "note": "Only explicitly reported difficulties recorded. Other Story 002 kanji remain unassessed unless already confirmed strong from Story 001; no general mastery claim yet."
+    },
+    {
+      "lesson_id": "N4-001",
+      "level": "N4",
+      "feedback_status": "awaiting_feedback",
+      "new_n4_kanji": 59,
+      "reused_n5_kanji": 30,
+      "reviewing_n5_weak": [
+        "木",
+        "下りる",
+        "一本"
+      ]
     }
   ],
-  "last_completed_lesson": "N5-001"
+  "last_completed_lesson": "N5-001",
+  "level_transitions": [
+    {
+      "date": "2026-10-14",
+      "from": "N5",
+      "to": "N4",
+      "reason": "Explicit learner request to increase reading difficulty before N5 completion",
+      "mastery_override": true,
+      "n5_unconfirmed_at_transition": 49
+    }
+  ],
+  "review_policy": "Any N5 character or word difficulty reported while reading N4 lessons must be recorded as weak (or unknown if explicitly unknown), preserving previous feedback and avoiding blanket mastery assumptions."
 }

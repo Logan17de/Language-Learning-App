@@ -48,6 +48,10 @@ def run():
         raise ValueError('No lesson files')
     for file in lesson_files:
         lesson = load(file)
+        lesson_index = LEVELS.index(lesson['level'])
+        max_allowed_index = LEVELS.index(current_level) + (1 if gate_open else 0)
+        if lesson_index > max_allowed_index:
+            raise ValueError(f'{file}: level cannot be introduced before explicit transition or promotion gate')
         story = lesson['title'] + '\n' + '\n'.join(lesson['paragraphs'])
         chars = set(KANJI.findall(story))
         # Stored lessons never become invalid when the gate changes later.
@@ -60,7 +64,10 @@ def run():
         if chars != set(lesson['introduced_kanji']):
             raise ValueError(f'{file}: introduced_kanji inventory mismatch')
         for focus in lesson['focus_cards']:
-            key = (focus['target'], focus['type'], lesson['level'])
+            source_level = focus.get('source_level', lesson['level'])
+            if LEVELS.index(source_level) > LEVELS.index(lesson['level']):
+                raise ValueError(f'{file}: focus source level above lesson: {source_level}')
+            key = (focus['target'], focus['type'], source_level)
             card = vocab.get(key)
             if card is None:
                 raise ValueError(f'{file}: unknown or cross-level vocabulary {key}')
@@ -71,12 +78,15 @@ def run():
                     raise ValueError(f'{file}: target inflection missing: {surface}')
                 if set(KANJI.findall(surface)) - lesson_allowed:
                     raise ValueError(f'{file}: target inflection above allowed level: {surface}')
+        for review in lesson.get('review_targets', []):
+            if review['surface'] not in story:
+                raise ValueError(f'{file}: missing weak review target: {review["surface"]}')
         markdown = file.with_suffix('.md').read_text(encoding='utf-8')
         for p in lesson['paragraphs']:
             if p not in markdown:
                 raise ValueError(f'{file}: reader Markdown and JSON differ')
         print(f'PASS {file.name}: {len(chars)} permitted distinct kanji, '
-              f'{len(lesson["focus_cards"])} N5 source-verified focus entries, '
+              f'{len(lesson["focus_cards"])} source-verified focus entries, '
               f'{len(lesson["paragraphs"])} paragraphs')
     return 0
 
