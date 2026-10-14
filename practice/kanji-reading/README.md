@@ -22,4 +22,4 @@ python practice/kanji-reading/validate_stories.py
 
 Validator checks that every kanji in story title/text is within the permitted character-level catalog and each focus card/inflected surface is grounded in the APK's N5 vocabulary exports. The file also checks the promotion threshold from progress. If higher-level kanji appear before the threshold, it fails.
 
-No score is assigned to the learner in the initial lesson. Feedback is pending.
+Story N5-001: learner confirmed reading all 32 distinct kanji and 20 focus entries without difficulty on 2026-10-14; recorded as strong in story context. Story N5-002 is awaiting feedback.

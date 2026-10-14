@@ -2,19 +2,312 @@
   "version": 1,
   "source": "Kanji Recall v32",
   "current_level": "N5",
-  "last_lesson": "N5-001",
+  "last_lesson": "N5-002",
   "states": [
     "strong",
     "weak",
     "unknown"
   ],
   "default_state": "unassessed",
-  "kanji": {},
-  "vocabulary": {},
+  "kanji": {
+    "七": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "下": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "中": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "二": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "人": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "今": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "先": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "入": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "前": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "名": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "外": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "大": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "学": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "小": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "山": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "川": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "後": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "日": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "時": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "本": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "校": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "父": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "生": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "行": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "見": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "話": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "語": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "読": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "車": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "間": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "雨": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    },
+    "電": {
+      "status": "strong",
+      "last_lesson": "N5-001",
+      "note": "Read entire Story 001 successfully without difficulty on 2026-10-14; strong in story context."
+    }
+  },
+  "vocabulary": {
+    "今日": {
+      "status": "strong",
+      "type": "compound",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "大雨": {
+      "status": "strong",
+      "type": "compound",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "学校": {
+      "status": "strong",
+      "type": "compound",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "時間": {
+      "status": "strong",
+      "type": "compound",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "日本語": {
+      "status": "strong",
+      "type": "compound",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "名前": {
+      "status": "strong",
+      "type": "compound",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "電車": {
+      "status": "strong",
+      "type": "compound",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "先生": {
+      "status": "strong",
+      "type": "compound",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "二人": {
+      "status": "strong",
+      "type": "compound",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "学生": {
+      "status": "strong",
+      "type": "compound",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "日本": {
+      "status": "strong",
+      "type": "compound",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "お父さん": {
+      "status": "strong",
+      "type": "kana",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "見る": {
+      "status": "strong",
+      "type": "kana",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "行く": {
+      "status": "strong",
+      "type": "kana",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "入れる": {
+      "status": "strong",
+      "type": "kana",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "小さな": {
+      "status": "strong",
+      "type": "kana",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "大きな": {
+      "status": "strong",
+      "type": "kana",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "読む": {
+      "status": "strong",
+      "type": "kana",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "見せる": {
+      "status": "strong",
+      "type": "kana",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    },
+    "話す": {
+      "status": "strong",
+      "type": "kana",
+      "last_lesson": "N5-001",
+      "note": "Read successfully in Story 001 on 2026-10-14."
+    }
+  },
   "lesson_history": [
     {
       "lesson_id": "N5-001",
-      "feedback_status": "awaiting_feedback"
+      "feedback_status": "completed",
+      "result": "all_read_fluently",
+      "feedback_date": "2026-10-14",
+      "strong_kanji": 32,
+      "strong_vocabulary": 20
+    },
+    {
+      "lesson_id": "N5-002",
+      "feedback_status": "awaiting_feedback",
+      "introduced_distinct_kanji": 46,
+      "new_unassessed_kanji": 28
     }
-  ]
+  ],
+  "last_completed_lesson": "N5-001"
 }
