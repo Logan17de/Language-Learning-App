@@ -177,8 +177,8 @@
     },
     "開": {
       "status": "weak",
-      "last_lesson": "N4-001",
-      "note": "Meaning/look-up for 開かれる; linked N4 character, exact individual decoding not separately tested. Feedback 2026-10-14."
+      "last_lesson": "N4-003",
+      "note": "Learner reported difficulty with word(s) 開い in N4 Story 003 on 2026-10-14. Review this kanji in context; individual standalone reading/meaning not independently assessed."
     },
     "会": {
       "status": "weak",
@@ -229,6 +229,61 @@
       "status": "weak",
       "last_lesson": "N4-001",
       "note": "N4: 無事 required meaning lookup; inferred component review, individual recognition not verified. Feedback 2026-10-14."
+    },
+    "用": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "note": "Learner reported difficulty with word(s) 用紙 in N4 Story 003 on 2026-10-14. Review this kanji in context; individual standalone reading/meaning not independently assessed."
+    },
+    "紙": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "note": "Learner reported difficulty with word(s) 用紙 in N4 Story 003 on 2026-10-14. Review this kanji in context; individual standalone reading/meaning not independently assessed."
+    },
+    "特": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "note": "Learner reported difficulty with word(s) 特色 in N4 Story 003 on 2026-10-14. Review this kanji in context; individual standalone reading/meaning not independently assessed."
+    },
+    "色": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "note": "Learner reported difficulty with word(s) 特色 in N4 Story 003 on 2026-10-14. Review this kanji in context; individual standalone reading/meaning not independently assessed."
+    },
+    "借": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "note": "Learner reported difficulty with word(s) 借金 in N4 Story 003 on 2026-10-14. Review this kanji in context; individual standalone reading/meaning not independently assessed."
+    },
+    "屋": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "note": "Learner reported difficulty with word(s) 屋外 in N4 Story 003 on 2026-10-14. Review this kanji in context; individual standalone reading/meaning not independently assessed."
+    },
+    "歌": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "note": "Learner reported difficulty with word(s) 歌手 in N4 Story 003 on 2026-10-14. Review this kanji in context; individual standalone reading/meaning not independently assessed."
+    },
+    "手": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "note": "Learner reported difficulty with word(s) 歌手 in N4 Story 003 on 2026-10-14. Review this kanji in context; individual standalone reading/meaning not independently assessed."
+    },
+    "飲": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "note": "Learner reported difficulty with word(s) 飲料 in N4 Story 003 on 2026-10-14. Review this kanji in context; individual standalone reading/meaning not independently assessed."
+    },
+    "料": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "note": "Learner reported difficulty with word(s) 飲料 in N4 Story 003 on 2026-10-14. Review this kanji in context; individual standalone reading/meaning not independently assessed."
+    },
+    "広": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "note": "Learner reported difficulty with word(s) 広がりました in N4 Story 003 on 2026-10-14. Review this kanji in context; individual standalone reading/meaning not independently assessed."
     }
   },
   "vocabulary": {
@@ -473,6 +528,114 @@
       "source_level": "N4",
       "feedback_kind": "meaning_lookup",
       "note": "Review 通る inflection; required lookup in this passage. 2026-10-14."
+    },
+    "用紙": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "reported_surface": "用紙",
+      "source_level": "N4",
+      "type": "compound",
+      "source_id": "N4_V320",
+      "source_reading": "ようし",
+      "prior_app_state": "unknown",
+      "feedback_kind": "reading_or_meaning_difficulty_unspecified",
+      "note": "Did not recognize or was unsure of word in N4 Story 003; app previously labeled unknown. Learner report 2026-10-14."
+    },
+    "特色": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "reported_surface": "特色",
+      "source_level": "N4",
+      "type": "compound",
+      "source_id": "N4_V203",
+      "source_reading": "とくしょく",
+      "prior_app_state": "unknown",
+      "feedback_kind": "reading_or_meaning_difficulty_unspecified",
+      "note": "Did not recognize or was unsure of word in N4 Story 003; app previously labeled unknown. Learner report 2026-10-14."
+    },
+    "借金": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "reported_surface": "借金",
+      "source_level": "N4",
+      "type": "compound",
+      "source_id": "N4_V391",
+      "source_reading": "しゃっきん",
+      "prior_app_state": "unknown",
+      "feedback_kind": "reading_or_meaning_difficulty_unspecified",
+      "note": "Did not recognize or was unsure of word in N4 Story 003; app previously labeled unknown. 金 itself not separately tested. Learner report 2026-10-14."
+    },
+    "屋外": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "reported_surface": "屋外",
+      "source_level": "N4",
+      "type": "compound",
+      "source_id": "N4_V093",
+      "source_reading": "おくがい",
+      "prior_app_state": "weak",
+      "feedback_kind": "reading_or_meaning_difficulty_unspecified",
+      "note": "Trouble with word despite previous N5 外 strong in separate context; retain 外 strong, check 屋外 compound. Learner report 2026-10-14."
+    },
+    "歌手": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "reported_surface": "歌手",
+      "source_level": "N4",
+      "type": "compound",
+      "source_id": "N4_V323",
+      "source_reading": "かしゅ",
+      "prior_app_state": "weak",
+      "feedback_kind": "reading_or_meaning_difficulty_unspecified",
+      "note": "Word-level N4 reading/meaning gap; practice in future story. Learner report 2026-10-14."
+    },
+    "飲料": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "reported_surface": "飲料",
+      "source_level": "N4",
+      "type": "compound",
+      "source_id": "N4_V350",
+      "source_reading": "いんりょう",
+      "prior_app_state": "weak",
+      "feedback_kind": "reading_or_meaning_difficulty_unspecified",
+      "note": "Word-level N4 reading/meaning gap; practice in future story. Learner report 2026-10-14."
+    },
+    "広がる": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "reported_surface": "広がりました",
+      "source_level": "N4",
+      "type": "contextual-inflection",
+      "prior_app_state": "not_in_app_snapshot",
+      "feedback_kind": "reading_or_meaning_difficulty_unspecified",
+      "note": "User supplied past-polite surface 広がりました; track lemma 広がる only as contextual form; no fabricated APK source. Learner report 2026-10-14."
+    },
+    "広がりました": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "source_level": "N4",
+      "type": "contextual-surface",
+      "base_form": "広がる",
+      "note": "User supplied past-polite surface 広がりました; track lemma 広がる only as contextual form; no fabricated APK source. Learner report 2026-10-14."
+    },
+    "開く": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "reported_surface": "開い",
+      "source_level": "N4",
+      "type": "contextual-inflection",
+      "prior_app_state": "not_in_app_snapshot",
+      "feedback_kind": "reading_or_meaning_difficulty_unspecified",
+      "note": "User supplied 開い, located within 会を開いてください. Contextual form 開いて (not APK N5 intransitive 開く/あく). Keep reading issue without assuming exact error; repeat 開いて in other contexts. Learner report 2026-10-14."
+    },
+    "開い": {
+      "status": "weak",
+      "last_lesson": "N4-003",
+      "source_level": "N4",
+      "type": "contextual-surface",
+      "base_form": "開く",
+      "note": "User supplied 開い, located within 会を開いてください. Contextual form 開いて (not APK N5 intransitive 開く/あく). Keep reading issue without assuming exact error; repeat 開いて in other contexts. Learner report 2026-10-14."
     }
   },
   "lesson_history": [
@@ -620,7 +783,7 @@
     {
       "lesson_id": "N4-003",
       "level": "N4",
-      "feedback_status": "awaiting_feedback",
+      "feedback_status": "partial_feedback",
       "introduced_distinct_kanji": 95,
       "n4_kanji": 60,
       "n5_reused": 35,
@@ -665,7 +828,96 @@
         "下りる"
       ],
       "source_verified_focus_count": 25,
-      "note": "No status upgrades from publication; await reading feedback."
+      "note": "Eight user-reported difficult words or forms. Three were previously app-unknown, three previously app-weak, and two are inflected contextual forms. No reading explanations requested. Only explicitly reported items are weak; other Story 003 material is not declared strong.",
+      "feedback_date": "2026-10-14",
+      "reported_difficulties": [
+        {
+          "surface": "用紙",
+          "target": "用紙",
+          "app_memory_state_at_export": "unknown",
+          "feedback_status": "weak",
+          "kind": "word_reading_or_meaning_difficulty",
+          "review_components": [
+            "用",
+            "紙"
+          ]
+        },
+        {
+          "surface": "特色",
+          "target": "特色",
+          "app_memory_state_at_export": "unknown",
+          "feedback_status": "weak",
+          "kind": "word_reading_or_meaning_difficulty",
+          "review_components": [
+            "特",
+            "色"
+          ]
+        },
+        {
+          "surface": "借金",
+          "target": "借金",
+          "app_memory_state_at_export": "unknown",
+          "feedback_status": "weak",
+          "kind": "word_reading_or_meaning_difficulty",
+          "review_components": [
+            "借",
+            "金"
+          ]
+        },
+        {
+          "surface": "屋外",
+          "target": "屋外",
+          "app_memory_state_at_export": "weak",
+          "feedback_status": "weak",
+          "kind": "word_reading_or_meaning_difficulty",
+          "review_components": [
+            "屋",
+            "外"
+          ]
+        },
+        {
+          "surface": "歌手",
+          "target": "歌手",
+          "app_memory_state_at_export": "weak",
+          "feedback_status": "weak",
+          "kind": "word_reading_or_meaning_difficulty",
+          "review_components": [
+            "歌",
+            "手"
+          ]
+        },
+        {
+          "surface": "飲料",
+          "target": "飲料",
+          "app_memory_state_at_export": "weak",
+          "feedback_status": "weak",
+          "kind": "word_reading_or_meaning_difficulty",
+          "review_components": [
+            "飲",
+            "料"
+          ]
+        },
+        {
+          "surface": "広がりました",
+          "target": "広がる",
+          "app_memory_state_at_export": null,
+          "feedback_status": "weak",
+          "kind": "word_reading_or_meaning_difficulty",
+          "review_components": [
+            "広"
+          ]
+        },
+        {
+          "surface": "開い",
+          "target": "開く",
+          "app_memory_state_at_export": null,
+          "feedback_status": "weak",
+          "kind": "word_reading_or_meaning_difficulty",
+          "review_components": [
+            "開"
+          ]
+        }
+      ]
     }
   ],
   "last_completed_lesson": "N5-001",
@@ -683,6 +935,14 @@
   "next_lesson_priorities": {
     "level": "N4",
     "prioritize_weak_vocabulary": [
+      "用紙",
+      "特色",
+      "借金",
+      "屋外",
+      "歌手",
+      "飲料",
+      "広がる",
+      "開く",
       "開かれる",
       "会",
       "書店",
@@ -693,6 +953,17 @@
       "無事"
     ],
     "prioritize_weak_kanji": [
+      "用",
+      "紙",
+      "特",
+      "色",
+      "借",
+      "屋",
+      "歌",
+      "手",
+      "飲",
+      "料",
+      "広",
       "開",
       "会",
       "書",
@@ -747,7 +1018,23 @@
       "親切",
       "運ぶ",
       "通る"
-    ]
+    ],
+    "next_requested": "N4-004",
+    "n5_component_review_without_single_char_demotion": [
+      "金",
+      "外"
+    ],
+    "recently_reported_weak_surfaces": [
+      "用紙",
+      "特色",
+      "借金",
+      "屋外",
+      "歌手",
+      "飲料",
+      "広がりました",
+      "開い"
+    ],
+    "recognition_rule": "Unknown app targets remain tagged unknown in immutable export; explicit story difficulty is a separate weak review flag. Do not infer isolated mastery or weakness for N5 components from compounds alone."
   },
   "app_export_snapshot": {
     "source_path": "practice/kanji-reading/app-exports/kanji-recall-2026-10-14-export.json",
