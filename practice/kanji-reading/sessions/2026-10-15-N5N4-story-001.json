@@ -1,0 +1,153 @@
+{
+  "schema_version": 2,
+  "session_id": "N5N4-001",
+  "session_number": 4,
+  "date": "2026-10-15",
+  "kind": "story_feedback",
+  "source_story": "practice/kanji-reading/stories/N5N4-001.md",
+  "completed": true,
+  "graded_answer_count": 0,
+  "reported_difficulty_count": 11,
+  "overall_score": null,
+  "accuracy": null,
+  "items": [
+    {
+      "reported_surface": "放送",
+      "target": "放送",
+      "key": "compound|放送",
+      "kind": "compound",
+      "difficulty": "slow_recall",
+      "recall_seconds": 10,
+      "reading_self_report": "unspecified",
+      "meaning_self_report": "unspecified",
+      "feedback_status": "weak",
+      "graded": false
+    },
+    {
+      "reported_surface": "試食会",
+      "target": "試食会",
+      "key": "compound|試食会",
+      "kind": "compound",
+      "difficulty": "meaning_unknown",
+      "recall_seconds": null,
+      "reading_self_report": "derived_from_components",
+      "meaning_self_report": "unknown",
+      "feedback_status": "weak",
+      "graded": false
+    },
+    {
+      "reported_surface": "朝食",
+      "target": "朝食",
+      "key": "compound|朝食",
+      "kind": "compound",
+      "difficulty": "reading_unknown",
+      "recall_seconds": null,
+      "reading_self_report": "unknown",
+      "meaning_self_report": "known",
+      "feedback_status": "weak",
+      "graded": false
+    },
+    {
+      "reported_surface": "昼食",
+      "target": "昼食",
+      "key": "compound|昼食",
+      "kind": "compound",
+      "difficulty": "reading_unknown",
+      "recall_seconds": null,
+      "reading_self_report": "unknown",
+      "meaning_self_report": "known",
+      "feedback_status": "weak",
+      "graded": false
+    },
+    {
+      "reported_surface": "住民",
+      "target": "住民",
+      "key": "compound|住民",
+      "kind": "compound",
+      "difficulty": "reading_unknown",
+      "recall_seconds": null,
+      "reading_self_report": "unknown",
+      "meaning_self_report": "known",
+      "feedback_status": "weak",
+      "graded": false
+    },
+    {
+      "reported_surface": "運ん",
+      "target": "運ぶ",
+      "key": "kana|運ぶ",
+      "kind": "kana",
+      "difficulty": "very_weak",
+      "recall_seconds": null,
+      "reading_self_report": "unspecified",
+      "meaning_self_report": "unspecified",
+      "feedback_status": "weak",
+      "graded": false
+    },
+    {
+      "reported_surface": "多数",
+      "target": "多数",
+      "key": "compound|多数",
+      "kind": "compound",
+      "difficulty": "very_weak",
+      "recall_seconds": null,
+      "reading_self_report": "unspecified",
+      "meaning_self_report": "unspecified",
+      "feedback_status": "weak",
+      "graded": false
+    },
+    {
+      "reported_surface": "渡し",
+      "target": "渡す",
+      "key": "kana|渡す",
+      "kind": "kana",
+      "difficulty": "very_weak",
+      "recall_seconds": null,
+      "reading_self_report": "unspecified",
+      "meaning_self_report": "unspecified",
+      "feedback_status": "weak",
+      "graded": false
+    },
+    {
+      "reported_surface": "会計",
+      "target": "会計",
+      "key": "compound|会計",
+      "kind": "compound",
+      "difficulty": "very_weak",
+      "recall_seconds": null,
+      "reading_self_report": "unspecified",
+      "meaning_self_report": "unspecified",
+      "feedback_status": "weak",
+      "graded": false
+    },
+    {
+      "reported_surface": "代金",
+      "target": "代金",
+      "key": "compound|代金",
+      "kind": "compound",
+      "difficulty": "very_weak",
+      "recall_seconds": null,
+      "reading_self_report": "unspecified",
+      "meaning_self_report": "unspecified",
+      "feedback_status": "weak",
+      "graded": false
+    },
+    {
+      "reported_surface": "お礼",
+      "target": "お礼",
+      "key": "kana|お礼",
+      "kind": "kana",
+      "difficulty": "very_weak",
+      "recall_seconds": null,
+      "reading_self_report": "unspecified",
+      "meaning_self_report": "unspecified",
+      "feedback_status": "weak",
+      "graded": false
+    }
+  ],
+  "notes": "Feedback from story reading: slow recall (10s), unknown meaning, unknown reading despite known meaning, or general weakness. No independent score inferred. 試食会 exact target, not an automatic miss on 試食. 運ん and 渡し linked to full verb cards. No standalone character demotions.",
+  "next_story": "N5N4-002",
+  "next_carryover_targets": [
+    "朝食",
+    "住民"
+  ]
+}
