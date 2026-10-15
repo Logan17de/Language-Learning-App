@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Kanji Recall v32",
   "current_level": "N2",
-  "last_lesson": "N2-002",
+  "last_lesson": "N2-003",
   "states": [
     "strong",
     "familiar",
@@ -1143,6 +1143,348 @@
         "outcome": "weak"
       },
       "note": "2026-10-15 N2-001: learner explicitly reported \"開店\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only."
+    },
+    "事件": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "事件",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "事件",
+        "canonical_target": "事件",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '事件' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "放送": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "放送",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "放送",
+        "canonical_target": "放送",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '放送' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "勝手": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "勝手",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "勝手",
+        "canonical_target": "勝手",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '勝手' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "現れる": {
+      "status": "weak",
+      "type": "kana-kanji",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "現れ",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "現れ",
+        "canonical_target": "現れる",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '現れ' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "行動": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "行動",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "行動",
+        "canonical_target": "行動",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '行動' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "改札": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "改札",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "改札",
+        "canonical_target": "改札",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '改札' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "拾う": {
+      "status": "weak",
+      "type": "kana-kanji",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "拾った",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "拾った",
+        "canonical_target": "拾う",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '拾った' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "資料": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "資料",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "資料",
+        "canonical_target": "資料",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '資料' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "粉": {
+      "status": "weak",
+      "type": "single-word",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "粉",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "粉",
+        "canonical_target": "粉",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '粉' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "突然": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "突然",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "突然",
+        "canonical_target": "突然",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '突然' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "受け取る": {
+      "status": "weak",
+      "type": "kana-kanji",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "受",
+      "feedback_kind": "self_report_fragment_in_word_context",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "受",
+        "canonical_target": "受け取る",
+        "context_expression": "受け取って",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '受' as difficult. Full form in story: 受け取って. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "戻る": {
+      "status": "weak",
+      "type": "kana-kanji",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "戻る",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "戻る",
+        "canonical_target": "戻る",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '戻る' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "渡す": {
+      "status": "weak",
+      "type": "kana-kanji",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "渡した",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "渡した",
+        "canonical_target": "渡す",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '渡した' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "連絡": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "連絡",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "連絡",
+        "canonical_target": "連絡",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '連絡' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "本部": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "本部",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "本部",
+        "canonical_target": "本部",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '本部' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "叫ぶ": {
+      "status": "weak",
+      "type": "kana-kanji",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "叫び",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "叫び",
+        "canonical_target": "叫ぶ",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '叫び' as difficult. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
+    },
+    "飛び込む": {
+      "status": "weak",
+      "type": "kana-kanji",
+      "last_lesson": "N2-002",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "込んで",
+      "feedback_kind": "self_report_fragment_in_word_context",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-002",
+        "date": "2026-10-15",
+        "reported_surface": "込んで",
+        "canonical_target": "飛び込む",
+        "context_expression": "飛び込んで",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-002: learner reported '込んで' as difficult. Full form in story: 飛び込んで. Whole-word review, not individual kanji. Reading or meaning gap unspecified."
     }
   },
   "lesson_history": [
@@ -1755,7 +2097,7 @@
     {
       "lesson_id": "N2-002",
       "level": "N2",
-      "feedback_status": "awaiting_feedback",
+      "feedback_status": "completed",
       "session_type": "contextual_story",
       "date": "2026-10-15",
       "line_count": 10,
@@ -1781,12 +2123,203 @@
         "連絡",
         "飛び込む"
       ],
+      "word_status_changes_applied": true,
+      "component_kanji_status_changes_applied": false,
+      "note": "All 17 user-reported weak word surfaces recorded. 受 and 込んで are linked to complete words, preserving their original fragments. No inference of success for unreported words.",
+      "feedback_date": "2026-10-15",
+      "session_number": 3,
+      "reported_weak_vocabulary_count": 17,
+      "reported_difficulties": [
+        {
+          "reported_surface": "事件",
+          "target": "事件",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "放送",
+          "target": "放送",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "勝手",
+          "target": "勝手",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "現れ",
+          "target": "現れる",
+          "type": "kana-kanji",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "行動",
+          "target": "行動",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "改札",
+          "target": "改札",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "拾った",
+          "target": "拾う",
+          "type": "kana-kanji",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "資料",
+          "target": "資料",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "粉",
+          "target": "粉",
+          "type": "single-word",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "突然",
+          "target": "突然",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "受",
+          "target": "受け取る",
+          "type": "kana-kanji",
+          "context_expression": "受け取って",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "戻る",
+          "target": "戻る",
+          "type": "kana-kanji",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "渡した",
+          "target": "渡す",
+          "type": "kana-kanji",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "連絡",
+          "target": "連絡",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "本部",
+          "target": "本部",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "叫び",
+          "target": "叫ぶ",
+          "type": "kana-kanji",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        },
+        {
+          "reported_surface": "込んで",
+          "target": "飛び込む",
+          "type": "kana-kanji",
+          "context_expression": "飛び込んで",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed"
+        }
+      ],
+      "session_file": "practice/kanji-reading/sessions/2026-10-15-N2-story-002.json"
+    },
+    {
+      "lesson_id": "N2-003",
+      "level": "N2",
+      "feedback_status": "awaiting_feedback",
+      "session_type": "contextual_story",
+      "date": "2026-10-15",
+      "line_count": 10,
+      "story_path": "practice/kanji-reading/stories/N2-003.md",
+      "carryover_targets": [
+        "改札",
+        "連絡"
+      ],
+      "new_focus_targets": [
+        "預ける",
+        "記録",
+        "番号",
+        "時刻表",
+        "比べる",
+        "印刷",
+        "発見",
+        "切符",
+        "期限",
+        "交換",
+        "指示",
+        "相談"
+      ],
       "word_status_changes_applied": false,
       "component_kanji_status_changes_applied": false,
-      "note": "Two previous weak whole-word targets, with new N5–N2 vocabulary. No scoring until learner feedback."
+      "note": "Two prior weak whole words and twelve new target words. Await learner feedback before grading."
     }
   ],
-  "last_completed_lesson": "N2-001",
+  "last_completed_lesson": "N2-002",
   "level_transitions": [
     {
       "date": "2026-10-14",
@@ -1809,6 +2342,23 @@
   "next_lesson_priorities": {
     "level": "N2",
     "prioritize_weak_vocabulary": [
+      "事件",
+      "放送",
+      "勝手",
+      "現れる",
+      "行動",
+      "改札",
+      "拾う",
+      "資料",
+      "粉",
+      "突然",
+      "受け取る",
+      "戻る",
+      "渡す",
+      "連絡",
+      "本部",
+      "叫ぶ",
+      "飛び込む",
       "理由",
       "調査",
       "設備",
@@ -1878,25 +2428,22 @@
       "下りる"
     ],
     "policy": "All N5–N2 permitted; N1 prohibited. Whole-word assessment controls review; do not change independent character status from compound mistakes.",
-    "active_lesson": "N2-002",
+    "active_lesson": "N2-003",
     "reviewing_now": [
-      "調査",
-      "混じる",
-      "地下鉄",
-      "運転",
-      "放送",
-      "事情",
-      "研究者",
-      "協力",
-      "行動",
       "改札",
-      "資料",
-      "確認",
-      "突然",
-      "降り始める",
-      "受け取る",
       "連絡",
-      "飛び込む"
+      "預ける",
+      "記録",
+      "番号",
+      "時刻表",
+      "比べる",
+      "印刷",
+      "発見",
+      "切符",
+      "期限",
+      "交換",
+      "指示",
+      "相談"
     ],
     "app_unknown_now": [
       "特色",
@@ -1914,7 +2461,7 @@
       "夕日",
       "通る"
     ],
-    "next_requested": "N2-003",
+    "next_requested": "N2-004",
     "n5_component_review_without_single_char_demotion": [
       "金",
       "外"
@@ -2014,7 +2561,7 @@
     "last_practice_session": "N2-D01-BASELINE",
     "last_practice_date": "2026-10-15"
   },
-  "last_completed_practice_session": "N2-001",
+  "last_completed_practice_session": "N2-002",
   "story_review_workflow": {
     "on_story_assignment": "No grading from merely appearing; mark awaiting feedback.",
     "on_learner_feedback": "Record only the exact reported words, distinguishing unknown reading, unknown meaning and hesitation when supplied; do not change individual kanji statuses from compound errors.",
