@@ -11,28 +11,8 @@
   "complete_story_feedback": true,
   "graded_questions": 0,
   "reported_weak_words": 11,
-  "pending_write_targets": [
-    "practice/kanji-reading/progress.json",
-    "practice/kanji-reading/word-review-stats.json",
-    "practice/kanji-reading/app-sync/overrides.json"
-  ],
-  "pending_overrides": [
-    {
-      "key": "compound|住民",
-      "state": "weak",
-      "reason": "Meaning known but reading unknown, reported in story"
-    },
-    {
-      "key": "compound|多数",
-      "state": "weak",
-      "reason": "Learner reported this word very weak"
-    },
-    {
-      "key": "kana|お礼",
-      "state": "weak",
-      "reason": "Learner reported this word very weak"
-    }
-  ],
+  "pending_write_targets": [],
+  "pending_overrides": [],
   "strict_rules": [
     "Existing 28 overrides must be preserved and revisions unique",
     "Do not change compound|試食 from report on 試食会",
@@ -40,7 +20,23 @@
     "Do not grade self-reported hesitation or weakness as wrong independent tests",
     "Reconcile only once from source session, avoiding duplicate practice attempts"
   ],
-  "status": "PENDING_GITHUB_UPDATES",
+  "status": "RECONCILED_IN_GITHUB_PHONE_RECEIPT_PENDING_FOR_OREI",
   "reason": "GitHub tool safety checks blocked existing-file update operations",
-  "active_story": "N5N4-002"
+  "active_story": "N5N4-002",
+  "reconciled_on": "2026-10-15",
+  "progress_json_commit": "ccc9dd48c2a2683da62037860f5798030f839301",
+  "stats_json_commit": "60b9d46440cba31b42677a7cc743bd771a9f3836",
+  "overrides_commit": "619cf10a5f06335f02744fb66fe3a839e6ba102b",
+  "reconciliation_result": {
+    "total_reported": 11,
+    "graded_attempts_added": 0,
+    "phone_weak_preexisting": [
+      "compound|多数",
+      "compound|住民"
+    ],
+    "new_phone_override_for_old_familiar": "kana|お礼",
+    "phone_state_applied_for_new_override": false,
+    "phone_verification_needed": true,
+    "story_advance_policy": "Only advance when user explicitly says next story. N5N4-002 exists but held."
+  }
 }
