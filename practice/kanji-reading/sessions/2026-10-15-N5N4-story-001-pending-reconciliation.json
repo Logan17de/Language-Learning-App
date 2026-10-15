@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-15",
+  "source_session": "practice/kanji-reading/sessions/2026-10-15-N5N4-story-001.json",
+  "source_story": "practice/kanji-reading/stories/N5N4-001.md",
+  "next_story": "practice/kanji-reading/stories/N5N4-002.md",
+  "next_carryover": [
+    "朝食",
+    "住民"
+  ],
+  "complete_story_feedback": true,
+  "graded_questions": 0,
+  "reported_weak_words": 11,
+  "pending_write_targets": [
+    "practice/kanji-reading/progress.json",
+    "practice/kanji-reading/word-review-stats.json",
+    "practice/kanji-reading/app-sync/overrides.json"
+  ],
+  "pending_overrides": [
+    {
+      "key": "compound|住民",
+      "state": "weak",
+      "reason": "Meaning known but reading unknown, reported in story"
+    },
+    {
+      "key": "compound|多数",
+      "state": "weak",
+      "reason": "Learner reported this word very weak"
+    },
+    {
+      "key": "kana|お礼",
+      "state": "weak",
+      "reason": "Learner reported this word very weak"
+    }
+  ],
+  "strict_rules": [
+    "Existing 28 overrides must be preserved and revisions unique",
+    "Do not change compound|試食 from report on 試食会",
+    "Do not downgrade standalone single kanji",
+    "Do not grade self-reported hesitation or weakness as wrong independent tests",
+    "Reconcile only once from source session, avoiding duplicate practice attempts"
+  ],
+  "status": "PENDING_GITHUB_UPDATES",
+  "reason": "GitHub tool safety checks blocked existing-file update operations",
+  "active_story": "N5N4-002"
+}
