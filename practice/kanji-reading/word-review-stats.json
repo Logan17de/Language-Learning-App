@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "scope": "whole-vocabulary-only",
-  "authoritative_note": "Counts are from recorded practice attempts after this ledger was created; historical app labels are preserved as context, not fabricated attempts.",
+  "authoritative_note": "Recorded practice appearances include explicitly self-reported unsuccessful recall, distinguished with grade self_report_weak (reading and meaning unassessed). Earlier graded baseline attempts remain intact. Unreported story words do not become mastered or count as verified successes.",
   "last_updated": "2026-10-15",
-  "current_session_number": 1,
-  "total_recorded_sessions": 1,
+  "current_session_number": 2,
+  "total_recorded_sessions": 2,
   "words": {
     "特色": {
       "type": "compound",
@@ -51,9 +51,9 @@
     "混じる": {
       "type": "kana-kanji",
       "source_level": "N2",
-      "total_appearances": 1,
+      "total_appearances": 2,
       "correct_answers": 0,
-      "incorrect_answers": 1,
+      "incorrect_answers": 2,
       "success_rate_percent": 0,
       "reading_correct": 0,
       "reading_incorrect": 1,
@@ -65,21 +65,21 @@
       "last_correct_date": null,
       "last_incorrect_date": "2026-10-15",
       "forgetting_score": null,
-      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
       "confidence_score": 0,
-      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
-      "classification": "critical_based_on_one_assessment",
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
       "app_memory_at_export": {
         "level": "N2",
         "status": "unknown"
       },
       "scheduled_review_sessions": [
-        2,
-        4,
-        8,
-        15
+        3,
+        5,
+        9,
+        16
       ],
-      "last_session_id": "N2-D01-BASELINE",
+      "last_session_id": "N2-001",
       "attempt_history": [
         {
           "session_id": "N2-D01-BASELINE",
@@ -87,8 +87,20 @@
           "grade": "unknown",
           "reading": "unknown",
           "meaning": "unknown"
+        },
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "混じる",
+          "scored_reading_or_meaning": false
         }
-      ]
+      ],
+      "character_level_ceiling": "N2",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
     },
     "下りる": {
       "type": "kana-kanji",
@@ -216,9 +228,9 @@
     "調査": {
       "type": "compound",
       "source_level": "N2",
-      "total_appearances": 1,
+      "total_appearances": 2,
       "correct_answers": 0,
-      "incorrect_answers": 1,
+      "incorrect_answers": 2,
       "success_rate_percent": 0,
       "reading_correct": 0,
       "reading_incorrect": 1,
@@ -230,18 +242,18 @@
       "last_correct_date": null,
       "last_incorrect_date": "2026-10-15",
       "forgetting_score": null,
-      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
       "confidence_score": 0,
-      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
-      "classification": "critical_based_on_one_assessment",
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
       "app_memory_at_export": null,
       "scheduled_review_sessions": [
-        2,
-        4,
-        8,
-        15
+        3,
+        5,
+        9,
+        16
       ],
-      "last_session_id": "N2-D01-BASELINE",
+      "last_session_id": "N2-001",
       "attempt_history": [
         {
           "session_id": "N2-D01-BASELINE",
@@ -249,8 +261,20 @@
           "grade": "unknown",
           "reading": "unknown",
           "meaning": "unknown"
+        },
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "調査",
+          "scored_reading_or_meaning": false
         }
-      ]
+      ],
+      "character_level_ceiling": "N2",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
     },
     "片付く": {
       "type": "kana-kanji",
@@ -379,9 +403,9 @@
     "腰掛ける": {
       "type": "kana-kanji",
       "source_level": "N2",
-      "total_appearances": 1,
+      "total_appearances": 2,
       "correct_answers": 0,
-      "incorrect_answers": 1,
+      "incorrect_answers": 2,
       "success_rate_percent": 0,
       "reading_correct": 0,
       "reading_incorrect": 1,
@@ -393,21 +417,21 @@
       "last_correct_date": null,
       "last_incorrect_date": "2026-10-15",
       "forgetting_score": null,
-      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
       "confidence_score": 0,
-      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
-      "classification": "critical_based_on_one_assessment",
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
       "app_memory_at_export": {
         "level": "N2",
         "status": "unknown"
       },
       "scheduled_review_sessions": [
-        2,
-        4,
-        8,
-        15
+        3,
+        5,
+        9,
+        16
       ],
-      "last_session_id": "N2-D01-BASELINE",
+      "last_session_id": "N2-001",
       "attempt_history": [
         {
           "session_id": "N2-D01-BASELINE",
@@ -415,8 +439,20 @@
           "grade": "unknown",
           "reading": "unknown",
           "meaning": "unknown"
+        },
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "腰掛",
+          "scored_reading_or_meaning": false
         }
-      ]
+      ],
+      "character_level_ceiling": "N2",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
     },
     "取り消す": {
       "type": "kana-kanji",
@@ -542,9 +578,9 @@
     "状況": {
       "type": "compound",
       "source_level": "N2",
-      "total_appearances": 1,
+      "total_appearances": 2,
       "correct_answers": 0,
-      "incorrect_answers": 1,
+      "incorrect_answers": 2,
       "success_rate_percent": 0,
       "reading_correct": 0,
       "reading_incorrect": 1,
@@ -556,18 +592,18 @@
       "last_correct_date": null,
       "last_incorrect_date": "2026-10-15",
       "forgetting_score": null,
-      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
       "confidence_score": 0,
-      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
-      "classification": "critical_based_on_one_assessment",
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
       "app_memory_at_export": null,
       "scheduled_review_sessions": [
-        2,
-        4,
-        8,
-        15
+        3,
+        5,
+        9,
+        16
       ],
-      "last_session_id": "N2-D01-BASELINE",
+      "last_session_id": "N2-001",
       "attempt_history": [
         {
           "session_id": "N2-D01-BASELINE",
@@ -575,15 +611,27 @@
           "grade": "unknown",
           "reading": "unknown",
           "meaning": "unknown"
+        },
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "状況",
+          "scored_reading_or_meaning": false
         }
-      ]
+      ],
+      "character_level_ceiling": "N2",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
     },
     "用いる": {
       "type": "kana-kanji",
       "source_level": "N3",
-      "total_appearances": 1,
+      "total_appearances": 2,
       "correct_answers": 0,
-      "incorrect_answers": 1,
+      "incorrect_answers": 2,
       "success_rate_percent": 0,
       "reading_correct": 0,
       "reading_incorrect": 1,
@@ -595,21 +643,21 @@
       "last_correct_date": null,
       "last_incorrect_date": "2026-10-15",
       "forgetting_score": null,
-      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
       "confidence_score": 0,
-      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
-      "classification": "critical_based_on_one_assessment",
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
       "app_memory_at_export": {
         "level": "N3",
         "status": "weak"
       },
       "scheduled_review_sessions": [
-        2,
-        4,
-        8,
-        15
+        3,
+        5,
+        9,
+        16
       ],
-      "last_session_id": "N2-D01-BASELINE",
+      "last_session_id": "N2-001",
       "attempt_history": [
         {
           "session_id": "N2-D01-BASELINE",
@@ -617,8 +665,20 @@
           "grade": "unknown",
           "reading": "unknown",
           "meaning": "unknown"
+        },
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "用いたら",
+          "scored_reading_or_meaning": false
         }
-      ]
+      ],
+      "character_level_ceiling": "N4",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
     },
     "食べる": {
       "type": "kana-kanji",
@@ -786,9 +846,9 @@
     "設備": {
       "type": "compound",
       "source_level": "N2",
-      "total_appearances": 1,
+      "total_appearances": 2,
       "correct_answers": 0,
-      "incorrect_answers": 1,
+      "incorrect_answers": 2,
       "success_rate_percent": 0,
       "reading_correct": 0,
       "reading_incorrect": 1,
@@ -800,18 +860,18 @@
       "last_correct_date": null,
       "last_incorrect_date": "2026-10-15",
       "forgetting_score": null,
-      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
       "confidence_score": 0,
-      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
-      "classification": "critical_based_on_one_assessment",
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
       "app_memory_at_export": null,
       "scheduled_review_sessions": [
-        2,
-        4,
-        8,
-        15
+        3,
+        5,
+        9,
+        16
       ],
-      "last_session_id": "N2-D01-BASELINE",
+      "last_session_id": "N2-001",
       "attempt_history": [
         {
           "session_id": "N2-D01-BASELINE",
@@ -819,8 +879,20 @@
           "grade": "unknown",
           "reading": "unknown",
           "meaning": "unknown"
+        },
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "設備",
+          "scored_reading_or_meaning": false
         }
-      ]
+      ],
+      "character_level_ceiling": "N2",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
     },
     "中止": {
       "type": "compound",
@@ -986,6 +1058,446 @@
           "meaning": "correct"
         }
       ]
+    },
+    "理由": {
+      "type": "compound",
+      "source_level": null,
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
+      "confidence_score": null,
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        3,
+        5,
+        9,
+        16
+      ],
+      "last_session_id": "N2-001",
+      "attempt_history": [
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "理由",
+          "scored_reading_or_meaning": false
+        }
+      ],
+      "character_level_ceiling": "N3",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
+    },
+    "調子": {
+      "type": "compound",
+      "source_level": null,
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
+      "confidence_score": null,
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        3,
+        5,
+        9,
+        16
+      ],
+      "last_session_id": "N2-001",
+      "attempt_history": [
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "調子",
+          "scored_reading_or_meaning": false
+        }
+      ],
+      "character_level_ceiling": "N3",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
+    },
+    "箱": {
+      "type": "single-word",
+      "source_level": null,
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
+      "confidence_score": null,
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        3,
+        5,
+        9,
+        16
+      ],
+      "last_session_id": "N2-001",
+      "attempt_history": [
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "箱",
+          "scored_reading_or_meaning": false
+        }
+      ],
+      "character_level_ceiling": "N3",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
+    },
+    "一枚": {
+      "type": "counter",
+      "source_level": null,
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
+      "confidence_score": null,
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        3,
+        5,
+        9,
+        16
+      ],
+      "last_session_id": "N2-001",
+      "attempt_history": [
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "一枚",
+          "scored_reading_or_meaning": false
+        }
+      ],
+      "character_level_ceiling": "N2",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
+    },
+    "写る": {
+      "type": "kana-kanji",
+      "source_level": null,
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
+      "confidence_score": null,
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        3,
+        5,
+        9,
+        16
+      ],
+      "last_session_id": "N2-001",
+      "attempt_history": [
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "写っていた",
+          "scored_reading_or_meaning": false
+        }
+      ],
+      "character_level_ceiling": "N4",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
+    },
+    "機械": {
+      "type": "compound",
+      "source_level": null,
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
+      "confidence_score": null,
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        3,
+        5,
+        9,
+        16
+      ],
+      "last_session_id": "N2-001",
+      "attempt_history": [
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "機械",
+          "scored_reading_or_meaning": false
+        }
+      ],
+      "character_level_ceiling": "N2",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
+    },
+    "床": {
+      "type": "single-word",
+      "source_level": null,
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
+      "confidence_score": null,
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        3,
+        5,
+        9,
+        16
+      ],
+      "last_session_id": "N2-001",
+      "attempt_history": [
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "床",
+          "scored_reading_or_meaning": false
+        }
+      ],
+      "character_level_ceiling": "N2",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
+    },
+    "散らかる": {
+      "type": "kana-kanji",
+      "source_level": null,
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
+      "confidence_score": null,
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        3,
+        5,
+        9,
+        16
+      ],
+      "last_session_id": "N2-001",
+      "attempt_history": [
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "散らかった",
+          "scored_reading_or_meaning": false
+        }
+      ],
+      "character_level_ceiling": "N3",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
+    },
+    "最後": {
+      "type": "compound",
+      "source_level": null,
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
+      "confidence_score": null,
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        3,
+        5,
+        9,
+        16
+      ],
+      "last_session_id": "N2-001",
+      "attempt_history": [
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "最後",
+          "scored_reading_or_meaning": false
+        }
+      ],
+      "character_level_ceiling": "N3",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
+    },
+    "開店": {
+      "type": "compound",
+      "source_level": null,
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not enough delayed independent assessments for reliable forgetting trend; story self-report is a real difficulty signal, not a graded reading/meaning test.",
+      "confidence_score": null,
+      "confidence_note": "Latest story self-report indicates difficulty; reading and meaning not independently tested.",
+      "classification": "weak_self_report_requires_delayed_recheck",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        3,
+        5,
+        9,
+        16
+      ],
+      "last_session_id": "N2-001",
+      "attempt_history": [
+        {
+          "session_id": "N2-001",
+          "date": "2026-10-15",
+          "grade": "self_report_weak",
+          "reading": "unassessed",
+          "meaning": "unassessed",
+          "reported_surface": "開店",
+          "scored_reading_or_meaning": false
+        }
+      ],
+      "character_level_ceiling": "N4",
+      "self_report_weak_count": 1,
+      "last_evidence_kind": "self_report_weak_reading_or_meaning_unspecified"
     }
   }
 }
