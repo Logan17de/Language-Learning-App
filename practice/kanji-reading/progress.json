@@ -1,8 +1,8 @@
 {
   "version": 1,
   "source": "Kanji Recall v32",
-  "current_level": "N2",
-  "last_lesson": "N2-003",
+  "current_level": "N4",
+  "last_lesson": "N5N4-001",
   "states": [
     "strong",
     "familiar",
@@ -2297,7 +2297,7 @@
     {
       "lesson_id": "N2-003",
       "level": "N2",
-      "feedback_status": "awaiting_feedback",
+      "feedback_status": "paused_unfinished",
       "session_type": "contextual_story",
       "date": "2026-10-15",
       "line_count": 10,
@@ -2322,7 +2322,53 @@
       ],
       "word_status_changes_applied": false,
       "component_kanji_status_changes_applied": false,
-      "note": "Two prior weak whole words and twelve new target words. Await learner feedback before grading."
+      "note": "Two prior weak whole words and twelve new target words. Await learner feedback before grading.",
+      "pause_date": "2026-10-15",
+      "pause_reason": "User requested completing N5 and N4 before new N3/N2 vocabulary; no learner feedback provided and no score assigned",
+      "can_resume": true
+    },
+    {
+      "lesson_id": "N5N4-001",
+      "level": "N4",
+      "level_mix": [
+        "N5",
+        "N4"
+      ],
+      "feedback_status": "awaiting_feedback",
+      "session_type": "contextual_story",
+      "date": "2026-10-15",
+      "line_count": 10,
+      "story_path": "practice/kanji-reading/stories/N5N4-001.md",
+      "carryover_targets": [
+        "放送",
+        "渡す"
+      ],
+      "new_focus_targets": [
+        "家族",
+        "食堂",
+        "朝食",
+        "試食",
+        "新聞紙",
+        "親切",
+        "注文",
+        "昼食",
+        "屋上",
+        "歌手",
+        "計画",
+        "会計",
+        "代金",
+        "多数",
+        "住民",
+        "運ぶ"
+      ],
+      "new_focus_phone_state_summary": {
+        "weak": 14,
+        "unknown": 2
+      },
+      "phone_snapshot_date": "2026-10-15T07:45:26.174Z",
+      "word_status_changes_applied": false,
+      "component_kanji_status_changes_applied": false,
+      "note": "User selected N5/N4 weakness cleanup before returning to N3/N2. First exposure only, no completion or correctness inferred. Two carryovers from previously completed N2-002 feedback are N4 放送 and N5 渡す. Some lower-level vocabulary cards can contain higher-level component characters; no N1 characters."
     }
   ],
   "last_completed_lesson": "N2-002",
@@ -2342,12 +2388,37 @@
       "reason": "Learner explicitly requests N5-through-N2 comprehensive preparation within 30 days, including kanji+kana and compound vocabulary",
       "mastery_override": true,
       "prior_progress_retained": true
+    },
+    {
+      "date": "2026-10-15",
+      "from": "N2",
+      "to": "N4",
+      "reason": "User explicitly reprioritized N5 and N4 vocabulary first while retaining JLPT N2 exam ceiling and all historical N3/N2 learning records.",
+      "mastery_override": false,
+      "completion_claim": false,
+      "temporary_curriculum_phase": "N5-N4-first"
     }
   ],
   "review_policy": "Keep per-target vocabulary reading and meaning evidence separate; wrong compounds or conjugated forms do not automatically demote individual component characters. Mix weak, critical, familiar and mastered using 50/25/15/10 proportions where verified accuracy exists; classify untested as unknown, not critical. Rotate missed targets across intervening items and sessions (1, 3, 7, 14), with successful items at 7, 14 and 30 sessions.",
   "next_lesson_priorities": {
-    "level": "N2",
+    "level": "N4",
     "prioritize_weak_vocabulary": [
+      "放送",
+      "渡す",
+      "家族",
+      "食堂",
+      "朝食",
+      "試食",
+      "新聞紙",
+      "親切",
+      "注文",
+      "昼食",
+      "屋上",
+      "歌手",
+      "計画",
+      "会計",
+      "代金",
+      "運ぶ",
       "事件",
       "放送",
       "勝手",
@@ -2434,22 +2505,26 @@
       "下りる"
     ],
     "policy": "All N5–N2 permitted; N1 prohibited. Whole-word assessment controls review; do not change independent character status from compound mistakes.",
-    "active_lesson": "N2-003",
+    "active_lesson": "N5N4-001",
     "reviewing_now": [
-      "改札",
-      "連絡",
-      "預ける",
-      "記録",
-      "番号",
-      "時刻表",
-      "比べる",
-      "印刷",
-      "発見",
-      "切符",
-      "期限",
-      "交換",
-      "指示",
-      "相談"
+      "放送",
+      "渡す",
+      "家族",
+      "食堂",
+      "朝食",
+      "試食",
+      "新聞紙",
+      "親切",
+      "注文",
+      "昼食",
+      "屋上",
+      "歌手",
+      "計画",
+      "会計",
+      "代金",
+      "多数",
+      "住民",
+      "運ぶ"
     ],
     "app_unknown_now": [
       "特色",
@@ -2467,7 +2542,7 @@
       "夕日",
       "通る"
     ],
-    "next_requested": "N2-004",
+    "next_requested": "N5N4-002",
     "n5_component_review_without_single_char_demotion": [
       "金",
       "外"
@@ -2491,7 +2566,23 @@
     "ten_lines_per_story": true,
     "new_session_id": "N2-D01-baseline",
     "next_story_carryover_count": 2,
-    "next_story_selection": "After feedback, carry exactly two previously targeted vocabulary words, prioritizing difficult ones, and add new N5-N2 targets. Do not repeat one weak word back-to-back."
+    "next_story_selection": "Maintain exactly two carryover whole-word targets chosen from previous finished reading feedback; remaining target vocabulary must be from N5/N4 original APK catalog. Include weak and unknown words, both kana+kanji and compounds, keeping N1 characters excluded. Story exposure is not graded.",
+    "prioritize_levels": [
+      "N5",
+      "N4"
+    ],
+    "exclude_new_target_levels": [
+      "N3",
+      "N2"
+    ],
+    "prioritize_unknown_vocabulary": [
+      "多数",
+      "住民",
+      "可決",
+      "建築",
+      "早退"
+    ],
+    "paused_unfinished_lesson": "N2-003"
   },
   "app_export_snapshot": {
     "source_path": "practice/kanji-reading/app-exports/kanji-recall-2026-10-14-export.json",
@@ -2565,7 +2656,21 @@
     "planning_file": "practice/kanji-reading/N2-30-day-plan-2026-10-15.md",
     "current_session_number": 1,
     "last_practice_session": "N2-D01-BASELINE",
-    "last_practice_date": "2026-10-15"
+    "last_practice_date": "2026-10-15",
+    "active_target_levels": [
+      "N5",
+      "N4"
+    ],
+    "paused_new_target_levels": [
+      "N3",
+      "N2"
+    ],
+    "study_order": "Finish comprehensive N5/N4 vocabulary recall and review before introducing new N3/N2 targets; then resume N2 exam prep.",
+    "current_phase": "N5_N4_first",
+    "low_level_cards_total": 1012,
+    "low_level_self_report_weak_unknown": 447,
+    "low_level_snapshot_generated_at": "2026-10-15T07:45:26.174Z",
+    "coverage_deadline_unchanged": "2026-11-13"
   },
   "last_completed_practice_session": "N2-002",
   "story_review_workflow": {
