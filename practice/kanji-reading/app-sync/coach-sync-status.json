@@ -3,8 +3,8 @@
   "lastReconciledDate": "2026-10-15",
   "sourceSnapshot": {
     "file": "practice/kanji-reading/app-sync/current.json",
-    "sha": "8f4a02797a78229d2f74292bbf0d5e6704feec58",
-    "generatedAt": "2026-10-15T06:54:36.955Z"
+    "sha": "d11d1b5b2fd36fadcf1bedb2c65d0ba9cd645b99",
+    "generatedAt": "2026-10-15T07:45:26.174Z"
   },
   "coachToPhone": {
     "file": "practice/kanji-reading/app-sync/overrides.json",
@@ -13,8 +13,10 @@
     "pendingOverrides": 28,
     "weak": 22,
     "familiar": 6,
-    "phoneReceiptVerified": false,
-    "awaitingNextPhoneSync": true
+    "phoneReceiptVerified": true,
+    "awaitingNextPhoneSync": false,
+    "verifiedMatchingStates": 28,
+    "verificationMethod": "Newer phone-uploaded current.json shows all 28 exact-card memoryState values matching overrides; revision IDs are not exposed by snapshot, so applied revisions cannot independently be proven."
   },
   "recentStoryFeedback": {
     "weakWordTargets": 33,
@@ -40,5 +42,16 @@
     "No override for kana|開く because the card's あく reading differs from the story's 開いて sense.",
     "Phone uploads current snapshot before applying overrides; user may need two Sync now taps. Verify a future uploaded snapshot before claiming applied."
   ],
-  "lastKnownStatus": "committed_to_github_not_verified_on_phone"
+  "lastKnownStatus": "newer_phone_snapshot_matches_all_28_intended_states",
+  "lastVerifiedDate": "2026-10-15",
+  "activeCurriculum": {
+    "examCeiling": "N2",
+    "currentFocus": [
+      "N5",
+      "N4"
+    ],
+    "newStory": "N5N4-001",
+    "phoneN5N4WeakUnknown": 447,
+    "notes": "User explicitly prioritized N5/N4 before new N3/N2; no phone override added for new story exposure."
+  }
 }
