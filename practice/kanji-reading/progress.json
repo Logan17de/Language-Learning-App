@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Kanji Recall v32",
   "current_level": "N2",
-  "last_lesson": "N4-005",
+  "last_lesson": "N2-001",
   "states": [
     "strong",
     "familiar",
@@ -1287,6 +1287,38 @@
       "app_export_historical_states_unmodified": true,
       "component_kanji_statuses_unmodified": true,
       "session_file": "practice/kanji-reading/sessions/2026-10-15-N2-baseline.json"
+    },
+    {
+      "lesson_id": "N2-001",
+      "level": "N2",
+      "feedback_status": "awaiting_feedback",
+      "session_type": "contextual_story",
+      "date": "2026-10-15",
+      "line_count": 10,
+      "story_path": "practice/kanji-reading/stories/N2-001.md",
+      "carryover_targets": [
+        "特色",
+        "休業"
+      ],
+      "additional_focus_targets": [
+        "調査",
+        "設備",
+        "取り消す",
+        "腰掛ける",
+        "状況",
+        "混じる",
+        "用いる",
+        "帰す",
+        "片付く"
+      ],
+      "supporting_review_targets": [
+        "主人",
+        "走り出す"
+      ],
+      "word_status_changes_applied": false,
+      "component_kanji_status_changes_applied": false,
+      "method": "Learner reads without furigana, romaji, or translations; reports exact difficult words. After feedback, update whole-word tracking; next story carries exactly two prior focus targets and introduces new targets. No unsolicited vocabulary explanations.",
+      "note": "Current story is assigned but not scored. Do not infer any familiarity or mastery from its appearance."
     }
   ],
   "last_completed_lesson": "N5-001",
@@ -1371,20 +1403,19 @@
       "下りる"
     ],
     "policy": "All N5–N2 permitted; N1 prohibited. Whole-word assessment controls review; do not change independent character status from compound mistakes.",
-    "active_lesson": "N2-D01-BASELINE",
+    "active_lesson": "N2-001",
     "reviewing_now": [
       "特色",
-      "混じる",
+      "休業",
       "調査",
-      "片付く",
-      "腰掛ける",
+      "設備",
       "取り消す",
+      "腰掛ける",
       "状況",
+      "混じる",
       "用いる",
       "帰す",
-      "走り出す",
-      "設備",
-      "超える"
+      "片付く"
     ],
     "app_unknown_now": [
       "特色",
@@ -1402,7 +1433,7 @@
       "夕日",
       "通る"
     ],
-    "next_requested": "N2-D02",
+    "next_requested": "N2-002",
     "n5_component_review_without_single_char_demotion": [
       "金",
       "外"
@@ -1424,7 +1455,9 @@
       "主人": "Recognized after initial hesitation; improve recall speed."
     },
     "ten_lines_per_story": true,
-    "new_session_id": "N2-D01-baseline"
+    "new_session_id": "N2-D01-baseline",
+    "next_story_carryover_count": 2,
+    "next_story_selection": "After feedback, carry exactly two previously targeted vocabulary words, prioritizing difficult ones, and add new N5-N2 targets. Do not repeat one weak word back-to-back."
   },
   "app_export_snapshot": {
     "source_path": "practice/kanji-reading/app-exports/kanji-recall-2026-10-14-export.json",
@@ -1464,7 +1497,9 @@
   "story_format_policy": {
     "max_lines": 10,
     "exactly_10_lines": true,
-    "description": "Exactly ten Japanese story lines per review story; no furigana unless requested; only N5–N2 kanji, not N1."
+    "description": "Exactly ten Japanese story lines per review story; no furigana unless requested; only N5–N2 kanji, not N1.",
+    "word_meaning_explanations": "Never volunteer explanations or translations; learner prefers to study difficult words independently.",
+    "selection_method": "Exactly two carryover target vocabulary words plus new target words in each following story; varied contexts and delayed rotation."
   },
   "study_goal": {
     "start_date": "2026-10-15",
@@ -1498,5 +1533,18 @@
     "last_practice_session": "N2-D01-BASELINE",
     "last_practice_date": "2026-10-15"
   },
-  "last_completed_practice_session": "N2-D01-BASELINE"
+  "last_completed_practice_session": "N2-D01-BASELINE",
+  "story_review_workflow": {
+    "on_story_assignment": "No grading from merely appearing; mark awaiting feedback.",
+    "on_learner_feedback": "Record only the exact reported words, distinguishing unknown reading, unknown meaning and hesitation when supplied; do not change individual kanji statuses from compound errors.",
+    "github": "Update progress.json, word-review-stats.json and session record after explicit feedback, then commit and generate next story.",
+    "next_story_carryover": 2,
+    "allowed_levels": [
+      "N5",
+      "N4",
+      "N3",
+      "N2"
+    ],
+    "prohibit_level": "N1"
+  }
 }
