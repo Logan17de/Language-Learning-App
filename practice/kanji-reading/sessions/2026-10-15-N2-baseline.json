@@ -1,0 +1,838 @@
+{
+  "session_id": "N2-D01-BASELINE",
+  "session_number": 1,
+  "date": "2026-10-15",
+  "kind": "N5-to-N2 mixed vocabulary reading-and-meaning baseline",
+  "scope": "complete vocabulary word, never component kanji",
+  "scoring_policy": "Both reading and meaning must be accurate for full credit; correct readings with approximate meanings earn partial/no full credit. Long-vowel romanization omitting macrons was accepted.",
+  "summary": {
+    "questions": 24,
+    "full_correct": 12,
+    "partial": 3,
+    "incorrect_meaning": 1,
+    "unknown": 8,
+    "reading_correct": 16,
+    "reading_accuracy_percent": 66.67,
+    "full_answer_accuracy_percent": 50,
+    "meaning_fully_correct": 12
+  },
+  "items": [
+    {
+      "number": 1,
+      "target": "特色",
+      "type": "compound",
+      "source_level": "N4",
+      "answer": {
+        "reading": "tokushoku",
+        "meaning": "special"
+      },
+      "expected": {
+        "reading": "とくしょく",
+        "meaning": "distinctive feature; characteristic"
+      },
+      "grade": "partial",
+      "reading_result": "correct",
+      "meaning_result": "partial",
+      "full_credit": false,
+      "review_after_sessions": [
+        1,
+        3,
+        7,
+        14
+      ],
+      "next_review_session_numbers": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "unknown"
+      },
+      "previous_manual_status": "weak"
+    },
+    {
+      "number": 2,
+      "target": "混じる",
+      "type": "kana-kanji",
+      "source_level": "N2",
+      "answer": {
+        "reading": null,
+        "meaning": null
+      },
+      "expected": {
+        "reading": "まじる",
+        "meaning": "to be mixed in; mix with"
+      },
+      "grade": "unknown",
+      "reading_result": "unknown",
+      "meaning_result": "unknown",
+      "full_credit": false,
+      "review_after_sessions": [
+        1,
+        3,
+        7,
+        14
+      ],
+      "next_review_session_numbers": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "app_memory_at_export": {
+        "level": "N2",
+        "status": "unknown"
+      },
+      "previous_manual_status": null
+    },
+    {
+      "number": 3,
+      "target": "下りる",
+      "type": "kana-kanji",
+      "source_level": "N4",
+      "answer": {
+        "reading": "oriru",
+        "meaning": "to decend"
+      },
+      "expected": {
+        "reading": "おりる",
+        "meaning": "to descend; go down"
+      },
+      "grade": "correct",
+      "reading_result": "correct",
+      "meaning_result": "correct",
+      "full_credit": true,
+      "review_after_sessions": [
+        7,
+        14,
+        30
+      ],
+      "next_review_session_numbers": [
+        8,
+        15,
+        31
+      ],
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "familiar"
+      },
+      "previous_manual_status": "weak"
+    },
+    {
+      "number": 4,
+      "target": "主人",
+      "type": "compound",
+      "source_level": "N4",
+      "answer": {
+        "reading": "shujin",
+        "meaning": "main person, owner, husband"
+      },
+      "expected": {
+        "reading": "しゅじん",
+        "meaning": "husband; master; owner"
+      },
+      "grade": "correct",
+      "reading_result": "correct",
+      "meaning_result": "correct",
+      "full_credit": true,
+      "review_after_sessions": [
+        7,
+        14,
+        30
+      ],
+      "next_review_session_numbers": [
+        8,
+        15,
+        31
+      ],
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "weak"
+      },
+      "previous_manual_status": "familiar"
+    },
+    {
+      "number": 5,
+      "target": "飲料",
+      "type": "compound",
+      "source_level": "N4",
+      "answer": {
+        "reading": "inryo",
+        "meaning": "beverages"
+      },
+      "expected": {
+        "reading": "いんりょう",
+        "meaning": "beverage; drink"
+      },
+      "grade": "correct",
+      "reading_result": "correct",
+      "meaning_result": "correct",
+      "full_credit": true,
+      "review_after_sessions": [
+        7,
+        14,
+        30
+      ],
+      "next_review_session_numbers": [
+        8,
+        15,
+        31
+      ],
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "weak"
+      },
+      "previous_manual_status": "weak"
+    },
+    {
+      "number": 6,
+      "target": "調査",
+      "type": "compound",
+      "source_level": "N2",
+      "answer": {
+        "reading": null,
+        "meaning": null
+      },
+      "expected": {
+        "reading": "ちょうさ",
+        "meaning": "investigation; survey"
+      },
+      "grade": "unknown",
+      "reading_result": "unknown",
+      "meaning_result": "unknown",
+      "full_credit": false,
+      "review_after_sessions": [
+        1,
+        3,
+        7,
+        14
+      ],
+      "next_review_session_numbers": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "app_memory_at_export": null,
+      "previous_manual_status": null
+    },
+    {
+      "number": 7,
+      "target": "片付く",
+      "type": "kana-kanji",
+      "source_level": "N2",
+      "answer": {
+        "reading": null,
+        "meaning": null
+      },
+      "expected": {
+        "reading": "かたづく",
+        "meaning": "to be tidied up; be settled"
+      },
+      "grade": "unknown",
+      "reading_result": "unknown",
+      "meaning_result": "unknown",
+      "full_credit": false,
+      "review_after_sessions": [
+        1,
+        3,
+        7,
+        14
+      ],
+      "next_review_session_numbers": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "app_memory_at_export": {
+        "level": "N2",
+        "status": "weak"
+      },
+      "previous_manual_status": null
+    },
+    {
+      "number": 8,
+      "target": "日本語",
+      "type": "compound",
+      "source_level": "N5",
+      "answer": {
+        "reading": "nihongo",
+        "meaning": "Japanese language"
+      },
+      "expected": {
+        "reading": "にほんご",
+        "meaning": "Japanese language"
+      },
+      "grade": "correct",
+      "reading_result": "correct",
+      "meaning_result": "correct",
+      "full_credit": true,
+      "review_after_sessions": [
+        7,
+        14,
+        30
+      ],
+      "next_review_session_numbers": [
+        8,
+        15,
+        31
+      ],
+      "app_memory_at_export": {
+        "level": "N5",
+        "status": "mastered"
+      },
+      "previous_manual_status": "strong"
+    },
+    {
+      "number": 9,
+      "target": "用紙",
+      "type": "compound",
+      "source_level": "N4",
+      "answer": {
+        "reading": "youshi",
+        "meaning": "sheet"
+      },
+      "expected": {
+        "reading": "ようし",
+        "meaning": "form; sheet of paper"
+      },
+      "grade": "correct",
+      "reading_result": "correct",
+      "meaning_result": "correct",
+      "full_credit": true,
+      "review_after_sessions": [
+        7,
+        14,
+        30
+      ],
+      "next_review_session_numbers": [
+        8,
+        15,
+        31
+      ],
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "unknown"
+      },
+      "previous_manual_status": "weak"
+    },
+    {
+      "number": 10,
+      "target": "腰掛ける",
+      "type": "kana-kanji",
+      "source_level": "N2",
+      "answer": {
+        "reading": null,
+        "meaning": null
+      },
+      "expected": {
+        "reading": "こしかける",
+        "meaning": "to sit down; take a seat"
+      },
+      "grade": "unknown",
+      "reading_result": "unknown",
+      "meaning_result": "unknown",
+      "full_credit": false,
+      "review_after_sessions": [
+        1,
+        3,
+        7,
+        14
+      ],
+      "next_review_session_numbers": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "app_memory_at_export": {
+        "level": "N2",
+        "status": "unknown"
+      },
+      "previous_manual_status": null
+    },
+    {
+      "number": 11,
+      "target": "取り消す",
+      "type": "kana-kanji",
+      "source_level": "N2",
+      "answer": {
+        "reading": "torikesu",
+        "meaning": "erase?"
+      },
+      "expected": {
+        "reading": "とりけす",
+        "meaning": "cancel; revoke; withdraw"
+      },
+      "grade": "incorrect_meaning",
+      "reading_result": "correct",
+      "meaning_result": "incorrect",
+      "full_credit": false,
+      "review_after_sessions": [
+        1,
+        3,
+        7,
+        14
+      ],
+      "next_review_session_numbers": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "app_memory_at_export": {
+        "level": "N2",
+        "status": "weak"
+      },
+      "previous_manual_status": null
+    },
+    {
+      "number": 12,
+      "target": "会議",
+      "type": "compound",
+      "source_level": "N4",
+      "answer": {
+        "reading": "kaigi",
+        "meaning": "meeting"
+      },
+      "expected": {
+        "reading": "かいぎ",
+        "meaning": "meeting; conference"
+      },
+      "grade": "correct",
+      "reading_result": "correct",
+      "meaning_result": "correct",
+      "full_credit": true,
+      "review_after_sessions": [
+        7,
+        14,
+        30
+      ],
+      "next_review_session_numbers": [
+        8,
+        15,
+        31
+      ],
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "familiar"
+      },
+      "previous_manual_status": null
+    },
+    {
+      "number": 13,
+      "target": "休業",
+      "type": "compound",
+      "source_level": "N4",
+      "answer": {
+        "reading": "kyuugyou",
+        "meaning": "temp. close of business?"
+      },
+      "expected": {
+        "reading": "きゅうぎょう",
+        "meaning": "temporary closure of business; suspension of operations"
+      },
+      "grade": "correct",
+      "reading_result": "correct",
+      "meaning_result": "correct",
+      "full_credit": true,
+      "review_after_sessions": [
+        7,
+        14,
+        30
+      ],
+      "next_review_session_numbers": [
+        8,
+        15,
+        31
+      ],
+      "app_memory_at_export": null,
+      "previous_manual_status": "weak"
+    },
+    {
+      "number": 14,
+      "target": "状況",
+      "type": "compound",
+      "source_level": "N2",
+      "answer": {
+        "reading": null,
+        "meaning": null
+      },
+      "expected": {
+        "reading": "じょうきょう",
+        "meaning": "situation; circumstances"
+      },
+      "grade": "unknown",
+      "reading_result": "unknown",
+      "meaning_result": "unknown",
+      "full_credit": false,
+      "review_after_sessions": [
+        1,
+        3,
+        7,
+        14
+      ],
+      "next_review_session_numbers": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "app_memory_at_export": null,
+      "previous_manual_status": null
+    },
+    {
+      "number": 15,
+      "target": "用いる",
+      "type": "kana-kanji",
+      "source_level": "N3",
+      "answer": {
+        "reading": null,
+        "meaning": null
+      },
+      "expected": {
+        "reading": "もちいる",
+        "meaning": "to use; employ"
+      },
+      "grade": "unknown",
+      "reading_result": "unknown",
+      "meaning_result": "unknown",
+      "full_credit": false,
+      "review_after_sessions": [
+        1,
+        3,
+        7,
+        14
+      ],
+      "next_review_session_numbers": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "app_memory_at_export": {
+        "level": "N3",
+        "status": "weak"
+      },
+      "previous_manual_status": null
+    },
+    {
+      "number": 16,
+      "target": "食べる",
+      "type": "kana-kanji",
+      "source_level": "N5",
+      "answer": {
+        "reading": "taberu",
+        "meaning": "eat"
+      },
+      "expected": {
+        "reading": "たべる",
+        "meaning": "to eat"
+      },
+      "grade": "correct",
+      "reading_result": "correct",
+      "meaning_result": "correct",
+      "full_credit": true,
+      "review_after_sessions": [
+        7,
+        14,
+        30
+      ],
+      "next_review_session_numbers": [
+        8,
+        15,
+        31
+      ],
+      "app_memory_at_export": {
+        "level": "N5",
+        "status": "mastered"
+      },
+      "previous_manual_status": null
+    },
+    {
+      "number": 17,
+      "target": "屋外",
+      "type": "compound",
+      "source_level": "N4",
+      "answer": {
+        "reading": "okugai",
+        "meaning": "outdoors"
+      },
+      "expected": {
+        "reading": "おくがい",
+        "meaning": "outdoors; outside a building"
+      },
+      "grade": "correct",
+      "reading_result": "correct",
+      "meaning_result": "correct",
+      "full_credit": true,
+      "review_after_sessions": [
+        7,
+        14,
+        30
+      ],
+      "next_review_session_numbers": [
+        8,
+        15,
+        31
+      ],
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "weak"
+      },
+      "previous_manual_status": "weak"
+    },
+    {
+      "number": 18,
+      "target": "帰す",
+      "type": "kana-kanji",
+      "source_level": "N2",
+      "answer": {
+        "reading": "kaesu",
+        "meaning": "to return"
+      },
+      "expected": {
+        "reading": "かえす",
+        "meaning": "to send someone home; let someone return"
+      },
+      "grade": "partial",
+      "reading_result": "correct",
+      "meaning_result": "partial",
+      "full_credit": false,
+      "review_after_sessions": [
+        1,
+        3,
+        7,
+        14
+      ],
+      "next_review_session_numbers": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "app_memory_at_export": {
+        "level": "N2",
+        "status": "familiar"
+      },
+      "previous_manual_status": null
+    },
+    {
+      "number": 19,
+      "target": "走り出す",
+      "type": "kana-kanji",
+      "source_level": "N4",
+      "answer": {
+        "reading": "hashiridasu",
+        "meaning": "to go run"
+      },
+      "expected": {
+        "reading": "はしりだす",
+        "meaning": "to start running; break into a run"
+      },
+      "grade": "partial",
+      "reading_result": "correct",
+      "meaning_result": "partial",
+      "full_credit": false,
+      "review_after_sessions": [
+        1,
+        3,
+        7,
+        14
+      ],
+      "next_review_session_numbers": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "app_memory_at_export": null,
+      "previous_manual_status": "weak"
+    },
+    {
+      "number": 20,
+      "target": "設備",
+      "type": "compound",
+      "source_level": "N2",
+      "answer": {
+        "reading": null,
+        "meaning": null
+      },
+      "expected": {
+        "reading": "せつび",
+        "meaning": "equipment; facilities"
+      },
+      "grade": "unknown",
+      "reading_result": "unknown",
+      "meaning_result": "unknown",
+      "full_credit": false,
+      "review_after_sessions": [
+        1,
+        3,
+        7,
+        14
+      ],
+      "next_review_session_numbers": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "app_memory_at_export": null,
+      "previous_manual_status": null
+    },
+    {
+      "number": 21,
+      "target": "中止",
+      "type": "compound",
+      "source_level": "N4",
+      "answer": {
+        "reading": "chushi",
+        "meaning": "cancel"
+      },
+      "expected": {
+        "reading": "ちゅうし",
+        "meaning": "cancellation; suspension; discontinuation"
+      },
+      "grade": "correct",
+      "reading_result": "correct",
+      "meaning_result": "correct",
+      "full_credit": true,
+      "review_after_sessions": [
+        7,
+        14,
+        30
+      ],
+      "next_review_session_numbers": [
+        8,
+        15,
+        31
+      ],
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "unknown"
+      },
+      "previous_manual_status": "weak"
+    },
+    {
+      "number": 22,
+      "target": "決める",
+      "type": "kana-kanji",
+      "source_level": "N4",
+      "answer": {
+        "reading": "kimeru",
+        "meaning": "decide"
+      },
+      "expected": {
+        "reading": "きめる",
+        "meaning": "to decide"
+      },
+      "grade": "correct",
+      "reading_result": "correct",
+      "meaning_result": "correct",
+      "full_credit": true,
+      "review_after_sessions": [
+        7,
+        14,
+        30
+      ],
+      "next_review_session_numbers": [
+        8,
+        15,
+        31
+      ],
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "familiar"
+      },
+      "previous_manual_status": null
+    },
+    {
+      "number": 23,
+      "target": "超える",
+      "type": "kana-kanji",
+      "source_level": "N2",
+      "answer": {
+        "reading": null,
+        "meaning": null
+      },
+      "expected": {
+        "reading": "こえる",
+        "meaning": "to exceed; go beyond"
+      },
+      "grade": "unknown",
+      "reading_result": "unknown",
+      "meaning_result": "unknown",
+      "full_credit": false,
+      "review_after_sessions": [
+        1,
+        3,
+        7,
+        14
+      ],
+      "next_review_session_numbers": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "app_memory_at_export": {
+        "level": "N2",
+        "status": "unknown"
+      },
+      "previous_manual_status": null
+    },
+    {
+      "number": 24,
+      "target": "通る",
+      "type": "kana-kanji",
+      "source_level": "N4",
+      "answer": {
+        "reading": "tooru",
+        "meaning": "to pass thru"
+      },
+      "expected": {
+        "reading": "とおる",
+        "meaning": "to pass through; go along"
+      },
+      "grade": "correct",
+      "reading_result": "correct",
+      "meaning_result": "correct",
+      "full_credit": true,
+      "review_after_sessions": [
+        7,
+        14,
+        30
+      ],
+      "next_review_session_numbers": [
+        8,
+        15,
+        31
+      ],
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "weak"
+      },
+      "previous_manual_status": "weak"
+    }
+  ],
+  "review_policy": {
+    "missed_session_offsets": [
+      1,
+      3,
+      7,
+      14
+    ],
+    "correct_session_offsets": [
+      7,
+      14,
+      30
+    ],
+    "minimum_intervening_targets": 3
+  },
+  "story_review_status": "Generated in conversation after results",
+  "preserve_app_snapshot": true
+}
