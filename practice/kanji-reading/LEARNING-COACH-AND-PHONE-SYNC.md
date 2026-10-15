@@ -31,6 +31,9 @@ Maintain independently for each directly tested character and each exact vocabul
 - Prefer delayed recall, interleaving, contextual use, and months-long retention over short-term quiz scores.
 
 ## Story-first workflow
+
+**Explicit advance requirement (learner request, 2026-10-15):** After the learner reports difficulty, record and sync it, then stop. **Never generate, display, or activate the next story unless the learner explicitly says “next story” or clearly requests another story.** Prepared story `N5N4-002.md` remains on hold until expressly requested. Asking to update statistics or phone sync does NOT authorize story advancement. The user studies reported words independently; do not explain reading/meaning unless explicitly asked.
+
 - User reads a short, memorable Japanese story using N5–N2 characters only, then reports exact difficult words. Do not automatically treat reading the story as a graded answer.
 - Prioritize weak and critical exact targets in funny, visual, emotional, or absurd but natural stories. Mix familiar/mastered words for support. Avoid N1. Add furigana or English meanings **when the user asks**; otherwise retain the established no-furigana story-first workflow.
 - Space target repetitions, including within stories; do not place the same weak target repeatedly in consecutive prompts.
