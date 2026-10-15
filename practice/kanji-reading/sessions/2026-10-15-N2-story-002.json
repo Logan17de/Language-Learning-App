@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "session_id": "N2-002",
+  "session_number": 3,
+  "date": "2026-10-15",
+  "kind": "contextual_story_word_feedback",
+  "story_path": "practice/kanji-reading/stories/N2-002.md",
+  "feedback_status": "completed",
+  "reported_weak_count": 17,
+  "reading_and_meaning_not_independently_scored": true,
+  "no_component_kanji_demotion": true,
+  "unreported_words_not_scored": true,
+  "items": [
+    {
+      "reported_surface": "事件",
+      "target": "事件",
+      "type": "compound",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "放送",
+      "target": "放送",
+      "type": "compound",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "勝手",
+      "target": "勝手",
+      "type": "compound",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "現れ",
+      "target": "現れる",
+      "type": "kana-kanji",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "行動",
+      "target": "行動",
+      "type": "compound",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "改札",
+      "target": "改札",
+      "type": "compound",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "拾った",
+      "target": "拾う",
+      "type": "kana-kanji",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "資料",
+      "target": "資料",
+      "type": "compound",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "粉",
+      "target": "粉",
+      "type": "single-word",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "突然",
+      "target": "突然",
+      "type": "compound",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "受",
+      "target": "受け取る",
+      "type": "kana-kanji",
+      "grade": "self_report_weak",
+      "context": "受け取って"
+    },
+    {
+      "reported_surface": "戻る",
+      "target": "戻る",
+      "type": "kana-kanji",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "渡した",
+      "target": "渡す",
+      "type": "kana-kanji",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "連絡",
+      "target": "連絡",
+      "type": "compound",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "本部",
+      "target": "本部",
+      "type": "compound",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "叫び",
+      "target": "叫ぶ",
+      "type": "kana-kanji",
+      "grade": "self_report_weak",
+      "context": null
+    },
+    {
+      "reported_surface": "込んで",
+      "target": "飛び込む",
+      "type": "kana-kanji",
+      "grade": "self_report_weak",
+      "context": "飛び込んで"
+    }
+  ],
+  "next_story": "N2-003",
+  "next_carryover_targets": [
+    "改札",
+    "連絡"
+  ]
+}
