@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "session_id": "N2-001",
+  "session_number": 2,
+  "date": "2026-10-15",
+  "kind": "contextual_story_word_feedback",
+  "story_path": "practice/kanji-reading/stories/N2-001.md",
+  "target_scope": "complete_word_only",
+  "reporting_method": "Learner supplied exact difficult surfaces without separating reading and meaning",
+  "feedback_status": "completed",
+  "reported_weak_count": 16,
+  "graded_correct_count": null,
+  "graded_reading_or_meaning_count": 0,
+  "unreported_words_status": "unassessed_no_success_inferred",
+  "component_kanji_status_changes": 0,
+  "items": [
+    {
+      "reported_surface": "理由",
+      "target": "理由",
+      "type": "compound",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N3"
+    },
+    {
+      "reported_surface": "調査",
+      "target": "調査",
+      "type": "compound",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N2"
+    },
+    {
+      "reported_surface": "設備",
+      "target": "設備",
+      "type": "compound",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N2"
+    },
+    {
+      "reported_surface": "調子",
+      "target": "調子",
+      "type": "compound",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N3"
+    },
+    {
+      "reported_surface": "箱",
+      "target": "箱",
+      "type": "single-word",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N3"
+    },
+    {
+      "reported_surface": "腰掛",
+      "target": "腰掛ける",
+      "type": "kana-kanji",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N2"
+    },
+    {
+      "reported_surface": "状況",
+      "target": "状況",
+      "type": "compound",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N2"
+    },
+    {
+      "reported_surface": "一枚",
+      "target": "一枚",
+      "type": "counter",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N2"
+    },
+    {
+      "reported_surface": "混じる",
+      "target": "混じる",
+      "type": "kana-kanji",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N2"
+    },
+    {
+      "reported_surface": "写っていた",
+      "target": "写る",
+      "type": "kana-kanji",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N4"
+    },
+    {
+      "reported_surface": "機械",
+      "target": "機械",
+      "type": "compound",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N2"
+    },
+    {
+      "reported_surface": "用いたら",
+      "target": "用いる",
+      "type": "kana-kanji",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N4"
+    },
+    {
+      "reported_surface": "床",
+      "target": "床",
+      "type": "single-word",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N2"
+    },
+    {
+      "reported_surface": "散らかった",
+      "target": "散らかる",
+      "type": "kana-kanji",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N3"
+    },
+    {
+      "reported_surface": "最後",
+      "target": "最後",
+      "type": "compound",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N3"
+    },
+    {
+      "reported_surface": "開店",
+      "target": "開店",
+      "type": "compound",
+      "status": "weak",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "reading_result": "unassessed",
+      "meaning_result": "unassessed",
+      "character_level_ceiling": "N4"
+    }
+  ],
+  "next_story": "N2-002",
+  "next_carryover_targets": [
+    "調査",
+    "混じる"
+  ],
+  "next_new_focus_targets": [
+    "地下鉄",
+    "運転",
+    "放送",
+    "事情",
+    "研究者",
+    "協力",
+    "行動",
+    "改札",
+    "資料",
+    "確認",
+    "突然",
+    "降り始める",
+    "受け取る",
+    "連絡",
+    "飛び込む"
+  ]
+}
