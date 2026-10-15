@@ -315,8 +315,14 @@
     "日本語": {
       "status": "strong",
       "type": "compound",
-      "last_lesson": "N5-001",
-      "note": "Read successfully in Story 001 on 2026-10-14."
+      "last_lesson": "N2-D01-BASELINE",
+      "note": "Read successfully in Story 001 on 2026-10-14. 2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall.",
+      "source_level": "N5",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "correct",
+      "reading_verified": true,
+      "meaning_verification": "correct",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
     },
     "名前": {
       "status": "strong",
@@ -417,10 +423,15 @@
     "下りる": {
       "status": "weak",
       "type": "kana",
-      "last_lesson": "N5-002",
-      "note": "Story-context verb (not a verified v32 focus card). Read さがりる; correct おりる (to descend); distinguish 下がる（さがる）. Confirmed as an N4 kana+kanji entry in original APK.",
+      "last_lesson": "N2-D01-BASELINE",
+      "note": "Story-context verb (not a verified v32 focus card). Read さがりる; correct おりる (to descend); distinguish 下がる（さがる）. Confirmed as an N4 kana+kanji entry in original APK. 2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall.",
       "source_level": "N4",
-      "source_id": "OPENJLPT_4806278f5b"
+      "source_id": "OPENJLPT_4806278f5b",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "correct",
+      "reading_verified": true,
+      "meaning_verification": "correct",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
     },
     "開かれる": {
       "status": "weak",
@@ -463,34 +474,49 @@
     },
     "通る": {
       "status": "weak",
-      "last_lesson": "N4-001",
+      "last_lesson": "N2-D01-BASELINE",
       "source_level": "N4",
       "observed_surface": "通って",
       "feedback_kind": "meaning_lookup",
-      "note": "Needed meaning check for 通って; use the same inflection and new contexts. Feedback 2026-10-14.",
+      "note": "Needed meaning check for 通って; use the same inflection and new contexts. Feedback 2026-10-14. 2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall.",
       "source_id": "OPENJLPT_e9c1a3ae2c",
-      "type": "kana"
+      "type": "kana",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "correct",
+      "reading_verified": true,
+      "meaning_verification": "correct",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
     },
     "走り出す": {
       "status": "weak",
-      "last_lesson": "N4-001",
+      "last_lesson": "N2-D01-BASELINE",
       "source_level": "N4",
       "observed_surface": "走り出しました",
       "feedback_kind": "incorrect_reading",
       "attempted_reading": "はしりでました (hashiridemashita)",
       "correct_reading": "はしりだしました (hashiridashimashita)",
-      "note": "Mistaken 出 reading in 走り出す compound: だす rather than でる; review combined verb, plus N5 出. Feedback 2026-10-14.",
-      "type": "contextual-verb"
+      "note": "Mistaken 出 reading in 走り出す compound: だす rather than でる; review combined verb, plus N5 出. Feedback 2026-10-14. 2026-10-15 N2-D01-BASELINE: partial; reading=correct, meaning=partial. Reading correct but meaning incomplete.",
+      "type": "contextual-verb",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "partial",
+      "reading_verified": true,
+      "meaning_verification": "partial",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
     },
     "中止": {
       "status": "weak",
-      "last_lesson": "N4-001",
+      "last_lesson": "N2-D01-BASELINE",
       "source_level": "N4",
       "observed_surface": "中止",
       "feedback_kind": "meaning_lookup",
-      "note": "Needed meaning check for 中止; existing N5 中 remains strong until its specific reading is missed. Feedback 2026-10-14.",
+      "note": "Needed meaning check for 中止; existing N5 中 remains strong until its specific reading is missed. Feedback 2026-10-14. 2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall.",
       "source_id": "N4_V293",
-      "type": "compound"
+      "type": "compound",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "correct",
+      "reading_verified": true,
+      "meaning_verification": "correct",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
     },
     "無事": {
       "status": "weak",
@@ -532,7 +558,7 @@
     },
     "用紙": {
       "status": "weak",
-      "last_lesson": "N4-003",
+      "last_lesson": "N2-D01-BASELINE",
       "reported_surface": "用紙",
       "source_level": "N4",
       "type": "compound",
@@ -540,11 +566,16 @@
       "source_reading": "ようし",
       "prior_app_state": "unknown",
       "feedback_kind": "reading_or_meaning_difficulty_unspecified",
-      "note": "Did not recognize or was unsure of word in N4 Story 003; app previously labeled unknown. Learner report 2026-10-14."
+      "note": "Did not recognize or was unsure of word in N4 Story 003; app previously labeled unknown. Learner report 2026-10-14. 2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall.",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "correct",
+      "reading_verified": true,
+      "meaning_verification": "correct",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
     },
     "特色": {
       "status": "weak",
-      "last_lesson": "N4-004",
+      "last_lesson": "N2-D01-BASELINE",
       "reported_surface": "特色",
       "source_level": "N4",
       "type": "compound",
@@ -552,9 +583,14 @@
       "source_reading": "とくしょく",
       "prior_app_state": "unknown",
       "feedback_kind": "incorrect_reading",
-      "note": "Story N4-004: learner read 特色 as tokushuu; correct とくしょく. Prior N4-003 weak report and app unknown status retained as history. 2026-10-14.",
+      "note": "Story N4-004: learner read 特色 as tokushuu; correct とくしょく. Prior N4-003 weak report and app unknown status retained as history. 2026-10-14. 2026-10-15 N2-D01-BASELINE: partial; reading=correct, meaning=partial. Reading correct but meaning incomplete.",
       "attempted_reading": "とくしゅう (tokushuu)",
-      "correct_reading": "とくしょく (tokushoku)"
+      "correct_reading": "とくしょく (tokushoku)",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "partial",
+      "reading_verified": true,
+      "meaning_verification": "partial",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
     },
     "借金": {
       "status": "weak",
@@ -570,7 +606,7 @@
     },
     "屋外": {
       "status": "weak",
-      "last_lesson": "N4-003",
+      "last_lesson": "N2-D01-BASELINE",
       "reported_surface": "屋外",
       "source_level": "N4",
       "type": "compound",
@@ -578,7 +614,12 @@
       "source_reading": "おくがい",
       "prior_app_state": "weak",
       "feedback_kind": "reading_or_meaning_difficulty_unspecified",
-      "note": "Trouble with word despite previous N5 外 strong in separate context; retain 外 strong, check 屋外 compound. Learner report 2026-10-14."
+      "note": "Trouble with word despite previous N5 外 strong in separate context; retain 外 strong, check 屋外 compound. Learner report 2026-10-14. 2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall.",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "correct",
+      "reading_verified": true,
+      "meaning_verification": "correct",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
     },
     "歌手": {
       "status": "weak",
@@ -594,7 +635,7 @@
     },
     "飲料": {
       "status": "weak",
-      "last_lesson": "N4-003",
+      "last_lesson": "N2-D01-BASELINE",
       "reported_surface": "飲料",
       "source_level": "N4",
       "type": "compound",
@@ -602,7 +643,12 @@
       "source_reading": "いんりょう",
       "prior_app_state": "weak",
       "feedback_kind": "reading_or_meaning_difficulty_unspecified",
-      "note": "Word-level N4 reading/meaning gap; practice in future story. Learner report 2026-10-14."
+      "note": "Word-level N4 reading/meaning gap; practice in future story. Learner report 2026-10-14. 2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall.",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "correct",
+      "reading_verified": true,
+      "meaning_verification": "correct",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
     },
     "広がる": {
       "status": "weak",
@@ -642,7 +688,7 @@
     },
     "休業": {
       "status": "weak",
-      "last_lesson": "N4-004",
+      "last_lesson": "N2-D01-BASELINE",
       "type": "contextual-compound",
       "source_level": "N4+N5",
       "reported_surface": "休業",
@@ -652,11 +698,16 @@
       "reading_verified_by_learner": true,
       "meaning_known": false,
       "source_id": null,
-      "note": "Story N4-004: pronounced 休業 correctly and identified 休 (rest) + 業 (business), but did not know word meaning. Review meaning only; do not demote either component kanji or invent a v32 source card. 2026-10-14."
+      "note": "Story N4-004: pronounced 休業 correctly and identified 休 (rest) + 業 (business), but did not know word meaning. Review meaning only; do not demote either component kanji or invent a v32 source card. 2026-10-14. 2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall.",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "correct",
+      "reading_verified": true,
+      "meaning_verification": "correct",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
     },
     "主人": {
       "status": "familiar",
-      "last_lesson": "N4-004",
+      "last_lesson": "N2-D01-BASELINE",
       "type": "compound",
       "source_level": "N4",
       "source_id": "N4_V083",
@@ -664,7 +715,168 @@
       "reported_surface": "主人",
       "feedback_kind": "hesitant_but_recalled",
       "app_state_at_export": "weak",
-      "note": "Story N4-004: briefly forgot, then could remember. Familiar/slow recall for reinforcement; actual recall delay not measured. More recent user feedback takes precedence over earlier app 'weak' snapshot. 2026-10-14."
+      "note": "Story N4-004: briefly forgot, then could remember. Familiar/slow recall for reinforcement; actual recall delay not measured. More recent user feedback takes precedence over earlier app 'weak' snapshot. 2026-10-14. 2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall.",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "correct",
+      "reading_verified": true,
+      "meaning_verification": "correct",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
+    },
+    "混じる": {
+      "status": "unknown",
+      "type": "kana",
+      "source_level": "N2",
+      "last_lesson": "N2-D01-BASELINE",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "unknown",
+      "reading_verified": false,
+      "meaning_verification": "unknown",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+    },
+    "調査": {
+      "status": "unknown",
+      "type": "compound",
+      "source_level": "N2",
+      "last_lesson": "N2-D01-BASELINE",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "unknown",
+      "reading_verified": false,
+      "meaning_verification": "unknown",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+    },
+    "片付く": {
+      "status": "unknown",
+      "type": "kana",
+      "source_level": "N2",
+      "last_lesson": "N2-D01-BASELINE",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "unknown",
+      "reading_verified": false,
+      "meaning_verification": "unknown",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+    },
+    "腰掛ける": {
+      "status": "unknown",
+      "type": "kana",
+      "source_level": "N2",
+      "last_lesson": "N2-D01-BASELINE",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "unknown",
+      "reading_verified": false,
+      "meaning_verification": "unknown",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+    },
+    "取り消す": {
+      "status": "weak",
+      "type": "kana",
+      "source_level": "N2",
+      "last_lesson": "N2-D01-BASELINE",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "incorrect_meaning",
+      "reading_verified": true,
+      "meaning_verification": "incorrect",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "note": "2026-10-15 N2-D01-BASELINE: incorrect_meaning; reading=correct, meaning=incorrect. Reading correct, meaning incorrect."
+    },
+    "会議": {
+      "status": "familiar",
+      "type": "compound",
+      "source_level": "N4",
+      "last_lesson": "N2-D01-BASELINE",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "correct",
+      "reading_verified": true,
+      "meaning_verification": "correct",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "note": "2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall."
+    },
+    "状況": {
+      "status": "unknown",
+      "type": "compound",
+      "source_level": "N2",
+      "last_lesson": "N2-D01-BASELINE",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "unknown",
+      "reading_verified": false,
+      "meaning_verification": "unknown",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+    },
+    "用いる": {
+      "status": "unknown",
+      "type": "kana",
+      "source_level": "N3",
+      "last_lesson": "N2-D01-BASELINE",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "unknown",
+      "reading_verified": false,
+      "meaning_verification": "unknown",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+    },
+    "食べる": {
+      "status": "familiar",
+      "type": "kana",
+      "source_level": "N5",
+      "last_lesson": "N2-D01-BASELINE",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "correct",
+      "reading_verified": true,
+      "meaning_verification": "correct",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "note": "2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall."
+    },
+    "帰す": {
+      "status": "weak",
+      "type": "kana",
+      "source_level": "N2",
+      "last_lesson": "N2-D01-BASELINE",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "partial",
+      "reading_verified": true,
+      "meaning_verification": "partial",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "note": "2026-10-15 N2-D01-BASELINE: partial; reading=correct, meaning=partial. Reading correct but meaning incomplete."
+    },
+    "設備": {
+      "status": "unknown",
+      "type": "compound",
+      "source_level": "N2",
+      "last_lesson": "N2-D01-BASELINE",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "unknown",
+      "reading_verified": false,
+      "meaning_verification": "unknown",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+    },
+    "決める": {
+      "status": "familiar",
+      "type": "kana",
+      "source_level": "N4",
+      "last_lesson": "N2-D01-BASELINE",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "correct",
+      "reading_verified": true,
+      "meaning_verification": "correct",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "note": "2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall."
+    },
+    "超える": {
+      "status": "unknown",
+      "type": "kana",
+      "source_level": "N2",
+      "last_lesson": "N2-D01-BASELINE",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "unknown",
+      "reading_verified": false,
+      "meaning_verification": "unknown",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
     }
   },
   "lesson_history": [
@@ -1059,6 +1271,22 @@
         "料理"
       ],
       "note": "10 physical lines; previous reader feedback retained; no invented mastery."
+    },
+    {
+      "lesson_id": "N2-D01-BASELINE",
+      "level": "N2",
+      "feedback_status": "completed",
+      "session_type": "mixed_word_reading_and_meaning",
+      "feedback_date": "2026-10-15",
+      "questions": 24,
+      "full_correct": 12,
+      "partial": 3,
+      "incorrect_meaning": 1,
+      "unknown": 8,
+      "reading_correct": 16,
+      "app_export_historical_states_unmodified": true,
+      "component_kanji_statuses_unmodified": true,
+      "session_file": "practice/kanji-reading/sessions/2026-10-15-N2-baseline.json"
     }
   ],
   "last_completed_lesson": "N5-001",
@@ -1085,6 +1313,17 @@
     "level": "N2",
     "prioritize_weak_vocabulary": [
       "特色",
+      "混じる",
+      "調査",
+      "片付く",
+      "腰掛ける",
+      "取り消す",
+      "状況",
+      "用いる",
+      "帰す",
+      "走り出す",
+      "設備",
+      "超える",
       "休業",
       "用紙",
       "借金",
@@ -1098,7 +1337,6 @@
       "書店",
       "道",
       "通る",
-      "走り出す",
       "中止",
       "無事"
     ],
@@ -1132,16 +1370,21 @@
       "一本",
       "下りる"
     ],
-    "policy": "Explicit authorization for all N5 through N2 characters and vocabulary; exclude N1 characters even when a vocabulary source labels the whole entry N2. Prioritize historically weak N5-N4 and add structured N3-N2 coverage. Preserve existing N4-005 feedback pending.",
-    "active_lesson": "N4-005",
+    "policy": "All N5–N2 permitted; N1 prohibited. Whole-word assessment controls review; do not change independent character status from compound mistakes.",
+    "active_lesson": "N2-D01-BASELINE",
     "reviewing_now": [
       "特色",
-      "休業",
-      "主人",
-      "用紙",
-      "飲料",
-      "広がる",
-      "開く"
+      "混じる",
+      "調査",
+      "片付く",
+      "腰掛ける",
+      "取り消す",
+      "状況",
+      "用いる",
+      "帰す",
+      "走り出す",
+      "設備",
+      "超える"
     ],
     "app_unknown_now": [
       "特色",
@@ -1159,7 +1402,7 @@
       "夕日",
       "通る"
     ],
-    "next_requested": "N4-006",
+    "next_requested": "N2-D02",
     "n5_component_review_without_single_char_demotion": [
       "金",
       "外"
@@ -1221,7 +1464,7 @@
   "story_format_policy": {
     "max_lines": 10,
     "exactly_10_lines": true,
-    "description": "Learner requested exactly 10 Japanese story lines per lesson, preserve hard line breaks in Markdown; no furigana; N4+N5 permitted."
+    "description": "Exactly ten Japanese story lines per review story; no furigana unless requested; only N5–N2 kanji, not N1."
   },
   "study_goal": {
     "start_date": "2026-10-15",
@@ -1250,6 +1493,10 @@
     "baseline_export": "practice/kanji-reading/app-exports/2026-10-14-summary.json",
     "session_in_progress": "N2-D01-baseline",
     "completed_sessions": 0,
-    "planning_file": "practice/kanji-reading/N2-30-day-plan-2026-10-15.md"
-  }
+    "planning_file": "practice/kanji-reading/N2-30-day-plan-2026-10-15.md",
+    "current_session_number": 1,
+    "last_practice_session": "N2-D01-BASELINE",
+    "last_practice_date": "2026-10-15"
+  },
+  "last_completed_practice_session": "N2-D01-BASELINE"
 }
