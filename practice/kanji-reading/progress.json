@@ -421,7 +421,7 @@
       "note": "Story-context counter (not a verified v32 focus card). Read いちほん; correct いっぽん (sound change いち＋ほん→いっぽん). Target pronunciation, not individual kanji mastery."
     },
     "下りる": {
-      "status": "weak",
+      "status": "familiar",
       "type": "kana",
       "last_lesson": "N2-D01-BASELINE",
       "note": "Story-context verb (not a verified v32 focus card). Read さがりる; correct おりる (to descend); distinguish 下がる（さがる）. Confirmed as an N4 kana+kanji entry in original APK. 2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall.",
@@ -431,7 +431,8 @@
       "last_practice_grade": "correct",
       "reading_verified": true,
       "meaning_verification": "correct",
-      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "phone_state_sync_basis": "N2-D01-BASELINE reading and meaning both correct. Provisional familiar, not mastered."
     },
     "開かれる": {
       "status": "weak",
@@ -473,7 +474,7 @@
       "note": "Read みち correctly; included in self-described weak list due to uncertainty. Feedback 2026-10-14."
     },
     "通る": {
-      "status": "weak",
+      "status": "familiar",
       "last_lesson": "N2-D01-BASELINE",
       "source_level": "N4",
       "observed_surface": "通って",
@@ -485,7 +486,8 @@
       "last_practice_grade": "correct",
       "reading_verified": true,
       "meaning_verification": "correct",
-      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "phone_state_sync_basis": "N2-D01-BASELINE reading and meaning both correct. Provisional familiar, not mastered."
     },
     "走り出す": {
       "status": "weak",
@@ -504,7 +506,7 @@
       "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
     },
     "中止": {
-      "status": "weak",
+      "status": "familiar",
       "last_lesson": "N2-D01-BASELINE",
       "source_level": "N4",
       "observed_surface": "中止",
@@ -516,7 +518,8 @@
       "last_practice_grade": "correct",
       "reading_verified": true,
       "meaning_verification": "correct",
-      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "phone_state_sync_basis": "N2-D01-BASELINE reading and meaning both correct. Provisional familiar, not mastered."
     },
     "無事": {
       "status": "weak",
@@ -557,7 +560,7 @@
       "note": "Review 通る inflection; required lookup in this passage. 2026-10-14."
     },
     "用紙": {
-      "status": "weak",
+      "status": "familiar",
       "last_lesson": "N2-D01-BASELINE",
       "reported_surface": "用紙",
       "source_level": "N4",
@@ -571,7 +574,8 @@
       "last_practice_grade": "correct",
       "reading_verified": true,
       "meaning_verification": "correct",
-      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "phone_state_sync_basis": "N2-D01-BASELINE reading and meaning both correct. Provisional familiar, not mastered."
     },
     "特色": {
       "status": "weak",
@@ -605,7 +609,7 @@
       "note": "Did not recognize or was unsure of word in N4 Story 003; app previously labeled unknown. 金 itself not separately tested. Learner report 2026-10-14."
     },
     "屋外": {
-      "status": "weak",
+      "status": "familiar",
       "last_lesson": "N2-D01-BASELINE",
       "reported_surface": "屋外",
       "source_level": "N4",
@@ -619,7 +623,8 @@
       "last_practice_grade": "correct",
       "reading_verified": true,
       "meaning_verification": "correct",
-      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "phone_state_sync_basis": "N2-D01-BASELINE reading and meaning both correct. Provisional familiar, not mastered."
     },
     "歌手": {
       "status": "weak",
@@ -634,7 +639,7 @@
       "note": "Word-level N4 reading/meaning gap; practice in future story. Learner report 2026-10-14."
     },
     "飲料": {
-      "status": "weak",
+      "status": "familiar",
       "last_lesson": "N2-D01-BASELINE",
       "reported_surface": "飲料",
       "source_level": "N4",
@@ -648,7 +653,8 @@
       "last_practice_grade": "correct",
       "reading_verified": true,
       "meaning_verification": "correct",
-      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "phone_state_sync_basis": "N2-D01-BASELINE reading and meaning both correct. Provisional familiar, not mastered."
     },
     "広がる": {
       "status": "weak",
