@@ -1,4 +1,6 @@
 # Kanji Reading Practice (from Kanji Recall v32)
+> **Current curriculum override (2026-10-15):** The learner explicitly advanced the overall study ceiling from N4 to **N2** for an N5–N2 30-day reading-and-meaning program. Older N4 gating paragraphs below describe historical lessons, not the current ceiling. N1 remains excluded. Keep compound and kanji+kana targets independent, with no component-kanji demotion from a whole-word miss. See `N2-30-day-plan-2026-10-15.md`, `sessions/2026-10-15-N2-baseline.json`, `word-review-stats.json`, and `progress.json`.
+
 
 This is a cumulative, feedback-driven **reading-only** track. The learner reads Japanese stories without furigana, romaji, or translations. After the learner reports unknown or difficult kanji, explain the *specific* characters/words (reading, meaning, and an example), and **commit the feedback to `progress.json` on GitHub** before selecting the next lesson.
 
