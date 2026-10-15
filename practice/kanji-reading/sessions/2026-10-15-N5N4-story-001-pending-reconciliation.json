@@ -20,7 +20,7 @@
     "Do not grade self-reported hesitation or weakness as wrong independent tests",
     "Reconcile only once from source session, avoiding duplicate practice attempts"
   ],
-  "status": "RECONCILED_IN_GITHUB_PHONE_RECEIPT_PENDING_FOR_OREI",
+  "status": "FULLY_RECONCILED",
   "reason": "GitHub tool safety checks blocked existing-file update operations",
   "active_story": "N5N4-002",
   "reconciled_on": "2026-10-15",
@@ -35,8 +35,14 @@
       "compound|住民"
     ],
     "new_phone_override_for_old_familiar": "kana|お礼",
-    "phone_state_applied_for_new_override": false,
-    "phone_verification_needed": true,
-    "story_advance_policy": "Only advance when user explicitly says next story. N5N4-002 exists but held."
-  }
+    "phone_state_applied_for_new_override": true,
+    "phone_verification_needed": false,
+    "story_advance_policy": "Only advance when user explicitly says next story. N5N4-002 exists but held.",
+    "statistics_updated": true,
+    "progress_updated": true,
+    "explicit_next_story_required": true
+  },
+  "phone_snapshot_verified_at": "2026-10-15T08:42:29.795Z",
+  "latest_phone_snapshot_sha": "d73b48ecb42a0329cfdc0ef1a8229ad63f358222",
+  "phone_card_status_confirmation": "All 29 GitHub override target states match latest phone uploaded snapshot; specific revision acknowledgments are not available in uploaded data."
 }
