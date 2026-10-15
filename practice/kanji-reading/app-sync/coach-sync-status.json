@@ -3,20 +3,21 @@
   "lastReconciledDate": "2026-10-15",
   "sourceSnapshot": {
     "file": "practice/kanji-reading/app-sync/current.json",
-    "sha": "d11d1b5b2fd36fadcf1bedb2c65d0ba9cd645b99",
-    "generatedAt": "2026-10-15T07:45:26.174Z"
+    "sha": "d73b48ecb42a0329cfdc0ef1a8229ad63f358222",
+    "generatedAt": "2026-10-15T08:42:29.795Z"
   },
   "coachToPhone": {
     "file": "practice/kanji-reading/app-sync/overrides.json",
-    "sha": "316c6aaef37b37900100662ad50f5a6a8b187ea6",
-    "commit": "c1966b7589ca02aac3995ea8fe059b62c2da8922",
-    "pendingOverrides": 28,
+    "sha": "89dd077f581df2e5136cf425ed51e85f24e86644",
+    "commit": "619cf10a5f06335f02744fb66fe3a839e6ba102b",
+    "pendingOverrides": 0,
     "weak": 22,
     "familiar": 6,
     "phoneReceiptVerified": true,
     "awaitingNextPhoneSync": false,
-    "verifiedMatchingStates": 28,
-    "verificationMethod": "Newer phone-uploaded current.json shows all 28 exact-card memoryState values matching overrides; revision IDs are not exposed by snapshot, so applied revisions cannot independently be proven."
+    "verifiedMatchingStates": 29,
+    "verificationMethod": "Newer phone-uploaded current.json contains exact target memoryState equal to all 29 override states, including kana|お礼. Revision metadata is not in snapshot and is not separately verified.",
+    "appliedStateMatchCount": 29
   },
   "recentStoryFeedback": {
     "weakWordTargets": 33,
@@ -42,7 +43,7 @@
     "No override for kana|開く because the card's あく reading differs from the story's 開いて sense.",
     "Phone uploads current snapshot before applying overrides; user may need two Sync now taps. Verify a future uploaded snapshot before claiming applied."
   ],
-  "lastKnownStatus": "newer_phone_snapshot_matches_all_28_intended_states",
+  "lastKnownStatus": "latest_phone_uploaded_states_match_all_29_overrides",
   "lastVerifiedDate": "2026-10-15",
   "activeCurriculum": {
     "examCeiling": "N2",
@@ -53,5 +54,12 @@
     "newStory": "N5N4-001",
     "phoneN5N4WeakUnknown": 447,
     "notes": "User explicitly prioritized N5/N4 before new N3/N2; no phone override added for new story exposure."
-  }
+  },
+  "latestCompletedStory": "N5N4-001",
+  "latestStoryFeedbackWords": 11,
+  "latestStoryGradedQuestions": 0,
+  "activeStory": null,
+  "nextStoryOnHold": "N5N4-002",
+  "autoAdvance": false,
+  "phoneUnknownVsWeak": "compound|多数 and compound|住民 were already changed to weak by newer phone evidence; no duplicate override required."
 }
