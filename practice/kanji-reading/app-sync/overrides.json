@@ -1,7 +1,63 @@
 {
   "format": "kanji-recall-state-overrides",
   "schemaVersion": 1,
-  "updatedAt": "2026-10-14",
+  "updatedAt": "2026-10-15",
   "notes": "Each override uses a targetType|target key and a unique revision. Device applies each revision only once; remote change does not count as a flashcard attempt.",
-  "overrides": {}
+  "overrides": {
+    "compound|理由": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-001",
+      "reason": "Reported difficult in story N2-001 after earlier phone familiar rating."
+    },
+    "kana|腰掛ける": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-002",
+      "reason": "Reported difficult as 腰掛 in story N2-001; exact full app card."
+    },
+    "kana|混じる": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-003",
+      "reason": "Reported difficult in story N2-001; exact full app card."
+    },
+    "compound|特色": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-004",
+      "reason": "Previously misread; N2 baseline reading correct but meaning incomplete."
+    },
+    "compound|借金": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-005",
+      "reason": "Explicit difficulty reported in N4-003; earlier phone rating unknown."
+    },
+    "compound|主人": {
+      "state": "familiar",
+      "revision": "coach-20261015-s3-v33-006",
+      "reason": "Correct reading and meaning in graded N2 baseline; recent hesitant recall."
+    },
+    "compound|飲料": {
+      "state": "familiar",
+      "revision": "coach-20261015-s3-v33-007",
+      "reason": "Correct reading and meaning in graded N2 baseline after older difficulty."
+    },
+    "compound|用紙": {
+      "state": "familiar",
+      "revision": "coach-20261015-s3-v33-008",
+      "reason": "Correct reading and meaning in graded N2 baseline after older difficulty."
+    },
+    "compound|屋外": {
+      "state": "familiar",
+      "revision": "coach-20261015-s3-v33-009",
+      "reason": "Correct reading and meaning in graded N2 baseline after older difficulty."
+    },
+    "compound|中止": {
+      "state": "familiar",
+      "revision": "coach-20261015-s3-v33-010",
+      "reason": "Correct reading and meaning in graded N2 baseline after older difficulty."
+    },
+    "kana|通る": {
+      "state": "familiar",
+      "revision": "coach-20261015-s3-v33-011",
+      "reason": "Correct reading and meaning in graded N2 baseline after older difficulty."
+    }
+  }
 }
