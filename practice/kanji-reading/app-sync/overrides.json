@@ -58,6 +58,91 @@
       "state": "familiar",
       "revision": "coach-20261015-s3-v33-011",
       "reason": "Correct reading and meaning in graded N2 baseline after older difficulty."
+    },
+    "compound|事件": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-012",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N3 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "compound|資料": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-013",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N3 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "compound|突然": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-014",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N3 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "compound|最後": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-015",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N3 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "compound|調子": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-016",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N3 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "compound|調査": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-017",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N2 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "compound|状況": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-018",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N2 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "compound|連絡": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-019",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N2 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "compound|改札": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-020",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N2 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "compound|機械": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-021",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N2 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "compound|一枚": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-022",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N2 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "kana|現れる": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-023",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N3 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "kana|受け取る": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-024",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N3 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "kana|叫ぶ": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-025",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N3 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "kana|写る": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-026",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N2 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "kana|散らかる": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-027",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N2 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "kana|飛び込む": {
+      "state": "weak",
+      "revision": "coach-20261015-s3-v33-028",
+      "reason": "Directly reported difficult in story N2-001/N2-002; exact N2 embedded source card confirmed. This override does not count as a flashcard attempt."
     }
   }
 }
