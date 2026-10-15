@@ -2,7 +2,7 @@
   "version": 1,
   "source": "Kanji Recall v32",
   "current_level": "N2",
-  "last_lesson": "N2-001",
+  "last_lesson": "N2-002",
   "states": [
     "strong",
     "familiar",
@@ -723,28 +723,50 @@
       "word_review_stats_file": "practice/kanji-reading/word-review-stats.json"
     },
     "混じる": {
-      "status": "unknown",
+      "status": "weak",
       "type": "kana",
       "source_level": "N2",
-      "last_lesson": "N2-D01-BASELINE",
+      "last_lesson": "N2-001",
       "last_practice_date": "2026-10-15",
-      "last_practice_grade": "unknown",
+      "last_practice_grade": "self_report_weak",
       "reading_verified": false,
       "meaning_verification": "unknown",
       "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
-      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown.\n2026-10-15 N2-001: learner explicitly reported \"混じる\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only.",
+      "reported_surface": "混じる",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "混じる",
+        "canonical_target": "混じる",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      }
     },
     "調査": {
-      "status": "unknown",
+      "status": "weak",
       "type": "compound",
       "source_level": "N2",
-      "last_lesson": "N2-D01-BASELINE",
+      "last_lesson": "N2-001",
       "last_practice_date": "2026-10-15",
-      "last_practice_grade": "unknown",
+      "last_practice_grade": "self_report_weak",
       "reading_verified": false,
       "meaning_verification": "unknown",
       "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
-      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown.\n2026-10-15 N2-001: learner explicitly reported \"調査\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only.",
+      "reported_surface": "調査",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "調査",
+        "canonical_target": "調査",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      }
     },
     "片付く": {
       "status": "unknown",
@@ -759,16 +781,27 @@
       "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
     },
     "腰掛ける": {
-      "status": "unknown",
+      "status": "weak",
       "type": "kana",
       "source_level": "N2",
-      "last_lesson": "N2-D01-BASELINE",
+      "last_lesson": "N2-001",
       "last_practice_date": "2026-10-15",
-      "last_practice_grade": "unknown",
+      "last_practice_grade": "self_report_weak",
       "reading_verified": false,
       "meaning_verification": "unknown",
       "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
-      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown.\n2026-10-15 N2-001: learner explicitly reported \"腰掛\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only.",
+      "reported_surface": "腰掛",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "腰掛",
+        "canonical_target": "腰掛ける",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      }
     },
     "取り消す": {
       "status": "weak",
@@ -795,28 +828,50 @@
       "note": "2026-10-15 N2-D01-BASELINE: correct; reading=correct, meaning=correct. One correct attempt is not proof of mastery; wait for delayed recall."
     },
     "状況": {
-      "status": "unknown",
+      "status": "weak",
       "type": "compound",
       "source_level": "N2",
-      "last_lesson": "N2-D01-BASELINE",
+      "last_lesson": "N2-001",
       "last_practice_date": "2026-10-15",
-      "last_practice_grade": "unknown",
+      "last_practice_grade": "self_report_weak",
       "reading_verified": false,
       "meaning_verification": "unknown",
       "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
-      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown.\n2026-10-15 N2-001: learner explicitly reported \"状況\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only.",
+      "reported_surface": "状況",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "状況",
+        "canonical_target": "状況",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      }
     },
     "用いる": {
-      "status": "unknown",
+      "status": "weak",
       "type": "kana",
       "source_level": "N3",
-      "last_lesson": "N2-D01-BASELINE",
+      "last_lesson": "N2-001",
       "last_practice_date": "2026-10-15",
-      "last_practice_grade": "unknown",
+      "last_practice_grade": "self_report_weak",
       "reading_verified": false,
       "meaning_verification": "unknown",
       "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
-      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown.\n2026-10-15 N2-001: learner explicitly reported \"用いたら\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only.",
+      "reported_surface": "用いたら",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "用いたら",
+        "canonical_target": "用いる",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      }
     },
     "食べる": {
       "status": "familiar",
@@ -843,16 +898,27 @@
       "note": "2026-10-15 N2-D01-BASELINE: partial; reading=correct, meaning=partial. Reading correct but meaning incomplete."
     },
     "設備": {
-      "status": "unknown",
+      "status": "weak",
       "type": "compound",
       "source_level": "N2",
-      "last_lesson": "N2-D01-BASELINE",
+      "last_lesson": "N2-001",
       "last_practice_date": "2026-10-15",
-      "last_practice_grade": "unknown",
+      "last_practice_grade": "self_report_weak",
       "reading_verified": false,
       "meaning_verification": "unknown",
       "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
-      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+      "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown.\n2026-10-15 N2-001: learner explicitly reported \"設備\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only.",
+      "reported_surface": "設備",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "設備",
+        "canonical_target": "設備",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      }
     },
     "決める": {
       "status": "familiar",
@@ -877,6 +943,206 @@
       "meaning_verification": "unknown",
       "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
       "note": "2026-10-15 N2-D01-BASELINE: unknown; reading=unknown, meaning=unknown. Word explicitly unknown."
+    },
+    "理由": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-001",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "理由",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "理由",
+        "canonical_target": "理由",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-001: learner explicitly reported \"理由\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only."
+    },
+    "調子": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-001",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "調子",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "調子",
+        "canonical_target": "調子",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-001: learner explicitly reported \"調子\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only."
+    },
+    "箱": {
+      "status": "weak",
+      "type": "single-word",
+      "last_lesson": "N2-001",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "箱",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "箱",
+        "canonical_target": "箱",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-001: learner explicitly reported \"箱\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only."
+    },
+    "一枚": {
+      "status": "weak",
+      "type": "counter",
+      "last_lesson": "N2-001",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "一枚",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "一枚",
+        "canonical_target": "一枚",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-001: learner explicitly reported \"一枚\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only."
+    },
+    "写る": {
+      "status": "weak",
+      "type": "kana-kanji",
+      "last_lesson": "N2-001",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "写っていた",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "写っていた",
+        "canonical_target": "写る",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-001: learner explicitly reported \"写っていた\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only."
+    },
+    "機械": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-001",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "機械",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "機械",
+        "canonical_target": "機械",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-001: learner explicitly reported \"機械\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only."
+    },
+    "床": {
+      "status": "weak",
+      "type": "single-word",
+      "last_lesson": "N2-001",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "床",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "床",
+        "canonical_target": "床",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-001: learner explicitly reported \"床\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only."
+    },
+    "散らかる": {
+      "status": "weak",
+      "type": "kana-kanji",
+      "last_lesson": "N2-001",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "散らかった",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "散らかった",
+        "canonical_target": "散らかる",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-001: learner explicitly reported \"散らかった\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only."
+    },
+    "最後": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-001",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "最後",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "最後",
+        "canonical_target": "最後",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-001: learner explicitly reported \"最後\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only."
+    },
+    "開店": {
+      "status": "weak",
+      "type": "compound",
+      "last_lesson": "N2-001",
+      "last_practice_date": "2026-10-15",
+      "last_practice_grade": "self_report_weak",
+      "reported_surface": "開店",
+      "feedback_kind": "self_report_reading_or_meaning_unspecified",
+      "word_review_stats_file": "practice/kanji-reading/word-review-stats.json",
+      "latest_story_feedback": {
+        "lesson_id": "N2-001",
+        "date": "2026-10-15",
+        "reported_surface": "開店",
+        "canonical_target": "開店",
+        "reading_result": "unassessed",
+        "meaning_result": "unassessed",
+        "outcome": "weak"
+      },
+      "note": "2026-10-15 N2-001: learner explicitly reported \"開店\" as difficult in story reading; reading-versus-meaning failure not specified. Whole-word feedback only."
     }
   },
   "lesson_history": [
@@ -1291,7 +1557,7 @@
     {
       "lesson_id": "N2-001",
       "level": "N2",
-      "feedback_status": "awaiting_feedback",
+      "feedback_status": "completed",
       "session_type": "contextual_story",
       "date": "2026-10-15",
       "line_count": 10,
@@ -1315,13 +1581,212 @@
         "主人",
         "走り出す"
       ],
-      "word_status_changes_applied": false,
+      "word_status_changes_applied": true,
       "component_kanji_status_changes_applied": false,
       "method": "Learner reads without furigana, romaji, or translations; reports exact difficult words. After feedback, update whole-word tracking; next story carries exactly two prior focus targets and introduces new targets. No unsolicited vocabulary explanations.",
-      "note": "Current story is assigned but not scored. Do not infer any familiarity or mastery from its appearance."
+      "note": "16 explicitly self-reported weak word surfaces. No unsolicited meanings/readings and no blanket mastery for unreported story words. Exact surfaces preserved alongside canonical lemmas.",
+      "feedback_date": "2026-10-15",
+      "session_number": 2,
+      "reported_weak_vocabulary_count": 16,
+      "reported_difficulties": [
+        {
+          "reported_surface": "理由",
+          "target": "理由",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N3"
+        },
+        {
+          "reported_surface": "調査",
+          "target": "調査",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N2"
+        },
+        {
+          "reported_surface": "設備",
+          "target": "設備",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N2"
+        },
+        {
+          "reported_surface": "調子",
+          "target": "調子",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N3"
+        },
+        {
+          "reported_surface": "箱",
+          "target": "箱",
+          "type": "single-word",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N3"
+        },
+        {
+          "reported_surface": "腰掛",
+          "target": "腰掛ける",
+          "type": "kana-kanji",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N2"
+        },
+        {
+          "reported_surface": "状況",
+          "target": "状況",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N2"
+        },
+        {
+          "reported_surface": "一枚",
+          "target": "一枚",
+          "type": "counter",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N2"
+        },
+        {
+          "reported_surface": "混じる",
+          "target": "混じる",
+          "type": "kana-kanji",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N2"
+        },
+        {
+          "reported_surface": "写っていた",
+          "target": "写る",
+          "type": "kana-kanji",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N4"
+        },
+        {
+          "reported_surface": "機械",
+          "target": "機械",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N2"
+        },
+        {
+          "reported_surface": "用いたら",
+          "target": "用いる",
+          "type": "kana-kanji",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N4"
+        },
+        {
+          "reported_surface": "床",
+          "target": "床",
+          "type": "single-word",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N2"
+        },
+        {
+          "reported_surface": "散らかった",
+          "target": "散らかる",
+          "type": "kana-kanji",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N3"
+        },
+        {
+          "reported_surface": "最後",
+          "target": "最後",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N3"
+        },
+        {
+          "reported_surface": "開店",
+          "target": "開店",
+          "type": "compound",
+          "status": "weak",
+          "feedback_kind": "self_report_reading_or_meaning_unspecified",
+          "reading_result": "unassessed",
+          "meaning_result": "unassessed",
+          "character_level_ceiling": "N4"
+        }
+      ],
+      "session_file": "practice/kanji-reading/sessions/2026-10-15-N2-story-001.json"
+    },
+    {
+      "lesson_id": "N2-002",
+      "level": "N2",
+      "feedback_status": "awaiting_feedback",
+      "session_type": "contextual_story",
+      "date": "2026-10-15",
+      "line_count": 10,
+      "story_path": "practice/kanji-reading/stories/N2-002.md",
+      "carryover_targets": [
+        "調査",
+        "混じる"
+      ],
+      "new_focus_targets": [
+        "地下鉄",
+        "運転",
+        "放送",
+        "事情",
+        "研究者",
+        "協力",
+        "行動",
+        "改札",
+        "資料",
+        "確認",
+        "突然",
+        "降り始める",
+        "受け取る",
+        "連絡",
+        "飛び込む"
+      ],
+      "word_status_changes_applied": false,
+      "component_kanji_status_changes_applied": false,
+      "note": "Two previous weak whole-word targets, with new N5–N2 vocabulary. No scoring until learner feedback."
     }
   ],
-  "last_completed_lesson": "N5-001",
+  "last_completed_lesson": "N2-001",
   "level_transitions": [
     {
       "date": "2026-10-14",
@@ -1344,17 +1809,27 @@
   "next_lesson_priorities": {
     "level": "N2",
     "prioritize_weak_vocabulary": [
-      "特色",
-      "混じる",
+      "理由",
       "調査",
-      "片付く",
+      "設備",
+      "調子",
+      "箱",
       "腰掛ける",
-      "取り消す",
       "状況",
+      "一枚",
+      "混じる",
+      "写る",
+      "機械",
       "用いる",
+      "床",
+      "散らかる",
+      "最後",
+      "開店",
+      "特色",
+      "片付く",
+      "取り消す",
       "帰す",
       "走り出す",
-      "設備",
       "超える",
       "休業",
       "用紙",
@@ -1403,19 +1878,25 @@
       "下りる"
     ],
     "policy": "All N5–N2 permitted; N1 prohibited. Whole-word assessment controls review; do not change independent character status from compound mistakes.",
-    "active_lesson": "N2-001",
+    "active_lesson": "N2-002",
     "reviewing_now": [
-      "特色",
-      "休業",
       "調査",
-      "設備",
-      "取り消す",
-      "腰掛ける",
-      "状況",
       "混じる",
-      "用いる",
-      "帰す",
-      "片付く"
+      "地下鉄",
+      "運転",
+      "放送",
+      "事情",
+      "研究者",
+      "協力",
+      "行動",
+      "改札",
+      "資料",
+      "確認",
+      "突然",
+      "降り始める",
+      "受け取る",
+      "連絡",
+      "飛び込む"
     ],
     "app_unknown_now": [
       "特色",
@@ -1433,7 +1914,7 @@
       "夕日",
       "通る"
     ],
-    "next_requested": "N2-002",
+    "next_requested": "N2-003",
     "n5_component_review_without_single_char_demotion": [
       "金",
       "外"
@@ -1533,7 +2014,7 @@
     "last_practice_session": "N2-D01-BASELINE",
     "last_practice_date": "2026-10-15"
   },
-  "last_completed_practice_session": "N2-D01-BASELINE",
+  "last_completed_practice_session": "N2-001",
   "story_review_workflow": {
     "on_story_assignment": "No grading from merely appearing; mark awaiting feedback.",
     "on_learner_feedback": "Record only the exact reported words, distinguishing unknown reading, unknown meaning and hesitation when supplied; do not change individual kanji statuses from compound errors.",
