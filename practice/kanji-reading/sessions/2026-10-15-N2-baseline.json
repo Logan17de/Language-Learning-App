@@ -833,6 +833,9 @@
     ],
     "minimum_intervening_targets": 3
   },
-  "story_review_status": "Generated in conversation after results",
-  "preserve_app_snapshot": true
+  "story_review_status": "created_and_character_level_checked",
+  "preserve_app_snapshot": true,
+  "story_review_file": "practice/kanji-reading/stories/N2-D01-review.md",
+  "story_review_lines": 10,
+  "story_kanji_limit": "N5-N2 only (index-validated)"
 }
