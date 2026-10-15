@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "lastReconciledDate": "2026-10-15",
+  "sourceSnapshot": {
+    "file": "practice/kanji-reading/app-sync/current.json",
+    "sha": "8f4a02797a78229d2f74292bbf0d5e6704feec58",
+    "generatedAt": "2026-10-15T06:54:36.955Z"
+  },
+  "coachToPhone": {
+    "file": "practice/kanji-reading/app-sync/overrides.json",
+    "sha": "316c6aaef37b37900100662ad50f5a6a8b187ea6",
+    "commit": "c1966b7589ca02aac3995ea8fe059b62c2da8922",
+    "pendingOverrides": 28,
+    "weak": 22,
+    "familiar": 6,
+    "phoneReceiptVerified": false,
+    "awaitingNextPhoneSync": true
+  },
+  "recentStoryFeedback": {
+    "weakWordTargets": 33,
+    "catalogMatchedFullWordCards": 25,
+    "alreadyPhoneWeak": 5,
+    "overrideWeakChangesForRecentWords": 20,
+    "noExactFullWordCard": [
+      "設備",
+      "箱",
+      "床",
+      "開店",
+      "勝手",
+      "行動",
+      "粉",
+      "本部"
+    ],
+    "note": "Absent from latest phone snapshot does not mean absent from embedded APK. All N5-N2 compound/kana catalog files were checked. Standalone single-kanji card state is not modified from contextual noun difficulty."
+  },
+  "decisionNotes": [
+    "No current.json edits. This is phone-owned.",
+    "No phone button press is graded as a correct or incorrect reading/meaning.",
+    "Provisional familiar from a fully correct recent graded word answer, not mastery.",
+    "No override for kana|開く because the card's あく reading differs from the story's 開いて sense.",
+    "Phone uploads current snapshot before applying overrides; user may need two Sync now taps. Verify a future uploaded snapshot before claiming applied."
+  ],
+  "lastKnownStatus": "committed_to_github_not_verified_on_phone"
+}
