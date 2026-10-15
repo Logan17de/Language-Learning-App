@@ -1,0 +1,991 @@
+{
+  "schema_version": 1,
+  "scope": "whole-vocabulary-only",
+  "authoritative_note": "Counts are from recorded practice attempts after this ledger was created; historical app labels are preserved as context, not fabricated attempts.",
+  "last_updated": "2026-10-15",
+  "current_session_number": 1,
+  "total_recorded_sessions": 1,
+  "words": {
+    "特色": {
+      "type": "compound",
+      "source_level": "N4",
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 1,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 75,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "critical_based_on_one_assessment",
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "unknown"
+      },
+      "scheduled_review_sessions": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "partial",
+          "reading": "correct",
+          "meaning": "partial"
+        }
+      ]
+    },
+    "混じる": {
+      "type": "kana-kanji",
+      "source_level": "N2",
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 1,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 1,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 0,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "critical_based_on_one_assessment",
+      "app_memory_at_export": {
+        "level": "N2",
+        "status": "unknown"
+      },
+      "scheduled_review_sessions": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "unknown",
+          "reading": "unknown",
+          "meaning": "unknown"
+        }
+      ]
+    },
+    "下りる": {
+      "type": "kana-kanji",
+      "source_level": "N4",
+      "total_appearances": 1,
+      "correct_answers": 1,
+      "incorrect_answers": 0,
+      "success_rate_percent": 100,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 1,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": "2026-10-15",
+      "last_incorrect_date": null,
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 100,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "provisional_correct_not_mastered",
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "familiar"
+      },
+      "scheduled_review_sessions": [
+        8,
+        15,
+        31
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "correct",
+          "reading": "correct",
+          "meaning": "correct"
+        }
+      ]
+    },
+    "主人": {
+      "type": "compound",
+      "source_level": "N4",
+      "total_appearances": 1,
+      "correct_answers": 1,
+      "incorrect_answers": 0,
+      "success_rate_percent": 100,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 1,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": "2026-10-15",
+      "last_incorrect_date": null,
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 100,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "provisional_correct_not_mastered",
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "weak"
+      },
+      "scheduled_review_sessions": [
+        8,
+        15,
+        31
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "correct",
+          "reading": "correct",
+          "meaning": "correct"
+        }
+      ]
+    },
+    "飲料": {
+      "type": "compound",
+      "source_level": "N4",
+      "total_appearances": 1,
+      "correct_answers": 1,
+      "incorrect_answers": 0,
+      "success_rate_percent": 100,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 1,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": "2026-10-15",
+      "last_incorrect_date": null,
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 100,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "provisional_correct_not_mastered",
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "weak"
+      },
+      "scheduled_review_sessions": [
+        8,
+        15,
+        31
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "correct",
+          "reading": "correct",
+          "meaning": "correct"
+        }
+      ]
+    },
+    "調査": {
+      "type": "compound",
+      "source_level": "N2",
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 1,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 1,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 0,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "critical_based_on_one_assessment",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "unknown",
+          "reading": "unknown",
+          "meaning": "unknown"
+        }
+      ]
+    },
+    "片付く": {
+      "type": "kana-kanji",
+      "source_level": "N2",
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 1,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 1,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 0,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "critical_based_on_one_assessment",
+      "app_memory_at_export": {
+        "level": "N2",
+        "status": "weak"
+      },
+      "scheduled_review_sessions": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "unknown",
+          "reading": "unknown",
+          "meaning": "unknown"
+        }
+      ]
+    },
+    "日本語": {
+      "type": "compound",
+      "source_level": "N5",
+      "total_appearances": 1,
+      "correct_answers": 1,
+      "incorrect_answers": 0,
+      "success_rate_percent": 100,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 1,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": "2026-10-15",
+      "last_incorrect_date": null,
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 100,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "provisional_correct_not_mastered",
+      "app_memory_at_export": {
+        "level": "N5",
+        "status": "mastered"
+      },
+      "scheduled_review_sessions": [
+        8,
+        15,
+        31
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "correct",
+          "reading": "correct",
+          "meaning": "correct"
+        }
+      ]
+    },
+    "用紙": {
+      "type": "compound",
+      "source_level": "N4",
+      "total_appearances": 1,
+      "correct_answers": 1,
+      "incorrect_answers": 0,
+      "success_rate_percent": 100,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 1,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": "2026-10-15",
+      "last_incorrect_date": null,
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 100,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "provisional_correct_not_mastered",
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "unknown"
+      },
+      "scheduled_review_sessions": [
+        8,
+        15,
+        31
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "correct",
+          "reading": "correct",
+          "meaning": "correct"
+        }
+      ]
+    },
+    "腰掛ける": {
+      "type": "kana-kanji",
+      "source_level": "N2",
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 1,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 1,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 0,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "critical_based_on_one_assessment",
+      "app_memory_at_export": {
+        "level": "N2",
+        "status": "unknown"
+      },
+      "scheduled_review_sessions": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "unknown",
+          "reading": "unknown",
+          "meaning": "unknown"
+        }
+      ]
+    },
+    "取り消す": {
+      "type": "kana-kanji",
+      "source_level": "N2",
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 1,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 50,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "critical_based_on_one_assessment",
+      "app_memory_at_export": {
+        "level": "N2",
+        "status": "weak"
+      },
+      "scheduled_review_sessions": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "incorrect_meaning",
+          "reading": "correct",
+          "meaning": "incorrect"
+        }
+      ]
+    },
+    "会議": {
+      "type": "compound",
+      "source_level": "N4",
+      "total_appearances": 1,
+      "correct_answers": 1,
+      "incorrect_answers": 0,
+      "success_rate_percent": 100,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 1,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": "2026-10-15",
+      "last_incorrect_date": null,
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 100,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "provisional_correct_not_mastered",
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "familiar"
+      },
+      "scheduled_review_sessions": [
+        8,
+        15,
+        31
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "correct",
+          "reading": "correct",
+          "meaning": "correct"
+        }
+      ]
+    },
+    "休業": {
+      "type": "compound",
+      "source_level": "N4",
+      "total_appearances": 1,
+      "correct_answers": 1,
+      "incorrect_answers": 0,
+      "success_rate_percent": 100,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 1,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": "2026-10-15",
+      "last_incorrect_date": null,
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 100,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "provisional_correct_not_mastered",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        8,
+        15,
+        31
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "correct",
+          "reading": "correct",
+          "meaning": "correct"
+        }
+      ]
+    },
+    "状況": {
+      "type": "compound",
+      "source_level": "N2",
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 1,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 1,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 0,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "critical_based_on_one_assessment",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "unknown",
+          "reading": "unknown",
+          "meaning": "unknown"
+        }
+      ]
+    },
+    "用いる": {
+      "type": "kana-kanji",
+      "source_level": "N3",
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 1,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 1,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 0,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "critical_based_on_one_assessment",
+      "app_memory_at_export": {
+        "level": "N3",
+        "status": "weak"
+      },
+      "scheduled_review_sessions": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "unknown",
+          "reading": "unknown",
+          "meaning": "unknown"
+        }
+      ]
+    },
+    "食べる": {
+      "type": "kana-kanji",
+      "source_level": "N5",
+      "total_appearances": 1,
+      "correct_answers": 1,
+      "incorrect_answers": 0,
+      "success_rate_percent": 100,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 1,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": "2026-10-15",
+      "last_incorrect_date": null,
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 100,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "provisional_correct_not_mastered",
+      "app_memory_at_export": {
+        "level": "N5",
+        "status": "mastered"
+      },
+      "scheduled_review_sessions": [
+        8,
+        15,
+        31
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "correct",
+          "reading": "correct",
+          "meaning": "correct"
+        }
+      ]
+    },
+    "屋外": {
+      "type": "compound",
+      "source_level": "N4",
+      "total_appearances": 1,
+      "correct_answers": 1,
+      "incorrect_answers": 0,
+      "success_rate_percent": 100,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 1,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": "2026-10-15",
+      "last_incorrect_date": null,
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 100,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "provisional_correct_not_mastered",
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "weak"
+      },
+      "scheduled_review_sessions": [
+        8,
+        15,
+        31
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "correct",
+          "reading": "correct",
+          "meaning": "correct"
+        }
+      ]
+    },
+    "帰す": {
+      "type": "kana-kanji",
+      "source_level": "N2",
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 1,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 75,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "critical_based_on_one_assessment",
+      "app_memory_at_export": {
+        "level": "N2",
+        "status": "familiar"
+      },
+      "scheduled_review_sessions": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "partial",
+          "reading": "correct",
+          "meaning": "partial"
+        }
+      ]
+    },
+    "走り出す": {
+      "type": "kana-kanji",
+      "source_level": "N4",
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 0,
+      "meaning_partial": 1,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 75,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "critical_based_on_one_assessment",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "partial",
+          "reading": "correct",
+          "meaning": "partial"
+        }
+      ]
+    },
+    "設備": {
+      "type": "compound",
+      "source_level": "N2",
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 1,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 1,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 0,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "critical_based_on_one_assessment",
+      "app_memory_at_export": null,
+      "scheduled_review_sessions": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "unknown",
+          "reading": "unknown",
+          "meaning": "unknown"
+        }
+      ]
+    },
+    "中止": {
+      "type": "compound",
+      "source_level": "N4",
+      "total_appearances": 1,
+      "correct_answers": 1,
+      "incorrect_answers": 0,
+      "success_rate_percent": 100,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 1,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": "2026-10-15",
+      "last_incorrect_date": null,
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 100,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "provisional_correct_not_mastered",
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "unknown"
+      },
+      "scheduled_review_sessions": [
+        8,
+        15,
+        31
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "correct",
+          "reading": "correct",
+          "meaning": "correct"
+        }
+      ]
+    },
+    "決める": {
+      "type": "kana-kanji",
+      "source_level": "N4",
+      "total_appearances": 1,
+      "correct_answers": 1,
+      "incorrect_answers": 0,
+      "success_rate_percent": 100,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 1,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": "2026-10-15",
+      "last_incorrect_date": null,
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 100,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "provisional_correct_not_mastered",
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "familiar"
+      },
+      "scheduled_review_sessions": [
+        8,
+        15,
+        31
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "correct",
+          "reading": "correct",
+          "meaning": "correct"
+        }
+      ]
+    },
+    "超える": {
+      "type": "kana-kanji",
+      "source_level": "N2",
+      "total_appearances": 1,
+      "correct_answers": 0,
+      "incorrect_answers": 1,
+      "success_rate_percent": 0,
+      "reading_correct": 0,
+      "reading_incorrect": 1,
+      "meaning_correct": 0,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 1,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": null,
+      "last_incorrect_date": "2026-10-15",
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 0,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "critical_based_on_one_assessment",
+      "app_memory_at_export": {
+        "level": "N2",
+        "status": "unknown"
+      },
+      "scheduled_review_sessions": [
+        2,
+        4,
+        8,
+        15
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "unknown",
+          "reading": "unknown",
+          "meaning": "unknown"
+        }
+      ]
+    },
+    "通る": {
+      "type": "kana-kanji",
+      "source_level": "N4",
+      "total_appearances": 1,
+      "correct_answers": 1,
+      "incorrect_answers": 0,
+      "success_rate_percent": 100,
+      "reading_correct": 1,
+      "reading_incorrect": 0,
+      "meaning_correct": 1,
+      "meaning_partial": 0,
+      "meaning_incorrect": 0,
+      "meaning_unknown": 0,
+      "last_seen_date": "2026-10-15",
+      "last_correct_date": "2026-10-15",
+      "last_incorrect_date": null,
+      "forgetting_score": null,
+      "forgetting_note": "Not established from one independently scored attempt; historic app classification is not an attempt history.",
+      "confidence_score": 100,
+      "confidence_note": "Single-session immediate recall only; not a long-term retention estimate.",
+      "classification": "provisional_correct_not_mastered",
+      "app_memory_at_export": {
+        "level": "N4",
+        "status": "weak"
+      },
+      "scheduled_review_sessions": [
+        8,
+        15,
+        31
+      ],
+      "last_session_id": "N2-D01-BASELINE",
+      "attempt_history": [
+        {
+          "session_id": "N2-D01-BASELINE",
+          "date": "2026-10-15",
+          "grade": "correct",
+          "reading": "correct",
+          "meaning": "correct"
+        }
+      ]
+    }
+  }
+}
