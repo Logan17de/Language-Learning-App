@@ -143,6 +143,11 @@
       "state": "weak",
       "revision": "coach-20261015-s3-v33-028",
       "reason": "Directly reported difficult in story N2-001/N2-002; exact N2 embedded source card confirmed. This override does not count as a flashcard attempt."
+    },
+    "kana|お礼": {
+      "state": "weak",
+      "revision": "coach-20261015-n5n4-001-orei-1",
+      "reason": "Story N5N4-001 explicit difficulty, newer than older familiar phone rating."
     }
   }
 }
