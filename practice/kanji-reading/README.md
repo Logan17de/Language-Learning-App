@@ -2,7 +2,9 @@
 > **Current curriculum override (2026-10-15):** The learner explicitly advanced the overall study ceiling from N4 to **N2** for an N5–N2 30-day reading-and-meaning program. Older N4 gating paragraphs below describe historical lessons, not the current ceiling. N1 remains excluded. Keep compound and kanji+kana targets independent, with no component-kanji demotion from a whole-word miss. See `N2-30-day-plan-2026-10-15.md`, `sessions/2026-10-15-N2-baseline.json`, `word-review-stats.json`, and `progress.json`.
 
 
-This is a cumulative, feedback-driven **reading-only** track. The learner reads Japanese stories without furigana, romaji, or translations. After the learner reports unknown or difficult kanji, explain the *specific* characters/words (reading, meaning, and an example), and **commit the feedback to `progress.json` on GitHub** before selecting the next lesson.
+**Active story workflow (2026-10-15):** Story first, learner reports weaknesses, then GitHub stats update, then next story. Story `stories/N2-001.md` is awaiting feedback and is not a completed practice result. N2 is the current authorized ceiling; N1 is excluded.
+
+This is a cumulative, feedback-driven **reading-only** track. The learner reads Japanese stories without furigana, romaji, or translations. After the learner reports difficult words, **record only the exact full-word vocabulary targets** (kanji+kana forms and compounds are assessed independently), update GitHub progress and review statistics, then select the next story. **Do not explain readings or meanings unless explicitly asked**; the learner studies weak words independently. Carry exactly two target vocabulary words into each next story, mixed with fresh targets and supporting familiar material. A compound mistake never automatically changes the status of its constituent individual kanji.
 
 ## Source and rules
 
