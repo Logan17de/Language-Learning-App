@@ -78,7 +78,7 @@
       ],
       "status": "weak",
       "firstMarkedDate": "2026-10-07",
-      "nextReviewDate": "2026-10-10",
+      "nextReviewDate": "2026-10-24",
       "evidence": [
         {
           "question": 184,
@@ -87,9 +87,33 @@
         {
           "question": 199,
           "note": "Selected ので where unexpected contrast のに was required: only 20 years old, yet already a company leader."
+        },
+        {
+          "date": "2026-10-21",
+          "batch": "N5 comprehensive review batch 1",
+          "question": 1,
+          "note": "Selected ので for even-though contrast; intended のに."
         }
       ],
-      "reviewGuidance": "Contrast direct cause/result (ので) with expectation-breaking 'even though/yet' (のに). Use paired sentences where only the semantic relationship changes."
+      "reviewGuidance": "Contrast direct cause/result (ので) with expectation-breaking 'even though/yet' (のに). Use paired sentences where only the semantic relationship changes.",
+      "lastReviewedDate": "2026-10-21"
+    },
+    {
+      "id": "tagaru-2026-10-21",
+      "level": "N5",
+      "pattern": "たがる",
+      "status": "needs_review",
+      "firstMarkedDate": "2026-10-21",
+      "nextReviewDate": "2026-10-24",
+      "evidence": [
+        {
+          "date": "2026-10-21",
+          "batch": "N5 comprehensive review batch 1",
+          "question": 3,
+          "note": "Selected たいで rather than たがって in 妹は外で遊び＿＿います. Single observed error, not yet evidence of a persistent weakness."
+        }
+      ],
+      "reviewGuidance": "Test たい (speaker's own wish) against たがる (third person's apparent desire), including formation たがっている; check whether it is a grammar or careless-selection mistake."
     }
   ]
 }
