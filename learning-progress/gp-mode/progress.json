@@ -621,5 +621,82 @@
     "vocabularyGlosses": "Give English definitions of kanji-bearing vocabulary from stems and options without revealing the grammar choice",
     "waitForUnderstandingAfterMistake": true,
     "ambiguityPolicy": "Avoid items where multiple choices are defensible; do not score ambiguous items"
+  },
+  "comprehensiveN5Review": {
+    "totalPatterns": 82,
+    "targetQuestions": 100,
+    "batches": [
+      {
+        "date": "2026-10-21",
+        "batchNumber": 1,
+        "questions": 10,
+        "correct": 8,
+        "accuracy": 0.8,
+        "answers": [
+          "A",
+          "A",
+          "B",
+          "A",
+          "A",
+          "A",
+          "A",
+          "A",
+          "A",
+          "A"
+        ],
+        "answerKey": [
+          "B",
+          "A",
+          "A",
+          "A",
+          "A",
+          "A",
+          "A",
+          "A",
+          "A",
+          "A"
+        ],
+        "patternPositions": [
+          31,
+          66,
+          57,
+          35,
+          74,
+          11,
+          22,
+          39,
+          78,
+          52
+        ],
+        "incorrect": [
+          {
+            "question": 1,
+            "pattern": "のに vs ので",
+            "selected": "ので",
+            "correct": "のに"
+          },
+          {
+            "question": 3,
+            "pattern": "たがる",
+            "selected": "たいで",
+            "correct": "たがって"
+          }
+        ],
+        "notes": "Q10 accepted as correct (ませんか); ますか is conversationally possible but was not selected. Stop after feedback until learner confirms understanding.",
+        "awaitingUnderstandingConfirmation": true
+      }
+    ],
+    "coveredPositions": [
+      11,
+      22,
+      31,
+      35,
+      39,
+      52,
+      57,
+      66,
+      74,
+      78
+    ]
   }
 }
