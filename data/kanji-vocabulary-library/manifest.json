@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-10-24T10:33:53.276760+00:00",
+  "levels": {
+    "N5": {
+      "kanji": 860,
+      "vocabs": 185
+    },
+    "N4": {
+      "kanji": 727,
+      "vocabs": 174
+    },
+    "N3": {
+      "kanji": 1519,
+      "vocabs": 474
+    },
+    "N2": {
+      "kanji": 1018,
+      "vocabs": 858
+    },
+    "N1": {
+      "kanji": 1560,
+      "vocabs": 1775
+    }
+  },
+  "totals": {
+    "kanji": 5684,
+    "vocabs": 3466
+  },
+  "unique_written_entries": 9150,
+  "duplicate_written_entries": 0,
+  "deduplication": "Unicode-normalized written form across all levels and categories. Kanji category takes priority for overlaps; earliest study level retained; readings and meanings merged."
+}
